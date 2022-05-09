@@ -1,0 +1,10 @@
+# Assembler list and symbol files (a09, as65, asm6809 etc) 
+*.lst
+*.lis
+*.sym
+
+# Textpad text editor workspace file
+*.tws
+
+# Excel temp files
+~$*.xls*

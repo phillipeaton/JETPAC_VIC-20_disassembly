@@ -1,0 +1,7 @@
+*.a65 linguist-language=Assembly
+*.asm linguist-language=Assembly
+
+*.vsf binary
+*.bin binary
+*.prg binary
+
