@@ -2,6 +2,12 @@
 
 A reverse-engineering to 6502 assembly source code of the classic VIC-20 game, JETPAC, by ULTIMATE PLAY THE GAME.
 
+## Status
+
+I'm right at the start, just putting the tools together and getting to a point where the binary can be disassembled by dasmfw and reassembled by as65 to an identical binary.
+
+Next steps are to configure VICE or MAME for interactive debugging.
+
 ## Why bother?
 
 JETPAC was one of my favourite games on the VIC-20 in the early '80s, the smooth movement of the sprites and execellent gameplay mechanics made it a standout title.
