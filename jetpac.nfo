@@ -1,63 +1,51 @@
-option upmnemo off * upper case mnemonics in output file
-*option forceaddr off * To handle forced direct / extended addressing
-*option addr on
-*option hex on
-*option asc on
-*option cref on   * show cross-referece table
-*option unused on * show unused labels
-*option conv on   * Convenience mnemonics
+*** GENERAL COMMAND LINE OPTIONS ***
+option dasm 6502                * Select disassembler type
+option out jetpac.a65           * Select output filename of dissasembly
 
+*** OUTPUT FORMATTING OPTIONS ***
+*option addr on      * Show address field output for clean assembler source files
+*option hex on       * Show hex dump output
+*option asc on       * Show output of the ASCII equivalent to code/data
+*option cref on      * Show cross-referece table
+*option unused on    * Show unused labels
+*option labellen 32  * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
+option eqlbllen 32   * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
+*option copndlen 22  * Reserve space in this length for the operand part of a disassembled instruction with a line comment
+
+*** DISASSEMBLER OPTIONS ***
+*option offset 2000  * NOT WORKING Select start address of supplied binary
+*option pbase 16     * Default parsing base, default is 16
+*option defdisp hex  * Default display base, default is hex
 *option cchar //
 *option cchar ;
-*option pbase 16    * Default parsing base, default is 16
-*option defdisp hex * Default display base, default is hex
+option upmnemo off   * Upper case mnemonics in output file
 
-*option copndlen 22  * Reserve space in this length for the operand part of a disassembled instruction with a line comment
-option eqlbllen 32  * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
-*option labellen 32  * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
+*** DISASSEMBLER SPECIFIC OPTIONS ***
+*option conv on        * Convenience mnemonics
+*option forceaddr off  * To handle forced direct / extended addressing
 
-*insert \ SETLI 128 ; a09 Assembler. Sets the line length for listings; nnn is the number of columns that can be printed in a line (40-2000).
-*insert \ processor 6502 ; DASM Assembler?
+******************************************************************************
+*If you think about it, there are various kinds of mutually exclusive options
+*for a memory cell. These are:
+*type (unused / code / data / rmb)
+*size (default char / word; dasmfw also has dword for processors that support 4-byte entities)
+*formatting (bin / char / dec / hex)
+*semantics (const)
+******************************************************************************
+
+*** INFO FILE INSTRUCTIONS ***
+file jetpac_2000-3fff.bin 2000  * Instructs dasmfw to load the given file at the given address
+include memory_map.nfo             * Include VIC-20 memory map info
+*insert \ SETLI 128      * a09 Assembler. Sets the line length for listings; nnn is the number of columns that can be printed in a line (40-2000).
+*insert \ processor 6502 * For DASM Assembler?
 
 insert ; ----------------------------------------------------------
 insert ;  This is the reverse-engineered source code for the
 insert ;  game 'JETPAC' written by Ultimate Play The Game.
 insert ; ----------------------------------------------------------
 
-label 030A-030B    Get_arithmetic_element_link
-label 030C         Storage_for_6502_.A_register
-label 030D         Storage_for_6502_.X_register
-label 030E         Storage_for_6502_.Y_register
-label 030F         Storage_for_6502_.P_register
-label 0310-0313    _0334_033B_???
-label 0314-0315    Hardware_IRQ *_interrupt_vector_[EABF]
-label 0316-0317    Break_interrupt_vector
-label 0318-0319    NMI_interrupt_vector
-label 031A-031B    OPEN_vector
-label 031C-031D    CLOSE_vector
-label 031E-031F    Set-input_vector
-label 0320-0321    Set-output_vector
-label 0322-0323    Restore_l_O_vector * Restore_l/O_vector
-label 0324-0325    INPUT_vector
-label 0326-0327    Output_vector
-label 0328-0329    Test-STOP_vector
-label 032A-032B    GET_vector
-label 032C-032D    Abort_l_O_vector * Abort_l/O_vector
-label 032E-032F    User_vector * User_vector_(default_BRK)
-label 0330-0331    Link_to_load_RAM
-label 0332-0333    Link_to_save_RAM
-label 0334-033B    _0334-033B_???
-label 003C-03FB    Cassette_Buffer
 
-
-label 1000-11ff SCREEN_RAM
-label 1200-1fff USR_BASIC_RAM
-
-*label 2000-3fff RAM_2000
-*label 4000-5fff RAM_4000
-*label 6000-7fff RAM_6000
-
-; Hack to cause as65 to assembly not zp
+; Hack to cause as65 to assemble non-zp
 data 2000-201c
 data 2e26-22ec
 data 22f5-22fe
@@ -104,6 +92,7 @@ comment 207C
 comment 2085
 comment 20E3
 
+* Double underline after jmp
 comment 20E9 ===========================================================
 comment 2187 ===========================================================
 comment 218d ===========================================================
@@ -268,7 +257,7 @@ comment 3E74 ===========================================================
 comment 3F22 ===========================================================
 comment 3F2d ===========================================================
 
-
+* Single underline after rts
 comment 20F0 -----------------------------------------------------------
 comment 2110 -----------------------------------------------------------
 comment 216B -----------------------------------------------------------
@@ -392,62 +381,8 @@ comment 3c96 -----------------------------------------------------------
 comment 3ddc -----------------------------------------------------------
 comment 3f16 -----------------------------------------------------------
 
-label 9000 VICCR0
-label 9001 VICCR1
-label 9002 VICCR2
-label 9003 VICCR3
-label 9004 VICCR4
-label 9005 VICCR5
-label 9006 VICCR6
-label 9007 VICCR7
-label 9008 VICCR8
-label 9009 VICCR9
-label 900A VICCRA
-label 900B VICCRB
-label 900C VICCRC
-label 900D VICCRD
-label 900E VICCRE
-label 900F VICCRF
-label 9110 VIA1PB
-label 9111 VIA1PA1
-label 9112 VIA1DDRB
-label 9113 VIA1DDRA
-label 9114 VIA1T1CL
-label 9115 VIA1T1CH
-label 9116 VIA1T1LL
-label 9117 VIA1T1LH
-label 9118 VIA1T2CL
-label 9119 VIA1T2CH
-label 911A VIA1SR
-label 911B VIA1ACR
-label 911C VIA1PCR
-label 911D VIA1IFR
-label 911E VIA1IER
-label 911F VIA1PA2
-label 9120 VIA2PB
-label 9121 VIA2PA1
-label 9122 VIA2DDRB
-label 9123 VIA2DDRA
-label 9124 VIA2T1CL
-label 9125 VIA2T1CH
-label 9126 VIA2T1LL
-label 9127 VIA2T1LH
-label 9128 VIA2T2CL
-label 9129 VIA2T2CH
-label 912A VIA2SR
-label 912B VIA2ACR
-label 912C VIA2PCR
-label 912D VIA2IFR
-label 912E VIA2IER
-label 912F VIA2PA2
 
-label 9400-95ff COLOR_RAM
-
-label EABF ROM_IRQ
-label FFE1 ROM_ISCNTC
-
-
-; Fix for undefined labels, hopefully these are actaully real data
+; Fix for undefined labels, hopefully these are actually real data
 data 2a15 * 2a31
 data 3fc5 * 2a5b
 data 2d44 * 2d50
