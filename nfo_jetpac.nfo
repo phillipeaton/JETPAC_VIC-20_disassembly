@@ -34,6 +34,13 @@ option upmnemo off   * Upper case mnemonics in output file
 *semantics (const)
 ******************************************************************************
 
+******************************************************************************
+If an address is used in an instruction that clearly indicates it's referencing
+data (LDA, as a simple example) and there's no label in place for that address,
+it uses a "M" prefix for generated labels; if the referenced address is clearly
+code (JMP, for example), it uses a "Z" prefix.
+******************************************************************************
+
 *** INFO FILE INSTRUCTIONS ***
 file    jetpac_2000-3fff.bin 2000 * Instructs dasmfw to load the given file at the given address
 include memory_map.nfo            * Include VIC-20 memory map info
