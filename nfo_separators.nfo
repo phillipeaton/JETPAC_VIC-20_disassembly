@@ -1,3 +1,109 @@
+<<<<<<< HEAD:nfo_separators.nfo
+=======
+*** GENERAL COMMAND LINE OPTIONS ***
+option dasm 6502                * Select disassembler type
+option out jetpac.a65           * Select output filename of dissasembly
+
+*** OUTPUT FORMATTING OPTIONS ***
+*option addr on      * Show address field output for clean assembler source files
+*option hex on       * Show hex dump output
+*option asc on       * Show output of the ASCII equivalent to code/data
+*option cref on      * Show cross-referece table
+*option unused on    * Show unused labels
+option labellen 18   * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
+option eqlbllen 24   * Reserve space in this length for EQU labels. By default, dasmfw reserves 8 places for labels
+*option copndlen 24   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
+option copndlen 10   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
+
+*** DISASSEMBLER OPTIONS ***
+*option offset 2000  * NOT WORKING Select start address of supplied binary
+*option pbase 16     * Default parsing base, default is 16
+*option defdisp hex  * Default display base, default is hex
+*option cchar //
+*option cchar ;
+option upmnemo off   * Upper case mnemonics in output file
+
+*** DISASSEMBLER SPECIFIC OPTIONS ***
+*option conv on       * Convenience mnemonics
+*option forceaddr off * To handle forced direct / extended addressing
+
+******************************************************************************
+*If you think about it, there are various kinds of mutually exclusive options
+*for a memory cell. These are:
+*type (unused / code / data / rmb)
+*size (default char / word; dasmfw also has dword for processors that support 4-byte entities)
+*formatting (bin / char / dec / hex)
+*semantics (const)
+******************************************************************************
+
+******************************************************************************
+If an address is used in an instruction that clearly indicates it's referencing 
+data (LDA, as a simple example) and there's no label in place for that address, 
+it uses a "M" prefix for generated labels; if the referenced address is clearly 
+code (JMP, for example), it uses a "Z" prefix.
+******************************************************************************
+
+*** INFO FILE INSTRUCTIONS ***
+file    jetpac_2000-3fff.bin 2000 * Instructs dasmfw to load the given file at the given address
+include memory_map.nfo            * Include VIC-20 memory map info
+*insert \ SETLI 128                * a09 Assembler. Sets the line length for listings; nnn is the number of columns that can be printed in a line (40-2000).
+*insert \ processor 6502           * For DASM Assembler? Can't remember...
+
+insert ; ----------------------------------------------------------
+insert ;  This is the reverse-engineered source code for the
+insert ;  game 'JETPAC' written by Ultimate Play The Game.
+insert ; ----------------------------------------------------------
+
+; Hacks to inhibit as65 assembling to zero-page memory, these will hopefully all be data anyway
+data 2000-201c
+data 2e26-22ec
+data 22f5-22fe
+data 2311-2319
+data 22e6-22f1
+data 2486-2490
+data 2481-2491
+data 2617-261b
+data 2677-267f
+data 26c5-26e3
+data 277a-278d
+data 2885-2887
+data 2a49-2a4e
+data 2b7f-2b87
+data 2bca-2bd0
+data 2d46-2d48
+data 2db9
+data 2e90
+data 38b0-3fff ; Graphics data
+binary  38b0-3fff ; Graphics data
+;data 38da
+;data 3a0e
+;data 3aa3
+;data 3b7f
+;data 3b81-3b82
+;data 3b9d
+;data 3e27-3e28
+;data 3eb5
+
+; Start of disassembly instructions
+lcomment 201c NMI Interrupt Vector points here
+
+comment  201d
+comment  201d  ----------------------------------------------------------
+comment  201d  Starts here
+comment  201d  ----------------------------------------------------------
+
+lcomment 201E Reset stack pointer
+lcomment 2022 Setup NMI Interrupt Vector
+comment  2058
+lcomment 2058 Reset the VIC 16 registers
+
+comment  2061
+comment  2079
+comment  207C
+comment  2085
+comment  20E3
+
+>>>>>>> bdf0e3e404608ba5c6b0a6f09224b9ae10213b9a:jetpac.nfo
 * Double underline after jmp
 comment  25Ca ===========================================================
 comment  25E0 ===========================================================
@@ -231,3 +337,170 @@ comment  38b0 GRAPHICS START ABOUT HERE
 ;comment  3c96 -----------------------------------------------------------
 ;comment  3ddc -----------------------------------------------------------
 ;comment  3f16 -----------------------------------------------------------
+<<<<<<< HEAD:nfo_separators.nfo
+=======
+
+
+; Fix for undefined labels, hopefully these are actually real data
+data     2a15 * 2a31
+data     3fc5 * 2a5b
+data     2d44 * 2d50
+data     3fe8 * 2eb7
+data     389f * 2e2a
+data     39df * 2e2d
+;data     2058 * 2004
+data     2f9a * 2015
+data     32cb * 2019
+data     3e26 * 206c
+data     2429 * 2465
+data     24dd * 2524
+data     2550
+data     2744
+data     283b
+data     3433
+data     347c
+data     3738
+data     3860
+data     2a7b
+data     2bf8
+data     2b8c
+data     2c0f
+data     2c03
+data     2c49
+data     2dc1
+data     203a
+data     23cf
+data     24b6
+data     2471
+data     25b7
+data     2581
+data     259d
+data     26ae
+data     286f
+data     3a97
+data     3be2
+data     3b21
+data     3ccf
+data     3cc6
+data     3cf1
+data     3cf2
+data     3c55
+data     3def
+data     3dfd
+data     3d08
+data     3d55
+data     3ea4
+data     3ebf
+data     3e3e
+data     3f42
+data     31f8
+data     351d
+data     357c
+data     3828
+data     39a5
+data     39f8
+data     395c
+data     24e7
+data     2690
+data     2a19
+data     2c64
+data     2bf2
+data     2bf5
+data     2be9
+data     2bef
+data     2dbc
+data     2018
+data     236b
+data     2454
+data     241c
+data     308b
+data     3361
+data     2569
+data     253e
+data     20f0
+data     2202
+data     22e6
+data     22f5
+data     2311
+data     2373
+data     2382
+data     2396
+data     2481
+data     2491
+data     24ca
+data     24d7
+data     24e4
+data     2676
+data     277a
+data     2787
+data     2867
+data     29ee
+data     29fb
+data     2a12
+data     2a48
+data     2bca
+data     2db8
+data     2e8f
+data     2ff9
+data     3067
+data     3091
+data     3469
+data     349a
+data     355c
+data     356c
+data     22ce
+data     286b
+data     3ac5
+data     3bb8
+data     3acf
+data     3c5e
+data     3cd4
+data     3cff
+data     3cd8
+data     3c63
+data     3dde
+data     3e7b
+data     3cd6
+data     3d03
+data     3ec2
+data     3e7d
+data     3e00
+data     3f3e
+data     31b6
+data     21be
+data     226e
+data     24fd
+data     3168
+data     3470
+data     34cf
+data     375d
+data     37ab
+data     3574
+data     2beb
+data     3a0b
+data     3a06
+data     390a
+data     38a4
+data     38d2
+data     3ba4
+data     22a7
+data     3395
+data     22cf
+data     226f
+data     242f
+data     26dc * m2744
+data     2836 * m283b
+data     3e30 * m347c
+data     3a8f * m3738
+data     3811 * m3860
+data     2d45 * z2d74
+data     22c1 * z22d1
+data     24e8 * z250f
+data     3d00 * z3cf2
+data     3d02 * z3cf4
+data     3d04 * z3d56
+data     37f5 * m201b
+data     33fa * m2015
+data     2435 * m2465
+data     243b * m2465
+>>>>>>> bdf0e3e404608ba5c6b0a6f09224b9ae10213b9a:jetpac.nfo
