@@ -8,3 +8,6 @@
 
 # Excel temp files
 ~$*.xls*
+
+# Ignore other prg files used for testing
+matrix.prg

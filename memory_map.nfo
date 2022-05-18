@@ -5,7 +5,7 @@ label 0200-03ff OS_Data
 label 0400-0fff Block0_3K_RAM
 label 1000-11ff Screen_RAM
 label 1200-1fff Std_3.5k_RAM
-label 2000-3fff Block1_8K_RAM
+*label 2000-3fff Block1_8K_RAM
 label 4000-5fff Block2_8K_RAM
 label 6000-7fff Block3_8K_RAM
 label 8000-8fff Character_ROM

@@ -1,0 +1,206 @@
+*** GENERAL COMMAND LINE OPTIONS ***
+option dasm 6502                * Select disassembler type
+option out jetpac.a65           * Select output filename of dissasembly
+
+*** OUTPUT FORMATTING OPTIONS ***
+*option addr on      * Show address field output for clean assembler source files
+*option hex on       * Show hex dump output
+*option asc on       * Show output of the ASCII equivalent to code/data
+*option cref on      * Show cross-referece table
+*option unused on    * Show unused labels
+option labellen 18   * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
+option eqlbllen 24   * Reserve space in this length for EQU labels. By default, dasmfw reserves 8 places for labels
+option copndlen 24   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
+*option copndlen 10   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
+
+*** DISASSEMBLER OPTIONS ***
+*option offset 2000  * NOT WORKING Select start address of supplied binary
+*option pbase 16     * Default parsing base, default is 16
+*option defdisp hex  * Default display base, default is hex
+*option cchar //
+*option cchar ;
+option upmnemo off   * Upper case mnemonics in output file
+
+*** DISASSEMBLER SPECIFIC OPTIONS ***
+*option conv on       * Convenience mnemonics
+*option forceaddr off * To handle forced direct / extended addressing
+
+******************************************************************************
+*If you think about it, there are various kinds of mutually exclusive options
+*for a memory cell. These are:
+*type (unused / code / data / rmb)
+*size (default char / word; dasmfw also has dword for processors that support 4-byte entities)
+*formatting (bin / char / dec / hex)
+*semantics (const)
+******************************************************************************
+
+*** INFO FILE INSTRUCTIONS ***
+file    jetpac_2000-3fff.bin 2000 * Instructs dasmfw to load the given file at the given address
+include memory_map.nfo            * Include VIC-20 memory map info
+include nfo_separators.nfo        * Include JMP/JSR separator lines
+include nfo_undef_labels.nfo      * Undefend Labels
+
+*insert \ SETLI 128               * a09 Assembler. Sets the line length for listings; nnn is the number of columns that can be printed in a line (40-2000).
+*insert \ processor 6502          * For DASM Assembler? Can't remember...
+
+insert ; ----------------------------------------------------------
+insert ;  This is the reverse-engineered source code for the
+insert ;  game 'JETPAC' written by Ultimate Play The Game.
+insert ; ----------------------------------------------------------
+
+; Hacks to inhibit as65 assembling to zero-page memory, these will hopefully all be data anyway
+data 2000-201c
+data 2e26-22ec
+data 22f5-22fe
+data 2311-2319
+data 22e6-22f1
+data 2486-2490
+data 2481-2491
+data 2617-261b
+data 2677-267f
+data 26c5-26e3
+data 277a-278d
+data 2885-2887
+data 2a49-2a4e
+data 2b7f-2b87
+data 2bca-2bd0
+data 2d46-2d48
+data 2db9
+data 2e90
+data 38b0-3fff ; Graphics data
+binary  38b0-3fff ; Graphics data
+;data 38da
+;data 3a0e
+;data 3aa3
+;data 3b7f
+;data 3b81-3b82
+;data 3b9d
+;data 3e27-3e28
+;data 3eb5
+
+; Start of disassembly instructions
+lcomment 201c NMI Interrupt Vector points here
+
+comment  201d
+comment  201d  ----------------------------------------------------------
+comment  201d  Starts here
+comment  201d  ----------------------------------------------------------
+
+lcomment 201E Reset stack pointer
+lcomment 2022 Setup NMI Interrupt Vector
+comment  2056
+lcomment 2056 Reset the VIC 16 registers
+label    2058 Start1
+comment  2061
+lcomment  2061
+lcomment 2061 Store ascending numbers step #11 at a time into #23 bytes from $200 as below
+lcomment 2061 then do it #10 more times, but starting at 1 higher each time
+lcomment 2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3   ..."-8CNYdoz...¦±¼ÇÒÝèó
+lcomment 2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4   ...#.9DOZep{...§²½ÈÓÞéô
+lcomment 2061 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5   ...$/:EP[fq|...¨³¾ÉÔßêõ
+lcomment 2061 025C  04 0F 1A 25 30 3B 46 51 5C 67 72 7D 88 93 9E A9 B4 BF CA D5 E0 EB F6   ...%0;FQ\gr}...©´¿ÊÕàëö
+lcomment 2061 0273  05 10 1B 26 31 3C 47 52 5D 68 73 7E 89 94 9F AA B5 C0 CB D6 E1 EC F7   ...&1<GR]hs~...ªµÀËÖáì÷
+lcomment 2061 028A  06 11 1C 27 32 3D 48 53 5E 69 74 7F 8A 95 A0 AB B6 C1 CC D7 E2 ED F8   ...'2=HS^it... «¶ÁÌ×âíø
+lcomment 2061 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 E3 EE F9   ...(3>IT_ju...¡¬·ÂÍØãîù
+lcomment 2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA   ...)4?JU`kv...¢-¸ÃÎÙäïú
+lcomment 2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB    ..*5@KValw...£®¹ÄÏÚåðû
+lcomment 2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC   .. +6ALWbmx...¤¯ºÅÐÛæñü
+lcomment 2061 02FD  00 00 00 3A C4 83 C4 7C C5 1A C7 E4 C7 86 CE 00 00 00 00 00 00 00 00   ...:Ä.Ä|Å.ÇäÇ.Î........
+comment  2071
+comment  2079
+comment  2079
+comment  207C
+comment  2085
+
+comment  20E3
+
+
+* Double underline after jmp
+comment  20E9 ===========================================================
+comment  2187 ===========================================================
+comment  218d ===========================================================
+comment  2195 ===========================================================
+comment  219a ===========================================================
+comment  2229 ===========================================================
+comment  2257 ===========================================================
+comment  2285 ===========================================================
+comment  228b ===========================================================
+comment  22D1 ===========================================================
+comment  22D7 ===========================================================
+comment  22E3 ===========================================================
+comment  22F2 ===========================================================
+comment  22Ff ===========================================================
+comment  23A8 ===========================================================
+comment  23B6 ===========================================================
+comment  23C7 ===========================================================
+comment  23D4 ===========================================================
+comment  23a2 ===========================================================
+comment  2481 ===========================================================
+comment  2491 ===========================================================
+comment  24a1 ===========================================================
+
+data     2450-2452
+break    2452
+hex      2452
+lcomment 2452 $71 = "1"
+break    2453
+data     2453-2455
+data     245A-245c
+lcomment 2461 $72 = "2"
+data     2462-2464
+data     251F-2524
+data     2525-252d
+data     2534-2538
+data     2539-253a
+data     253b-2541
+data     2542-254f
+data     2557-255d
+data     255E-2561
+data     2569-2572
+data     2579-257f
+data     2586-258c
+data     2593-2597
+data     2599-259c
+
+comment  259d
+lcomment 259d
+lcomment 259d Takes stuff that was stashed on the stack previously and leaves
+lcomment 259d as an address in $0040, in this case $355E
+code     259d-259f
+
+lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
+comment  3579
+label    357b LOOP_357b
+lcomment 357b 9600  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 9610  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 9620  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 9630  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 9640  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 9650  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 9660  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 9670  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 9680  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 9690  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 96A0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 96B0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 96C0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 96D0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 96E0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357b 96F0  01 01 01 01 01 01 01 01 01 01 01 01 01 00 00 00   ................
+lcomment 357b 9700  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+lcomment 357b Fills memory from 9600-96fc (address at zero page $05) with $01's
+lcomment 357b This is color RAM for 3.5k but unused for 8k+!?
+
+
+comment  265e Setup Timer 1
+label    265e SETTMR1
+comment  275b Erase $100 bytes zero page
+label    275b ERASEZP
+lcomment 275b Erase $100 bytes zero page
+label    275e ERASEZ1
+comment  276f Erase $30 bytes in User Basic RAM $1fd0-$2000
+label    276f ERASE30BYTES
+lcomment 276f Erase $30 bytes in User Basic RAM $1fd0-$2000
+label    2773 ERASE1
+
+
