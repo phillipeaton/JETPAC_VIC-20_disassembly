@@ -8,9 +8,9 @@ option out jetpac.a65           * Select output filename of dissasembly
 *option asc on       * Show output of the ASCII equivalent to code/data
 *option cref on      * Show cross-referece table
 *option unused on    * Show unused labels
-option labellen 18   * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
-option eqlbllen 24   * Reserve space in this length for EQU labels. By default, dasmfw reserves 8 places for labels
-option copndlen 24   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
+option labellen 12   * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
+option eqlbllen 18   * Reserve space in this length for EQU labels. By default, dasmfw reserves 8 places for labels
+option copndlen 18   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
 *option copndlen 10   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
 
 *** DISASSEMBLER OPTIONS ***
@@ -35,15 +35,21 @@ option upmnemo off   * Upper case mnemonics in output file
 ******************************************************************************
 
 ******************************************************************************
-If an address is used in an instruction that clearly indicates it's referencing
-data (LDA, as a simple example) and there's no label in place for that address,
-it uses a "M" prefix for generated labels; if the referenced address is clearly
-code (JMP, for example), it uses a "Z" prefix.
+* If an address is used in an instruction that clearly indicates it's referencing
+* data (LDA, as a simple example) and there's no label in place for that address,
+* it uses a "M" prefix for generated labels; if the referenced address is clearly
+* code (JMP, for example), it uses a "Z" prefix.
 ******************************************************************************
+
+******************************************************************************
+* NOTES:
+* Set breakpoint at 201d then SYS4624 then SYS8221
+******************************************************************************
+
 
 *** INFO FILE INSTRUCTIONS ***
 file    jetpac_2000-3fff.bin 2000 * Instructs dasmfw to load the given file at the given address
-include memory_map.nfo            * Include VIC-20 memory map info
+include nfo_memory_map.nfo        * Include VIC-20 memory map info
 include nfo_separators.nfo        * Include JMP/JSR separator lines
 include nfo_undef_labels.nfo      * Undefend Labels
 
@@ -56,34 +62,37 @@ insert ;  game 'JETPAC' written by Ultimate Play The Game.
 insert ; ----------------------------------------------------------
 
 ; Hacks to inhibit as65 assembling to zero-page memory, these will hopefully all be data anyway
-data 2000-201c
-data 2e26-22ec
-data 22f5-22fe
-data 2311-2319
-data 22e6-22f1
-data 2486-2490
-data 2481-2491
-data 2617-261b
-data 2677-267f
-data 26c5-26e3
-data 277a-278d
-data 2885-2887
-data 2a49-2a4e
-data 2b7f-2b87
-data 2bca-2bd0
-data 2d46-2d48
-data 2db9
-data 2e90
-data 38b0-3fff ; Graphics data
-binary  38b0-3fff ; Graphics data
-;data 38da
-;data 3a0e
-;data 3aa3
-;data 3b7f
-;data 3b81-3b82
-;data 3b9d
-;data 3e27-3e28
-;data 3eb5
+data     2000-201c
+data     2e26-22ec
+data     22f5-22fe
+data     2311-2319
+data     22e6-22f1
+data     2486-2480
+
+data     2487-2491
+data     2617-261b
+data     2677-267f
+data     26c5-26e3
+data     277a-278d
+data     2885-2887
+data     2a49-2a4e
+data     2b7f-2b87
+data     2bca-2bd0
+data     2d46-2d48
+data     2db9
+data     2e90
+data     38b0-3fff ; Graphics data
+binary   38b0-3fff ; Graphics data
+;data     38da
+;data     3a0e
+;data     3aa3
+;data     3b7f
+;data     3b81-3b82
+;data     3b9d
+;data     3e27-3e28
+;data     3eb5
+
+
 
 ; Start of disassembly instructions
 lcomment 201c NMI Interrupt Vector points here
@@ -94,14 +103,16 @@ comment  201d  Starts here
 comment  201d  ----------------------------------------------------------
 
 lcomment 201E Reset stack pointer
+lcomment 2021 CLear Decimal flag
 lcomment 2022 Setup NMI Interrupt Vector
 comment  2056
 lcomment 2056 Reset the VIC 16 registers
 label    2058 Start1
 comment  2061
-lcomment  2061
+lcomment 2061
 lcomment 2061 Store ascending numbers step #11 at a time into #23 bytes from $200 as below
 lcomment 2061 then do it #10 more times, but starting at 1 higher each time
+lcomment 2061 THIS BLANKS A SECTION OF THE SCREEN ONE PIXEL LINE AT A TIME
 lcomment 2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3   ..."-8CNYdoz...¶±º«“›ËÛ
 lcomment 2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4   ...#.9DOZep{...ß≤Ω»”ﬁÈÙ
 lcomment 2061 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5   ...$/:EP[fq|...®≥æ…‘ﬂÍı
@@ -121,30 +132,11 @@ comment  2085
 
 comment  20E3
 
+lcomment 2416 Blanks half of the screen
+lcomment 2419 Blanks Erase 1200-1fff Standard RAM
+lcomment 2422 Puts 000000  000000  00 at top of screen
 
-* Double underline after jmp
-comment  20E9 ===========================================================
-comment  2187 ===========================================================
-comment  218d ===========================================================
-comment  2195 ===========================================================
-comment  219a ===========================================================
-comment  2229 ===========================================================
-comment  2257 ===========================================================
-comment  2285 ===========================================================
-comment  228b ===========================================================
-comment  22D1 ===========================================================
-comment  22D7 ===========================================================
-comment  22E3 ===========================================================
-comment  22F2 ===========================================================
-comment  22Ff ===========================================================
-comment  23A8 ===========================================================
-comment  23B6 ===========================================================
-comment  23C7 ===========================================================
-comment  23D4 ===========================================================
-comment  23a2 ===========================================================
-comment  2481 ===========================================================
-comment  2491 ===========================================================
-comment  24a1 ===========================================================
+comment 2425
 
 data     2450-2452
 break    2452
@@ -155,6 +147,9 @@ data     2453-2455
 data     245A-245c
 lcomment 2461 $72 = "2"
 data     2462-2464
+data     2465-2468
+word     2465-2468
+lcomment 2465-2468 Addresses for generic copy routine
 data     251F-2524
 data     2525-252d
 data     2534-2538
@@ -176,8 +171,45 @@ lcomment 259d as an address in $0040, in this case $355E
 code     259d-259f
 
 lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
+
+comment  265e Setup Timer 1
+label    265e SETTMR1
+comment  275b Erase $100 bytes zero page
+label    275b ERASEZP
+lcomment 275b Erase $100 bytes zero page
+label    275e ERASEZ1
+comment  276f Erase $30 bytes in User Basic RAM $1fd0-$2000
+label    276f ERASE30BYTES
+lcomment 276f Erase $30 bytes in User Basic RAM $1fd0-$2000
+label    2773 ERASE1
+
+
+lcomment 34CC This is an intermediate jsr, called from several places
+lcomment 34CF Doesn't seem to do much
+label    34D6 LOOP_34D6
+lcomment 34D8 Load A with content of $2450+y?
+lcomment 34DB Strange pair of jumps to same place, branch&jsr
+lcomment 34Dd Strange pair of jumps to same place, branch&jsr
+lcomment 34e3 Run through, don't know what it's doing
+
+comment  34e9
+lcomment 34e9 Stash y via a
+lcomment 34EB Moves a few bytes around
+lcomment 34ef Restore y via a
+comment  34f0
+
+comment  351D
+lcomment 351D Valid Target - traced but doesn't seem to do much
+
 comment  3579
 label    357b LOOP_357b
+lcomment 357b
+lcomment 357b Fills memory from 9600-96fc (address at zero page $05) with $01's
+lcomment 357b This is color RAM for 3.5k but unused for 8k+!?
+lcomment 357b ALSO CONTIUNES TO BLANK THE SCREEN, COMPLETING BOTTOM HALF
+lcomment 357b FILLS SCREEN WITH A RUG
+lcomment 357b FILLS 1200-1fff i.e. stanard RAM
+lcomment 357b This may be a generic memory move operation, as it also is used ot fill screen-ram at $1000
 lcomment 357b 9600  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
 lcomment 357b 9610  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
 lcomment 357b 9620  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
@@ -195,19 +227,14 @@ lcomment 357b 96D0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ..........
 lcomment 357b 96E0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
 lcomment 357b 96F0  01 01 01 01 01 01 01 01 01 01 01 01 01 00 00 00   ................
 lcomment 357b 9700  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
-lcomment 357b Fills memory from 9600-96fc (address at zero page $05) with $01's
-lcomment 357b This is color RAM for 3.5k but unused for 8k+!?
 
-
-comment  265e Setup Timer 1
-label    265e SETTMR1
-comment  275b Erase $100 bytes zero page
-label    275b ERASEZP
-lcomment 275b Erase $100 bytes zero page
-label    275e ERASEZ1
-comment  276f Erase $30 bytes in User Basic RAM $1fd0-$2000
-label    276f ERASE30BYTES
-lcomment 276f Erase $30 bytes in User Basic RAM $1fd0-$2000
-label    2773 ERASE1
-
-
+lcomment 3595 Run through
+lcomment 35A2 Looped a few times only
+label    35A2 LOOP_35A2
+lcomment 35B6 Store about 8 bytes from $0081 to $1000?, all seem to be zeros for now
+label    35B6 LOOP_35B6
+lcomment 35BD Updates to location for saving character line
+label    35CB LOOP_35CB
+lcomment 35CB Load from 81xx, offset with y, which is probably 0-7
+lcomment 35cd Intro screen: Invert a line of a character, change to $F0 and only half inverts
+lcomment 35CB Save to 13xx

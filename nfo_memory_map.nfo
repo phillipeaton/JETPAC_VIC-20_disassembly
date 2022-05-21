@@ -1,11 +1,11 @@
 * Top Level Memory Map for VIC-20 with 8K+ Expansion
 label 0000-00ff Zero_Page
 label 0100-01ff Stack
-label 0200-03ff OS_Data
+*label 0200-03ff OS_Data
 label 0400-0fff Block0_3K_RAM
 label 1000-11ff Screen_RAM
 label 1200-1fff Std_3.5k_RAM
-*label 2000-3fff Block1_8K_RAM
+label 2000-3fff Block1_8K_RAM
 label 4000-5fff Block2_8K_RAM
 label 6000-7fff Block3_8K_RAM
 label 8000-8fff Character_ROM
@@ -27,8 +27,8 @@ label 030F      P_register
 
 * OS_Data vectors
 label 0314-0315 Hardware_IRQ
-label 0316-0317 Break_interrupt_vector
-label 0318-0319 NMI_interrupt_vector
+label 0316-0317 Break_int_vector
+label 0318-0319 NMI_int_vector
 label 031A-031B OPEN_vector
 label 031C-031D CLOSE_vector
 label 031E-031F Set-input_vector
