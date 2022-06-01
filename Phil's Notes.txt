@@ -1,0 +1,32 @@
+To debug JETPAC after a warm reset, set breakpoint at $201d then SYS4624 then SYS8221.
+
+Colour mapping is at $9600, #23 columns, #11 rows from 1UP to COPYRIGHT text
+Potentially more rows are used. 
+23rd column might be not used, it's not used on game selection screen.
+
+9600  07 05 01 01 01 01 01 01 07 07 05 04 07 07 01 01 01 01 01 01 01 06 04
+9617  06 01 01 01 01 01 01 01 07 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+962E  05 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+9645  04 01 01 00 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+965C  03 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+9673  02 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 04 01 01 01 01 01 01
+968A  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 04 01 01 01 01 01 01
+96A1  01 01 01 01 01 01 07 06 07 01 01 01 01 01 01 01 04 01 01 01 01 01 01
+96B8  01 01 01 01 01 01 01 01 07 01 01 01 01 01 01 01 04 01 01 01 01 01 01
+96CF  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+96E6  07 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+
+07=yellow
+06=blue
+05=green
+04=purple
+03=cyan
+02=red
+01=white
+00=black
+
+1UP 
+000000 are both on a single line, which is 15 pixels.
+Line spacing between lines appears large.
+
+

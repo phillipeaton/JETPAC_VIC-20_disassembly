@@ -1,18 +1,20 @@
-* Top Level Memory Map for VIC-20 with 8K+ Expansion
+* Top Level Memory Map for VIC-20 with 8K+ Expansion as used by JETPAC
 label 0000-00ff Zero_Page
 label 0100-01ff Stack
 *label 0200-03ff OS_Data
+label 0200-03ff Screen_RAM
 label 0400-0fff Block0_3K_RAM
-label 1000-11ff Screen_RAM
-label 1200-1fff Std_3.5k_RAM
-label 2000-3fff Block1_8K_RAM
+*label 1000-11ff Screen_RAM
+*label 1200-1fff Std_3.5k_RAM
+label 1000-1fff UDG_RAM * User-Defined Graphics characters
+*label 2000-3fff Block1_8K_RAM * Removed, else branch labels don't show-up
 label 4000-5fff Block2_8K_RAM
 label 6000-7fff Block3_8K_RAM
 label 8000-8fff Character_ROM
 label 9000-90ff VIC
 label 9100-93ff VIA1_2
-label 9400-95ff Color_RAM
-label 9600-97ff Unused
+label 9400-95ff Unused    * Swapped from default
+label 9600-97ff Color_RAM * Swapped from default
 label 9800-9bff I_O_Expansion1
 label 9c00-9fff I_O_Expansion2
 label a000-bfff Block5_CartROM

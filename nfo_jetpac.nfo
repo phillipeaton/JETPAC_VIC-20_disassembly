@@ -43,11 +43,6 @@ option upmnemo off   * Upper case mnemonics in output file
 * code (JMP, for example), it uses a "Z" prefix.
 ******************************************************************************
 
-******************************************************************************
-* NOTES:
-* For JETPAC, set breakpoint at 201d then SYS4624 then SYS8221
-******************************************************************************
-
 *** INFO FILE INSTRUCTIONS ***
 include nfo_memory_map.nfo        * Include VIC-20 memory map info
 include nfo_separators.nfo        * Include JMP/JSR separator lines
@@ -92,9 +87,9 @@ binary   38b0-3fff ; Graphics data
 ;data     3e27-3e28
 ;data     3eb5
 
-
-
 ; Start of disassembly instructions
+comment  2000 USE CONST to avoid string break-up
+
 lcomment 201c NMI Interrupt Vector points here
 
 comment  201d
