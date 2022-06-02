@@ -8,7 +8,7 @@ file   jetpac_2000-3fff.bin * Instructs dasmfw to load the given file at the giv
 *** OUTPUT FORMATTING OPTIONS ***
 *option addr on      * Show address field output for clean assembler source files
 *option hex on       * Show hex dump output
-*option asc on       * Show output of the ASCII equivalent to code/data
+option asc off       * Show output of the ASCII equivalent to code/data
 *option cref on      * Show cross-referece table
 *option unused on    * Show unused labels
 option labellen 12   * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
@@ -87,8 +87,18 @@ binary   38b0-3fff ; Graphics data
 ;data     3e27-3e28
 ;data     3eb5
 
+; Zero-Page variables
+label    0004 ZP_Addr_To
+label    0005 ZP_Addr_To+1
+label    0006 ZP_Addr_From
+label    0007 ZP_Addr_From+1
+label    1fd0 UDG_END
+
 ; Start of disassembly instructions
 comment  2000 USE CONST to avoid string break-up
+
+label    2004 VIC_Init_Tab
+lcomment 2004 Initial value table for VIC setup 16 bytes
 
 lcomment 201c NMI Interrupt Vector points here
 
@@ -102,7 +112,7 @@ lcomment 2021 CLear Decimal flag
 lcomment 2022 Setup NMI Interrupt Vector
 comment  2056
 lcomment 2056 Reset the VIC 16 registers
-label    2058 Start1
+label    2058 Start_1
 comment  2061
 lcomment 2061
 lcomment 2061 Store ascending numbers step #11 at a time into #23 bytes from $200 as below
@@ -119,6 +129,9 @@ lcomment 2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 
 lcomment 2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB    ..*5@KValw...£®¹ÄÏÚåðû
 lcomment 2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC   .. +6ALWbmx...¤¯ºÅÐÛæñü
 lcomment 2061 02FD  00 00 00 3A C4 83 C4 7C C5 1A C7 E4 C7 86 CE 00 00 00 00 00 00 00 00   ...:Ä.Ä|Å.ÇäÇ.Î........
+
+label    2064 Start_2
+label    2067 Start_3
 comment  2071
 comment  2079
 comment  2079
@@ -131,7 +144,7 @@ lcomment 2416 Blanks half of the screen
 lcomment 2419 Blanks Erase 1200-1fff Standard RAM
 lcomment 2422 Puts 000000  000000  00 at top of screen
 
-comment 2425
+comment  2425
 
 data     2450-2452
 break    2452
@@ -168,14 +181,13 @@ code     259d-259f
 lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
 
 comment  265e Setup Timer 1
-label    265e SETTMR1
+label    265e SET_TMR_1
 comment  275b Erase $100 bytes zero page
 label    275b ERASEZP
 lcomment 275b Erase $100 bytes zero page
 label    275e ERASEZ1
-comment  276f Erase $30 bytes in User Basic RAM $1fd0-$2000
-label    276f ERASE30BYTES
-lcomment 276f Erase $30 bytes in User Basic RAM $1fd0-$2000
+comment  276f Erase $30 bytes at end of UDGs $1fd0-$2000
+label    276f ERASE_UDG_END
 label    2773 ERASE1
 
 
@@ -224,12 +236,17 @@ lcomment 357b 96F0  01 01 01 01 01 01 01 01 01 01 01 01 01 00 00 00   ..........
 lcomment 357b 9700  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
 
 lcomment 3595 Run through
-lcomment 35A2 Looped a few times only
+
+comment  35A0
+lcomment 35A0 Loop a few times only
 label    35A2 LOOP_35A2
+comment  35Aa
+
 lcomment 35B6 Store about 8 bytes from $0081 to $1000?, all seem to be zeros for now
 label    35B6 LOOP_35B6
 lcomment 35BD Updates to location for saving character line
-label    35CB LOOP_35CB
+
+label    35CB Invrt_Pix_Lines
 lcomment 35CB Load from 81xx, offset with y, which is probably 0-7
 lcomment 35cd Intro screen: Invert a line of a character, change to $F0 and only half inverts
 lcomment 35CB Save to 13xx
