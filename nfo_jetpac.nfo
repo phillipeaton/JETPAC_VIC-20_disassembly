@@ -84,6 +84,7 @@ label    0004 ZP_Addr_To
 label    0005 ZP_Addr_To+1
 label    0006 ZP_Addr_From
 label    0007 ZP_Addr_From+1
+label      5a Num_Lives
 label    1fd0 UDG_END
 
 ; Start of disassembly instructions

@@ -14,6 +14,7 @@
 Zero_Page         equ     $0000
 ZP_Addr_To        equ     $0004
 ZP_Addr_From      equ     $0006
+Num_Lives         equ     $005A
 Screen_RAM        equ     $0200
 Hardware_IRQ      equ     $0314
 NMI_int_vector    equ     $0318
@@ -470,7 +471,7 @@ Z22BA       jsr     Z2416             ; 22BA: 20 16 24
             fcb     $D0               ; 22C1: D0             
             asl     Block0_3K_RAM+1824 ; 22C2: 0E 20 0B       
             fcb     $23               ; 22C5: 23             
-            inc     Zero_Page+90      ; 22C6: E6 5A          
+            inc     Num_Lives         ; 22C6: E6 5A          
             jsr     Z235B             ; 22C8: 20 5B 23       
 Z22CB       jsr     Z3152             ; 22CB: 20 52 31       
             fcc     "L"               ; 22CE: 4C             
@@ -571,7 +572,7 @@ Z235D       lda     M2353,x           ; 235D: BD 53 23
             fcb     $62               ; 236C: 62             
             lda     #$FF              ; 236D: A9 FF          
 Z236F       sta     Zero_Page+93      ; 236F: 85 5D          
-            dec     Zero_Page+90      ; 2371: C6 5A          
+            dec     Num_Lives         ; 2371: C6 5A          
 Z2373       fcc     " "               ; 2373: 20             
             sta     Block0_3K_RAM+37,x ; 2374: 9D 25 04       
             jsr     Kernal_ROM+7956   ; 2377: 20 14 FF       
@@ -608,7 +609,7 @@ Z23A8       lda     #$60              ; 23A8: A9 60
 ; ===========================================================
 Z23B6       lda     Zero_Page+94      ; 23B6: A5 5E          
             bne     Z23BD             ; 23B8: D0 03          
-Z23BA       lda     Zero_Page+90      ; 23BA: A5 5A          
+Z23BA       lda     Num_Lives         ; 23BA: A5 5A          
             rts                       ; 23BC: 60             
 ; -----------------------------------------------------------
 Z23BD       lda     Zero_Page+92      ; 23BD: A5 5C          
@@ -630,7 +631,7 @@ Z23D4       ldy     #$02              ; 23D4: A0 02
 Z23D6       lda     #$00              ; 23D6: A9 00          
             sta     Zero_Page+89      ; 23D8: 85 59          
             lda     #$04              ; 23DA: A9 04          
-            sta     Zero_Page+90      ; 23DC: 85 5A          
+            sta     Num_Lives         ; 23DC: 85 5A          
             jsr     Z22FF             ; 23DE: 20 FF 22       
             jsr     Z23F5             ; 23E1: 20 F5 23       
             dey                       ; 23E4: 88             
@@ -1495,7 +1496,7 @@ Z299D       lda     #$00              ; 299D: A9 00
             lda     UDG_RAM+4051      ; 29BB: AD D3 1F       
             bit     M2014             ; 29BE: 2C 14 20       
             bne     Z29D0             ; 29C1: D0 0D          
-Z29C3       lda     Zero_Page+90      ; 29C3: A5 5A          
+Z29C3       lda     Num_Lives         ; 29C3: A5 5A          
             beq     Z2987             ; 29C5: F0 C0          
 Z29C7       jsr     Z22D7             ; 29C7: 20 D7 22       
             jsr     Z235B             ; 29CA: 20 5B 23       
@@ -1503,7 +1504,7 @@ Z29C7       jsr     Z22D7             ; 29C7: 20 D7 22
 ; ===========================================================
 Z29D0       lda     Zero_Page+92      ; 29D0: A5 5C          
             beq     Z29C3             ; 29D2: F0 EF          
-            lda     Zero_Page+90      ; 29D4: A5 5A          
+            lda     Num_Lives         ; 29D4: A5 5A          
             bne     Z29DB             ; 29D6: D0 03          
             jsr     Z29E7             ; 29D8: 20 E7 29       
 Z29DB       jsr     Z23F5             ; 29DB: 20 F5 23       
@@ -2185,7 +2186,7 @@ Z2E34       inc     Zero_Page+89      ; 2E34: E6 59
             lda     #$00              ; 2E9C: A9 00          
             sta     Screen_RAM+384    ; 2E9E: 8D 80 03       
             jsr     Z28F0             ; 2EA1: 20 F0 28       
-            inc     Zero_Page+90      ; 2EA4: E6 5A          
+            inc     Num_Lives         ; 2EA4: E6 5A          
             jsr     Z2373             ; 2EA6: 20 73 23       
             jmp     Z261A             ; 2EA9: 4C 1A 26       
 ; ===========================================================
