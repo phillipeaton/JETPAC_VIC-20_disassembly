@@ -56,6 +56,7 @@ insert ;  This is the reverse-engineered source code for the
 insert ;  game 'JETPAC' written by Ultimate Play The Game.
 insert ; ----------------------------------------------------------
 
+
 ; Hacks to inhibit as65 assembling to zero-page memory, these will hopefully all be data anyway
 data     2000-201c
 data     2e26-22ec
@@ -63,7 +64,6 @@ data     22f5-22fe
 data     2311-2319
 data     22e6-22f1
 data     2486-2480
-
 data     2487-2491
 data     2617-261b
 data     2677-267f
@@ -77,15 +77,7 @@ data     2d46-2d48
 data     2db9
 data     2e90
 data     38b0-3fff ; Graphics data
-binary   38b0-3fff ; Graphics data
-;data     38da
-;data     3a0e
-;data     3aa3
-;data     3b7f
-;data     3b81-3b82
-;data     3b9d
-;data     3e27-3e28
-;data     3eb5
+binary   385f-3fff ; Graphics data
 
 ; Zero-Page variables
 label    0004 ZP_Addr_To
@@ -95,11 +87,10 @@ label    0007 ZP_Addr_From+1
 label    1fd0 UDG_END
 
 ; Start of disassembly instructions
-comment  2000 USE CONST to avoid string break-up
-
+data     2000-201c
+comment  2000 USE CONST INFO DIRECTIVE to avoid string break-up
 label    2004 VIC_Init_Tab
 lcomment 2004 Initial value table for VIC setup 16 bytes
-
 lcomment 201c NMI Interrupt Vector points here
 
 comment  201d
@@ -250,3 +241,10 @@ label    35CB Invrt_Pix_Lines
 lcomment 35CB Load from 81xx, offset with y, which is probably 0-7
 lcomment 35cd Intro screen: Invert a line of a character, change to $F0 and only half inverts
 lcomment 35CB Save to 13xx
+
+comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
+comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
+comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
+comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
+comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
+data     385f-3fff

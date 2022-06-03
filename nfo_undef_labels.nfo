@@ -1,9 +1,4 @@
 ; Fix for undefined labels, hopefully these are actually real data
-;data     2058 * 2004
-;data     241c
-;data     2481
-;data     259d
-;data     355c
 data     2018
 data     203a
 data     20f0
@@ -29,7 +24,6 @@ data     2435 * m2465
 data     243b * m2465
 data     2454
 data     246e-2470
-;data     2471
 data     2491
 data     24b6
 data     24ca
@@ -98,7 +92,6 @@ data     3469
 data     3470
 data     347c
 data     349a
-;data     34cf
 data     351c
 data     356c
 data     3574

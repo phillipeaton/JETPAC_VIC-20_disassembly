@@ -27,7 +27,7 @@ label 030D      X_register
 label 030E      Y_register
 label 030F      P_register
 
-* OS_Data vectors
+* OS_Data vectors - THESE SHOULD PROBABLY GO, SCREEN_MAP CLASHES WITH THESE
 label 0314-0315 Hardware_IRQ
 label 0316-0317 Break_int_vector
 label 0318-0319 NMI_int_vector
