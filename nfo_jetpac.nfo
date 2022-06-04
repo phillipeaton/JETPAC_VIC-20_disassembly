@@ -46,7 +46,7 @@ option upmnemo off   * Upper case mnemonics in output file
 *** INFO FILE INSTRUCTIONS ***
 include nfo_memory_map.nfo        * Include VIC-20 memory map info
 include nfo_separators.nfo        * Include JMP/JSR separator lines
-include nfo_undef_labels.nfo      * Undefend Labels
+include nfo_code_data.nfo         * Undefend Labels
 
 *insert \ SETLI 128               * a09 Assembler. Sets the line length for listings; nnn is the number of columns that can be printed in a line (40-2000).
 *insert \ processor 6502          * For DASM Assembler? Can't remember...
@@ -56,40 +56,36 @@ insert ;  This is the reverse-engineered source code for the
 insert ;  game 'JETPAC' written by Ultimate Play The Game.
 insert ; ----------------------------------------------------------
 
+; Workaround for dasmfw incorrectly disassembling 'jmp ($addr)'
+hex       2617-2619
+const     2617-2619
+lcomment  2617 jmp ($005f)
 
-; Hacks to inhibit as65 assembling to zero-page memory, these will hopefully all be data anyway
-data     2000-201c
-data     2e26-22ec
-data     22f5-22fe
-data     2311-2319
-data     22e6-22f1
-data     2486-2480
-data     2487-2491
-data     2617-261b
-data     2677-267f
-data     26c5-26e3
-data     277a-278d
-data     2885-2887
-data     2a49-2a4e
-data     2b7f-2b87
-data     2bca-2bd0
-data     2d46-2d48
-data     2db9
-data     2e90
-data     38b0-3fff ; Graphics data
-binary   385f-3fff ; Graphics data
+hex       26e1-26e3
+const     26e1-26e3
+lcomment  26e1 jmp ($0008)
+
+hex       2885-2887
+const     2885-2887
+lcomment  2885 jmp ($0008)
+
+; Workaround for as65 interpreting a '\' as escaping the next charecter
+const 3457
+const 3516
 
 ; Zero-Page variables
 label    0004 ZP_Addr_To
 label    0005 ZP_Addr_To+1
 label    0006 ZP_Addr_From
 label    0007 ZP_Addr_From+1
+label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
+label      54 Score_P2 ; 3 bytes
 label      5a Num_Lives
 label    1fd0 UDG_END
 
 ; Start of disassembly instructions
-data     2000-201c
-comment  2000 USE CONST INFO DIRECTIVE to avoid string break-up
+const    2000-201b
+break    2019-2020
 label    2004 VIC_Init_Tab
 lcomment 2004 Initial value table for VIC setup 16 bytes
 lcomment 201c NMI Interrupt Vector points here
@@ -137,32 +133,6 @@ lcomment 2419 Blanks Erase 1200-1fff Standard RAM
 lcomment 2422 Puts 000000  000000  00 at top of screen
 
 comment  2425
-
-data     2450-2452
-break    2452
-hex      2452
-lcomment 2452 $71 = "1"
-break    2453
-data     2453-2455
-data     245A-245c
-lcomment 2461 $72 = "2"
-data     2462-2464
-data     2465-2468
-word     2465-2468
-lcomment 2465-2468 Addresses for generic copy routine
-data     251F-2524
-data     2525-252d
-data     2534-2538
-data     2539-253a
-data     253b-2541
-data     2542-254f
-data     2557-255d
-data     255E-2561
-data     2569-2572
-data     2579-257f
-data     2586-258c
-data     2593-2597
-data     2599-259c
 
 comment  259d
 lcomment 259d
@@ -243,9 +213,5 @@ lcomment 35CB Load from 81xx, offset with y, which is probably 0-7
 lcomment 35cd Intro screen: Invert a line of a character, change to $F0 and only half inverts
 lcomment 35CB Save to 13xx
 
-comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
-comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
-comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
-comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
-comment  38b0 ****** 38b0 GRAPHICS START HERE (prob 385f actually) ******
-data     385f-3fff
+; End of file contains graphics data
+binary   385f-3fff
