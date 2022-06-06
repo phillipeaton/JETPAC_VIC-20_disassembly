@@ -56,19 +56,6 @@ insert ;  This is the reverse-engineered source code for the
 insert ;  game 'JETPAC' written by Ultimate Play The Game.
 insert ; ----------------------------------------------------------
 
-; Workaround for dasmfw incorrectly disassembling 'jmp ($addr)'
-hex       2617-2619
-const     2617-2619
-lcomment  2617 jmp ($005f)
-
-hex       26e1-26e3
-const     26e1-26e3
-lcomment  26e1 jmp ($0008)
-
-hex       2885-2887
-const     2885-2887
-lcomment  2885 jmp ($0008)
-
 ; Workaround for as65 interpreting a '\' as escaping the next charecter
 const 3457
 const 3516
@@ -96,7 +83,7 @@ comment  201d  Starts here
 comment  201d  ----------------------------------------------------------
 
 lcomment 201E Reset stack pointer
-lcomment 2021 CLear Decimal flag
+lcomment 2021 Clear Decimal flag
 lcomment 2022 Setup NMI Interrupt Vector
 comment  2056
 lcomment 2056 Reset the VIC 16 registers
