@@ -125,7 +125,10 @@ comment  259d
 lcomment 259d
 lcomment 259d Takes stuff that was stashed on the stack previously and leaves
 lcomment 259d as an address in $0040, in this case $355E
-code     259d-259f
+lcomment 25A5 Load from 355e+1 value 02
+lcomment 25A7 Value $FF?
+lcomment 25A9 If No, Skip
+
 
 lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
 
@@ -135,7 +138,7 @@ comment  275b Erase $100 bytes zero page
 label    275b ERASEZP
 lcomment 275b Erase $100 bytes zero page
 label    275e ERASEZ1
-comment  276f Erase $30 bytes at end of UDGs $1fd0-$2000
+lcomment  276f Erase $30 bytes at end of UDGs $1fd0-$2000
 label    276f ERASE_UDG_END
 label    2773 ERASE1
 
@@ -156,6 +159,9 @@ comment  34f0
 
 comment  351D
 lcomment 351D Valid Target - traced but doesn't seem to do much
+
+label    355c JSRs to Z259D which then stores modifies 355e to ZP and then
+lcomment 355c JSR followed by KIL
 
 comment  3579
 label    357b LOOP_357b

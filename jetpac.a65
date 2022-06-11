@@ -19,6 +19,7 @@ Screen_RAM        equ     $0200
 Hardware_IRQ      equ     $0314
 NMI_int_vector    equ     $0318
 UDG_RAM           equ     $1000
+UDG_END           equ     $1FD0
 VIC_R0_H_Ctr      equ     $9000
 VIC_R4_TV_Raster  equ     $9004
 VIC_RA_Frq_Osc1   equ     $900A
@@ -611,7 +612,7 @@ Z2406       lda     Screen_RAM+432,x  ; 2406: BD B0 03
             bpl     Z2406             ; 2413: 10 F1          
             rts                       ; 2415: 60             
 ; -----------------------------------------------------------
-Z2416       jsr     Z355C             ; 2416: 20 5C 35        Blanks half of the screen
+Z2416       jsr     JSRs              ; 2416: 20 5C 35        Blanks half of the screen
             jsr     Z356C             ; 2419: 20 6C 35        Blanks Erase 1200-1fff Standard RAM
             jsr     Z2471             ; 241C: 20 71 24       
             jsr     Z2491             ; 241F: 20 91 24       
@@ -784,9 +785,9 @@ Z259D       pla                       ; 259D: 68
             pla                       ; 25A0: 68             
             sta     Zero_Page+65      ; 25A1: 85 41          
             ldy     #$01              ; 25A3: A0 01          
-Z25A5       lda     (Zero_Page+64),y  ; 25A5: B1 40          
-            cmp     #$FF              ; 25A7: C9 FF          
-            bne     Z25B5             ; 25A9: D0 0A          
+Z25A5       lda     (Zero_Page+64),y  ; 25A5: B1 40           Load from 355e+1 value 02
+            cmp     #$FF              ; 25A7: C9 FF           Value $FF?
+            bne     Z25B5             ; 25A9: D0 0A           If No, Skip
             jsr     Z25CA             ; 25AB: 20 CA 25       
             lda     Zero_Page+65      ; 25AE: A5 41          
             pha                       ; 25B0: 48             
@@ -1025,14 +1026,14 @@ Z2768       sta     Screen_RAM+384,x  ; 2768: 9D 80 03
             bpl     Z2768             ; 276C: 10 FA          
             rts                       ; 276E: 60             
 ; -----------------------------------------------------------
-; Erase $30 bytes at end of UDGs $1fd0-$2000
 ERASE_UDG_END
-            fcb     $A2               ; 276F: A2             
-            fcc     "/"               ; 2770: 2F             
-            fcb     $A9,$00           ; 2771: A9 00          
-ERASE1      fcb     $9D,$D0,$1F,$CA   ; 2773: 9D D0 1F CA    
-            fcb     $10,$FA           ; 2777: 10 FA          
-            fcc     "`"               ; 2779: 60             
+            ldx     #$2F              ; 276F: A2 2F           Erase $30 bytes at end of UDGs $1fd0-$2000
+            lda     #$00              ; 2771: A9 00          
+ERASE1      sta     UDG_END,x         ; 2773: 9D D0 1F       
+            dex                       ; 2776: CA             
+            bpl     ERASE1            ; 2777: 10 FA          
+            rts                       ; 2779: 60             
+; -----------------------------------------------------------
 Z277A       jsr     Z259D             ; 277A: 20 9D 25       
 ; -----------------------------------------------------------
             fcb     $00,$D0,$1F,$08   ; 277D: 00 D0 1F 08    
@@ -2914,7 +2915,7 @@ M3545       fcb     $00,$0B,$16       ; 3545: 00 0B 16
             fcb     $84,$8F,$9A,$A5   ; 3551: 84 8F 9A A5    
             fcb     $B0,$BB,$C6,$D1   ; 3555: B0 BB C6 D1    
             fcb     $DC,$E7,$F2       ; 3559: DC E7 F2       
-Z355C       jsr     Z259D             ; 355C: 20 9D 25       
+JSRs        jsr     Z259D             ; 355C: 20 9D 25        JSR followed by KIL
             fcb     $02,$FC,$00,$04   ; 355F: 02 FC 00 04    
             fcb     $00,$96,$06,$01   ; 3563: 00 96 06 01    
             fcb     $00,$FF           ; 3567: 00 FF          
