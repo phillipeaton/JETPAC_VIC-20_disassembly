@@ -65,6 +65,8 @@ label    0004 ZP_Addr_To
 label    0005 ZP_Addr_To+1
 label    0006 ZP_Addr_From
 label    0007 ZP_Addr_From+1
+label      40 ZP_ADDR
+label      41 ZP_ADDR+1
 label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54 Score_P2 ; 3 bytes
 label      5a Num_Lives
@@ -115,22 +117,33 @@ comment  2085
 
 comment  20E3
 
-lcomment 2416 Blanks half of the screen
-lcomment 2419 Blanks Erase 1200-1fff Standard RAM
+lcomment 2416 Sets some stuff up?
+lcomment 2419 Erase 1000-1fff Standard RAM
 lcomment 2422 Puts 000000  000000  00 at top of screen
 
 comment  2425
 
+label    2471 MOVE_CHARROM_TO UDGRAM
+lcomment 2474 2471 routine ZP $40 addr points here
+
+
+
 comment  259d
+label    259d AAAAA
 lcomment 259d
 lcomment 259d Takes stuff that was stashed on the stack previously and leaves
 lcomment 259d as an address in $0040, in this case $355E
+label    25A5 AAAAA1
 lcomment 25A5 Load from 355e+1 value 02
 lcomment 25A7 Value $FF?
 lcomment 25A9 If No, Skip
 
+label    25B5 GET_40Y_PUT_0X_2BYTES
 
+label    25ca INC_ADDRESS_AT_40
 lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
+label    25d0 INCADDR40
+
 
 comment  265e Setup Timer 1
 label    265e SET_TMR_1
@@ -142,6 +155,11 @@ lcomment  276f Erase $30 bytes at end of UDGs $1fd0-$2000
 label    276f ERASE_UDG_END
 label    2773 ERASE1
 
+lcomment  349D Data for AAAAA call above
+
+label    34a4 CCCC_34a4
+
+lcomment 34be Jump to routine copy stuff from STD CHAR ROM TO UDG CHAR SET
 
 lcomment 34CC This is an intermediate jsr, called from several places
 lcomment 34CF Doesn't seem to do much
@@ -160,11 +178,17 @@ comment  34f0
 comment  351D
 lcomment 351D Valid Target - traced but doesn't seem to do much
 
-label    355c JSRs to Z259D which then stores modifies 355e to ZP and then
+comment  355c
+label    355c JSR_TO_AAAAA
+comment  355c JSRs to Z259D which then stores modifies 355e to ZP and then
 lcomment 355c JSR followed by KIL
+lcomment 355F These might be parameters that get saved to address in ZP?
 
-comment  3579
-label    357b LOOP_357b
+label    356c ERASE_UDG_RAM_1000_1fff
+
+
+label    3579 ERASE_COLOR_RAM_9600
+label    357b ERASECR1
 lcomment 357b
 lcomment 357b Fills memory from 9600-96fc (address at zero page $05) with $01's
 lcomment 357b This is color RAM for 3.5k but unused for 8k+!?
@@ -189,15 +213,16 @@ lcomment 357b 96D0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ..........
 lcomment 357b 96E0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
 lcomment 357b 96F0  01 01 01 01 01 01 01 01 01 01 01 01 01 00 00 00   ................
 lcomment 357b 9700  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+label    3584 ERASECR2
 
-lcomment 3595 Run through
+label    3595 MV_CHARS_TO_UDGRAM
 
 comment  35A0
 lcomment 35A0 Loop a few times only
 label    35A2 LOOP_35A2
 comment  35Aa
 
-lcomment 35B6 Store about 8 bytes from $0081 to $1000?, all seem to be zeros for now
+lcomment 35B6 Store about 8 bytes from $8100 to $1000?, all seem to be zeros for now
 label    35B6 LOOP_35B6
 lcomment 35BD Updates to location for saving character line
 
