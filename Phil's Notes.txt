@@ -29,4 +29,5 @@ Potentially more rows are used.
 000000 are both on a single line, which is 15 pixels.
 Line spacing between lines appears large.
 
+23x11 tile map = 253 tiles. Each tile maps to a user-defined character in the $1000-$1fcf range, which effectively gives bitmapped graphics with X:Y 23*8 x 11*16 = X:Y 184x176 pixels.
 

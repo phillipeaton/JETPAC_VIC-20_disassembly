@@ -122,11 +122,47 @@ lcomment 2419 Erase 1000-1fff Standard RAM
 lcomment 2422 Puts 000000  000000  00 at top of screen
 
 comment  2425
-
-label    2471 MOVE_CHARROM_TO UDGRAM
-lcomment 2474 2471 routine ZP $40 addr points here
+comment  2425 YOU ARE HERE Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
 
 
+label    2471 P1_SCORE_TO_UDG_RAM
+const    2474
+lcomment 2474 ZP Offset for 1st address
+lcomment 2475 1st Address
+word     2475
+const    2477
+lcomment 2477 ZP Offset for 2nd address
+lcomment 2478 2nd address
+word     2478
+lcomment 247a 2x3=6 characters?
+break    247d
+lcomment 247d FF is loop terminator
+
+label    2481 P2_SCORE_TO_UDG_RAM
+const    2484
+lcomment 2484 ZP Offset for 1st address
+lcomment 2485 1st Address
+word     2485
+const    2487
+lcomment 2487 ZP Offset for 2nd address
+lcomment 2488 2nd address
+word     2488
+lcomment 248a 2x3=6 characters?
+break    248d
+lcomment 248d FF is loop terminator
+
+label    2491 HI_SCORE_TO_UDG_RAM?
+const    2494
+lcomment 2494 ZP Offset for 1st address
+lcomment 2495 1st address
+word     2495
+const    2497
+lcomment 2497 ZP Offset for 2nd address
+lcomment 2498 2nd address
+word     2498
+lcomment 249a 2x3=6 characters?
+break    249d
+lcomment 249d FF is loop terminator
 
 comment  259d
 label    259d AAAAA
@@ -179,12 +215,31 @@ comment  351D
 lcomment 351D Valid Target - traced but doesn't seem to do much
 
 comment  355c
-label    355c JSR_TO_AAAAA
-comment  355c JSRs to Z259D which then stores modifies 355e to ZP and then
-lcomment 355c JSR followed by KIL
-lcomment 355F These might be parameters that get saved to address in ZP?
+label    355c RESET_COLOR_RAM?
+const    355f
+lcomment 355f ZP Offset for 1st address
+lcomment 3560 1st Address
+word     3560
+const    3562
+lcomment 3562 ZP Offset for 2nd address
+lcomment 3563 2nd address
+word     3563
+lcomment 3565 ?????? characters?
+break    3568
+lcomment 3568 FF is loop terminator
 
 label    356c ERASE_UDG_RAM_1000_1fff
+const    356f
+lcomment 356f ZP Offset for 1st address
+lcomment 3560 1st Address
+word     3560
+const    3562
+lcomment 3562 ZP Offset for 2nd address
+lcomment 3563 2nd address
+word     3563
+lcomment 3565 ?????? characters?
+break    3568
+lcomment 3568 FF is loop terminator
 
 
 label    3579 ERASE_COLOR_RAM_9600
