@@ -11,14 +11,14 @@ file   jetpac_2000-3fff.bin * Instructs dasmfw to load the given file at the giv
 option asc off       * Show output of the ASCII equivalent to code/data
 *option cref on      * Show cross-referece table
 *option unused on    * Show unused labels
-option labellen 12   * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
+* option labellen 12   * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
 option eqlbllen 18   * Reserve space in this length for EQU labels. By default, dasmfw reserves 8 places for labels
-option copndlen 18   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
+option copndlen 24   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
 *option copndlen 10  * Reserve space in this length for the operand part of a disassembled instruction with a line comment
 
 *** DISASSEMBLER OPTIONS ***
 *option pbase 16     * Default parsing base, default is 16
-*option defdisp hex  * Default display base, default is hex
+option defdisp hex  * Default display base, default is hex
 *option cchar //     * Set end of line comment character
 *option cchar ;      * Set end of line comment character
 option upmnemo off   * Upper case mnemonics in output file
@@ -70,6 +70,12 @@ label      41 ZP_ADDR+1
 label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54 Score_P2 ; 3 bytes
 label      5a Num_Lives
+label    1008 UDG_P1_SCORE
+label    1420 UDG_P1_LIVES
+label    1588 UDG_HI_SCORE
+label    19a0 UDG_P2_LIVES
+label    1b08 UDG_P2_SCORE
+
 label    1fd0 UDG_END
 
 ; Start of disassembly instructions
@@ -117,12 +123,36 @@ comment  2085
 
 comment  20E3
 
+label    20F0 ???_TO_UDG_RAM
+const    20F3
+lcomment 20F3 ZP Offset for 1st address
+lcomment 20F4 1st Address
+word     20F4
+const    20F6
+lcomment 20F6 FF is loop terminator
+
+
 lcomment 2416 Sets some stuff up?
 lcomment 2419 Erase 1000-1fff Standard RAM
 lcomment 2422 Puts 000000  000000  00 at top of screen
 
 comment  2425
 comment  2425 YOU ARE HERE Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
+
+
+ label   2373 P1_LIVES__TO_UDG_RAM
+const    2376
+lcomment 2376 ZP Offset for 1st address
+lcomment 2377 1st Address
+word     2377
+lcomment 2379 FF is loop terminator
+
+label    2382 P2_LIVES__TO_UDG_RAM
+const    2385
+lcomment 2385 ZP Offset for 1st address
+lcomment 2386 1st Address
+word     2386
+lcomment 2388 FF is loop terminator
 
 
 label    2471 P1_SCORE_TO_UDG_RAM
