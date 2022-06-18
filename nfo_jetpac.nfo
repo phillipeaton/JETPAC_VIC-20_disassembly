@@ -131,14 +131,26 @@ word     20F4
 const    20F6
 lcomment 20F6 FF is loop terminator
 
+word     2206
+word     2209
+word     220c
+break    220f
 
-lcomment 2416 Sets some stuff up?
-lcomment 2419 Erase 1000-1fff Standard RAM
-lcomment 2422 Puts 000000  000000  00 at top of screen
+word     22ea
+break    22ed
+
+word     239a
+
+label    2416 RESET_COLOR_PIXELS_SCORES
+lcomment 241c Puts 000000  000000  00 at top of screen
 
 comment  2425
 comment  2425 YOU ARE HERE Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
 
+word     22f9
+
+
+word     2315
 
  label   2373 P1_LIVES__TO_UDG_RAM
 const    2376
@@ -154,6 +166,20 @@ lcomment 2386 1st Address
 word     2386
 lcomment 2388 FF is loop terminator
 
+label    2450 TEXT_STRINGS_1UP
+break    245e
+label    2457 TEXT_STRINGS_HI
+break    2457
+label    245e TEXT_STRINGS_2UP
+break    245e
+
+
+
+
+label    2465 TEXT_STRINGS_1UP_HI_2UP
+word     2465-246f
+break    246b
+break    246d
 
 label    2471 P1_SCORE_TO_UDG_RAM
 const    2474
@@ -194,6 +220,12 @@ lcomment 249a 2x3=6 characters?
 break    249d
 lcomment 249d FF is loop terminator
 
+word     24ce
+word     24D1
+word     24Db
+word     24De
+
+
 comment  259d
 label    259d AAAAA
 lcomment 259d
@@ -223,6 +255,9 @@ label    2773 ERASE1
 
 lcomment  349D Data for AAAAA call above
 
+const    34a1-34a3
+break    34a1
+word     349e
 label    34a4 CCCC_34a4
 
 lcomment 34be Jump to routine copy stuff from STD CHAR ROM TO UDG CHAR SET
@@ -246,32 +281,46 @@ lcomment 351D Valid Target - traced but doesn't seem to do much
 
 comment  355c
 label    355c RESET_COLOR_RAM?
+
 const    355f
 lcomment 355f ZP Offset for 1st address
 lcomment 3560 1st Address
 word     3560
+
 const    3562
 lcomment 3562 ZP Offset for 2nd address
 lcomment 3563 2nd address
 word     3563
-lcomment 3565 ?????? characters?
+
+const    3565
+lcomment 3565 ZP Offset for 3rd address
+lcomment 3566 3rd address
+word     3566
+
 break    3568
 lcomment 3568 FF is loop terminator
+
 
 label    356c ERASE_UDG_RAM_1000_1fff
 const    356f
 lcomment 356f ZP Offset for 1st address
-lcomment 3560 1st Address
-word     3560
-const    3562
-lcomment 3562 ZP Offset for 2nd address
-lcomment 3563 2nd address
-word     3563
-lcomment 3565 ?????? characters?
-break    3568
-lcomment 3568 FF is loop terminator
+lcomment 3570 1st Address
+word     3570
 
+const    3572
+lcomment 3572 ZP Offset for 2nd address
+lcomment 3573 2nd address
+word     3573
 
+const    3575
+lcomment 3575 ZP Offset for 3rd address
+lcomment 3576 3rd address
+word     3576
+
+break    3578
+lcomment 3578 FF is loop terminator
+
+comment  3579
 label    3579 ERASE_COLOR_RAM_9600
 label    357b ERASECR1
 lcomment 357b

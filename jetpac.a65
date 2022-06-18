@@ -21,6 +21,7 @@ Num_Lives         equ     $005A
 Screen_RAM        equ     $0200
 Hardware_IRQ      equ     $0314
 NMI_int_vector    equ     $0318
+Block0_3K_RAM     equ     $0400
 UDG_RAM           equ     $1000
 UDG_P1_SCORE      equ     $1008
 UDG_P1_LIVES      equ     $1420
@@ -46,6 +47,8 @@ VIA2_T1_Cnt_Lo    equ     $9124
 VIA2_T1_Cnt_Hi    equ     $9125
 VIA2_Int_Enable   equ     $912E
 Color_RAM         equ     $9600
+Block5_CartROM    equ     $A000
+Kernal_ROM        equ     $E000
 
 ;****************************************************
 ; Program's Code Areas
@@ -135,7 +138,7 @@ Start_3 sta     Screen_RAM,x            ; 2067: 9D 00 02
         bne     Start_2                 ; 2077: D0 EB          
 
 
-Z2079   jsr     Z2416                   ; 2079: 20 16 24       
+Z2079   jsr     RESET_COLOR_PIXELS_SCORES ; 2079: 20 16 24       
 
         lda     #$01                    ; 207C: A9 01          
         ldx     #$05                    ; 207E: A2 05          
@@ -186,7 +189,7 @@ Z20D0   txa                             ; 20D0: 8A
         and     #$10                    ; 20DF: 29 10          
         bne     Z208F                   ; 20E1: D0 AC          
 
-        jsr     Z2416                   ; 20E3: 20 16 24       
+        jsr     RESET_COLOR_PIXELS_SCORES ; 20E3: 20 16 24       
         jmp     Z25D1                   ; 20E6: 4C D1 25       
 ; ===========================================================
 Z20E9   lda     Zero_Page+74            ; 20E9: A5 4A          
@@ -346,8 +349,14 @@ Z21FC   lda     ZP_Addr_From            ; 21FC: A5 06
         and     #$FB                    ; 21FE: 29 FB          
         sta     ZP_Addr_From            ; 2200: 85 06          
 Z2202   jsr     AAAAA                   ; 2202: 20 9D 25       
-        fcb     $14,$00,$03,$16,$1C,$E0 ; 2205: 14 00 03 16 1C E0 
-        fcb     $02,$03,$00,$FF,$A0,$02 ; 220B: 02 03 00 FF A0 02 
+        fcb     $14                     ; 2205: 14             
+        fdb     Screen_RAM+256          ; 2206: 00 03          
+        fcb     $16                     ; 2208: 16             
+        fdb     Kernal_ROM+28           ; 2209: 1C E0          
+        fcb     $02                     ; 220B: 02             
+        fdb     Zero_Page+3             ; 220C: 03 00          
+        fcb     $FF                     ; 220E: FF             
+        fcb     $A0,$02                 ; 220F: A0 02          
 Z2211   iny                             ; 2211: C8             
         lda     (Zero_Page),y           ; 2212: B1 00          
         eor     ZP_Addr_From            ; 2214: 45 06          
@@ -446,7 +455,7 @@ Z22B4   pla                             ; 22B4: 68
         and     #$07                    ; 22B7: 29 07          
         rts                             ; 22B9: 60             
 ; -----------------------------------------------------------
-Z22BA   jsr     Z2416                   ; 22BA: 20 16 24       
+Z22BA   jsr     RESET_COLOR_PIXELS_SCORES ; 22BA: 20 16 24       
         lda     Zero_Page+89            ; 22BD: A5 59          
         and     #$03                    ; 22BF: 29 03          
         bne     Z22D1                   ; 22C1: D0 0E          
@@ -459,20 +468,24 @@ Z22CB   jsr     Z3152                   ; 22CB: 20 52 31
 Z22D1   jsr     Z2DCB                   ; 22D1: 20 CB 2D       
         jmp     Z22CB                   ; 22D4: 4C CB 22       
 ; ===========================================================
-Z22D7   jsr     Z2416                   ; 22D7: 20 16 24       
+Z22D7   jsr     RESET_COLOR_PIXELS_SCORES ; 22D7: 20 16 24       
         jsr     P1_LIVES__TO_UDG_RAM    ; 22DA: 20 73 23       
         jsr     Z2DA1                   ; 22DD: 20 A1 2D       
         jmp     Z22CB                   ; 22E0: 4C CB 22       
 ; ===========================================================
 Z22E3   jsr     Z28E7                   ; 22E3: 20 E7 28       
         jsr     AAAAA                   ; 22E6: 20 9D 25       
-        fcb     $00,$B8,$03,$FF         ; 22E9: 00 B8 03 FF    
+        fcb     $00                     ; 22E9: 00             
+        fdb     Screen_RAM+440          ; 22EA: B8 03          
+        fcb     $FF                     ; 22EC: FF             
         ldx     #$01                    ; 22ED: A2 01          
         jmp     Z231A                   ; 22EF: 4C 1A 23       
 ; ===========================================================
 Z22F2   jsr     Z28E7                   ; 22F2: 20 E7 28       
         jsr     AAAAA                   ; 22F5: 20 9D 25       
-        fcb     $00,$C0,$03,$FF         ; 22F8: 00 C0 03 FF    
+        fcb     $00                     ; 22F8: 00             
+        fdb     Screen_RAM+448          ; 22F9: C0 03          
+        fcb     $FF                     ; 22FB: FF             
         fcc     "L"                     ; 22FC: 4C             
         fcb     $ED,$22                 ; 22FD: ED 22          
 Z22FF   ldx     #$17                    ; 22FF: A2 17          
@@ -486,7 +499,7 @@ Z230B   jsr     Z22FF                   ; 230B: 20 FF 22
         jsr     Z28E7                   ; 230E: 20 E7 28       
         jsr     AAAAA                   ; 2311: 20 9D 25       
         fcb     $00                     ; 2314: 00             
-        fcc     ";#"                    ; 2315: 3B 23          
+        fdb     M233B                   ; 2315: 3B 23          
         fcb     $FF                     ; 2317: FF             
         ldx     #$03                    ; 2318: A2 03          
 Z231A   txa                             ; 231A: 8A             
@@ -556,8 +569,8 @@ Z238E   clc                             ; 238E: 18
         sta     ZP_Addr_From            ; 2391: 85 06          
         jsr     MV_CHARS_TO_UDGRAM      ; 2393: 20 95 35       
         jsr     AAAAA                   ; 2396: 20 9D 25       
-        fcb     $06,$C7                 ; 2399: 06 C7          
-        fcc     "#"                     ; 239B: 23             
+        fcb     $06                     ; 2399: 06             
+        fdb     $23C7                   ; 239A: C7 23          
         fcb     $FF                     ; 239C: FF             
         ldy     #$07                    ; 239D: A0 07          
         jmp     LOOP_35B6               ; 239F: 4C B6 35       
@@ -625,25 +638,26 @@ Z2406   lda     Screen_RAM+432,x        ; 2406: BD B0 03
         bpl     Z2406                   ; 2413: 10 F1          
         rts                             ; 2415: 60             
 ; -----------------------------------------------------------
-Z2416   jsr     RESET_COLOR_RAM?        ; 2416: 20 5C 35        Sets some stuff up?
-        jsr     ERASE_UDG_RAM_1000_1fff ; 2419: 20 6C 35        Erase 1000-1fff Standard RAM
-        jsr     P1_SCORE_TO_UDG_RAM     ; 241C: 20 71 24       
+RESET_COLOR_PIXELS_SCORES
+        jsr     RESET_COLOR_RAM?        ; 2416: 20 5C 35       
+        jsr     ERASE_UDG_RAM_1000_1fff ; 2419: 20 6C 35       
+        jsr     P1_SCORE_TO_UDG_RAM     ; 241C: 20 71 24        Puts 000000  000000  00 at top of screen
         jsr     HI_SCORE_TO_UDG_RAM?    ; 241F: 20 91 24       
-        jsr     P2_SCORE_TO_UDG_RAM     ; 2422: 20 81 24        Puts 000000  000000  00 at top of screen
+        jsr     P2_SCORE_TO_UDG_RAM     ; 2422: 20 81 24       
 
 ; YOU ARE HERE Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
 Z2425   ldx     #$00                    ; 2425: A2 00          
         ldy     #$03                    ; 2427: A0 03          
-Z2429   lda     M2465,x                 ; 2429: BD 65 24       
+Z2429   lda     TEXT_STRINGS_1UP_HI_2UP,x ; 2429: BD 65 24       
         sta     ZP_Addr_To              ; 242C: 85 04          
         inx                             ; 242E: E8             
-        lda     M2465,x                 ; 242F: BD 65 24       
+        lda     TEXT_STRINGS_1UP_HI_2UP,x ; 242F: BD 65 24       
         sta     ZP_Addr_To+1            ; 2432: 85 05          
         inx                             ; 2434: E8             
-        lda     M2465,x                 ; 2435: BD 65 24       
+        lda     TEXT_STRINGS_1UP_HI_2UP,x ; 2435: BD 65 24       
         sta     Zero_Page+14            ; 2438: 85 0E          
         inx                             ; 243A: E8             
-        lda     M2465,x                 ; 243B: BD 65 24       
+        lda     TEXT_STRINGS_1UP_HI_2UP,x ; 243B: BD 65 24       
         sta     Zero_Page+15            ; 243E: 85 0F          
         inx                             ; 2440: E8             
         txa                             ; 2441: 8A             
@@ -659,19 +673,25 @@ Z2429   lda     M2465,x                 ; 2429: BD 65 24
         bne     Z2429                   ; 244D: D0 DA          
         rts                             ; 244F: 60             
 ; -----------------------------------------------------------
+TEXT_STRINGS_1UP
         fcb     $01                     ; 2450: 01             
         fcc     "`qUP`"                 ; 2451: 60 71 55 50 60 
-        fcb     $E0,$07                 ; 2456: E0 07          
+        fcb     $E0                     ; 2456: E0             
+TEXT_STRINGS_HI
+        fcb     $07                     ; 2457: 07             
         fcc     "``HI`"                 ; 2458: 60 60 48 49 60 
-        fcb     $E0,$01                 ; 245D: E0 01          
+        fcb     $E0                     ; 245D: E0             
+TEXT_STRINGS_2UP
+        fcb     $01                     ; 245E: 01             
         fcc     "``rUP"                 ; 245F: 60 60 72 55 50 
         fcb     $E0                     ; 2464: E0             
-M2465   fcb     $00,$00                 ; 2465: 00 00          
-        fcc     "P$@"                   ; 2467: 50 24 40       
-        fcb     $00                     ; 246A: 00             
-        fcc     "W$"                    ; 246B: 57 24          
-        fcb     $80,$00                 ; 246D: 80 00          
-        fcc     "^$"                    ; 246F: 5E 24          
+TEXT_STRINGS_1UP_HI_2UP
+        fdb     Zero_Page               ; 2465: 00 00          
+        fdb     TEXT_STRINGS_1UP        ; 2467: 50 24          
+        fdb     ZP_ADDR                 ; 2469: 40 00          
+        fdb     TEXT_STRINGS_HI         ; 246B: 57 24          
+        fdb     Zero_Page+128           ; 246D: 80 00          
+        fdb     TEXT_STRINGS_2UP        ; 246F: 5E 24          
 P1_SCORE_TO_UDG_RAM
         jsr     AAAAA                   ; 2471: 20 9D 25       
         fcb     $04                     ; 2474: 04              ZP Offset for 1st address
@@ -726,15 +746,17 @@ Z24B9   ldx     #$00                    ; 24B9: A2 00
         lsr     a                       ; 24C6: 4A             
         jsr     Z24A1                   ; 24C7: 20 A1 24       
         jsr     AAAAA                   ; 24CA: 20 9D 25       
-        fcb     $04,$08                 ; 24CD: 04 08          
-        fcc     " "                     ; 24CF: 20             
+        fcb     $04                     ; 24CD: 04             
+        fdb     $2008                   ; 24CE: 08 20          
         fcb     $0E                     ; 24D0: 0E             
-        fcc     ":%"                    ; 24D1: 3A 25          
+        fdb     $253A                   ; 24D1: 3A 25          
         fcb     $FF                     ; 24D3: FF             
         jsr     Z34CC                   ; 24D4: 20 CC 34       
         jsr     AAAAA                   ; 24D7: 20 9D 25       
-        fcb     $04,$08,$A8,$0E         ; 24DA: 04 08 A8 0E    
-        fcc     "$%"                    ; 24DE: 24 25          
+        fcb     $04                     ; 24DA: 04             
+        fdb     Block5_CartROM+2056     ; 24DB: 08 A8          
+        fcb     $0E                     ; 24DD: 0E             
+        fdb     $2524                   ; 24DE: 24 25          
         fcb     $FF                     ; 24E0: FF             
         fcc     " "                     ; 24E1: 20             
         fcb     $CC                     ; 24E2: CC             
@@ -1335,7 +1357,7 @@ Z2975   fcb     $A0,$00                 ; 2975: A0 00
         jmp     Z261A                   ; 2984: 4C 1A 26       
 ; ===========================================================
 Z2987   jsr     Z277A                   ; 2987: 20 7A 27       
-        jsr     Z2416                   ; 298A: 20 16 24       
+        jsr     RESET_COLOR_PIXELS_SCORES ; 298A: 20 16 24       
         lda     Zero_Page+94            ; 298D: A5 5E          
         bne     Z2997                   ; 298F: D0 06          
         fcc     " "                     ; 2991: 20             
@@ -1375,7 +1397,7 @@ Z29DB   jsr     Z23F5                   ; 29DB: 20 F5 23
         sta     Zero_Page+94            ; 29E2: 85 5E          
         jmp     Z29C7                   ; 29E4: 4C C7 29       
 ; ===========================================================
-Z29E7   jsr     Z2416                   ; 29E7: 20 16 24       
+Z29E7   jsr     RESET_COLOR_PIXELS_SCORES ; 29E7: 20 16 24       
         lda     Zero_Page+94            ; 29EA: A5 5E          
         bne     Z2A12                   ; 29EC: D0 24          
         jsr     AAAAA                   ; 29EE: 20 9D 25       
@@ -2803,8 +2825,10 @@ Z347D   lda     (ZP_Addr_To),y          ; 347D: B1 04
 Z3499   rts                             ; 3499: 60             
 ; -----------------------------------------------------------
 Z349A   jsr     AAAAA                   ; 349A: 20 9D 25       
-        fcb     $04,$80,$00,$FF         ; 349D: 04 80 00 FF     Data for AAAAA call above
-        fcc     "Lp4"                   ; 34A1: 4C 70 34       
+        fcb     $04                     ; 349D: 04              Data for AAAAA call above
+        fdb     Zero_Page+128           ; 349E: 80 00          
+        fcb     $FF                     ; 34A0: FF             
+        fcb     $4C,$70,$34             ; 34A1: 4C 70 34       
 CCCC_34a4
         ldy     #$00                    ; 34A4: A0 00          
         lda     (Zero_Page+14),y        ; 34A6: B1 0E          
@@ -2918,21 +2942,23 @@ RESET_COLOR_RAM?
         jsr     AAAAA                   ; 355C: 20 9D 25       
         fcb     $02                     ; 355F: 02              ZP Offset for 1st address
         fdb     Zero_Page+252           ; 3560: FC 00           1st Address
-                                        ; 1st Address
         fcb     $04                     ; 3562: 04              ZP Offset for 2nd address
-                                        ; ZP Offset for 2nd address
         fdb     Color_RAM               ; 3563: 00 96           2nd address
-                                        ; 2nd address
-        fcb     $06,$01,$00             ; 3565: 06 01 00        ?????? characters?
-                                        ; ?????? characters?
+        fcb     $06                     ; 3565: 06              ZP Offset for 3rd address
+        fdb     Zero_Page+1             ; 3566: 01 00           3rd address
         fcb     $FF                     ; 3568: FF              FF is loop terminator
-                                        ; FF is loop terminator
         jmp     ERASE_COLOR_RAM_9600    ; 3569: 4C 79 35       
 ; ===========================================================
 ERASE_UDG_RAM_1000_1fff
         jsr     AAAAA                   ; 356C: 20 9D 25       
-        fcb     $02,$CF,$0F,$04,$00,$10 ; 356F: 02 CF 0F 04 00 10  ZP Offset for 1st address
-        fcb     $06,$00,$00,$FF         ; 3575: 06 00 00 FF    
+        fcb     $02                     ; 356F: 02              ZP Offset for 1st address
+        fdb     Block0_3K_RAM+3023      ; 3570: CF 0F           1st Address
+        fcb     $04                     ; 3572: 04              ZP Offset for 2nd address
+        fdb     UDG_RAM                 ; 3573: 00 10           2nd address
+        fcb     $06                     ; 3575: 06              ZP Offset for 3rd address
+        fdb     Zero_Page               ; 3576: 00 00           3rd address
+        fcb     $FF                     ; 3578: FF              FF is loop terminator
+
 ERASE_COLOR_RAM_9600
         ldy     #$00                    ; 3579: A0 00          
 ERASECR1 lda    ZP_Addr_From            ; 357B: A5 06          
