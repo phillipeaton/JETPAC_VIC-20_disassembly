@@ -238,10 +238,8 @@ label    258E STRING_SP_START_GAME
 
 
 
-;break    2524
-
-
-;const    2524
+word     24Db
+word     24De
 
 
 comment  259d
