@@ -79,7 +79,21 @@ label    1b08 UDG_P2_SCORE
 label    1fd0 UDG_END
 
 ; Start of disassembly instructions
-const    2000-201b
+word     2000-2003
+const    2004-201b
+break    2008
+break    200c
+break    2010
+
+label    2014 BITM_01
+label    2015 BITM_02
+label    2016 BITM_04
+label    2017 BITM_08
+label    2018 BITM_10
+label    2019 BITM_20
+label    201a BITM_40
+label    201b BITM_80
+
 break    2019-2020
 label    2004 VIC_Init_Tab
 lcomment 2004 Initial value table for VIC setup 16 bytes
@@ -121,6 +135,14 @@ comment  2079
 comment  207C
 comment  2085
 
+
+label    2080 BACK_2080
+label    208F BACK_20b2
+label    20b2 SKIP_20b2
+label    20bc SKIP_20bc
+label    20c6 SKIP_20c6
+label    20d0 SKIP_20d0
+
 comment  20E3
 
 label    20F0 ???_TO_UDG_RAM
@@ -130,6 +152,12 @@ lcomment 20F4 1st Address
 word     20F4
 const    20F6
 lcomment 20F6 FF is loop terminator
+
+label    2145 BACK_2145
+
+label    216b _12346737
+label    21dc SKIP_21DC
+label    21F1 SKIP_21F1
 
 word     2206
 word     2209
@@ -141,18 +169,12 @@ break    22ed
 
 word     239a
 
-label    2416 RESET_COLOR_PIXELS_SCORES
-lcomment 241c Puts 000000  000000  00 at top of screen
-
-comment  2425
-comment  2425 YOU ARE HERE Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
-
 word     22f9
 
 
 word     2315
 
- label   2373 P1_LIVES__TO_UDG_RAM
+label    2373 P1_LIVES_TO_UDG_RAM
 const    2376
 lcomment 2376 ZP Offset for 1st address
 lcomment 2377 1st Address
@@ -165,6 +187,21 @@ lcomment 2385 ZP Offset for 1st address
 lcomment 2386 1st Address
 word     2386
 lcomment 2388 FF is loop terminator
+
+label    23D6 BACK_23D6
+label    23F4 SKIP_23F4
+label    23F7 BACK_23F7
+label    2406 BACK_2406
+
+label    2416 RESET_COLOR_PIXELS_SCORES
+lcomment 241c Puts 000000  000000  00 at top of screen
+
+comment  2425
+comment  2425 YOU ARE HERE Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
+
+
+
+label    2429 BACK_2429
 
 label    2450 TEXT_STRINGS_1UP
 break    245e
@@ -190,8 +227,10 @@ const    2477
 lcomment 2477 ZP Offset for 2nd address
 lcomment 2478 2nd address
 word     2478
-lcomment 247a 2x3=6 characters?
-break    247d
+const    247a
+lcomment 247a ZP Offset for 2nd address
+lcomment 247b 2nd address
+word     247b
 lcomment 247d FF is loop terminator
 
 label    2481 P2_SCORE_TO_UDG_RAM
@@ -203,7 +242,10 @@ const    2487
 lcomment 2487 ZP Offset for 2nd address
 lcomment 2488 2nd address
 word     2488
-lcomment 248a 2x3=6 characters?
+const    248a
+lcomment 248a ZP Offset for 2nd address
+lcomment 248b 2nd address
+word     248b
 break    248d
 lcomment 248d FF is loop terminator
 
@@ -216,9 +258,14 @@ const    2497
 lcomment 2497 ZP Offset for 2nd address
 lcomment 2498 2nd address
 word     2498
-lcomment 249a 2x3=6 characters?
+const    249a
+lcomment 249a ZP Offset for 3rd address
+lcomment 249b 3rd address
+word     249b
 break    249d
 lcomment 249d FF is loop terminator
+
+label    24B2 SKIP_24B2
 
 word     24ce
 word     24D1
@@ -261,6 +308,22 @@ label    25d0 INCADDR40
 
 comment  265e Setup Timer 1
 label    265e SET_TMR_1
+
+const    2679
+lcomment 2679 ZP Offset for 1st address
+lcomment 267a 1st Address
+word     267a
+
+const    268e-26ad
+word     268e-26ad
+
+label    26b0 BACK_26b0
+
+label    26c5 SCREEN_C0000000
+
+label    26d1 BACK_26d1
+
+
 comment  275b Erase $100 bytes zero page
 label    275b ERASEZP
 lcomment 275b Erase $100 bytes zero page
@@ -268,6 +331,40 @@ label    275e ERASEZ1
 lcomment  276f Erase $30 bytes at end of UDGs $1fd0-$2000
 label    276f ERASE_UDG_END
 label    2773 ERASE1
+
+const    277d
+lcomment 277d ZP Offset for 1st address
+lcomment 277e 1st Address
+word     277e
+const    2780
+lcomment 2780 ZP Offset for 1st address
+lcomment 2781 1st Address
+word     2781
+const    278a
+lcomment 278a ZP Offset for 1st address
+lcomment 278b 1st Address
+word     278b
+
+
+
+const    29f1
+lcomment 29f1 ZP Offset for 1st address
+lcomment 29f2 1st Address
+word     29f2
+const    29f4
+lcomment 29f4 ZP Offset for 1st address?????
+lcomment 29f5 1st Address?????
+word     29f5
+
+const    29fe
+lcomment 29fe ZP Offset for 1st address
+lcomment 29ff 1st Address
+word     29ff
+const    2a01
+lcomment 2a01 ZP Offset for 1st address
+lcomment 2a02 1st Address
+word     2a02
+
 
 lcomment  349D Data for AAAAA call above
 

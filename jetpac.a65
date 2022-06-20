@@ -29,6 +29,7 @@ UDG_HI_SCORE      equ     $1588
 UDG_P2_LIVES      equ     $19A0
 UDG_P2_SCORE      equ     $1B08
 UDG_END           equ     $1FD0
+Block3_8K_RAM     equ     $6000
 VIC_R0_H_Ctr      equ     $9000
 VIC_R4_TV_Raster  equ     $9004
 VIC_RA_Frq_Osc1   equ     $900A
@@ -56,19 +57,20 @@ Kernal_ROM        equ     $E000
 
         org     $2000
 
-        fcb     $1D,$20,$1D,$20         ; 2000: 1D 20 1D 20    
+        fdb     $201D,$201D             ; 2000: 1D 20 1D 20    
 VIC_Init_Tab
-        fcb     $0B,$26,$97,$17,$00,$8C ; 2004: 0B 26 97 17 00 8C  Initial value table for VIC setup 16 bytes
-        fcb     $00,$00,$00,$00,$00,$00 ; 200A: 00 00 00 00 00 00 
+        fcb     $0B,$26,$97,$17         ; 2004: 0B 26 97 17     Initial value table for VIC setup 16 bytes
+        fcb     $00,$8C,$00,$00         ; 2008: 00 8C 00 00    
+        fcb     $00,$00,$00,$00         ; 200C: 00 00 00 00    
         fcb     $00,$00,$00,$08         ; 2010: 00 00 00 08    
-M2014   fcb     $01                     ; 2014: 01             
-M2015   fcb     $02                     ; 2015: 02             
-M2016   fcb     $04                     ; 2016: 04             
-M2017   fcb     $08                     ; 2017: 08             
-M2018   fcb     $10                     ; 2018: 10             
-M2019   fcb     $20                     ; 2019: 20             
-        fcb     $40                     ; 201A: 40             
-M201B   fcb     $80                     ; 201B: 80             
+BITM_01 fcb     $01                     ; 2014: 01             
+BITM_02 fcb     $02                     ; 2015: 02             
+BITM_04 fcb     $04                     ; 2016: 04             
+BITM_08 fcb     $08                     ; 2017: 08             
+BITM_10 fcb     $10                     ; 2018: 10             
+BITM_20 fcb     $20                     ; 2019: 20             
+BITM_40 fcb     $40                     ; 201A: 40             
+BITM_80 fcb     $80                     ; 201B: 80             
         rti                             ; 201C: 40              NMI Interrupt Vector points here
 
 ; ----------------------------------------------------------
@@ -141,15 +143,17 @@ Z2079   jsr     RESET_COLOR_PIXELS_SCORES ; 2079: 20 16 24
 
         lda     #$01                    ; 207C: A9 01          
         ldx     #$05                    ; 207E: A2 05          
-Z2080   sta     Zero_Page+69,x          ; 2080: 95 45          
+BACK_2080
+        sta     Zero_Page+69,x          ; 2080: 95 45          
         dex                             ; 2082: CA             
-        bpl     Z2080                   ; 2083: 10 FB          
+        bpl     BACK_2080               ; 2083: 10 FB          
 
         lda     #$0F                    ; 2085: A9 0F          
         sta     VIC_RE_Vol_Color        ; 2087: 8D 0E 90       
         lda     #$00                    ; 208A: A9 00          
         sta     Screen_RAM+424          ; 208C: 8D A8 03       
-Z208F   inc     Zero_Page+88            ; 208F: E6 58          
+BACK_20b2
+        inc     Zero_Page+88            ; 208F: E6 58          
         lda     #$00                    ; 2091: A9 00          
         sta     VIA2_DDR_B              ; 2093: 8D 22 91       
         lda     #$FF                    ; 2096: A9 FF          
@@ -161,32 +165,38 @@ Z208F   inc     Zero_Page+88            ; 208F: E6 58
         sta     Zero_Page+19            ; 20A6: 85 13          
         lda     #$10                    ; 20A8: A9 10          
         bit     Zero_Page+19            ; 20AA: 24 13          
-        bne     Z20B2                   ; 20AC: D0 04          
-        fcb     $8A                     ; 20AE: 8A             
-        fcc     ")"                     ; 20AF: 29             
-        fcb     $02,$AA                 ; 20B0: 02 AA          
-Z20B2   lda     #$20                    ; 20B2: A9 20          
+        bne     SKIP_20b2               ; 20AC: D0 04          
+        txa                             ; 20AE: 8A             
+        and     #$02                    ; 20AF: 29 02          
+        tax                             ; 20B1: AA             
+SKIP_20b2
+        lda     #$20                    ; 20B2: A9 20          
         bit     Zero_Page+19            ; 20B4: 24 13          
-        bne     Z20BC                   ; 20B6: D0 04          
-        fcb     $8A,$09,$01,$AA         ; 20B8: 8A 09 01 AA    
-Z20BC   lda     #$40                    ; 20BC: A9 40          
+        bne     SKIP_20bc               ; 20B6: D0 04          
+        txa                             ; 20B8: 8A             
+        ora     #$01                    ; 20B9: 09 01          
+        tax                             ; 20BB: AA             
+SKIP_20bc
+        lda     #$40                    ; 20BC: A9 40          
         bit     Zero_Page+19            ; 20BE: 24 13          
-        bne     Z20C6                   ; 20C0: D0 04          
-        fcb     $8A                     ; 20C2: 8A             
-        fcc     ")"                     ; 20C3: 29             
-        fcb     $01,$AA                 ; 20C4: 01 AA          
-Z20C6   lda     #$80                    ; 20C6: A9 80          
+        bne     SKIP_20c6               ; 20C0: D0 04          
+        txa                             ; 20C2: 8A             
+        and     #$01                    ; 20C3: 29 01          
+        tax                             ; 20C5: AA             
+SKIP_20c6
+        lda     #$80                    ; 20C6: A9 80          
         bit     Zero_Page+19            ; 20C8: 24 13          
-        bne     Z20D0                   ; 20CA: D0 04          
+        bne     SKIP_20d0               ; 20CA: D0 04          
         fcb     $8A,$09,$02,$AA         ; 20CC: 8A 09 02 AA    
-Z20D0   txa                             ; 20D0: 8A             
+SKIP_20d0
+        txa                             ; 20D0: 8A             
         sta     UDG_RAM+4051            ; 20D1: 8D D3 1F       
         jsr     Z24B9                   ; 20D4: 20 B9 24       
         lda     #$FE                    ; 20D7: A9 FE          
         sta     VIA2_Port_A             ; 20D9: 8D 21 91       
         lda     VIA2_Port_B             ; 20DC: AD 20 91       
         and     #$10                    ; 20DF: 29 10          
-        bne     Z208F                   ; 20E1: D0 AC          
+        bne     BACK_20b2               ; 20E1: D0 AC          
 
         jsr     RESET_COLOR_PIXELS_SCORES ; 20E3: 20 16 24       
         jmp     Z25D1                   ; 20E6: 4C D1 25       
@@ -247,10 +257,11 @@ Z212F   sta     Zero_Page+8             ; 212F: 85 08
         lda     Zero_Page+8             ; 213F: A5 08          
         sta     (ZP_Addr_From),y        ; 2141: 91 06          
         and     #$FB                    ; 2143: 29 FB          
-Z2145   iny                             ; 2145: C8             
+BACK_2145
+        iny                             ; 2145: C8             
         sta     (ZP_Addr_From),y        ; 2146: 91 06          
         dex                             ; 2148: CA             
-        bne     Z2145                   ; 2149: D0 FA          
+        bne     BACK_2145               ; 2149: D0 FA          
         iny                             ; 214B: C8             
         lda     Zero_Page+76            ; 214C: A5 4C          
         and     #$38                    ; 214E: 29 38          
@@ -261,7 +272,7 @@ Z2145   iny                             ; 2145: C8
         lda     Zero_Page+76            ; 2156: A5 4C          
         and     #$07                    ; 2158: 29 07          
         tax                             ; 215A: AA             
-        lda     M216B,x                 ; 215B: BD 6B 21       
+        lda     _12346737,x             ; 215B: BD 6B 21       
         sta     (ZP_Addr_From),y        ; 215E: 91 06          
         lda     #$03                    ; 2160: A9 03          
         sta     Screen_RAM+429          ; 2162: 8D AD 03       
@@ -269,7 +280,8 @@ Z2145   iny                             ; 2145: C8
         sta     Screen_RAM+430          ; 2167: 8D AE 03       
         rts                             ; 216A: 60             
 ; -----------------------------------------------------------
-M216B   fcb     $01,$02,$03,$04,$06,$07 ; 216B: 01 02 03 04 06 07 
+_12346737
+        fcb     $01,$02,$03,$04,$06,$07 ; 216B: 01 02 03 04 06 07 
         fcb     $03,$07                 ; 2171: 03 07          
 Z2173   lda     (Zero_Page),y           ; 2173: B1 00          
         and     #$07                    ; 2175: 29 07          
@@ -309,12 +321,12 @@ Z2195   adc     #$08                    ; 2195: 69 08
         sta     ZP_Addr_To+1            ; 21B0: 85 05          
         sta     Zero_Page+19            ; 21B2: 85 13          
         lda     ZP_Addr_From            ; 21B4: A5 06          
-        bit     M2016                   ; 21B6: 2C 16 20       
+        bit     BITM_04                 ; 21B6: 2C 16 20       
         beq     Z2202                   ; 21B9: F0 47          
         jsr     Z34F7                   ; 21BB: 20 F7 34       
         jsr     Z351D                   ; 21BE: 20 1D 35       
         lda     ZP_Addr_From            ; 21C1: A5 06          
-        bit     M2014                   ; 21C3: 2C 14 20       
+        bit     BITM_01                 ; 21C3: 2C 14 20       
         clc                             ; 21C6: 18             
         beq     Z2195                   ; 21C7: F0 CC          
         adc     #$F8                    ; 21C9: 69 F8          
@@ -324,10 +336,11 @@ Z21CB   jsr     Z2298                   ; 21CB: 20 98 22
         lda     (Zero_Page),y           ; 21D1: B1 00          
         dey                             ; 21D3: 88             
         cmp     #$80                    ; 21D4: C9 80          
-        bcs     Z21DC                   ; 21D6: B0 04          
+        bcs     SKIP_21DC               ; 21D6: B0 04          
         lda     (ZP_Addr_To),y          ; 21D8: B1 04          
         bne     Z21FC                   ; 21DA: D0 20          
-Z21DC   txa                             ; 21DC: 8A             
+SKIP_21DC
+        txa                             ; 21DC: 8A             
         sta     ZP_Addr_From            ; 21DD: 85 06          
         lda     (ZP_Addr_To),y          ; 21DF: B1 04          
         eor     #$FF                    ; 21E1: 49 FF          
@@ -335,10 +348,11 @@ Z21DC   txa                             ; 21DC: 8A
         lda     (Zero_Page+12),y        ; 21E5: B1 0C          
         and     #$0F                    ; 21E7: 29 0F          
         cmp     #$05                    ; 21E9: C9 05          
-        beq     Z21F1                   ; 21EB: F0 04          
+        beq     SKIP_21F1               ; 21EB: F0 04          
         lda     Zero_Page+27            ; 21ED: A5 1B          
         sta     (Zero_Page+12),y        ; 21EF: 91 0C          
-Z21F1   lda     ZP_Addr_From+1          ; 21F1: A5 07          
+SKIP_21F1
+        lda     ZP_Addr_From+1          ; 21F1: A5 07          
         sec                             ; 21F3: 38             
         sbc     #$08                    ; 21F4: E9 08          
         sta     ZP_Addr_From+1          ; 21F6: 85 07          
@@ -370,7 +384,7 @@ Z2211   iny                             ; 2211: C8
         jmp     Z261A                   ; 2226: 4C 1A 26       
 ; ===========================================================
 Z2229   lda     (Zero_Page),y           ; 2229: B1 00          
-        bit     M2016                   ; 222B: 2C 16 20       
+        bit     BITM_04                 ; 222B: 2C 16 20       
         bne     Z2257                   ; 222E: D0 27          
         dec     ZP_Addr_From+1          ; 2230: C6 07          
         lda     ZP_Addr_From+1          ; 2232: A5 07          
@@ -394,7 +408,7 @@ Z2248   ldy     #$06                    ; 2248: A0 06
 ; ===========================================================
 Z2257   lda     (Zero_Page),y           ; 2257: B1 00          
         sta     ZP_Addr_To              ; 2259: 85 04          
-        bit     M2014                   ; 225B: 2C 14 20       
+        bit     BITM_01                 ; 225B: 2C 14 20       
         beq     Z2285                   ; 225E: F0 25          
         clc                             ; 2260: 18             
         adc     #$F8                    ; 2261: 69 F8          
@@ -439,7 +453,7 @@ Z22A1   tya                             ; 22A1: 98
         pha                             ; 22A2: 48             
         ldy     #$00                    ; 22A3: A0 00          
         lda     (Zero_Page),y           ; 22A5: B1 00          
-        bit     M201B                   ; 22A7: 2C 1B 20       
+        bit     BITM_80                 ; 22A7: 2C 1B 20       
         beq     Z22B4                   ; 22AA: F0 08          
         pla                             ; 22AC: 68             
         tay                             ; 22AD: A8             
@@ -468,7 +482,7 @@ Z22D1   jsr     Z2DCB                   ; 22D1: 20 CB 2D
         jmp     Z22CB                   ; 22D4: 4C CB 22       
 ; ===========================================================
 Z22D7   jsr     RESET_COLOR_PIXELS_SCORES ; 22D7: 20 16 24       
-        jsr     P1_LIVES__TO_UDG_RAM    ; 22DA: 20 73 23       
+        jsr     P1_LIVES_TO_UDG_RAM     ; 22DA: 20 73 23       
         jsr     Z2DA1                   ; 22DD: 20 A1 2D       
         jmp     Z22CB                   ; 22E0: 4C CB 22       
 ; ===========================================================
@@ -544,9 +558,9 @@ Z235D   lda     M2353,x                 ; 235D: BD 53 23
         and     #$01                    ; 2369: 29 01          
         beq     Z23CF                   ; 236B: F0 62          
         lda     #$FF                    ; 236D: A9 FF          
-        sta     Zero_Page+93            ; 236F: 85 5D          
+Z236F   sta     Zero_Page+93            ; 236F: 85 5D          
         dec     Num_Lives               ; 2371: C6 5A          
-P1_LIVES__TO_UDG_RAM
+P1_LIVES_TO_UDG_RAM
         jsr     AAAAA                   ; 2373: 20 9D 25       
         fcb     $04                     ; 2376: 04              ZP Offset for 1st address
         fdb     UDG_P1_LIVES            ; 2377: 20 14           1st Address
@@ -559,9 +573,7 @@ P2_LIVES__TO_UDG_RAM
         fcb     $04                     ; 2385: 04              ZP Offset for 1st address
         fdb     UDG_P2_LIVES            ; 2386: A0 19           1st Address
         fcb     $FF                     ; 2388: FF              FF is loop terminator
-        fcc     " "                     ; 2389: 20             
-        fcb     $C0                     ; 238A: C0             
-        fcc     "#"                     ; 238B: 23             
+        jsr     Z23C0                   ; 2389: 20 C0 23       
         beq     Z23A8                   ; 238C: F0 1A          
 Z238E   clc                             ; 238E: 18             
         adc     #$70                    ; 238F: 69 70          
@@ -592,49 +604,53 @@ Z23BA   lda     Num_Lives               ; 23BA: A5 5A
 Z23BD   lda     Zero_Page+92            ; 23BD: A5 5C          
         rts                             ; 23BF: 60             
 ; -----------------------------------------------------------
-        lda     Zero_Page+94            ; 23C0: A5 5E          
+Z23C0   lda     Zero_Page+94            ; 23C0: A5 5E          
         beq     Z23BD                   ; 23C2: F0 F9          
         jmp     Z23BA                   ; 23C4: 4C BA 23       
 ; ===========================================================
         fcb     $18                     ; 23C7: 18             
         fcc     "$<~Z<<f"               ; 23C8: 24 3C 7E 5A 3C 3C 66 
-Z23CF   fcb     $A9,$7F                 ; 23CF: A9 7F          
-        fcc     "Lo#"                   ; 23D1: 4C 6F 23       
-Z23D4   fcb     $A0,$02                 ; 23D4: A0 02          
-Z23D6   lda     #$00                    ; 23D6: A9 00          
+Z23CF   lda     #$7F                    ; 23CF: A9 7F          
+        jmp     Z236F                   ; 23D1: 4C 6F 23       
+Z23D4   ldy     #$02                    ; 23D4: A0 02          
+BACK_23D6
+        lda     #$00                    ; 23D6: A9 00          
         sta     Zero_Page+89            ; 23D8: 85 59          
         lda     #$04                    ; 23DA: A9 04          
         sta     Num_Lives               ; 23DC: 85 5A          
         jsr     Z22FF                   ; 23DE: 20 FF 22       
         jsr     Z23F5                   ; 23E1: 20 F5 23       
         dey                             ; 23E4: 88             
-        bne     Z23D6                   ; 23E5: D0 EF          
+        bne     BACK_23D6               ; 23E5: D0 EF          
         lda     #$05                    ; 23E7: A9 05          
         sta     Zero_Page+92            ; 23E9: 85 5C          
         lda     UDG_RAM+4051            ; 23EB: AD D3 1F       
         and     #$01                    ; 23EE: 29 01          
-        bne     Z23F4                   ; 23F0: D0 02          
+        bne     SKIP_23F4               ; 23F0: D0 02          
         sta     Zero_Page+92            ; 23F2: 85 5C          
-Z23F4   rts                             ; 23F4: 60             
+SKIP_23F4
+        rts                             ; 23F4: 60             
 ; -----------------------------------------------------------
 Z23F5   ldx     #$01                    ; 23F5: A2 01          
-Z23F7   lda     Zero_Page+89,x          ; 23F7: B5 59          
+BACK_23F7
+        lda     Zero_Page+89,x          ; 23F7: B5 59          
         pha                             ; 23F9: 48             
         lda     Zero_Page+91,x          ; 23FA: B5 5B          
         sta     Zero_Page+89,x          ; 23FC: 95 59          
         pla                             ; 23FE: 68             
         sta     Zero_Page+91,x          ; 23FF: 95 5B          
         dex                             ; 2401: CA             
-        bpl     Z23F7                   ; 2402: 10 F3          
+        bpl     BACK_23F7               ; 2402: 10 F3          
         ldx     #$17                    ; 2404: A2 17          
-Z2406   lda     Screen_RAM+432,x        ; 2406: BD B0 03       
+BACK_2406
+        lda     Screen_RAM+432,x        ; 2406: BD B0 03       
         pha                             ; 2409: 48             
         lda     Zero_Page+40,x          ; 240A: B5 28          
         sta     Screen_RAM+432,x        ; 240C: 9D B0 03       
         pla                             ; 240F: 68             
         sta     Zero_Page+40,x          ; 2410: 95 28          
         dex                             ; 2412: CA             
-        bpl     Z2406                   ; 2413: 10 F1          
+        bpl     BACK_2406               ; 2413: 10 F1          
         rts                             ; 2415: 60             
 ; -----------------------------------------------------------
 RESET_COLOR_PIXELS_SCORES
@@ -647,7 +663,8 @@ RESET_COLOR_PIXELS_SCORES
 ; YOU ARE HERE Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
 Z2425   ldx     #$00                    ; 2425: A2 00          
         ldy     #$03                    ; 2427: A0 03          
-Z2429   lda     TEXT_STRINGS_1UP_HI_2UP,x ; 2429: BD 65 24       
+BACK_2429
+        lda     TEXT_STRINGS_1UP_HI_2UP,x ; 2429: BD 65 24       
         sta     ZP_Addr_To              ; 242C: 85 04          
         inx                             ; 242E: E8             
         lda     TEXT_STRINGS_1UP_HI_2UP,x ; 242F: BD 65 24       
@@ -669,7 +686,7 @@ Z2429   lda     TEXT_STRINGS_1UP_HI_2UP,x ; 2429: BD 65 24
         pla                             ; 244A: 68             
         tax                             ; 244B: AA             
         dey                             ; 244C: 88             
-        bne     Z2429                   ; 244D: D0 DA          
+        bne     BACK_2429               ; 244D: D0 DA          
         rts                             ; 244F: 60             
 ; -----------------------------------------------------------
 TEXT_STRINGS_1UP
@@ -697,7 +714,8 @@ P1_SCORE_TO_UDG_RAM
         fdb     UDG_P1_SCORE            ; 2475: 08 10           1st Address
         fcb     $0E                     ; 2477: 0E              ZP Offset for 2nd address
         fdb     Score_P1                ; 2478: 51 00           2nd address
-        fcb     $02,$03,$00             ; 247A: 02 03 00        2x3=6 characters?
+        fcb     $02                     ; 247A: 02              ZP Offset for 2nd address
+        fdb     Zero_Page+3             ; 247B: 03 00           2nd address
         fcb     $FF                     ; 247D: FF              FF is loop terminator
         jmp     CCCC_34a4               ; 247E: 4C A4 34       
 ; ===========================================================
@@ -707,7 +725,8 @@ P2_SCORE_TO_UDG_RAM
         fdb     UDG_P2_SCORE            ; 2485: 08 1B           1st Address
         fcb     $0E                     ; 2487: 0E              ZP Offset for 2nd address
         fdb     Score_P2                ; 2488: 54 00           2nd address
-        fcb     $02,$03,$00             ; 248A: 02 03 00        2x3=6 characters?
+        fcb     $02                     ; 248A: 02              ZP Offset for 2nd address
+        fdb     Zero_Page+3             ; 248B: 03 00           2nd address
         fcb     $FF                     ; 248D: FF              FF is loop terminator
         jmp     CCCC_34a4               ; 248E: 4C A4 34       
 ; ===========================================================
@@ -717,21 +736,23 @@ HI_SCORE_TO_UDG_RAM?
         fdb     UDG_HI_SCORE            ; 2495: 88 15           1st address
         fcb     $0E                     ; 2497: 0E              ZP Offset for 2nd address
         fdb     UDG_END                 ; 2498: D0 1F           2nd address
-        fcb     $02,$03,$00             ; 249A: 02 03 00        2x3=6 characters?
+        fcb     $02                     ; 249A: 02              ZP Offset for 3rd address
+        fdb     Zero_Page+3             ; 249B: 03 00           3rd address
         fcb     $FF                     ; 249D: FF              FF is loop terminator
         jmp     CCCC_34a4               ; 249E: 4C A4 34       
 ; ===========================================================
 Z24A1   jsr     Z24A4                   ; 24A1: 20 A4 24       
 Z24A4   pha                             ; 24A4: 48             
         and     #$01                    ; 24A5: 29 01          
-        bne     Z24B2                   ; 24A7: D0 09          
+        bne     SKIP_24B2               ; 24A7: D0 09          
         lda     Zero_Page+88            ; 24A9: A5 58          
         lsr     a                       ; 24AB: 4A             
         lsr     a                       ; 24AC: 4A             
         lsr     a                       ; 24AD: 4A             
         and     #$01                    ; 24AE: 29 01          
         ora     #$80                    ; 24B0: 09 80          
-Z24B2   sta     Zero_Page+69,x          ; 24B2: 95 45          
+SKIP_24B2
+        sta     Zero_Page+69,x          ; 24B2: 95 45          
         pla                             ; 24B4: 68             
         eor     #$01                    ; 24B5: 49 01          
         inx                             ; 24B7: E8             
@@ -942,7 +963,9 @@ Z2669   sei                             ; 2669: 78
         lda     Zero_Page+1             ; 2672: A5 01          
         sta     Zero_Page+35            ; 2674: 85 23          
         jsr     AAAAA                   ; 2676: 20 9D 25       
-        fcb     $00,$80,$03,$FF         ; 2679: 00 80 03 FF    
+        fcb     $00                     ; 2679: 00              ZP Offset for 1st address
+        fdb     Screen_RAM+384          ; 267A: 80 03           1st Address
+        fcb     $FF                     ; 267C: FF             
         fcc     "L"                     ; 267D: 4C             
         fcb     $07,$26                 ; 267E: 07 26          
 Z2680   fcb     $A5,$22                 ; 2680: A5 22          
@@ -954,33 +977,29 @@ Z2680   fcb     $A5,$22                 ; 2680: A5 22
 ; ===========================================================
 M268C   fcb     $1A                     ; 268C: 1A             
 M268D   fcb     $26                     ; 268D: 26             
-        fcc     "s2M34)"                ; 268E: 73 32 4D 33 34 29 
-        fcb     $8E                     ; 2694: 8E             
-        fcc     "/j,"                   ; 2695: 2F 6A 2C       
-        fcb     $BC                     ; 2698: BC             
-        fcc     "*m*_*t."               ; 2699: 2A 6D 2A 5F 2A 74 2E 
-        fcb     $17                     ; 26A0: 17             
-        fcc     ".N."                   ; 26A1: 2E 4E 2E       
-        fcb     $CD,$26,$1A,$26         ; 26A4: CD 26 1A 26    
-        fcc     ">("                    ; 26A8: 3E 28          
-        fcb     $1A,$26,$9A             ; 26AA: 1A 26 9A       
-        fcc     "!"                     ; 26AD: 21             
-Z26AE   fcb     $A2,$07                 ; 26AE: A2 07          
-Z26B0   fcb     $BD,$C5,$26             ; 26B0: BD C5 26       
+        fdb     $3273,$334D,$2934,$2F8E ; 268E: 73 32 4D 33 34 29 8E 2F 
+        fdb     $2C6A,$2ABC,$2A6D,$2A5F ; 2696: 6A 2C BC 2A 6D 2A 5F 2A 
+        fdb     $2E74,$2E17,$2E4E,$26CD ; 269E: 74 2E 17 2E 4E 2E CD 26 
+        fdb     $261A,$283E,$261A,$219A ; 26A6: 1A 26 3E 28 1A 26 9A 21 
+Z26AE   ldx     #$07                    ; 26AE: A2 07          
+BACK_26b0
+        lda     SCREEN_C0000000,x       ; 26B0: BD C5 26       
         sta     Screen_RAM+424,x        ; 26B3: 9D A8 03       
         dex                             ; 26B6: CA             
-        bpl     Z26B0                   ; 26B7: 10 F7          
+        bpl     BACK_26b0               ; 26B7: 10 F7          
         lda     #$00                    ; 26B9: A9 00          
         sta     VIC_RA_Frq_Osc1         ; 26BB: 8D 0A 90       
         sta     VIC_RB_Frq_Osc2         ; 26BE: 8D 0B 90       
         sta     VIC_RC_Frq_Osc3         ; 26C1: 8D 0C 90       
         rts                             ; 26C4: 60             
 ; -----------------------------------------------------------
+SCREEN_C0000000
         fcb     $0C,$00,$00,$00,$00,$00 ; 26C5: 0C 00 00 00 00 00 
         fcb     $00,$00                 ; 26CB: 00 00          
         lda     #$01                    ; 26CD: A9 01          
         sta     Zero_Page+96            ; 26CF: 85 60          
-Z26D1   ldy     Zero_Page+96            ; 26D1: A4 60          
+BACK_26d1
+        ldy     Zero_Page+96            ; 26D1: A4 60          
         lda     (Zero_Page),y           ; 26D3: B1 00          
         asl     a                       ; 26D5: 0A             
         tax                             ; 26D6: AA             
@@ -994,7 +1013,7 @@ Z26E4   lda     Zero_Page+96            ; 26E4: A5 60
         adc     #$02                    ; 26E7: 69 02          
         sta     Zero_Page+96            ; 26E9: 85 60          
         cmp     #$07                    ; 26EB: C9 07          
-        bcc     Z26D1                   ; 26ED: 90 E2          
+        bcc     BACK_26d1               ; 26ED: 90 E2          
         jmp     Z261A                   ; 26EF: 4C 1A 26       
 ; ===========================================================
 Z26F2   lda     Zero_Page+96            ; 26F2: A5 60          
@@ -1079,18 +1098,17 @@ ERASE1  sta     UDG_END,x               ; 2773: 9D D0 1F
         rts                             ; 2779: 60             
 ; -----------------------------------------------------------
 Z277A   jsr     AAAAA                   ; 277A: 20 9D 25       
-; -----------------------------------------------------------
-        fcb     $00,$D0,$1F,$08         ; 277D: 00 D0 1F 08    
-        fcc     "Q"                     ; 2781: 51             
-        fcb     $00,$FF                 ; 2782: 00 FF          
-        fcc     " "                     ; 2784: 20             
-        fcb     $8E                     ; 2785: 8E             
-        fcc     "' "                    ; 2786: 27 20          
-        fcb     $9D                     ; 2788: 9D             
-        fcc     "%"                     ; 2789: 25             
-        fcb     $08                     ; 278A: 08             
-        fcc     "T"                     ; 278B: 54             
-        fcb     $00,$FF,$A0,$00         ; 278C: 00 FF A0 00    
+        fcb     $00                     ; 277D: 00              ZP Offset for 1st address
+        fdb     UDG_END                 ; 277E: D0 1F           1st Address
+        fcb     $08                     ; 2780: 08              ZP Offset for 1st address
+        fdb     Score_P1                ; 2781: 51 00           1st Address
+        fcb     $FF                     ; 2783: FF             
+        jsr     Z278E                   ; 2784: 20 8E 27       
+        jsr     AAAAA                   ; 2787: 20 9D 25       
+        fcb     $08                     ; 278A: 08              ZP Offset for 1st address
+        fdb     Score_P2                ; 278B: 54 00           1st Address
+        fcb     $FF                     ; 278D: FF             
+Z278E   ldy     #$00                    ; 278E: A0 00          
 Z2790   lda     (Zero_Page),y           ; 2790: B1 00          
         cmp     (Zero_Page+8),y         ; 2792: D1 08          
         beq     Z2799                   ; 2794: F0 03          
@@ -1101,10 +1119,13 @@ Z2799   iny                             ; 2799: C8
         tya                             ; 279A: 98             
         cmp     #$03                    ; 279B: C9 03          
         bne     Z2790                   ; 279D: D0 F1          
-        fcc     "`"                     ; 279F: 60             
-Z27A0   fcb     $A0,$02,$B1,$08,$91,$00 ; 27A0: A0 02 B1 08 91 00 
-        fcb     $88,$10,$F9             ; 27A6: 88 10 F9       
-        fcc     "`"                     ; 27A9: 60             
+        rts                             ; 279F: 60             
+Z27A0   ldy     #$02                    ; 27A0: A0 02          
+Z27A2   lda     (Zero_Page+8),y         ; 27A2: B1 08          
+        sta     (Zero_Page),y           ; 27A4: 91 00          
+        dey                             ; 27A6: 88             
+        bpl     Z27A2                   ; 27A7: 10 F9          
+        rts                             ; 27A9: 60             
 Z27AA   ldy     #$00                    ; 27AA: A0 00          
         lda     (Zero_Page),y           ; 27AC: B1 00          
         cmp     #$0A                    ; 27AE: C9 0A          
@@ -1388,7 +1409,7 @@ Z299D   lda     #$00                    ; 299D: A9 00
         and     #$FD                    ; 29B6: 29 FD          
         sta     Screen_RAM+452          ; 29B8: 8D C4 03       
         lda     UDG_RAM+4051            ; 29BB: AD D3 1F       
-        bit     M2014                   ; 29BE: 2C 14 20       
+        bit     BITM_01                 ; 29BE: 2C 14 20       
         bne     Z29D0                   ; 29C1: D0 0D          
 Z29C3   lda     Num_Lives               ; 29C3: A5 5A          
         beq     Z2987                   ; 29C5: F0 C0          
@@ -1411,17 +1432,17 @@ Z29E7   jsr     RESET_COLOR_PIXELS_SCORES ; 29E7: 20 16 24
         lda     Zero_Page+94            ; 29EA: A5 5E          
         bne     Z2A12                   ; 29EC: D0 24          
         jsr     AAAAA                   ; 29EE: 20 9D 25       
-        fcb     $0E,$1F                 ; 29F1: 0E 1F          
-        fcc     "*"                     ; 29F3: 2A             
-        fcb     $04,$10                 ; 29F4: 04 10          
-        fcc     "`"                     ; 29F6: 60             
+        fcb     $0E                     ; 29F1: 0E              ZP Offset for 1st address
+        fdb     $2A1F                   ; 29F2: 1F 2A           1st Address
+        fcb     $04                     ; 29F4: 04              ZP Offset for 1st address?????
+        fdb     Block3_8K_RAM+16        ; 29F5: 10 60           1st Address?????
         fcb     $FF                     ; 29F7: FF             
-        fcc     " "                     ; 29F8: 20             
-        fcb     $CC                     ; 29F9: CC             
-        fcc     "4 "                    ; 29FA: 34 20          
-        fcb     $9D                     ; 29FC: 9D             
-        fcc     "%"                     ; 29FD: 25             
-        fcb     $02,$00,$00,$0A,$F8,$00 ; 29FE: 02 00 00 0A F8 00 
+        jsr     Z34CC                   ; 29F8: 20 CC 34       
+        jsr     AAAAA                   ; 29FB: 20 9D 25       
+        fcb     $02                     ; 29FE: 02              ZP Offset for 1st address
+        fdb     Zero_Page               ; 29FF: 00 00           1st Address
+        fcb     $0A                     ; 2A01: 0A              ZP Offset for 1st address
+        fdb     Zero_Page+248           ; 2A02: F8 00           1st Address
         fcb     $FF                     ; 2A04: FF             
 Z2A05   fcb     $E6,$02                 ; 2A05: E6 02          
         bne     Z2A05                   ; 2A07: D0 FC          
@@ -1462,7 +1483,7 @@ Z2A45   jsr     Z28E7                   ; 2A45: 20 E7 28
 Z2A67   jsr     Z2B16                   ; 2A67: 20 16 2B       
         jmp     Z2A83                   ; 2A6A: 4C 83 2A       
 ; ===========================================================
-        fcc     " _,"                   ; 2A6D: 20 5F 2C       
+        jsr     Z2C5F                   ; 2A6D: 20 5F 2C       
         fcb     $F0,$03                 ; 2A70: F0 03          
         fcc     "Lx, "                  ; 2A72: 4C 78 2C 20    
         fcb     $16                     ; 2A76: 16             
@@ -1545,10 +1566,10 @@ Z2B16   jsr     Z30B3                   ; 2B16: 20 B3 30
         lda     Zero_Page+2             ; 2B19: A5 02          
         bpl     Z2B36                   ; 2B1B: 10 19          
         ldy     #$02                    ; 2B1D: A0 02          
-        bit     M2016                   ; 2B1F: 2C 16 20       
+        bit     BITM_04                 ; 2B1F: 2C 16 20       
         bne     Z2B37                   ; 2B22: D0 13          
         ldy     #$04                    ; 2B24: A0 04          
-        bit     M2017                   ; 2B26: 2C 17 20       
+        bit     BITM_08                 ; 2B26: 2C 17 20       
         bne     Z2B42                   ; 2B29: D0 17          
         lda     (Zero_Page),y           ; 2B2B: B1 00          
         bpl     Z2B36                   ; 2B2D: 10 07          
@@ -1558,7 +1579,7 @@ Z2B2F   eor     #$FF                    ; 2B2F: 49 FF
         sta     (Zero_Page),y           ; 2B34: 91 00          
 Z2B36   rts                             ; 2B36: 60             
 ; -----------------------------------------------------------
-Z2B37   bit     M2014                   ; 2B37: 2C 14 20       
+Z2B37   bit     BITM_01                 ; 2B37: 2C 14 20       
         bne     Z2B42                   ; 2B3A: D0 06          
         lda     (Zero_Page),y           ; 2B3C: B1 00          
         bpl     Z2B36                   ; 2B3E: 10 F6          
@@ -1621,7 +1642,7 @@ Z2BA8   lda     M2B87,x                 ; 2BA8: BD 87 2B
         sta     Screen_RAM+449          ; 2BB4: 8D C1 03       
         lda     Zero_Page+76            ; 2BB7: A5 4C          
         and     #$0E                    ; 2BB9: 29 0E          
-        bit     M2017                   ; 2BBB: 2C 17 20       
+        bit     BITM_08                 ; 2BBB: 2C 17 20       
         beq     Z2BC2                   ; 2BBE: F0 02          
         and     #$08                    ; 2BC0: 29 08          
 Z2BC2   ora     #$20                    ; 2BC2: 09 20          
@@ -1661,11 +1682,11 @@ Z2BF8   fcb     $A9,$88                 ; 2BF8: A9 88
         sta     ZP_Addr_From+1          ; 2C0E: 85 07          
 Z2C10   ldy     #$02                    ; 2C10: A0 02          
         lda     (Zero_Page+8),y         ; 2C12: B1 08          
-        bit     M2016                   ; 2C14: 2C 16 20       
+        bit     BITM_04                 ; 2C14: 2C 16 20       
         bne     Z2C21                   ; 2C17: D0 08          
         iny                             ; 2C19: C8             
         lda     (Zero_Page+8),y         ; 2C1A: B1 08          
-        bit     M2016                   ; 2C1C: 2C 16 20       
+        bit     BITM_04                 ; 2C1C: 2C 16 20       
         beq     Z2C53                   ; 2C1F: F0 32          
 Z2C21   ldy     #$00                    ; 2C21: A0 00          
         lda     (Zero_Page+8),y         ; 2C23: B1 08          
@@ -2019,7 +2040,7 @@ Z2E34   inc     Zero_Page+89            ; 2E34: E6 59
         sta     Screen_RAM+384          ; 2E9E: 8D 80 03       
         jsr     Z28F0                   ; 2EA1: 20 F0 28       
         inc     Num_Lives               ; 2EA4: E6 5A          
-        jsr     P1_LIVES__TO_UDG_RAM    ; 2EA6: 20 73 23       
+        jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23       
         jmp     Z261A                   ; 2EA9: 4C 1A 26       
 ; ===========================================================
 Z2EAC   jsr     Z35E9                   ; 2EAC: 20 E9 35       
@@ -2137,11 +2158,11 @@ Z2F77   ldy     #$03                    ; 2F77: A0 03
         jsr     Z35D7                   ; 2F8E: 20 D7 35       
         ldy     #$04                    ; 2F91: A0 04          
         lda     (Zero_Page),y           ; 2F93: B1 00          
-        bit     M2016                   ; 2F95: 2C 16 20       
+        bit     BITM_04                 ; 2F95: 2C 16 20       
         bne     Z2F31                   ; 2F98: D0 97          
-        bit     M2015                   ; 2F9A: 2C 15 20       
+        bit     BITM_02                 ; 2F9A: 2C 15 20       
         bne     Z301E                   ; 2F9D: D0 7F          
-        bit     M2014                   ; 2F9F: 2C 14 20       
+        bit     BITM_01                 ; 2F9F: 2C 14 20       
         beq     Z2FBD                   ; 2FA2: F0 19          
         jsr     Z2D58                   ; 2FA4: 20 58 2D       
         lda     Zero_Page+2             ; 2FA7: A5 02          
@@ -2439,7 +2460,7 @@ Z31A8   lda     ZP_Addr_From            ; 31A8: A5 06
         fcb     $03                     ; 31BE: 03             
 Z31BF   ldy     #$02                    ; 31BF: A0 02          
         clc                             ; 31C1: 18             
-        bit     M2014                   ; 31C2: 2C 14 20       
+        bit     BITM_01                 ; 31C2: 2C 14 20       
         beq     Z31DF                   ; 31C5: F0 18          
         lda     (Zero_Page),y           ; 31C7: B1 00          
         bpl     Z31CE                   ; 31C9: 10 03          
@@ -2464,14 +2485,14 @@ Z31EA   ldy     #$00                    ; 31EA: A0 00
         bit     Zero_Page+28            ; 31EC: 24 1C          
         bpl     Z323E                   ; 31EE: 10 4E          
         bmi     Z31E7                   ; 31F0: 30 F5          
-Z31F2   bit     M2017                   ; 31F2: 2C 17 20       
+Z31F2   bit     BITM_08                 ; 31F2: 2C 17 20       
         beq     Z3200                   ; 31F5: F0 09          
         ldy     #$04                    ; 31F7: A0 04          
         lda     (Zero_Page),y           ; 31F9: B1 00          
         bmi     Z31CB                   ; 31FB: 30 CE          
         jmp     Z3321                   ; 31FD: 4C 21 33       
 ; ===========================================================
-Z3200   bit     M2016                   ; 3200: 2C 16 20       
+Z3200   bit     BITM_04                 ; 3200: 2C 16 20       
         bne     Z31BF                   ; 3203: D0 BA          
         jmp     Z3285                   ; 3205: 4C 85 32       
 ; ===========================================================
@@ -2486,7 +2507,7 @@ Z3215   jmp     Z32C7                   ; 3215: 4C C7 32
 ; ===========================================================
 Z3218   tax                             ; 3218: AA             
         lda     Zero_Page+28            ; 3219: A5 1C          
-        bit     M2018                   ; 321B: 2C 18 20       
+        bit     BITM_10                 ; 321B: 2C 18 20       
         bne     Z3224                   ; 321E: D0 04          
         lda     #$00                    ; 3220: A9 00          
         beq     Z3212                   ; 3222: F0 EE          
@@ -2590,9 +2611,9 @@ Z32BA   sta     (Zero_Page),y           ; 32BA: 91 00
 ; ===========================================================
 Z32C7   ldy     #$04                    ; 32C7: A0 04          
         lda     Zero_Page+28            ; 32C9: A5 1C          
-        bit     M2019                   ; 32CB: 2C 19 20       
+        bit     BITM_20                 ; 32CB: 2C 19 20       
         beq     Z3318                   ; 32CE: F0 48          
-        bit     M2018                   ; 32D0: 2C 18 20       
+        bit     BITM_10                 ; 32D0: 2C 18 20       
         beq     Z330C                   ; 32D3: F0 37          
         lda     (Zero_Page),y           ; 32D5: B1 00          
         cmp     #$04                    ; 32D7: C9 04          
@@ -2619,7 +2640,7 @@ Z32F7   sta     (Zero_Page),y           ; 32F7: 91 00
 Z32F9   jsr     Z3646                   ; 32F9: 20 46 36       
         jsr     Z381F                   ; 32FC: 20 1F 38       
         lda     Zero_Page+28            ; 32FF: A5 1C          
-        bit     M2017                   ; 3301: 2C 17 20       
+        bit     BITM_08                 ; 3301: 2C 17 20       
         bne     Z3309                   ; 3304: D0 03          
         jsr     Z20E9                   ; 3306: 20 E9 20       
 Z3309   jmp     Z261A                   ; 3309: 4C 1A 26       
@@ -2694,7 +2715,7 @@ Z338D   ldx     #$FF                    ; 338D: A2 FF
 Z338F   ldy     #$02                    ; 338F: A0 02          
         lda     Zero_Page+2             ; 3391: A5 02          
         bpl     Z339D                   ; 3393: 10 08          
-        bit     M2015                   ; 3395: 2C 15 20       
+        bit     BITM_02                 ; 3395: 2C 15 20       
         php                             ; 3398: 08             
         txa                             ; 3399: 8A             
         plp                             ; 339A: 28             
@@ -2750,7 +2771,7 @@ Z33D4   lda     VIA1_Port_A             ; 33D4: AD 11 91
         rts                             ; 33F6: 60             
 ; -----------------------------------------------------------
 Z33F7   lda     UDG_RAM+4051            ; 33F7: AD D3 1F       
-        bit     M2015                   ; 33FA: 2C 15 20       
+        bit     BITM_02                 ; 33FA: 2C 15 20       
         bne     Z33D4                   ; 33FD: D0 D5          
         fcb     $A9,$FF,$8D             ; 33FF: A9 FF 8D       
         fcc     "#"                     ; 3402: 23             
@@ -3358,7 +3379,7 @@ Z37ED   tay                             ; 37ED: A8
         cmp     #$03                    ; 37F0: C9 03          
         bcs     Z37D4                   ; 37F2: B0 E0          
         tya                             ; 37F4: 98             
-        bit     M201B                   ; 37F5: 2C 1B 20       
+        bit     BITM_80                 ; 37F5: 2C 1B 20       
         beq     Z3800                   ; 37F8: F0 06          
         pha                             ; 37FA: 48             
         txa                             ; 37FB: 8A             
