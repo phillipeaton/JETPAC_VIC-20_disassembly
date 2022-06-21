@@ -784,7 +784,8 @@ Z24B9   ldx     #$00                    ; 24B9: A2 00
         fdb     STRING_F1_1_PLAYER_GAME ; 24E8: 50 25          
         fcb     $FF,$A9,$00             ; 24EA: FF A9 00       
         sta     Zero_Page+8             ; 24ED: 85 08          
-Z24EF   lda     #$18                    ; 24EF: A9 18          
+BACK_24EF
+        lda     #$18                    ; 24EF: A9 18          
         sta     ZP_Addr_To              ; 24F1: 85 04          
         ldx     Zero_Page+8             ; 24F3: A6 08          
         lda     M251F,x                 ; 24F5: BD 1F 25       
@@ -806,7 +807,7 @@ Z24EF   lda     #$18                    ; 24EF: A9 18
         inc     Zero_Page+8             ; 2516: E6 08          
         lda     Zero_Page+8             ; 2518: A5 08          
         cmp     #$05                    ; 251A: C9 05          
-        bne     Z24EF                   ; 251C: D0 D1          
+        bne     BACK_24EF               ; 251C: D0 D1          
         rts                             ; 251E: 60             
 ; -----------------------------------------------------------
 M251F   fcc     "8HXh"                  ; 251F: 38 48 58 68    
@@ -915,17 +916,19 @@ Z2607   ldy     #$00                    ; 2607: A0 00
 ; ===========================================================
 Z261A   ldy     #$00                    ; 261A: A0 00          
         lda     (Zero_Page),y           ; 261C: B1 00          
-        bne     Z2630                   ; 261E: D0 10          
+        bne     BACK_2630               ; 261E: D0 10          
         lda     Zero_Page               ; 2620: A5 00          
         cmp     #$B0                    ; 2622: C9 B0          
-        bcc     Z2630                   ; 2624: 90 0A          
+        bcc     BACK_2630               ; 2624: 90 0A          
         ldy     #$02                    ; 2626: A0 02          
         ldx     #$00                    ; 2628: A2 00          
-Z262A   dex                             ; 262A: CA             
-        bne     Z262A                   ; 262B: D0 FD          
+BACK_262A
+        dex                             ; 262A: CA             
+        bne     BACK_262A               ; 262B: D0 FD          
         dey                             ; 262D: 88             
-        bne     Z262A                   ; 262E: D0 FA          
-Z2630   lda     Zero_Page               ; 2630: A5 00          
+        bne     BACK_262A               ; 262E: D0 FA          
+BACK_2630
+        lda     Zero_Page               ; 2630: A5 00          
         clc                             ; 2632: 18             
         adc     #$08                    ; 2633: 69 08          
         sta     Zero_Page               ; 2635: 85 00          
@@ -938,12 +941,14 @@ Z263B   lda     Zero_Page               ; 263B: A5 00
         bne     Z2607                   ; 2643: D0 C2          
         lda     Zero_Page+33            ; 2645: A5 21          
         cmp     #$04                    ; 2647: C9 04          
-        bcc     Z2652                   ; 2649: 90 07          
+        bcc     SKIP_2652               ; 2649: 90 07          
         lda     VIC_R4_TV_Raster        ; 264B: AD 04 90       
         and     #$07                    ; 264E: 29 07          
-        bne     Z2655                   ; 2650: D0 03          
-Z2652   jsr     Z2CD6                   ; 2652: 20 D6 2C       
-Z2655   jsr     Z2B4B                   ; 2655: 20 4B 2B       
+        bne     SKIP_2655               ; 2650: D0 03          
+SKIP_2652
+        jsr     Z2CD6                   ; 2652: 20 D6 2C       
+SKIP_2655
+        jsr     Z2B4B                   ; 2655: 20 4B 2B       
         jsr     Z2B8F                   ; 2658: 20 8F 2B       
         jmp     Z25FA                   ; 265B: 4C FA 25       
 ; ===========================================================
@@ -968,7 +973,7 @@ Z2669   sei                             ; 2669: 78
         fcb     $FF                     ; 267C: FF             
         fcc     "L"                     ; 267D: 4C             
         fcb     $07,$26                 ; 267E: 07 26          
-Z2680   fcb     $A5,$22                 ; 2680: A5 22          
+Z2680   lda     Zero_Page+34            ; 2680: A5 22          
         sta     Zero_Page               ; 2682: 85 00          
         lda     Zero_Page+35            ; 2684: A5 23          
         sta     Zero_Page+1             ; 2686: 85 01          
@@ -1084,9 +1089,10 @@ ERASEZ1 sta     Zero_Page,x             ; 275E: 95 00
 ; -----------------------------------------------------------
 Z2764   ldx     #$7F                    ; 2764: A2 7F          
         lda     #$00                    ; 2766: A9 00          
-Z2768   sta     Screen_RAM+384,x        ; 2768: 9D 80 03       
+BACK_2768
+        sta     Screen_RAM+384,x        ; 2768: 9D 80 03       
         dex                             ; 276B: CA             
-        bpl     Z2768                   ; 276C: 10 FA          
+        bpl     BACK_2768               ; 276C: 10 FA          
         rts                             ; 276E: 60             
 ; -----------------------------------------------------------
 ERASE_UDG_END

@@ -288,6 +288,7 @@ label    258E STRING_SP_START_GAME
 word     24Db
 word     24De
 
+label    24EF BACK_24EF
 
 comment  259d
 label    259d AAAAA
@@ -305,6 +306,10 @@ label    25ca INC_ADDRESS_AT_40
 lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
 label    25d0 INCADDR40
 
+label    262A BACK_262A
+label    2630 BACK_2630
+label    2652 SKIP_2652
+label    2655 SKIP_2655
 
 comment  265e Setup Timer 1
 label    265e SET_TMR_1
@@ -328,6 +333,9 @@ comment  275b Erase $100 bytes zero page
 label    275b ERASEZP
 lcomment 275b Erase $100 bytes zero page
 label    275e ERASEZ1
+
+label    2768 BACK_2768
+
 lcomment  276f Erase $30 bytes at end of UDGs $1fd0-$2000
 label    276f ERASE_UDG_END
 label    2773 ERASE1
