@@ -14,6 +14,7 @@
 Zero_Page         equ     $0000
 ZP_Addr_To        equ     $0004
 ZP_Addr_From      equ     $0006
+KEYBOARD_DATA     equ     $0013
 ZP_ADDR           equ     $0040
 Score_P1          equ     $0051
 Score_P2          equ     $0054
@@ -29,6 +30,7 @@ UDG_HI_SCORE      equ     $1588
 UDG_P2_LIVES      equ     $19A0
 UDG_P2_SCORE      equ     $1B08
 UDG_END           equ     $1FD0
+GAME_SETTINGS     equ     $1FD3
 Block3_8K_RAM     equ     $6000
 VIC_R0_H_Ctr      equ     $9000
 VIC_R4_TV_Raster  equ     $9004
@@ -155,48 +157,50 @@ BACK_2080
 BACK_20b2
         inc     Zero_Page+88            ; 208F: E6 58          
         lda     #$00                    ; 2091: A9 00          
-        sta     VIA2_DDR_B              ; 2093: 8D 22 91       
+        sta     VIA2_DDR_B              ; 2093: 8D 22 91        Set Port B all bits to input
         lda     #$FF                    ; 2096: A9 FF          
-        sta     VIA2_DDR_A              ; 2098: 8D 23 91       
+        sta     VIA2_DDR_A              ; 2098: 8D 23 91        Set Port A all bits to output
         lda     #$7F                    ; 209B: A9 7F          
-        sta     VIA2_Port_A             ; 209D: 8D 21 91       
-        ldx     UDG_RAM+4051            ; 20A0: AE D3 1F       
-        lda     VIA2_Port_B             ; 20A3: AD 20 91       
-        sta     Zero_Page+19            ; 20A6: 85 13          
+        sta     VIA2_Port_A             ; 209D: 8D 21 91        Select keyboard column to read (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
+        ldx     GAME_SETTINGS           ; 20A0: AE D3 1F        Get game settings ($1fD3 = Just outside UDG RAM)
+        lda     VIA2_Port_B             ; 20A3: AD 20 91        Read keyboard column
+        sta     KEYBOARD_DATA           ; 20A6: 85 13           Store keyboard data
         lda     #$10                    ; 20A8: A9 10          
-        bit     Zero_Page+19            ; 20AA: 24 13          
-        bne     SKIP_20b2               ; 20AC: D0 04          
+        bit     KEYBOARD_DATA           ; 20AA: 24 13           F1 pressed? (1 Player)
+        bne     SKIP_20b2               ; 20AC: D0 04           No, skip
         txa                             ; 20AE: 8A             
         and     #$02                    ; 20AF: 29 02          
         tax                             ; 20B1: AA             
 SKIP_20b2
         lda     #$20                    ; 20B2: A9 20          
-        bit     Zero_Page+19            ; 20B4: 24 13          
-        bne     SKIP_20bc               ; 20B6: D0 04          
+        bit     KEYBOARD_DATA           ; 20B4: 24 13           F3 pressed? (2 Player)
+        bne     SKIP_20bc               ; 20B6: D0 04           No, skip
         txa                             ; 20B8: 8A             
         ora     #$01                    ; 20B9: 09 01          
         tax                             ; 20BB: AA             
 SKIP_20bc
         lda     #$40                    ; 20BC: A9 40          
-        bit     Zero_Page+19            ; 20BE: 24 13          
-        bne     SKIP_20c6               ; 20C0: D0 04          
+        bit     KEYBOARD_DATA           ; 20BE: 24 13           F5 pressed? (Keyboard)
+        bne     SKIP_20c6               ; 20C0: D0 04           No, skip
         txa                             ; 20C2: 8A             
         and     #$01                    ; 20C3: 29 01          
         tax                             ; 20C5: AA             
 SKIP_20c6
         lda     #$80                    ; 20C6: A9 80          
-        bit     Zero_Page+19            ; 20C8: 24 13          
-        bne     SKIP_20d0               ; 20CA: D0 04          
-        fcb     $8A,$09,$02,$AA         ; 20CC: 8A 09 02 AA    
+        bit     KEYBOARD_DATA           ; 20C8: 24 13           F7 pressed? (Joystick)
+        bne     SKIP_20d0               ; 20CA: D0 04           No, skip
+        txa                             ; 20CC: 8A             
+        ora     #$02                    ; 20CD: 09 02          
+        tax                             ; 20CF: AA             
 SKIP_20d0
         txa                             ; 20D0: 8A             
-        sta     UDG_RAM+4051            ; 20D1: 8D D3 1F       
+        sta     GAME_SETTINGS           ; 20D1: 8D D3 1F        Store game settings ($1fD3 = Just outside UDG RAM)
         jsr     Z24B9                   ; 20D4: 20 B9 24       
         lda     #$FE                    ; 20D7: A9 FE          
-        sta     VIA2_Port_A             ; 20D9: 8D 21 91       
+        sta     VIA2_Port_A             ; 20D9: 8D 21 91        Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
         lda     VIA2_Port_B             ; 20DC: AD 20 91       
-        and     #$10                    ; 20DF: 29 10          
-        bne     BACK_20b2               ; 20E1: D0 AC          
+        and     #$10                    ; 20DF: 29 10           Space Pressed?
+        bne     BACK_20b2               ; 20E1: D0 AC           No, read keyboard again
 
         jsr     RESET_COLOR_PIXELS_SCORES ; 20E3: 20 16 24       
         jmp     Z25D1                   ; 20E6: 4C D1 25       
@@ -319,7 +323,7 @@ Z2195   adc     #$08                    ; 2195: 69 08
         dey                             ; 21AD: 88             
         lda     (Zero_Page),y           ; 21AE: B1 00          
         sta     ZP_Addr_To+1            ; 21B0: 85 05          
-        sta     Zero_Page+19            ; 21B2: 85 13          
+        sta     KEYBOARD_DATA           ; 21B2: 85 13          
         lda     ZP_Addr_From            ; 21B4: A5 06          
         bit     BITM_04                 ; 21B6: 2C 16 20       
         beq     Z2202                   ; 21B9: F0 47          
@@ -414,7 +418,7 @@ Z2257   lda     (Zero_Page),y           ; 2257: B1 00
         adc     #$F8                    ; 2261: 69 F8          
 Z2263   jsr     Z2298                   ; 2263: 20 98 22       
         sta     (Zero_Page),y           ; 2266: 91 00          
-        lda     Zero_Page+19            ; 2268: A5 13          
+        lda     KEYBOARD_DATA           ; 2268: A5 13          
         sta     ZP_Addr_To+1            ; 226A: 85 05          
         tya                             ; 226C: 98             
         pha                             ; 226D: 48             
@@ -554,7 +558,7 @@ Z235D   lda     M2353,x                 ; 235D: BD 53 23
         sta     Screen_RAM+384,x        ; 2360: 9D 80 03       
         dex                             ; 2363: CA             
         bpl     Z235D                   ; 2364: 10 F7          
-        lda     UDG_RAM+4051            ; 2366: AD D3 1F       
+        lda     GAME_SETTINGS           ; 2366: AD D3 1F       
         and     #$01                    ; 2369: 29 01          
         beq     Z23CF                   ; 236B: F0 62          
         lda     #$FF                    ; 236D: A9 FF          
@@ -624,7 +628,7 @@ BACK_23D6
         bne     BACK_23D6               ; 23E5: D0 EF          
         lda     #$05                    ; 23E7: A9 05          
         sta     Zero_Page+92            ; 23E9: 85 5C          
-        lda     UDG_RAM+4051            ; 23EB: AD D3 1F       
+        lda     GAME_SETTINGS           ; 23EB: AD D3 1F       
         and     #$01                    ; 23EE: 29 01          
         bne     SKIP_23F4               ; 23F0: D0 02          
         sta     Zero_Page+92            ; 23F2: 85 5C          
@@ -759,10 +763,10 @@ SKIP_24B2
         rts                             ; 24B8: 60             
 ; -----------------------------------------------------------
 Z24B9   ldx     #$00                    ; 24B9: A2 00          
-        lda     UDG_RAM+4051            ; 24BB: AD D3 1F       
+        lda     GAME_SETTINGS           ; 24BB: AD D3 1F       
         and     #$01                    ; 24BE: 29 01          
         jsr     Z24A1                   ; 24C0: 20 A1 24       
-        lda     UDG_RAM+4051            ; 24C3: AD D3 1F       
+        lda     GAME_SETTINGS           ; 24C3: AD D3 1F       
         lsr     a                       ; 24C6: 4A             
         jsr     Z24A1                   ; 24C7: 20 A1 24       
         jsr     AAAAA                   ; 24CA: 20 9D 25       
@@ -1414,7 +1418,7 @@ Z299D   lda     #$00                    ; 299D: A9 00
         lda     Screen_RAM+452          ; 29B3: AD C4 03       
         and     #$FD                    ; 29B6: 29 FD          
         sta     Screen_RAM+452          ; 29B8: 8D C4 03       
-        lda     UDG_RAM+4051            ; 29BB: AD D3 1F       
+        lda     GAME_SETTINGS           ; 29BB: AD D3 1F       
         bit     BITM_01                 ; 29BE: 2C 14 20       
         bne     Z29D0                   ; 29C1: D0 0D          
 Z29C3   lda     Num_Lives               ; 29C3: A5 5A          
@@ -2071,7 +2075,7 @@ Z2ECA   sta     Zero_Page+27            ; 2ECA: 85 1B
         ldy     #$02                    ; 2ED6: A0 02          
         lda     (Zero_Page),y           ; 2ED8: B1 00          
         lsr     a                       ; 2EDA: 4A             
-        sta     Zero_Page+19            ; 2EDB: 85 13          
+        sta     KEYBOARD_DATA           ; 2EDB: 85 13          
         beq     Z2EFD                   ; 2EDD: F0 1E          
         cmp     #$03                    ; 2EDF: C9 03          
         bcs     Z2F01                   ; 2EE1: B0 1E          
@@ -2081,7 +2085,7 @@ Z2ECA   sta     Zero_Page+27            ; 2ECA: 85 1B
         jsr     Z2F07                   ; 2EE9: 20 07 2F       
         lda     #$03                    ; 2EEC: A9 03          
         sec                             ; 2EEE: 38             
-        sbc     Zero_Page+19            ; 2EEF: E5 13          
+        sbc     KEYBOARD_DATA           ; 2EEF: E5 13          
         sta     Zero_Page+2             ; 2EF1: 85 02          
         lda     #$01                    ; 2EF3: A9 01          
         sta     Zero_Page+27            ; 2EF5: 85 1B          
@@ -2135,10 +2139,10 @@ Z2F31   ldy     #$06                    ; 2F31: A0 06
         asl     a                       ; 2F52: 0A             
         asl     a                       ; 2F53: 0A             
         asl     a                       ; 2F54: 0A             
-        sta     Zero_Page+19            ; 2F55: 85 13          
+        sta     KEYBOARD_DATA           ; 2F55: 85 13          
         lda     Screen_RAM+435          ; 2F57: AD B3 03       
         sec                             ; 2F5A: 38             
-        sbc     Zero_Page+19            ; 2F5B: E5 13          
+        sbc     KEYBOARD_DATA           ; 2F5B: E5 13          
         sta     Zero_Page+25            ; 2F5D: 85 19          
         jsr     Z3057                   ; 2F5F: 20 57 30       
         inc     Screen_RAM+436          ; 2F62: EE B4 03       
@@ -2776,7 +2780,7 @@ Z33D4   lda     VIA1_Port_A             ; 33D4: AD 11 91
         sta     Zero_Page+28            ; 33F4: 85 1C          
         rts                             ; 33F6: 60             
 ; -----------------------------------------------------------
-Z33F7   lda     UDG_RAM+4051            ; 33F7: AD D3 1F       
+Z33F7   lda     GAME_SETTINGS           ; 33F7: AD D3 1F       
         bit     BITM_02                 ; 33FA: 2C 15 20       
         bne     Z33D4                   ; 33FD: D0 D5          
         fcb     $A9,$FF,$8D             ; 33FF: A9 FF 8D       
@@ -3138,10 +3142,10 @@ Z362F   lda     (Zero_Page+14),y        ; 362F: B1 0E
         dex                             ; 3636: CA             
         bne     Z362F                   ; 3637: D0 F6          
         pla                             ; 3639: 68             
-        sta     Zero_Page+19            ; 363A: 85 13          
+        sta     KEYBOARD_DATA           ; 363A: 85 13          
         lda     Zero_Page+9             ; 363C: A5 09          
         sec                             ; 363E: 38             
-        sbc     Zero_Page+19            ; 363F: E5 13          
+        sbc     KEYBOARD_DATA           ; 363F: E5 13          
         sta     Zero_Page+9             ; 3641: 85 09          
         jmp     Z3688                   ; 3643: 4C 88 36       
 ; ===========================================================
@@ -3176,10 +3180,10 @@ Z3674   lda     (ZP_Addr_From),y        ; 3674: B1 06
         dex                             ; 367B: CA             
         bne     Z3674                   ; 367C: D0 F6          
         pla                             ; 367E: 68             
-        sta     Zero_Page+19            ; 367F: 85 13          
+        sta     KEYBOARD_DATA           ; 367F: 85 13          
         lda     Zero_Page+8             ; 3681: A5 08          
         sec                             ; 3683: 38             
-        sbc     Zero_Page+19            ; 3684: E5 13          
+        sbc     KEYBOARD_DATA           ; 3684: E5 13          
         sta     Zero_Page+8             ; 3686: 85 08          
 Z3688   lda     Zero_Page+2             ; 3688: A5 02          
         beq     Z36AB                   ; 368A: F0 1F          
@@ -3398,9 +3402,9 @@ Z3800   sec                             ; 3800: 38
         asl     a                       ; 3804: 0A             
         asl     a                       ; 3805: 0A             
         asl     a                       ; 3806: 0A             
-Z3807   sta     Zero_Page+19            ; 3807: 85 13          
+Z3807   sta     KEYBOARD_DATA           ; 3807: 85 13          
         txa                             ; 3809: 8A             
-        ora     Zero_Page+19            ; 380A: 05 13          
+        ora     KEYBOARD_DATA           ; 380A: 05 13          
         tax                             ; 380C: AA             
         lda     M385F,x                 ; 380D: BD 5F 38       
         tay                             ; 3810: A8             

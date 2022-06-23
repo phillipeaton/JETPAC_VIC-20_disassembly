@@ -1,8 +1,7 @@
 data     2000-3fff
-
+; ----------------
 code     201c-20ad
-code     2079-20cb
-code     20d0-20f2
+code     2079-20f2
 code     20f7-216a
 code     2173-2204
 code     2211-22e8

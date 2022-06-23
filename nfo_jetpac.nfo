@@ -61,10 +61,11 @@ const 3457
 const 3516
 
 ; Zero-Page variables
-label    0004 ZP_Addr_To
-label    0005 ZP_Addr_To+1
-label    0006 ZP_Addr_From
-label    0007 ZP_Addr_From+1
+label      04 ZP_Addr_To
+label      05 ZP_Addr_To+1
+label      06 ZP_Addr_From
+label      07 ZP_Addr_From+1
+label      13 KEYBOARD_DATA
 label      40 ZP_ADDR
 label      41 ZP_ADDR+1
 label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
@@ -77,6 +78,7 @@ label    19a0 UDG_P2_LIVES
 label    1b08 UDG_P2_SCORE
 
 label    1fd0 UDG_END
+label    1fd3 GAME_SETTINGS
 
 ; Start of disassembly instructions
 word     2000-2003
@@ -352,6 +354,27 @@ const    278a
 lcomment 278a ZP Offset for 1st address
 lcomment 278b 1st Address
 word     278b
+
+lcomment 2093 Set Port B all bits to input
+lcomment 2098 Set Port A all bits to output
+lcomment 209D Select keyboard column to read (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
+lcomment 20A0 Get game settings ($1fD3 = Just outside UDG RAM)
+lcomment 20A3 Read keyboard column
+lcomment 20A6 Store keyboard data
+lcomment 20AA F1 pressed? (1 Player)
+lcomment 20AC No, skip
+lcomment 20B4 F3 pressed? (2 Player)
+lcomment 20b6 No, skip
+lcomment 20BE F5 pressed? (Keyboard)
+lcomment 20c0 No, skip
+lcomment 20c8 F7 pressed? (Joystick)
+lcomment 20ca No, skip
+lcomment 20d1 Store game settings ($1fD3 = Just outside UDG RAM)
+lcomment 20d9 Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
+lcomment 20df Space Pressed?
+lcomment 20e1 No, read keyboard again
+
+
 
 
 
