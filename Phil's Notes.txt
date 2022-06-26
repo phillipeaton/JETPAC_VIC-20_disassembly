@@ -31,3 +31,28 @@ Line spacing between lines appears large.
 
 23x11 tile map = 253 tiles. Each tile maps to a user-defined character in the $1000-$1fcf range, which effectively gives bitmapped graphics with X:Y 23*8 x 11*16 = X:Y 184x176 pixels.
 
+
+Attract/Game Selection screen
+-----------------------------
+208f ATTRACT_MODE
+  24b9
+    Z24A1 
+      Z24a4 x
+    AAAAA
+      INC_ADDRESS_AT_40 X
+    Z34CC
+      Z34F7 X
+      Z351D X
+      Z34E3
+        MV_CHARS_TO_UDGRAM 
+          Invrt_Pix_Lines
+    Z34F7
+    Z351D
+    BACK_34D6
+      Z34E3
+        MV_CHARS_TO_UDGRAM
+          Invrt_Pix_Lines
+loop
+
+
+

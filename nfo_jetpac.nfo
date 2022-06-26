@@ -70,7 +70,9 @@ label      40 ZP_ADDR
 label      41 ZP_ADDR+1
 label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54 Score_P2 ; 3 bytes
+label      58 ZP_COUNTER
 label      5a Num_Lives
+
 label    1008 UDG_P1_SCORE
 label    1420 UDG_P1_LIVES
 label    1588 UDG_HI_SCORE
@@ -139,7 +141,8 @@ comment  2085
 
 
 label    2080 BACK_2080
-label    208F BACK_20b2
+comment  208f
+label    208F ATTRACT_MODE
 label    20b2 SKIP_20b2
 label    20bc SKIP_20bc
 label    20c6 SKIP_20c6
@@ -199,7 +202,7 @@ label    2416 RESET_COLOR_PIXELS_SCORES
 lcomment 241c Puts 000000  000000  00 at top of screen
 
 comment  2425
-comment  2425 YOU ARE HERE Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
+comment  2425 Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
 
 
 
@@ -274,8 +277,8 @@ word     24D1
 const    24db
 word     24Db
 word     24de
-code     24e1-24e6
-word     24E8
+word     24e8
+
 
 label    2524 STRING_COPYRIGHT_1983_ACG
 label    253a STRING_JETPAC_GAME_SELECT
@@ -408,7 +411,7 @@ lcomment 34be Jump to routine copy stuff from STD CHAR ROM TO UDG CHAR SET
 
 lcomment 34CC This is an intermediate jsr, called from several places
 lcomment 34CF Doesn't seem to do much
-label    34D6 LOOP_34D6
+label    34D6 BACK_34D6
 lcomment 34D8 Load A with content of $2450+y?
 lcomment 34DB Strange pair of jumps to same place, branch&jsr
 lcomment 34Dd Strange pair of jumps to same place, branch&jsr
@@ -422,6 +425,8 @@ comment  34f0
 
 comment  351D
 lcomment 351D Valid Target - traced but doesn't seem to do much
+
+label    3531 BACK_3531
 
 comment  355c
 label    355c RESET_COLOR_RAM?
@@ -497,17 +502,57 @@ label    3595 MV_CHARS_TO_UDGRAM
 
 comment  35A0
 lcomment 35A0 Loop a few times only
-label    35A2 LOOP_35A2
+label    35A2 BACK_35A2
 comment  35Aa
 
 lcomment 35B6 Store about 8 bytes from $8100 to $1000?, all seem to be zeros for now
-label    35B6 LOOP_35B6
+label    35B6 BACK_35B6
 lcomment 35BD Updates to location for saving character line
 
-label    35CB Invrt_Pix_Lines
-lcomment 35CB Load from 81xx, offset with y, which is probably 0-7
-lcomment 35cd Intro screen: Invert a line of a character, change to $F0 and only half inverts
-lcomment 35CB Save to 13xx
+comment  3595
+comment  3595 ----------------------------------------------------------
+comment  3595 Move Characters to User-Defined Graphics Memory
+comment  3595 ----------------------------------------------------------
+comment  3595 FUNCTION  :
+comment  3595 \
+comment  3595 CALLED BY :
+comment  3595 \
+comment  3595 CALLS     :
+comment  3595 \
+comment  3595 ARGUMENTS :  Addr_From is already setup (fixed Character ROM)
+comment  3595              Addr_To is already setup (UDG memory)
+comment  3595 ----------------------------------------------------------
+label    3595 MV_CHARS_TO_UDGRAM
+comment  35BD
+lcomment 35C0 #B0=176=number of vertical pixels i.e. move to next char right
+lcomment 35C6 Increment address hi-byte if previous addition overflowed
+
+comment  35CB
+comment  35CB ----------------------------------------------------------
+comment  35CB Move Bytes with Invert
+comment  35CB ----------------------------------------------------------
+comment  35CB FUNCTION  :  Move bytes from one location to another,
+comment  35CB              inverting them in the process. Typically used
+comment  35CB              when moving graptics from fixed character ROM
+comment  35CB              to the user-defined graphics memory.
+comment  35CB \
+comment  35CB CALLED BY :  MV_CHARS_TO_UDGRAM, ???
+comment  35CB \
+comment  35CB CALLS     :  Nothing
+comment  35CB \
+comment  35CB ARGUMENTS :  Y contains number of bytes to move.
+comment  35CB              Addr_From is already setup (fixed Character ROM)
+comment  35CB              Addr_To is already setup (UDG memory)
+comment  35CB ----------------------------------------------------------
+label    35CB Move_Bytes_Invert
+lcomment 35CB Move bytes from given address with Y offset
+lcomment 35cd Invert the byte (used to make the byte flash)
+lcomment 35Cf Move bytes to given address with Y offset
+lcomment 35d1 Decrement number of lines counter
+lcomment 35d2 All lines copied? If no, loop back.
+lcomment 35d4 If yes, routine ends
+
+
 
 ; End of file contains graphics data
 binary   385f-3fff

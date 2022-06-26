@@ -18,6 +18,7 @@ KEYBOARD_DATA     equ     $0013
 ZP_ADDR           equ     $0040
 Score_P1          equ     $0051
 Score_P2          equ     $0054
+ZP_COUNTER        equ     $0058
 Num_Lives         equ     $005A
 Screen_RAM        equ     $0200
 Hardware_IRQ      equ     $0314
@@ -154,8 +155,9 @@ BACK_2080
         sta     VIC_RE_Vol_Color        ; 2087: 8D 0E 90       
         lda     #$00                    ; 208A: A9 00          
         sta     Screen_RAM+424          ; 208C: 8D A8 03       
-BACK_20b2
-        inc     Zero_Page+88            ; 208F: E6 58          
+
+ATTRACT_MODE
+        inc     ZP_COUNTER              ; 208F: E6 58          
         lda     #$00                    ; 2091: A9 00          
         sta     VIA2_DDR_B              ; 2093: 8D 22 91        Set Port B all bits to input
         lda     #$FF                    ; 2096: A9 FF          
@@ -200,7 +202,7 @@ SKIP_20d0
         sta     VIA2_Port_A             ; 20D9: 8D 21 91        Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
         lda     VIA2_Port_B             ; 20DC: AD 20 91       
         and     #$10                    ; 20DF: 29 10           Space Pressed?
-        bne     BACK_20b2               ; 20E1: D0 AC           No, read keyboard again
+        bne     ATTRACT_MODE            ; 20E1: D0 AC           No, read keyboard again
 
         jsr     RESET_COLOR_PIXELS_SCORES ; 20E3: 20 16 24       
         jmp     Z25D1                   ; 20E6: 4C D1 25       
@@ -588,7 +590,7 @@ Z238E   clc                             ; 238E: 18
         fdb     $23C7                   ; 239A: C7 23          
         fcb     $FF                     ; 239C: FF             
         ldy     #$07                    ; 239D: A0 07          
-        jmp     LOOP_35B6               ; 239F: 4C B6 35       
+        jmp     BACK_35B6               ; 239F: 4C B6 35       
 ; ===========================================================
 Z23A2   jsr     Z23A8                   ; 23A2: 20 A8 23       
         jmp     P2_LIVES__TO_UDG_RAM    ; 23A5: 4C 82 23       
@@ -664,7 +666,7 @@ RESET_COLOR_PIXELS_SCORES
         jsr     HI_SCORE_TO_UDG_RAM?    ; 241F: 20 91 24       
         jsr     P2_SCORE_TO_UDG_RAM     ; 2422: 20 81 24       
 
-; YOU ARE HERE Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
+; Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
 Z2425   ldx     #$00                    ; 2425: A2 00          
         ldy     #$03                    ; 2427: A0 03          
 BACK_2429
@@ -749,7 +751,7 @@ Z24A1   jsr     Z24A4                   ; 24A1: 20 A4 24
 Z24A4   pha                             ; 24A4: 48             
         and     #$01                    ; 24A5: 29 01          
         bne     SKIP_24B2               ; 24A7: D0 09          
-        lda     Zero_Page+88            ; 24A9: A5 58          
+        lda     ZP_COUNTER              ; 24A9: A5 58          
         lsr     a                       ; 24AB: 4A             
         lsr     a                       ; 24AC: 4A             
         lsr     a                       ; 24AD: 4A             
@@ -786,7 +788,8 @@ Z24B9   ldx     #$00                    ; 24B9: A2 00
         jsr     AAAAA                   ; 24E4: 20 9D 25       
         fcb     $0E                     ; 24E7: 0E             
         fdb     STRING_F1_1_PLAYER_GAME ; 24E8: 50 25          
-        fcb     $FF,$A9,$00             ; 24EA: FF A9 00       
+        fcb     $FF                     ; 24EA: FF             
+        lda     #$00                    ; 24EB: A9 00          
         sta     Zero_Page+8             ; 24ED: 85 08          
 BACK_24EF
         lda     #$18                    ; 24EF: A9 18          
@@ -799,7 +802,7 @@ BACK_24EF
         ldy     #$00                    ; 2500: A0 00          
         ldx     Zero_Page+8             ; 2502: A6 08          
         lda     Zero_Page+69,x          ; 2504: B5 45          
-        jsr     LOOP_34D6               ; 2506: 20 D6 34       
+        jsr     BACK_34D6               ; 2506: 20 D6 34       
         iny                             ; 2509: C8             
         tya                             ; 250A: 98             
         clc                             ; 250B: 18             
@@ -2425,10 +2428,10 @@ Z3155   lda     (Zero_Page+8),y         ; 3155: B1 08
         lda     #$3E                    ; 316F: A9 3E          
         sta     ZP_Addr_From+1          ; 3171: 85 07          
         ldy     #$09                    ; 3173: A0 09          
-        jsr     LOOP_35B6               ; 3175: 20 B6 35       
+        jsr     BACK_35B6               ; 3175: 20 B6 35       
         jsr     Z31A8                   ; 3178: 20 A8 31       
 Z317B   ldy     #$09                    ; 317B: A0 09          
-        jsr     LOOP_35B6               ; 317D: 20 B6 35       
+        jsr     BACK_35B6               ; 317D: 20 B6 35       
         dec     Zero_Page+11            ; 3180: C6 0B          
         beq     Z31A2                   ; 3182: F0 1E          
         bpl     Z317B                   ; 3184: 10 F5          
@@ -2898,14 +2901,14 @@ Z34CC   jsr     Z34F7                   ; 34CC: 20 F7 34        This is an inter
         jsr     Z351D                   ; 34CF: 20 1D 35        Doesn't seem to do much
         ldy     #$00                    ; 34D2: A0 00          
         lda     (Zero_Page+14),y        ; 34D4: B1 0E          
-LOOP_34D6
+BACK_34D6
         tax                             ; 34D6: AA             
         iny                             ; 34D7: C8             
         lda     (Zero_Page+14),y        ; 34D8: B1 0E           Load A with content of $2450+y?
         asl     a                       ; 34DA: 0A             
         bcs     Z34E3                   ; 34DB: B0 06           Strange pair of jumps to same place, branch&jsr
         jsr     Z34E3                   ; 34DD: 20 E3 34        Strange pair of jumps to same place, branch&jsr
-        jmp     LOOP_34D6               ; 34E0: 4C D6 34       
+        jmp     BACK_34D6               ; 34E0: 4C D6 34       
 ; ===========================================================
 Z34E3   lsr     a                       ; 34E3: 4A              Run through, don't know what it's doing
         sta     ZP_Addr_From            ; 34E4: 85 06          
@@ -2961,10 +2964,11 @@ Z351D   lda     ZP_Addr_To+1            ; 351D: A5 05           Valid Target - t
         lda     #$00                    ; 352B: A9 00          
         sta     ZP_Addr_To+1            ; 352D: 85 05          
         ldx     #$04                    ; 352F: A2 04          
-Z3531   asl     ZP_Addr_To              ; 3531: 06 04          
+BACK_3531
+        asl     ZP_Addr_To              ; 3531: 06 04          
         rol     ZP_Addr_To+1            ; 3533: 26 05          
         dex                             ; 3535: CA             
-        bne     Z3531                   ; 3536: D0 F9          
+        bne     BACK_3531               ; 3536: D0 F9          
         tya                             ; 3538: 98             
         clc                             ; 3539: 18             
         adc     ZP_Addr_To              ; 353A: 65 04          
@@ -3039,7 +3043,19 @@ ERASECR2 dec    Zero_Page+2             ; 3584: C6 02
         cmp     #$FF                    ; 3590: C9 FF          
         bne     ERASECR1                ; 3592: D0 E7          
         rts                             ; 3594: 60             
-; -----------------------------------------------------------
+
+; ----------------------------------------------------------
+; Move Characters to User-Defined Graphics Memory
+; ----------------------------------------------------------
+; FUNCTION  :
+; \
+; CALLED BY :
+; \
+; CALLS     :
+; \
+; ARGUMENTS :  Addr_From is already setup (fixed Character ROM)
+; Addr_To is already setup (UDG memory)
+; ----------------------------------------------------------
 MV_CHARS_TO_UDGRAM
         lda     #$00                    ; 3595: A9 00          
         sta     ZP_Addr_From+1          ; 3597: 85 07          
@@ -3049,41 +3065,57 @@ MV_CHARS_TO_UDGRAM
         sta     ZP_Addr_From            ; 359E: 85 06          
 
         ldx     #$03                    ; 35A0: A2 03           Loop a few times only
-LOOP_35A2
+BACK_35A2
         clc                             ; 35A2: 18             
         rol     ZP_Addr_From            ; 35A3: 26 06          
         rol     ZP_Addr_From+1          ; 35A5: 26 07          
         dex                             ; 35A7: CA             
-        bne     LOOP_35A2               ; 35A8: D0 F8          
+        bne     BACK_35A2               ; 35A8: D0 F8          
 
         lda     ZP_Addr_From+1          ; 35AA: A5 07          
         adc     #$80                    ; 35AC: 69 80          
         sta     ZP_Addr_From+1          ; 35AE: 85 07          
         ldy     #$07                    ; 35B0: A0 07          
         lda     Zero_Page+87            ; 35B2: A5 57          
-        bmi     Invrt_Pix_Lines         ; 35B4: 30 15          
-LOOP_35B6
+        bmi     Move_Bytes_Invert       ; 35B4: 30 15          
+BACK_35B6
         lda     (ZP_Addr_From),y        ; 35B6: B1 06           Store about 8 bytes from $8100 to $1000?, all seem to be zeros for now
         sta     (ZP_Addr_To),y          ; 35B8: 91 04          
         dey                             ; 35BA: 88             
-        bpl     LOOP_35B6               ; 35BB: 10 F9          
+        bpl     BACK_35B6               ; 35BB: 10 F9          
+
 Z35BD   lda     ZP_Addr_To              ; 35BD: A5 04           Updates to location for saving character line
         clc                             ; 35BF: 18             
-        adc     #$B0                    ; 35C0: 69 B0          
+        adc     #$B0                    ; 35C0: 69 B0           #B0=176=number of vertical pixels i.e. move to next char right
         sta     ZP_Addr_To              ; 35C2: 85 04          
         lda     ZP_Addr_To+1            ; 35C4: A5 05          
-        adc     #$00                    ; 35C6: 69 00          
+        adc     #$00                    ; 35C6: 69 00           Increment address hi-byte if previous addition overflowed
         sta     ZP_Addr_To+1            ; 35C8: 85 05          
         rts                             ; 35CA: 60             
-; -----------------------------------------------------------
-Invrt_Pix_Lines
-        lda     (ZP_Addr_From),y        ; 35CB: B1 06           Load from 81xx, offset with y, which is probably 0-7
-                                        ; Save to 13xx
-        eor     #$FF                    ; 35CD: 49 FF           Intro screen: Invert a line of a character, change to $F0 and only half inverts
-        sta     (ZP_Addr_To),y          ; 35CF: 91 04          
-        dey                             ; 35D1: 88             
-        bpl     Invrt_Pix_Lines         ; 35D2: 10 F7          
-        jmp     Z35BD                   ; 35D4: 4C BD 35       
+
+; ----------------------------------------------------------
+; Move Bytes with Invert
+; ----------------------------------------------------------
+; FUNCTION  :  Move bytes from one location to another,
+; inverting them in the process. Typically used
+; when moving graptics from fixed character ROM
+; to the user-defined graphics memory.
+; \
+; CALLED BY :  MV_CHARS_TO_UDGRAM, ???
+; \
+; CALLS     :  Nothing
+; \
+; ARGUMENTS :  Y contains number of bytes to move.
+; Addr_From is already setup (fixed Character ROM)
+; Addr_To is already setup (UDG memory)
+; ----------------------------------------------------------
+Move_Bytes_Invert
+        lda     (ZP_Addr_From),y        ; 35CB: B1 06           Move bytes from given address with Y offset
+        eor     #$FF                    ; 35CD: 49 FF           Invert the byte (used to make the byte flash)
+        sta     (ZP_Addr_To),y          ; 35CF: 91 04           Move bytes to given address with Y offset
+        dey                             ; 35D1: 88              Decrement number of lines counter
+        bpl     Move_Bytes_Invert       ; 35D2: 10 F7           All lines copied? If no, loop back.
+        jmp     Z35BD                   ; 35D4: 4C BD 35        If yes, routine ends
 ; ===========================================================
 Z35D7   ldy     #$00                    ; 35D7: A0 00          
         lda     (Zero_Page),y           ; 35D9: B1 00          
