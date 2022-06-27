@@ -6,15 +6,16 @@ option offset 2000          * Select start address of supplied binary
 file   jetpac_2000-3fff.bin * Instructs dasmfw to load the given file at the given address
 
 *** OUTPUT FORMATTING OPTIONS ***
-*option addr on      * Show address field output for clean assembler source files
+*option addr off     * Show address field output for clean assembler source files
 *option hex on       * Show hex dump output
 option asc off       * Show output of the ASCII equivalent to code/data
 *option cref on      * Show cross-referece table
 *option unused on    * Show unused labels
-* option labellen 12   * Reserve space in this length for code labels. By default, dasmfw reserves 8 places for labels
-option eqlbllen 18   * Reserve space in this length for EQU labels. By default, dasmfw reserves 8 places for labels
-option copndlen 24   * Reserve space in this length for the operand part of a disassembled instruction with a line comment
-*option copndlen 10  * Reserve space in this length for the operand part of a disassembled instruction with a line comment
+*option labellen 12  * Def=8  Reserve spaces for code labels.
+option eqlbllen 18   * Def=8  Reserve spaces for EQU labels.
+option copndlen 20   * Def=24 Reserve spaces for operand part of disassembled instruction with line comment
+option uopndlen 52   * Def=52 Reserve spaces for operand part of disassembled instruction without line comment
+option dbcount 3     * Def=5  Reserve spaces for hex/ascii dump bytes if hex or asc options enabled.
 
 *** DISASSEMBLER OPTIONS ***
 *option pbase 16     * Default parsing base, default is 16
@@ -70,6 +71,7 @@ label      40 ZP_ADDR
 label      41 ZP_ADDR+1
 label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54 Score_P2 ; 3 bytes
+label      57 ZP_INVERT ; Used to flash game options & 1UP+score at player start
 label      58 ZP_COUNTER
 label      5a Num_Lives
 
@@ -500,18 +502,9 @@ label    3584 ERASECR2
 
 label    3595 MV_CHARS_TO_UDGRAM
 
-comment  35A0
-lcomment 35A0 Loop a few times only
-label    35A2 BACK_35A2
-comment  35Aa
-
-lcomment 35B6 Store about 8 bytes from $8100 to $1000?, all seem to be zeros for now
-label    35B6 BACK_35B6
-lcomment 35BD Updates to location for saving character line
-
 comment  3595
 comment  3595 ----------------------------------------------------------
-comment  3595 Move Characters to User-Defined Graphics Memory
+comment  3595 Copy Character ROM Character to User-Defined Graphics Memory
 comment  3595 ----------------------------------------------------------
 comment  3595 FUNCTION  :
 comment  3595 \
@@ -519,33 +512,64 @@ comment  3595 CALLED BY :
 comment  3595 \
 comment  3595 CALLS     :
 comment  3595 \
-comment  3595 ARGUMENTS :  Addr_From is already setup (fixed Character ROM)
-comment  3595              Addr_To is already setup (UDG memory)
+comment  3595 ARGUMENTS :  Addr_From is already setup, typically $60 or $70.
+comment  3595 \             Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
+comment  3595 \             Addr_To gets updated as part of this routine.
 comment  3595 ----------------------------------------------------------
-label    3595 MV_CHARS_TO_UDGRAM
+label    3595 COPY_CHAR_TO_UDG_RAM
+lcomment 3595 Addr_From = 71 xx as example
+lcomment 3597 Clear address hi-byte
+lcomment 3599 Addr_From = 71 00
+lcomment 359E Addr_From = 31 00, $31st Character ROM character is "1"
+
+comment  35A0
+lcomment 35A0 Multiply Addr_From by 8, as 8 bytes per character definition
+label    35A2 CCTUR1
+
+lcomment 35a5 Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
+lcomment 35a7 Left-shifted 3 times? i.e. multiplied by 8
+lcomment 35a8 If no, loop back
+
+comment  35aa
+lcomment 35aa Add $8000 Character ROM offset to address
+lcomment 35ae Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
+
+comment  35B0
+lcomment 35b0 8 bytes to form a complete character
+lcomment 35b2 Test the Invert flag
+lcomment 35b4 If yes, copy bytes with inversion instead
+label    35B6 CCTUR2
+lcomment 35B6 Copy bytes from given address with Y offset
+lcomment 35b8 Copy bytes to given address with Y offset
+lcomment 35ba Decrement number of lines counter
+lcomment 35bb All lines copied? If no, loop back.
+
+label    35bd NEXT_CHAR
 comment  35BD
+lcomment 35BD Updates to location for saving character line
+
 lcomment 35C0 #B0=176=number of vertical pixels i.e. move to next char right
 lcomment 35C6 Increment address hi-byte if previous addition overflowed
 
 comment  35CB
 comment  35CB ----------------------------------------------------------
-comment  35CB Move Bytes with Invert
+comment  35CB Copy Bytes with Invert
 comment  35CB ----------------------------------------------------------
-comment  35CB FUNCTION  :  Move bytes from one location to another,
-comment  35CB              inverting them in the process. Typically used
-comment  35CB              when moving graptics from fixed character ROM
-comment  35CB              to the user-defined graphics memory.
+comment  35CB FUNCTION  :  Copy bytes from one location to another,
+comment  35CB \             inverting them in the process. Typically used
+comment  35CB \             when copying graptics from fixed character ROM
+comment  35CB \             to the user-defined graphics memory.
 comment  35CB \
-comment  35CB CALLED BY :  MV_CHARS_TO_UDGRAM, ???
+comment  35CB CALLED BY :  COPY_CHAR_TO_UDG_RAM, ???
 comment  35CB \
 comment  35CB CALLS     :  Nothing
 comment  35CB \
 comment  35CB ARGUMENTS :  Y contains number of bytes to move.
-comment  35CB              Addr_From is already setup (fixed Character ROM)
-comment  35CB              Addr_To is already setup (UDG memory)
+comment  35CB \             Addr_From is already setup (fixed Character ROM).
+comment  35CB \             Addr_To is already setup (UDG memory).
 comment  35CB ----------------------------------------------------------
-label    35CB Move_Bytes_Invert
-lcomment 35CB Move bytes from given address with Y offset
+label    35CB Copy_Bytes_Invert
+lcomment 35CB Copy bytes from given address with Y offset
 lcomment 35cd Invert the byte (used to make the byte flash)
 lcomment 35Cf Move bytes to given address with Y offset
 lcomment 35d1 Decrement number of lines counter
@@ -553,6 +577,7 @@ lcomment 35d2 All lines copied? If no, loop back.
 lcomment 35d4 If yes, routine ends
 
 
-
 ; End of file contains graphics data
+unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
+break    385f-3fff ; Output one byte per line
 binary   385f-3fff
