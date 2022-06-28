@@ -14,6 +14,7 @@
 Zero_Page         equ     $0000
 ZP_Addr_To        equ     $0004
 ZP_Addr_From      equ     $0006
+ZP_Color_RAM_Ptr  equ     $000C
 KEYBOARD_DATA     equ     $0013
 ZP_ADDR           equ     $0040
 Score_P1          equ     $0051
@@ -354,12 +355,12 @@ SKIP_21DC
         lda     (ZP_Addr_To),y      ; 21DF: B1 04    
         eor     #$FF                ; 21E1: 49 FF    
         sta     (ZP_Addr_To),y      ; 21E3: 91 04    
-        lda     (Zero_Page+12),y    ; 21E5: B1 0C    
+        lda     (ZP_Color_RAM_Ptr),y ; 21E5: B1 0C    
         and     #$0F                ; 21E7: 29 0F    
         cmp     #$05                ; 21E9: C9 05    
         beq     SKIP_21F1           ; 21EB: F0 04    
         lda     Zero_Page+27        ; 21ED: A5 1B    
-        sta     (Zero_Page+12),y    ; 21EF: 91 0C    
+        sta     (ZP_Color_RAM_Ptr),y ; 21EF: 91 0C    
 SKIP_21F1
         lda     ZP_Addr_From+1      ; 21F1: A5 07    
         sec                         ; 21F3: 38       
@@ -543,22 +544,13 @@ Z231A   txa                         ; 231A: 8A
         jsr     Z28F0               ; 2337: 20 F0 28 
         rts                         ; 233A: 60       
 ; -----------------------------------------------------------
-M233B   fcb     $09                 ; 233B: 09       
-        fcc     "p"                 ; 233C: 70       
-        fcb     $00,$AF,$01,$00,$00 ; 233D: 00 AF 01 00 00 
-        fcb     $1C,$04             ; 2342: 1C 04    
-        fcc     " "                 ; 2344: 20       
-        fcb     $00                 ; 2345: 00       
-        fcc     "?"                 ; 2346: 3F       
-        fcb     $00,$01,$10,$18,$04 ; 2347: 00 01 10 18 04 
-        fcc     "P"                 ; 234C: 50       
-        fcb     $00                 ; 234D: 00       
-        fcc     "_"                 ; 234E: 5F       
+M233B   fcb     $09,$70,$00,$AF,$01 ; 233B: 09 70 00 AF 01 
+        fcb     $00,$00,$1C,$04,$20 ; 2340: 00 00 1C 04 20 
+        fcb     $00,$3F,$00,$01,$10 ; 2345: 00 3F 00 01 10 
+        fcb     $18,$04,$50,$00,$5F ; 234A: 18 04 50 00 5F 
         fcb     $01,$01,$08,$18     ; 234F: 01 01 08 18 
-M2353   fcb     $02                 ; 2353: 02       
-        fcc     "P"                 ; 2354: 50       
-        fcb     $00,$AF,$00,$01,$00 ; 2355: 00 AF 00 01 00 
-        fcb     $00                 ; 235A: 00       
+M2353   fcb     $02,$50,$00,$AF,$00 ; 2353: 02 50 00 AF 00 
+        fcb     $01,$00,$00         ; 2358: 01 00 00 
 Z235B   ldx     #$07                ; 235B: A2 07    
 Z235D   lda     M2353,x             ; 235D: BD 53 23 
         sta     Screen_RAM+384,x    ; 2360: 9D 80 03 
@@ -591,7 +583,7 @@ Z238E   clc                         ; 238E: 18
         jsr     COPY_CHAR_TO_UDG_RAM ; 2393: 20 95 35 
         jsr     AAAAA               ; 2396: 20 9D 25 
         fcb     $06                 ; 2399: 06       
-        fdb     $23C7               ; 239A: C7 23    
+        fdb     SOME_DATA           ; 239A: C7 23    
         fcb     $FF                 ; 239C: FF       
         ldy     #$07                ; 239D: A0 07    
         jmp     CCTUR2              ; 239F: 4C B6 35 
@@ -618,6 +610,7 @@ Z23C0   lda     Zero_Page+94        ; 23C0: A5 5E
         beq     Z23BD               ; 23C2: F0 F9    
         jmp     Z23BA               ; 23C4: 4C BA 23 
 ; ===========================================================
+SOME_DATA
         fcb     $18                 ; 23C7: 18       
         fcc     "$<~Z<<f"           ; 23C8: 24 3C 7E 5A 3C 3C 66 
 Z23CF   lda     #$7F                ; 23CF: A9 7F    
@@ -1194,9 +1187,9 @@ Z27E1   lda     Zero_Page+39        ; 27E1: A5 27
         jsr     Z34F7               ; 27FF: 20 F7 34 
         lda     #$02                ; 2802: A9 02    
         ldy     #$00                ; 2804: A0 00    
-        sta     (Zero_Page+12),y    ; 2806: 91 0C    
+        sta     (ZP_Color_RAM_Ptr),y ; 2806: 91 0C    
         iny                         ; 2808: C8       
-        sta     (Zero_Page+12),y    ; 2809: 91 0C    
+        sta     (ZP_Color_RAM_Ptr),y ; 2809: 91 0C    
 Z280B   pla                         ; 280B: 68       
         sta     Zero_Page+25        ; 280C: 85 19    
         pla                         ; 280E: 68       
@@ -1257,32 +1250,27 @@ Z2874   ldy     #$06                ; 2874: A0 06
         lda     (Zero_Page),y       ; 2876: B1 00    
         and     #$0E                ; 2878: 29 0E    
         tax                         ; 287A: AA       
-        lda     M2888,x             ; 287B: BD 88 28 
+        lda     Vectors,x           ; 287B: BD 88 28 
         sta     Zero_Page+8         ; 287E: 85 08    
-        lda     M2889,x             ; 2880: BD 89 28 
+        lda     Vectors+1,x         ; 2880: BD 89 28 
         sta     Zero_Page+9         ; 2883: 85 09    
         jmp     (Zero_Page+8)       ; 2885: 6C 08 00 
-M2888   fcb     $92                 ; 2888: 92       
-M2889   fcc     "("                 ; 2889: 28       
-        fcb     $A4                 ; 288A: A4       
-        fcc     "("                 ; 288B: 28       
-        fcb     $A4                 ; 288C: A4       
-        fcc     "("                 ; 288D: 28       
-        fcb     $9F                 ; 288E: 9F       
-        fcc     "("                 ; 288F: 28       
-        fcb     $B6                 ; 2890: B6       
-        fcc     "("                 ; 2891: 28       
-        lda     #$07                ; 2892: A9 07    
+Vectors fdb     WWW                 ; 2888: 92 28    
+        fdb     XXX                 ; 288A: A4 28    
+        fdb     XXX                 ; 288C: A4 28    
+        fdb     YYY                 ; 288E: 9F 28    
+        fdb     ZZZ                 ; 2890: B6 28    
+WWW     lda     #$07                ; 2892: A9 07    
 Z2894   ldy     #$05                ; 2894: A0 05    
         sta     (Zero_Page),y       ; 2896: 91 00    
         ldy     #$06                ; 2898: A0 06    
         lda     (Zero_Page),y       ; 289A: B1 00    
         jmp     Z2FC3               ; 289C: 4C C3 2F 
 ; ===========================================================
-        lda     #$06                ; 289F: A9 06    
+YYY     lda     #$06                ; 289F: A9 06    
         jmp     Z2894               ; 28A1: 4C 94 28 
 ; ===========================================================
-        lda     Zero_Page+74        ; 28A4: A5 4A    
+XXX     lda     Zero_Page+74        ; 28A4: A5 4A    
         and     #$1F                ; 28A6: 29 1F    
         cmp     #$18                ; 28A8: C9 18    
         bcs     Z28B1               ; 28AA: B0 05    
@@ -1292,7 +1280,7 @@ Z2894   ldy     #$05                ; 2894: A0 05
 Z28B1   lda     #$03                ; 28B1: A9 03    
         jmp     Z2894               ; 28B3: 4C 94 28 
 ; ===========================================================
-        lda     Zero_Page+74        ; 28B6: A5 4A    
+ZZZ     lda     Zero_Page+74        ; 28B6: A5 4A    
         lsr     a                   ; 28B8: 4A       
         lsr     a                   ; 28B9: 4A       
         and     #$07                ; 28BA: 29 07    
@@ -2119,16 +2107,16 @@ Z2F07   ldy     #$01                ; 2F07: A0 01
         jsr     Z34F7               ; 2F13: 20 F7 34 
 Z2F16   ldy     #$00                ; 2F16: A0 00    
         lda     Zero_Page+27        ; 2F18: A5 1B    
-        sta     (Zero_Page+12),y    ; 2F1A: 91 0C    
+        sta     (ZP_Color_RAM_Ptr),y ; 2F1A: 91 0C    
         iny                         ; 2F1C: C8       
-        sta     (Zero_Page+12),y    ; 2F1D: 91 0C    
-        lda     Zero_Page+12        ; 2F1F: A5 0C    
+        sta     (ZP_Color_RAM_Ptr),y ; 2F1D: 91 0C    
+        lda     ZP_Color_RAM_Ptr    ; 2F1F: A5 0C    
         sec                         ; 2F21: 38       
         sbc     #$17                ; 2F22: E9 17    
-        sta     Zero_Page+12        ; 2F24: 85 0C    
-        lda     Zero_Page+13        ; 2F26: A5 0D    
+        sta     ZP_Color_RAM_Ptr    ; 2F24: 85 0C    
+        lda     ZP_Color_RAM_Ptr+1  ; 2F26: A5 0D    
         sbc     #$00                ; 2F28: E9 00    
-        sta     Zero_Page+13        ; 2F2A: 85 0D    
+        sta     ZP_Color_RAM_Ptr+1  ; 2F2A: 85 0D    
         dec     Zero_Page+2         ; 2F2C: C6 02    
         bne     Z2F16               ; 2F2E: D0 E6    
         rts                         ; 2F30: 60       
@@ -2452,7 +2440,7 @@ Z317B   ldy     #$09                ; 317B: A0 09
         sta     Zero_Page+11        ; 318D: 85 0B    
         ldy     #$00                ; 318F: A0 00    
         lda     #$05                ; 3191: A9 05    
-Z3193   sta     (Zero_Page+12),y    ; 3193: 91 0C    
+Z3193   sta     (ZP_Color_RAM_Ptr),y ; 3193: 91 0C    
         iny                         ; 3195: C8       
         dec     Zero_Page+11        ; 3196: C6 0B    
         bpl     Z3193               ; 3198: 10 F9    
@@ -2910,7 +2898,7 @@ Z34C7   dec     Zero_Page+2         ; 34C7: C6 02
         bne     CCCC_34a4           ; 34C9: D0 D9    
         rts                         ; 34CB: 60       
 ; -----------------------------------------------------------
-Z34CC   jsr     Z34F7               ; 34CC: 20 F7 34  This is an intermediate jsr, called from several places
+Z34CC   jsr     Z34F7               ; 34CC: 20 F7 34  YOU ARE HERE --- intermediate jsr, called from several places
         jsr     Z351D               ; 34CF: 20 1D 35  Doesn't seem to do much
         ldy     #$00                ; 34D2: A0 00    
         lda     (Zero_Page+14),y    ; 34D4: B1 0E    
@@ -2936,7 +2924,7 @@ Z34E3   lsr     a                   ; 34E3: 4A        Run through, don't know wh
 
         lda     ZP_INVERT           ; 34F0: A5 57    
         dey                         ; 34F2: 88       
-        sta     (Zero_Page+12),y    ; 34F3: 91 0C    
+        sta     (ZP_Color_RAM_Ptr),y ; 34F3: 91 0C    
         iny                         ; 34F5: C8       
         rts                         ; 34F6: 60       
 ; -----------------------------------------------------------
@@ -2944,7 +2932,7 @@ Z34F7   lda     ZP_Addr_To          ; 34F7: A5 04
         lsr     a                   ; 34F9: 4A       
         lsr     a                   ; 34FA: 4A       
         lsr     a                   ; 34FB: 4A       
-        sta     Zero_Page+12        ; 34FC: 85 0C    
+        sta     ZP_Color_RAM_Ptr    ; 34FC: 85 0C    
         lda     ZP_Addr_To+1        ; 34FE: A5 05    
         lsr     a                   ; 3500: 4A       
         lsr     a                   ; 3501: 4A       
@@ -2953,17 +2941,15 @@ Z34F7   lda     ZP_Addr_To          ; 34F7: A5 04
         tax                         ; 3504: AA       
         lda     M3512,x             ; 3505: BD 12 35 
         clc                         ; 3508: 18       
-        adc     Zero_Page+12        ; 3509: 65 0C    
-        sta     Zero_Page+12        ; 350B: 85 0C    
+        adc     ZP_Color_RAM_Ptr    ; 3509: 65 0C    
+        sta     ZP_Color_RAM_Ptr    ; 350B: 85 0C    
         lda     #$96                ; 350D: A9 96    
-        sta     Zero_Page+13        ; 350F: 85 0D    
+        sta     ZP_Color_RAM_Ptr+1  ; 350F: 85 0D    
         rts                         ; 3511: 60       
 ; -----------------------------------------------------------
-M3512   fcb     $00,$17             ; 3512: 00 17    
-        fcc     ".E"                ; 3514: 2E 45    
-        fcb     $5C                 ; 3516: 5C       
-        fcc     "s"                 ; 3517: 73       
-        fcb     $8A,$A1,$B8,$CF,$E6 ; 3518: 8A A1 B8 CF E6 
+M3512   fcb     $00,$17,$2E,$45,$5C ; 3512: 00 17 2E 45 5C 
+        fcb     $73,$8A,$A1,$B8,$CF ; 3517: 73 8A A1 B8 CF 
+        fcb     $E6                 ; 351C: E6       
 
 Z351D   lda     ZP_Addr_To+1        ; 351D: A5 05     Valid Target - traced but doesn't seem to do much
         tay                         ; 351F: A8       
@@ -3061,15 +3047,14 @@ ERASECR2 dec    Zero_Page+2         ; 3584: C6 02
 ; ----------------------------------------------------------
 ; Copy Character ROM Character to User-Defined Graphics Memory
 ; ----------------------------------------------------------
-; FUNCTION  :
-; \
+; FUNCTION  : Copy an 8 byte Character ROM character to the
+;             Used-Defined Graphics RAM e.g. to display a
+;             text string or score.
 ; CALLED BY :
-; \
-; CALLS     :
-; \
-; ARGUMENTS :  Addr_From is already setup, typically $60 or $70.
-;              Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
-;              Addr_To gets updated as part of this routine.
+; CALLS     : Nothing
+; ARGUMENTS : Addr_From is already setup, typically $60 or $70.
+;             Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
+;             Addr_To gets updated as part of this routine.
 ; ----------------------------------------------------------
 COPY_CHAR_TO_UDG_RAM
         lda     #$00                ; 3595: A9 00     Addr_From = 71 xx as example
@@ -3079,27 +3064,31 @@ COPY_CHAR_TO_UDG_RAM
         sbc     #$40                ; 359C: E9 40    
         sta     ZP_Addr_From        ; 359E: 85 06     Addr_From = 31 00, $31st Character ROM character is "1"
 
-        ldx     #$03                ; 35A0: A2 03     Multiply Addr_From by 8, as 8 bytes per character definition
+; Multiply Addr_From by 8, as 8 bytes per character definition
+        ldx     #$03                ; 35A0: A2 03    
 CCTUR1  clc                         ; 35A2: 18       
         rol     ZP_Addr_From        ; 35A3: 26 06    
         rol     ZP_Addr_From+1      ; 35A5: 26 07     Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
         dex                         ; 35A7: CA        Left-shifted 3 times? i.e. multiplied by 8
         bne     CCTUR1              ; 35A8: D0 F8     If no, loop back
 
-        lda     ZP_Addr_From+1      ; 35AA: A5 07     Add $8000 Character ROM offset to address
+; Add $8000 Character ROM offset to address
+        lda     ZP_Addr_From+1      ; 35AA: A5 07    
         adc     #$80                ; 35AC: 69 80    
         sta     ZP_Addr_From+1      ; 35AE: 85 07     Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
 
-        ldy     #$07                ; 35B0: A0 07     8 bytes to form a complete character
+; Copy 8 bytes to form a complete character
+        ldy     #$07                ; 35B0: A0 07    
         lda     ZP_INVERT           ; 35B2: A5 57     Test the Invert flag
-        bmi     Copy_Bytes_Invert   ; 35B4: 30 15     If yes, copy bytes with inversion instead
+        bmi     CCTUR_INV           ; 35B4: 30 15     If yes, copy bytes with inversion instead
 CCTUR2  lda     (ZP_Addr_From),y    ; 35B6: B1 06     Copy bytes from given address with Y offset
         sta     (ZP_Addr_To),y      ; 35B8: 91 04     Copy bytes to given address with Y offset
         dey                         ; 35BA: 88        Decrement number of lines counter
         bpl     CCTUR2              ; 35BB: 10 F9     All lines copied? If no, loop back.
 
-NEXT_CHAR
-        lda     ZP_Addr_To          ; 35BD: A5 04     Updates to location for saving character line
+; Move the next character address to the next column
+CCTUR_NEXT
+        lda     ZP_Addr_To          ; 35BD: A5 04    
         clc                         ; 35BF: 18       
         adc     #$B0                ; 35C0: 69 B0     #B0=176=number of vertical pixels i.e. move to next char right
         sta     ZP_Addr_To          ; 35C2: 85 04    
@@ -3107,30 +3096,14 @@ NEXT_CHAR
         adc     #$00                ; 35C6: 69 00     Increment address hi-byte if previous addition overflowed
         sta     ZP_Addr_To+1        ; 35C8: 85 05    
         rts                         ; 35CA: 60       
-
-; ----------------------------------------------------------
-; Copy Bytes with Invert
-; ----------------------------------------------------------
-; FUNCTION  :  Copy bytes from one location to another,
-;              inverting them in the process. Typically used
-;              when copying graptics from fixed character ROM
-;              to the user-defined graphics memory.
-; \
-; CALLED BY :  COPY_CHAR_TO_UDG_RAM, ???
-; \
-; CALLS     :  Nothing
-; \
-; ARGUMENTS :  Y contains number of bytes to move.
-;              Addr_From is already setup (fixed Character ROM).
-;              Addr_To is already setup (UDG memory).
-; ----------------------------------------------------------
-Copy_Bytes_Invert
+; Copy 8 inverted bytes to form a complete character
+CCTUR_INV
         lda     (ZP_Addr_From),y    ; 35CB: B1 06     Copy bytes from given address with Y offset
         eor     #$FF                ; 35CD: 49 FF     Invert the byte (used to make the byte flash)
         sta     (ZP_Addr_To),y      ; 35CF: 91 04     Move bytes to given address with Y offset
         dey                         ; 35D1: 88        Decrement number of lines counter
-        bpl     Copy_Bytes_Invert   ; 35D2: 10 F7     All lines copied? If no, loop back.
-        jmp     NEXT_CHAR           ; 35D4: 4C BD 35  If yes, routine ends
+        bpl     CCTUR_INV           ; 35D2: 10 F7     All lines copied? If no, loop back.
+        jmp     CCTUR_NEXT          ; 35D4: 4C BD 35  If yes, routine ends
 ; ===========================================================
 Z35D7   ldy     #$00                ; 35D7: A0 00    
         lda     (Zero_Page),y       ; 35D9: B1 00    
@@ -3183,8 +3156,8 @@ Z3619   eor     #$FF                ; 3619: 49 FF
         sta     Zero_Page+10        ; 362B: 85 0A    
         ldy     Zero_Page+9         ; 362D: A4 09    
 Z362F   lda     (Zero_Page+14),y    ; 362F: B1 0E    
-        eor     (Zero_Page+12),y    ; 3631: 51 0C    
-        sta     (Zero_Page+12),y    ; 3633: 91 0C    
+        eor     (ZP_Color_RAM_Ptr),y ; 3631: 51 0C    
+        sta     (ZP_Color_RAM_Ptr),y ; 3633: 91 0C    
         dey                         ; 3635: 88       
         dex                         ; 3636: CA       
         bne     Z362F               ; 3637: D0 F6    
@@ -3245,8 +3218,8 @@ Z3688   lda     Zero_Page+2         ; 3688: A5 02
 Z369C   dec     Zero_Page+10        ; 369C: C6 0A    
         ldy     Zero_Page+9         ; 369E: A4 09    
         lda     (Zero_Page+14),y    ; 36A0: B1 0E    
-        eor     (Zero_Page+12),y    ; 36A2: 51 0C    
-        sta     (Zero_Page+12),y    ; 36A4: 91 0C    
+        eor     (ZP_Color_RAM_Ptr),y ; 36A2: 51 0C    
+        sta     (ZP_Color_RAM_Ptr),y ; 36A4: 91 0C    
         dec     Zero_Page+9         ; 36A6: C6 09    
         jmp     Z3688               ; 36A8: 4C 88 36 
 ; ===========================================================
@@ -3292,26 +3265,26 @@ Z36E7   lda     Zero_Page+21        ; 36E7: A5 15
         lda     Zero_Page+15        ; 36F4: A5 0F    
         sbc     #$00                ; 36F6: E9 00    
         sta     Zero_Page+15        ; 36F8: 85 0F    
-        lda     Zero_Page+12        ; 36FA: A5 0C    
+        lda     ZP_Color_RAM_Ptr    ; 36FA: A5 0C    
         clc                         ; 36FC: 18       
         adc     #$B0                ; 36FD: 69 B0    
-        sta     Zero_Page+12        ; 36FF: 85 0C    
-        lda     Zero_Page+13        ; 3701: A5 0D    
+        sta     ZP_Color_RAM_Ptr    ; 36FF: 85 0C    
+        lda     ZP_Color_RAM_Ptr+1  ; 3701: A5 0D    
         adc     #$00                ; 3703: 69 00    
-        sta     Zero_Page+13        ; 3705: 85 0D    
-        lda     Zero_Page+12        ; 3707: A5 0C    
+        sta     ZP_Color_RAM_Ptr+1  ; 3705: 85 0D    
+        lda     ZP_Color_RAM_Ptr    ; 3707: A5 0C    
         sec                         ; 3709: 38       
         sbc     #$D1                ; 370A: E9 D1    
-        lda     Zero_Page+13        ; 370C: A5 0D    
+        lda     ZP_Color_RAM_Ptr+1  ; 370C: A5 0D    
         sbc     #$1E                ; 370E: E9 1E    
         bcc     Z371F               ; 3710: 90 0D    
-        lda     Zero_Page+12        ; 3712: A5 0C    
+        lda     ZP_Color_RAM_Ptr    ; 3712: A5 0C    
         sec                         ; 3714: 38       
         sbc     #$D0                ; 3715: E9 D0    
-        sta     Zero_Page+12        ; 3717: 85 0C    
-        lda     Zero_Page+13        ; 3719: A5 0D    
+        sta     ZP_Color_RAM_Ptr    ; 3717: 85 0C    
+        lda     ZP_Color_RAM_Ptr+1  ; 3719: A5 0D    
         sbc     #$0F                ; 371B: E9 0F    
-        sta     Zero_Page+13        ; 371D: 85 0D    
+        sta     ZP_Color_RAM_Ptr+1  ; 371D: 85 0D    
 Z371F   jmp     Z364C               ; 371F: 4C 4C 36 
 ; ===========================================================
 Z3722   lda     #$00                ; 3722: A9 00    
@@ -3351,10 +3324,10 @@ Z3759   sta     ZP_Addr_To          ; 3759: 85 04
         lda     ZP_Addr_To          ; 3760: A5 04    
         sec                         ; 3762: 38       
         sbc     #$FF                ; 3763: E9 FF    
-        sta     Zero_Page+12        ; 3765: 85 0C    
+        sta     ZP_Color_RAM_Ptr    ; 3765: 85 0C    
         lda     ZP_Addr_To+1        ; 3767: A5 05    
         sbc     #$00                ; 3769: E9 00    
-        sta     Zero_Page+13        ; 376B: 85 0D    
+        sta     ZP_Color_RAM_Ptr+1  ; 376B: 85 0D    
         ldy     #$FE                ; 376D: A0 FE    
         lda     (Zero_Page+14),y    ; 376F: B1 0E    
         sta     Zero_Page+21        ; 3771: 85 15    
@@ -3481,21 +3454,21 @@ Z381F   lda     Zero_Page+24        ; 381F: A5 18
         inc     Zero_Page+10        ; 3839: E6 0A    
 Z383B   ldx     Zero_Page+10        ; 383B: A6 0A    
         ldy     #$00                ; 383D: A0 00    
-Z383F   lda     (Zero_Page+12),y    ; 383F: B1 0C    
+Z383F   lda     (ZP_Color_RAM_Ptr),y ; 383F: B1 0C    
         and     #$07                ; 3841: 29 07    
         cmp     #$05                ; 3843: C9 05    
         beq     Z384B               ; 3845: F0 04    
         lda     Zero_Page+27        ; 3847: A5 1B    
-        sta     (Zero_Page+12),y    ; 3849: 91 0C    
+        sta     (ZP_Color_RAM_Ptr),y ; 3849: 91 0C    
 Z384B   iny                         ; 384B: C8       
         dex                         ; 384C: CA       
         bne     Z383F               ; 384D: D0 F0    
-        lda     Zero_Page+12        ; 384F: A5 0C    
+        lda     ZP_Color_RAM_Ptr    ; 384F: A5 0C    
         sec                         ; 3851: 38       
         sbc     #$17                ; 3852: E9 17    
         cmp     #$17                ; 3854: C9 17    
         bcc     Z385E               ; 3856: 90 06    
-        sta     Zero_Page+12        ; 3858: 85 0C    
+        sta     ZP_Color_RAM_Ptr    ; 3858: 85 0C    
         dec     Zero_Page+11        ; 385A: C6 0B    
         bne     Z383B               ; 385C: D0 DD    
 Z385E   rts                         ; 385E: 60       

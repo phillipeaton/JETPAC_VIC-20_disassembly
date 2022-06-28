@@ -55,4 +55,38 @@ Attract/Game Selection screen
 loop
 
 
+--------------------------------------------------------------------------
 
+VIC20 Keyboard Matrix
+
+Write to Port B($9120)column
+Read from Port A($9121)row
+
+     7   6   5   4   3   2   1   0
+    --------------------------------
+  7| F7  F5  F3  F1  CDN CRT RET DEL    CRT=Cursor-Right, CDN=Cursor-Down
+   |
+  6| HOM UA  =   RSH /   ;   *   BP     BP=British Pound, RSH=Should be Right-SHIFT,
+   |                                    UA=Up Arrow
+  5| -   @   :   .   ,   L   P   +
+   |
+  4| 0   O   K   M   N   J   I   9
+   |
+  3| 8   U   H   B   V   G   Y   7
+   |
+  2| 6   T   F   C   X   D   R   5
+   |
+  1| 4   E   S   Z   LSH A   W   3      LSH=Should be Left-SHIFT
+   |
+  0| 2   Q   CBM SPC STP CTL LA  1      LA=Left Arrow, CTL=Should be CTRL, STP=RUN/STOP
+   |                                    CBM=Commodore key
+
+C64/VIC20 Keyboard Layout
+
+  LA  1  2  3  4  5  6  7  8  9  0  +  -  BP HOM DEL    F1
+  CTRL Q  W  E  R  T  Y  U  I  O  P  @  *  UA RESTORE   F3
+STOP SL A  S  D  F  G  H  J  K  L  :  ;  =  RETURN      F5
+C= SHIFT Z  X  C  V  B  N  M  ,  .  /  SHIFT  CDN CRT   F7
+         [        SPACE BAR       ]
+         
+--------------------------------------------------------------------------         
