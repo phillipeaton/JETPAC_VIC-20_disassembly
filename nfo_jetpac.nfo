@@ -11,9 +11,9 @@ file   jetpac_2000-3fff.bin * Instructs dasmfw to load the given file at the giv
 option asc off       * Show output of the ASCII equivalent to code/data
 *option cref on      * Show cross-referece table
 *option unused on    * Show unused labels
-*option labellen 12  * Def=8  Reserve spaces for code labels.
-option eqlbllen 18   * Def=8  Reserve spaces for EQU labels.
-option copndlen 20   * Def=24 Reserve spaces for operand part of disassembled instruction with line comment
+;option labellen 32   * Def=8  Reserve spaces for code labels.
+option eqlbllen 16   * Def=8  Reserve spaces for EQU labels.
+option copndlen 24   * Def=24 Reserve spaces for operand part of disassembled instruction with line comment
 option uopndlen 52   * Def=52 Reserve spaces for operand part of disassembled instruction without line comment
 option dbcount 3     * Def=5  Reserve spaces for hex/ascii dump bytes if hex or asc options enabled.
 
@@ -62,20 +62,66 @@ const 3457
 const 3516
 
 ; Zero-Page variables
+label      01 ZP_0001
+label      02 ZP_0002
+label      03 ZP_0003
 label      04 ZP_Addr_To
 label      05 ZP_Addr_To+1
 label      06 ZP_Addr_From
 label      07 ZP_Addr_From+1
-label      0c ZP_Color_RAM_Ptr
-label      0d ZP_Color_RAM_Ptr+1
+label      08 ZP_0008
+label      09 ZP_0009
+label      0A ZP_000a
+label      0B ZP_000b
+label      0c ZP_ColorRAMPtr
+label      0d ZP_ColorRAMPtr+1
+label      0E ZP_PTR_TO_STR
+label      0F ZP_000f
+label      10 ZP_0010
+label      11 ZP_0011
+label      12 ZP_0012
 label      13 KEYBOARD_DATA
+label      14 ZP_0014
+label      15 ZP_0015
+label      16 ZP_0016
+label      17 ZP_0017
+label      18 ZP_0018
+label      19 ZP_0019
+label      1A ZP_001a
+label      1B ZP_001b
+label      1C ZP_001c
+label      1E ZP_001e
+label      1F ZP_001f
+label      20 ZP_0020
+label      21 ZP_0021
+label      22 ZP_0022
+label      23 ZP_0023
+label      24 ZP_0024
+label      25 ZP_0025
+label      26 ZP_0026
+label      27 ZP_0027
+label      28 ZP_0028
 label      40 ZP_ADDR
 label      41 ZP_ADDR+1
+label      45 ZP_0045
+label      4a ZP_004a
+label      4b ZP_004b
+label      4c ZP_004c
 label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54 Score_P2 ; 3 bytes
 label      57 ZP_INVERT ; Used to flash game options & 1UP+score at player start
 label      58 ZP_COUNTER
+label      59 ZP_0059
 label      5a Num_Lives
+label      5b ZP_005b
+label      5c ZP_005c
+label      5d ZP_005d
+label      5e ZP_005e
+label      5f ZP_005f
+label      60 ZP_0060
+label      80 ZP_0080
+label      f8 ZP_00f8
+label      fc ZP_00fc
 
 label    1008 UDG_P1_SCORE
 label    1420 UDG_P1_LIVES
@@ -427,26 +473,55 @@ label    34a4 CCCC_34a4
 
 lcomment 34be Jump to routine copy stuff from STD CHAR ROM TO UDG CHAR SET
 
-lcomment 34CC YOU ARE HERE --- intermediate jsr, called from several places
-lcomment 34CF Doesn't seem to do much
+
+
+comment  34cc
+comment  34cc ----------------------------------------------------------
+comment  34cc NOT SURE WHAT THIS IS YET
+comment  34cc ----------------------------------------------------------
+comment  34cc FUNCTION  :
+comment  34cc CALLED BY :
+comment  34cc CALLS     :
+comment  34cc ARGUMENTS :
+comment  34cc ZP_PTR_TO_STR  = "COPYRIGHT`qyxs`An" or "JETPAC`GAME`SELEC"
+comment  34cc ZP_ColorRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
+comment  34cc ZP_Addr_To     = 08 A8 or 08 20
+comment  34cc ZP_Addr_From   = 70 80 or 28 80
+comment  34cc ----------------------------------------------------------
 label    34D6 BACK_34D6
-lcomment 34D8 Load A with content of $2450+y?
-lcomment 34DB Strange pair of jumps to same place, branch&jsr
-lcomment 34Dd Strange pair of jumps to same place, branch&jsr
-lcomment 34e3 Run through, don't know what it's doing
 
 comment  34e9
-lcomment 34e9 Stash y via a
-lcomment 34EB Moves a few bytes around
-lcomment 34ef Restore y via a
 comment  34f0
 
+label    34f7 Setup_Color_RAM_Ptr
+lcomment 34F7 Get Addr_To lo-byte and divide by 8
+lcomment 34f9 and store to Color RAM Ptr lo-byte.
+lcomment 34fa ZP_Addr_To is used to work out the column
+
+comment  34fe
+lcomment 34fe Get Addr_To hi-byte, divide by $10
+lcomment 3500 and use as index into Color RAM
+lcomment 3501 Row Offsets i.e. 9600, 9617, 962e etc.
+lcomment 3502 Divided by #16 because 16 y-pixels per
+lcomment 3503 Color RAM tile.
+comment  350D
+lcomment 350D Store hi-byte of Color RAM
+lcomment 350F to pointer hi-byte.
+
+label    3512 Color_RAM_Row_Offsets
 const    3512-351c
 
+label    351d Setup_UDG_RAM_Ptr
 comment  351D
-lcomment 351D Valid Target - traced but doesn't seem to do much
+comment  3520
+comment  352b
+lcomment 351D YOU ARE HERE ##################
 
 label    3531 BACK_3531
+
+label    3545 UDG_RAM_Column_Offsets
+lcomment  3545 Bytes are middle two numbers in addr e.g. 10b0, 1160 etc
+const    3545-3557
 
 comment  355c
 label    355c RESET_COLOR_RAM?
