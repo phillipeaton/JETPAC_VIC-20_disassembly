@@ -15,7 +15,8 @@ ZP              equ     $0000
 ZP_0001         equ     $0001
 ZP_0002         equ     $0002
 ZP_0003         equ     $0003
-ZP_Addr_To      equ     $0004
+ZP_UDG_RAM_X    equ     $0004
+ZP_UDG_RAM_Y    equ     $0005
 ZP_Addr_From    equ     $0006
 ZP_0008         equ     $0008
 ZP_0009         equ     $0009
@@ -371,16 +372,16 @@ Z2195   adc     #$08                    ; 2195: 69 08
         ldy     #$02                    ; 21A5: A0 02    
         lda     (ZP),y                  ; 21A7: B1 00    
         sta     ZP_Addr_From            ; 21A9: 85 06    
-        sta     ZP_Addr_To              ; 21AB: 85 04    
+        sta     ZP_UDG_RAM_X            ; 21AB: 85 04    
         dey                             ; 21AD: 88       
         lda     (ZP),y                  ; 21AE: B1 00    
-        sta     ZP_Addr_To+1            ; 21B0: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 21B0: 85 05    
         sta     KEYBOARD_DATA           ; 21B2: 85 13    
         lda     ZP_Addr_From            ; 21B4: A5 06    
         bit     BITM_04                 ; 21B6: 2C 16 20 
         beq     Z2202                   ; 21B9: F0 47    
         jsr     Setup_Color_RAM_Ptr     ; 21BB: 20 F7 34 
-        jsr     Setup_UDG_RAM_Ptr       ; 21BE: 20 1D 35 
+        jsr     Setup_UDG_RAM_XY        ; 21BE: 20 1D 35 
         lda     ZP_Addr_From            ; 21C1: A5 06    
         bit     BITM_01                 ; 21C3: 2C 14 20 
         clc                             ; 21C6: 18       
@@ -393,14 +394,14 @@ Z21CB   jsr     Z2298                   ; 21CB: 20 98 22
         dey                             ; 21D3: 88       
         cmp     #$80                    ; 21D4: C9 80    
         bcs     SKIP_21DC               ; 21D6: B0 04    
-        lda     (ZP_Addr_To),y          ; 21D8: B1 04    
+        lda     (ZP_UDG_RAM_X),y        ; 21D8: B1 04    
         bne     Z21FC                   ; 21DA: D0 20    
 SKIP_21DC
         txa                             ; 21DC: 8A       
         sta     ZP_Addr_From            ; 21DD: 85 06    
-        lda     (ZP_Addr_To),y          ; 21DF: B1 04    
+        lda     (ZP_UDG_RAM_X),y        ; 21DF: B1 04    
         eor     #$FF                    ; 21E1: 49 FF    
-        sta     (ZP_Addr_To),y          ; 21E3: 91 04    
+        sta     (ZP_UDG_RAM_X),y        ; 21E3: 91 04    
         lda     (ZP_ColorRAMPtr),y      ; 21E5: B1 0C    
         and     #$0F                    ; 21E7: 29 0F    
         cmp     #$05                    ; 21E9: C9 05    
@@ -463,7 +464,7 @@ Z2248   ldy     #$06                    ; 2248: A0 06
         jmp     Z261A                   ; 2254: 4C 1A 26 
 ; ===========================================================
 Z2257   lda     (ZP),y                  ; 2257: B1 00    
-        sta     ZP_Addr_To              ; 2259: 85 04    
+        sta     ZP_UDG_RAM_X            ; 2259: 85 04    
         bit     BITM_01                 ; 225B: 2C 14 20 
         beq     Z2285                   ; 225E: F0 25    
         clc                             ; 2260: 18       
@@ -471,15 +472,15 @@ Z2257   lda     (ZP),y                  ; 2257: B1 00
 Z2263   jsr     Z2298                   ; 2263: 20 98 22 
         sta     (ZP),y                  ; 2266: 91 00    
         lda     KEYBOARD_DATA           ; 2268: A5 13    
-        sta     ZP_Addr_To+1            ; 226A: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 226A: 85 05    
         tya                             ; 226C: 98       
         pha                             ; 226D: 48       
-        jsr     Setup_UDG_RAM_Ptr       ; 226E: 20 1D 35 
+        jsr     Setup_UDG_RAM_XY        ; 226E: 20 1D 35 
         jsr     Z228B                   ; 2271: 20 8B 22 
         ldy     #$00                    ; 2274: A0 00    
         lda     ZP_0014                 ; 2276: A5 14    
-        eor     (ZP_Addr_To),y          ; 2278: 51 04    
-        sta     (ZP_Addr_To),y          ; 227A: 91 04    
+        eor     (ZP_UDG_RAM_X),y        ; 2278: 51 04    
+        sta     (ZP_UDG_RAM_X),y        ; 227A: 91 04    
         pla                             ; 227C: 68       
         tay                             ; 227D: A8       
         dec     ZP_0002                 ; 227E: C6 02    
@@ -713,10 +714,10 @@ Z2425   ldx     #$00                    ; 2425: A2 00
         ldy     #$03                    ; 2427: A0 03    
 BACK_2429
         lda     TEXT_STRINGS_1UP_HI_2UP,x ; 2429: BD 65 24 
-        sta     ZP_Addr_To              ; 242C: 85 04    
+        sta     ZP_UDG_RAM_X            ; 242C: 85 04    
         inx                             ; 242E: E8       
         lda     TEXT_STRINGS_1UP_HI_2UP,x ; 242F: BD 65 24 
-        sta     ZP_Addr_To+1            ; 2432: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 2432: 85 05    
         inx                             ; 2434: E8       
         lda     TEXT_STRINGS_1UP_HI_2UP,x ; 2435: BD 65 24 
         sta     ZP_PTR_TO_STR           ; 2438: 85 0E    
@@ -728,7 +729,7 @@ BACK_2429
         pha                             ; 2442: 48       
         tya                             ; 2443: 98       
         pha                             ; 2444: 48       
-        jsr     Z34CC                   ; 2445: 20 CC 34 
+        jsr     Display_String          ; 2445: 20 CC 34 
         pla                             ; 2448: 68       
         tay                             ; 2449: A8       
         pla                             ; 244A: 68       
@@ -818,14 +819,14 @@ Z24B9   ldx     #$00                    ; 24B9: A2 00
         fcb     $0E                     ; 24D0: 0E       
         fdb     STRING_JETPAC_GAME_SELECT ; 24D1: 3A 25    
         fcb     $FF                     ; 24D3: FF       
-        jsr     Z34CC                   ; 24D4: 20 CC 34 
+        jsr     Display_String          ; 24D4: 20 CC 34 
         jsr     AAAAA                   ; 24D7: 20 9D 25 
         fcb     $04                     ; 24DA: 04       
         fdb     $A808                   ; 24DB: 08 A8    
         fcb     $0E                     ; 24DD: 0E       
         fdb     STRING_COPYRIGHT_1983_ACG ; 24DE: 24 25    
         fcb     $FF                     ; 24E0: FF       
-        jsr     Z34CC                   ; 24E1: 20 CC 34 
+        jsr     Display_String          ; 24E1: 20 CC 34 
         jsr     AAAAA                   ; 24E4: 20 9D 25 
         fcb     $0E                     ; 24E7: 0E       
         fdb     STRING_F1_1_PLAYER_GAME ; 24E8: 50 25    
@@ -834,16 +835,16 @@ Z24B9   ldx     #$00                    ; 24B9: A2 00
         sta     ZP_0008                 ; 24ED: 85 08    
 BACK_24EF
         lda     #$18                    ; 24EF: A9 18    
-        sta     ZP_Addr_To              ; 24F1: 85 04    
+        sta     ZP_UDG_RAM_X            ; 24F1: 85 04    
         ldx     ZP_0008                 ; 24F3: A6 08    
-        lda     M251F,x                 ; 24F5: BD 1F 25 
-        sta     ZP_Addr_To+1            ; 24F8: 85 05    
+        lda     ATTRACT_FKey_SP_Row_Offsets,x ; 24F5: BD 1F 25 
+        sta     ZP_UDG_RAM_Y            ; 24F8: 85 05    
         jsr     Setup_Color_RAM_Ptr     ; 24FA: 20 F7 34 
-        jsr     Setup_UDG_RAM_Ptr       ; 24FD: 20 1D 35 
+        jsr     Setup_UDG_RAM_XY        ; 24FD: 20 1D 35 
         ldy     #$00                    ; 2500: A0 00    
         ldx     ZP_0008                 ; 2502: A6 08    
         lda     ZP_0045,x               ; 2504: B5 45    
-        jsr     BACK_34D6               ; 2506: 20 D6 34 
+        jsr     DSTR1                   ; 2506: 20 D6 34 
         iny                             ; 2509: C8       
         tya                             ; 250A: 98       
         clc                             ; 250B: 18       
@@ -858,12 +859,14 @@ BACK_24EF
         bne     BACK_24EF               ; 251C: D0 D1    
         rts                             ; 251E: 60       
 ; -----------------------------------------------------------
-M251F   fcc     "8HXh"                  ; 251F: 38 48 58 68 
-        fcb     $90                     ; 2523: 90       
+ATTRACT_FKey_SP_Row_Offsets
+        fcb     $38,$48,$58,$68,$90     ; 251F: 38 48 58 68 90 
+
 STRING_COPYRIGHT_1983_ACG
         fcb     $01                     ; 2524: 01       
         fcc     "COPYRIGHT`qyxs`AnCnG"  ; 2525: 43 4F 50 59 52 49 47 48 54 60 71 79 78 73 60 41 6E 43 6E 47 
-        fcb     $EE                     ; 2539: EE       
+        fcb     $EE                     ; 2539: EE        Top bit=1 indicates end of string
+                                        ; `= Space, qyxs = 1983, n=.
 STRING_JETPAC_GAME_SELECT
         fcb     $01                     ; 253A: 01       
         fcc     "JETPAC`GAME`SELECTIO"  ; 253B: 4A 45 54 50 41 43 60 47 41 4D 45 60 53 45 4C 45 43 54 49 4F 
@@ -1221,9 +1224,9 @@ Z27E1   lda     ZP_0027                 ; 27E1: A5 27
         jsr     Z378D                   ; 27F1: 20 8D 37 
         jsr     Z364C                   ; 27F4: 20 4C 36 
         lda     ZP_0018                 ; 27F7: A5 18    
-        sta     ZP_Addr_To              ; 27F9: 85 04    
+        sta     ZP_UDG_RAM_X            ; 27F9: 85 04    
         lda     ZP_0019                 ; 27FB: A5 19    
-        sta     ZP_Addr_To+1            ; 27FD: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 27FD: 85 05    
         jsr     Setup_Color_RAM_Ptr     ; 27FF: 20 F7 34 
         lda     #$02                    ; 2802: A9 02    
         ldy     #$00                    ; 2804: A0 00    
@@ -1486,7 +1489,7 @@ Z29E7   jsr     RESET_COLOR_PIXELS_SCORES ; 29E7: 20 16 24
         fcb     $04                     ; 29F4: 04        ZP Offset for 1st address?????
         fdb     Block3_8K_RAM+16        ; 29F5: 10 60     1st Address?????
         fcb     $FF                     ; 29F7: FF       
-        jsr     Z34CC                   ; 29F8: 20 CC 34 
+        jsr     Display_String          ; 29F8: 20 CC 34 
         jsr     AAAAA                   ; 29FB: 20 9D 25 
         fcb     $02                     ; 29FE: 02        ZP Offset for 1st address
         fdb     ZP                      ; 29FF: 00 00     1st Address
@@ -2138,10 +2141,10 @@ Z2F01   jsr     Z2F07                   ; 2F01: 20 07 2F
 ; ===========================================================
 Z2F07   ldy     #$01                    ; 2F07: A0 01    
         lda     (ZP),y                  ; 2F09: B1 00    
-        sta     ZP_Addr_To              ; 2F0B: 85 04    
+        sta     ZP_UDG_RAM_X            ; 2F0B: 85 04    
         ldy     #$03                    ; 2F0D: A0 03    
         lda     (ZP),y                  ; 2F0F: B1 00    
-        sta     ZP_Addr_To+1            ; 2F11: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 2F11: 85 05    
         jsr     Setup_Color_RAM_Ptr     ; 2F13: 20 F7 34 
 Z2F16   ldy     #$00                    ; 2F16: A0 00    
         lda     ZP_001b                 ; 2F18: A5 1B    
@@ -2449,16 +2452,16 @@ Z3143   lda     #$B6                    ; 3143: A9 B6
 ; -----------------------------------------------------------
 Z3152   jsr     Z3143                   ; 3152: 20 43 31 
 Z3155   lda     (ZP_0008),y             ; 3155: B1 08    
-        sta     ZP_Addr_To              ; 3157: 85 04    
+        sta     ZP_UDG_RAM_X            ; 3157: 85 04    
         iny                             ; 3159: C8       
         lda     (ZP_0008),y             ; 315A: B1 08    
-        sta     ZP_Addr_To+1            ; 315C: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 315C: 85 05    
         iny                             ; 315E: C8       
         lda     (ZP_0008),y             ; 315F: B1 08    
         sta     ZP_000b                 ; 3161: 85 0B    
         sty     ZP_0003                 ; 3163: 84 03    
         jsr     Setup_Color_RAM_Ptr     ; 3165: 20 F7 34 
-        jsr     Setup_UDG_RAM_Ptr       ; 3168: 20 1D 35 
+        jsr     Setup_UDG_RAM_XY        ; 3168: 20 1D 35 
         lda     #$15                    ; 316B: A9 15    
         sta     ZP_Addr_From            ; 316D: 85 06    
         lda     #$3E                    ; 316F: A9 3E    
@@ -2886,20 +2889,20 @@ Z3465   lda     ZP_005e                 ; 3465: A5 5E
         bne     Z3499                   ; 3477: D0 20    
         ldx     #$06                    ; 3479: A2 06    
 Z347B   ldy     #$0F                    ; 347B: A0 0F    
-Z347D   lda     (ZP_Addr_To),y          ; 347D: B1 04    
+Z347D   lda     (ZP_UDG_RAM_X),y        ; 347D: B1 04    
         eor     #$FF                    ; 347F: 49 FF    
-        sta     (ZP_Addr_To),y          ; 3481: 91 04    
+        sta     (ZP_UDG_RAM_X),y        ; 3481: 91 04    
         dey                             ; 3483: 88       
         bpl     Z347D                   ; 3484: 10 F7    
         dex                             ; 3486: CA       
         beq     Z3499                   ; 3487: F0 10    
-        lda     ZP_Addr_To              ; 3489: A5 04    
+        lda     ZP_UDG_RAM_X            ; 3489: A5 04    
         clc                             ; 348B: 18       
         adc     #$B0                    ; 348C: 69 B0    
-        sta     ZP_Addr_To              ; 348E: 85 04    
-        lda     ZP_Addr_To+1            ; 3490: A5 05    
+        sta     ZP_UDG_RAM_X            ; 348E: 85 04    
+        lda     ZP_UDG_RAM_Y            ; 3490: A5 05    
         adc     #$00                    ; 3492: 69 00    
-        sta     ZP_Addr_To+1            ; 3494: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 3494: 85 05    
         jmp     Z347B                   ; 3496: 4C 7B 34 
 ; ===========================================================
 Z3499   rts                             ; 3499: 60       
@@ -2943,22 +2946,24 @@ Z34C7   dec     ZP_0002                 ; 34C7: C6 02
 ; ARGUMENTS :
 ; ZP_PTR_TO_STR  = "COPYRIGHT`qyxs`An" or "JETPAC`GAME`SELEC"
 ; ZP_ColorRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
-; ZP_Addr_To     = 08 A8 or 08 20
+; ZP_UDG_RAM_X   = 08 A8 or 08 20
+; ZP_UDG_RAM_Y   = 08 A8 or 08 20
 ; ZP_Addr_From   = 70 80 or 28 80
 ; ----------------------------------------------------------
-Z34CC   jsr     Setup_Color_RAM_Ptr     ; 34CC: 20 F7 34 
-        jsr     Setup_UDG_RAM_Ptr       ; 34CF: 20 1D 35 
-        ldy     #$00                    ; 34D2: A0 00    
-        lda     (ZP_PTR_TO_STR),y       ; 34D4: B1 0E    
-BACK_34D6
-        tax                             ; 34D6: AA       
-        iny                             ; 34D7: C8       
+Display_String
+        jsr     Setup_Color_RAM_Ptr     ; 34CC: 20 F7 34 
+        jsr     Setup_UDG_RAM_XY        ; 34CF: 20 1D 35 
+        ldy     #$00                    ; 34D2: A0 00     Y=string character pointer
+        lda     (ZP_PTR_TO_STR),y       ; 34D4: B1 0E     Get character to display
+DSTR1   tax                             ; 34D6: AA        Stash character to X
+        iny                             ; 34D7: C8        Inc character pointer
         lda     (ZP_PTR_TO_STR),y       ; 34D8: B1 0E    
-        asl     a                       ; 34DA: 0A       
-        bcs     Z34E3                   ; 34DB: B0 06    
-        jsr     Z34E3                   ; 34DD: 20 E3 34 
-        jmp     BACK_34D6               ; 34E0: 4C D6 34 
-; ===========================================================
+        asl     a                       ; 34DA: 0A        Test if character top bit is set = string end
+        bcs     Z34E3                   ; 34DB: B0 06     Display character then exit
+        jsr     Z34E3                   ; 34DD: 20 E3 34  Display character
+        jmp     DSTR1                   ; 34E0: 4C D6 34 
+
+; Display_Character
 Z34E3   lsr     a                       ; 34E3: 4A       
         sta     ZP_Addr_From            ; 34E4: 85 06    
         txa                             ; 34E6: 8A       
@@ -2977,13 +2982,13 @@ Z34E3   lsr     a                       ; 34E3: 4A
         rts                             ; 34F6: 60       
 ; -----------------------------------------------------------
 Setup_Color_RAM_Ptr
-        lda     ZP_Addr_To              ; 34F7: A5 04     Get Addr_To lo-byte and divide by 8
+        lda     ZP_UDG_RAM_X            ; 34F7: A5 04     Get Addr_To lo-byte and divide by 8
         lsr     a                       ; 34F9: 4A        and store to Color RAM Ptr lo-byte.
         lsr     a                       ; 34FA: 4A        ZP_Addr_To is used to work out the column
         lsr     a                       ; 34FB: 4A       
         sta     ZP_ColorRAMPtr          ; 34FC: 85 0C    
 
-        lda     ZP_Addr_To+1            ; 34FE: A5 05     Get Addr_To hi-byte, divide by $10
+        lda     ZP_UDG_RAM_Y            ; 34FE: A5 05     Get Addr_To hi-byte, divide by $10
         lsr     a                       ; 3500: 4A        and use as index into Color RAM
         lsr     a                       ; 3501: 4A        Row Offsets i.e. 9600, 9617, 962e etc.
         lsr     a                       ; 3502: 4A        Divided by #16 because 16 y-pixels per
@@ -3002,33 +3007,33 @@ Color_RAM_Row_Offsets
         fcb     $00,$17,$2E,$45,$5C,$73 ; 3512: 00 17 2E 45 5C 73 
         fcb     $8A,$A1,$B8,$CF,$E6     ; 3518: 8A A1 B8 CF E6 
 
-Setup_UDG_RAM_Ptr
-        lda     ZP_Addr_To+1            ; 351D: A5 05     YOU ARE HERE ##################
-        tay                             ; 351F: A8       
+Setup_UDG_RAM_XY
+        lda     ZP_UDG_RAM_Y            ; 351D: A5 05     Addr_To = 18 68, as example
+        tay                             ; 351F: A8        Addr_To = 18 xx, 68 stashed to Y
 
-        lda     ZP_Addr_To              ; 3520: A5 04    
+        lda     ZP_UDG_RAM_X            ; 3520: A5 04     Get Addr_To lo-byte, divide by 8, example = $18/8=3
         lsr     a                       ; 3522: 4A       
         lsr     a                       ; 3523: 4A       
         lsr     a                       ; 3524: 4A       
         tax                             ; 3525: AA       
-        lda     UDG_RAM_Column_Offsets,x ; 3526: BD 45 35 
-        sta     ZP_Addr_To              ; 3529: 85 04    
+        lda     UDG_RAM_Column_Offsets,x ; 3526: BD 45 35  Load Column offset (4th item = $21)
+        sta     ZP_UDG_RAM_X            ; 3529: 85 04     Store back to Addr_To lo-byte, Addr_To = 21 xx
+        lda     #$00                    ; 352B: A9 00     Reset Addr_To hi-byte to 00
+        sta     ZP_UDG_RAM_Y            ; 352D: 85 05     Addr_To = 21 xx
 
-        lda     #$00                    ; 352B: A9 00    
-        sta     ZP_Addr_To+1            ; 352D: 85 05    
-        ldx     #$04                    ; 352F: A2 04    
-BACK_3531
-        asl     ZP_Addr_To              ; 3531: 06 04    
-        rol     ZP_Addr_To+1            ; 3533: 26 05    
+        ldx     #$04                    ; 352F: A2 04     Rotate left Addr_To by 4 bits
+SURP1   asl     ZP_UDG_RAM_X            ; 3531: 06 04    
+        rol     ZP_UDG_RAM_Y            ; 3533: 26 05    
         dex                             ; 3535: CA       
-        bne     BACK_3531               ; 3536: D0 F9    
-        tya                             ; 3538: 98       
+        bne     SURP1                   ; 3536: D0 F9     Addr_To = 1x x2
+
+        tya                             ; 3538: 98        Get stashed Y = 68 to A
         clc                             ; 3539: 18       
-        adc     ZP_Addr_To              ; 353A: 65 04    
-        sta     ZP_Addr_To              ; 353C: 85 04    
+        adc     ZP_UDG_RAM_X            ; 353A: 65 04    
+        sta     ZP_UDG_RAM_X            ; 353C: 85 04     Addr_To = 78 x2
         lda     #$10                    ; 353E: A9 10    
-        adc     ZP_Addr_To+1            ; 3540: 65 05    
-        sta     ZP_Addr_To+1            ; 3542: 85 05    
+        adc     ZP_UDG_RAM_Y            ; 3540: 65 05    
+        sta     ZP_UDG_RAM_Y            ; 3542: 85 05     Addr_To = 78 12 = "F7 JOYSTICK" start position
         rts                             ; 3544: 60       
 ; -----------------------------------------------------------
 UDG_RAM_Column_Offsets
@@ -3084,10 +3089,10 @@ ERASECR1 lda    ZP_Addr_From            ; 357B: A5 06
                                         ; 96E0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
                                         ; 96F0  01 01 01 01 01 01 01 01 01 01 01 01 01 00 00 00   ................
                                         ; 9700  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
-        sta     (ZP_Addr_To),y          ; 357D: 91 04    
+        sta     (ZP_UDG_RAM_X),y        ; 357D: 91 04    
         iny                             ; 357F: C8       
         bne     ERASECR2                ; 3580: D0 02    
-        inc     ZP_Addr_To+1            ; 3582: E6 05    
+        inc     ZP_UDG_RAM_Y            ; 3582: E6 05    
 ERASECR2 dec    ZP_0002                 ; 3584: C6 02    
         lda     ZP_0002                 ; 3586: A5 02    
         cmp     #$FF                    ; 3588: C9 FF    
@@ -3136,25 +3141,26 @@ CCTUR1  clc                             ; 35A2: 18
         lda     ZP_INVERT               ; 35B2: A5 57     Test the Invert flag
         bmi     CCTUR_INV               ; 35B4: 30 15     If yes, copy bytes with inversion instead
 CCTUR2  lda     (ZP_Addr_From),y        ; 35B6: B1 06     Copy bytes from given address with Y offset
-        sta     (ZP_Addr_To),y          ; 35B8: 91 04     Copy bytes to given address with Y offset
+        sta     (ZP_UDG_RAM_X),y        ; 35B8: 91 04     Copy bytes to given address with Y offset
         dey                             ; 35BA: 88        Decrement number of lines counter
         bpl     CCTUR2                  ; 35BB: 10 F9     All lines copied? If no, loop back.
 
 ; Move the next character address to the next column
 CCTUR_NEXT
-        lda     ZP_Addr_To              ; 35BD: A5 04    
+        lda     ZP_UDG_RAM_X            ; 35BD: A5 04    
         clc                             ; 35BF: 18       
         adc     #$B0                    ; 35C0: 69 B0     #B0=176=number of vertical pixels i.e. move to next char right
-        sta     ZP_Addr_To              ; 35C2: 85 04    
-        lda     ZP_Addr_To+1            ; 35C4: A5 05    
+        sta     ZP_UDG_RAM_X            ; 35C2: 85 04    
+        lda     ZP_UDG_RAM_Y            ; 35C4: A5 05    
         adc     #$00                    ; 35C6: 69 00     Increment address hi-byte if previous addition overflowed
-        sta     ZP_Addr_To+1            ; 35C8: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 35C8: 85 05    
         rts                             ; 35CA: 60       
+
 ; Copy 8 inverted bytes to form a complete character
 CCTUR_INV
         lda     (ZP_Addr_From),y        ; 35CB: B1 06     Copy bytes from given address with Y offset
         eor     #$FF                    ; 35CD: 49 FF     Invert the byte (used to make the byte flash)
-        sta     (ZP_Addr_To),y          ; 35CF: 91 04     Move bytes to given address with Y offset
+        sta     (ZP_UDG_RAM_X),y        ; 35CF: 91 04     Move bytes to given address with Y offset
         dey                             ; 35D1: 88        Decrement number of lines counter
         bpl     CCTUR_INV               ; 35D2: 10 F7     All lines copied? If no, loop back.
         jmp     CCTUR_NEXT              ; 35D4: 4C BD 35  If yes, routine ends
@@ -3248,8 +3254,8 @@ Z364C   lda     #$FF                    ; 364C: A9 FF
         sta     ZP_0002                 ; 3670: 85 02    
         ldy     ZP_0008                 ; 3672: A4 08    
 Z3674   lda     (ZP_Addr_From),y        ; 3674: B1 06    
-        eor     (ZP_Addr_To),y          ; 3676: 51 04    
-        sta     (ZP_Addr_To),y          ; 3678: 91 04    
+        eor     (ZP_UDG_RAM_X),y        ; 3676: 51 04    
+        sta     (ZP_UDG_RAM_X),y        ; 3678: 91 04    
         dey                             ; 367A: 88       
         dex                             ; 367B: CA       
         bne     Z3674                   ; 367C: D0 F6    
@@ -3264,8 +3270,8 @@ Z3688   lda     ZP_0002                 ; 3688: A5 02
         dec     ZP_0002                 ; 368C: C6 02    
         ldy     ZP_0008                 ; 368E: A4 08    
         lda     (ZP_Addr_From),y        ; 3690: B1 06    
-        eor     (ZP_Addr_To),y          ; 3692: 51 04    
-        sta     (ZP_Addr_To),y          ; 3694: 91 04    
+        eor     (ZP_UDG_RAM_X),y        ; 3692: 51 04    
+        sta     (ZP_UDG_RAM_X),y        ; 3694: 91 04    
         dec     ZP_0008                 ; 3696: C6 08    
         lda     ZP_000a                 ; 3698: A5 0A    
         beq     Z3688                   ; 369A: F0 EC    
@@ -3289,26 +3295,26 @@ Z36AB   lda     ZP_000a                 ; 36AB: A5 0A
         lda     ZP_Addr_From+1          ; 36BC: A5 07    
         sbc     #$00                    ; 36BE: E9 00    
         sta     ZP_Addr_From+1          ; 36C0: 85 07    
-        lda     ZP_Addr_To              ; 36C2: A5 04    
+        lda     ZP_UDG_RAM_X            ; 36C2: A5 04    
         clc                             ; 36C4: 18       
         adc     #$B0                    ; 36C5: 69 B0    
-        sta     ZP_Addr_To              ; 36C7: 85 04    
-        lda     ZP_Addr_To+1            ; 36C9: A5 05    
+        sta     ZP_UDG_RAM_X            ; 36C7: 85 04    
+        lda     ZP_UDG_RAM_Y            ; 36C9: A5 05    
         adc     #$00                    ; 36CB: 69 00    
-        sta     ZP_Addr_To+1            ; 36CD: 85 05    
-        lda     ZP_Addr_To              ; 36CF: A5 04    
+        sta     ZP_UDG_RAM_Y            ; 36CD: 85 05    
+        lda     ZP_UDG_RAM_X            ; 36CF: A5 04    
         sec                             ; 36D1: 38       
         sbc     #$D1                    ; 36D2: E9 D1    
-        lda     ZP_Addr_To+1            ; 36D4: A5 05    
+        lda     ZP_UDG_RAM_Y            ; 36D4: A5 05    
         sbc     #$1E                    ; 36D6: E9 1E    
         bcc     Z36E7                   ; 36D8: 90 0D    
-        lda     ZP_Addr_To              ; 36DA: A5 04    
+        lda     ZP_UDG_RAM_X            ; 36DA: A5 04    
         sec                             ; 36DC: 38       
         sbc     #$D0                    ; 36DD: E9 D0    
-        sta     ZP_Addr_To              ; 36DF: 85 04    
-        lda     ZP_Addr_To+1            ; 36E1: A5 05    
+        sta     ZP_UDG_RAM_X            ; 36DF: 85 04    
+        lda     ZP_UDG_RAM_Y            ; 36E1: A5 05    
         sbc     #$0F                    ; 36E3: E9 0F    
-        sta     ZP_Addr_To+1            ; 36E5: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 36E5: 85 05    
 Z36E7   lda     ZP_0015                 ; 36E7: A5 15    
         beq     Z3722                   ; 36E9: F0 37    
         dec     ZP_0015                 ; 36EB: C6 15    
@@ -3361,25 +3367,25 @@ Z373D   sty     ZP_PTR_TO_STR           ; 373D: 84 0E
         dey                             ; 3740: 88       
         sty     ZP_000f                 ; 3741: 84 0F    
         lda     ZP_0018                 ; 3743: A5 18    
-        sta     ZP_Addr_To              ; 3745: 85 04    
+        sta     ZP_UDG_RAM_X            ; 3745: 85 04    
         lda     ZP_0019                 ; 3747: A5 19    
-        sta     ZP_Addr_To+1            ; 3749: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 3749: 85 05    
         ldy     #$FF                    ; 374B: A0 FF    
         lda     (ZP_PTR_TO_STR),y       ; 374D: B1 0E    
         clc                             ; 374F: 18       
-        adc     ZP_Addr_To              ; 3750: 65 04    
+        adc     ZP_UDG_RAM_X            ; 3750: 65 04    
         cmp     #$B8                    ; 3752: C9 B8    
         bcc     Z3759                   ; 3754: 90 03    
         sec                             ; 3756: 38       
         sbc     #$B8                    ; 3757: E9 B8    
-Z3759   sta     ZP_Addr_To              ; 3759: 85 04    
+Z3759   sta     ZP_UDG_RAM_X            ; 3759: 85 04    
         sta     ZP_0018                 ; 375B: 85 18    
-        jsr     Setup_UDG_RAM_Ptr       ; 375D: 20 1D 35 
-        lda     ZP_Addr_To              ; 3760: A5 04    
+        jsr     Setup_UDG_RAM_XY        ; 375D: 20 1D 35 
+        lda     ZP_UDG_RAM_X            ; 3760: A5 04    
         sec                             ; 3762: 38       
         sbc     #$FF                    ; 3763: E9 FF    
         sta     ZP_ColorRAMPtr          ; 3765: 85 0C    
-        lda     ZP_Addr_To+1            ; 3767: A5 05    
+        lda     ZP_UDG_RAM_Y            ; 3767: A5 05    
         sbc     #$00                    ; 3769: E9 00    
         sta     ZP_ColorRAMPtr+1        ; 376B: 85 0D    
         ldy     #$FE                    ; 376D: A0 FE    
@@ -3405,26 +3411,26 @@ Z378D   sty     ZP_Addr_From            ; 378D: 84 06
         dey                             ; 3790: 88       
         sty     ZP_Addr_From+1          ; 3791: 84 07    
         lda     ZP_0010                 ; 3793: A5 10    
-        sta     ZP_Addr_To              ; 3795: 85 04    
+        sta     ZP_UDG_RAM_X            ; 3795: 85 04    
         lda     ZP_0011                 ; 3797: A5 11    
-        sta     ZP_Addr_To+1            ; 3799: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 3799: 85 05    
         ldy     #$FF                    ; 379B: A0 FF    
         lda     (ZP_Addr_From),y        ; 379D: B1 06    
         clc                             ; 379F: 18       
-        adc     ZP_Addr_To              ; 37A0: 65 04    
+        adc     ZP_UDG_RAM_X            ; 37A0: 65 04    
         cmp     #$B8                    ; 37A2: C9 B8    
         bcc     Z37A9                   ; 37A4: 90 03    
         sec                             ; 37A6: 38       
         sbc     #$B8                    ; 37A7: E9 B8    
-Z37A9   sta     ZP_Addr_To              ; 37A9: 85 04    
-        jsr     Setup_UDG_RAM_Ptr       ; 37AB: 20 1D 35 
-        lda     ZP_Addr_To              ; 37AE: A5 04    
+Z37A9   sta     ZP_UDG_RAM_X            ; 37A9: 85 04    
+        jsr     Setup_UDG_RAM_XY        ; 37AB: 20 1D 35 
+        lda     ZP_UDG_RAM_X            ; 37AE: A5 04    
         sec                             ; 37B0: 38       
         sbc     #$FF                    ; 37B1: E9 FF    
-        sta     ZP_Addr_To              ; 37B3: 85 04    
-        lda     ZP_Addr_To+1            ; 37B5: A5 05    
+        sta     ZP_UDG_RAM_X            ; 37B3: 85 04    
+        lda     ZP_UDG_RAM_Y            ; 37B5: A5 05    
         sbc     #$00                    ; 37B7: E9 00    
-        sta     ZP_Addr_To+1            ; 37B9: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 37B9: 85 05    
         ldy     #$FE                    ; 37BB: A0 FE    
         lda     (ZP_Addr_From),y        ; 37BD: B1 06    
         sta     ZP_0014                 ; 37BF: 85 14    
@@ -3491,9 +3497,9 @@ Z3815   lda     ZP_0018                 ; 3815: A5 18
         lda     ZP_001a                 ; 381A: A5 1A    
         jmp     Z37ED                   ; 381C: 4C ED 37 
 Z381F   lda     ZP_0018                 ; 381F: A5 18    
-        sta     ZP_Addr_To              ; 3821: 85 04    
+        sta     ZP_UDG_RAM_X            ; 3821: 85 04    
         lda     ZP_0019                 ; 3823: A5 19    
-        sta     ZP_Addr_To+1            ; 3825: 85 05    
+        sta     ZP_UDG_RAM_Y            ; 3825: 85 05    
         jsr     Setup_Color_RAM_Ptr     ; 3827: 20 F7 34 
         lda     ZP_0017                 ; 382A: A5 17    
         lsr     a                       ; 382C: 4A       

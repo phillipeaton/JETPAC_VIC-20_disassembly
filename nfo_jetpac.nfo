@@ -65,8 +65,8 @@ const 3516
 label      01 ZP_0001
 label      02 ZP_0002
 label      03 ZP_0003
-label      04 ZP_Addr_To
-label      05 ZP_Addr_To+1
+label      04 ZP_UDG_RAM_X
+label      05 ZP_UDG_RAM_Y
 label      06 ZP_Addr_From
 label      07 ZP_Addr_From+1
 label      08 ZP_0008
@@ -338,6 +338,8 @@ word     24e8
 
 
 label    2524 STRING_COPYRIGHT_1983_ACG
+lcomment 2539 Top bit=1 indicates end of string
+lcomment 2539 `= Space, qyxs = 1983, n=.
 label    253a STRING_JETPAC_GAME_SELECT
 label    2550 STRING_F1_1_PLAYER_GAME
 label    2562 STRING_F3_2_PLAYER_GAME
@@ -345,12 +347,14 @@ label    2574 STRING_F5_KEYBOARD
 label    2581 STRING_F7_JOYSTICK
 label    258E STRING_SP_START_GAME
 
-
-
 word     24Db
 word     24De
 
 label    24EF BACK_24EF
+
+label    251f ATTRACT_FKey_SP_Row_Offsets
+const    251f-2523
+comment  2524
 
 comment  259d
 label    259d AAAAA
@@ -485,10 +489,27 @@ comment  34cc CALLS     :
 comment  34cc ARGUMENTS :
 comment  34cc ZP_PTR_TO_STR  = "COPYRIGHT`qyxs`An" or "JETPAC`GAME`SELEC"
 comment  34cc ZP_ColorRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
-comment  34cc ZP_Addr_To     = 08 A8 or 08 20
+comment  34cc ZP_UDG_RAM_X   = 08 A8 or 08 20
+comment  34cc ZP_UDG_RAM_Y   = 08 A8 or 08 20
 comment  34cc ZP_Addr_From   = 70 80 or 28 80
 comment  34cc ----------------------------------------------------------
-label    34D6 BACK_34D6
+label    34cc Display_String
+
+label    34d2
+lcomment 34d2 Y=string character pointer
+lcomment 34d4 Get character to display
+lcomment 34d6 Stash character to X
+lcomment 34d7 Inc character pointer
+lcomment 34da Test if character top bit is set = string end
+lcomment 34db Display character then exit
+lcomment 34dd Display character
+
+
+
+label    34D6 DSTR1
+
+comment  34e3
+comment  34e3 Display_Character
 
 comment  34e9
 comment  34f0
@@ -511,13 +532,31 @@ lcomment 350F to pointer hi-byte.
 label    3512 Color_RAM_Row_Offsets
 const    3512-351c
 
-label    351d Setup_UDG_RAM_Ptr
-comment  351D
+comment  351d
+label    351d Setup_UDG_RAM_XY
+lcomment 351d Addr_To = 18 68, as example
+lcomment 351f Addr_To = 18 xx, 68 stashed to Y
 comment  3520
-comment  352b
-lcomment 351D YOU ARE HERE ##################
+lcomment 3520 Get Addr_To lo-byte, divide by 8, example = $18/8=3
+lcomment 3526 Load Column offset (4th item = $21)
+lcomment 3529 Store back to Addr_To lo-byte, Addr_To = 21 xx
 
-label    3531 BACK_3531
+lcomment 352b Reset Addr_To hi-byte to 00
+lcomment 352d Addr_To = 21 xx
+
+
+comment  352f
+lcomment 352f Rotate left Addr_To by 4 bits
+lcomment 3536 Addr_To = 1x x2
+
+comment   3538
+lcomment  3538 Get stashed Y = 68 to A
+lcomment  353c Addr_To = 78 x2
+lcomment  3542 Addr_To = 78 12 = "F7 JOYSTICK" start position
+
+
+
+label    3531 SURP1
 
 label    3545 UDG_RAM_Column_Offsets
 lcomment  3545 Bytes are middle two numbers in addr e.g. 10b0, 1160 etc
@@ -644,6 +683,7 @@ lcomment 35C0 #B0=176=number of vertical pixels i.e. move to next char right
 lcomment 35C6 Increment address hi-byte if previous addition overflowed
 
 label    35CB CCTUR_INV
+comment  35CB
 comment  35CB Copy 8 inverted bytes to form a complete character
 lcomment 35CB Copy bytes from given address with Y offset
 lcomment 35cd Invert the byte (used to make the byte flash)
