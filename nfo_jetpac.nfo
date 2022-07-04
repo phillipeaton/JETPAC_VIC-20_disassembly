@@ -12,7 +12,7 @@ option asc off       * Show output of the ASCII equivalent to code/data
 *option cref on      * Show cross-referece table
 *option unused on    * Show unused labels
 ;option labellen 32   * Def=8  Reserve spaces for code labels.
-option eqlbllen 16   * Def=8  Reserve spaces for EQU labels.
+option eqlbllen 24   * Def=8  Reserve spaces for EQU labels.
 option copndlen 24   * Def=24 Reserve spaces for operand part of disassembled instruction with line comment
 option uopndlen 52   * Def=52 Reserve spaces for operand part of disassembled instruction without line comment
 option dbcount 3     * Def=5  Reserve spaces for hex/ascii dump bytes if hex or asc options enabled.
@@ -75,12 +75,12 @@ label      0A ZP_000a
 label      0B ZP_000b
 label      0c ZP_ColorRAMPtr
 label      0d ZP_ColorRAMPtr+1
-label      0E ZP_PTR_TO_STR
+label      0E ZP_Ptr_To_Str
 label      0F ZP_000f
 label      10 ZP_0010
 label      11 ZP_0011
 label      12 ZP_0012
-label      13 KEYBOARD_DATA
+label      13 Keyboard_Data
 label      14 ZP_0014
 label      15 ZP_0015
 label      16 ZP_0016
@@ -101,9 +101,9 @@ label      25 ZP_0025
 label      26 ZP_0026
 label      27 ZP_0027
 label      28 ZP_0028
-label      40 ZP_ADDR
-label      41 ZP_ADDR+1
-label      45 ZP_0045
+label      40 ZP_Param_Addr
+label      41 ZP_Param_Addr+1
+label      45 ZP_Game_Sel_Flash
 label      4a ZP_004a
 label      4b ZP_004b
 label      4c ZP_004c
@@ -327,50 +327,84 @@ word     249b
 break    249d
 lcomment 249d FF is loop terminator
 
-label    24B2 SKIP_24B2
+label    24a1 Game_Sel_Flash_Period
+label    24A4 GSFP1
+lcomment 24A5 Test settings bit 1, if not set, skip counter logic
+lcomment 24A9 Counter for flash period
+lcomment 24ab remove the lsrs and flashes get faster
+
+
+label    24B2 GSFP2
+label    24B9 Display_Game_Select
+
+comment  24CA
+comment  24D7
+comment  24E4
+comment  24EB
+comment  2500
 
 word     24ce
 word     24D1
 const    24db
 word     24Db
 word     24de
+lcomment 24e7 ZP_Ptr_To_Str
+lcomment 24e8 String address
 word     24e8
 
 
 label    2524 STRING_COPYRIGHT_1983_ACG
 lcomment 2539 Top bit=1 indicates end of string
 lcomment 2539 `= Space, qyxs = 1983, n=.
-label    253a STRING_JETPAC_GAME_SELECT
-label    2550 STRING_F1_1_PLAYER_GAME
-label    2562 STRING_F3_2_PLAYER_GAME
-label    2574 STRING_F5_KEYBOARD
-label    2581 STRING_F7_JOYSTICK
-label    258E STRING_SP_START_GAME
+label    253a STR_JETPAC_GAME_SELECT
+label    2550 STR_F1_1_PLAYER_GAME
+label    2562 STR_F3_2_PLAYER_GAME
+label    2574 STR_F5_KEYBOARD
+label    2581 STR_F7_JOYSTICK
+label    258E STR_SP_START_GAME
 
 word     24Db
 word     24De
 
-label    24EF BACK_24EF
+label    24EF DGS1
 
-label    251f ATTRACT_FKey_SP_Row_Offsets
+label    251f Fn_Key_SP_Row_Offsets
 const    251f-2523
 comment  2524
 
 comment  259d
-label    259d AAAAA
+label    259d Read_ZP_Paramenters
 lcomment 259d
-lcomment 259d Takes stuff that was stashed on the stack previously and leaves
-lcomment 259d as an address in $0040, in this case $355E
-label    25A5 AAAAA1
-lcomment 25A5 Load from 355e+1 value 02
+lcomment 259d Parameters for this routine are assembled into ROM after the
+lcomment 259d call to this routine and accessed via the return address
+lcomment 259d stored on the stack.
+lcomment 259e Stash return address
+comment  25A3
+comment  25AE
+comment  25A3
+
+
+label    25A5 RZPP1
+lcomment 25A5 Load next parameter value, ZP address for next param else $FF
 lcomment 25A7 Value $FF?
 lcomment 25A9 If No, Skip
 
-label    25B5 GET_40Y_PUT_0X_2BYTES
+label    25B5 Read_ZP_Paramenter
+lcomment 25B5 Stash to X number before string characters (string len?)
+comment  25b6
+lcomment 25B6 Address starts at end of previous opcode operand, so inc it
+lcomment 25B9 Y starts at 1
+lcomment 25BB Store the parameter value to requried ZP address lo-byte
+comment  25bd
+lcomment 25bd Same again for hi-byte
+comment  25c4
+lcomment 25c4 Move to next parameter
+lcomment 25c7 Go back and read the next parameter
 
-label    25ca INC_ADDRESS_AT_40
+
+label    25ca Inc_Param_Addr
 lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
-label    25d0 INCADDR40
+label    25d0 IPA1
 
 label    262A BACK_262A
 label    2630 BACK_2630
@@ -467,12 +501,41 @@ lcomment 2a01 ZP Offset for 1st address
 lcomment 2a02 1st Address
 word     2a02
 
+const    2bcd
+lcomment 2bcd ZP Offset for 1st address
+lcomment 2bce 1st Address
+word     2bce
 
-lcomment  349D Data for AAAAA call above
+const    2BE8-2bf7
+break    2BE8-2bf7
 
-const    34a1-34a3
-break    34a1
-word     349e
+const    306a-306d
+lcomment 306a ZP Offset for 1st address
+lcomment 306b 1st Address
+break    306d-306e
+
+const    3094-3096
+lcomment 3094 ZP Offset for 1st address
+lcomment 3095 1st Address
+break    3097
+
+
+
+const    346c
+lcomment 346c ZP Offset for 1st address
+lcomment 346d 1st Address
+word     346d
+
+
+
+lcomment 349D Store to ZP_UDG_RAM_X
+lcomment 349e Character ROM
+const    349e-34a3
+break    34a0-34a1
+code     34a0-34a1
+
+
+
 label    34a4 CCCC_34a4
 
 lcomment 34be Jump to routine copy stuff from STD CHAR ROM TO UDG CHAR SET
@@ -509,7 +572,7 @@ lcomment 34dd Display character
 label    34D6 DSTR1
 
 comment  34e3
-comment  34e3 Display_Character
+label    34e3 Display_Character
 
 comment  34e9
 comment  34f0
@@ -588,6 +651,7 @@ label    356c ERASE_UDG_RAM_1000_1fff
 const    356f
 lcomment 356f ZP Offset for 1st address
 lcomment 3570 1st Address
+const    3570
 word     3570
 
 const    3572
@@ -694,6 +758,6 @@ lcomment 35d4 If yes, routine ends
 
 
 ; End of file contains graphics data
-unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
+;unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
 break    385f-3fff ; Output one byte per line
 binary   385f-3fff
