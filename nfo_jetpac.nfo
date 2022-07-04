@@ -133,24 +133,39 @@ label    1fd0 UDG_END
 label    1fd3 GAME_SETTINGS
 
 ; Start of disassembly instructions
+comment  2004 Left edge of TV picture and interlace switch.
 word     2000-2003
 const    2004-201b
-break    2008
-break    200c
-break    2010
+break    2004-2013
 
-label    2014 BITM_01
-label    2015 BITM_02
-label    2016 BITM_04
-label    2017 BITM_08
-label    2018 BITM_10
-label    2019 BITM_20
-label    201a BITM_40
-label    201b BITM_80
-
-break    2019-2020
 label    2004 VIC_Init_Tab
-lcomment 2004 Initial value table for VIC setup 16 bytes
+lcomment 2004 VICCRO Initial value table for VIC setup 16 bytes
+lcomment 2005 VICCR1
+lcomment 2006 VICCR2
+lcomment 2007 VICCR3
+lcomment 2008 VICCR4
+lcomment 2009 VICCR5
+lcomment 200a VICCR6
+lcomment 200b VICCR7
+lcomment 200c VICCR8
+lcomment 200d VICCR9
+lcomment 200e VICCRA
+lcomment 200f VICCRB
+lcomment 2010 VICCRC
+lcomment 2011 VICCRD
+lcomment 2012 VICCRE
+lcomment 2013 VICCRF
+
+
+label    2014 MASK_01
+label    2015 MASK_02
+label    2016 MASK_04
+label    2017 MASK_08
+label    2018 MASK_10
+label    2019 MASK_20
+label    201a MASK_40
+label    201b MASK_80
+
 lcomment 201c NMI Interrupt Vector points here
 
 comment  201d
@@ -265,17 +280,17 @@ comment  2425 Setup address to copy data from ($2450) into UDG array for 1UP HI 
 
 label    2429 BACK_2429
 
-label    2450 TEXT_STRINGS_1UP
+label    2450 STR_1UP
 break    245e
-label    2457 TEXT_STRINGS_HI
+label    2457 STR_HI
 break    2457
-label    245e TEXT_STRINGS_2UP
+label    245e STR_2UP
 break    245e
 
 
 
 
-label    2465 TEXT_STRINGS_1UP_HI_2UP
+label    2465 STR_1UP_HI_2UP
 word     2465-246f
 break    246b
 break    246d
@@ -406,6 +421,7 @@ label    25ca Inc_Param_Addr
 lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
 label    25d0 IPA1
 
+
 label    262A BACK_262A
 label    2630 BACK_2630
 label    2652 SKIP_2652
@@ -419,8 +435,8 @@ lcomment 2679 ZP Offset for 1st address
 lcomment 267a 1st Address
 word     267a
 
-const    268e-26ad
-word     268e-26ad
+;const    268e-26ad
+word     268c-26ad
 
 label    26b0 BACK_26b0
 
@@ -428,6 +444,7 @@ label    26c5 SCREEN_C0000000
 
 label    26d1 BACK_26d1
 
+word     2743-274e
 
 comment  275b Erase $100 bytes zero page
 label    275b ERASEZP
@@ -453,6 +470,11 @@ lcomment 278a ZP Offset for 1st address
 lcomment 278b 1st Address
 word     278b
 
+const    286B
+break    286B
+break    286d
+
+
 lcomment 2093 Set Port B all bits to input
 lcomment 2098 Set Port A all bits to output
 lcomment 209D Select keyboard column to read (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
@@ -468,20 +490,30 @@ lcomment 20c0 No, skip
 lcomment 20c8 F7 pressed? (Joystick)
 lcomment 20ca No, skip
 lcomment 20d1 Store game settings ($1fD3 = Just outside UDG RAM)
+lcomment 20d1 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
 lcomment 20d9 Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
 lcomment 20df Space Pressed?
 lcomment 20e1 No, read keyboard again
 
-label    2888 Vectors
-label    2889 Vectors+1
+label    268C Subroutine_List
+label    268D Subroutine_List+1
+
+label    2888 Subroutine_List3
+label    2889 Subroutine_List3+1
 word     2888-2891
-break     2888-2891
+break    2888-2891
 
-label 2892 WWW
-label 28a4 XXX
-label 289F YYY
-label 28b6 ZZZ
+label 2892 Routine_2892
+label 28a4 Routine_28a4
+label 289F Routine_289f
+label 28b6 Routine_28b6
 
+label    2967 UDG_Ptr
+label    2968 UDG_Ptr+1
+const    2967-2974
+word     2967-2974
+break    2968
+break    296f
 
 const    29f1
 lcomment 29f1 ZP Offset for 1st address
@@ -519,7 +551,52 @@ lcomment 3094 ZP Offset for 1st address
 lcomment 3095 1st Address
 break    3097
 
+label    261A Routine_261A
+label    3273 Routine_3273
+label    334D Routine_334D
+label    2934 Routine_2934
+label    2F8E Routine_2F8E
+label    2C6A Routine_2C6A
+label    2ABC Routine_2ABC
+label    2A6D Routine_2A6D
+label    2A5F Routine_2A5F
+label    2E74 Routine_2E74
+label    2E17 Routine_2E17
+label    2E4E Routine_2E4E
+label    26CD Routine_26CD
+label    283E Routine_283E
+label    219A Routine_219A
 
+label    26e4 Routine_26e4
+label    26fe Routine_26fe
+label    271c Routine_271c
+label    2727 Routine_2727
+label    2735 Routine_2735
+label    274f Routine_274f
+
+label    2743 Subroutine_List2
+label    2744 Subroutine_List2+1
+
+const    2A16
+word     2A16
+word     2A19
+
+word     2a4c
+
+const    2B82
+const    2B8A
+
+label    2BDE Get_Raster_Line_Band
+label    2BE8 Raster_Line_Table
+
+word     2CDB-2ce2
+break    2CDB-2ce2
+
+
+word     2DBc
+
+word     2e93
+word     2FFd
 
 const    346c
 lcomment 346c ZP Offset for 1st address
@@ -530,13 +607,14 @@ word     346d
 
 lcomment 349D Store to ZP_UDG_RAM_X
 lcomment 349e Character ROM
-const    349e-34a3
-break    34a0-34a1
-code     34a0-34a1
+const    349e-34a0
+break    34a0-34a0
 
+lcomment 34A8 Divide by $10
 
-
-label    34a4 CCCC_34a4
+label    34a4 Display_Scores
+comment  34b4
+comment  34c1
 
 lcomment 34be Jump to routine copy stuff from STD CHAR ROM TO UDG CHAR SET
 
@@ -759,5 +837,7 @@ lcomment 35d4 If yes, routine ends
 
 ; End of file contains graphics data
 ;unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
+label    385f UDG_Start
+label    3860 UDG_Start+1
 break    385f-3fff ; Output one byte per line
 binary   385f-3fff

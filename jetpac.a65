@@ -69,6 +69,7 @@ ZP_0060                 equ     $0060
 ZP_0080                 equ     $0080
 ZP_00f8                 equ     $00F8
 ZP_00fc                 equ     $00FC
+Stack                   equ     $0100
 Screen_RAM              equ     $0200
 Hardware_IRQ            equ     $0314
 NMI_int_vector          equ     $0318
@@ -80,7 +81,6 @@ UDG_P2_LIVES            equ     $19A0
 UDG_P2_SCORE            equ     $1B08
 UDG_END                 equ     $1FD0
 GAME_SETTINGS           equ     $1FD3
-Block3_8K_RAM           equ     $6000
 VIC_R0_H_Ctr            equ     $9000
 VIC_R4_TV_Raster        equ     $9004
 VIC_RA_Frq_Osc1         equ     $900A
@@ -109,19 +109,32 @@ Kernal_ROM              equ     $E000
         org     $2000
 
         fdb     $201D,$201D             ; 2000: 1D 20 1D 20 
+; Left edge of TV picture and interlace switch.
 VIC_Init_Tab
-        fcb     $0B,$26,$97,$17         ; 2004: 0B 26 97 17  Initial value table for VIC setup 16 bytes
-        fcb     $00,$8C,$00,$00         ; 2008: 00 8C 00 00 
-        fcb     $00,$00,$00,$00         ; 200C: 00 00 00 00 
-        fcb     $00,$00,$00,$08         ; 2010: 00 00 00 08 
-BITM_01 fcb     $01                     ; 2014: 01       
-BITM_02 fcb     $02                     ; 2015: 02       
-BITM_04 fcb     $04                     ; 2016: 04       
-BITM_08 fcb     $08                     ; 2017: 08       
-BITM_10 fcb     $10                     ; 2018: 10       
-BITM_20 fcb     $20                     ; 2019: 20       
-BITM_40 fcb     $40                     ; 201A: 40       
-BITM_80 fcb     $80                     ; 201B: 80       
+        fcb     $0B                     ; 2004: 0B        VICCRO Initial value table for VIC setup 16 bytes
+        fcb     $26                     ; 2005: 26        VICCR1
+        fcb     $97                     ; 2006: 97        VICCR2
+        fcb     $17                     ; 2007: 17        VICCR3
+        fcb     $00                     ; 2008: 00        VICCR4
+        fcb     $8C                     ; 2009: 8C        VICCR5
+        fcb     $00                     ; 200A: 00        VICCR6
+        fcb     $00                     ; 200B: 00        VICCR7
+        fcb     $00                     ; 200C: 00        VICCR8
+        fcb     $00                     ; 200D: 00        VICCR9
+        fcb     $00                     ; 200E: 00        VICCRA
+        fcb     $00                     ; 200F: 00        VICCRB
+        fcb     $00                     ; 2010: 00        VICCRC
+        fcb     $00                     ; 2011: 00        VICCRD
+        fcb     $00                     ; 2012: 00        VICCRE
+        fcb     $08                     ; 2013: 08        VICCRF
+MASK_01 fcb     $01                     ; 2014: 01       
+MASK_02 fcb     $02                     ; 2015: 02       
+MASK_04 fcb     $04                     ; 2016: 04       
+MASK_08 fcb     $08                     ; 2017: 08       
+MASK_10 fcb     $10                     ; 2018: 10       
+MASK_20 fcb     $20                     ; 2019: 20       
+MASK_40 fcb     $40                     ; 201A: 40       
+MASK_80 fcb     $80                     ; 201B: 80       
         rti                             ; 201C: 40        NMI Interrupt Vector points here
 
 ; ----------------------------------------------------------
@@ -245,6 +258,7 @@ SKIP_20c6
 SKIP_20d0
         txa                             ; 20D0: 8A       
         sta     GAME_SETTINGS           ; 20D1: 8D D3 1F  Store game settings ($1fD3 = Just outside UDG RAM)
+                                        ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
         jsr     Display_Game_Select     ; 20D4: 20 B9 24 
         lda     #$FE                    ; 20D7: A9 FE    
         sta     VIA2_Port_A             ; 20D9: 8D 21 91  Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
@@ -360,6 +374,7 @@ Z218D   lda     ZP_0008                 ; 218D: A5 08
 Z2195   adc     #$08                    ; 2195: 69 08    
         jmp     Z21CB                   ; 2197: 4C CB 21 
 ; -----------------------------------------------------------
+Routine_219A
         ldy     #$06                    ; 219A: A0 06    
         lda     (ZP),y                  ; 219C: B1 00    
         sta     ZP_Addr_From+1          ; 219E: 85 07    
@@ -375,12 +390,12 @@ Z2195   adc     #$08                    ; 2195: 69 08
         sta     ZP_UDG_RAM_Y            ; 21B0: 85 05    
         sta     Keyboard_Data           ; 21B2: 85 13    
         lda     ZP_Addr_From            ; 21B4: A5 06    
-        bit     BITM_04                 ; 21B6: 2C 16 20 
+        bit     MASK_04                 ; 21B6: 2C 16 20 
         beq     Z2202                   ; 21B9: F0 47    
         jsr     Setup_Color_RAM_Ptr     ; 21BB: 20 F7 34 
         jsr     Setup_UDG_RAM_XY        ; 21BE: 20 1D 35 
         lda     ZP_Addr_From            ; 21C1: A5 06    
-        bit     BITM_01                 ; 21C3: 2C 14 20 
+        bit     MASK_01                 ; 21C3: 2C 14 20 
         clc                             ; 21C6: 18       
         beq     Z2195                   ; 21C7: F0 CC    
         adc     #$F8                    ; 21C9: 69 F8    
@@ -423,7 +438,7 @@ Z2202   jsr     Read_ZP_Paramenters     ; 2202: 20 9D 25
         fcb     $02                     ; 220B: 02       
         fdb     ZP_0003                 ; 220C: 03 00    
         fcb     $FF                     ; 220E: FF       
-        fcb     $A0,$02                 ; 220F: A0 02    
+        ldy     #$02                    ; 220F: A0 02    
 Z2211   iny                             ; 2211: C8       
         lda     (ZP),y                  ; 2212: B1 00    
         eor     ZP_Addr_From            ; 2214: 45 06    
@@ -435,10 +450,10 @@ Z2211   iny                             ; 2211: C8
         lda     #$00                    ; 2221: A9 00    
         tay                             ; 2223: A8       
         sta     (ZP),y                  ; 2224: 91 00    
-        jmp     Z261A                   ; 2226: 4C 1A 26 
+        jmp     Routine_261A            ; 2226: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2229   lda     (ZP),y                  ; 2229: B1 00    
-        bit     BITM_04                 ; 222B: 2C 16 20 
+        bit     MASK_04                 ; 222B: 2C 16 20 
         bne     Z2257                   ; 222E: D0 27    
         dec     ZP_Addr_From+1          ; 2230: C6 07    
         lda     ZP_Addr_From+1          ; 2232: A5 07    
@@ -458,11 +473,11 @@ Z2248   ldy     #$06                    ; 2248: A0 06
         ldy     #$02                    ; 224E: A0 02    
         lda     ZP_Addr_From            ; 2250: A5 06    
         sta     (ZP),y                  ; 2252: 91 00    
-        jmp     Z261A                   ; 2254: 4C 1A 26 
+        jmp     Routine_261A            ; 2254: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2257   lda     (ZP),y                  ; 2257: B1 00    
         sta     ZP_UDG_RAM_X            ; 2259: 85 04    
-        bit     BITM_01                 ; 225B: 2C 14 20 
+        bit     MASK_01                 ; 225B: 2C 14 20 
         beq     Z2285                   ; 225E: F0 25    
         clc                             ; 2260: 18       
         adc     #$F8                    ; 2261: 69 F8    
@@ -507,7 +522,7 @@ Z22A1   tya                             ; 22A1: 98
         pha                             ; 22A2: 48       
         ldy     #$00                    ; 22A3: A0 00    
         lda     (ZP),y                  ; 22A5: B1 00    
-        bit     BITM_80                 ; 22A7: 2C 1B 20 
+        bit     MASK_80                 ; 22A7: 2C 1B 20 
         beq     Z22B4                   ; 22AA: F0 08    
         pla                             ; 22AC: 68       
         tay                             ; 22AD: A8       
@@ -545,7 +560,7 @@ Z22E3   jsr     Z28E7                   ; 22E3: 20 E7 28
         fcb     $00                     ; 22E9: 00       
         fdb     Screen_RAM+440          ; 22EA: B8 03    
         fcb     $FF                     ; 22EC: FF       
-        ldx     #$01                    ; 22ED: A2 01    
+Z22ED   ldx     #$01                    ; 22ED: A2 01    
         jmp     Z231A                   ; 22EF: 4C 1A 23 
 ; -----------------------------------------------------------
 Z22F2   jsr     Z28E7                   ; 22F2: 20 E7 28 
@@ -553,8 +568,7 @@ Z22F2   jsr     Z28E7                   ; 22F2: 20 E7 28
         fcb     $00                     ; 22F8: 00       
         fdb     Screen_RAM+448          ; 22F9: C0 03    
         fcb     $FF                     ; 22FB: FF       
-        fcc     "L"                     ; 22FC: 4C       
-        fcb     $ED,$22                 ; 22FD: ED 22    
+        jmp     Z22ED                   ; 22FC: 4C ED 22 
 Z22FF   ldx     #$17                    ; 22FF: A2 17    
 Z2301   lda     M233B,x                 ; 2301: BD 3B 23 
         sta     Screen_RAM+432,x        ; 2304: 9D B0 03 
@@ -710,16 +724,16 @@ RESET_COLOR_PIXELS_SCORES
 Z2425   ldx     #$00                    ; 2425: A2 00    
         ldy     #$03                    ; 2427: A0 03    
 BACK_2429
-        lda     TEXT_STRINGS_1UP_HI_2UP,x ; 2429: BD 65 24 
+        lda     STR_1UP_HI_2UP,x        ; 2429: BD 65 24 
         sta     ZP_UDG_RAM_X            ; 242C: 85 04    
         inx                             ; 242E: E8       
-        lda     TEXT_STRINGS_1UP_HI_2UP,x ; 242F: BD 65 24 
+        lda     STR_1UP_HI_2UP,x        ; 242F: BD 65 24 
         sta     ZP_UDG_RAM_Y            ; 2432: 85 05    
         inx                             ; 2434: E8       
-        lda     TEXT_STRINGS_1UP_HI_2UP,x ; 2435: BD 65 24 
+        lda     STR_1UP_HI_2UP,x        ; 2435: BD 65 24 
         sta     ZP_Ptr_To_Str           ; 2438: 85 0E    
         inx                             ; 243A: E8       
-        lda     TEXT_STRINGS_1UP_HI_2UP,x ; 243B: BD 65 24 
+        lda     STR_1UP_HI_2UP,x        ; 243B: BD 65 24 
         sta     ZP_000f                 ; 243E: 85 0F    
         inx                             ; 2440: E8       
         txa                             ; 2441: 8A       
@@ -735,24 +749,21 @@ BACK_2429
         bne     BACK_2429               ; 244D: D0 DA    
         rts                             ; 244F: 60       
 ; ===========================================================
-TEXT_STRINGS_1UP
-        fcb     $01                     ; 2450: 01       
+STR_1UP fcb     $01                     ; 2450: 01       
         fcc     "`qUP`"                 ; 2451: 60 71 55 50 60 
         fcb     $E0                     ; 2456: E0       
-TEXT_STRINGS_HI
-        fcb     $07                     ; 2457: 07       
+STR_HI  fcb     $07                     ; 2457: 07       
         fcc     "``HI`"                 ; 2458: 60 60 48 49 60 
         fcb     $E0                     ; 245D: E0       
-TEXT_STRINGS_2UP
-        fcb     $01                     ; 245E: 01       
+STR_2UP fcb     $01                     ; 245E: 01       
         fcc     "``rUP"                 ; 245F: 60 60 72 55 50 
         fcb     $E0                     ; 2464: E0       
-TEXT_STRINGS_1UP_HI_2UP
-        fdb     ZP,TEXT_STRINGS_1UP     ; 2465: 00 00 50 24 
+STR_1UP_HI_2UP
+        fdb     ZP,STR_1UP              ; 2465: 00 00 50 24 
         fdb     ZP_Param_Addr           ; 2469: 40 00    
-        fdb     TEXT_STRINGS_HI         ; 246B: 57 24    
+        fdb     STR_HI                  ; 246B: 57 24    
         fdb     ZP_0080                 ; 246D: 80 00    
-        fdb     TEXT_STRINGS_2UP        ; 246F: 5E 24    
+        fdb     STR_2UP                 ; 246F: 5E 24    
 P1_SCORE_TO_UDG_RAM
         jsr     Read_ZP_Paramenters     ; 2471: 20 9D 25 
         fcb     $04                     ; 2474: 04        ZP Offset for 1st address
@@ -762,7 +773,7 @@ P1_SCORE_TO_UDG_RAM
         fcb     $02                     ; 247A: 02        ZP Offset for 2nd address
         fdb     ZP_0003                 ; 247B: 03 00     2nd address
         fcb     $FF                     ; 247D: FF        FF is loop terminator
-        jmp     CCCC_34a4               ; 247E: 4C A4 34 
+        jmp     Display_Scores          ; 247E: 4C A4 34 
 ; -----------------------------------------------------------
 P2_SCORE_TO_UDG_RAM
         jsr     Read_ZP_Paramenters     ; 2481: 20 9D 25 
@@ -773,7 +784,7 @@ P2_SCORE_TO_UDG_RAM
         fcb     $02                     ; 248A: 02        ZP Offset for 2nd address
         fdb     ZP_0003                 ; 248B: 03 00     2nd address
         fcb     $FF                     ; 248D: FF        FF is loop terminator
-        jmp     CCCC_34a4               ; 248E: 4C A4 34 
+        jmp     Display_Scores          ; 248E: 4C A4 34 
 ; -----------------------------------------------------------
 HI_SCORE_TO_UDG_RAM?
         jsr     Read_ZP_Paramenters     ; 2491: 20 9D 25 
@@ -784,7 +795,7 @@ HI_SCORE_TO_UDG_RAM?
         fcb     $02                     ; 249A: 02        ZP Offset for 3rd address
         fdb     ZP_0003                 ; 249B: 03 00     3rd address
         fcb     $FF                     ; 249D: FF        FF is loop terminator
-        jmp     CCCC_34a4               ; 249E: 4C A4 34 
+        jmp     Display_Scores          ; 249E: 4C A4 34 
 ; -----------------------------------------------------------
 Game_Sel_Flash_Period
         jsr     GSFP1                   ; 24A1: 20 A4 24 
@@ -968,13 +979,14 @@ Z2607   ldy     #$00                    ; 2607: A0 00
         lda     (ZP),y                  ; 2609: B1 00    
         asl     a                       ; 260B: 0A       
         tay                             ; 260C: A8       
-        lda     M268C,y                 ; 260D: B9 8C 26 
+        lda     Subroutine_List,y       ; 260D: B9 8C 26 
         sta     ZP_005f                 ; 2610: 85 5F    
-        lda     M268D,y                 ; 2612: B9 8D 26 
+        lda     Subroutine_List+1,y     ; 2612: B9 8D 26 
         sta     ZP_0060                 ; 2615: 85 60    
         jmp     (ZP_005f)               ; 2617: 6C 5F 00 
 ; -----------------------------------------------------------
-Z261A   ldy     #$00                    ; 261A: A0 00    
+Routine_261A
+        ldy     #$00                    ; 261A: A0 00    
         lda     (ZP),y                  ; 261C: B1 00    
         bne     BACK_2630               ; 261E: D0 10    
         lda     ZP                      ; 2620: A5 00    
@@ -1031,8 +1043,7 @@ Z2669   sei                             ; 2669: 78
         fcb     $00                     ; 2679: 00        ZP Offset for 1st address
         fdb     Screen_RAM+384          ; 267A: 80 03     1st Address
         fcb     $FF                     ; 267C: FF       
-        fcc     "L"                     ; 267D: 4C       
-        fcb     $07,$26                 ; 267E: 07 26    
+        jmp     Z2607                   ; 267D: 4C 07 26 
 Z2680   lda     ZP_0022                 ; 2680: A5 22    
         sta     ZP                      ; 2682: 85 00    
         lda     ZP_0023                 ; 2684: A5 23    
@@ -1040,12 +1051,24 @@ Z2680   lda     ZP_0022                 ; 2680: A5 22
         cli                             ; 2688: 58       
         jmp     Z263B                   ; 2689: 4C 3B 26 
 ; -----------------------------------------------------------
-M268C   fcb     $1A                     ; 268C: 1A       
-M268D   fcb     $26                     ; 268D: 26       
-        fdb     $3273,$334D,$2934,$2F8E ; 268E: 73 32 4D 33 34 29 8E 2F 
-        fdb     $2C6A,$2ABC,$2A6D,$2A5F ; 2696: 6A 2C BC 2A 6D 2A 5F 2A 
-        fdb     $2E74,$2E17,$2E4E,$26CD ; 269E: 74 2E 17 2E 4E 2E CD 26 
-        fdb     $261A,$283E,$261A,$219A ; 26A6: 1A 26 3E 28 1A 26 9A 21 
+Subroutine_List
+        fdb     Routine_261A            ; 268C: 1A 26    
+        fdb     Routine_3273            ; 268E: 73 32    
+        fdb     Routine_334D            ; 2690: 4D 33    
+        fdb     Routine_2934            ; 2692: 34 29    
+        fdb     Routine_2F8E            ; 2694: 8E 2F    
+        fdb     Routine_2C6A            ; 2696: 6A 2C    
+        fdb     Routine_2ABC            ; 2698: BC 2A    
+        fdb     Routine_2A6D            ; 269A: 6D 2A    
+        fdb     Routine_2A5F            ; 269C: 5F 2A    
+        fdb     Routine_2E74            ; 269E: 74 2E    
+        fdb     Routine_2E17            ; 26A0: 17 2E    
+        fdb     Routine_2E4E            ; 26A2: 4E 2E    
+        fdb     Routine_26CD            ; 26A4: CD 26    
+        fdb     Routine_261A            ; 26A6: 1A 26    
+        fdb     Routine_283E            ; 26A8: 3E 28    
+        fdb     Routine_261A            ; 26AA: 1A 26    
+        fdb     Routine_219A            ; 26AC: 9A 21    
 Z26AE   ldx     #$07                    ; 26AE: A2 07    
 BACK_26b0
         lda     SCREEN_C0000000,x       ; 26B0: BD C5 26 
@@ -1061,6 +1084,7 @@ BACK_26b0
 SCREEN_C0000000
         fcb     $0C,$00,$00,$00,$00,$00 ; 26C5: 0C 00 00 00 00 00 
         fcb     $00,$00                 ; 26CB: 00 00    
+Routine_26CD
         lda     #$01                    ; 26CD: A9 01    
         sta     ZP_0060                 ; 26CF: 85 60    
 BACK_26d1
@@ -1068,18 +1092,20 @@ BACK_26d1
         lda     (ZP),y                  ; 26D3: B1 00    
         asl     a                       ; 26D5: 0A       
         tax                             ; 26D6: AA       
-        lda     M2743,x                 ; 26D7: BD 43 27 
+        lda     Subroutine_List2,x      ; 26D7: BD 43 27 
         sta     ZP_0008                 ; 26DA: 85 08    
-        lda     M2744,x                 ; 26DC: BD 44 27 
+        lda     Subroutine_List2+1,x    ; 26DC: BD 44 27 
         sta     ZP_0009                 ; 26DF: 85 09    
         jmp     (ZP_0008)               ; 26E1: 6C 08 00 
-Z26E4   lda     ZP_0060                 ; 26E4: A5 60    
+; -----------------------------------------------------------
+Routine_26e4
+        lda     ZP_0060                 ; 26E4: A5 60    
         clc                             ; 26E6: 18       
         adc     #$02                    ; 26E7: 69 02    
         sta     ZP_0060                 ; 26E9: 85 60    
         cmp     #$07                    ; 26EB: C9 07    
         bcc     BACK_26d1               ; 26ED: 90 E2    
-        jmp     Z261A                   ; 26EF: 4C 1A 26 
+        jmp     Routine_261A            ; 26EF: 4C 1A 26 
 ; -----------------------------------------------------------
 Z26F2   lda     ZP_0060                 ; 26F2: A5 60    
         tay                             ; 26F4: A8       
@@ -1090,6 +1116,7 @@ Z26F2   lda     ZP_0060                 ; 26F2: A5 60
         sta     (ZP),y                  ; 26FB: 91 00    
         rts                             ; 26FD: 60       
 ; ===========================================================
+Routine_26fe
         jsr     Z26F2                   ; 26FE: 20 F2 26 
         beq     Z270A                   ; 2701: F0 07    
         eor     #$FF                    ; 2703: 49 FF    
@@ -1107,14 +1134,16 @@ Z2710   pha                             ; 2710: 48
         dex                             ; 2714: CA       
         pla                             ; 2715: 68       
         sta     VIC_RA_Frq_Osc1,x       ; 2716: 9D 0A 90 
-        jmp     Z26E4                   ; 2719: 4C E4 26 
+        jmp     Routine_26e4            ; 2719: 4C E4 26 
 ; -----------------------------------------------------------
+Routine_271c
         jsr     Z26F2                   ; 271C: 20 F2 26 
         beq     Z270A                   ; 271F: F0 E9    
         asl     a                       ; 2721: 0A       
         eor     #$F3                    ; 2722: 49 F3    
         jmp     Z2705                   ; 2724: 4C 05 27 
 ; -----------------------------------------------------------
+Routine_2727
         jsr     Z26F2                   ; 2727: 20 F2 26 
         beq     Z270A                   ; 272A: F0 DE    
         asl     a                       ; 272C: 0A       
@@ -1124,6 +1153,7 @@ Z2710   pha                             ; 2710: 48
         ora     #$0F                    ; 2730: 09 0F    
         jmp     Z2705                   ; 2732: 4C 05 27 
 ; -----------------------------------------------------------
+Routine_2735
         jsr     Z26F2                   ; 2735: 20 F2 26 
         beq     Z270A                   ; 2738: F0 D0    
         lda     Screen_RAM+435          ; 273A: AD B3 03 
@@ -1131,10 +1161,17 @@ Z2710   pha                             ; 2710: 48
         eor     #$FE                    ; 273E: 49 FE    
         jmp     Z2705                   ; 2740: 4C 05 27 
 ; -----------------------------------------------------------
-M2743   fcb     $E4                     ; 2743: E4       
-M2744   fcb     $26,$FE,$26,$1C         ; 2744: 26 FE 26 1C 
-        fcc     "'''5'O' "              ; 2748: 27 27 27 35 27 4F 27 20 
-        fcb     $F2,$26,$F0,$B6,$0A     ; 2750: F2 26 F0 B6 0A 
+Subroutine_List2
+        fdb     Routine_26e4            ; 2743: E4 26    
+        fdb     Routine_26fe            ; 2745: FE 26    
+        fdb     Routine_271c            ; 2747: 1C 27    
+        fdb     Routine_2727            ; 2749: 27 27    
+        fdb     Routine_2735            ; 274B: 35 27    
+        fdb     Routine_274f            ; 274D: 4F 27    
+Routine_274f
+        jsr     Z26F2                   ; 274F: 20 F2 26 
+        beq     Z270A                   ; 2752: F0 B6    
+        asl     a                       ; 2754: 0A       
         asl     a                       ; 2755: 0A       
         eor     #$E3                    ; 2756: 49 E3    
         jmp     Z2705                   ; 2758: 4C 05 27 
@@ -1273,11 +1310,10 @@ Z282E   lsr     a                       ; 282E: 4A
 M283A   fcb     $D5                     ; 283A: D5       
 M283B   fcc     "?"                     ; 283B: 3F       
         fcb     $F8                     ; 283C: F8       
-        fcc     "? "                    ; 283D: 3F 20    
-        fcb     $D7                     ; 283F: D7       
-        fcc     "5 "                    ; 2840: 35 20    
-        fcb     $B3                     ; 2842: B3       
-        fcc     "0"                     ; 2843: 30       
+        fcc     "?"                     ; 283D: 3F       
+Routine_283E
+        jsr     Z35D7                   ; 283E: 20 D7 35 
+        jsr     Z30B3                   ; 2841: 20 B3 30 
         lda     ZP_0002                 ; 2844: A5 02    
         bmi     Z2851                   ; 2846: 30 09    
         ldy     #$03                    ; 2848: A0 03    
@@ -1295,34 +1331,39 @@ Z2851   jsr     Z35E9                   ; 2851: 20 E9 35
         jsr     Z3610                   ; 2864: 20 10 36 
         jsr     Read_ZP_Paramenters     ; 2867: 20 9D 25 
         fcb     $02                     ; 286A: 02       
-        fcc     "P"                     ; 286B: 50       
-        fcb     $02,$FF                 ; 286C: 02 FF    
-        fcc     " c0Le/"                ; 286E: 20 63 30 4C 65 2F 
+        fcb     $50,$02                 ; 286B: 50 02    
+        fcb     $FF                     ; 286D: FF       
+        jsr     Z3063                   ; 286E: 20 63 30 
+        jmp     Z2F65                   ; 2871: 4C 65 2F 
 Z2874   ldy     #$06                    ; 2874: A0 06    
         lda     (ZP),y                  ; 2876: B1 00    
         and     #$0E                    ; 2878: 29 0E    
         tax                             ; 287A: AA       
-        lda     Vectors,x               ; 287B: BD 88 28 
+        lda     Subroutine_List3,x      ; 287B: BD 88 28 
         sta     ZP_0008                 ; 287E: 85 08    
-        lda     Vectors+1,x             ; 2880: BD 89 28 
+        lda     Subroutine_List3+1,x    ; 2880: BD 89 28 
         sta     ZP_0009                 ; 2883: 85 09    
         jmp     (ZP_0008)               ; 2885: 6C 08 00 
-Vectors fdb     WWW                     ; 2888: 92 28    
-        fdb     XXX                     ; 288A: A4 28    
-        fdb     XXX                     ; 288C: A4 28    
-        fdb     YYY                     ; 288E: 9F 28    
-        fdb     ZZZ                     ; 2890: B6 28    
-WWW     lda     #$07                    ; 2892: A9 07    
+Subroutine_List3
+        fdb     Routine_2892            ; 2888: 92 28    
+        fdb     Routine_28a4            ; 288A: A4 28    
+        fdb     Routine_28a4            ; 288C: A4 28    
+        fdb     Routine_289f            ; 288E: 9F 28    
+        fdb     Routine_28b6            ; 2890: B6 28    
+Routine_2892
+        lda     #$07                    ; 2892: A9 07    
 Z2894   ldy     #$05                    ; 2894: A0 05    
         sta     (ZP),y                  ; 2896: 91 00    
         ldy     #$06                    ; 2898: A0 06    
         lda     (ZP),y                  ; 289A: B1 00    
         jmp     Z2FC3                   ; 289C: 4C C3 2F 
 ; -----------------------------------------------------------
-YYY     lda     #$06                    ; 289F: A9 06    
+Routine_289f
+        lda     #$06                    ; 289F: A9 06    
         jmp     Z2894                   ; 28A1: 4C 94 28 
 ; -----------------------------------------------------------
-XXX     lda     ZP_004a                 ; 28A4: A5 4A    
+Routine_28a4
+        lda     ZP_004a                 ; 28A4: A5 4A    
         and     #$1F                    ; 28A6: 29 1F    
         cmp     #$18                    ; 28A8: C9 18    
         bcs     Z28B1                   ; 28AA: B0 05    
@@ -1332,7 +1373,8 @@ XXX     lda     ZP_004a                 ; 28A4: A5 4A
 Z28B1   lda     #$03                    ; 28B1: A9 03    
         jmp     Z2894                   ; 28B3: 4C 94 28 
 ; -----------------------------------------------------------
-ZZZ     lda     ZP_004a                 ; 28B6: A5 4A    
+Routine_28b6
+        lda     ZP_004a                 ; 28B6: A5 4A    
         lsr     a                       ; 28B8: 4A       
         lsr     a                       ; 28B9: 4A       
         and     #$07                    ; 28BA: 29 07    
@@ -1403,6 +1445,7 @@ Z2927   ldy     #$05                    ; 2927: A0 05
         sta     Screen_RAM+428          ; 2930: 8D AC 03 
         rts                             ; 2933: 60       
 ; ===========================================================
+Routine_2934
         inc     ZP_0021                 ; 2934: E6 21    
         jsr     Z35E9                   ; 2936: 20 E9 35 
         ldy     #$02                    ; 2939: A0 02    
@@ -1420,25 +1463,18 @@ Z294A   ldy     #$04                    ; 294A: A0 04
         bcs     Z2975                   ; 2950: B0 23    
         asl     a                       ; 2952: 0A       
         tax                             ; 2953: AA       
-        lda     M2967,x                 ; 2954: BD 67 29 
+        lda     UDG_Ptr,x               ; 2954: BD 67 29 
         tay                             ; 2957: A8       
-        lda     M2968,x                 ; 2958: BD 68 29 
+        lda     UDG_Ptr+1,x             ; 2958: BD 68 29 
         jsr     Z373D                   ; 295B: 20 3D 37 
         jsr     Z3604                   ; 295E: 20 04 36 
         jsr     Z381F                   ; 2961: 20 1F 38 
-        jmp     Z261A                   ; 2964: 4C 1A 26 
+        jmp     Routine_261A            ; 2964: 4C 1A 26 
 ; -----------------------------------------------------------
-M2967   fcc     "t"                     ; 2967: 74       
-M2968   fcc     "?t?"                   ; 2968: 3F 74 3F 
-        fcb     $9B                     ; 296B: 9B       
-        fcc     "?"                     ; 296C: 3F       
-        fcb     $B2                     ; 296D: B2       
-        fcc     "?t?"                   ; 296E: 3F 74 3F 
-        fcb     $9B                     ; 2971: 9B       
-        fcc     "?"                     ; 2972: 3F       
-        fcb     $B2                     ; 2973: B2       
-        fcc     "?"                     ; 2974: 3F       
-Z2975   fcb     $A0,$00                 ; 2975: A0 00    
+UDG_Ptr fdb     $3F74                   ; 2967: 74 3F    
+        fdb     $3F74,$3F9B,$3FB2       ; 2969: 74 3F 9B 3F B2 3F 
+        fdb     $3F74,$3F9B,$3FB2       ; 296F: 74 3F 9B 3F B2 3F 
+Z2975   ldy     #$00                    ; 2975: A0 00    
         tya                             ; 2977: 98       
         sta     (ZP),y                  ; 2978: 91 00    
         ldy     #$06                    ; 297A: A0 06    
@@ -1446,7 +1482,7 @@ Z2975   fcb     $A0,$00                 ; 2975: A0 00
         and     #$3F                    ; 297E: 29 3F    
         cmp     #$03                    ; 2980: C9 03    
         bcc     Z299D                   ; 2982: 90 19    
-        jmp     Z261A                   ; 2984: 4C 1A 26 
+        jmp     Routine_261A            ; 2984: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2987   jsr     Z277A                   ; 2987: 20 7A 27 
         jsr     RESET_COLOR_PIXELS_SCORES ; 298A: 20 16 24 
@@ -1470,13 +1506,13 @@ Z299D   lda     #$00                    ; 299D: A9 00
         and     #$FD                    ; 29B6: 29 FD    
         sta     Screen_RAM+452          ; 29B8: 8D C4 03 
         lda     GAME_SETTINGS           ; 29BB: AD D3 1F 
-        bit     BITM_01                 ; 29BE: 2C 14 20 
+        bit     MASK_01                 ; 29BE: 2C 14 20 
         bne     Z29D0                   ; 29C1: D0 0D    
 Z29C3   lda     Num_Lives               ; 29C3: A5 5A    
         beq     Z2987                   ; 29C5: F0 C0    
 Z29C7   jsr     Z22D7                   ; 29C7: 20 D7 22 
         jsr     Z235B                   ; 29CA: 20 5B 23 
-        jmp     Z261A                   ; 29CD: 4C 1A 26 
+        jmp     Routine_261A            ; 29CD: 4C 1A 26 
 ; -----------------------------------------------------------
 Z29D0   lda     ZP_005c                 ; 29D0: A5 5C    
         beq     Z29C3                   ; 29D2: F0 EF    
@@ -1496,9 +1532,9 @@ Z29E7   jsr     RESET_COLOR_PIXELS_SCORES ; 29E7: 20 16 24
         fcb     $0E                     ; 29F1: 0E        ZP Offset for 1st address
         fdb     $2A1F                   ; 29F2: 1F 2A     1st Address
         fcb     $04                     ; 29F4: 04        ZP Offset for 1st address?????
-        fdb     Block3_8K_RAM+16        ; 29F5: 10 60     1st Address?????
+        fdb     $6010                   ; 29F5: 10 60     1st Address?????
         fcb     $FF                     ; 29F7: FF       
-        jsr     Display_String          ; 29F8: 20 CC 34 
+Z29F8   jsr     Display_String          ; 29F8: 20 CC 34 
         jsr     Read_ZP_Paramenters     ; 29FB: 20 9D 25 
         fcb     $02                     ; 29FE: 02        ZP Offset for 1st address
         fdb     ZP                      ; 29FF: 00 00     1st Address
@@ -1515,13 +1551,11 @@ Z2A05   fcb     $E6,$02                 ; 2A05: E6 02
 ; ===========================================================
 Z2A12   jsr     Read_ZP_Paramenters     ; 2A12: 20 9D 25 
         fcb     $0E                     ; 2A15: 0E       
-        fcc     "2*"                    ; 2A16: 32 2A    
-        fcb     $04,$10                 ; 2A18: 04 10    
-        fcc     "`"                     ; 2A1A: 60       
+        fdb     $2A32                   ; 2A16: 32 2A    
+        fcb     $04                     ; 2A18: 04       
+        fdb     $6010                   ; 2A19: 10 60    
         fcb     $FF                     ; 2A1B: FF       
-        fcc     "L"                     ; 2A1C: 4C       
-        fcb     $F8                     ; 2A1D: F8       
-        fcc     ")"                     ; 2A1E: 29       
+        jmp     Z29F8                   ; 2A1C: 4C F8 29 
         fcb     $01                     ; 2A1F: 01       
         fcc     "GAME`OVER`PLAYER`"     ; 2A20: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
         fcb     $F1,$01                 ; 2A31: F1 01    
@@ -1529,7 +1563,10 @@ Z2A12   jsr     Read_ZP_Paramenters     ; 2A12: 20 9D 25
         fcb     $F2                     ; 2A44: F2       
 Z2A45   jsr     Z28E7                   ; 2A45: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2A48: 20 9D 25 
-        fcb     $00,$80,$03,$FF,$A0,$02 ; 2A4B: 00 80 03 FF A0 02 
+        fcb     $00                     ; 2A4B: 00       
+        fdb     Screen_RAM+384          ; 2A4C: 80 03    
+        fcb     $FF                     ; 2A4E: FF       
+        ldy     #$02                    ; 2A4F: A0 02    
         lda     #$01                    ; 2A51: A9 01    
         sta     (ZP),y                  ; 2A53: 91 00    
         ldy     #$00                    ; 2A55: A0 00    
@@ -1537,6 +1574,7 @@ Z2A45   jsr     Z28E7                   ; 2A45: 20 E7 28
         jsr     Z290A                   ; 2A59: 20 0A 29 
         jmp     Z28F0                   ; 2A5C: 4C F0 28 
 ; -----------------------------------------------------------
+Routine_2A5F
         jsr     Z2C5F                   ; 2A5F: 20 5F 2C 
         bpl     Z2A67                   ; 2A62: 10 03    
         jmp     Z2C78                   ; 2A64: 4C 78 2C 
@@ -1544,14 +1582,17 @@ Z2A45   jsr     Z28E7                   ; 2A45: 20 E7 28
 Z2A67   jsr     Z2B16                   ; 2A67: 20 16 2B 
         jmp     Z2A83                   ; 2A6A: 4C 83 2A 
 ; -----------------------------------------------------------
+Routine_2A6D
         jsr     Z2C5F                   ; 2A6D: 20 5F 2C 
-        fcb     $F0,$03                 ; 2A70: F0 03    
-        fcc     "Lx, "                  ; 2A72: 4C 78 2C 20 
-        fcb     $16                     ; 2A76: 16       
-        fcc     "+"                     ; 2A77: 2B       
-        fcb     $A0,$06,$B1,$00,$F0     ; 2A78: A0 06 B1 00 F0 
-        fcc     "$8"                    ; 2A7D: 24 38    
-        fcb     $E9,$01,$91,$00         ; 2A7F: E9 01 91 00 
+        beq     Z2A75                   ; 2A70: F0 03    
+        jmp     Z2C78                   ; 2A72: 4C 78 2C 
+Z2A75   jsr     Z2B16                   ; 2A75: 20 16 2B 
+        ldy     #$06                    ; 2A78: A0 06    
+        lda     (ZP),y                  ; 2A7A: B1 00    
+        beq     Z2AA2                   ; 2A7C: F0 24    
+        sec                             ; 2A7E: 38       
+        sbc     #$01                    ; 2A7F: E9 01    
+        sta     (ZP),y                  ; 2A81: 91 00    
 Z2A83   ldy     #$02                    ; 2A83: A0 02    
         lda     (ZP),y                  ; 2A85: B1 00    
         bmi     Z2A9E                   ; 2A87: 30 15    
@@ -1568,7 +1609,7 @@ Z2A9A   lda     #$F8                    ; 2A9A: A9 F8
         bmi     Z2A95                   ; 2A9C: 30 F7    
 Z2A9E   lda     #$F8                    ; 2A9E: A9 F8    
         bmi     Z2A8B                   ; 2AA0: 30 E9    
-        lda     ZP_004c                 ; 2AA2: A5 4C    
+Z2AA2   lda     ZP_004c                 ; 2AA2: A5 4C    
         and     #$0F                    ; 2AA4: 29 0F    
         adc     #$10                    ; 2AA6: 69 10    
         sta     (ZP),y                  ; 2AA8: 91 00    
@@ -1581,6 +1622,7 @@ Z2A9E   lda     #$F8                    ; 2A9E: A9 F8
         adc     #$01                    ; 2AB5: 69 01    
 Z2AB7   sta     (ZP),y                  ; 2AB7: 91 00    
         jmp     Z2C92                   ; 2AB9: 4C 92 2C 
+Routine_2ABC
         jsr     Z2C5F                   ; 2ABC: 20 5F 2C 
         bpl     Z2AC4                   ; 2ABF: 10 03    
         jmp     Z2C78                   ; 2AC1: 4C 78 2C 
@@ -1630,10 +1672,10 @@ Z2B16   jsr     Z30B3                   ; 2B16: 20 B3 30
         lda     ZP_0002                 ; 2B19: A5 02    
         bpl     Z2B36                   ; 2B1B: 10 19    
         ldy     #$02                    ; 2B1D: A0 02    
-        bit     BITM_04                 ; 2B1F: 2C 16 20 
+        bit     MASK_04                 ; 2B1F: 2C 16 20 
         bne     Z2B37                   ; 2B22: D0 13    
         ldy     #$04                    ; 2B24: A0 04    
-        bit     BITM_08                 ; 2B26: 2C 17 20 
+        bit     MASK_08                 ; 2B26: 2C 17 20 
         bne     Z2B42                   ; 2B29: D0 17    
         lda     (ZP),y                  ; 2B2B: B1 00    
         bpl     Z2B36                   ; 2B2D: 10 07    
@@ -1643,7 +1685,7 @@ Z2B2F   eor     #$FF                    ; 2B2F: 49 FF
         sta     (ZP),y                  ; 2B34: 91 00    
 Z2B36   rts                             ; 2B36: 60       
 ; ===========================================================
-Z2B37   bit     BITM_01                 ; 2B37: 2C 14 20 
+Z2B37   bit     MASK_01                 ; 2B37: 2C 14 20 
         bne     Z2B42                   ; 2B3A: D0 06    
         lda     (ZP),y                  ; 2B3C: B1 00    
         bpl     Z2B36                   ; 2B3E: 10 F6    
@@ -1675,16 +1717,14 @@ Z2B6D   lda     M2B7F,x                 ; 2B6D: BD 7F 2B
         sta     Screen_RAM+440,x        ; 2B70: 9D B8 03 
         dex                             ; 2B73: CA       
         bpl     Z2B6D                   ; 2B74: 10 F7    
-        jsr     Z2BDE                   ; 2B76: 20 DE 2B 
+        jsr     Get_Raster_Line_Band    ; 2B76: 20 DE 2B 
         sta     Screen_RAM+441          ; 2B79: 8D B9 03 
         jmp     Z22E3                   ; 2B7C: 4C E3 22 
 ; -----------------------------------------------------------
-M2B7F   fcb     $04,$00,$00             ; 2B7F: 04 00 00 
-        fcc     " "                     ; 2B82: 20       
-        fcb     $01,$04,$18,$18         ; 2B83: 01 04 18 18 
-M2B87   fcb     $0E,$00,$00             ; 2B87: 0E 00 00 
-        fcc     " "                     ; 2B8A: 20       
-        fcb     $00,$00,$00,$18         ; 2B8B: 00 00 00 18 
+M2B7F   fcb     $04,$00,$00,$20,$01,$04 ; 2B7F: 04 00 00 20 01 04 
+        fcb     $18,$18                 ; 2B85: 18 18    
+M2B87   fcb     $0E,$00,$00,$20,$00,$00 ; 2B87: 0E 00 00 20 00 00 
+        fcb     $00,$18                 ; 2B8D: 00 18    
 Z2B8F   lda     Screen_RAM+384          ; 2B8F: AD 80 03 
         and     #$3F                    ; 2B92: 29 3F    
         bne     Z2B97                   ; 2B94: D0 01    
@@ -1702,11 +1742,11 @@ Z2BA8   lda     M2B87,x                 ; 2BA8: BD 87 2B
         sta     Screen_RAM+448,x        ; 2BAB: 9D C0 03 
         dex                             ; 2BAE: CA       
         bpl     Z2BA8                   ; 2BAF: 10 F7    
-        jsr     Z2BDE                   ; 2BB1: 20 DE 2B 
+        jsr     Get_Raster_Line_Band    ; 2BB1: 20 DE 2B 
         sta     Screen_RAM+449          ; 2BB4: 8D C1 03 
         lda     ZP_004c                 ; 2BB7: A5 4C    
         and     #$0E                    ; 2BB9: 29 0E    
-        bit     BITM_08                 ; 2BBB: 2C 17 20 
+        bit     MASK_08                 ; 2BBB: 2C 17 20 
         beq     Z2BC2                   ; 2BBE: F0 02    
         and     #$08                    ; 2BC0: 29 08    
 Z2BC2   ora     #$20                    ; 2BC2: 09 20    
@@ -1722,13 +1762,15 @@ Z2BC7   jsr     Z28E7                   ; 2BC7: 20 E7 28
         jsr     Z305A                   ; 2BD8: 20 5A 30 
         jmp     Z28F0                   ; 2BDB: 4C F0 28 
 ; -----------------------------------------------------------
-Z2BDE   lda     VIC_R4_TV_Raster        ; 2BDE: AD 04 90 
+Get_Raster_Line_Band
+        lda     VIC_R4_TV_Raster        ; 2BDE: AD 04 90 
         and     #$0F                    ; 2BE1: 29 0F    
         tax                             ; 2BE3: AA       
-        lda     M2BE8,x                 ; 2BE4: BD E8 2B 
+        lda     Raster_Line_Table,x     ; 2BE4: BD E8 2B 
         rts                             ; 2BE7: 60       
 ; ===========================================================
-M2BE8   fcb     $00                     ; 2BE8: 00       
+Raster_Line_Table
+        fcb     $00                     ; 2BE8: 00       
         fcb     $10                     ; 2BE9: 10       
         fcb     $18                     ; 2BEA: 18       
         fcb     $20                     ; 2BEB: 20       
@@ -1759,11 +1801,11 @@ Z2BF8   lda     #$88                    ; 2BF8: A9 88
         sta     ZP_Addr_From+1          ; 2C0E: 85 07    
 Z2C10   ldy     #$02                    ; 2C10: A0 02    
         lda     (ZP_0008),y             ; 2C12: B1 08    
-        bit     BITM_04                 ; 2C14: 2C 16 20 
+        bit     MASK_04                 ; 2C14: 2C 16 20 
         bne     Z2C21                   ; 2C17: D0 08    
         iny                             ; 2C19: C8       
         lda     (ZP_0008),y             ; 2C1A: B1 08    
-        bit     BITM_04                 ; 2C1C: 2C 16 20 
+        bit     MASK_04                 ; 2C1C: 2C 16 20 
         beq     Z2C53                   ; 2C1F: F0 32    
 Z2C21   ldy     #$00                    ; 2C21: A0 00    
         lda     (ZP_0008),y             ; 2C23: B1 08    
@@ -1808,6 +1850,7 @@ Z2C5F   inc     ZP_0021                 ; 2C5F: E6 21
         lda     ZP_0002                 ; 2C67: A5 02    
         rts                             ; 2C69: 60       
 ; ===========================================================
+Routine_2C6A
         jsr     Z2C5F                   ; 2C6A: 20 5F 2C 
         bmi     Z2C78                   ; 2C6D: 30 09    
         jsr     Z30B3                   ; 2C6F: 20 B3 30 
@@ -1825,7 +1868,7 @@ Z2C78   lda     ZP_0059                 ; 2C78: A5 59
         sta     ZP_0003                 ; 2C87: 85 03    
         jsr     Z3063                   ; 2C89: 20 63 30 
 Z2C8C   jsr     Z28F9                   ; 2C8C: 20 F9 28 
-        jmp     Z261A                   ; 2C8F: 4C 1A 26 
+        jmp     Routine_261A            ; 2C8F: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2C92   jsr     Z2D58                   ; 2C92: 20 58 2D 
         lda     ZP_0002                 ; 2C95: A5 02    
@@ -1859,7 +1902,7 @@ Z2CB3   sta     (ZP),y                  ; 2CB3: 91 00
         sta     (ZP),y                  ; 2CC1: 91 00    
         jsr     Z3646                   ; 2CC3: 20 46 36 
         jsr     Z381F                   ; 2CC6: 20 1F 38 
-        jmp     Z261A                   ; 2CC9: 4C 1A 26 
+        jmp     Routine_261A            ; 2CC9: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2CCC   adc     #$B8                    ; 2CCC: 69 B8    
         jmp     Z2CB3                   ; 2CCE: 4C B3 2C 
@@ -1871,14 +1914,10 @@ Z2CD6   lda     ZP_005d                 ; 2CD6: A5 5D
         beq     Z2CE3                   ; 2CD8: F0 09    
         rts                             ; 2CDA: 60       
 ; ===========================================================
-M2CDB   fcc     "%"                     ; 2CDB: 25       
-        fcb     $00                     ; 2CDC: 00       
-        fcc     "5"                     ; 2CDD: 35       
-        fcb     $00                     ; 2CDE: 00       
-        fcc     "E"                     ; 2CDF: 45       
-        fcb     $00                     ; 2CE0: 00       
-        fcc     "U"                     ; 2CE1: 55       
-        fcb     $00                     ; 2CE2: 00       
+M2CDB   fdb     ZP_0025                 ; 2CDB: 25 00    
+        fdb     ZP+53                   ; 2CDD: 35 00    
+        fdb     ZP_Game_Sel_Flash       ; 2CDF: 45 00    
+        fdb     ZP+85                   ; 2CE1: 55 00    
 Z2CE3   lda     Screen_RAM+384          ; 2CE3: AD 80 03 
         and     #$3F                    ; 2CE6: 29 3F    
         cmp     #$01                    ; 2CE8: C9 01    
@@ -1997,12 +2036,11 @@ Z2DA9   lda     Screen_RAM+448          ; 2DA9: AD C0 03
         jsr     Z22F2                   ; 2DB2: 20 F2 22 
 Z2DB5   jsr     Z28E7                   ; 2DB5: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2DB8: 20 9D 25 
-        fcb     $00,$B0,$03,$FF         ; 2DBB: 00 B0 03 FF 
-        fcc     " "                     ; 2DBF: 20       
-        fcb     $CB                     ; 2DC0: CB       
-        fcc     "-L"                    ; 2DC1: 2D 4C    
-        fcb     $F0                     ; 2DC3: F0       
-        fcc     "("                     ; 2DC4: 28       
+        fcb     $00                     ; 2DBB: 00       
+        fdb     Screen_RAM+432          ; 2DBC: B0 03    
+        fcb     $FF                     ; 2DBE: FF       
+        jsr     Z2DCB                   ; 2DBF: 20 CB 2D 
+        jmp     Z28F0                   ; 2DC2: 4C F0 28 
 Z2DC5   jsr     Z2BC7                   ; 2DC5: 20 C7 2B 
         jmp     Z2DB5                   ; 2DC8: 4C B5 2D 
 ; -----------------------------------------------------------
@@ -2049,6 +2087,7 @@ Z2DFF   lda     ZP_0019                 ; 2DFF: A5 19
         dec     ZP_001f                 ; 2E14: C6 1F    
         rts                             ; 2E16: 60       
 ; ===========================================================
+Routine_2E17
         jsr     Z35D7                   ; 2E17: 20 D7 35 
         ldy     #$03                    ; 2E1A: A0 03    
         lda     (ZP),y                  ; 2E1C: B1 00    
@@ -2074,8 +2113,9 @@ Z2E34   inc     ZP_0059                 ; 2E34: E6 59
         jsr     Z22BA                   ; 2E44: 20 BA 22 
         lda     #$00                    ; 2E47: A9 00    
         sta     ZP_0026                 ; 2E49: 85 26    
-        jmp     Z261A                   ; 2E4B: 4C 1A 26 
+        jmp     Routine_261A            ; 2E4B: 4C 1A 26 
 ; -----------------------------------------------------------
+Routine_2E4E
         jsr     Z35D7                   ; 2E4E: 20 D7 35 
         lda     #$04                    ; 2E51: A9 04    
         sta     Screen_RAM+427          ; 2E53: 8D AB 03 
@@ -2094,6 +2134,7 @@ Z2E34   inc     ZP_0059                 ; 2E34: E6 59
         jsr     Z235B                   ; 2E6E: 20 5B 23 
         jmp     Z2EAC                   ; 2E71: 4C AC 2E 
 ; -----------------------------------------------------------
+Routine_2E74
         jsr     Z35D7                   ; 2E74: 20 D7 35 
         jsr     Z2D58                   ; 2E77: 20 58 2D 
         lda     ZP_0002                 ; 2E7A: A5 02    
@@ -2107,18 +2148,17 @@ Z2E34   inc     ZP_0059                 ; 2E34: E6 59
         sta     (ZP),y                  ; 2E8A: 91 00    
         jsr     Z28E7                   ; 2E8C: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2E8F: 20 9D 25 
-        fcb     $00,$80,$03,$FF         ; 2E92: 00 80 03 FF 
-        fcc     " "                     ; 2E96: 20       
-        fcb     $E9                     ; 2E97: E9       
-        fcc     "5 "                    ; 2E98: 35 20    
-        fcb     $01                     ; 2E9A: 01       
-        fcc     "6"                     ; 2E9B: 36       
+        fcb     $00                     ; 2E92: 00       
+        fdb     Screen_RAM+384          ; 2E93: 80 03    
+        fcb     $FF                     ; 2E95: FF       
+        jsr     Z35E9                   ; 2E96: 20 E9 35 
+        jsr     Z3601                   ; 2E99: 20 01 36 
         lda     #$00                    ; 2E9C: A9 00    
         sta     Screen_RAM+384          ; 2E9E: 8D 80 03 
         jsr     Z28F0                   ; 2EA1: 20 F0 28 
         inc     Num_Lives               ; 2EA4: E6 5A    
         jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23 
-        jmp     Z261A                   ; 2EA9: 4C 1A 26 
+        jmp     Routine_261A            ; 2EA9: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2EAC   jsr     Z35E9                   ; 2EAC: 20 E9 35 
         jsr     Z27AA                   ; 2EAF: 20 AA 27 
@@ -2157,12 +2197,12 @@ Z2ECA   sta     ZP_001b                 ; 2ECA: 85 1B
         lda     #$01                    ; 2EF3: A9 01    
         sta     ZP_001b                 ; 2EF5: 85 1B    
         jsr     Z2F16                   ; 2EF7: 20 16 2F 
-        jmp     Z261A                   ; 2EFA: 4C 1A 26 
+        jmp     Routine_261A            ; 2EFA: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2EFD   lda     #$01                    ; 2EFD: A9 01    
         sta     ZP_001b                 ; 2EFF: 85 1B    
 Z2F01   jsr     Z2F07                   ; 2F01: 20 07 2F 
-        jmp     Z261A                   ; 2F04: 4C 1A 26 
+        jmp     Routine_261A            ; 2F04: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2F07   ldy     #$01                    ; 2F07: A0 01    
         lda     (ZP),y                  ; 2F09: B1 00    
@@ -2220,7 +2260,7 @@ Z2F65   lda     #$00                    ; 2F65: A9 00
         sta     Screen_RAM+425          ; 2F6C: 8D A9 03 
         lda     #$10                    ; 2F6F: A9 10    
         sta     Screen_RAM+426          ; 2F71: 8D AA 03 
-        jmp     Z261A                   ; 2F74: 4C 1A 26 
+        jmp     Routine_261A            ; 2F74: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2F77   ldy     #$03                    ; 2F77: A0 03    
         lda     (ZP),y                  ; 2F79: B1 00    
@@ -2232,14 +2272,15 @@ Z2F77   ldy     #$03                    ; 2F77: A0 03
         jsr     Z305A                   ; 2F88: 20 5A 30 
         jmp     Z2F65                   ; 2F8B: 4C 65 2F 
 ; -----------------------------------------------------------
+Routine_2F8E
         jsr     Z35D7                   ; 2F8E: 20 D7 35 
         ldy     #$04                    ; 2F91: A0 04    
         lda     (ZP),y                  ; 2F93: B1 00    
-        bit     BITM_04                 ; 2F95: 2C 16 20 
+        bit     MASK_04                 ; 2F95: 2C 16 20 
         bne     Z2F31                   ; 2F98: D0 97    
-        bit     BITM_02                 ; 2F9A: 2C 15 20 
+        bit     MASK_02                 ; 2F9A: 2C 15 20 
         bne     Z301E                   ; 2F9D: D0 7F    
-        bit     BITM_01                 ; 2F9F: 2C 14 20 
+        bit     MASK_01                 ; 2F9F: 2C 14 20 
         beq     Z2FBD                   ; 2FA2: F0 19    
         jsr     Z2D58                   ; 2FA4: 20 58 2D 
         lda     ZP_0002                 ; 2FA7: A5 02    
@@ -2263,7 +2304,7 @@ Z2FC3   pha                             ; 2FC3: 48
         jsr     Z378D                   ; 2FCE: 20 8D 37 
         jsr     Z364C                   ; 2FD1: 20 4C 36 
         jsr     Z381F                   ; 2FD4: 20 1F 38 
-        jmp     Z261A                   ; 2FD7: 4C 1A 26 
+        jmp     Routine_261A            ; 2FD7: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2FDA   lda     ZP_0059                 ; 2FDA: A5 59    
 Z2FDC   lsr     a                       ; 2FDC: 4A       
@@ -2285,7 +2326,9 @@ Z2FEE   jsr     Z35D7                   ; 2FEE: 20 D7 35
         ora     #$02                    ; 2FF5: 09 02    
         sta     (ZP),y                  ; 2FF7: 91 00    
         jsr     Read_ZP_Paramenters     ; 2FF9: 20 9D 25 
-        fcb     $02,$00,$01,$FF         ; 2FFC: 02 00 01 FF 
+        fcb     $02                     ; 2FFC: 02       
+        fdb     Stack                   ; 2FFD: 00 01    
+        fcb     $FF                     ; 2FFF: FF       
         jsr     Z3063                   ; 3000: 20 63 30 
         lda     #$01                    ; 3003: A9 01    
         sta     Screen_RAM+425          ; 3005: 8D A9 03 
@@ -2536,7 +2579,7 @@ Z31A8   lda     ZP_Addr_From            ; 31A8: A5 06
         fcb     $03                     ; 31BE: 03       
 Z31BF   ldy     #$02                    ; 31BF: A0 02    
         clc                             ; 31C1: 18       
-        bit     BITM_01                 ; 31C2: 2C 14 20 
+        bit     MASK_01                 ; 31C2: 2C 14 20 
         beq     Z31DF                   ; 31C5: F0 18    
         lda     (ZP),y                  ; 31C7: B1 00    
         bpl     Z31CE                   ; 31C9: 10 03    
@@ -2561,14 +2604,14 @@ Z31EA   ldy     #$00                    ; 31EA: A0 00
         bit     ZP_001c                 ; 31EC: 24 1C    
         bpl     Z323E                   ; 31EE: 10 4E    
         bmi     Z31E7                   ; 31F0: 30 F5    
-Z31F2   bit     BITM_08                 ; 31F2: 2C 17 20 
+Z31F2   bit     MASK_08                 ; 31F2: 2C 17 20 
         beq     Z3200                   ; 31F5: F0 09    
         ldy     #$04                    ; 31F7: A0 04    
         lda     (ZP),y                  ; 31F9: B1 00    
         bmi     Z31CB                   ; 31FB: 30 CE    
         jmp     Z3321                   ; 31FD: 4C 21 33 
 ; -----------------------------------------------------------
-Z3200   bit     BITM_04                 ; 3200: 2C 16 20 
+Z3200   bit     MASK_04                 ; 3200: 2C 16 20 
         bne     Z31BF                   ; 3203: D0 BA    
         jmp     Z3285                   ; 3205: 4C 85 32 
 ; -----------------------------------------------------------
@@ -2583,7 +2626,7 @@ Z3215   jmp     Z32C7                   ; 3215: 4C C7 32
 ; -----------------------------------------------------------
 Z3218   tax                             ; 3218: AA       
         lda     ZP_001c                 ; 3219: A5 1C    
-        bit     BITM_10                 ; 321B: 2C 18 20 
+        bit     MASK_10                 ; 321B: 2C 18 20 
         bne     Z3224                   ; 321E: D0 04    
         lda     #$00                    ; 3220: A9 00    
         beq     Z3212                   ; 3222: F0 EE    
@@ -2638,6 +2681,7 @@ Z326A   adc     #$48                    ; 326A: 69 48
 Z326F   txa                             ; 326F: 8A       
         jmp     Z32A6                   ; 3270: 4C A6 32 
 ; -----------------------------------------------------------
+Routine_3273
         jsr     Z35D7                   ; 3273: 20 D7 35 
         jsr     Z33F7                   ; 3276: 20 F7 33 
         sta     ZP_001c                 ; 3279: 85 1C    
@@ -2687,9 +2731,9 @@ Z32BA   sta     (ZP),y                  ; 32BA: 91 00
 ; -----------------------------------------------------------
 Z32C7   ldy     #$04                    ; 32C7: A0 04    
         lda     ZP_001c                 ; 32C9: A5 1C    
-        bit     BITM_20                 ; 32CB: 2C 19 20 
+        bit     MASK_20                 ; 32CB: 2C 19 20 
         beq     Z3318                   ; 32CE: F0 48    
-        bit     BITM_10                 ; 32D0: 2C 18 20 
+        bit     MASK_10                 ; 32D0: 2C 18 20 
         beq     Z330C                   ; 32D3: F0 37    
         lda     (ZP),y                  ; 32D5: B1 00    
         cmp     #$04                    ; 32D7: C9 04    
@@ -2716,10 +2760,10 @@ Z32F7   sta     (ZP),y                  ; 32F7: 91 00
 Z32F9   jsr     Z3646                   ; 32F9: 20 46 36 
         jsr     Z381F                   ; 32FC: 20 1F 38 
         lda     ZP_001c                 ; 32FF: A5 1C    
-        bit     BITM_08                 ; 3301: 2C 17 20 
+        bit     MASK_08                 ; 3301: 2C 17 20 
         bne     Z3309                   ; 3304: D0 03    
         jsr     Z20E9                   ; 3306: 20 E9 20 
-Z3309   jmp     Z261A                   ; 3309: 4C 1A 26 
+Z3309   jmp     Routine_261A            ; 3309: 4C 1A 26 
 ; -----------------------------------------------------------
 Z330C   lda     (ZP),y                  ; 330C: B1 00    
         cmp     #$FC                    ; 330E: C9 FC    
@@ -2759,6 +2803,7 @@ Z3342   clc                             ; 3342: 18
 Z3348   adc     #$48                    ; 3348: 69 48    
         jmp     Z33AF                   ; 334A: 4C AF 33 
 ; -----------------------------------------------------------
+Routine_334D
         lda     ZP_005d                 ; 334D: A5 5D    
         beq     Z336A                   ; 334F: F0 19    
         jsr     Z3465                   ; 3351: 20 65 34 
@@ -2769,7 +2814,7 @@ Z3348   adc     #$48                    ; 3348: 69 48
         jsr     Z2425                   ; 335E: 20 25 24 
         jsr     P1_SCORE_TO_UDG_RAM     ; 3361: 20 71 24 
         jsr     P2_SCORE_TO_UDG_RAM     ; 3364: 20 81 24 
-Z3367   jmp     Z261A                   ; 3367: 4C 1A 26 
+Z3367   jmp     Routine_261A            ; 3367: 4C 1A 26 
 ; -----------------------------------------------------------
 Z336A   jsr     Z35D7                   ; 336A: 20 D7 35 
         jsr     Z33F7                   ; 336D: 20 F7 33 
@@ -2791,7 +2836,7 @@ Z338D   ldx     #$FF                    ; 338D: A2 FF
 Z338F   ldy     #$02                    ; 338F: A0 02    
         lda     ZP_0002                 ; 3391: A5 02    
         bpl     Z339D                   ; 3393: 10 08    
-        bit     BITM_02                 ; 3395: 2C 15 20 
+        bit     MASK_02                 ; 3395: 2C 15 20 
         php                             ; 3398: 08       
         txa                             ; 3399: 8A       
         plp                             ; 339A: 28       
@@ -2847,7 +2892,7 @@ Z33D4   lda     VIA1_Port_A             ; 33D4: AD 11 91
         rts                             ; 33F6: 60       
 ; ===========================================================
 Z33F7   lda     GAME_SETTINGS           ; 33F7: AD D3 1F 
-        bit     BITM_02                 ; 33FA: 2C 15 20 
+        bit     MASK_02                 ; 33FA: 2C 15 20 
         bne     Z33D4                   ; 33FD: D0 D5    
         lda     #$FF                    ; 33FF: A9 FF    
         sta     VIA2_DDR_A              ; 3401: 8D 23 91 
@@ -2910,7 +2955,7 @@ Z3465   lda     ZP_005e                 ; 3465: A5 5E
         fcb     $04                     ; 346C: 04        ZP Offset for 1st address
         fdb     ZP                      ; 346D: 00 00     1st Address
         fcb     $FF                     ; 346F: FF       
-        jsr     Setup_UDG_RAM_XY        ; 3470: 20 1D 35 
+Z3470   jsr     Setup_UDG_RAM_XY        ; 3470: 20 1D 35 
         lda     ZP_004a                 ; 3473: A5 4A    
         and     #$07                    ; 3475: 29 07    
         bne     Z3499                   ; 3477: D0 20    
@@ -2938,11 +2983,12 @@ Z349A   jsr     Read_ZP_Paramenters     ; 349A: 20 9D 25
         fcb     $04                     ; 349D: 04        Store to ZP_UDG_RAM_X
         fcb     $80,$00                 ; 349E: 80 00     Character ROM
         fcb     $FF                     ; 34A0: FF       
-        jmp     $3470                   ; 34A1: 4C 70 34 
-CCCC_34a4
+        jmp     Z3470                   ; 34A1: 4C 70 34 
+; ===========================================================
+Display_Scores
         ldy     #$00                    ; 34A4: A0 00    
         lda     (ZP_Ptr_To_Str),y       ; 34A6: B1 0E    
-        lsr     a                       ; 34A8: 4A       
+        lsr     a                       ; 34A8: 4A        Divide by $10
         lsr     a                       ; 34A9: 4A       
         lsr     a                       ; 34AA: 4A       
         lsr     a                       ; 34AB: 4A       
@@ -2950,17 +2996,19 @@ CCCC_34a4
         adc     #$70                    ; 34AD: 69 70    
         sta     ZP_Addr_From            ; 34AF: 85 06    
         jsr     COPY_CHAR_TO_UDG_RAM    ; 34B1: 20 95 35 
+
         ldy     #$00                    ; 34B4: A0 00    
         lda     (ZP_Ptr_To_Str),y       ; 34B6: B1 0E    
         and     #$0F                    ; 34B8: 29 0F    
         adc     #$70                    ; 34BA: 69 70    
         sta     ZP_Addr_From            ; 34BC: 85 06    
         jsr     COPY_CHAR_TO_UDG_RAM    ; 34BE: 20 95 35  Jump to routine copy stuff from STD CHAR ROM TO UDG CHAR SET
+
         inc     ZP_Ptr_To_Str           ; 34C1: E6 0E    
         bne     Z34C7                   ; 34C3: D0 02    
-        fcb     $E6,$07                 ; 34C5: E6 07    
+        inc     ZP_Addr_From+1          ; 34C5: E6 07    
 Z34C7   dec     ZP_0002                 ; 34C7: C6 02    
-        bne     CCCC_34a4               ; 34C9: D0 D9    
+        bne     Display_Scores          ; 34C9: D0 D9    
         rts                             ; 34CB: 60       
 ; ===========================================================
 
@@ -3496,7 +3544,7 @@ Z37ED   tay                             ; 37ED: A8
         cmp     #$03                    ; 37F0: C9 03    
         bcs     Z37D4                   ; 37F2: B0 E0    
         tya                             ; 37F4: 98       
-        bit     BITM_80                 ; 37F5: 2C 1B 20 
+        bit     MASK_80                 ; 37F5: 2C 1B 20 
         beq     Z3800                   ; 37F8: F0 06    
         pha                             ; 37FA: 48       
         txa                             ; 37FB: 8A       
@@ -3513,9 +3561,9 @@ Z3807   sta     Keyboard_Data           ; 3807: 85 13
         txa                             ; 3809: 8A       
         ora     Keyboard_Data           ; 380A: 05 13    
         tax                             ; 380C: AA       
-        lda     M385F,x                 ; 380D: BD 5F 38 
+        lda     UDG_Start,x             ; 380D: BD 5F 38 
         tay                             ; 3810: A8       
-        lda     M3860,x                 ; 3811: BD 60 38 
+        lda     UDG_Start+1,x           ; 3811: BD 60 38 
         rts                             ; 3814: 60       
 ; ===========================================================
 Z3815   lda     ZP_0018                 ; 3815: A5 18    
@@ -3560,8 +3608,9 @@ Z384B   iny                             ; 384B: C8
         bne     Z383B                   ; 385C: D0 DD    
 Z385E   rts                             ; 385E: 60       
 ; ===========================================================
-M385F   fcb     %10111110               ; 385F: BE       
-M3860   fcb     %00111011               ; 3860: 3B       
+UDG_Start
+        fcb     %10111110               ; 385F: BE       
+        fcb     %00111011               ; 3860: 3B       
         fcb     %11110001               ; 3861: F1       
         fcb     %00111011               ; 3862: 3B       
         fcb     %00111100               ; 3863: 3C       

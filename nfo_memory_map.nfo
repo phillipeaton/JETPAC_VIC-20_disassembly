@@ -8,8 +8,8 @@ label 0400-0fff Block0_3K_RAM
 *label 1200-1fff Std_3.5k_RAM
 label 1000-1fff UDG_RAM * User-Defined Graphics characters
 *label 2000-3fff Block1_8K_RAM * Removed, else branch labels don't show-up
-label 4000-5fff Block2_8K_RAM
-label 6000-7fff Block3_8K_RAM
+*label 4000-5fff Block2_8K_RAM * Removed, else branch labels don't show-up
+*label 6000-7fff Block3_8K_RAM * Removed, else branch labels don't show-up
 label 8000-8fff Character_ROM
 label 9000-90ff VIC
 label 9100-93ff VIA1_2
