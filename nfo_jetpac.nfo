@@ -103,7 +103,10 @@ label      27 ZP_0027
 label      28 ZP_0028
 label      40 ZP_Param_Addr
 label      41 ZP_Param_Addr+1
-label      45 ZP_Game_Sel_Flash
+label      45 ZP_Game_Sel_F1_Flash
+label      45 ZP_Game_Sel_F3_Flash
+label      45 ZP_Game_Sel_F5_Flash
+label      45 ZP_Game_Sel_F7_Flash
 label      4a ZP_004a
 label      4b ZP_004b
 label      4c ZP_004c
@@ -112,9 +115,9 @@ label      54 Score_P2 ; 3 bytes
 label      57 ZP_INVERT ; Used to flash game options & 1UP+score at player start
 label      58 ZP_COUNTER
 label      59 ZP_0059
-label      5a Num_Lives
+label      5a Num_Lives_P1
 label      5b ZP_005b
-label      5c ZP_005c
+label      5c Num_Lives_P2
 label      5d ZP_005d
 label      5e ZP_005e
 label      5f ZP_005f
@@ -129,7 +132,7 @@ label    1588 UDG_HI_SCORE
 label    19a0 UDG_P2_LIVES
 label    1b08 UDG_P2_SCORE
 
-label    1fd0 UDG_END
+label    1fd0 SCORE_HI
 label    1fd3 GAME_SETTINGS
 
 ; Start of disassembly instructions
@@ -183,7 +186,7 @@ comment  2061
 lcomment 2061
 lcomment 2061 Store ascending numbers step #11 at a time into #23 bytes from $200 as below
 lcomment 2061 then do it #10 more times, but starting at 1 higher each time
-lcomment 2061 THIS BLANKS A SECTION OF THE SCREEN ONE PIXEL LINE AT A TIME
+lcomment 2061 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2   ???
 lcomment 2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3   ..."-8CNYdoz...¦±¼ÇÒÝèó
 lcomment 2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4   ...#.9DOZep{...§²½ÈÓÞéô
 lcomment 2061 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5   ...$/:EP[fq|...¨³¾ÉÔßêõ
@@ -194,7 +197,6 @@ lcomment 2061 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 
 lcomment 2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA   ...)4?JU`kv...¢-¸ÃÎÙäïú
 lcomment 2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB    ..*5@KValw...£®¹ÄÏÚåðû
 lcomment 2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC   .. +6ALWbmx...¤¯ºÅÐÛæñü
-lcomment 2061 02FD  00 00 00 3A C4 83 C4 7C C5 1A C7 E4 C7 86 CE 00 00 00 00 00 00 00 00   ...:Ä.Ä|Å.ÇäÇ.Î........
 
 label    2064 Start_2
 label    2067 Start_3
@@ -241,12 +243,16 @@ break    22ed
 
 ;const    22f9
 
+label    22ff Copy_Bytes_To_Screen_RAM
+label    2301 CBTSR1
+
 word     239a
 
 word     22f9
 
 
 word     2315
+label    233b BYTES_TO_COPY_TO_SCREEN_RAM
 const     233b-235a
 
 label    2373 P1_LIVES_TO_UDG_RAM
@@ -263,11 +269,18 @@ lcomment 2386 1st Address
 word     2386
 lcomment 2388 FF is loop terminator
 
+
 label    23c7 SOME_DATA
 
+comment  23d4
+label    23d4 Setup_Player_Lives
 label    23D6 BACK_23D6
+comment  23da
+comment  23e7
 label    23F4 SKIP_23F4
+label    23F5 SWAP_ZP59_ZP5B_SCR_RAM_COPY
 label    23F7 BACK_23F7
+comment  2404
 label    2406 BACK_2406
 
 label    2416 RESET_COLOR_PIXELS_SCORES
@@ -326,7 +339,7 @@ word     248b
 break    248d
 lcomment 248d FF is loop terminator
 
-label    2491 HI_SCORE_TO_UDG_RAM?
+label    2491 HI_SCORE_TO_UDG_RAM
 const    2494
 lcomment 2494 ZP Offset for 1st address
 lcomment 2495 1st address
@@ -451,10 +464,11 @@ label    275b ERASEZP
 lcomment 275b Erase $100 bytes zero page
 label    275e ERASEZ1
 
+label    2764 RESET_SCREEN_RAM_0380_03ff
 label    2768 BACK_2768
 
 lcomment  276f Erase $30 bytes at end of UDGs $1fd0-$2000
-label    276f ERASE_UDG_END
+label    276f ERASE_HI_SCORE_SETTINGS_ETC
 label    2773 ERASE1
 
 const    277d
@@ -495,6 +509,8 @@ lcomment 20d9 Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
 lcomment 20df Space Pressed?
 lcomment 20e1 No, read keyboard again
 
+label    25d1 Game_Start
+
 label    268C Subroutine_List
 label    268D Subroutine_List+1
 
@@ -514,6 +530,8 @@ const    2967-2974
 word     2967-2974
 break    2968
 break    296f
+
+label    299D Sound_Channels_Off_ETC
 
 const    29f1
 lcomment 29f1 ZP Offset for 1st address
@@ -595,8 +613,12 @@ break    2CDB-2ce2
 
 word     2DBc
 
+label    2ddd LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
+
 word     2e93
 word     2FFd
+
+
 
 const    346c
 lcomment 346c ZP Offset for 1st address
@@ -704,7 +726,7 @@ lcomment  3545 Bytes are middle two numbers in addr e.g. 10b0, 1160 etc
 const    3545-3557
 
 comment  355c
-label    355c RESET_COLOR_RAM?
+label    355c RESET_COLOR_RAM
 
 const    355f
 lcomment 355f ZP Offset for 1st address
@@ -834,6 +856,9 @@ lcomment 35d1 Decrement number of lines counter
 lcomment 35d2 All lines copied? If no, loop back.
 lcomment 35d4 If yes, routine ends
 
+label    35e9 LOAD_ZP18_TO_1b_W_ZP00_01_03_05
+comment  35f4
+comment  35fa
 
 ; End of file contains graphics data
 ;unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
