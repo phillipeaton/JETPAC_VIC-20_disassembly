@@ -862,7 +862,10 @@ comment  35fa
 
 ; End of file contains graphics data
 ;unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
-label    385f UDG_Start
-label    3860 UDG_Start+1
+label    385f UDG_Lookup
+label    3860 UDG_Lookup+1
 break    385f-3fff ; Output one byte per line
-binary   385f-3fff
+word     385f-3896
+binary   3897-3c86
+word     3c87-3cb0
+binary   3cb1-3fff
