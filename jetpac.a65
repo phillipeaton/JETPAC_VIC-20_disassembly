@@ -40,8 +40,8 @@ ZP_001b                 equ     $001B
 ZP_001c                 equ     $001C
 ZP_001e                 equ     $001E
 ZP_001f                 equ     $001F
-ZP_0020                 equ     $0020
-ZP_0021                 equ     $0021
+ZP_HW_IRQ_1_OR_0        equ     $0020
+ZP_HW_IRQ_VAR           equ     $0021
 ZP_0022                 equ     $0022
 ZP_0023                 equ     $0023
 ZP_0024                 equ     $0024
@@ -51,9 +51,9 @@ ZP_0027                 equ     $0027
 ZP_0028                 equ     $0028
 ZP_Param_Addr           equ     $0040
 ZP_Game_Sel_F7_Flash    equ     $0045
-ZP_004a                 equ     $004A
-ZP_004b                 equ     $004B
-ZP_004c                 equ     $004C
+ZP_HW_IRQ_Count1        equ     $004A
+ZP_HW_IRQ_Count2        equ     $004B
+ZP_HW_IRQ_Count3        equ     $004C
 Score_P1                equ     $0051
 Score_P2                equ     $0054
 ZP_INVERT               equ     $0057
@@ -64,8 +64,8 @@ ZP_005b                 equ     $005B
 Num_Lives_P2            equ     $005C
 ZP_005d                 equ     $005D
 ZP_005e                 equ     $005E
-ZP_005f                 equ     $005F
-ZP_0060                 equ     $0060
+ZP_Subroutine_Vec_Lo    equ     $005F
+ZP_Subroutine_Vec_Hi    equ     $0060
 ZP_0080                 equ     $0080
 ZP_00f8                 equ     $00F8
 ZP_00fc                 equ     $00FC
@@ -135,7 +135,11 @@ MASK_10 fcb     $10                     ; 2018: 10
 MASK_20 fcb     $20                     ; 2019: 20       
 MASK_40 fcb     $40                     ; 201A: 40       
 MASK_80 fcb     $80                     ; 201B: 80       
-        rti                             ; 201C: 40        NMI Interrupt Vector points here
+
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+NMI_Interrupt_Hardler
+        rti                             ; 201C: 40       
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 ; ----------------------------------------------------------
 ; Starts here
@@ -268,7 +272,7 @@ SKIP_20d0
         jsr     RESET_COLOR_PIXELS_SCORES ; 20E3: 20 16 24 
         jmp     Game_Start              ; 20E6: 4C D1 25 
 ; -----------------------------------------------------------
-Z20E9   lda     ZP_004a                 ; 20E9: A5 4A    
+Z20E9   lda     ZP_HW_IRQ_Count1        ; 20E9: A5 4A    
         and     #$03                    ; 20EB: 29 03    
         beq     ???_TO_UDG_RAM          ; 20ED: F0 01    
         rts                             ; 20EF: 60       
@@ -330,13 +334,13 @@ BACK_2145
         dex                             ; 2148: CA       
         bne     BACK_2145               ; 2149: D0 FA    
         iny                             ; 214B: C8       
-        lda     ZP_004c                 ; 214C: A5 4C    
+        lda     ZP_HW_IRQ_Count3        ; 214C: A5 4C    
         and     #$38                    ; 214E: 29 38    
         clc                             ; 2150: 18       
         adc     #$40                    ; 2151: 69 40    
         sta     (ZP_Addr_From),y        ; 2153: 91 06    
         iny                             ; 2155: C8       
-        lda     ZP_004c                 ; 2156: A5 4C    
+        lda     ZP_HW_IRQ_Count3        ; 2156: A5 4C    
         and     #$07                    ; 2158: 29 07    
         tax                             ; 215A: AA       
         lda     _12346737,x             ; 215B: BD 6B 21 
@@ -373,7 +377,7 @@ Z218D   lda     ZP_0008                 ; 218D: A5 08
 Z2195   adc     #$08                    ; 2195: 69 08    
         jmp     Z21CB                   ; 2197: 4C CB 21 
 ; -----------------------------------------------------------
-Routine_219A
+Subroutine_219A
         ldy     #$06                    ; 219A: A0 06    
         lda     (ZP),y                  ; 219C: B1 00    
         sta     ZP_Addr_From+1          ; 219E: 85 07    
@@ -449,7 +453,7 @@ Z2211   iny                             ; 2211: C8
         lda     #$00                    ; 2221: A9 00    
         tay                             ; 2223: A8       
         sta     (ZP),y                  ; 2224: 91 00    
-        jmp     Routine_261A            ; 2226: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2226: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2229   lda     (ZP),y                  ; 2229: B1 00    
         bit     MASK_04                 ; 222B: 2C 16 20 
@@ -458,7 +462,7 @@ Z2229   lda     (ZP),y                  ; 2229: B1 00
         lda     ZP_Addr_From+1          ; 2232: A5 07    
         and     #$07                    ; 2234: 29 07    
         bne     Z2248                   ; 2236: D0 10    
-        lda     ZP_004c                 ; 2238: A5 4C    
+        lda     ZP_HW_IRQ_Count3        ; 2238: A5 4C    
         and     #$03                    ; 223A: 29 03    
         ora     #$04                    ; 223C: 09 04    
         ora     ZP_Addr_From+1          ; 223E: 05 07    
@@ -472,7 +476,7 @@ Z2248   ldy     #$06                    ; 2248: A0 06
         ldy     #$02                    ; 224E: A0 02    
         lda     ZP_Addr_From            ; 2250: A5 06    
         sta     (ZP),y                  ; 2252: 91 00    
-        jmp     Routine_261A            ; 2254: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2254: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2257   lda     (ZP),y                  ; 2257: B1 00    
         sta     ZP_UDG_RAM_X            ; 2259: 85 04    
@@ -767,12 +771,14 @@ STR_HI  fcb     $07                     ; 2457: 07
 STR_2UP fcb     $01                     ; 245E: 01       
         fcc     "``rUP"                 ; 245F: 60 60 72 55 50 
         fcb     $E0                     ; 2464: E0       
+
 STR_1UP_HI_2UP
         fdb     ZP,STR_1UP              ; 2465: 00 00 50 24 
         fdb     ZP_Param_Addr           ; 2469: 40 00    
         fdb     STR_HI                  ; 246B: 57 24    
         fdb     ZP_0080                 ; 246D: 80 00    
         fdb     STR_2UP                 ; 246F: 5E 24    
+
 P1_SCORE_TO_UDG_RAM
         jsr     Read_ZP_Paramenters     ; 2471: 20 9D 25 
         fcb     $04                     ; 2474: 04        ZP Offset for 1st address
@@ -923,7 +929,6 @@ Read_ZP_Paramenters
         pla                             ; 25A0: 68       
         sta     ZP_Param_Addr+1         ; 25A1: 85 41    
 
-
         ldy     #$01                    ; 25A3: A0 01    
 RZPP1   lda     (ZP_Param_Addr),y       ; 25A5: B1 40     Load next parameter value, ZP address for next param else $FF
         cmp     #$FF                    ; 25A7: C9 FF     Value $FF?
@@ -961,25 +966,32 @@ Game_Start
         jsr     ERASEZP                 ; 25D4: 20 5B 27 
         jsr     Setup_Player_Lives      ; 25D7: 20 D4 23 
         jsr     Z22BA                   ; 25DA: 20 BA 22 
-        jmp     Z25FA                   ; 25DD: 4C FA 25 
+        jmp     Game_Start_             ; 25DD: 4C FA 25 
 ; -----------------------------------------------------------
+
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+Hardware_Interrupt_Handler
         lda     #$01                    ; 25E0: A9 01    
-        sta     ZP_0020                 ; 25E2: 85 20    
+        sta     ZP_HW_IRQ_1_OR_0        ; 25E2: 85 20    
         jsr     SET_TMR_1               ; 25E4: 20 5E 26 
         lda     VIC_R4_TV_Raster        ; 25E7: AD 04 90 
-        adc     ZP_004c                 ; 25EA: 65 4C    
-        sta     ZP_004c                 ; 25EC: 85 4C    
-        inc     ZP_004a                 ; 25EE: E6 4A    
-        bne     Z25F4                   ; 25F0: D0 02    
-        inc     ZP_004b                 ; 25F2: E6 4B    
-Z25F4   pla                             ; 25F4: 68       
+        adc     ZP_HW_IRQ_Count3        ; 25EA: 65 4C    
+        sta     ZP_HW_IRQ_Count3        ; 25EC: 85 4C    
+        inc     ZP_HW_IRQ_Count1        ; 25EE: E6 4A    
+        bne     SKIP_25f4               ; 25F0: D0 02    
+        inc     ZP_HW_IRQ_Count2        ; 25F2: E6 4B    
+SKIP_25f4
+        pla                             ; 25F4: 68       
         tay                             ; 25F5: A8       
         pla                             ; 25F6: 68       
         tax                             ; 25F7: AA       
         pla                             ; 25F8: 68       
         rti                             ; 25F9: 40       
-Z25FA   lda     #$00                    ; 25FA: A9 00    
-        sta     ZP_0021                 ; 25FC: 85 21    
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Game_Start_
+        lda     #$00                    ; 25FA: A9 00    
+        sta     ZP_HW_IRQ_VAR           ; 25FC: 85 21    
         lda     #$B0                    ; 25FE: A9 B0    
         sta     ZP                      ; 2600: 85 00    
         lda     #$03                    ; 2602: A9 03    
@@ -990,12 +1002,12 @@ Z2607   ldy     #$00                    ; 2607: A0 00
         asl     a                       ; 260B: 0A       
         tay                             ; 260C: A8       
         lda     Subroutine_List,y       ; 260D: B9 8C 26 
-        sta     ZP_005f                 ; 2610: 85 5F    
+        sta     ZP_Subroutine_Vec_Lo    ; 2610: 85 5F    
         lda     Subroutine_List+1,y     ; 2612: B9 8D 26 
-        sta     ZP_0060                 ; 2615: 85 60    
-        jmp     (ZP_005f)               ; 2617: 6C 5F 00 
+        sta     ZP_Subroutine_Vec_Hi    ; 2615: 85 60    
+        jmp     (ZP_Subroutine_Vec_Lo)  ; 2617: 6C 5F 00 
 ; -----------------------------------------------------------
-Routine_261A
+Subroutine_261A
         ldy     #$00                    ; 261A: A0 00    
         lda     (ZP),y                  ; 261C: B1 00    
         bne     BACK_2630               ; 261E: D0 10    
@@ -1014,14 +1026,14 @@ BACK_2630
         clc                             ; 2632: 18       
         adc     #$08                    ; 2633: 69 08    
         sta     ZP                      ; 2635: 85 00    
-        lda     ZP_0020                 ; 2637: A5 20    
+        lda     ZP_HW_IRQ_1_OR_0        ; 2637: A5 20    
         bne     Z2669                   ; 2639: D0 2E    
 Z263B   lda     ZP                      ; 263B: A5 00    
         cmp     #$B0                    ; 263D: C9 B0    
         beq     Z2680                   ; 263F: F0 3F    
         and     ZP                      ; 2641: 25 00    
         bne     Z2607                   ; 2643: D0 C2    
-        lda     ZP_0021                 ; 2645: A5 21    
+        lda     ZP_HW_IRQ_VAR           ; 2645: A5 21    
         cmp     #$04                    ; 2647: C9 04    
         bcc     SKIP_2652               ; 2649: 90 07    
         lda     VIC_R4_TV_Raster        ; 264B: AD 04 90 
@@ -1032,7 +1044,7 @@ SKIP_2652
 SKIP_2655
         jsr     Z2B4B                   ; 2655: 20 4B 2B 
         jsr     Z2B8F                   ; 2658: 20 8F 2B 
-        jmp     Z25FA                   ; 265B: 4C FA 25 
+        jmp     Game_Start_             ; 265B: 4C FA 25 
 ; -----------------------------------------------------------
 ; Setup Timer 1
 SET_TMR_1
@@ -1044,7 +1056,7 @@ SET_TMR_1
 ; ===========================================================
 Z2669   sei                             ; 2669: 78       
         lda     #$00                    ; 266A: A9 00    
-        sta     ZP_0020                 ; 266C: 85 20    
+        sta     ZP_HW_IRQ_1_OR_0        ; 266C: 85 20    
         lda     ZP                      ; 266E: A5 00    
         sta     ZP_0022                 ; 2670: 85 22    
         lda     ZP_0001                 ; 2672: A5 01    
@@ -1062,23 +1074,24 @@ Z2680   lda     ZP_0022                 ; 2680: A5 22
         jmp     Z263B                   ; 2689: 4C 3B 26 
 ; -----------------------------------------------------------
 Subroutine_List
-        fdb     Routine_261A            ; 268C: 1A 26    
-        fdb     Routine_3273            ; 268E: 73 32    
-        fdb     Routine_334D            ; 2690: 4D 33    
-        fdb     Routine_2934            ; 2692: 34 29    
-        fdb     Routine_2F8E            ; 2694: 8E 2F    
-        fdb     Routine_2C6A            ; 2696: 6A 2C    
-        fdb     Routine_2ABC            ; 2698: BC 2A    
-        fdb     Routine_2A6D            ; 269A: 6D 2A    
-        fdb     Routine_2A5F            ; 269C: 5F 2A    
-        fdb     Routine_2E74            ; 269E: 74 2E    
-        fdb     Routine_2E17            ; 26A0: 17 2E    
-        fdb     Routine_2E4E            ; 26A2: 4E 2E    
-        fdb     Routine_26CD            ; 26A4: CD 26    
-        fdb     Routine_261A            ; 26A6: 1A 26    
-        fdb     Routine_283E            ; 26A8: 3E 28    
-        fdb     Routine_261A            ; 26AA: 1A 26    
-        fdb     Routine_219A            ; 26AC: 9A 21    
+        fdb     Subroutine_261A         ; 268C: 1A 26    
+        fdb     Subroutine_3273         ; 268E: 73 32    
+        fdb     Subroutine_334D         ; 2690: 4D 33    
+        fdb     Subroutine_2934         ; 2692: 34 29    
+        fdb     Subroutine_2F8E         ; 2694: 8E 2F    
+        fdb     Subroutine_2C6A         ; 2696: 6A 2C    
+        fdb     Subroutine_2ABC         ; 2698: BC 2A    
+        fdb     Subroutine_2A6D         ; 269A: 6D 2A    
+        fdb     Subroutine_2A5F         ; 269C: 5F 2A    
+        fdb     Subroutine_2E74         ; 269E: 74 2E    
+        fdb     Subroutine_2E17         ; 26A0: 17 2E    
+        fdb     Subroutine_2E4E         ; 26A2: 4E 2E    
+        fdb     Subroutine_26CD         ; 26A4: CD 26    
+        fdb     Subroutine_261A         ; 26A6: 1A 26    
+        fdb     Subroutine_283E         ; 26A8: 3E 28    
+        fdb     Subroutine_261A         ; 26AA: 1A 26    
+        fdb     Subroutine_219A         ; 26AC: 9A 21    
+
 Z26AE   ldx     #$07                    ; 26AE: A2 07    
 BACK_26b0
         lda     SCREEN_C0000000,x       ; 26B0: BD C5 26 
@@ -1094,11 +1107,11 @@ BACK_26b0
 SCREEN_C0000000
         fcb     $0C,$00,$00,$00,$00,$00 ; 26C5: 0C 00 00 00 00 00 
         fcb     $00,$00                 ; 26CB: 00 00    
-Routine_26CD
+Subroutine_26CD
         lda     #$01                    ; 26CD: A9 01    
-        sta     ZP_0060                 ; 26CF: 85 60    
+        sta     ZP_Subroutine_Vec_Hi    ; 26CF: 85 60    
 BACK_26d1
-        ldy     ZP_0060                 ; 26D1: A4 60    
+        ldy     ZP_Subroutine_Vec_Hi    ; 26D1: A4 60    
         lda     (ZP),y                  ; 26D3: B1 00    
         asl     a                       ; 26D5: 0A       
         tax                             ; 26D6: AA       
@@ -1108,16 +1121,16 @@ BACK_26d1
         sta     ZP_0009                 ; 26DF: 85 09    
         jmp     (ZP_0008)               ; 26E1: 6C 08 00 
 ; -----------------------------------------------------------
-Routine_26e4
-        lda     ZP_0060                 ; 26E4: A5 60    
+Subroutine_26e4
+        lda     ZP_Subroutine_Vec_Hi    ; 26E4: A5 60    
         clc                             ; 26E6: 18       
         adc     #$02                    ; 26E7: 69 02    
-        sta     ZP_0060                 ; 26E9: 85 60    
+        sta     ZP_Subroutine_Vec_Hi    ; 26E9: 85 60    
         cmp     #$07                    ; 26EB: C9 07    
         bcc     BACK_26d1               ; 26ED: 90 E2    
-        jmp     Routine_261A            ; 26EF: 4C 1A 26 
+        jmp     Subroutine_261A         ; 26EF: 4C 1A 26 
 ; -----------------------------------------------------------
-Z26F2   lda     ZP_0060                 ; 26F2: A5 60    
+Z26F2   lda     ZP_Subroutine_Vec_Hi    ; 26F2: A5 60    
         tay                             ; 26F4: A8       
         iny                             ; 26F5: C8       
         lda     (ZP),y                  ; 26F6: B1 00    
@@ -1126,7 +1139,7 @@ Z26F2   lda     ZP_0060                 ; 26F2: A5 60
         sta     (ZP),y                  ; 26FB: 91 00    
         rts                             ; 26FD: 60       
 ; ===========================================================
-Routine_26fe
+Subroutine_26fe
         jsr     Z26F2                   ; 26FE: 20 F2 26 
         beq     Z270A                   ; 2701: F0 07    
         eor     #$FF                    ; 2703: 49 FF    
@@ -1144,16 +1157,16 @@ Z2710   pha                             ; 2710: 48
         dex                             ; 2714: CA       
         pla                             ; 2715: 68       
         sta     VIC_RA_Frq_Osc1,x       ; 2716: 9D 0A 90 
-        jmp     Routine_26e4            ; 2719: 4C E4 26 
+        jmp     Subroutine_26e4         ; 2719: 4C E4 26 
 ; -----------------------------------------------------------
-Routine_271c
+Subroutine_271c
         jsr     Z26F2                   ; 271C: 20 F2 26 
         beq     Z270A                   ; 271F: F0 E9    
         asl     a                       ; 2721: 0A       
         eor     #$F3                    ; 2722: 49 F3    
         jmp     Z2705                   ; 2724: 4C 05 27 
 ; -----------------------------------------------------------
-Routine_2727
+Subroutine_2727
         jsr     Z26F2                   ; 2727: 20 F2 26 
         beq     Z270A                   ; 272A: F0 DE    
         asl     a                       ; 272C: 0A       
@@ -1163,7 +1176,7 @@ Routine_2727
         ora     #$0F                    ; 2730: 09 0F    
         jmp     Z2705                   ; 2732: 4C 05 27 
 ; -----------------------------------------------------------
-Routine_2735
+Subroutine_2735
         jsr     Z26F2                   ; 2735: 20 F2 26 
         beq     Z270A                   ; 2738: F0 D0    
         lda     Screen_RAM+435          ; 273A: AD B3 03 
@@ -1172,13 +1185,13 @@ Routine_2735
         jmp     Z2705                   ; 2740: 4C 05 27 
 ; -----------------------------------------------------------
 Subroutine_List2
-        fdb     Routine_26e4            ; 2743: E4 26    
-        fdb     Routine_26fe            ; 2745: FE 26    
-        fdb     Routine_271c            ; 2747: 1C 27    
-        fdb     Routine_2727            ; 2749: 27 27    
-        fdb     Routine_2735            ; 274B: 35 27    
-        fdb     Routine_274f            ; 274D: 4F 27    
-Routine_274f
+        fdb     Subroutine_26e4         ; 2743: E4 26    
+        fdb     Subroutine_26fe         ; 2745: FE 26    
+        fdb     Subroutine_271c         ; 2747: 1C 27    
+        fdb     Subroutine_2727         ; 2749: 27 27    
+        fdb     Subroutine_2735         ; 274B: 35 27    
+        fdb     Subroutine_274f         ; 274D: 4F 27    
+Subroutine_274f
         jsr     Z26F2                   ; 274F: 20 F2 26 
         beq     Z270A                   ; 2752: F0 B6    
         asl     a                       ; 2754: 0A       
@@ -1322,7 +1335,7 @@ M283A   fcb     $D5                     ; 283A: D5
 M283B   fcc     "?"                     ; 283B: 3F       
         fcb     $F8                     ; 283C: F8       
         fcc     "?"                     ; 283D: 3F       
-Routine_283E
+Subroutine_283E
         jsr     Z35D7                   ; 283E: 20 D7 35 
         jsr     Z30B3                   ; 2841: 20 B3 30 
         lda     ZP_0002                 ; 2844: A5 02    
@@ -1374,7 +1387,7 @@ Routine_289f
         jmp     Z2894                   ; 28A1: 4C 94 28 
 ; -----------------------------------------------------------
 Routine_28a4
-        lda     ZP_004a                 ; 28A4: A5 4A    
+        lda     ZP_HW_IRQ_Count1        ; 28A4: A5 4A    
         and     #$1F                    ; 28A6: 29 1F    
         cmp     #$18                    ; 28A8: C9 18    
         bcs     Z28B1                   ; 28AA: B0 05    
@@ -1385,7 +1398,7 @@ Z28B1   lda     #$03                    ; 28B1: A9 03
         jmp     Z2894                   ; 28B3: 4C 94 28 
 ; -----------------------------------------------------------
 Routine_28b6
-        lda     ZP_004a                 ; 28B6: A5 4A    
+        lda     ZP_HW_IRQ_Count1        ; 28B6: A5 4A    
         lsr     a                       ; 28B8: 4A       
         lsr     a                       ; 28B9: 4A       
         and     #$07                    ; 28BA: 29 07    
@@ -1442,7 +1455,7 @@ Z290A   ldy     #$06                    ; 290A: A0 06
         tya                             ; 2914: 98       
         ldy     #$04                    ; 2915: A0 04    
         sta     (ZP),y                  ; 2917: 91 00    
-        lda     ZP_004c                 ; 2919: A5 4C    
+        lda     ZP_HW_IRQ_Count3        ; 2919: A5 4C    
         and     #$07                    ; 291B: 29 07    
         bne     Z2921                   ; 291D: D0 02    
         ora     #$01                    ; 291F: 09 01    
@@ -1456,12 +1469,12 @@ Z2927   ldy     #$05                    ; 2927: A0 05
         sta     Screen_RAM+428          ; 2930: 8D AC 03 
         rts                             ; 2933: 60       
 ; ===========================================================
-Routine_2934
-        inc     ZP_0021                 ; 2934: E6 21    
+Subroutine_2934
+        inc     ZP_HW_IRQ_VAR           ; 2934: E6 21    
         jsr     LOAD_ZP18_TO_1b_W_ZP00_01_03_05 ; 2936: 20 E9 35 
         ldy     #$02                    ; 2939: A0 02    
         lda     (ZP),y                  ; 293B: B1 00    
-        and     ZP_004a                 ; 293D: 25 4A    
+        and     ZP_HW_IRQ_Count1        ; 293D: 25 4A    
         bne     Z294A                   ; 293F: D0 09    
         ldy     #$04                    ; 2941: A0 04    
         lda     (ZP),y                  ; 2943: B1 00    
@@ -1480,11 +1493,13 @@ Z294A   ldy     #$04                    ; 294A: A0 04
         jsr     Z373D                   ; 295B: 20 3D 37 
         jsr     Z3604                   ; 295E: 20 04 36 
         jsr     Z381F                   ; 2961: 20 1F 38 
-        jmp     Routine_261A            ; 2964: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2964: 4C 1A 26 
 ; -----------------------------------------------------------
-UDG_Ptr fdb     $3F74                   ; 2967: 74 3F    
-        fdb     $3F74,$3F9B,$3FB2       ; 2969: 74 3F 9B 3F B2 3F 
-        fdb     $3F74,$3F9B,$3FB2       ; 296F: 74 3F 9B 3F B2 3F 
+UDG_Ptr fdb     Explosion_1             ; 2967: 74 3F    
+        fdb     Explosion_1,Explosion_2 ; 2969: 74 3F 9B 3F 
+        fdb     Explosion_3             ; 296D: B2 3F    
+        fdb     Explosion_1,Explosion_2 ; 296F: 74 3F 9B 3F 
+        fdb     Explosion_3             ; 2973: B2 3F    
 Z2975   ldy     #$00                    ; 2975: A0 00    
         tya                             ; 2977: 98       
         sta     (ZP),y                  ; 2978: 91 00    
@@ -1493,7 +1508,7 @@ Z2975   ldy     #$00                    ; 2975: A0 00
         and     #$3F                    ; 297E: 29 3F    
         cmp     #$03                    ; 2980: C9 03    
         bcc     Sound_Channels_Off_ETC  ; 2982: 90 19    
-        jmp     Routine_261A            ; 2984: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2984: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2987   jsr     Z277A                   ; 2987: 20 7A 27 
         jsr     RESET_COLOR_PIXELS_SCORES ; 298A: 20 16 24 
@@ -1523,7 +1538,7 @@ Z29C3   lda     Num_Lives_P1            ; 29C3: A5 5A
         beq     Z2987                   ; 29C5: F0 C0    
 Z29C7   jsr     Z22D7                   ; 29C7: 20 D7 22 
         jsr     Z235B                   ; 29CA: 20 5B 23 
-        jmp     Routine_261A            ; 29CD: 4C 1A 26 
+        jmp     Subroutine_261A         ; 29CD: 4C 1A 26 
 ; -----------------------------------------------------------
 Z29D0   lda     Num_Lives_P2            ; 29D0: A5 5C    
         beq     Z29C3                   ; 29D2: F0 EF    
@@ -1585,7 +1600,7 @@ Z2A45   jsr     Z28E7                   ; 2A45: 20 E7 28
         jsr     Z290A                   ; 2A59: 20 0A 29 
         jmp     Z28F0                   ; 2A5C: 4C F0 28 
 ; -----------------------------------------------------------
-Routine_2A5F
+Subroutine_2A5F
         jsr     Z2C5F                   ; 2A5F: 20 5F 2C 
         bpl     Z2A67                   ; 2A62: 10 03    
         jmp     Z2C78                   ; 2A64: 4C 78 2C 
@@ -1593,7 +1608,7 @@ Routine_2A5F
 Z2A67   jsr     Z2B16                   ; 2A67: 20 16 2B 
         jmp     Z2A83                   ; 2A6A: 4C 83 2A 
 ; -----------------------------------------------------------
-Routine_2A6D
+Subroutine_2A6D
         jsr     Z2C5F                   ; 2A6D: 20 5F 2C 
         beq     Z2A75                   ; 2A70: F0 03    
         jmp     Z2C78                   ; 2A72: 4C 78 2C 
@@ -1620,20 +1635,20 @@ Z2A9A   lda     #$F8                    ; 2A9A: A9 F8
         bmi     Z2A95                   ; 2A9C: 30 F7    
 Z2A9E   lda     #$F8                    ; 2A9E: A9 F8    
         bmi     Z2A8B                   ; 2AA0: 30 E9    
-Z2AA2   lda     ZP_004c                 ; 2AA2: A5 4C    
+Z2AA2   lda     ZP_HW_IRQ_Count3        ; 2AA2: A5 4C    
         and     #$0F                    ; 2AA4: 29 0F    
         adc     #$10                    ; 2AA6: 69 10    
         sta     (ZP),y                  ; 2AA8: 91 00    
         ldy     #$04                    ; 2AAA: A0 04    
         and     #$04                    ; 2AAC: 29 04    
-        bit     ZP_004c                 ; 2AAE: 24 4C    
+        bit     ZP_HW_IRQ_Count3        ; 2AAE: 24 4C    
         bmi     Z2AB7                   ; 2AB0: 30 05    
         eor     #$FF                    ; 2AB2: 49 FF    
         clc                             ; 2AB4: 18       
         adc     #$01                    ; 2AB5: 69 01    
 Z2AB7   sta     (ZP),y                  ; 2AB7: 91 00    
         jmp     Z2C92                   ; 2AB9: 4C 92 2C 
-Routine_2ABC
+Subroutine_2ABC
         jsr     Z2C5F                   ; 2ABC: 20 5F 2C 
         bpl     Z2AC4                   ; 2ABF: 10 03    
         jmp     Z2C78                   ; 2AC1: 4C 78 2C 
@@ -1719,7 +1734,7 @@ Z2B53   cmp     #$03                    ; 2B53: C9 03
         lda     Screen_RAM+434          ; 2B5C: AD B2 03 
         cmp     #$06                    ; 2B5F: C9 06    
         bcs     Z2B52                   ; 2B61: B0 EF    
-        lda     ZP_004a                 ; 2B63: A5 4A    
+        lda     ZP_HW_IRQ_Count1        ; 2B63: A5 4A    
         eor     #$FF                    ; 2B65: 49 FF    
         and     #$0F                    ; 2B67: 29 0F    
         bne     Z2B52                   ; 2B69: D0 E7    
@@ -1745,7 +1760,7 @@ Z2B97   cmp     #$03                    ; 2B97: C9 03
         bcs     Z2B96                   ; 2B99: B0 FB    
         lda     Screen_RAM+448          ; 2B9B: AD C0 03 
         bne     Z2B96                   ; 2B9E: D0 F6    
-        lda     ZP_004a                 ; 2BA0: A5 4A    
+        lda     ZP_HW_IRQ_Count1        ; 2BA0: A5 4A    
         and     #$7F                    ; 2BA2: 29 7F    
         bne     Z2B96                   ; 2BA4: D0 F0    
         ldx     #$07                    ; 2BA6: A2 07    
@@ -1755,7 +1770,7 @@ Z2BA8   lda     M2B87,x                 ; 2BA8: BD 87 2B
         bpl     Z2BA8                   ; 2BAF: 10 F7    
         jsr     Get_Raster_Line_Band    ; 2BB1: 20 DE 2B 
         sta     Screen_RAM+449          ; 2BB4: 8D C1 03 
-        lda     ZP_004c                 ; 2BB7: A5 4C    
+        lda     ZP_HW_IRQ_Count3        ; 2BB7: A5 4C    
         and     #$0E                    ; 2BB9: 29 0E    
         bit     MASK_08                 ; 2BBB: 2C 17 20 
         beq     Z2BC2                   ; 2BBE: F0 02    
@@ -1855,13 +1870,13 @@ Z2C53   lda     ZP_0008                 ; 2C53: A5 08
         bne     Z2C10                   ; 2C5C: D0 B2    
         rts                             ; 2C5E: 60       
 ; ===========================================================
-Z2C5F   inc     ZP_0021                 ; 2C5F: E6 21    
+Z2C5F   inc     ZP_HW_IRQ_VAR           ; 2C5F: E6 21    
         jsr     Z35D7                   ; 2C61: 20 D7 35 
         jsr     Z2BF8                   ; 2C64: 20 F8 2B 
         lda     ZP_0002                 ; 2C67: A5 02    
         rts                             ; 2C69: 60       
 ; ===========================================================
-Routine_2C6A
+Subroutine_2C6A
         jsr     Z2C5F                   ; 2C6A: 20 5F 2C 
         bmi     Z2C78                   ; 2C6D: 30 09    
         jsr     Z30B3                   ; 2C6F: 20 B3 30 
@@ -1879,7 +1894,7 @@ Z2C78   lda     ZP_0059                 ; 2C78: A5 59
         sta     ZP_0003                 ; 2C87: 85 03    
         jsr     Z3063                   ; 2C89: 20 63 30 
 Z2C8C   jsr     Z28F9                   ; 2C8C: 20 F9 28 
-        jmp     Routine_261A            ; 2C8F: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2C8F: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2C92   jsr     Z2D58                   ; 2C92: 20 58 2D 
         lda     ZP_0002                 ; 2C95: A5 02    
@@ -1913,7 +1928,7 @@ Z2CB3   sta     (ZP),y                  ; 2CB3: 91 00
         sta     (ZP),y                  ; 2CC1: 91 00    
         jsr     Z3646                   ; 2CC3: 20 46 36 
         jsr     Z381F                   ; 2CC6: 20 1F 38 
-        jmp     Routine_261A            ; 2CC9: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2CC9: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2CCC   adc     #$B8                    ; 2CCC: 69 B8    
         jmp     Z2CB3                   ; 2CCE: 4C B3 2C 
@@ -1963,7 +1978,7 @@ Z2D0F   lda     ZP_0059                 ; 2D0F: A5 59
         iny                             ; 2D1A: C8       
         sta     (ZP),y                  ; 2D1B: 91 00    
         iny                             ; 2D1D: C8       
-        lda     ZP_004c                 ; 2D1E: A5 4C    
+        lda     ZP_HW_IRQ_Count3        ; 2D1E: A5 4C    
         tax                             ; 2D20: AA       
         and     #$10                    ; 2D21: 29 10    
         sec                             ; 2D23: 38       
@@ -2099,7 +2114,7 @@ Z2DFF   lda     ZP_0019                 ; 2DFF: A5 19
         dec     ZP_001f                 ; 2E14: C6 1F    
         rts                             ; 2E16: 60       
 ; ===========================================================
-Routine_2E17
+Subroutine_2E17
         jsr     Z35D7                   ; 2E17: 20 D7 35 
         ldy     #$03                    ; 2E1A: A0 03    
         lda     (ZP),y                  ; 2E1C: B1 00    
@@ -2125,9 +2140,9 @@ Z2E34   inc     ZP_0059                 ; 2E34: E6 59
         jsr     Z22BA                   ; 2E44: 20 BA 22 
         lda     #$00                    ; 2E47: A9 00    
         sta     ZP_0026                 ; 2E49: 85 26    
-        jmp     Routine_261A            ; 2E4B: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2E4B: 4C 1A 26 
 ; -----------------------------------------------------------
-Routine_2E4E
+Subroutine_2E4E
         jsr     Z35D7                   ; 2E4E: 20 D7 35 
         lda     #$04                    ; 2E51: A9 04    
         sta     Screen_RAM+427          ; 2E53: 8D AB 03 
@@ -2146,7 +2161,7 @@ Routine_2E4E
         jsr     Z235B                   ; 2E6E: 20 5B 23 
         jmp     Z2EAC                   ; 2E71: 4C AC 2E 
 ; -----------------------------------------------------------
-Routine_2E74
+Subroutine_2E74
         jsr     Z35D7                   ; 2E74: 20 D7 35 
         jsr     Z2D58                   ; 2E77: 20 58 2D 
         lda     ZP_0002                 ; 2E7A: A5 02    
@@ -2170,7 +2185,7 @@ Routine_2E74
         jsr     Z28F0                   ; 2EA1: 20 F0 28 
         inc     Num_Lives_P1            ; 2EA4: E6 5A    
         jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23 
-        jmp     Routine_261A            ; 2EA9: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2EA9: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2EAC   jsr     LOAD_ZP18_TO_1b_W_ZP00_01_03_05 ; 2EAC: 20 E9 35 
         jsr     Z27AA                   ; 2EAF: 20 AA 27 
@@ -2179,7 +2194,7 @@ Z2EB5   jsr     Z2DE8                   ; 2EB5: 20 E8 2D
         jsr     Z364C                   ; 2EB8: 20 4C 36 
         jsr     Z2DFF                   ; 2EBB: 20 FF 2D 
         bne     Z2EB5                   ; 2EBE: D0 F5    
-        lda     ZP_004a                 ; 2EC0: A5 4A    
+        lda     ZP_HW_IRQ_Count1        ; 2EC0: A5 4A    
         lsr     a                       ; 2EC2: 4A       
         lsr     a                       ; 2EC3: 4A       
         and     #$04                    ; 2EC4: 29 04    
@@ -2209,12 +2224,12 @@ Z2ECA   sta     ZP_001b                 ; 2ECA: 85 1B
         lda     #$01                    ; 2EF3: A9 01    
         sta     ZP_001b                 ; 2EF5: 85 1B    
         jsr     Z2F16                   ; 2EF7: 20 16 2F 
-        jmp     Routine_261A            ; 2EFA: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2EFA: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2EFD   lda     #$01                    ; 2EFD: A9 01    
         sta     ZP_001b                 ; 2EFF: 85 1B    
 Z2F01   jsr     Z2F07                   ; 2F01: 20 07 2F 
-        jmp     Routine_261A            ; 2F04: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2F04: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2F07   ldy     #$01                    ; 2F07: A0 01    
         lda     (ZP),y                  ; 2F09: B1 00    
@@ -2272,7 +2287,7 @@ Z2F65   lda     #$00                    ; 2F65: A9 00
         sta     Screen_RAM+425          ; 2F6C: 8D A9 03 
         lda     #$10                    ; 2F6F: A9 10    
         sta     Screen_RAM+426          ; 2F71: 8D AA 03 
-        jmp     Routine_261A            ; 2F74: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2F74: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2F77   ldy     #$03                    ; 2F77: A0 03    
         lda     (ZP),y                  ; 2F79: B1 00    
@@ -2284,7 +2299,7 @@ Z2F77   ldy     #$03                    ; 2F77: A0 03
         jsr     Z305A                   ; 2F88: 20 5A 30 
         jmp     Z2F65                   ; 2F8B: 4C 65 2F 
 ; -----------------------------------------------------------
-Routine_2F8E
+Subroutine_2F8E
         jsr     Z35D7                   ; 2F8E: 20 D7 35 
         ldy     #$04                    ; 2F91: A0 04    
         lda     (ZP),y                  ; 2F93: B1 00    
@@ -2316,7 +2331,7 @@ Z2FC3   pha                             ; 2FC3: 48
         jsr     Z378D                   ; 2FCE: 20 8D 37 
         jsr     Z364C                   ; 2FD1: 20 4C 36 
         jsr     Z381F                   ; 2FD4: 20 1F 38 
-        jmp     Routine_261A            ; 2FD7: 4C 1A 26 
+        jmp     Subroutine_261A         ; 2FD7: 4C 1A 26 
 ; -----------------------------------------------------------
 Z2FDA   lda     ZP_0059                 ; 2FDA: A5 59    
 Z2FDC   lsr     a                       ; 2FDC: 4A       
@@ -2327,9 +2342,9 @@ Z2FDC   lsr     a                       ; 2FDC: 4A
         rts                             ; 2FE4: 60       
 ; ===========================================================
 Z2FE5   tax                             ; 2FE5: AA       
-        lda     M3C87,x                 ; 2FE6: BD 87 3C 
+        lda     abc,x                   ; 2FE6: BD 87 3C 
         tay                             ; 2FE9: A8       
-        lda     M3C88,x                 ; 2FEA: BD 88 3C 
+        lda     def,x                   ; 2FEA: BD 88 3C 
         rts                             ; 2FED: 60       
 ; ===========================================================
 Z2FEE   jsr     Z35D7                   ; 2FEE: 20 D7 35 
@@ -2689,7 +2704,7 @@ Z326A   adc     #$48                    ; 326A: 69 48
 Z326F   txa                             ; 326F: 8A       
         jmp     Z32A6                   ; 3270: 4C A6 32 
 ; -----------------------------------------------------------
-Routine_3273
+Subroutine_3273
         jsr     Z35D7                   ; 3273: 20 D7 35 
         jsr     Z33F7                   ; 3276: 20 F7 33 
         sta     ZP_001c                 ; 3279: 85 1C    
@@ -2705,7 +2720,7 @@ Z3285   ldy     #$02                    ; 3285: A0 02
         bpl     Z323E                   ; 328D: 10 AF    
         bvc     Z3228                   ; 328F: 50 97    
         tax                             ; 3291: AA       
-        lda     ZP_004a                 ; 3292: A5 4A    
+        lda     ZP_HW_IRQ_Count1        ; 3292: A5 4A    
         and     #$01                    ; 3294: 29 01    
         beq     Z326F                   ; 3296: F0 D7    
         txa                             ; 3298: 8A       
@@ -2771,7 +2786,7 @@ Z32F9   jsr     Z3646                   ; 32F9: 20 46 36
         bit     MASK_08                 ; 3301: 2C 17 20 
         bne     Z3309                   ; 3304: D0 03    
         jsr     Z20E9                   ; 3306: 20 E9 20 
-Z3309   jmp     Routine_261A            ; 3309: 4C 1A 26 
+Z3309   jmp     Subroutine_261A         ; 3309: 4C 1A 26 
 ; -----------------------------------------------------------
 Z330C   lda     (ZP),y                  ; 330C: B1 00    
         cmp     #$FC                    ; 330E: C9 FC    
@@ -2811,7 +2826,7 @@ Z3342   clc                             ; 3342: 18
 Z3348   adc     #$48                    ; 3348: 69 48    
         jmp     Z33AF                   ; 334A: 4C AF 33 
 ; -----------------------------------------------------------
-Routine_334D
+Subroutine_334D
         lda     ZP_005d                 ; 334D: A5 5D    
         beq     Z336A                   ; 334F: F0 19    
         jsr     Z3465                   ; 3351: 20 65 34 
@@ -2822,7 +2837,7 @@ Routine_334D
         jsr     Z2425                   ; 335E: 20 25 24 
         jsr     P1_SCORE_TO_UDG_RAM     ; 3361: 20 71 24 
         jsr     P2_SCORE_TO_UDG_RAM     ; 3364: 20 81 24 
-Z3367   jmp     Routine_261A            ; 3367: 4C 1A 26 
+Z3367   jmp     Subroutine_261A         ; 3367: 4C 1A 26 
 ; -----------------------------------------------------------
 Z336A   jsr     Z35D7                   ; 336A: 20 D7 35 
         jsr     Z33F7                   ; 336D: 20 F7 33 
@@ -2964,7 +2979,7 @@ Z3465   lda     ZP_005e                 ; 3465: A5 5E
         fdb     ZP                      ; 346D: 00 00     1st Address
         fcb     $FF                     ; 346F: FF       
 Z3470   jsr     Setup_UDG_RAM_XY        ; 3470: 20 1D 35 
-        lda     ZP_004a                 ; 3473: A5 4A    
+        lda     ZP_HW_IRQ_Count1        ; 3473: A5 4A    
         and     #$07                    ; 3475: 29 07    
         bne     Z3499                   ; 3477: D0 20    
         ldx     #$06                    ; 3479: A2 06    
@@ -2992,7 +3007,7 @@ Z349A   jsr     Read_ZP_Paramenters     ; 349A: 20 9D 25
         fcb     $80,$00                 ; 349E: 80 00     Character ROM
         fcb     $FF                     ; 34A0: FF       
         jmp     Z3470                   ; 34A1: 4C 70 34 
-; ===========================================================
+; -----------------------------------------------------------
 Display_Scores
         ldy     #$00                    ; 34A4: A0 00    
         lda     (ZP_Ptr_To_Str),y       ; 34A6: B1 0E    
@@ -3045,6 +3060,7 @@ DSTR1   tax                             ; 34D6: AA        Stash character to X
         bcs     Display_Character       ; 34DB: B0 06     Display character then exit
         jsr     Display_Character       ; 34DD: 20 E3 34  Display character
         jmp     DSTR1                   ; 34E0: 4C D6 34 
+; -----------------------------------------------------------
 
 Display_Character
         lsr     a                       ; 34E3: 4A       
@@ -3620,34 +3636,34 @@ Z384B   iny                             ; 384B: C8
 Z385E   rts                             ; 385E: 60       
 ; ===========================================================
 UDG_Lookup
-        fdb     $3BBE                   ; 385F: BE 3B    
-        fdb     $3BF1                   ; 3861: F1 3B    
-        fdb     $3C3C                   ; 3863: 3C 3C    
-        fdb     M3C87                   ; 3865: 87 3C    
-        fdb     $3B8B                   ; 3867: 8B 3B    
-        fdb     $3B40                   ; 3869: 40 3B    
-        fdb     $3AF5                   ; 386B: F5 3A    
-        fdb     $38CA                   ; 386D: CA 38    
-        fdb     $39F9                   ; 386F: F9 39    
-        fdb     $3A2C                   ; 3871: 2C 3A    
-        fdb     $3A77                   ; 3873: 77 3A    
-        fdb     $3AC2                   ; 3875: C2 3A    
-        fdb     $39C6                   ; 3877: C6 39    
-        fdb     $397B                   ; 3879: 7B 39    
-        fdb     $3930                   ; 387B: 30 39    
-        fdb     $38FD                   ; 387D: FD 38    
-        fdb     $3E78                   ; 387F: 78 3E    
-        fdb     $3E99                   ; 3881: 99 3E    
-        fdb     $3E78                   ; 3883: 78 3E    
-        fdb     $3E99                   ; 3885: 99 3E    
-        fdb     $3E78                   ; 3887: 78 3E    
-        fdb     $3E99                   ; 3889: 99 3E    
-        fdb     $3E46                   ; 388B: 46 3E    
-        fdb     $3E61                   ; 388D: 61 3E    
-        fdb     $3EB8                   ; 388F: B8 3E    
-        fdb     $3EEB                   ; 3891: EB 3E    
-        fdb     $3F0E                   ; 3893: 0E 3F    
-        fdb     $3F41                   ; 3895: 41 3F    
+        fdb     Jetman_Fly_Right_2      ; 385F: BE 3B    
+        fdb     Jetman_Fly_Right_3      ; 3861: F1 3B    
+        fdb     Jetman_Fly_Right_4      ; 3863: 3C 3C    
+        fdb     abc                     ; 3865: 87 3C    
+        fdb     Jetman_Fly_Left_3       ; 3867: 8B 3B    
+        fdb     Jetman_Fly_Left_2       ; 3869: 40 3B    
+        fdb     Jetman_Fly_Left_1       ; 386B: F5 3A    
+        fdb     Jetman_Fly_Right_1      ; 386D: CA 38    
+        fdb     Jetman_Walk_Left_1      ; 386F: F9 39    
+        fdb     Jetman_Walk_Left_2      ; 3871: 2C 3A    
+        fdb     Jetman_Walk_Left_3      ; 3873: 77 3A    
+        fdb     Jetman_Walk_Left_4      ; 3875: C2 3A    
+        fdb     Jetman_Walk_Right_4     ; 3877: C6 39    
+        fdb     Jetman_Walk_Right_3     ; 3879: 7B 39    
+        fdb     Jetman_Walk_Right_2     ; 387B: 30 39    
+        fdb     Jetman_Walk_Right_1     ; 387D: FD 38    
+        fdb     Alien_Fuzz_1            ; 387F: 78 3E    
+        fdb     Alien_Fuzz_2            ; 3881: 99 3E    
+        fdb     Alien_Fuzz_1            ; 3883: 78 3E    
+        fdb     Alien_Fuzz_2            ; 3885: 99 3E    
+        fdb     Alien_Fuzz_1            ; 3887: 78 3E    
+        fdb     Alien_Fuzz_2            ; 3889: 99 3E    
+        fdb     Alien_Ship_1            ; 388B: 46 3E    
+        fdb     Alien_Ship_2            ; 388D: 61 3E    
+        fdb     Alien_Bubble_1          ; 388F: B8 3E    
+        fdb     Alien_Bubble_2          ; 3891: EB 3E    
+        fdb     Alien_Cross_1           ; 3893: 0E 3F    
+        fdb     Alien_Cross_2           ; 3895: 41 3F    
         fcb     %11100000               ; 3897: E0       
         fcb     %01110000               ; 3898: 70       
         fcb     %10110100               ; 3899: B4       
@@ -3699,6 +3715,7 @@ UDG_Lookup
         fcb     %00011000               ; 38C7: 18       
         fcb     %00000001               ; 38C8: 01       
         fcb     %00001000               ; 38C9: 08       
+Jetman_Fly_Right_1
         fcb     %11100000               ; 38CA: E0       
         fcb     %01110000               ; 38CB: 70       
         fcb     %10110100               ; 38CC: B4       
@@ -3750,6 +3767,7 @@ UDG_Lookup
         fcb     %00011000               ; 38FA: 18       
         fcb     %00000001               ; 38FB: 01       
         fcb     %00001000               ; 38FC: 08       
+Jetman_Walk_Right_1
         fcb     %10000000               ; 38FD: 80       
         fcb     %11000000               ; 38FE: C0       
         fcb     %11001000               ; 38FF: C8       
@@ -3801,6 +3819,7 @@ UDG_Lookup
         fcb     %00011000               ; 392D: 18       
         fcb     %00000001               ; 392E: 01       
         fcb     %00001000               ; 392F: 08       
+Jetman_Walk_Right_2
         fcb     %00000000               ; 3930: 00       
         fcb     %00000000               ; 3931: 00       
         fcb     %01000000               ; 3932: 40       
@@ -3876,6 +3895,7 @@ UDG_Lookup
         fcb     %00011000               ; 3978: 18       
         fcb     %00000010               ; 3979: 02       
         fcb     %00000000               ; 397A: 00       
+Jetman_Walk_Right_3
         fcb     %00000000               ; 397B: 00       
         fcb     %00000000               ; 397C: 00       
         fcb     %10000000               ; 397D: 80       
@@ -3951,6 +3971,7 @@ UDG_Lookup
         fcb     %00011000               ; 39C3: 18       
         fcb     %00000010               ; 39C4: 02       
         fcb     %00000000               ; 39C5: 00       
+Jetman_Walk_Right_4
         fcb     %10000000               ; 39C6: 80       
         fcb     %00000000               ; 39C7: 00       
         fcb     %11100000               ; 39C8: E0       
@@ -4002,6 +4023,7 @@ UDG_Lookup
         fcb     %00011000               ; 39F6: 18       
         fcb     %00000001               ; 39F7: 01       
         fcb     %00000000               ; 39F8: 00       
+Jetman_Walk_Left_1
         fcb     %11100000               ; 39F9: E0       
         fcb     %10000000               ; 39FA: 80       
         fcb     %01111000               ; 39FB: 78       
@@ -4053,6 +4075,7 @@ UDG_Lookup
         fcb     %00011000               ; 3A29: 18       
         fcb     %00000001               ; 3A2A: 01       
         fcb     %00000000               ; 3A2B: 00       
+Jetman_Walk_Left_2
         fcb     %00000000               ; 3A2C: 00       
         fcb     %00000000               ; 3A2D: 00       
         fcb     %00000000               ; 3A2E: 00       
@@ -4128,6 +4151,7 @@ UDG_Lookup
         fcb     %00011000               ; 3A74: 18       
         fcb     %00000010               ; 3A75: 02       
         fcb     %00000000               ; 3A76: 00       
+Jetman_Walk_Left_3
         fcb     %00000000               ; 3A77: 00       
         fcb     %00000000               ; 3A78: 00       
         fcb     %10000000               ; 3A79: 80       
@@ -4203,6 +4227,7 @@ UDG_Lookup
         fcb     %00011000               ; 3ABF: 18       
         fcb     %00000010               ; 3AC0: 02       
         fcb     %00000000               ; 3AC1: 00       
+Jetman_Walk_Left_4
         fcb     %10000000               ; 3AC2: 80       
         fcb     %11000000               ; 3AC3: C0       
         fcb     %11010000               ; 3AC4: D0       
@@ -4254,6 +4279,7 @@ UDG_Lookup
         fcb     %00011000               ; 3AF2: 18       
         fcb     %00000001               ; 3AF3: 01       
         fcb     %00001000               ; 3AF4: 08       
+Jetman_Fly_Left_1
         fcb     %00000000               ; 3AF5: 00       
         fcb     %00000000               ; 3AF6: 00       
         fcb     %01000000               ; 3AF7: 40       
@@ -4329,6 +4355,7 @@ UDG_Lookup
         fcb     %00011000               ; 3B3D: 18       
         fcb     %00000010               ; 3B3E: 02       
         fcb     %00000000               ; 3B3F: 00       
+Jetman_Fly_Left_2
         fcb     %00000000               ; 3B40: 00       
         fcb     %00000000               ; 3B41: 00       
         fcb     %00000000               ; 3B42: 00       
@@ -4404,6 +4431,7 @@ UDG_Lookup
         fcb     %00011000               ; 3B88: 18       
         fcb     %00000010               ; 3B89: 02       
         fcb     %00000000               ; 3B8A: 00       
+Jetman_Fly_Left_3
         fcb     %10000000               ; 3B8B: 80       
         fcb     %00000000               ; 3B8C: 00       
         fcb     %11100000               ; 3B8D: E0       
@@ -4455,6 +4483,7 @@ UDG_Lookup
         fcb     %00011000               ; 3BBB: 18       
         fcb     %00000001               ; 3BBC: 01       
         fcb     %00000000               ; 3BBD: 00       
+Jetman_Fly_Right_2
         fcb     %11100000               ; 3BBE: E0       
         fcb     %10000000               ; 3BBF: 80       
         fcb     %01111000               ; 3BC0: 78       
@@ -4506,6 +4535,7 @@ UDG_Lookup
         fcb     %00011000               ; 3BEE: 18       
         fcb     %00000001               ; 3BEF: 01       
         fcb     %00000000               ; 3BF0: 00       
+Jetman_Fly_Right_3
         fcb     %00000000               ; 3BF1: 00       
         fcb     %00000000               ; 3BF2: 00       
         fcb     %00000000               ; 3BF3: 00       
@@ -4581,6 +4611,7 @@ UDG_Lookup
         fcb     %00011000               ; 3C39: 18       
         fcb     %00000010               ; 3C3A: 02       
         fcb     %00000000               ; 3C3B: 00       
+Jetman_Fly_Right_4
         fcb     %00000000               ; 3C3C: 00       
         fcb     %00000000               ; 3C3D: 00       
         fcb     %10000000               ; 3C3E: 80       
@@ -4656,27 +4687,28 @@ UDG_Lookup
         fcb     %00011000               ; 3C84: 18       
         fcb     %00000010               ; 3C85: 02       
         fcb     %00000000               ; 3C86: 00       
-M3C87   fdb     $3CD4                   ; 3C87: D4 3C    
+abc     fcb     $D4                     ; 3C87: D4       
+def     fcb     $3C                     ; 3C88: 3C       
         fdb     $3D3D                   ; 3C89: 3D 3D    
-        fdb     $3CD4                   ; 3C8B: D4 3C    
-        fdb     $3D3D                   ; 3C8D: 3D 3D    
-        fdb     $3CF7                   ; 3C8F: F7 3C    
-        fdb     $3D60                   ; 3C91: 60 3D    
-        fdb     $3CF7                   ; 3C93: F7 3C    
-        fdb     $3D60                   ; 3C95: 60 3D    
-        fdb     $3D1A                   ; 3C97: 1A 3D    
-        fdb     $3D83                   ; 3C99: 83 3D    
-        fdb     $3D1A                   ; 3C9B: 1A 3D    
-        fdb     $3D83                   ; 3C9D: 83 3D    
-        fdb     $3D9C                   ; 3C9F: 9C 3D    
-        fdb     $3D9C                   ; 3CA1: 9C 3D    
-        fdb     $3D9C                   ; 3CA3: 9C 3D    
-        fdb     $3D9C                   ; 3CA5: 9C 3D    
-        fdb     $3DAF                   ; 3CA7: AF 3D    
-        fdb     $3DE3                   ; 3CA9: E3 3D    
-        fdb     $3E00                   ; 3CAB: 00 3E    
-        fdb     $3E15                   ; 3CAD: 15 3E    
-        fdb     $3DCA                   ; 3CAF: CA 3D    
+        fdb     Ship_1_Bott             ; 3C8B: D4 3C    
+        fdb     Ship_2_Bott             ; 3C8D: 3D 3D    
+        fdb     Ship_1_Mid              ; 3C8F: F7 3C    
+        fdb     Ship_2_Mid              ; 3C91: 60 3D    
+        fdb     Ship_1_Mid              ; 3C93: F7 3C    
+        fdb     Ship_2_Mid              ; 3C95: 60 3D    
+        fdb     Ship_1_Top              ; 3C97: 1A 3D    
+        fdb     Ship_2_Top              ; 3C99: 83 3D    
+        fdb     Ship_1_Top              ; 3C9B: 1A 3D    
+        fdb     Ship_2_Top              ; 3C9D: 83 3D    
+        fdb     Fuel                    ; 3C9F: 9C 3D    
+        fdb     Fuel                    ; 3CA1: 9C 3D    
+        fdb     Fuel                    ; 3CA3: 9C 3D    
+        fdb     Fuel                    ; 3CA5: 9C 3D    
+        fdb     Gold_Bar                ; 3CA7: AF 3D    
+        fdb     Plutonium               ; 3CA9: E3 3D    
+        fdb     Isotope                 ; 3CAB: 00 3E    
+        fdb     Mineral                 ; 3CAD: 15 3E    
+        fdb     Diamond                 ; 3CAF: CA 3D    
         fcb     %11110111               ; 3CB1: F7       
         fcb     %11110111               ; 3CB2: F7       
         fcb     %11110111               ; 3CB3: F7       
@@ -4712,6 +4744,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3CD1: 10       
         fcb     %00000001               ; 3CD2: 01       
         fcb     %00000000               ; 3CD3: 00       
+Ship_1_Bott
         fcb     %00010000               ; 3CD4: 10       
         fcb     %11110000               ; 3CD5: F0       
         fcb     %10110000               ; 3CD6: B0       
@@ -4747,6 +4780,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3CF4: 10       
         fcb     %00000001               ; 3CF5: 01       
         fcb     %00000000               ; 3CF6: 00       
+Ship_1_Mid
         fcb     %10000000               ; 3CF7: 80       
         fcb     %10000000               ; 3CF8: 80       
         fcb     %11000000               ; 3CF9: C0       
@@ -4782,6 +4816,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3D17: 10       
         fcb     %00000001               ; 3D18: 01       
         fcb     %00000000               ; 3D19: 00       
+Ship_1_Top
         fcb     %01110110               ; 3D1A: 76       
         fcb     %01110110               ; 3D1B: 76       
         fcb     %01110110               ; 3D1C: 76       
@@ -4817,6 +4852,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3D3A: 10       
         fcb     %00000001               ; 3D3B: 01       
         fcb     %00000000               ; 3D3C: 00       
+Ship_2_Bott
         fcb     %01011010               ; 3D3D: 5A       
         fcb     %01011010               ; 3D3E: 5A       
         fcb     %01010010               ; 3D3F: 52       
@@ -4852,6 +4888,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3D5D: 10       
         fcb     %00000001               ; 3D5E: 01       
         fcb     %00000000               ; 3D5F: 00       
+Ship_2_Mid
         fcb     %00111000               ; 3D60: 38       
         fcb     %01111100               ; 3D61: 7C       
         fcb     %11110010               ; 3D62: F2       
@@ -4887,6 +4924,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3D80: 10       
         fcb     %00000001               ; 3D81: 01       
         fcb     %00000000               ; 3D82: 00       
+Ship_2_Top
         fcb     %00011000               ; 3D83: 18       
         fcb     %11111111               ; 3D84: FF       
         fcb     %11111111               ; 3D85: FF       
@@ -4912,7 +4950,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001011               ; 3D99: 0B       
         fcb     %00000001               ; 3D9A: 01       
         fcb     %00000000               ; 3D9B: 00       
-        fcb     %11111000               ; 3D9C: F8       
+Fuel    fcb     %11111000               ; 3D9C: F8       
         fcb     %11101100               ; 3D9D: EC       
         fcb     %11011110               ; 3D9E: DE       
         fcb     %00111111               ; 3D9F: 3F       
@@ -4931,7 +4969,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001000               ; 3DAC: 08       
         fcb     %00000001               ; 3DAD: 01       
         fcb     %00000000               ; 3DAE: 00       
-        fcb     %11000000               ; 3DAF: C0       
+Gold_Bar fcb    %11000000               ; 3DAF: C0       
         fcb     %11110000               ; 3DB0: F0       
         fcb     %11111000               ; 3DB1: F8       
         fcb     %11110100               ; 3DB2: F4       
@@ -4958,7 +4996,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001100               ; 3DC7: 0C       
         fcb     %00000001               ; 3DC8: 01       
         fcb     %00000000               ; 3DC9: 00       
-        fcb     %11111000               ; 3DCA: F8       
+Diamond fcb     %11111000               ; 3DCA: F8       
         fcb     %00000100               ; 3DCB: 04       
         fcb     %00010010               ; 3DCC: 12       
         fcb     %00111001               ; 3DCD: 39       
@@ -4983,6 +5021,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001011               ; 3DE0: 0B       
         fcb     %00000001               ; 3DE1: 01       
         fcb     %00000000               ; 3DE2: 00       
+Plutonium
         fcb     %10000000               ; 3DE3: 80       
         fcb     %11000000               ; 3DE4: C0       
         fcb     %11000000               ; 3DE5: C0       
@@ -5012,7 +5051,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001101               ; 3DFD: 0D       
         fcb     %00000001               ; 3DFE: 01       
         fcb     %00000000               ; 3DFF: 00       
-        fcb     %11110000               ; 3E00: F0       
+Isotope fcb     %11110000               ; 3E00: F0       
         fcb     %00111100               ; 3E01: 3C       
         fcb     %01111110               ; 3E02: 7E       
         fcb     %11111111               ; 3E03: FF       
@@ -5033,7 +5072,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001001               ; 3E12: 09       
         fcb     %00000001               ; 3E13: 01       
         fcb     %00000000               ; 3E14: 00       
-        fcb     %00110111               ; 3E15: 37       
+Mineral fcb     %00110111               ; 3E15: 37       
         fcb     %01111111               ; 3E16: 7F       
         fcb     %11111111               ; 3E17: FF       
         fcb     %11111111               ; 3E18: FF       
@@ -5082,6 +5121,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001000               ; 3E43: 08       
         fcb     %00000001               ; 3E44: 01       
         fcb     %00000000               ; 3E45: 00       
+Alien_Ship_1
         fcb     %00000000               ; 3E46: 00       
         fcb     %00000000               ; 3E47: 00       
         fcb     %00000000               ; 3E48: 00       
@@ -5109,6 +5149,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001000               ; 3E5E: 08       
         fcb     %00000010               ; 3E5F: 02       
         fcb     %00000000               ; 3E60: 00       
+Alien_Ship_2
         fcb     %00001000               ; 3E61: 08       
         fcb     %01000000               ; 3E62: 40       
         fcb     %11010100               ; 3E63: D4       
@@ -5132,6 +5173,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001010               ; 3E75: 0A       
         fcb     %00000001               ; 3E76: 01       
         fcb     %00000000               ; 3E77: 00       
+Alien_Fuzz_1
         fcb     %00000000               ; 3E78: 00       
         fcb     %01000000               ; 3E79: 40       
         fcb     %00000000               ; 3E7A: 00       
@@ -5165,6 +5207,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001010               ; 3E96: 0A       
         fcb     %00000010               ; 3E97: 02       
         fcb     %00000000               ; 3E98: 00       
+Alien_Fuzz_2
         fcb     %11100000               ; 3E99: E0       
         fcb     %11111000               ; 3E9A: F8       
         fcb     %11111100               ; 3E9B: FC       
@@ -5196,6 +5239,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001110               ; 3EB5: 0E       
         fcb     %00000001               ; 3EB6: 01       
         fcb     %00000000               ; 3EB7: 00       
+Alien_Bubble_1
         fcb     %00000000               ; 3EB8: 00       
         fcb     %10000000               ; 3EB9: 80       
         fcb     %11000000               ; 3EBA: C0       
@@ -5247,6 +5291,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3EE8: 10       
         fcb     %00000010               ; 3EE9: 02       
         fcb     %00000000               ; 3EEA: 00       
+Alien_Bubble_2
         fcb     %10000000               ; 3EEB: 80       
         fcb     %11000000               ; 3EEC: C0       
         fcb     %11000000               ; 3EED: C0       
@@ -5282,6 +5327,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3F0B: 10       
         fcb     %00000001               ; 3F0C: 01       
         fcb     %00000000               ; 3F0D: 00       
+Alien_Cross_1
         fcb     %00000000               ; 3F0E: 00       
         fcb     %00000000               ; 3F0F: 00       
         fcb     %00000000               ; 3F10: 00       
@@ -5333,6 +5379,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3F3E: 10       
         fcb     %00000010               ; 3F3F: 02       
         fcb     %00000000               ; 3F40: 00       
+Alien_Cross_2
         fcb     %11000000               ; 3F41: C0       
         fcb     %01110000               ; 3F42: 70       
         fcb     %11111000               ; 3F43: F8       
@@ -5384,6 +5431,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00010000               ; 3F71: 10       
         fcb     %00000010               ; 3F72: 02       
         fcb     %00000000               ; 3F73: 00       
+Explosion_1
         fcb     %10000000               ; 3F74: 80       
         fcb     %11000000               ; 3F75: C0       
         fcb     %11011000               ; 3F76: D8       
@@ -5423,6 +5471,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001100               ; 3F98: 0C       
         fcb     %00000010               ; 3F99: 02       
         fcb     %00000000               ; 3F9A: 00       
+Explosion_2
         fcb     %11000000               ; 3F9B: C0       
         fcb     %01100000               ; 3F9C: 60       
         fcb     %11110110               ; 3F9D: F6       
@@ -5446,6 +5495,7 @@ M3C87   fdb     $3CD4                   ; 3C87: D4 3C
         fcb     %00001010               ; 3FAF: 0A       
         fcb     %00000001               ; 3FB0: 01       
         fcb     %00000000               ; 3FB1: 00       
+Explosion_3
         fcb     %11111100               ; 3FB2: FC       
         fcb     %01111010               ; 3FB3: 7A       
         fcb     %11110100               ; 3FB4: F4       

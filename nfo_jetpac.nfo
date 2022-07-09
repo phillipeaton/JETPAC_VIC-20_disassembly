@@ -62,6 +62,7 @@ const 3457
 const 3516
 
 ; Zero-Page variables
+;label      00 ZP_0000
 label      01 ZP_0001
 label      02 ZP_0002
 label      03 ZP_0003
@@ -92,8 +93,8 @@ label      1B ZP_001b
 label      1C ZP_001c
 label      1E ZP_001e
 label      1F ZP_001f
-label      20 ZP_0020
-label      21 ZP_0021
+label      20 ZP_HW_IRQ_1_OR_0
+label      21 ZP_HW_IRQ_VAR
 label      22 ZP_0022
 label      23 ZP_0023
 label      24 ZP_0024
@@ -107,9 +108,9 @@ label      45 ZP_Game_Sel_F1_Flash
 label      45 ZP_Game_Sel_F3_Flash
 label      45 ZP_Game_Sel_F5_Flash
 label      45 ZP_Game_Sel_F7_Flash
-label      4a ZP_004a
-label      4b ZP_004b
-label      4c ZP_004c
+label      4a ZP_HW_IRQ_Count1
+label      4b ZP_HW_IRQ_Count2
+label      4c ZP_HW_IRQ_Count3
 label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54 Score_P2 ; 3 bytes
 label      57 ZP_INVERT ; Used to flash game options & 1UP+score at player start
@@ -120,8 +121,8 @@ label      5b ZP_005b
 label      5c Num_Lives_P2
 label      5d ZP_005d
 label      5e ZP_005e
-label      5f ZP_005f
-label      60 ZP_0060
+label      5f ZP_Subroutine_Vec_Lo
+label      60 ZP_Subroutine_Vec_Hi
 label      80 ZP_0080
 label      f8 ZP_00f8
 label      fc ZP_00fc
@@ -169,7 +170,9 @@ label    2019 MASK_20
 label    201a MASK_40
 label    201b MASK_80
 
-lcomment 201c NMI Interrupt Vector points here
+comment  201c
+comment  201c +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+used     201c NMI_Interrupt_Hardler
 
 comment  201d
 comment  201d  ----------------------------------------------------------
@@ -300,14 +303,13 @@ break    2457
 label    245e STR_2UP
 break    245e
 
-
-
-
+comment  2465
 label    2465 STR_1UP_HI_2UP
 word     2465-246f
 break    246b
 break    246d
 
+comment  2471
 label    2471 P1_SCORE_TO_UDG_RAM
 const    2474
 lcomment 2474 ZP Offset for 1st address
@@ -409,7 +411,6 @@ lcomment 259d stored on the stack.
 lcomment 259e Stash return address
 comment  25A3
 comment  25AE
-comment  25A3
 
 
 label    25A5 RZPP1
@@ -434,6 +435,13 @@ label    25ca Inc_Param_Addr
 lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
 label    25d0 IPA1
 
+comment  25E0
+comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+used     25e0 Hardware_Interrupt_Handler
+
+label    25f4 SKIP_25f4
+comment  25FA
+label    25FA Game_Start_
 
 label    262A BACK_262A
 label    2630 BACK_2630
@@ -450,6 +458,8 @@ word     267a
 
 ;const    268e-26ad
 word     268c-26ad
+
+comment  26ae
 
 label    26b0 BACK_26b0
 
@@ -526,7 +536,7 @@ label 28b6 Routine_28b6
 
 label    2967 UDG_Ptr
 label    2968 UDG_Ptr+1
-const    2967-2974
+;const    2967-2974
 word     2967-2974
 break    2968
 break    296f
@@ -569,28 +579,28 @@ lcomment 3094 ZP Offset for 1st address
 lcomment 3095 1st Address
 break    3097
 
-label    261A Routine_261A
-label    3273 Routine_3273
-label    334D Routine_334D
-label    2934 Routine_2934
-label    2F8E Routine_2F8E
-label    2C6A Routine_2C6A
-label    2ABC Routine_2ABC
-label    2A6D Routine_2A6D
-label    2A5F Routine_2A5F
-label    2E74 Routine_2E74
-label    2E17 Routine_2E17
-label    2E4E Routine_2E4E
-label    26CD Routine_26CD
-label    283E Routine_283E
-label    219A Routine_219A
+label    261A Subroutine_261A
+label    3273 Subroutine_3273
+label    334D Subroutine_334D
+label    2934 Subroutine_2934
+label    2F8E Subroutine_2F8E
+label    2C6A Subroutine_2C6A
+label    2ABC Subroutine_2ABC
+label    2A6D Subroutine_2A6D
+label    2A5F Subroutine_2A5F
+label    2E74 Subroutine_2E74
+label    2E17 Subroutine_2E17
+label    2E4E Subroutine_2E4E
+label    26CD Subroutine_26CD
+label    283E Subroutine_283E
+label    219A Subroutine_219A
 
-label    26e4 Routine_26e4
-label    26fe Routine_26fe
-label    271c Routine_271c
-label    2727 Routine_2727
-label    2735 Routine_2735
-label    274f Routine_274f
+label    26e4 Subroutine_26e4
+label    26fe Subroutine_26fe
+label    271c Subroutine_271c
+label    2727 Subroutine_2727
+label    2735 Subroutine_2735
+label    274f Subroutine_274f
 
 label    2743 Subroutine_List2
 label    2744 Subroutine_List2+1
@@ -867,5 +877,50 @@ label    3860 UDG_Lookup+1
 break    385f-3fff ; Output one byte per line
 word     385f-3896
 binary   3897-3c86
-word     3c87-3cb0
+byte     3c88-3c89
+const    3c88-3c89
+word     3c89-3cb0
 binary   3cb1-3fff
+
+label    38CA Jetman_Fly_Right_1
+label    38FD Jetman_Walk_Right_1
+label    3930 Jetman_Walk_Right_2
+label    397B Jetman_Walk_Right_3
+label    39C6 Jetman_Walk_Right_4
+label    39F9 Jetman_Walk_Left_1
+label    3A2C Jetman_Walk_Left_2
+label    3A77 Jetman_Walk_Left_3
+label    3AC2 Jetman_Walk_Left_4
+label    3AF5 Jetman_Fly_Left_1
+label    3B40 Jetman_Fly_Left_2
+label    3B8B Jetman_Fly_Left_3
+label    3BBE Jetman_Fly_Right_2
+label    3BF1 Jetman_Fly_Right_3
+label    3C3C Jetman_Fly_Right_4
+label    3C87 abc
+label    3C88 def
+label    3E46 Alien_Ship_1
+label    3E61 Alien_Ship_2
+label    3E78 Alien_Fuzz_1
+label    3E99 Alien_Fuzz_2
+label    3EB8 Alien_Bubble_1
+label    3EEB Alien_Bubble_2
+label    3F0E Alien_Cross_1
+label    3F41 Alien_Cross_2
+
+label    3CD4 Ship_1_Bott
+label    3CF7 Ship_1_Mid
+label    3D1A Ship_1_Top
+label    3D3D Ship_2_Bott
+label    3D60 Ship_2_Mid
+label    3D83 Ship_2_Top
+label    3D9C Fuel
+label    3DAF Gold_Bar
+label    3DCA Diamond
+label    3DE3 Plutonium
+label    3E00 Isotope
+label    3E15 Mineral
+
+label    3f74 Explosion_1
+label    3f9b Explosion_2
+label    3fb2 Explosion_3
