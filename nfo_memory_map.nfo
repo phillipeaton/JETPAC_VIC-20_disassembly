@@ -1,5 +1,5 @@
 * Top Level Memory Map for VIC-20 with 8K+ Expansion as used by JETPAC
-label 0000-00ff ZP
+;label 0000-00ff ZP
 label 0100-01ff Stack
 *label 0200-03ff OS_Data
 label 0200-03ff Screen_RAM

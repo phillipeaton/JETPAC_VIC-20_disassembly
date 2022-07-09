@@ -62,22 +62,22 @@ const 3457
 const 3516
 
 ; Zero-Page variables
-;label      00 ZP_0000
+label      00 ZP_0000
 label      01 ZP_0001
-label      02 ZP_0002
-label      03 ZP_0003
+label      02 ZP_Temp_1_Lo
+label      03 ZP_Temp_1_Hi
 label      04 ZP_UDG_RAM_X
 label      05 ZP_UDG_RAM_Y
-label      06 ZP_Addr_From
-label      07 ZP_Addr_From+1
+label      06 ZP_Temp_2_Lo
+label      07 ZP_Temp_2_Hi
 label      08 ZP_0008
 label      09 ZP_0009
-label      0A ZP_000a
-label      0B ZP_000b
-label      0c ZP_ColorRAMPtr
-label      0d ZP_ColorRAMPtr+1
-label      0E ZP_Ptr_To_Str
-label      0F ZP_000f
+label      0A ZP_Temp_3_Lo
+label      0B ZP_Temp_3_Hi
+label      0c ZP_Col_RAM_Ptr_Lo
+label      0d ZP_Col_RAM_Ptr_Hi
+label      0E ZP_Ptr_To_Str_Lo
+label      0F ZP_Ptr_To_Str_Hi
 label      10 ZP_0010
 label      11 ZP_0011
 label      12 ZP_0012
@@ -102,8 +102,8 @@ label      25 ZP_0025
 label      26 ZP_0026
 label      27 ZP_0027
 label      28 ZP_0028
-label      40 ZP_Param_Addr
-label      41 ZP_Param_Addr+1
+label      40 ZP_Param_Addr_Lo
+label      41 ZP_Param_Addr_Hi
 label      45 ZP_Game_Sel_F1_Flash
 label      45 ZP_Game_Sel_F3_Flash
 label      45 ZP_Game_Sel_F5_Flash
@@ -113,28 +113,28 @@ label      4b ZP_HW_IRQ_Count2
 label      4c ZP_HW_IRQ_Count3
 label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54 Score_P2 ; 3 bytes
-label      57 ZP_INVERT ; Used to flash game options & 1UP+score at player start
-label      58 ZP_COUNTER
+label      57 ZP_Invert ; Used to flash game options & 1UP+score at player start
+label      58 ZP_Counter
 label      59 ZP_0059
 label      5a Num_Lives_P1
 label      5b ZP_005b
 label      5c Num_Lives_P2
 label      5d ZP_005d
-label      5e ZP_005e
+label      5e ZP_Game_Over_P1_P2
 label      5f ZP_Subroutine_Vec_Lo
 label      60 ZP_Subroutine_Vec_Hi
 label      80 ZP_0080
 label      f8 ZP_00f8
 label      fc ZP_00fc
 
-label    1008 UDG_P1_SCORE
-label    1420 UDG_P1_LIVES
-label    1588 UDG_HI_SCORE
-label    19a0 UDG_P2_LIVES
-label    1b08 UDG_P2_SCORE
+label    1008 UDG_P1_SCORE_RAW_POSN
+label    1420 UDG_P1_LIVES_RAW_POSN
+label    1588 UDG_HI_SCORE_RAW_POSN
+label    19a0 UDG_P2_LIVES_RAW_POSN
+label    1b08 UDG_P2_SCORE_RAW_POSN
 
 label    1fd0 SCORE_HI
-label    1fd3 GAME_SETTINGS
+label    1fd3 GAME_OPTIONS
 
 ; Start of disassembly instructions
 comment  2004 Left edge of TV picture and interlace switch.
@@ -226,7 +226,7 @@ lcomment 20F3 ZP Offset for 1st address
 lcomment 20F4 1st Address
 word     20F4
 const    20F6
-lcomment 20F6 FF is loop terminator
+lcomment 20F6 End of Parameters
 
 label    2145 BACK_2145
 
@@ -263,14 +263,14 @@ const    2376
 lcomment 2376 ZP Offset for 1st address
 lcomment 2377 1st Address
 word     2377
-lcomment 2379 FF is loop terminator
+lcomment 2379 End of Parameters
 
 label    2382 P2_LIVES__TO_UDG_RAM
 const    2385
 lcomment 2385 ZP Offset for 1st address
 lcomment 2386 1st Address
 word     2386
-lcomment 2388 FF is loop terminator
+lcomment 2388 End of Parameters
 
 
 label    23c7 SOME_DATA
@@ -309,53 +309,53 @@ word     2465-246f
 break    246b
 break    246d
 
+
 comment  2471
 label    2471 P1_SCORE_TO_UDG_RAM
-const    2474
-lcomment 2474 ZP Offset for 1st address
-lcomment 2475 1st Address
+lcomment 2474 ZP_UDG_RAM_X ZP_UDG_RAM_Y, but not in this case
+lcomment 2475 UDG array absolute position to display score at
 word     2475
-const    2477
-lcomment 2477 ZP Offset for 2nd address
-lcomment 2478 2nd address
+lcomment 2477 ZP_Ptr_To_Str
+lcomment 2478 Players score in ZP as BCD e.g. 12 34 56
 word     2478
-const    247a
-lcomment 247a ZP Offset for 2nd address
-lcomment 247b 2nd address
+lcomment 247a ZP_Temp_1
+lcomment 247b 3 bytes of BCD data to display e.g. 12 34 56
+const    247b
 word     247b
-lcomment 247d FF is loop terminator
+lcomment 247d End of Parameters
+
 
 label    2481 P2_SCORE_TO_UDG_RAM
 const    2484
-lcomment 2484 ZP Offset for 1st address
-lcomment 2485 1st Address
+lcomment 2484
+lcomment 2485
 word     2485
 const    2487
-lcomment 2487 ZP Offset for 2nd address
-lcomment 2488 2nd address
+lcomment 2487
+lcomment 2488
 word     2488
 const    248a
-lcomment 248a ZP Offset for 2nd address
-lcomment 248b 2nd address
+lcomment 248a
+lcomment 248b
 word     248b
 break    248d
-lcomment 248d FF is loop terminator
+lcomment 248d End of Parameters
 
 label    2491 HI_SCORE_TO_UDG_RAM
 const    2494
-lcomment 2494 ZP Offset for 1st address
-lcomment 2495 1st address
+lcomment 2494
+lcomment 2495
 word     2495
 const    2497
-lcomment 2497 ZP Offset for 2nd address
-lcomment 2498 2nd address
+lcomment 2497
+lcomment 2498
 word     2498
 const    249a
-lcomment 249a ZP Offset for 3rd address
-lcomment 249b 3rd address
+lcomment 249a
+lcomment 249b
 word     249b
 break    249d
-lcomment 249d FF is loop terminator
+lcomment 249d End of Parameters
 
 label    24a1 Game_Sel_Flash_Period
 label    24A4 GSFP1
@@ -392,9 +392,6 @@ label    2562 STR_F3_2_PLAYER_GAME
 label    2574 STR_F5_KEYBOARD
 label    2581 STR_F7_JOYSTICK
 label    258E STR_SP_START_GAME
-
-word     24Db
-word     24De
 
 label    24EF DGS1
 
@@ -542,42 +539,65 @@ break    2968
 break    296f
 
 label    299D Sound_Channels_Off_ETC
-
-const    29f1
-lcomment 29f1 ZP Offset for 1st address
-lcomment 29f2 1st Address
+lcomment 29DB Swap between P1 and P2?????????
+label    29E7 Display_Game_Over
+lcomment 29EA Game Over for P1 or P2?
+label    29ee Display_Game_Over_P1
+lcomment 29f1 ZP_Ptr_To_Str
+lcomment 29f2 Pointer to "GAME OVER PLAYER 1"
 word     29f2
-const    29f4
-lcomment 29f4 ZP Offset for 1st address?????
-lcomment 29f5 1st Address?????
+lcomment 29f4 ZP_UDG_RAM_X ZP_UDG_RAM_Y
+lcomment 29f5 X Y
 word     29f5
 
-const    29fe
-lcomment 29fe ZP Offset for 1st address
-lcomment 29ff 1st Address
+label    29f8 Display_String_
+
+comment  29fb
+
+lcomment 29fe Into ZP addr 02 and 03...
+lcomment 29ff ...load 00 and 00
+const    29ff
 word     29ff
-const    2a01
-lcomment 2a01 ZP Offset for 1st address
-lcomment 2a02 1st Address
+lcomment 2a01 Into ZP addr 0A and 0B
+lcomment 2a02 ...load F8 and 00
+const    2a02
 word     2a02
 
+comment  2a05
+comment  2a05 Delay loop $100^2 x $08 x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
+label    2a05 Delay_Loop_Game_Over
+lcomment 2a05 5 cycles
+lcomment 2a07 3 cycles when taken, 2 when not taken
+
+label    2a12 Display_Game_Over_P2
+lcomment 2a15 ZP_Ptr_To_Str
+lcomment 2a16 Pointer to "GAME OVER PLAYER 2"
+word     2a16
+const    2A18
+lcomment 2A18 ZP_UDG_RAM_X ZP_UDG_RAM_Y
+lcomment 2A19 X Y
+word     2A19
+
+
+label    2a1f STR_GAME_OVER_PLAYER_1
+label    2a32 STR_GAME_OVER_PLAYER_2
+
 const    2bcd
-lcomment 2bcd ZP Offset for 1st address
-lcomment 2bce 1st Address
+lcomment 2bcd
+lcomment 2bce
+const    2bce
 word     2bce
 
 const    2BE8-2bf7
 break    2BE8-2bf7
 
-const    306a-306d
-lcomment 306a ZP Offset for 1st address
-lcomment 306b 1st Address
-break    306d-306e
-
-const    3094-3096
-lcomment 3094 ZP Offset for 1st address
-lcomment 3095 1st Address
-break    3097
+lcomment 306a ZP_Temp_2
+lcomment 306b P1 Score in ZP
+word     306b
+comment  306E
+lcomment 3094 ZP_Temp_2
+lcomment 3095 P2 Score in ZP
+word     3095
 
 label    261A Subroutine_261A
 label    3273 Subroutine_3273
@@ -605,9 +625,8 @@ label    274f Subroutine_274f
 label    2743 Subroutine_List2
 label    2744 Subroutine_List2+1
 
-const    2A16
-word     2A16
-word     2A19
+
+break    2a32
 
 word     2a4c
 
@@ -628,6 +647,11 @@ label    2ddd LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
 word     2e93
 word     2FFd
 
+lcomment 3143 Loads address to data from $31B6
+
+comment  31b6 XY_Data_for_3143_Subroutine
+word     31b6-31bd
+const    31B6-31be
 
 
 const    346c
@@ -639,17 +663,41 @@ word     346d
 
 lcomment 349D Store to ZP_UDG_RAM_X
 lcomment 349e Character ROM
-const    349e-34a0
-break    34a0-34a0
+;word     349e
+const    349e
+break    34a0
 
-lcomment 34A8 Divide by $10
+comment  34A4
+comment  34A4 ----------------------------------------------------------
+comment  34A4 Display_BCD_Bytes
+comment  34A4 ----------------------------------------------------------
+comment  34A4 FUNCTION  : Display
+comment  34A4 \            Scores
+comment  34A4 CALLED BY :
+comment  34A4 CALLS     :
+comment  34A4 ARGUMENTS : ZP_UDG_RAM_X ZP_UDG_RAM_Y = UDG array absolute position to display score at
+comment  34A4 \            ZP_Ptr_To_Str             = Players score in ZP as BCD e.g. 12 34 56
+comment  34A4 \            ZP_Temp_1                 = BCD byte counter i.e. number of bytes to display
+comment  34A4 ----------------------------------------------------------
+label    34a4 Display_BCD_Bytes
+lcomment 34a4 Pointer to raw 12 34 56 in ZP
+lcomment 34a6 Load first score byte i.e. 12
+lcomment 34a8 Divide by $10
+lcomment 34ab 12 has become 01
+lcomment 34ad Add $70, $40 gets subtracted later on
+lcomment 34af and resultant $31st char in Char ROM is "1"
 
-label    34a4 Display_Scores
 comment  34b4
+comment  34b4 Display 2nd score character
+lcomment 34b6 Load first score byte again i.e. 12
+lcomment 34b8 Mask top 4 bits, 12 becomes 02
+
 comment  34c1
-
-lcomment 34be Jump to routine copy stuff from STD CHAR ROM TO UDG CHAR SET
-
+comment  34c1 Increment pointer to next score byte
+lcomment 34C5 Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
+label    34C7 SKIP_34C7
+lcomment 34c7 Decrement number of bytes to display counter
+lcomment 34c9 If <> 0 yet, process another byte
 
 
 comment  34cc
@@ -754,7 +802,7 @@ lcomment 3566 3rd address
 word     3566
 
 break    3568
-lcomment 3568 FF is loop terminator
+lcomment 3568 End of Parameters
 
 
 label    356c ERASE_UDG_RAM_1000_1fff
@@ -775,7 +823,7 @@ lcomment 3576 3rd address
 word     3576
 
 break    3578
-lcomment 3578 FF is loop terminator
+lcomment 3578 End of Parameters
 
 comment  3579
 label    3579 ERASE_COLOR_RAM_9600
@@ -817,18 +865,18 @@ comment  3595 \            Used-Defined Graphics RAM e.g. to display a
 comment  3595 \            text string or score.
 comment  3595 CALLED BY :
 comment  3595 CALLS     : Nothing
-comment  3595 ARGUMENTS : Addr_From is already setup, typically $60 or $70.
-comment  3595 \            Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
-comment  3595 \            Addr_To gets updated as part of this routine.
+comment  3595 ARGUMENTS : ZP_Temp_2_Lo = Loaded with character to copy e.g. $71 for "1"
+comment  3595 \            ??? BROKEN COMMENTS Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
+comment  3595 \            ??? BROKEN COMMENTS Addr_To gets updated as part of this routine.
 comment  3595 ----------------------------------------------------------
-label    3595 COPY_CHAR_TO_UDG_RAM
+label    3595 Copy_Char_To_UDG_RAM
 lcomment 3595 Addr_From = 71 xx as example
 lcomment 3597 Clear address hi-byte
 lcomment 3599 Addr_From = 71 00
 lcomment 359E Addr_From = 31 00, $31st Character ROM character is "1"
 
 comment  35A0
-comment  35A0 Multiply Addr_From by 8, as 8 bytes per character definition
+comment  35A0 Multiply Addr_From by 8, as 8 bytes per UDG RAM character definition
 label    35A2 CCTUR1
 
 lcomment 35a5 Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
@@ -866,7 +914,11 @@ lcomment 35d1 Decrement number of lines counter
 lcomment 35d2 All lines copied? If no, loop back.
 lcomment 35d4 If yes, routine ends
 
-label    35e9 LOAD_ZP18_TO_1b_W_ZP00_01_03_05
+label    35D7 COPY_ZP00TO12_ZP01TO10_ZP03TO11
+
+comment  35E2
+
+label    35e9 COPY_ZP0TO1A_1TO18_3TO19_5TO1B
 comment  35f4
 comment  35fa
 
