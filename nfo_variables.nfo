@@ -1,0 +1,76 @@
+; Zero-Page variables
+label      00 ZP_0000
+label      01 ZP_0001
+label      02 ZP_Temp_1_Lo
+label      03 ZP_Temp_1_Hi
+label      04 ZP_UDG_RAM_X
+label      05 ZP_UDG_RAM_Y
+label      06 ZP_Temp_2_Lo
+label      07 ZP_Temp_2_Hi
+label      08 ZP_0008
+label      09 ZP_0009
+label      0A ZP_Temp_3_Lo
+label      0B ZP_Temp_3_Hi
+label      0c ZP_Col_RAM_Ptr_Lo
+label      0d ZP_Col_RAM_Ptr_Hi
+label      0E ZP_Ptr_To_Str_Lo
+label      0F ZP_Ptr_To_Str_Hi
+label      10 ZP_0010
+label      11 ZP_0011
+label      12 ZP_0012
+label      13 Keyboard_Data
+label      14 ZP_0014
+label      15 ZP_0015
+label      16 ZP_0016
+label      17 ZP_0017
+label      18 ZP_0018
+label      19 ZP_0019
+label      1A ZP_001a
+label      1B ZP_001b
+label      1C ZP_Player_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
+label      1E ZP_001e
+label      1F ZP_001f
+label      20 ZP_HW_IRQ_1_OR_0
+label      21 ZP_HW_IRQ_VAR
+label      22 ZP_0022
+label      23 ZP_0023
+label      24 ZP_0024
+label      25 ZP_0025
+label      26 ZP_0026
+label      27 ZP_0027
+label      28 ZP_0028
+label      40 ZP_Param_Addr_Lo
+label      41 ZP_Param_Addr_Hi
+label      45 ZP_Game_Sel_F1_Flash
+label      45 ZP_Game_Sel_F3_Flash
+label      45 ZP_Game_Sel_F5_Flash
+label      45 ZP_Game_Sel_F7_Flash
+label      4a ZP_HW_IRQ_Count1
+label      4b ZP_HW_IRQ_Count2
+label      4c ZP_HW_IRQ_Count3
+label      51 ZP_Score_P1 ; 3 bytes (Hi Score is stored where?)
+label      54 ZP_Score_P2 ; 3 bytes
+label      57 ZP_Invert ; Used to flash game options & 1UP+score at player start
+label      58 ZP_Counter
+label      59 ZP_0059
+label      5a Num_Lives_P1
+label      5b ZP_005b
+label      5c Num_Lives_P2
+label      5d ZP_005d
+label      5e ZP_Game_Over_P1_P2
+label      5f ZP_Subroutine_Vec_Lo
+label      60 ZP_Subroutine_Vec_Hi
+label      80 ZP_0080
+label      f8 ZP_00f8
+label      fc ZP_00fc
+
+; Other variables that are somewhat persistent i.e. not reset at game restart
+label    1008 UDG_P1_SCORE_RAW_POSN
+label    1420 UDG_P1_LIVES_RAW_POSN
+label    1588 UDG_HI_SCORE_RAW_POSN
+label    19a0 UDG_P2_LIVES_RAW_POSN
+label    1b08 UDG_P2_SCORE_RAW_POSN
+
+label    1fd0 SCORE_HI
+label    1fd3 GAME_OPTIONS
+

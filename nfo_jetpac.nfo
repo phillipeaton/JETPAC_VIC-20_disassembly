@@ -43,12 +43,6 @@ option upmnemo off   * Upper case mnemonics in output file
 * it uses a "M" prefix for generated labels; if the referenced address is clearly
 * code (JMP, for example), it uses a "Z" prefix.
 ******************************************************************************
-
-*** INFO FILE INSTRUCTIONS ***
-include nfo_memory_map.nfo        * Include VIC-20 memory map info
-include nfo_separators.nfo        * Include JMP/JSR separator lines
-include nfo_code_data.nfo         * Undefend Labels
-
 *insert \ SETLI 128               * a09 Assembler. Sets the line length for listings; nnn is the number of columns that can be printed in a line (40-2000).
 *insert \ processor 6502          * For DASM Assembler? Can't remember...
 
@@ -57,84 +51,15 @@ insert ;  This is the reverse-engineered source code for the
 insert ;  game 'JETPAC' written by Ultimate Play The Game.
 insert ; ----------------------------------------------------------
 
+*** INFO FILE INSTRUCTIONS ***
+include nfo_memory_map.nfo        * Include VIC-20 memory map info
+include nfo_separators.nfo        * Include JMP/JSR separator lines
+include nfo_code_data.nfo         * Everything is data, unless it's not
+include nfo_variables.nfo         * Zero Page and others with persistency
+
 ; Workaround for as65 interpreting a '\' as escaping the next charecter
 const 3457
 const 3516
-
-; Zero-Page variables
-label      00 ZP_0000
-label      01 ZP_0001
-label      02 ZP_Temp_1_Lo
-label      03 ZP_Temp_1_Hi
-label      04 ZP_UDG_RAM_X
-label      05 ZP_UDG_RAM_Y
-label      06 ZP_Temp_2_Lo
-label      07 ZP_Temp_2_Hi
-label      08 ZP_0008
-label      09 ZP_0009
-label      0A ZP_Temp_3_Lo
-label      0B ZP_Temp_3_Hi
-label      0c ZP_Col_RAM_Ptr_Lo
-label      0d ZP_Col_RAM_Ptr_Hi
-label      0E ZP_Ptr_To_Str_Lo
-label      0F ZP_Ptr_To_Str_Hi
-label      10 ZP_0010
-label      11 ZP_0011
-label      12 ZP_0012
-label      13 Keyboard_Data
-label      14 ZP_0014
-label      15 ZP_0015
-label      16 ZP_0016
-label      17 ZP_0017
-label      18 ZP_0018
-label      19 ZP_0019
-label      1A ZP_001a
-label      1B ZP_001b
-label      1C ZP_001c
-label      1E ZP_001e
-label      1F ZP_001f
-label      20 ZP_HW_IRQ_1_OR_0
-label      21 ZP_HW_IRQ_VAR
-label      22 ZP_0022
-label      23 ZP_0023
-label      24 ZP_0024
-label      25 ZP_0025
-label      26 ZP_0026
-label      27 ZP_0027
-label      28 ZP_0028
-label      40 ZP_Param_Addr_Lo
-label      41 ZP_Param_Addr_Hi
-label      45 ZP_Game_Sel_F1_Flash
-label      45 ZP_Game_Sel_F3_Flash
-label      45 ZP_Game_Sel_F5_Flash
-label      45 ZP_Game_Sel_F7_Flash
-label      4a ZP_HW_IRQ_Count1
-label      4b ZP_HW_IRQ_Count2
-label      4c ZP_HW_IRQ_Count3
-label      51 Score_P1 ; 3 bytes (Hi Score is stored where?)
-label      54 Score_P2 ; 3 bytes
-label      57 ZP_Invert ; Used to flash game options & 1UP+score at player start
-label      58 ZP_Counter
-label      59 ZP_0059
-label      5a Num_Lives_P1
-label      5b ZP_005b
-label      5c Num_Lives_P2
-label      5d ZP_005d
-label      5e ZP_Game_Over_P1_P2
-label      5f ZP_Subroutine_Vec_Lo
-label      60 ZP_Subroutine_Vec_Hi
-label      80 ZP_0080
-label      f8 ZP_00f8
-label      fc ZP_00fc
-
-label    1008 UDG_P1_SCORE_RAW_POSN
-label    1420 UDG_P1_LIVES_RAW_POSN
-label    1588 UDG_HI_SCORE_RAW_POSN
-label    19a0 UDG_P2_LIVES_RAW_POSN
-label    1b08 UDG_P2_SCORE_RAW_POSN
-
-label    1fd0 SCORE_HI
-label    1fd3 GAME_OPTIONS
 
 ; Start of disassembly instructions
 comment  2004 Left edge of TV picture and interlace switch.
@@ -206,6 +131,7 @@ label    2067 Start_3
 comment  2071
 comment  2079
 comment  2079
+label    2079 Start_Rst_Game_Sel_Flash
 comment  207C
 comment  2085
 
@@ -474,22 +400,38 @@ label    275e ERASEZ1
 label    2764 RESET_SCREEN_RAM_0380_03ff
 label    2768 BACK_2768
 
-lcomment  276f Erase $30 bytes at end of UDGs $1fd0-$2000
+lcomment 276f Erase $30 bytes at end of UDGs $1fd0-$2000
 label    276f ERASE_HI_SCORE_SETTINGS_ETC
 label    2773 ERASE1
 
+label    277a Check_New_Hi_Score
 const    277d
-lcomment 277d ZP Offset for 1st address
-lcomment 277e 1st Address
+lcomment 277d ZP_00
+lcomment 277e Addr of High Score value
 word     277e
 const    2780
-lcomment 2780 ZP Offset for 1st address
-lcomment 2781 1st Address
+lcomment 2780 ZP_08
+lcomment 2781 Addr of P1 High Score value
 word     2781
+lcomment 2784 Check Player 1 first
+lcomment 2787  then follow through for Player 2
 const    278a
-lcomment 278a ZP Offset for 1st address
-lcomment 278b 1st Address
+lcomment 278a ZP_08
+lcomment 278b Addr of P2 High Score value
 word     278b
+comment  278e
+label    278e Test_New_Hi_Score
+comment  278e Compare Hi Score BCD bytes
+label    2790 Compare_BCD_Byte
+lcomment 2796 Branch if SCORE_HI < Player Score
+lcomment 2798 SCORE_HI >= Player Score, so return
+label    2799 Move_To_Next_BCD_Byte
+lcomment 279B All BCD bytes checked?
+lcomment 279D No, check the next BCD byte
+label    27A0 Copy_Player_To_Hi_Score
+lcomment 27A0 3 BCD bytes, 02, 01, 00
+label    27a2 CPTHS_1
+lcomment 27A7 Return when all bytes copied
 
 const    286B
 break    286B
@@ -518,18 +460,29 @@ lcomment 20e1 No, read keyboard again
 
 label    25d1 Game_Start
 
+comment  282E Using A to toggle, Load A and Y with Ship UDG address
+label    282E Get_Flame_UDG_Addr
+
 label    268C Subroutine_List
 label    268D Subroutine_List+1
+
+label    283a Ptr_Rocket_Flame_Lo
+lcomment 283a Addr of rocket flame UDG
+label    283b Ptr_Rocket_Flame_Hi
+label    283c Ptr_Final_Char_Lo
+lcomment 283c Addr of final char UDG
+label    283d Ptr_Final_Char_Hi
+const    283a-283d
 
 label    2888 Subroutine_List3
 label    2889 Subroutine_List3+1
 word     2888-2891
 break    2888-2891
 
-label 2892 Routine_2892
-label 28a4 Routine_28a4
-label 289F Routine_289f
-label 28b6 Routine_28b6
+label    2892 Routine_2892
+label    28a4 Routine_28a4
+label    289F Routine_289f
+label    28b6 Routine_28b6
 
 label    2967 UDG_Ptr
 label    2968 UDG_Ptr+1
@@ -538,6 +491,9 @@ word     2967-2974
 break    2968
 break    296f
 
+label    2987 Game_Over
+
+label    2997 SKIP_2997
 label    299D Sound_Channels_Off_ETC
 lcomment 29DB Swap between P1 and P2?????????
 label    29E7 Display_Game_Over
@@ -599,21 +555,21 @@ lcomment 3094 ZP_Temp_2
 lcomment 3095 P2 Score in ZP
 word     3095
 
+label    219A Subroutine_219A
 label    261A Subroutine_261A
-label    3273 Subroutine_3273
-label    334D Subroutine_334D
-label    2934 Subroutine_2934
-label    2F8E Subroutine_2F8E
-label    2C6A Subroutine_2C6A
-label    2ABC Subroutine_2ABC
-label    2A6D Subroutine_2A6D
-label    2A5F Subroutine_2A5F
-label    2E74 Subroutine_2E74
-label    2E17 Subroutine_2E17
-label    2E4E Subroutine_2E4E
 label    26CD Subroutine_26CD
 label    283E Subroutine_283E
-label    219A Subroutine_219A
+label    2934 Subroutine_2934
+label    2A5F Subroutine_2A5F
+label    2A6D Subroutine_2A6D
+label    2ABC Subroutine_2ABC
+label    2C6A Subroutine_2C6A
+label    2E17 Subroutine_2E17
+label    2E4E Subroutine_2E4E
+label    2E74 Subroutine_2E74
+label    2F8E Subroutine_2F8E
+label    3273 Subroutine_3273
+label    334D Subroutine_334D
 
 label    26e4 Subroutine_26e4
 label    26fe Subroutine_26fe
@@ -646,6 +602,9 @@ label    2ddd LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
 
 word     2e93
 word     2FFd
+
+comment  2fe5 Using A as offset, Load A and Y with Ship UDG address
+label    2fe5 Get_Ship_UDG_Addr
 
 lcomment 3143 Loads address to data from $31B6
 

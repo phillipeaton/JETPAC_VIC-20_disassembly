@@ -39,7 +39,7 @@ ZP_0018                 equ     $0018
 ZP_0019                 equ     $0019
 ZP_001a                 equ     $001A
 ZP_001b                 equ     $001B
-ZP_001c                 equ     $001C
+ZP_Player_Movement      equ     $001C
 ZP_001e                 equ     $001E
 ZP_001f                 equ     $001F
 ZP_HW_IRQ_1_OR_0        equ     $0020
@@ -57,8 +57,8 @@ ZP_Game_Sel_F7_Flash    equ     $0045
 ZP_HW_IRQ_Count1        equ     $004A
 ZP_HW_IRQ_Count2        equ     $004B
 ZP_HW_IRQ_Count3        equ     $004C
-Score_P1                equ     $0051
-Score_P2                equ     $0054
+ZP_Score_P1             equ     $0051
+ZP_Score_P2             equ     $0054
 ZP_Invert               equ     $0057
 ZP_Counter              equ     $0058
 ZP_0059                 equ     $0059
@@ -208,7 +208,8 @@ Start_3 sta     Screen_RAM,x            ; 2067: 9D 00 02
         bne     Start_2                 ; 2077: D0 EB    
 
 
-Z2079   jsr     RESET_COLOR_PIXELS_SCORES ; 2079: 20 16 24 
+Start_Rst_Game_Sel_Flash
+        jsr     RESET_COLOR_PIXELS_SCORES ; 2079: 20 16 24 
 
         lda     #$01                    ; 207C: A9 01    
         ldx     #$05                    ; 207E: A2 05    
@@ -786,7 +787,7 @@ P1_SCORE_TO_UDG_RAM
         fcb     $04                     ; 2474: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y, but not in this case
         fdb     UDG_P1_SCORE_RAW_POSN   ; 2475: 08 10     UDG array absolute position to display score at
         fcb     $0E                     ; 2477: 0E        ZP_Ptr_To_Str
-        fdb     Score_P1                ; 2478: 51 00     Players score in ZP as BCD e.g. 12 34 56
+        fdb     ZP_Score_P1             ; 2478: 51 00     Players score in ZP as BCD e.g. 12 34 56
         fcb     $02                     ; 247A: 02        ZP_Temp_1
         fdb     $0003                   ; 247B: 03 00     3 bytes of BCD data to display e.g. 12 34 56
         fcb     $FF                     ; 247D: FF        End of Parameters
@@ -797,7 +798,7 @@ P2_SCORE_TO_UDG_RAM
         fcb     $04                     ; 2484: 04       
         fdb     UDG_P2_SCORE_RAW_POSN   ; 2485: 08 1B    
         fcb     $0E                     ; 2487: 0E       
-        fdb     Score_P2                ; 2488: 54 00    
+        fdb     ZP_Score_P2             ; 2488: 54 00    
         fcb     $02                     ; 248A: 02       
         fdb     ZP_Temp_1_Hi            ; 248B: 03 00    
         fcb     $FF                     ; 248D: FF        End of Parameters
@@ -1226,35 +1227,44 @@ ERASE1  sta     SCORE_HI,x              ; 2773: 9D D0 1F
         bpl     ERASE1                  ; 2777: 10 FA    
         rts                             ; 2779: 60       
 ; ===========================================================
-Z277A   jsr     Read_ZP_Paramenters     ; 277A: 20 9D 25 
-        fcb     $00                     ; 277D: 00        ZP Offset for 1st address
-        fdb     SCORE_HI                ; 277E: D0 1F     1st Address
-        fcb     $08                     ; 2780: 08        ZP Offset for 1st address
-        fdb     Score_P1                ; 2781: 51 00     1st Address
+Check_New_Hi_Score
+        jsr     Read_ZP_Paramenters     ; 277A: 20 9D 25 
+        fcb     $00                     ; 277D: 00        ZP_00
+        fdb     SCORE_HI                ; 277E: D0 1F     Addr of High Score value
+        fcb     $08                     ; 2780: 08        ZP_08
+        fdb     ZP_Score_P1             ; 2781: 51 00     Addr of P1 High Score value
         fcb     $FF                     ; 2783: FF       
-        jsr     Z278E                   ; 2784: 20 8E 27 
-        jsr     Read_ZP_Paramenters     ; 2787: 20 9D 25 
-        fcb     $08                     ; 278A: 08        ZP Offset for 1st address
-        fdb     Score_P2                ; 278B: 54 00     1st Address
+        jsr     Test_New_Hi_Score       ; 2784: 20 8E 27  Check Player 1 first
+        jsr     Read_ZP_Paramenters     ; 2787: 20 9D 25  then follow through for Player 2
+        fcb     $08                     ; 278A: 08        ZP_08
+        fdb     ZP_Score_P2             ; 278B: 54 00     Addr of P2 High Score value
         fcb     $FF                     ; 278D: FF       
-Z278E   ldy     #$00                    ; 278E: A0 00    
-Z2790   lda     (ZP_0000),y             ; 2790: B1 00    
+
+; Compare Hi Score BCD bytes
+Test_New_Hi_Score
+        ldy     #$00                    ; 278E: A0 00    
+Compare_BCD_Byte
+        lda     (ZP_0000),y             ; 2790: B1 00    
         cmp     (ZP_0008),y             ; 2792: D1 08    
-        beq     Z2799                   ; 2794: F0 03    
-        bcc     Z27A0                   ; 2796: 90 08    
-        rts                             ; 2798: 60       
+        beq     Move_To_Next_BCD_Byte   ; 2794: F0 03    
+        bcc     Copy_Player_To_Hi_Score ; 2796: 90 08     Branch if SCORE_HI < Player Score
+        rts                             ; 2798: 60        SCORE_HI >= Player Score, so return
 ; ===========================================================
-Z2799   iny                             ; 2799: C8       
+Move_To_Next_BCD_Byte
+        iny                             ; 2799: C8       
         tya                             ; 279A: 98       
-        cmp     #$03                    ; 279B: C9 03    
-        bne     Z2790                   ; 279D: D0 F1    
+        cmp     #$03                    ; 279B: C9 03     All BCD bytes checked?
+        bne     Compare_BCD_Byte        ; 279D: D0 F1     No, check the next BCD byte
         rts                             ; 279F: 60       
-Z27A0   ldy     #$02                    ; 27A0: A0 02    
-Z27A2   lda     (ZP_0008),y             ; 27A2: B1 08    
+; ===========================================================
+Copy_Player_To_Hi_Score
+        ldy     #$02                    ; 27A0: A0 02     3 BCD bytes, 02, 01, 00
+CPTHS_1 lda     (ZP_0008),y             ; 27A2: B1 08    
         sta     (ZP_0000),y             ; 27A4: 91 00    
         dey                             ; 27A6: 88       
-        bpl     Z27A2                   ; 27A7: 10 F9    
+        bpl     CPTHS_1                 ; 27A7: 10 F9     Return when all bytes copied
         rts                             ; 27A9: 60       
+; ===========================================================
 Z27AA   ldy     #$00                    ; 27AA: A0 00    
         lda     (ZP_0000),y             ; 27AC: B1 00    
         cmp     #$0A                    ; 27AE: C9 0A    
@@ -1282,17 +1292,17 @@ Z27B3   inc     ZP_0027                 ; 27B3: E6 27
         lda     ZP_0027                 ; 27D3: A5 27    
         sec                             ; 27D5: 38       
         sbc     #$01                    ; 27D6: E9 01    
-        jsr     Z282E                   ; 27D8: 20 2E 28 
+        jsr     Get_Flame_UDG_Addr      ; 27D8: 20 2E 28 
         jsr     Z378D                   ; 27DB: 20 8D 37 
         jsr     Z3610                   ; 27DE: 20 10 36 
 Z27E1   lda     ZP_0027                 ; 27E1: A5 27    
         pha                             ; 27E3: 48       
-        jsr     Z282E                   ; 27E4: 20 2E 28 
+        jsr     Get_Flame_UDG_Addr      ; 27E4: 20 2E 28 
         jsr     Z373D                   ; 27E7: 20 3D 37 
         pla                             ; 27EA: 68       
         sec                             ; 27EB: 38       
         sbc     #$01                    ; 27EC: E9 01    
-        jsr     Z282E                   ; 27EE: 20 2E 28 
+        jsr     Get_Flame_UDG_Addr      ; 27EE: 20 2E 28 
         jsr     Z378D                   ; 27F1: 20 8D 37 
         jsr     Z364C                   ; 27F4: 20 4C 36 
         lda     ZP_0018                 ; 27F7: A5 18    
@@ -1320,23 +1330,29 @@ Z2819   lda     ZP_0026                 ; 2819: A5 26
         lda     ZP_0027                 ; 281D: A5 27    
         sec                             ; 281F: 38       
         sbc     #$01                    ; 2820: E9 01    
-        jsr     Z282E                   ; 2822: 20 2E 28 
+        jsr     Get_Flame_UDG_Addr      ; 2822: 20 2E 28 
         jsr     Z378D                   ; 2825: 20 8D 37 
         jsr     Z3610                   ; 2828: 20 10 36 
         jmp     Z280B                   ; 282B: 4C 0B 28 
 ; -----------------------
-Z282E   lsr     a                       ; 282E: 4A       
+; Using A to toggle, Load A and Y with Ship UDG address
+Get_Flame_UDG_Addr
+        lsr     a                       ; 282E: 4A       
         and     #$02                    ; 282F: 29 02    
         tax                             ; 2831: AA       
-        lda     M283A,x                 ; 2832: BD 3A 28 
+        lda     Ptr_Rocket_Flame_Lo,x   ; 2832: BD 3A 28 
         tay                             ; 2835: A8       
-        lda     M283B,x                 ; 2836: BD 3B 28 
+        lda     Ptr_Rocket_Flame_Hi,x   ; 2836: BD 3B 28 
         rts                             ; 2839: 60       
 ; ===========================================================
-M283A   fcb     $D5                     ; 283A: D5       
-M283B   fcc     "?"                     ; 283B: 3F       
-        fcb     $F8                     ; 283C: F8       
-        fcc     "?"                     ; 283D: 3F       
+Ptr_Rocket_Flame_Lo
+        fcb     $D5                     ; 283A: D5        Addr of rocket flame UDG
+Ptr_Rocket_Flame_Hi
+        fcb     $3F                     ; 283B: 3F       
+Ptr_Final_Char_Lo
+        fcb     $F8                     ; 283C: F8        Addr of final char UDG
+Ptr_Final_Char_Hi
+        fcb     $3F                     ; 283D: 3F       
 Subroutine_283E
         jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 283E: 20 D7 35 
         jsr     Z30B3                   ; 2841: 20 B3 30 
@@ -1352,7 +1368,7 @@ Z2851   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2851: 20 E9 35
         bpl     Z2874                   ; 2857: 10 1B    
         lda     #$00                    ; 2859: A9 00    
         jsr     Z2FDC                   ; 285B: 20 DC 2F 
-        jsr     Z2FE5                   ; 285E: 20 E5 2F 
+        jsr     Get_Ship_UDG_Addr       ; 285E: 20 E5 2F 
         jsr     Z378D                   ; 2861: 20 8D 37 
         jsr     Z3610                   ; 2864: 20 10 36 
         jsr     Read_ZP_Paramenters     ; 2867: 20 9D 25 
@@ -1512,14 +1528,16 @@ Z2975   ldy     #$00                    ; 2975: A0 00
         bcc     Sound_Channels_Off_ETC  ; 2982: 90 19    
         jmp     Subroutine_261A         ; 2984: 4C 1A 26 
 ; -----------------------
-Z2987   jsr     Z277A                   ; 2987: 20 7A 27 
+Game_Over
+        jsr     Check_New_Hi_Score      ; 2987: 20 7A 27 
         jsr     RESET_COLOR_PIXELS_SCORES ; 298A: 20 16 24 
         lda     ZP_Game_Over_P1_P2      ; 298D: A5 5E    
-        bne     Z2997                   ; 298F: D0 06    
+        bne     SKIP_2997               ; 298F: D0 06    
         jsr     Display_Game_Over_P1    ; 2991: 20 EE 29 
-        jmp     Z2079                   ; 2994: 4C 79 20 
-Z2997   jsr     Display_Game_Over_P2    ; 2997: 20 12 2A 
-        jmp     Z2079                   ; 299A: 4C 79 20 
+        jmp     Start_Rst_Game_Sel_Flash ; 2994: 4C 79 20 
+SKIP_2997
+        jsr     Display_Game_Over_P2    ; 2997: 20 12 2A 
+        jmp     Start_Rst_Game_Sel_Flash ; 299A: 4C 79 20 
 ; -----------------------
 Sound_Channels_Off_ETC
         lda     #$00                    ; 299D: A9 00    
@@ -1537,7 +1555,7 @@ Sound_Channels_Off_ETC
         bit     MASK_01                 ; 29BE: 2C 14 20 
         bne     Z29D0                   ; 29C1: D0 0D    
 Z29C3   lda     Num_Lives_P1            ; 29C3: A5 5A    
-        beq     Z2987                   ; 29C5: F0 C0    
+        beq     Game_Over               ; 29C5: F0 C0    
 Z29C7   jsr     Z22D7                   ; 29C7: 20 D7 22 
         jsr     Z235B                   ; 29CA: 20 5B 23 
         jmp     Subroutine_261A         ; 29CD: 4C 1A 26 
@@ -2107,10 +2125,10 @@ Z2DE8   lda     ZP_0059                 ; 2DE8: A5 59
         ora     ZP_001e                 ; 2DEE: 05 1E    
         asl     a                       ; 2DF0: 0A       
         pha                             ; 2DF1: 48       
-        jsr     Z2FE5                   ; 2DF2: 20 E5 2F 
+        jsr     Get_Ship_UDG_Addr       ; 2DF2: 20 E5 2F 
         jsr     Z373D                   ; 2DF5: 20 3D 37 
         pla                             ; 2DF8: 68       
-        jsr     Z2FE5                   ; 2DF9: 20 E5 2F 
+        jsr     Get_Ship_UDG_Addr       ; 2DF9: 20 E5 2F 
         jmp     Z378D                   ; 2DFC: 4C 8D 37 
 ; -----------------------
 Z2DFF   lda     ZP_0019                 ; 2DFF: A5 19    
@@ -2338,10 +2356,10 @@ Z2FB2   ldy     #$03                    ; 2FB2: A0 03
 Z2FBD   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2FBD: 20 E9 35 
         jsr     Z2FDA                   ; 2FC0: 20 DA 2F 
 Z2FC3   pha                             ; 2FC3: 48       
-        jsr     Z2FE5                   ; 2FC4: 20 E5 2F 
+        jsr     Get_Ship_UDG_Addr       ; 2FC4: 20 E5 2F 
         jsr     Z373D                   ; 2FC7: 20 3D 37 
         pla                             ; 2FCA: 68       
-        jsr     Z2FE5                   ; 2FCB: 20 E5 2F 
+        jsr     Get_Ship_UDG_Addr       ; 2FCB: 20 E5 2F 
         jsr     Z378D                   ; 2FCE: 20 8D 37 
         jsr     Z364C                   ; 2FD1: 20 4C 36 
         jsr     Z381F                   ; 2FD4: 20 1F 38 
@@ -2355,7 +2373,9 @@ Z2FDC   lsr     a                       ; 2FDC: 4A
         adc     (ZP_0000),y             ; 2FE2: 71 00    
         rts                             ; 2FE4: 60       
 ; ===========================================================
-Z2FE5   tax                             ; 2FE5: AA       
+; Using A as offset, Load A and Y with Ship UDG address
+Get_Ship_UDG_Addr
+        tax                             ; 2FE5: AA       
         lda     abc,x                   ; 2FE6: BD 87 3C 
         tay                             ; 2FE9: A8       
         lda     def,x                   ; 2FEA: BD 88 3C 
@@ -2414,7 +2434,7 @@ Z3051   jmp     Z2FBD                   ; 3051: 4C BD 2F
 ; -----------------------
 Z3054   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 3054: 20 E9 35 
 Z3057   jsr     Z2FDA                   ; 3057: 20 DA 2F 
-Z305A   jsr     Z2FE5                   ; 305A: 20 E5 2F 
+Z305A   jsr     Get_Ship_UDG_Addr       ; 305A: 20 E5 2F 
         jsr     Z373D                   ; 305D: 20 3D 37 
         jmp     Z3604                   ; 3060: 4C 04 36 
 ; -----------------------
@@ -2422,7 +2442,7 @@ Z3063   lda     ZP_Game_Over_P1_P2      ; 3063: A5 5E
         bne     Z3091                   ; 3065: D0 2A    
         jsr     Read_ZP_Paramenters     ; 3067: 20 9D 25 
         fcb     $06                     ; 306A: 06        ZP_Temp_2
-        fdb     Score_P1                ; 306B: 51 00     P1 Score in ZP
+        fdb     ZP_Score_P1             ; 306B: 51 00     P1 Score in ZP
         fcb     $FF                     ; 306D: FF       
 
 Z306E   ldy     #$02                    ; 306E: A0 02    
@@ -2448,7 +2468,7 @@ Z308E   jmp     P2_SCORE_TO_UDG_RAM     ; 308E: 4C 81 24
 ; -----------------------
 Z3091   jsr     Read_ZP_Paramenters     ; 3091: 20 9D 25 
         fcb     $06                     ; 3094: 06        ZP_Temp_2
-        fdb     Score_P2                ; 3095: 54 00     P2 Score in ZP
+        fdb     ZP_Score_P2             ; 3095: 54 00     P2 Score in ZP
         fcb     $FF                     ; 3097: FF       
         jmp     Z306E                   ; 3098: 4C 6E 30 
 Z309B   eor     #$FF                    ; 309B: 49 FF    
@@ -2629,7 +2649,7 @@ Z31CE   beq     Z31D7                   ; 31CE: F0 07
 Z31D4   jmp     Z32A2                   ; 31D4: 4C A2 32 
 ; -----------------------
 Z31D7   ldy     #$00                    ; 31D7: A0 00    
-        bit     ZP_001c                 ; 31D9: 24 1C    
+        bit     ZP_Player_Movement      ; 31D9: 24 1C    
         bvc     Z3228                   ; 31DB: 50 4B    
         bvs     Z31D4                   ; 31DD: 70 F5    
 Z31DF   lda     (ZP_0000),y             ; 31DF: B1 00    
@@ -2639,7 +2659,7 @@ Z31DF   lda     (ZP_0000),y             ; 31DF: B1 00
 Z31E7   jmp     Z32A2                   ; 31E7: 4C A2 32 
 ; -----------------------
 Z31EA   ldy     #$00                    ; 31EA: A0 00    
-        bit     ZP_001c                 ; 31EC: 24 1C    
+        bit     ZP_Player_Movement      ; 31EC: 24 1C    
         bpl     Z323E                   ; 31EE: 10 4E    
         bmi     Z31E7                   ; 31F0: 30 F5    
 Z31F2   bit     MASK_08                 ; 31F2: 2C 17 20 
@@ -2663,7 +2683,7 @@ Z3212   jmp     Z32DE                   ; 3212: 4C DE 32
 Z3215   jmp     Z32C7                   ; 3215: 4C C7 32 
 ; -----------------------
 Z3218   tax                             ; 3218: AA       
-        lda     ZP_001c                 ; 3219: A5 1C    
+        lda     ZP_Player_Movement      ; 3219: A5 1C    
         bit     MASK_10                 ; 321B: 2C 18 20 
         bne     Z3224                   ; 321E: D0 04    
         lda     #$00                    ; 3220: A9 00    
@@ -2718,7 +2738,7 @@ Z326F   txa                             ; 326F: 8A
 Subroutine_3273
         jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 3273: 20 D7 35 
         jsr     Z33F7                   ; 3276: 20 F7 33 
-        sta     ZP_001c                 ; 3279: 85 1C    
+        sta     ZP_Player_Movement      ; 3279: 85 1C    
         jsr     Z30B3                   ; 327B: 20 B3 30 
         lda     ZP_Temp_1_Lo            ; 327E: A5 02    
         bpl     Z3285                   ; 3280: 10 03    
@@ -2727,7 +2747,7 @@ Subroutine_3273
 Z3285   ldy     #$02                    ; 3285: A0 02    
         lda     (ZP_0000),y             ; 3287: B1 00    
         ldy     #$00                    ; 3289: A0 00    
-        bit     ZP_001c                 ; 328B: 24 1C    
+        bit     ZP_Player_Movement      ; 328B: 24 1C    
         bpl     Z323E                   ; 328D: 10 AF    
         bvc     Z3228                   ; 328F: 50 97    
         tax                             ; 3291: AA       
@@ -2764,7 +2784,7 @@ Z32BA   sta     (ZP_0000),y             ; 32BA: 91 00
         jmp     Z3208                   ; 32C4: 4C 08 32 
 ; -----------------------
 Z32C7   ldy     #$04                    ; 32C7: A0 04    
-        lda     ZP_001c                 ; 32C9: A5 1C    
+        lda     ZP_Player_Movement      ; 32C9: A5 1C    
         bit     MASK_20                 ; 32CB: 2C 19 20 
         beq     Z3318                   ; 32CE: F0 48    
         bit     MASK_10                 ; 32D0: 2C 18 20 
@@ -2793,7 +2813,7 @@ Z32E0   dey                             ; 32E0: 88
 Z32F7   sta     (ZP_0000),y             ; 32F7: 91 00    
 Z32F9   jsr     Z3646                   ; 32F9: 20 46 36 
         jsr     Z381F                   ; 32FC: 20 1F 38 
-        lda     ZP_001c                 ; 32FF: A5 1C    
+        lda     ZP_Player_Movement      ; 32FF: A5 1C    
         bit     MASK_08                 ; 3301: 2C 17 20 
         bne     Z3309                   ; 3304: D0 03    
         jsr     Z20E9                   ; 3306: 20 E9 20 
@@ -2859,7 +2879,7 @@ Z336A   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 336A: 20 D7 35
         lda     (ZP_0000),y             ; 3379: B1 00    
         bpl     Z33C0                   ; 337B: 10 43    
 Z337D   ldy     #$00                    ; 337D: A0 00    
-        bit     ZP_001c                 ; 337F: 24 1C    
+        bit     ZP_Player_Movement      ; 337F: 24 1C    
         bpl     Z332C                   ; 3381: 10 A9    
         bvc     Z3337                   ; 3383: 50 B2    
         lda     (ZP_0000),y             ; 3385: B1 00    
@@ -2886,7 +2906,7 @@ Z339F   ldy     #$02                    ; 339F: A0 02
         cmp     #$B8                    ; 33AB: C9 B8    
         bcs     Z3348                   ; 33AD: B0 99    
 Z33AF   sta     (ZP_0000),y             ; 33AF: 91 00    
-        lda     ZP_001c                 ; 33B1: A5 1C    
+        lda     ZP_Player_Movement      ; 33B1: A5 1C    
         and     #$10                    ; 33B3: 29 10    
         beq     Z33BA                   ; 33B5: F0 03    
         jmp     Z32F9                   ; 33B7: 4C F9 32 
@@ -2910,19 +2930,19 @@ Z33D4   lda     VIA1_Port_A             ; 33D4: AD 11 91
         rol     a                       ; 33D7: 2A       
         rol     a                       ; 33D8: 2A       
         ora     #$8F                    ; 33D9: 09 8F    
-        sta     ZP_001c                 ; 33DB: 85 1C    
+        sta     ZP_Player_Movement      ; 33DB: 85 1C    
         lda     VIA1_Port_A             ; 33DD: AD 11 91 
         ror     a                       ; 33E0: 6A       
         ror     a                       ; 33E1: 6A       
         ora     #$F7                    ; 33E2: 09 F7    
-        and     ZP_001c                 ; 33E4: 25 1C    
-        sta     ZP_001c                 ; 33E6: 85 1C    
+        and     ZP_Player_Movement      ; 33E4: 25 1C    
+        sta     ZP_Player_Movement      ; 33E6: 85 1C    
         lda     #$00                    ; 33E8: A9 00    
         sta     VIA2_DDR_B              ; 33EA: 8D 22 91 
         lda     VIA2_Port_B             ; 33ED: AD 20 91 
         ora     #$7F                    ; 33F0: 09 7F    
-        and     ZP_001c                 ; 33F2: 25 1C    
-        sta     ZP_001c                 ; 33F4: 85 1C    
+        and     ZP_Player_Movement      ; 33F2: 25 1C    
+        sta     ZP_Player_Movement      ; 33F4: 85 1C    
         rts                             ; 33F6: 60       
 ; ===========================================================
 Z33F7   lda     GAME_OPTIONS            ; 33F7: AD D3 1F 
@@ -2939,27 +2959,27 @@ Z33F7   lda     GAME_OPTIONS            ; 33F7: AD D3 1F
         rol     a                       ; 3412: 2A       
         rol     a                       ; 3413: 2A       
         ora     #$3F                    ; 3414: 09 3F    
-        sta     ZP_001c                 ; 3416: 85 1C    
+        sta     ZP_Player_Movement      ; 3416: 85 1C    
         lda     VIA2_Port_B             ; 3418: AD 20 91 
         tay                             ; 341B: A8       
         ror     a                       ; 341C: 6A       
         ror     a                       ; 341D: 6A       
         ora     #$F7                    ; 341E: 09 F7    
-        and     ZP_001c                 ; 3420: 25 1C    
-        sta     ZP_001c                 ; 3422: 85 1C    
+        and     ZP_Player_Movement      ; 3420: 25 1C    
+        sta     ZP_Player_Movement      ; 3422: 85 1C    
         tya                             ; 3424: 98       
         rol     a                       ; 3425: 2A       
         ora     #$F7                    ; 3426: 09 F7    
-        and     ZP_001c                 ; 3428: 25 1C    
-        sta     ZP_001c                 ; 342A: 85 1C    
+        and     ZP_Player_Movement      ; 3428: 25 1C    
+        sta     ZP_Player_Movement      ; 342A: 85 1C    
         lda     #$80                    ; 342C: A9 80    
         sta     VIA2_Port_A             ; 342E: 8D 21 91 
         lda     VIA2_Port_B             ; 3431: AD 20 91 
         ror     a                       ; 3434: 6A       
         ror     a                       ; 3435: 6A       
         ora     #$EF                    ; 3436: 09 EF    
-        and     ZP_001c                 ; 3438: 25 1C    
-        sta     ZP_001c                 ; 343A: 85 1C    
+        and     ZP_Player_Movement      ; 3438: 25 1C    
+        sta     ZP_Player_Movement      ; 343A: 85 1C    
         lda     #$81                    ; 343C: A9 81    
         sta     VIA2_Port_A             ; 343E: 8D 21 91 
         lda     VIA2_Port_B             ; 3441: AD 20 91 
@@ -2967,8 +2987,8 @@ Z33F7   lda     GAME_OPTIONS            ; 33F7: AD D3 1F
         rol     a                       ; 3445: 2A       
         rol     a                       ; 3446: 2A       
         ora     #$EF                    ; 3447: 09 EF    
-        and     ZP_001c                 ; 3449: 25 1C    
-        sta     ZP_001c                 ; 344B: 85 1C    
+        and     ZP_Player_Movement      ; 3449: 25 1C    
+        sta     ZP_Player_Movement      ; 344B: 85 1C    
         lda     #$80                    ; 344D: A9 80    
         sta     VIA2_Port_A             ; 344F: 8D 21 91 
         lda     VIA2_Port_B             ; 3452: AD 20 91 
@@ -2980,8 +3000,8 @@ Z33F7   lda     GAME_OPTIONS            ; 33F7: AD D3 1F
         ror     a                       ; 345C: 6A       
         ror     a                       ; 345D: 6A       
         ora     #$DF                    ; 345E: 09 DF    
-        and     ZP_001c                 ; 3460: 25 1C    
-        sta     ZP_001c                 ; 3462: 85 1C    
+        and     ZP_Player_Movement      ; 3460: 25 1C    
+        sta     ZP_Player_Movement      ; 3462: 85 1C    
         rts                             ; 3464: 60       
 Z3465   lda     ZP_Game_Over_P1_P2      ; 3465: A5 5E    
         bne     Z349A                   ; 3467: D0 31    
