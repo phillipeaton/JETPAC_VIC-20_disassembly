@@ -58,53 +58,51 @@ include nfo_code_data.nfo         * Everything is data, unless it's not
 include nfo_variables.nfo         * Zero Page and others with persistency
 
 ; Workaround for as65 interpreting a '\' as escaping the next charecter
-const 3457
-const 3516
+const    3457
+const    3516
 
 ; Start of disassembly instructions
-comment  2004 Left edge of TV picture and interlace switch.
 word     2000-2003
-const    2004-201b
+;        2004
 break    2004-2013
-
+comment  2004 Initial value table for VIC setup 16 bytes
+lcomment 2004 VICCRO Left edge of TV picture and interlace switch.
+const    2004-201B
 label    2004 VIC_Init_Tab
-lcomment 2004 VICCRO Initial value table for VIC setup 16 bytes
 lcomment 2005 VICCR1
 lcomment 2006 VICCR2
 lcomment 2007 VICCR3
 lcomment 2008 VICCR4
 lcomment 2009 VICCR5
-lcomment 200a VICCR6
-lcomment 200b VICCR7
-lcomment 200c VICCR8
-lcomment 200d VICCR9
-lcomment 200e VICCRA
-lcomment 200f VICCRB
+lcomment 200A VICCR6
+lcomment 200B VICCR7
+lcomment 200C VICCR8
+lcomment 200D VICCR9
+lcomment 200E VICCRA
+lcomment 200F VICCRB
 lcomment 2010 VICCRC
 lcomment 2011 VICCRD
 lcomment 2012 VICCRE
 lcomment 2013 VICCRF
-
-
+;        2014
 label    2014 MASK_01
 label    2015 MASK_02
 label    2016 MASK_04
 label    2017 MASK_08
 label    2018 MASK_10
 label    2019 MASK_20
-label    201a MASK_40
-label    201b MASK_80
-
-comment  201c
-comment  201c +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-used     201c NMI_Interrupt_Hardler
-
-comment  201d
-comment  201d  ----------------------------------------------------------
-comment  201d  Starts here
-comment  201d  ----------------------------------------------------------
-
+label    201A MASK_40
+label    201B MASK_80
+comment  201C
+comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+used     201C NMI_Interrupt_Hardler
+;        201D
+comment  201D
+comment  201D  ----------------------------------------------------------
+comment  201D  Starts here
+comment  201D  ----------------------------------------------------------
 lcomment 201E Reset stack pointer
+;        201e
 lcomment 2021 Clear Decimal flag
 lcomment 2022 Setup NMI Interrupt Vector
 comment  2056
@@ -114,38 +112,56 @@ comment  2061
 lcomment 2061
 lcomment 2061 Store ascending numbers step #11 at a time into #23 bytes from $200 as below
 lcomment 2061 then do it #10 more times, but starting at 1 higher each time
-lcomment 2061 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2   ???
-lcomment 2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3   ..."-8CNYdoz...¦±¼ÇÒÝèó
-lcomment 2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4   ...#.9DOZep{...§²½ÈÓÞéô
-lcomment 2061 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5   ...$/:EP[fq|...¨³¾ÉÔßêõ
-lcomment 2061 025C  04 0F 1A 25 30 3B 46 51 5C 67 72 7D 88 93 9E A9 B4 BF CA D5 E0 EB F6   ...%0;FQ\gr}...©´¿ÊÕàëö
-lcomment 2061 0273  05 10 1B 26 31 3C 47 52 5D 68 73 7E 89 94 9F AA B5 C0 CB D6 E1 EC F7   ...&1<GR]hs~...ªµÀËÖáì÷
-lcomment 2061 028A  06 11 1C 27 32 3D 48 53 5E 69 74 7F 8A 95 A0 AB B6 C1 CC D7 E2 ED F8   ...'2=HS^it... «¶ÁÌ×âíø
-lcomment 2061 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 E3 EE F9   ...(3>IT_ju...¡¬·ÂÍØãîù
-lcomment 2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA   ...)4?JU`kv...¢-¸ÃÎÙäïú
-lcomment 2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB    ..*5@KValw...£®¹ÄÏÚåðû
-lcomment 2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC   .. +6ALWbmx...¤¯ºÅÐÛæñü
-
+lcomment 2061 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
+lcomment 2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
+lcomment 2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
+lcomment 2061 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5
+lcomment 2061 025C  04 0F 1A 25 30 3B 46 51 5C 67 72 7D 88 93 9E A9 B4 BF CA D5 E0 EB F6
+lcomment 2061 0273  05 10 1B 26 31 3C 47 52 5D 68 73 7E 89 94 9F AA B5 C0 CB D6 E1 EC F7
+lcomment 2061 028A  06 11 1C 27 32 3D 48 53 5E 69 74 7F 8A 95 A0 AB B6 C1 CC D7 E2 ED F8
+lcomment 2061 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 E3 EE F9
+lcomment 2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA
+lcomment 2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
+lcomment 2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
+;        2064
 label    2064 Start_2
 label    2067 Start_3
 comment  2071
 comment  2079
-comment  2079
 label    2079 Start_Rst_Game_Sel_Flash
 comment  207C
-comment  2085
-
-
+;        2080
 label    2080 BACK_2080
-comment  208f
+comment  2085
+comment  208F
 label    208F ATTRACT_MODE
-label    20b2 SKIP_20b2
-label    20bc SKIP_20bc
-label    20c6 SKIP_20c6
-label    20d0 SKIP_20d0
-
+;        2093
+lcomment 2093 Set Port B all bits to input
+lcomment 2098 Set Port A all bits to output
+lcomment 209D Select keyboard column to read (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
+lcomment 20A0 Get game settings ($1fD3 = Just outside UDG RAM)
+lcomment 20A3 Read keyboard column
+lcomment 20A6 Store keyboard data
+lcomment 20AA F1 pressed? (1 Player)
+lcomment 20AC No, skip
+label    20B2 SKIP_20B2
+lcomment 20B4 F3 pressed? (2 Player)
+lcomment 20B6 No, skip
+label    20BC SKIP_20BC
+lcomment 20BE F5 pressed? (Keyboard)
+lcomment 20C0 No, skip
+label    20C6 SKIP_20C6
+lcomment 20C8 F7 pressed? (Joystick)
+lcomment 20CA No, skip
+label    20D0 SKIP_20D0
+lcomment 20D1 Store game settings ($1fD3 = Just outside UDG RAM)
+lcomment 20D1 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
+lcomment 20D9 Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
+lcomment 20DF Space Pressed?
+lcomment 20E1 No, read keyboard again
+;        20E3
 comment  20E3
-
+;        20F0
 label    20F0 ???_TO_UDG_RAM
 const    20F3
 lcomment 20F3 ZP Offset for 1st address
@@ -153,105 +169,97 @@ lcomment 20F4 1st Address
 word     20F4
 const    20F6
 lcomment 20F6 End of Parameters
-
+;        2145
 label    2145 BACK_2145
-
-label    216b _12346737
-label    21dc SKIP_21DC
+;        216B
+label    216B _12346737
+;        219A
+label    219A Subroutine_219A
+label    21DC SKIP_21DC
 label    21F1 SKIP_21F1
-
+;        2206
 word     2206
 word     2209
-word     220c
-break    220f
-
-;const    22ea
-word     22ea
-
-break    22ed
-
-;const    22f9
-
-label    22ff Copy_Bytes_To_Screen_RAM
+word     220C
+break    220F
+;        22EA
+word     22EA
+;        22ED
+break    22ED
+;        22F9
+word     22F9
+;        22FF
+label    22FF Copy_Bytes_To_Screen_RAM
 label    2301 CBTSR1
-
-word     239a
-
-word     22f9
-
-
+;        2315
 word     2315
-label    233b BYTES_TO_COPY_TO_SCREEN_RAM
-const     233b-235a
-
+const    233B-235A
+label    233B BYTES_TO_COPY_TO_SCREEN_RAM
+;        2373
 label    2373 P1_LIVES_TO_UDG_RAM
 const    2376
 lcomment 2376 ZP Offset for 1st address
 lcomment 2377 1st Address
 word     2377
 lcomment 2379 End of Parameters
-
+;        2382
 label    2382 P2_LIVES__TO_UDG_RAM
 const    2385
 lcomment 2385 ZP Offset for 1st address
 lcomment 2386 1st Address
 word     2386
 lcomment 2388 End of Parameters
-
-
-label    23c7 SOME_DATA
-
-comment  23d4
-label    23d4 Setup_Player_Lives
+;        239A
+word     239A
+;        23C7
+label    23C7 SOME_DATA
+;        23D4
+comment  23D4
+label    23D4 Setup_Player_Lives
 label    23D6 BACK_23D6
-comment  23da
-comment  23e7
+comment  23DA
+comment  23E7
 label    23F4 SKIP_23F4
 label    23F5 SWAP_ZP59_ZP5B_SCR_RAM_COPY
 label    23F7 BACK_23F7
 comment  2404
 label    2406 BACK_2406
-
+;        2416
 label    2416 RESET_COLOR_PIXELS_SCORES
-lcomment 241c Puts 000000  000000  00 at top of screen
-
+lcomment 241C Puts 000000  000000  00 at top of screen
+;        2425
 comment  2425
 comment  2425 Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
-
-
-
+;        2429
 label    2429 BACK_2429
-
+;        2450
 label    2450 STR_1UP
-break    245e
-label    2457 STR_HI
 break    2457
-label    245e STR_2UP
-break    245e
-
+label    2457 STR_HI
+break    245E
+label    245E STR_2UP
+;        2465
 comment  2465
 label    2465 STR_1UP_HI_2UP
-word     2465-246f
-break    246b
-break    246d
-
-
+word     2465-246F
+break    246B
+break    246D
+;        2471
 comment  2471
-label    2471 P1_SCORE_TO_UDG_RAM
+label    2471 P1_Score_To_UDG_RAM
 lcomment 2474 ZP_UDG_RAM_X ZP_UDG_RAM_Y, but not in this case
 lcomment 2475 UDG array absolute position to display score at
 word     2475
 lcomment 2477 ZP_Ptr_To_Str
 lcomment 2478 Players score in ZP as BCD e.g. 12 34 56
 word     2478
-lcomment 247a ZP_Temp_1
-lcomment 247b 3 bytes of BCD data to display e.g. 12 34 56
-const    247b
-word     247b
-lcomment 247d End of Parameters
-
-
-label    2481 P2_SCORE_TO_UDG_RAM
+lcomment 247A ZP_Temp_1
+const    247B
+lcomment 247B 3 bytes of BCD data to display e.g. 12 34 56
+word     247B
+lcomment 247D End of Parameters
+;        2481
+label    2481 P2_Score_To_UDG_RAM
 const    2484
 lcomment 2484
 lcomment 2485
@@ -260,13 +268,13 @@ const    2487
 lcomment 2487
 lcomment 2488
 word     2488
-const    248a
-lcomment 248a
-lcomment 248b
-word     248b
-break    248d
-lcomment 248d End of Parameters
-
+const    248A
+lcomment 248A
+lcomment 248B
+word     248B
+break    248D
+lcomment 248D End of Parameters
+;        2491
 label    2491 HI_SCORE_TO_UDG_RAM
 const    2494
 lcomment 2494
@@ -276,152 +284,163 @@ const    2497
 lcomment 2497
 lcomment 2498
 word     2498
-const    249a
-lcomment 249a
-lcomment 249b
-word     249b
-break    249d
-lcomment 249d End of Parameters
-
-label    24a1 Game_Sel_Flash_Period
+const    249A
+lcomment 249A
+lcomment 249B
+word     249B
+break    249D
+lcomment 249D End of Parameters
+;        24A1
+label    24A1 Game_Sel_Flash_Period
 label    24A4 GSFP1
 lcomment 24A5 Test settings bit 1, if not set, skip counter logic
 lcomment 24A9 Counter for flash period
-lcomment 24ab remove the lsrs and flashes get faster
-
-
+lcomment 24AB remove the lsrs and flashes get faster
+;        24B2
 label    24B2 GSFP2
 label    24B9 Display_Game_Select
-
+;        24CA
 comment  24CA
-comment  24D7
-comment  24E4
-comment  24EB
-comment  2500
-
-word     24ce
+;        24CE
+word     24CE
 word     24D1
-const    24db
-word     24Db
-word     24de
-lcomment 24e7 ZP_Ptr_To_Str
-lcomment 24e8 String address
-word     24e8
-
-
+comment  24D7
+const    24DB
+word     24DB
+word     24DE
+comment  24E4
+lcomment 24E7 ZP_Ptr_To_Str
+lcomment 24E8 String address
+word     24E8
+comment  24EB
+;        24EF
+label    24EF DGS1
+comment  2500
+;        251F
+const    251F-2523
+label    251F Fn_Key_SP_Row_Offsets
+;        2524
+comment  2524
 label    2524 STRING_COPYRIGHT_1983_ACG
 lcomment 2539 Top bit=1 indicates end of string
 lcomment 2539 `= Space, qyxs = 1983, n=.
-label    253a STR_JETPAC_GAME_SELECT
+label    253A STR_JETPAC_GAME_SELECT
 label    2550 STR_F1_1_PLAYER_GAME
 label    2562 STR_F3_2_PLAYER_GAME
 label    2574 STR_F5_KEYBOARD
 label    2581 STR_F7_JOYSTICK
 label    258E STR_SP_START_GAME
-
-label    24EF DGS1
-
-label    251f Fn_Key_SP_Row_Offsets
-const    251f-2523
-comment  2524
-
-comment  259d
-label    259d Read_ZP_Paramenters
-lcomment 259d
-lcomment 259d Parameters for this routine are assembled into ROM after the
-lcomment 259d call to this routine and accessed via the return address
-lcomment 259d stored on the stack.
-lcomment 259e Stash return address
+;        259D
+comment  259D
+label    259D Read_ZP_Paramenters
+lcomment 259D
+lcomment 259D Parameters for this routine are assembled into ROM after the
+lcomment 259D call to this routine and accessed via the return address
+lcomment 259D stored on the stack.
+lcomment 259E Stash return address
 comment  25A3
-comment  25AE
-
-
+;        25A5
 label    25A5 RZPP1
 lcomment 25A5 Load next parameter value, ZP address for next param else $FF
 lcomment 25A7 Value $FF?
 lcomment 25A9 If No, Skip
-
+comment  25AE
+;        25B5
 label    25B5 Read_ZP_Paramenter
 lcomment 25B5 Stash to X number before string characters (string len?)
-comment  25b6
+comment  25B6
 lcomment 25B6 Address starts at end of previous opcode operand, so inc it
 lcomment 25B9 Y starts at 1
 lcomment 25BB Store the parameter value to requried ZP address lo-byte
-comment  25bd
-lcomment 25bd Same again for hi-byte
-comment  25c4
-lcomment 25c4 Move to next parameter
-lcomment 25c7 Go back and read the next parameter
-
-
-label    25ca Inc_Param_Addr
-lcomment 25ca Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
-label    25d0 IPA1
-
+comment  25BD
+lcomment 25BD Same again for hi-byte
+comment  25C4
+lcomment 25C4 Move to next parameter
+lcomment 25C7 Go back and read the next parameter
+;        25CA
+label    25CA Inc_Param_Addr
+lcomment 25CA Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
+label    25D0 IPA1
+;        25D1
+label    25D1 Game_Start
+;        25E0
 comment  25E0
 comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-used     25e0 Hardware_Interrupt_Handler
-
-label    25f4 SKIP_25f4
+used     25E0 Hardware_Interrupt_Handler
+;        25F4
+label    25F4 SKIP_25F4
 comment  25FA
 label    25FA Game_Start_
-
+label    2607 Main_Loop
+lcomment 260B Mulitply by two as 2 bytes in an address
+label    261A Subroutine_261A
 label    262A BACK_262A
-label    2630 BACK_2630
+label    2630 SKIP_2630
 label    2652 SKIP_2652
 label    2655 SKIP_2655
-
-comment  265e Setup Timer 1
-label    265e SET_TMR_1
-
+;        265E
+comment  265E Setup Timer 1
+label    265E Set_Jetman_Movement_Speed
+;        2679
 const    2679
 lcomment 2679 ZP Offset for 1st address
-lcomment 267a 1st Address
-word     267a
-
-;const    268e-26ad
-word     268c-26ad
-
-comment  26ae
-
-label    26b0 BACK_26b0
-
-label    26c5 SCREEN_C0000000
-
-label    26d1 BACK_26d1
-
-word     2743-274e
-
-comment  275b Erase $100 bytes zero page
-label    275b ERASEZP
-lcomment 275b Erase $100 bytes zero page
-label    275e ERASEZ1
-
+lcomment 267A 1st Address
+word     267A
+;        268C
+label    268C Subroutine_List
+word     268C-26AD
+label    268D Subroutine_List+1
+;        26AE
+comment  26AE
+;        26B0
+label    26B0 BACK_26B0
+;        26C5
+label    26C5 SCREEN_C0000000
+label    26CD Subroutine_26CD
+;        26D1
+label    26D1 BACK_26D1
+;        26E4
+label    26E4 Subroutine_26E4
+label    26FE Subroutine_26FE
+label    271C Subroutine_271C
+label    2727 Subroutine_2727
+label    2735 Subroutine_2735
+;        2743
+label    2743 Subroutine_List2
+word     2743-274E
+label    2744 Subroutine_List2+1
+label    274F Subroutine_274F
+;        275B
+comment  275B Erase $100 bytes zero page
+label    275B ERASEZP
+lcomment 275B Erase $100 bytes zero page
+label    275E ERASEZ1
+;        2764
 label    2764 RESET_SCREEN_RAM_0380_03ff
 label    2768 BACK_2768
-
-lcomment 276f Erase $30 bytes at end of UDGs $1fd0-$2000
-label    276f ERASE_HI_SCORE_SETTINGS_ETC
+;        276F
+label    276F ERASE_HI_SCORE_SETTINGS_ETC
+lcomment 276F Erase $30 bytes at end of UDGs $1fd0-$2000
 label    2773 ERASE1
-
-label    277a Check_New_Hi_Score
-const    277d
-lcomment 277d ZP_00
-lcomment 277e Addr of High Score value
-word     277e
+;        277A
+label    277A Check_New_Hi_Score
+const    277D
+lcomment 277D ZP_00
+lcomment 277E Addr of High Score value
+word     277E
 const    2780
 lcomment 2780 ZP_08
 lcomment 2781 Addr of P1 High Score value
 word     2781
 lcomment 2784 Check Player 1 first
 lcomment 2787  then follow through for Player 2
-const    278a
-lcomment 278a ZP_08
-lcomment 278b Addr of P2 High Score value
-word     278b
-comment  278e
-label    278e Test_New_Hi_Score
-comment  278e Compare Hi Score BCD bytes
+const    278A
+lcomment 278A ZP_08
+lcomment 278B Addr of P2 High Score value
+word     278B
+comment  278E
+comment  278E Compare Hi Score BCD bytes
+label    278E Test_New_Hi_Score
 label    2790 Compare_BCD_Byte
 lcomment 2796 Branch if SCORE_HI < Player Score
 lcomment 2798 SCORE_HI >= Player Score, so return
@@ -430,202 +449,162 @@ lcomment 279B All BCD bytes checked?
 lcomment 279D No, check the next BCD byte
 label    27A0 Copy_Player_To_Hi_Score
 lcomment 27A0 3 BCD bytes, 02, 01, 00
-label    27a2 CPTHS_1
+label    27A2 CPTHS_1
 lcomment 27A7 Return when all bytes copied
-
-const    286B
-break    286B
-break    286d
-
-
-lcomment 2093 Set Port B all bits to input
-lcomment 2098 Set Port A all bits to output
-lcomment 209D Select keyboard column to read (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
-lcomment 20A0 Get game settings ($1fD3 = Just outside UDG RAM)
-lcomment 20A3 Read keyboard column
-lcomment 20A6 Store keyboard data
-lcomment 20AA F1 pressed? (1 Player)
-lcomment 20AC No, skip
-lcomment 20B4 F3 pressed? (2 Player)
-lcomment 20b6 No, skip
-lcomment 20BE F5 pressed? (Keyboard)
-lcomment 20c0 No, skip
-lcomment 20c8 F7 pressed? (Joystick)
-lcomment 20ca No, skip
-lcomment 20d1 Store game settings ($1fD3 = Just outside UDG RAM)
-lcomment 20d1 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
-lcomment 20d9 Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
-lcomment 20df Space Pressed?
-lcomment 20e1 No, read keyboard again
-
-label    25d1 Game_Start
-
+;        282E
 comment  282E Using A to toggle, Load A and Y with Ship UDG address
 label    282E Get_Flame_UDG_Addr
-
-label    268C Subroutine_List
-label    268D Subroutine_List+1
-
-label    283a Ptr_Rocket_Flame_Lo
-lcomment 283a Addr of rocket flame UDG
-label    283b Ptr_Rocket_Flame_Hi
-label    283c Ptr_Final_Char_Lo
-lcomment 283c Addr of final char UDG
-label    283d Ptr_Final_Char_Hi
-const    283a-283d
-
-label    2888 Subroutine_List3
-label    2889 Subroutine_List3+1
-word     2888-2891
+;        283A
+const    283A-283d
+label    283A Ptr_Rocket_Flame_Lo
+lcomment 283A Addr of rocket flame UDG
+label    283B Ptr_Rocket_Flame_Hi
+label    283C Ptr_Final_Char_Lo
+lcomment 283C Addr of final char UDG
+label    283D Ptr_Final_Char_Hi
+label    283E Subroutine_283E
+;        286B
+break    286B
+const    286B
+break    286D
+;        2888
 break    2888-2891
-
+label    2888 Subroutine_List3
+word     2888-2891
+label    2889 Subroutine_List3+1
+;        2892
 label    2892 Routine_2892
-label    28a4 Routine_28a4
-label    289F Routine_289f
-label    28b6 Routine_28b6
-
+label    289F Routine_289F
+label    28A4 Routine_28A4
+label    28B6 Routine_28B6
+label    2934 Subroutine_2934
+;        2967
 label    2967 UDG_Ptr
-label    2968 UDG_Ptr+1
-;const    2967-2974
 word     2967-2974
 break    2968
-break    296f
-
+label    2968 UDG_Ptr+1
+break    296F
+;        2987
 label    2987 Game_Over
-
+;        2997
 label    2997 SKIP_2997
 label    299D Sound_Channels_Off_ETC
 lcomment 29DB Swap between P1 and P2?????????
 label    29E7 Display_Game_Over
 lcomment 29EA Game Over for P1 or P2?
-label    29ee Display_Game_Over_P1
-lcomment 29f1 ZP_Ptr_To_Str
-lcomment 29f2 Pointer to "GAME OVER PLAYER 1"
-word     29f2
-lcomment 29f4 ZP_UDG_RAM_X ZP_UDG_RAM_Y
-lcomment 29f5 X Y
-word     29f5
-
-label    29f8 Display_String_
-
-comment  29fb
-
-lcomment 29fe Into ZP addr 02 and 03...
-lcomment 29ff ...load 00 and 00
-const    29ff
-word     29ff
-lcomment 2a01 Into ZP addr 0A and 0B
-lcomment 2a02 ...load F8 and 00
-const    2a02
-word     2a02
-
-comment  2a05
-comment  2a05 Delay loop $100^2 x $08 x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
-label    2a05 Delay_Loop_Game_Over
-lcomment 2a05 5 cycles
-lcomment 2a07 3 cycles when taken, 2 when not taken
-
-label    2a12 Display_Game_Over_P2
-lcomment 2a15 ZP_Ptr_To_Str
-lcomment 2a16 Pointer to "GAME OVER PLAYER 2"
-word     2a16
+label    29EE Display_Game_Over_P1
+lcomment 29F1 ZP_Ptr_To_Str
+lcomment 29F2 Pointer to "GAME OVER PLAYER 1"
+word     29F2
+lcomment 29F4 ZP_UDG_RAM_X ZP_UDG_RAM_Y
+lcomment 29F5 X Y
+word     29F5
+;        29F8
+label    29F8 Display_String_
+;        29FB
+comment  29FB
+;        29FE
+lcomment 29FE Into ZP addr 02 and 03...
+const    29FF
+lcomment 29FF ...load 00 and 00
+word     29FF
+lcomment 2A01 Into ZP addr 0A and 0B
+const    2A02
+lcomment 2A02 ...load F8 and 00
+word     2A02
+;        2A05
+comment  2A05
+comment  2A05 Delay loop $100^2 x $08 x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
+label    2A05 Delay_Loop_Game_Over
+lcomment 2A05 5 cycles
+lcomment 2A07 3 cycles when taken, 2 when not taken
+;        2A12
+label    2A12 Display_Game_Over_P2
+lcomment 2A15 ZP_Ptr_To_Str
+lcomment 2A16 Pointer to "GAME OVER PLAYER 2"
+word     2A16
 const    2A18
 lcomment 2A18 ZP_UDG_RAM_X ZP_UDG_RAM_Y
 lcomment 2A19 X Y
 word     2A19
-
-
-label    2a1f STR_GAME_OVER_PLAYER_1
-label    2a32 STR_GAME_OVER_PLAYER_2
-
-const    2bcd
-lcomment 2bcd
-lcomment 2bce
-const    2bce
-word     2bce
-
-const    2BE8-2bf7
-break    2BE8-2bf7
-
-lcomment 306a ZP_Temp_2
-lcomment 306b P1 Score in ZP
-word     306b
-comment  306E
-lcomment 3094 ZP_Temp_2
-lcomment 3095 P2 Score in ZP
-word     3095
-
-label    219A Subroutine_219A
-label    261A Subroutine_261A
-label    26CD Subroutine_26CD
-label    283E Subroutine_283E
-label    2934 Subroutine_2934
+;        2A1F
+label    2A1F STR_GAME_OVER_PLAYER_1
+;        2A32
+break    2A32
+label    2A32 STR_GAME_OVER_PLAYER_2
+;        2A4C
+word     2A4C
 label    2A5F Subroutine_2A5F
 label    2A6D Subroutine_2A6D
 label    2ABC Subroutine_2ABC
+;        2B82
+const    2B82
+const    2B8A
+;        2BCD
+const    2BCD
+lcomment 2BCD
+const    2BCE
+lcomment 2BCE
+word     2BCE
+;        2BDE
+label    2BDE Get_Raster_Line_Band
+;        2BE8
+break    2BE8-2BF7
+const    2BE8-2BF7
+label    2BE8 Raster_Line_Table
 label    2C6A Subroutine_2C6A
+;        2CDB
+const    2CDB-2CE2
+label    2CDB _0025_0035_0045_0055
+word     2CDB-2CE2
+;        2DBC
+word     2DBC
+;        2DDD
+label    2DDD LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
 label    2E17 Subroutine_2E17
 label    2E4E Subroutine_2E4E
 label    2E74 Subroutine_2E74
+;        2E93
+word     2E93
 label    2F8E Subroutine_2F8E
+;        2FE5
+comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
+label    2FE5 Get_Ship_UDG_Addr
+word     2FFD
+label    3063 GameOverScoreStuff
+lcomment 3065 If P2, setup P2 Score instead of P1 and then return after the param setup below
+lcomment 306A ZP_Temp_2
+lcomment 306B P1 Score in ZP
+word     306B
+comment  306E
+label    306E Continue_Score_Process
+lcomment 3070 Set Decimal Mode
+lcomment 3086 Clear Decimal Mode
+lcomment 3087 Decide if working with P1 or P2
+label    308e P2_Score_To_UDG_RAM_
+label    3091 Read_ZP_Params_P2_Score
+lcomment 3094 ZP_Temp_2
+lcomment 3095 P2 Score in ZP
+word     3095
+;        3143
+lcomment 3143 Loads address to data from $31B6
+;        31B6
+comment  31B6 XY_Data_for_3143_Subroutine
+const    31B6-31BE
+word     31B6-31BD
 label    3273 Subroutine_3273
 label    334D Subroutine_334D
-
-label    26e4 Subroutine_26e4
-label    26fe Subroutine_26fe
-label    271c Subroutine_271c
-label    2727 Subroutine_2727
-label    2735 Subroutine_2735
-label    274f Subroutine_274f
-
-label    2743 Subroutine_List2
-label    2744 Subroutine_List2+1
-
-
-break    2a32
-
-word     2a4c
-
-const    2B82
-const    2B8A
-
-label    2BDE Get_Raster_Line_Band
-label    2BE8 Raster_Line_Table
-
-word     2CDB-2ce2
-break    2CDB-2ce2
-
-
-word     2DBc
-
-label    2ddd LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
-
-word     2e93
-word     2FFd
-
-comment  2fe5 Using A as offset, Load A and Y with Ship UDG address
-label    2fe5 Get_Ship_UDG_Addr
-
-lcomment 3143 Loads address to data from $31B6
-
-comment  31b6 XY_Data_for_3143_Subroutine
-word     31b6-31bd
-const    31B6-31be
-
-
-const    346c
-lcomment 346c ZP Offset for 1st address
-lcomment 346d 1st Address
-word     346d
-
-
-
+;        346C
+const    346C
+lcomment 346C ZP Offset for 1st address
+lcomment 346D 1st Address
+word     346D
+;        349D
 lcomment 349D Store to ZP_UDG_RAM_X
-lcomment 349e Character ROM
-;word     349e
-const    349e
-break    34a0
-
+const    349E
+lcomment 349E Character ROM
+break    34A0
+;        34A4
 comment  34A4
 comment  34A4 ----------------------------------------------------------
 comment  34A4 Display_BCD_Bytes
@@ -638,69 +617,66 @@ comment  34A4 ARGUMENTS : ZP_UDG_RAM_X ZP_UDG_RAM_Y = UDG array absolute positio
 comment  34A4 \            ZP_Ptr_To_Str             = Players score in ZP as BCD e.g. 12 34 56
 comment  34A4 \            ZP_Temp_1                 = BCD byte counter i.e. number of bytes to display
 comment  34A4 ----------------------------------------------------------
-label    34a4 Display_BCD_Bytes
-lcomment 34a4 Pointer to raw 12 34 56 in ZP
-lcomment 34a6 Load first score byte i.e. 12
-lcomment 34a8 Divide by $10
-lcomment 34ab 12 has become 01
-lcomment 34ad Add $70, $40 gets subtracted later on
-lcomment 34af and resultant $31st char in Char ROM is "1"
-
-comment  34b4
-comment  34b4 Display 2nd score character
-lcomment 34b6 Load first score byte again i.e. 12
-lcomment 34b8 Mask top 4 bits, 12 becomes 02
-
-comment  34c1
-comment  34c1 Increment pointer to next score byte
+label    34A4 Display_BCD_Bytes
+lcomment 34A4 Pointer to raw 12 34 56 in ZP
+lcomment 34A6 Load first score byte i.e. 12
+lcomment 34A8 Divide by $10
+lcomment 34AB 12 has become 01
+lcomment 34AD Add $70, $40 gets subtracted later on
+lcomment 34AF and resultant $31st char in Char ROM is "1"
+;        34B4
+comment  34B4
+comment  34B4 Display 2nd score character
+lcomment 34B6 Load first score byte again i.e. 12
+lcomment 34B8 Mask top 4 bits, 12 becomes 02
+;        34C1
+comment  34C1
+comment  34C1 Increment pointer to next score byte
 lcomment 34C5 Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
 label    34C7 SKIP_34C7
-lcomment 34c7 Decrement number of bytes to display counter
-lcomment 34c9 If <> 0 yet, process another byte
-
-
-comment  34cc
-comment  34cc ----------------------------------------------------------
-comment  34cc NOT SURE WHAT THIS IS YET
-comment  34cc ----------------------------------------------------------
-comment  34cc FUNCTION  :
-comment  34cc CALLED BY :
-comment  34cc CALLS     :
-comment  34cc ARGUMENTS :
-comment  34cc ZP_PTR_TO_STR  = "COPYRIGHT`qyxs`An" or "JETPAC`GAME`SELEC"
-comment  34cc ZP_ColorRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
-comment  34cc ZP_UDG_RAM_X   = 08 A8 or 08 20
-comment  34cc ZP_UDG_RAM_Y   = 08 A8 or 08 20
-comment  34cc ZP_Addr_From   = 70 80 or 28 80
-comment  34cc ----------------------------------------------------------
-label    34cc Display_String
-
-label    34d2
-lcomment 34d2 Y=string character pointer
-lcomment 34d4 Get character to display
-lcomment 34d6 Stash character to X
-lcomment 34d7 Inc character pointer
-lcomment 34da Test if character top bit is set = string end
-lcomment 34db Display character then exit
-lcomment 34dd Display character
-
-
-
+lcomment 34C7 Decrement number of bytes to display counter
+lcomment 34C9 If <> 0 yet, process another byte
+;        34CC
+comment  34CC
+comment  34CC ----------------------------------------------------------
+comment  34CC NOT SURE WHAT THIS IS YET
+comment  34CC ----------------------------------------------------------
+comment  34CC FUNCTION  :
+comment  34CC CALLED BY :
+comment  34CC CALLS     :
+comment  34CC ARGUMENTS :
+comment  34CC ZP_PTR_TO_STR  = "COPYRIGHT`qyxs`An" or "JETPAC`GAME`SELEC"
+comment  34CC ZP_ColorRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
+comment  34CC ZP_UDG_RAM_X   = 08 A8 or 08 20
+comment  34CC ZP_UDG_RAM_Y   = 08 A8 or 08 20
+comment  34CC ZP_Addr_From   = 70 80 or 28 80
+comment  34CC ----------------------------------------------------------
+label    34CC Display_String
+;        34D2
+label    34D2
+lcomment 34D2 Y=string character pointer
+lcomment 34D4 Get character to display
+;        34D6
 label    34D6 DSTR1
-
-comment  34e3
-label    34e3 Display_Character
-
-comment  34e9
-comment  34f0
-
-label    34f7 Setup_Color_RAM_Ptr
+lcomment 34D6 Stash character to X
+lcomment 34D7 Inc character pointer
+lcomment 34DA Test if character top bit is set = string end
+lcomment 34DB Display character then exit
+lcomment 34DD Display character
+;        34E3
+comment  34E3
+label    34E3 Display_Character
+;        34E9
+comment  34E9
+comment  34F0
+;        34F7
+label    34F7 Setup_Color_RAM_Ptr
 lcomment 34F7 Get Addr_To lo-byte and divide by 8
-lcomment 34f9 and store to Color RAM Ptr lo-byte.
-lcomment 34fa ZP_Addr_To is used to work out the column
-
-comment  34fe
-lcomment 34fe Get Addr_To hi-byte, divide by $10
+lcomment 34F9 and store to Color RAM Ptr lo-byte.
+lcomment 34FA ZP_Addr_To is used to work out the column
+;        34FE
+comment  34FE
+lcomment 34FE Get Addr_To hi-byte, divide by $10
 lcomment 3500 and use as index into Color RAM
 lcomment 3501 Row Offsets i.e. 9600, 9617, 962e etc.
 lcomment 3502 Divided by #16 because 16 y-pixels per
@@ -708,113 +684,107 @@ lcomment 3503 Color RAM tile.
 comment  350D
 lcomment 350D Store hi-byte of Color RAM
 lcomment 350F to pointer hi-byte.
-
+;        3512
+const    3512-351C
 label    3512 Color_RAM_Row_Offsets
-const    3512-351c
-
-comment  351d
-label    351d Setup_UDG_RAM_XY
-lcomment 351d Addr_To = 18 68, as example
-lcomment 351f Addr_To = 18 xx, 68 stashed to Y
+;        351D
+comment  351D
+label    351D Setup_UDG_RAM_XY
+lcomment 351D Addr_To = 18 68, as example
+lcomment 351F Addr_To = 18 xx, 68 stashed to Y
 comment  3520
 lcomment 3520 Get Addr_To lo-byte, divide by 8, example = $18/8=3
 lcomment 3526 Load Column offset (4th item = $21)
 lcomment 3529 Store back to Addr_To lo-byte, Addr_To = 21 xx
-
-lcomment 352b Reset Addr_To hi-byte to 00
-lcomment 352d Addr_To = 21 xx
-
-
-comment  352f
-lcomment 352f Rotate left Addr_To by 4 bits
-lcomment 3536 Addr_To = 1x x2
-
-comment   3538
-lcomment  3538 Get stashed Y = 68 to A
-lcomment  353c Addr_To = 78 x2
-lcomment  3542 Addr_To = 78 12 = "F7 JOYSTICK" start position
-
-
-
+;        352B
+lcomment 352B Reset Addr_To hi-byte to 00
+lcomment 352D Addr_To = 21 xx
+;        352F
+comment  352F
+lcomment 352F Rotate left Addr_To by 4 bits
+;        3531
 label    3531 SURP1
-
-label    3545 UDG_RAM_Column_Offsets
-lcomment  3545 Bytes are middle two numbers in addr e.g. 10b0, 1160 etc
+lcomment 3536 Addr_To = 1x x2
+;        3538
+comment  3538
+lcomment 3538 Get stashed Y = 68 to A
+lcomment 353C Addr_To = 78 x2
+lcomment 3542 Addr_To = 78 12 = "F7 JOYSTICK" start position
+;        3545
 const    3545-3557
-
-comment  355c
-label    355c RESET_COLOR_RAM
-
-const    355f
-lcomment 355f ZP Offset for 1st address
+label    3545 UDG_RAM_Column_Offsets
+lcomment 3545 Bytes are middle two numbers in addr e.g. 10b0, 1160 etc
+;        355C
+comment  355C
+label    355C RESET_COLOR_RAM
+;        355F
+const    355F
+lcomment 355F ZP Offset for 1st address
 lcomment 3560 1st Address
 word     3560
-
+;        3562
 const    3562
 lcomment 3562 ZP Offset for 2nd address
 lcomment 3563 2nd address
 word     3563
-
+;        3565
 const    3565
 lcomment 3565 ZP Offset for 3rd address
 lcomment 3566 3rd address
 word     3566
-
+;        3568
 break    3568
 lcomment 3568 End of Parameters
-
-
-label    356c ERASE_UDG_RAM_1000_1fff
-const    356f
-lcomment 356f ZP Offset for 1st address
-lcomment 3570 1st Address
+;        356C
+label    356C ERASE_UDG_RAM_1000_1fff
+const    356F
+lcomment 356F ZP Offset for 1st address
 const    3570
+lcomment 3570 1st Address
 word     3570
-
+;        3572
 const    3572
 lcomment 3572 ZP Offset for 2nd address
 lcomment 3573 2nd address
 word     3573
-
+;        3575
 const    3575
 lcomment 3575 ZP Offset for 3rd address
 lcomment 3576 3rd address
 word     3576
-
+;        3578
 break    3578
 lcomment 3578 End of Parameters
-
+;        3579
 comment  3579
 label    3579 ERASE_COLOR_RAM_9600
-label    357b ERASECR1
-lcomment 357b
-lcomment 357b Fills memory from 9600-96fc (address at zero page $05) with $01's
-lcomment 357b This is color RAM for 3.5k but unused for 8k+!?
-lcomment 357b ALSO CONTIUNES TO BLANK THE SCREEN, COMPLETING BOTTOM HALF
-lcomment 357b FILLS SCREEN WITH A RUG
-lcomment 357b FILLS 1200-1fff i.e. stanard RAM
-lcomment 357b This may be a generic memory move operation, as it also is used ot fill screen-ram at $1000
-lcomment 357b 9600  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 9610  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 9620  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 9630  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 9640  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 9650  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 9660  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 9670  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 9680  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 9690  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 96A0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 96B0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 96C0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 96D0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 96E0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357b 96F0  01 01 01 01 01 01 01 01 01 01 01 01 01 00 00 00   ................
-lcomment 357b 9700  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+label    357B ERASECR1
+lcomment 357B
+lcomment 357B Fills memory from 9600-96FC (address at zero page $05) with $01's
+lcomment 357B This is color RAM for 3.5k but unused for 8k+!?
+lcomment 357B ALSO CONTIUNES TO BLANK THE SCREEN, COMPLETING BOTTOM HALF
+lcomment 357B FILLS SCREEN WITH A RUG
+lcomment 357B FILLS 1200-1FFF i.e. stanDard RAM
+lcomment 357B This may be a generic memory move operation, as it also is used ot fill screen-ram at $1000
+lcomment 357B 9600  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 9610  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 9620  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 9630  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 9640  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 9650  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 9660  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 9670  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 9680  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 9690  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 96A0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 96B0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 96C0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 96D0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 96E0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
+lcomment 357B 96F0  01 01 01 01 01 01 01 01 01 01 01 01 01 00 00 00   ................
+lcomment 357B 9700  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
 label    3584 ERASECR2
-
-label    3595 MV_CHARS_TO_UDGRAM
-
+;        3595
 comment  3595
 comment  3595 ----------------------------------------------------------
 comment  3595 Copy Character ROM Character to User-Defined Graphics Memory
@@ -833,66 +803,66 @@ lcomment 3595 Addr_From = 71 xx as example
 lcomment 3597 Clear address hi-byte
 lcomment 3599 Addr_From = 71 00
 lcomment 359E Addr_From = 31 00, $31st Character ROM character is "1"
-
+;        35A0
 comment  35A0
 comment  35A0 Multiply Addr_From by 8, as 8 bytes per UDG RAM character definition
 label    35A2 CCTUR1
-
-lcomment 35a5 Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
-lcomment 35a7 Left-shifted 3 times? i.e. multiplied by 8
-lcomment 35a8 If no, loop back
-
-comment  35aa
-comment  35aa Add $8000 Character ROM offset to address
-lcomment 35ae Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
-
+;        35A5
+lcomment 35A5 Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
+lcomment 35A7 Left-shifted 3 times? i.e. multiplied by 8
+lcomment 35A8 If no, loop back
+;        35AA
+comment  35AA
+comment  35AA Add $8000 Character ROM offset to address
+lcomment 35AE Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
+;        35B0
 comment  35B0
-comment  35b0 Copy 8 bytes to form a complete character
-lcomment 35b2 Test the Invert flag
-lcomment 35b4 If yes, copy bytes with inversion instead
+comment  35B0 Copy 8 bytes to form a complete character
+lcomment 35B2 Test the Invert flag
+lcomment 35B4 If yes, copy bytes with inversion instead
 label    35B6 CCTUR2
 lcomment 35B6 Copy bytes from given address with Y offset
-lcomment 35b8 Copy bytes to given address with Y offset
-lcomment 35ba Decrement number of lines counter
-lcomment 35bb All lines copied? If no, loop back.
-
-label    35bd CCTUR_NEXT
+lcomment 35B8 Copy bytes to given address with Y offset
+lcomment 35BA Decrement number of lines counter
+lcomment 35BB All lines copied? If no, loop back.
+;        35BD
 comment  35BD
 comment  35BD Move the next character address to the next column
-
+label    35BD CCTUR_NEXT
+;        35C0
 lcomment 35C0 #B0=176=number of vertical pixels i.e. move to next char right
 lcomment 35C6 Increment address hi-byte if previous addition overflowed
-
-label    35CB CCTUR_INV
+;        35CB
 comment  35CB
 comment  35CB Copy 8 inverted bytes to form a complete character
+label    35CB CCTUR_INV
 lcomment 35CB Copy bytes from given address with Y offset
-lcomment 35cd Invert the byte (used to make the byte flash)
-lcomment 35Cf Move bytes to given address with Y offset
-lcomment 35d1 Decrement number of lines counter
-lcomment 35d2 All lines copied? If no, loop back.
-lcomment 35d4 If yes, routine ends
-
+lcomment 35CD Invert the byte (used to make the byte flash)
+lcomment 35CF Move bytes to given address with Y offset
+lcomment 35D1 Decrement number of lines counter
+lcomment 35D2 All lines copied? If no, loop back.
+lcomment 35D4 If yes, routine ends
+;        35D7
 label    35D7 COPY_ZP00TO12_ZP01TO10_ZP03TO11
-
+;        35E2
 comment  35E2
-
-label    35e9 COPY_ZP0TO1A_1TO18_3TO19_5TO1B
-comment  35f4
-comment  35fa
-
+;        35E9
+label    35E9 COPY_ZP0TO1A_1TO18_3TO19_5TO1B
+comment  35F4
+comment  35FA
+;        End
 ; End of file contains graphics data
-;unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
-label    385f UDG_Lookup
+;unused  3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
+label    385F UDG_Lookup
 label    3860 UDG_Lookup+1
-break    385f-3fff ; Output one byte per line
-word     385f-3896
-binary   3897-3c86
-byte     3c88-3c89
-const    3c88-3c89
-word     3c89-3cb0
-binary   3cb1-3fff
-
+break    385F-3FFF ; Output one byte per line
+word     385F-3896
+binary   3897-3C86
+byte     3C88-3C89
+const    3C88-3C89
+word     3C89-3CB0
+binary   3CB1-3FFF
+;        38CA
 label    38CA Jetman_Fly_Right_1
 label    38FD Jetman_Walk_Right_1
 label    3930 Jetman_Walk_Right_2
@@ -918,7 +888,6 @@ label    3EB8 Alien_Bubble_1
 label    3EEB Alien_Bubble_2
 label    3F0E Alien_Cross_1
 label    3F41 Alien_Cross_2
-
 label    3CD4 Ship_1_Bott
 label    3CF7 Ship_1_Mid
 label    3D1A Ship_1_Top
@@ -931,7 +900,6 @@ label    3DCA Diamond
 label    3DE3 Plutonium
 label    3E00 Isotope
 label    3E15 Mineral
-
-label    3f74 Explosion_1
-label    3f9b Explosion_2
-label    3fb2 Explosion_3
+label    3F74 Explosion_1
+label    3F9B Explosion_2
+label    3FB2 Explosion_3

@@ -111,9 +111,9 @@ Kernal_ROM              equ     $E000
         org     $2000
 
         fdb     $201D,$201D             ; 2000: 1D 20 1D 20 
-; Left edge of TV picture and interlace switch.
+; Initial value table for VIC setup 16 bytes
 VIC_Init_Tab
-        fcb     $0B                     ; 2004: 0B        VICCRO Initial value table for VIC setup 16 bytes
+        fcb     $0B                     ; 2004: 0B        VICCRO Left edge of TV picture and interlace switch.
         fcb     $26                     ; 2005: 26        VICCR1
         fcb     $97                     ; 2006: 97        VICCR2
         fcb     $17                     ; 2007: 17        VICCR3
@@ -162,7 +162,7 @@ NMI_Interrupt_Hardler
         sta     VIA1_Int_Enable         ; 2039: 8D 1E 91 
         lda     #$C0                    ; 203C: A9 C0    
         sta     VIA2_Int_Enable         ; 203E: 8D 2E 91 
-        jsr     SET_TMR_1               ; 2041: 20 5E 26 
+        jsr     Set_Jetman_Movement_Speed ; 2041: 20 5E 26 
         lda     #$40                    ; 2044: A9 40    
         sta     VIA1_Port_B             ; 2046: 8D 10 91 
         sta     VIA2_Port_B             ; 2049: 8D 20 91 
@@ -180,17 +180,17 @@ Start_1 lda     VIC_Init_Tab,x          ; 2058: BD 04 20
         ldx     #$00                    ; 2061: A2 00    
                                         ; Store ascending numbers step #11 at a time into #23 bytes from $200 as below
                                         ; then do it #10 more times, but starting at 1 higher each time
-                                        ; 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2   ???
-                                        ; 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3   ..."-8CNYdoz...¶±º«“›ËÛ
-                                        ; 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4   ...#.9DOZep{...ß≤Ω»”ﬁÈÙ
-                                        ; 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5   ...$/:EP[fq|...®≥æ…‘ﬂÍı
-                                        ; 025C  04 0F 1A 25 30 3B 46 51 5C 67 72 7D 88 93 9E A9 B4 BF CA D5 E0 EB F6   ...%0;FQgr}...©¥ø ’‡Îˆ
-                                        ; 0273  05 10 1B 26 31 3C 47 52 5D 68 73 7E 89 94 9F AA B5 C0 CB D6 E1 EC F7   ...&1<GR]hs~...™µ¿À÷·Ï˜
-                                        ; 028A  06 11 1C 27 32 3D 48 53 5E 69 74 7F 8A 95 A0 AB B6 C1 CC D7 E2 ED F8   ...'2=HS^it...†´∂¡Ã◊‚Ì¯
-                                        ; 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 E3 EE F9   ...(3>IT_ju...°¨∑¬Õÿ„Ó˘
-                                        ; 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA   ...)4?JU`kv...¢-∏√ŒŸ‰Ô˙
-                                        ; 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB    ..
-                                        ; 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC   .. +6ALWbmx...§Ø∫≈–€ÊÒ¸
+                                        ; 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
+                                        ; 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
+                                        ; 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
+                                        ; 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5
+                                        ; 025C  04 0F 1A 25 30 3B 46 51 5C 67 72 7D 88 93 9E A9 B4 BF CA D5 E0 EB F6
+                                        ; 0273  05 10 1B 26 31 3C 47 52 5D 68 73 7E 89 94 9F AA B5 C0 CB D6 E1 EC F7
+                                        ; 028A  06 11 1C 27 32 3D 48 53 5E 69 74 7F 8A 95 A0 AB B6 C1 CC D7 E2 ED F8
+                                        ; 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 E3 EE F9
+                                        ; 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA
+                                        ; 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
+                                        ; 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
         txa                             ; 2063: 8A       
 Start_2 ldy     #$17                    ; 2064: A0 17    
         pha                             ; 2066: 48       
@@ -206,7 +206,6 @@ Start_3 sta     Screen_RAM,x            ; 2067: 9D 00 02
         adc     #$01                    ; 2073: 69 01    
         cmp     #$0B                    ; 2075: C9 0B    
         bne     Start_2                 ; 2077: D0 EB    
-
 
 Start_Rst_Game_Sel_Flash
         jsr     RESET_COLOR_PIXELS_SCORES ; 2079: 20 16 24 
@@ -236,32 +235,32 @@ ATTRACT_MODE
         sta     Keyboard_Data           ; 20A6: 85 13     Store keyboard data
         lda     #$10                    ; 20A8: A9 10    
         bit     Keyboard_Data           ; 20AA: 24 13     F1 pressed? (1 Player)
-        bne     SKIP_20b2               ; 20AC: D0 04     No, skip
+        bne     SKIP_20B2               ; 20AC: D0 04     No, skip
         txa                             ; 20AE: 8A       
         and     #$02                    ; 20AF: 29 02    
         tax                             ; 20B1: AA       
-SKIP_20b2
+SKIP_20B2
         lda     #$20                    ; 20B2: A9 20    
         bit     Keyboard_Data           ; 20B4: 24 13     F3 pressed? (2 Player)
-        bne     SKIP_20bc               ; 20B6: D0 04     No, skip
+        bne     SKIP_20BC               ; 20B6: D0 04     No, skip
         txa                             ; 20B8: 8A       
         ora     #$01                    ; 20B9: 09 01    
         tax                             ; 20BB: AA       
-SKIP_20bc
+SKIP_20BC
         lda     #$40                    ; 20BC: A9 40    
         bit     Keyboard_Data           ; 20BE: 24 13     F5 pressed? (Keyboard)
-        bne     SKIP_20c6               ; 20C0: D0 04     No, skip
+        bne     SKIP_20C6               ; 20C0: D0 04     No, skip
         txa                             ; 20C2: 8A       
         and     #$01                    ; 20C3: 29 01    
         tax                             ; 20C5: AA       
-SKIP_20c6
+SKIP_20C6
         lda     #$80                    ; 20C6: A9 80    
         bit     Keyboard_Data           ; 20C8: 24 13     F7 pressed? (Joystick)
-        bne     SKIP_20d0               ; 20CA: D0 04     No, skip
+        bne     SKIP_20D0               ; 20CA: D0 04     No, skip
         txa                             ; 20CC: 8A       
         ora     #$02                    ; 20CD: 09 02    
         tax                             ; 20CF: AA       
-SKIP_20d0
+SKIP_20D0
         txa                             ; 20D0: 8A       
         sta     GAME_OPTIONS            ; 20D1: 8D D3 1F  Store game settings ($1fD3 = Just outside UDG RAM)
                                         ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
@@ -732,9 +731,9 @@ BACK_2406
 RESET_COLOR_PIXELS_SCORES
         jsr     RESET_COLOR_RAM         ; 2416: 20 5C 35 
         jsr     ERASE_UDG_RAM_1000_1fff ; 2419: 20 6C 35 
-        jsr     P1_SCORE_TO_UDG_RAM     ; 241C: 20 71 24  Puts 000000  000000  00 at top of screen
+        jsr     P1_Score_To_UDG_RAM     ; 241C: 20 71 24  Puts 000000  000000  00 at top of screen
         jsr     HI_SCORE_TO_UDG_RAM     ; 241F: 20 91 24 
-        jsr     P2_SCORE_TO_UDG_RAM     ; 2422: 20 81 24 
+        jsr     P2_Score_To_UDG_RAM     ; 2422: 20 81 24 
 
 ; Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
 Z2425   ldx     #$00                    ; 2425: A2 00    
@@ -782,7 +781,7 @@ STR_1UP_HI_2UP
         fdb     ZP_0080                 ; 246D: 80 00    
         fdb     STR_2UP                 ; 246F: 5E 24    
 
-P1_SCORE_TO_UDG_RAM
+P1_Score_To_UDG_RAM
         jsr     Read_ZP_Paramenters     ; 2471: 20 9D 25 
         fcb     $04                     ; 2474: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y, but not in this case
         fdb     UDG_P1_SCORE_RAW_POSN   ; 2475: 08 10     UDG array absolute position to display score at
@@ -793,7 +792,7 @@ P1_SCORE_TO_UDG_RAM
         fcb     $FF                     ; 247D: FF        End of Parameters
         jmp     Display_BCD_Bytes       ; 247E: 4C A4 34 
 ; -----------------------
-P2_SCORE_TO_UDG_RAM
+P2_Score_To_UDG_RAM
         jsr     Read_ZP_Paramenters     ; 2481: 20 9D 25 
         fcb     $04                     ; 2484: 04       
         fdb     UDG_P2_SCORE_RAW_POSN   ; 2485: 08 1B    
@@ -976,14 +975,14 @@ Game_Start
 Hardware_Interrupt_Handler
         lda     #$01                    ; 25E0: A9 01    
         sta     ZP_HW_IRQ_1_OR_0        ; 25E2: 85 20    
-        jsr     SET_TMR_1               ; 25E4: 20 5E 26 
+        jsr     Set_Jetman_Movement_Speed ; 25E4: 20 5E 26 
         lda     VIC_R4_TV_Raster        ; 25E7: AD 04 90 
         adc     ZP_HW_IRQ_Count3        ; 25EA: 65 4C    
         sta     ZP_HW_IRQ_Count3        ; 25EC: 85 4C    
         inc     ZP_HW_IRQ_Count1        ; 25EE: E6 4A    
-        bne     SKIP_25f4               ; 25F0: D0 02    
+        bne     SKIP_25F4               ; 25F0: D0 02    
         inc     ZP_HW_IRQ_Count2        ; 25F2: E6 4B    
-SKIP_25f4
+SKIP_25F4
         pla                             ; 25F4: 68       
         tay                             ; 25F5: A8       
         pla                             ; 25F6: 68       
@@ -1000,9 +999,10 @@ Game_Start_
         lda     #$03                    ; 2602: A9 03    
         sta     ZP_0001                 ; 2604: 85 01    
         cli                             ; 2606: 58       
-Z2607   ldy     #$00                    ; 2607: A0 00    
+Main_Loop
+        ldy     #$00                    ; 2607: A0 00    
         lda     (ZP_0000),y             ; 2609: B1 00    
-        asl     a                       ; 260B: 0A       
+        asl     a                       ; 260B: 0A        Mulitply by two as 2 bytes in an address
         tay                             ; 260C: A8       
         lda     Subroutine_List,y       ; 260D: B9 8C 26 
         sta     ZP_Subroutine_Vec_Lo    ; 2610: 85 5F    
@@ -1013,10 +1013,10 @@ Z2607   ldy     #$00                    ; 2607: A0 00
 Subroutine_261A
         ldy     #$00                    ; 261A: A0 00    
         lda     (ZP_0000),y             ; 261C: B1 00    
-        bne     BACK_2630               ; 261E: D0 10    
+        bne     SKIP_2630               ; 261E: D0 10    
         lda     ZP_0000                 ; 2620: A5 00    
         cmp     #$B0                    ; 2622: C9 B0    
-        bcc     BACK_2630               ; 2624: 90 0A    
+        bcc     SKIP_2630               ; 2624: 90 0A    
         ldy     #$02                    ; 2626: A0 02    
         ldx     #$00                    ; 2628: A2 00    
 BACK_262A
@@ -1024,7 +1024,7 @@ BACK_262A
         bne     BACK_262A               ; 262B: D0 FD    
         dey                             ; 262D: 88       
         bne     BACK_262A               ; 262E: D0 FA    
-BACK_2630
+SKIP_2630
         lda     ZP_0000                 ; 2630: A5 00    
         clc                             ; 2632: 18       
         adc     #$08                    ; 2633: 69 08    
@@ -1035,7 +1035,7 @@ Z263B   lda     ZP_0000                 ; 263B: A5 00
         cmp     #$B0                    ; 263D: C9 B0    
         beq     Z2680                   ; 263F: F0 3F    
         and     ZP_0000                 ; 2641: 25 00    
-        bne     Z2607                   ; 2643: D0 C2    
+        bne     Main_Loop               ; 2643: D0 C2    
         lda     ZP_HW_IRQ_VAR           ; 2645: A5 21    
         cmp     #$04                    ; 2647: C9 04    
         bcc     SKIP_2652               ; 2649: 90 07    
@@ -1050,7 +1050,7 @@ SKIP_2655
         jmp     Game_Start_             ; 265B: 4C FA 25 
 ; -----------------------
 ; Setup Timer 1
-SET_TMR_1
+Set_Jetman_Movement_Speed
         lda     #$D7                    ; 265E: A9 D7    
         sta     VIA2_T1_Cnt_Lo          ; 2660: 8D 24 91 
         lda     #$4F                    ; 2663: A9 4F    
@@ -1068,7 +1068,7 @@ Z2669   sei                             ; 2669: 78
         fcb     $00                     ; 2679: 00        ZP Offset for 1st address
         fdb     Screen_RAM+384          ; 267A: 80 03     1st Address
         fcb     $FF                     ; 267C: FF       
-        jmp     Z2607                   ; 267D: 4C 07 26 
+        jmp     Main_Loop               ; 267D: 4C 07 26 
 Z2680   lda     ZP_0022                 ; 2680: A5 22    
         sta     ZP_0000                 ; 2682: 85 00    
         lda     ZP_0023                 ; 2684: A5 23    
@@ -1096,11 +1096,11 @@ Subroutine_List
         fdb     Subroutine_219A         ; 26AC: 9A 21    
 
 Z26AE   ldx     #$07                    ; 26AE: A2 07    
-BACK_26b0
+BACK_26B0
         lda     SCREEN_C0000000,x       ; 26B0: BD C5 26 
         sta     Screen_RAM+424,x        ; 26B3: 9D A8 03 
         dex                             ; 26B6: CA       
-        bpl     BACK_26b0               ; 26B7: 10 F7    
+        bpl     BACK_26B0               ; 26B7: 10 F7    
         lda     #$00                    ; 26B9: A9 00    
         sta     VIC_RA_Frq_Osc1         ; 26BB: 8D 0A 90 
         sta     VIC_RB_Frq_Osc2         ; 26BE: 8D 0B 90 
@@ -1113,7 +1113,7 @@ SCREEN_C0000000
 Subroutine_26CD
         lda     #$01                    ; 26CD: A9 01    
         sta     ZP_Subroutine_Vec_Hi    ; 26CF: 85 60    
-BACK_26d1
+BACK_26D1
         ldy     ZP_Subroutine_Vec_Hi    ; 26D1: A4 60    
         lda     (ZP_0000),y             ; 26D3: B1 00    
         asl     a                       ; 26D5: 0A       
@@ -1124,13 +1124,13 @@ BACK_26d1
         sta     ZP_0009                 ; 26DF: 85 09    
         jmp     (ZP_0008)               ; 26E1: 6C 08 00 
 ; -----------------------
-Subroutine_26e4
+Subroutine_26E4
         lda     ZP_Subroutine_Vec_Hi    ; 26E4: A5 60    
         clc                             ; 26E6: 18       
         adc     #$02                    ; 26E7: 69 02    
         sta     ZP_Subroutine_Vec_Hi    ; 26E9: 85 60    
         cmp     #$07                    ; 26EB: C9 07    
-        bcc     BACK_26d1               ; 26ED: 90 E2    
+        bcc     BACK_26D1               ; 26ED: 90 E2    
         jmp     Subroutine_261A         ; 26EF: 4C 1A 26 
 ; -----------------------
 Z26F2   lda     ZP_Subroutine_Vec_Hi    ; 26F2: A5 60    
@@ -1142,7 +1142,7 @@ Z26F2   lda     ZP_Subroutine_Vec_Hi    ; 26F2: A5 60
         sta     (ZP_0000),y             ; 26FB: 91 00    
         rts                             ; 26FD: 60       
 ; ===========================================================
-Subroutine_26fe
+Subroutine_26FE
         jsr     Z26F2                   ; 26FE: 20 F2 26 
         beq     Z270A                   ; 2701: F0 07    
         eor     #$FF                    ; 2703: 49 FF    
@@ -1160,9 +1160,9 @@ Z2710   pha                             ; 2710: 48
         dex                             ; 2714: CA       
         pla                             ; 2715: 68       
         sta     VIC_RA_Frq_Osc1,x       ; 2716: 9D 0A 90 
-        jmp     Subroutine_26e4         ; 2719: 4C E4 26 
+        jmp     Subroutine_26E4         ; 2719: 4C E4 26 
 ; -----------------------
-Subroutine_271c
+Subroutine_271C
         jsr     Z26F2                   ; 271C: 20 F2 26 
         beq     Z270A                   ; 271F: F0 E9    
         asl     a                       ; 2721: 0A       
@@ -1188,13 +1188,13 @@ Subroutine_2735
         jmp     Z2705                   ; 2740: 4C 05 27 
 ; -----------------------
 Subroutine_List2
-        fdb     Subroutine_26e4         ; 2743: E4 26    
-        fdb     Subroutine_26fe         ; 2745: FE 26    
-        fdb     Subroutine_271c         ; 2747: 1C 27    
+        fdb     Subroutine_26E4         ; 2743: E4 26    
+        fdb     Subroutine_26FE         ; 2745: FE 26    
+        fdb     Subroutine_271C         ; 2747: 1C 27    
         fdb     Subroutine_2727         ; 2749: 27 27    
         fdb     Subroutine_2735         ; 274B: 35 27    
-        fdb     Subroutine_274f         ; 274D: 4F 27    
-Subroutine_274f
+        fdb     Subroutine_274F         ; 274D: 4F 27    
+Subroutine_274F
         jsr     Z26F2                   ; 274F: 20 F2 26 
         beq     Z270A                   ; 2752: F0 B6    
         asl     a                       ; 2754: 0A       
@@ -1375,7 +1375,7 @@ Z2851   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2851: 20 E9 35
         fcb     $02                     ; 286A: 02       
         fcb     $50,$02                 ; 286B: 50 02    
         fcb     $FF                     ; 286D: FF       
-        jsr     Z3063                   ; 286E: 20 63 30 
+        jsr     GameOverScoreStuff      ; 286E: 20 63 30 
         jmp     Z2F65                   ; 2871: 4C 65 2F 
 Z2874   ldy     #$06                    ; 2874: A0 06    
         lda     (ZP_0000),y             ; 2876: B1 00    
@@ -1388,10 +1388,10 @@ Z2874   ldy     #$06                    ; 2874: A0 06
         jmp     (ZP_0008)               ; 2885: 6C 08 00 
 Subroutine_List3
         fdb     Routine_2892            ; 2888: 92 28    
-        fdb     Routine_28a4            ; 288A: A4 28    
-        fdb     Routine_28a4            ; 288C: A4 28    
-        fdb     Routine_289f            ; 288E: 9F 28    
-        fdb     Routine_28b6            ; 2890: B6 28    
+        fdb     Routine_28A4            ; 288A: A4 28    
+        fdb     Routine_28A4            ; 288C: A4 28    
+        fdb     Routine_289F            ; 288E: 9F 28    
+        fdb     Routine_28B6            ; 2890: B6 28    
 Routine_2892
         lda     #$07                    ; 2892: A9 07    
 Z2894   ldy     #$05                    ; 2894: A0 05    
@@ -1400,11 +1400,11 @@ Z2894   ldy     #$05                    ; 2894: A0 05
         lda     (ZP_0000),y             ; 289A: B1 00    
         jmp     Z2FC3                   ; 289C: 4C C3 2F 
 ; -----------------------
-Routine_289f
+Routine_289F
         lda     #$06                    ; 289F: A9 06    
         jmp     Z2894                   ; 28A1: 4C 94 28 
 ; -----------------------
-Routine_28a4
+Routine_28A4
         lda     ZP_HW_IRQ_Count1        ; 28A4: A5 4A    
         and     #$1F                    ; 28A6: 29 1F    
         cmp     #$18                    ; 28A8: C9 18    
@@ -1415,7 +1415,7 @@ Routine_28a4
 Z28B1   lda     #$03                    ; 28B1: A9 03    
         jmp     Z2894                   ; 28B3: 4C 94 28 
 ; -----------------------
-Routine_28b6
+Routine_28B6
         lda     ZP_HW_IRQ_Count1        ; 28B6: A5 4A    
         lsr     a                       ; 28B8: 4A       
         lsr     a                       ; 28B9: 4A       
@@ -1919,12 +1919,12 @@ Z2C78   lda     ZP_0059                 ; 2C78: A5 59
         and     #$03                    ; 2C7A: 29 03    
         asl     a                       ; 2C7C: 0A       
         tax                             ; 2C7D: AA       
-        lda     M2CDB,x                 ; 2C7E: BD DB 2C 
+        lda     _0025_0035_0045_0055,x  ; 2C7E: BD DB 2C 
         sta     ZP_Temp_1_Lo            ; 2C81: 85 02    
         inx                             ; 2C83: E8       
-        lda     M2CDB,x                 ; 2C84: BD DB 2C 
+        lda     _0025_0035_0045_0055,x  ; 2C84: BD DB 2C 
         sta     ZP_Temp_1_Hi            ; 2C87: 85 03    
-        jsr     Z3063                   ; 2C89: 20 63 30 
+        jsr     GameOverScoreStuff      ; 2C89: 20 63 30 
 Z2C8C   jsr     Z28F9                   ; 2C8C: 20 F9 28 
         jmp     Subroutine_261A         ; 2C8F: 4C 1A 26 
 ; -----------------------
@@ -1972,10 +1972,8 @@ Z2CD6   lda     ZP_005d                 ; 2CD6: A5 5D
         beq     Z2CE3                   ; 2CD8: F0 09    
         rts                             ; 2CDA: 60       
 ; ===========================================================
-M2CDB   fdb     ZP_0025                 ; 2CDB: 25 00    
-        fdb     $0035                   ; 2CDD: 35 00    
-        fdb     ZP_Game_Sel_F7_Flash    ; 2CDF: 45 00    
-        fdb     $0055                   ; 2CE1: 55 00    
+_0025_0035_0045_0055
+        fdb     $0025,$0035,$0045,$0055 ; 2CDB: 25 00 35 00 45 00 55 00 
 Z2CE3   lda     Screen_RAM+384          ; 2CE3: AD 80 03 
         and     #$3F                    ; 2CE6: 29 3F    
         cmp     #$01                    ; 2CE8: C9 01    
@@ -2390,7 +2388,7 @@ Z2FEE   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2FEE: 20 D7 35
         fcb     $02                     ; 2FFC: 02       
         fdb     Stack                   ; 2FFD: 00 01    
         fcb     $FF                     ; 2FFF: FF       
-        jsr     Z3063                   ; 3000: 20 63 30 
+        jsr     GameOverScoreStuff      ; 3000: 20 63 30 
         lda     #$01                    ; 3003: A9 01    
         sta     Screen_RAM+425          ; 3005: 8D A9 03 
         lda     #$10                    ; 3008: A9 10    
@@ -2438,15 +2436,17 @@ Z305A   jsr     Get_Ship_UDG_Addr       ; 305A: 20 E5 2F
         jsr     Z373D                   ; 305D: 20 3D 37 
         jmp     Z3604                   ; 3060: 4C 04 36 
 ; -----------------------
-Z3063   lda     ZP_Game_Over_P1_P2      ; 3063: A5 5E    
-        bne     Z3091                   ; 3065: D0 2A    
+GameOverScoreStuff
+        lda     ZP_Game_Over_P1_P2      ; 3063: A5 5E    
+        bne     Read_ZP_Params_P2_Score ; 3065: D0 2A     If P2, setup P2 Score instead of P1 and then return after the param setup below
         jsr     Read_ZP_Paramenters     ; 3067: 20 9D 25 
         fcb     $06                     ; 306A: 06        ZP_Temp_2
         fdb     ZP_Score_P1             ; 306B: 51 00     P1 Score in ZP
         fcb     $FF                     ; 306D: FF       
 
-Z306E   ldy     #$02                    ; 306E: A0 02    
-        sed                             ; 3070: F8       
+Continue_Score_Process
+        ldy     #$02                    ; 306E: A0 02    
+        sed                             ; 3070: F8        Set Decimal Mode
         lda     (ZP_Temp_2_Lo),y        ; 3071: B1 06    
         clc                             ; 3073: 18       
         adc     ZP_Temp_1_Lo            ; 3074: 65 02    
@@ -2459,18 +2459,21 @@ Z306E   ldy     #$02                    ; 306E: A0 02
         lda     (ZP_Temp_2_Lo),y        ; 3080: B1 06    
         adc     #$00                    ; 3082: 69 00    
         sta     (ZP_Temp_2_Lo),y        ; 3084: 91 06    
-        cld                             ; 3086: D8       
-        lda     ZP_Game_Over_P1_P2      ; 3087: A5 5E    
-        bne     Z308E                   ; 3089: D0 03    
-        jmp     P1_SCORE_TO_UDG_RAM     ; 308B: 4C 71 24 
+        cld                             ; 3086: D8        Clear Decimal Mode
+        lda     ZP_Game_Over_P1_P2      ; 3087: A5 5E     Decide if working with P1 or P2
+        bne     P2_Score_To_UDG_RAM_    ; 3089: D0 03    
+        jmp     P1_Score_To_UDG_RAM     ; 308B: 4C 71 24 
 ; -----------------------
-Z308E   jmp     P2_SCORE_TO_UDG_RAM     ; 308E: 4C 81 24 
+P2_Score_To_UDG_RAM_
+        jmp     P2_Score_To_UDG_RAM     ; 308E: 4C 81 24 
 ; -----------------------
-Z3091   jsr     Read_ZP_Paramenters     ; 3091: 20 9D 25 
+Read_ZP_Params_P2_Score
+        jsr     Read_ZP_Paramenters     ; 3091: 20 9D 25 
         fcb     $06                     ; 3094: 06        ZP_Temp_2
         fdb     ZP_Score_P2             ; 3095: 54 00     P2 Score in ZP
         fcb     $FF                     ; 3097: FF       
-        jmp     Z306E                   ; 3098: 4C 6E 30 
+        jmp     Continue_Score_Process  ; 3098: 4C 6E 30 
+; ===========================================================
 Z309B   eor     #$FF                    ; 309B: 49 FF    
         adc     #$01                    ; 309D: 69 01    
         iny                             ; 309F: C8       
@@ -2866,8 +2869,8 @@ Subroutine_334D
         jsr     Z3601                   ; 3358: 20 01 36 
         jsr     Z381F                   ; 335B: 20 1F 38 
         jsr     Z2425                   ; 335E: 20 25 24 
-        jsr     P1_SCORE_TO_UDG_RAM     ; 3361: 20 71 24 
-        jsr     P2_SCORE_TO_UDG_RAM     ; 3364: 20 81 24 
+        jsr     P1_Score_To_UDG_RAM     ; 3361: 20 71 24 
+        jsr     P2_Score_To_UDG_RAM     ; 3364: 20 81 24 
 Z3367   jmp     Subroutine_261A         ; 3367: 4C 1A 26 
 ; -----------------------
 Z336A   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 336A: 20 D7 35 
@@ -3211,11 +3214,11 @@ ERASE_UDG_RAM_1000_1fff
 ERASE_COLOR_RAM_9600
         ldy     #$00                    ; 3579: A0 00    
 ERASECR1 lda    ZP_Temp_2_Lo            ; 357B: A5 06    
-                                        ; Fills memory from 9600-96fc (address at zero page $05) with $01's
+                                        ; Fills memory from 9600-96FC (address at zero page $05) with $01's
                                         ; This is color RAM for 3.5k but unused for 8k+!?
                                         ; ALSO CONTIUNES TO BLANK THE SCREEN, COMPLETING BOTTOM HALF
                                         ; FILLS SCREEN WITH A RUG
-                                        ; FILLS 1200-1fff i.e. stanard RAM
+                                        ; FILLS 1200-1FFF i.e. stanDard RAM
                                         ; This may be a generic memory move operation, as it also is used ot fill screen-ram at $1000
                                         ; 9600  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
                                         ; 9610  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
