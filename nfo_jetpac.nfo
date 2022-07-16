@@ -57,10 +57,6 @@ include nfo_separators.nfo        * Include JMP/JSR separator lines
 include nfo_code_data.nfo         * Everything is data, unless it's not
 include nfo_variables.nfo         * Zero Page and others with persistency
 
-; Workaround for as65 interpreting a '\' as escaping the next charecter
-const    3457
-const    3516
-
 ; Start of disassembly instructions
 word     2000-2003
 ;        2004
@@ -198,6 +194,8 @@ word     2315
 const    233B-235A
 label    233B Bytes_To_Copy_To_Other_RAM
 label    2353 BTCTOR_1
+label    235D BACK_235D
+label    236F LDA_7F_Return
 ;        2373
 label    2373 P1_LIVES_TO_UDG_RAM
 const    2376
@@ -206,19 +204,32 @@ lcomment 2377 1st Address
 word     2377
 lcomment 2379 End of Parameters
 ;        2382
-label    2382 P2_LIVES__TO_UDG_RAM
+label    2382 P2_Lives_To_UDG_RAM
 const    2385
 lcomment 2385 ZP Offset for 1st address
 lcomment 2386 1st Address
 word     2386
 lcomment 2388 End of Parameters
+comment  2396
+comment  2396 Display Jetman Icon
+lcomment 2399 ZP_Temp_2_Lo
 ;        239A
 word     239A
+lcomment 239D 8 bytes of UDG data to copy
+label    23A2 _Display_2_Spaces???_
+lcomment 23A8 $60 = Space character
+label    23A8 Display_2_Spaces???
+lcomment 23AF $60 = Space character
+label    23B6 Load_Num_Lives
+label    23BA Load_Num_Lives_P1
+label    23BD Load_Num_Lives_P2
+label    23C0 Load_Num_Lives_Inverse
 ;        23C7
 label    23C7 Jetman_Icon
 const    23C7-23CE
 break    23C7-23CE
 bin      23C7-23CE
+label    23CF LDA_7F
 lcomment 23CE
 lcomment 23CE ...##...
 lcomment 23CE ..#..#..
@@ -236,18 +247,20 @@ label    23D6 BACK_23D6
 comment  23DA
 comment  23E7
 label    23F4 SKIP_23F4
-label    23F5 SWAP_ZP59_ZP5B_SCR_RAM_COPY
+label    23F5 Swap_ZP59_ZP5B_SCR_RAM_Copy
 label    23F7 BACK_23F7
 comment  2404
 label    2406 BACK_2406
 ;        2416
-label    2416 RESET_COLOR_PIXELS_SCORES
+label    2416 Reset_Color_Pixels_Scores
 lcomment 241C Puts 000000  000000  00 at top of screen
 ;        2425
+label    2425 Display_1UP_HI_2UP_Titles
 comment  2425
 comment  2425 Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
+lcomment 2427 3 strings to display, 1UP, HI and 2UP
 ;        2429
-label    2429 BACK_2429
+label    2429 D1H2
 ;        2450
 label    2450 STR_1UP
 break    2457
@@ -257,9 +270,13 @@ label    245E STR_2UP
 ;        2465
 comment  2465
 label    2465 STR_1UP_HI_2UP
-word     2465-246F
-break    246B
-break    246D
+lcomment 2465 X Y
+word     2467
+const    2469
+lcomment 2469 X Y
+word     246B
+lcomment 246D X Y
+word     246F
 ;        2471
 comment  2471
 label    2471 P1_Score_To_UDG_RAM
@@ -291,7 +308,7 @@ word     248B
 break    248D
 lcomment 248D End of Parameters
 ;        2491
-label    2491 HI_SCORE_TO_UDG_RAM
+label    2491 Hi_Score_To_UDG_RAM
 const    2494
 lcomment 2494
 lcomment 2495
@@ -608,7 +625,8 @@ lcomment 3094 ZP_Temp_2
 lcomment 3095 P2 Score in ZP
 word     3095
 ;        3143
-lcomment 3143 Loads address to data from $31B6
+lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
+lcomment 316B $3E15 is the Mineral UDG address
 ;        31B6
 comment  31B6 XY_Data_for_3143_Subroutine
 const    31B6-31BE
@@ -904,8 +922,8 @@ label    3860 UDG_Lookup+1
 break    385F-3FFF ; Output one byte per line
 word     385F-3896
 binary   3897-3C86
-byte     3C88-3C89
-const    3C88-3C89
+byte     3C87-3C88
+const    3C87-3C88
 word     3C89-3CB0
 binary   3CB1-3FFF
 ;        38CA
@@ -924,8 +942,9 @@ label    3B8B Jetman_Fly_Left_3
 label    3BBE Jetman_Fly_Right_2
 label    3BF1 Jetman_Fly_Right_3
 label    3C3C Jetman_Fly_Right_4
-label    3C87 abc
-label    3C88 def
+lcomment 3C87 $3CD4 = Ship_1_Bott
+label    3C87 UDG_Ships_Lookup_Lo
+label    3C88 UDG_Ships_Lookup_Hi
 label    3E46 Alien_Ship_1
 label    3E61 Alien_Ship_2
 label    3E78 Alien_Fuzz_1
