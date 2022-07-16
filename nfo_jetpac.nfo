@@ -112,6 +112,7 @@ comment  2061
 lcomment 2061
 lcomment 2061 Store ascending numbers step #11 at a time into #23 bytes from $200 as below
 lcomment 2061 then do it #10 more times, but starting at 1 higher each time
+lcomment 2061 Note each character is a 16x8 tile i.e. double height
 lcomment 2061 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
 lcomment 2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
 lcomment 2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
@@ -162,13 +163,14 @@ lcomment 20E1 No, read keyboard again
 ;        20E3
 comment  20E3
 ;        20F0
-label    20F0 ???_TO_UDG_RAM
+label    20F0 SOMETHING_TO_UDG_RAM
 const    20F3
-lcomment 20F3 ZP Offset for 1st address
-lcomment 20F4 1st Address
+lcomment 20F3 ZP_Temp_2_Lo
+lcomment 20F4
 word     20F4
 const    20F6
 lcomment 20F6 End of Parameters
+label    20FB BACK_20FB
 ;        2145
 label    2145 BACK_2145
 ;        216B
@@ -189,12 +191,13 @@ break    22ED
 ;        22F9
 word     22F9
 ;        22FF
-label    22FF Copy_Bytes_To_Screen_RAM
+label    22FF Copy_Bytes_To_Other_RAM
 label    2301 CBTSR1
 ;        2315
 word     2315
 const    233B-235A
-label    233B BYTES_TO_COPY_TO_SCREEN_RAM
+label    233B Bytes_To_Copy_To_Other_RAM
+label    2353 BTCTOR_1
 ;        2373
 label    2373 P1_LIVES_TO_UDG_RAM
 const    2376
@@ -212,7 +215,20 @@ lcomment 2388 End of Parameters
 ;        239A
 word     239A
 ;        23C7
-label    23C7 SOME_DATA
+label    23C7 Jetman_Icon
+const    23C7-23CE
+break    23C7-23CE
+bin      23C7-23CE
+lcomment 23CE
+lcomment 23CE ...##...
+lcomment 23CE ..#..#..
+lcomment 23CE ..####..
+lcomment 23CE .######.
+lcomment 23CE .#.##.#.
+lcomment 23CE ..####..
+lcomment 23CE ..####..
+lcomment 23CE .##..##.
+comment  23Cf
 ;        23D4
 comment  23D4
 label    23D4 Setup_Player_Lives
@@ -381,26 +397,27 @@ label    2655 SKIP_2655
 ;        265E
 comment  265E Setup Timer 1
 label    265E Set_Jetman_Movement_Speed
+lcomment 2669 Set Disable Interrupts flag
 ;        2679
 const    2679
 lcomment 2679 ZP Offset for 1st address
 lcomment 267A 1st Address
 word     267A
+label    2680 Copy_ZP22_00_ZP23_00_And_CLI
+lcomment 2688 Clear Disable Interrupts flag
 ;        268C
 label    268C Subroutine_List
 word     268C-26AD
 label    268D Subroutine_List+1
 ;        26AE
 comment  26AE
-;        26B0
-label    26B0 BACK_26B0
-;        26C5
-label    26C5 SCREEN_C0000000
-label    26CD Subroutine_26CD
-;        26D1
-label    26D1 BACK_26D1
-;        26E4
-label    26E4 Subroutine_26E4
+label    26AE Copy_C0_00_00_Etc_To_Other_RAM
+label    26B0 CCTOR_1
+label    26C5 C0_00_00_00_00_00_00_00
+label    26CD Jmp_To_SRList2_SR
+label    26D1 JTSRLSR_1
+label    26E4 Jmp_To_SRList2_SR_
+label    26F2 Copy_ZP_Val_to_ZP1_Val
 label    26FE Subroutine_26FE
 label    271C Subroutine_271C
 label    2727 Subroutine_2727
@@ -412,16 +429,16 @@ label    2744 Subroutine_List2+1
 label    274F Subroutine_274F
 ;        275B
 comment  275B Erase $100 bytes zero page
-label    275B ERASEZP
+label    275B Erase_ZP
 lcomment 275B Erase $100 bytes zero page
-label    275E ERASEZ1
+label    275E Erase_ZP_1
 ;        2764
-label    2764 RESET_SCREEN_RAM_0380_03ff
+label    2764 Reset_Other_RAM_0380_03ff
 label    2768 BACK_2768
 ;        276F
-label    276F ERASE_HI_SCORE_SETTINGS_ETC
+label    276F Erase_Hi_Score_Settings_Etc
 lcomment 276F Erase $30 bytes at end of UDGs $1fd0-$2000
-label    2773 ERASE1
+label    2773 Erase_1
 ;        277A
 label    277A Check_New_Hi_Score
 const    277D
@@ -451,6 +468,7 @@ label    27A0 Copy_Player_To_Hi_Score
 lcomment 27A0 3 BCD bytes, 02, 01, 00
 label    27A2 CPTHS_1
 lcomment 27A7 Return when all bytes copied
+label    27AA If_ZP0_EqualsA_Do_27B3
 ;        282E
 comment  282E Using A to toggle, Load A and Y with Ship UDG address
 label    282E Get_Flame_UDG_Addr
@@ -477,6 +495,7 @@ label    2892 Routine_2892
 label    289F Routine_289F
 label    28A4 Routine_28A4
 label    28B6 Routine_28B6
+label    28C9 Reset_Other_RAM_03B8_03FF
 label    2934 Subroutine_2934
 ;        2967
 label    2967 UDG_Ptr
@@ -537,6 +556,8 @@ word     2A4C
 label    2A5F Subroutine_2A5F
 label    2A6D Subroutine_2A6D
 label    2ABC Subroutine_2ABC
+label    2B7F _0400002001041818
+label    2B87 _0E00002000000018
 ;        2B82
 const    2B82
 const    2B8A
@@ -594,15 +615,40 @@ const    31B6-31BE
 word     31B6-31BD
 label    3273 Subroutine_3273
 label    334D Subroutine_334D
-;        346C
+label    33D4 Read_Joystick
+label    33F7 Read_Keyboard_Joystick
+lcomment 33FA Joystick selected?
+label    345C SKIP_345CXXX
+label    3465 Flash_Score
+lcomment 3467 P1 or P2? Branch if P2
 const    346C
-lcomment 346C ZP Offset for 1st address
-lcomment 346D 1st Address
-word     346D
+lcomment 346C Store to ZP_UDG_RAM_X
+lcomment 346D X Y position in pixels
+const    346D
+break    346F
+label    3470 _Flash_Score_
+lcomment 3479 Number of 8-bit wide characters to reverse
+label    347B Invert_UDG_Columns
+lcomment 347B Number of pixel lines to reverse
+label    347D Invert_UDG_Rows
+lcomment 347D Get current byte of character
+lcomment 347F \ invert it
+lcomment 3481 \ and write it back
+lcomment 3484 All bytes inverted?
+lcomment 3486 \ If yes, continue to next column
+lcomment 3487 All columns inverted? If yes, finish
+comment  3489
+comment  3489 Move to next column by adding $B0 (#176) pixel to X postion
+comment  3490
+comment  3490 Move to top row by adding $B0 (#176) pixeln to X postion i.e. one column
+lcomment 348C $B0 = height of screen in pixels i.e. move one column right
+lcomment 3492 Add the carry from the previous $B0 addition for X
+label    3499 Do_RTS
+label    349A Load_UDG_RAM_for_P2
 ;        349D
 lcomment 349D Store to ZP_UDG_RAM_X
 const    349E
-lcomment 349E Character ROM
+lcomment 349E X Y position in pixels
 break    34A0
 ;        34A4
 comment  34A4

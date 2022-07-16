@@ -66,13 +66,14 @@ Num_Lives_P1            equ     $005A
 ZP_005b                 equ     $005B
 Num_Lives_P2            equ     $005C
 ZP_005d                 equ     $005D
-ZP_Game_Over_P1_P2      equ     $005E
+ZP_P1_Or_P2             equ     $005E
 ZP_Subroutine_Vec_Lo    equ     $005F
 ZP_Subroutine_Vec_Hi    equ     $0060
 ZP_0080                 equ     $0080
 ZP_00fc                 equ     $00FC
 Stack                   equ     $0100
 Screen_RAM              equ     $0200
+Other_RAM               equ     $0300
 Hardware_IRQ            equ     $0314
 NMI_int_vector          equ     $0318
 UDG_RAM                 equ     $1000
@@ -154,8 +155,8 @@ NMI_Interrupt_Hardler
         sta     NMI_int_vector          ; 2024: 8D 18 03 
         lda     #$20                    ; 2027: A9 20    
         sta     NMI_int_vector+1        ; 2029: 8D 19 03 
-        jsr     ERASE_HI_SCORE_SETTINGS_ETC ; 202C: 20 6F 27 
-        jsr     ERASEZP                 ; 202F: 20 5B 27 
+        jsr     Erase_Hi_Score_Settings_Etc ; 202C: 20 6F 27 
+        jsr     Erase_ZP                ; 202F: 20 5B 27 
         lda     #$00                    ; 2032: A9 00    
         sta     VIA1_DDR_A              ; 2034: 8D 13 91 
         lda     #$80                    ; 2037: A9 80    
@@ -180,6 +181,7 @@ Start_1 lda     VIC_Init_Tab,x          ; 2058: BD 04 20
         ldx     #$00                    ; 2061: A2 00    
                                         ; Store ascending numbers step #11 at a time into #23 bytes from $200 as below
                                         ; then do it #10 more times, but starting at 1 higher each time
+                                        ; Note each character is a 16x8 tile i.e. double height
                                         ; 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
                                         ; 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
                                         ; 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
@@ -220,7 +222,7 @@ BACK_2080
         lda     #$0F                    ; 2085: A9 0F    
         sta     VIC_RE_Vol_Color        ; 2087: 8D 0E 90 
         lda     #$00                    ; 208A: A9 00    
-        sta     Screen_RAM+424          ; 208C: 8D A8 03 
+        sta     Other_RAM+168           ; 208C: 8D A8 03 
 
 ATTRACT_MODE
         inc     ZP_Counter              ; 208F: E6 58    
@@ -276,17 +278,18 @@ SKIP_20D0
 ; -----------------------
 Z20E9   lda     ZP_HW_IRQ_Count1        ; 20E9: A5 4A    
         and     #$03                    ; 20EB: 29 03    
-        beq     ???_TO_UDG_RAM          ; 20ED: F0 01    
+        beq     SOMETHING_TO_UDG_RAM    ; 20ED: F0 01    
         rts                             ; 20EF: 60       
 ; ===========================================================
-???_TO_UDG_RAM
+SOMETHING_TO_UDG_RAM
         jsr     Read_ZP_Paramenters     ; 20F0: 20 9D 25 
-        fcb     $06                     ; 20F3: 06        ZP Offset for 1st address
-        fdb     Screen_RAM+392          ; 20F4: 88 03     1st Address
+        fcb     $06                     ; 20F3: 06        ZP_Temp_2_Lo
+        fdb     Other_RAM+136           ; 20F4: 88 03    
         fcb     $FF                     ; 20F6: FF        End of Parameters
         ldx     #$04                    ; 20F7: A2 04    
         ldy     #$00                    ; 20F9: A0 00    
-Z20FB   lda     (ZP_Temp_2_Lo),y        ; 20FB: B1 06    
+BACK_20FB
+        lda     (ZP_Temp_2_Lo),y        ; 20FB: B1 06    
         beq     Z2110                   ; 20FD: F0 11    
         lda     ZP_Temp_2_Lo            ; 20FF: A5 06    
         clc                             ; 2101: 18       
@@ -296,7 +299,7 @@ Z20FB   lda     (ZP_Temp_2_Lo),y        ; 20FB: B1 06
         adc     #$00                    ; 2108: 69 00    
         sta     ZP_Temp_2_Hi            ; 210A: 85 07    
         dex                             ; 210C: CA       
-        bne     Z20FB                   ; 210D: D0 EC    
+        bne     BACK_20FB               ; 210D: D0 EC    
         rts                             ; 210F: 60       
 ; ===========================================================
 Z2110   lda     (ZP_0000),y             ; 2110: B1 00    
@@ -348,9 +351,9 @@ BACK_2145
         lda     _12346737,x             ; 215B: BD 6B 21 
         sta     (ZP_Temp_2_Lo),y        ; 215E: 91 06    
         lda     #$03                    ; 2160: A9 03    
-        sta     Screen_RAM+429          ; 2162: 8D AD 03 
+        sta     Other_RAM+173           ; 2162: 8D AD 03 
         lda     #$10                    ; 2165: A9 10    
-        sta     Screen_RAM+430          ; 2167: 8D AE 03 
+        sta     Other_RAM+174           ; 2167: 8D AE 03 
         rts                             ; 216A: 60       
 ; ===========================================================
 _12346737
@@ -437,7 +440,7 @@ Z21FC   lda     ZP_Temp_2_Lo            ; 21FC: A5 06
         sta     ZP_Temp_2_Lo            ; 2200: 85 06    
 Z2202   jsr     Read_ZP_Paramenters     ; 2202: 20 9D 25 
         fcb     $14                     ; 2205: 14       
-        fdb     Screen_RAM+256          ; 2206: 00 03    
+        fdb     Other_RAM               ; 2206: 00 03    
         fcb     $16                     ; 2208: 16       
         fdb     Kernal_ROM+28           ; 2209: 1C E0    
         fcb     $02                     ; 220B: 02       
@@ -550,7 +553,7 @@ Z22BA   jsr     RESET_COLOR_PIXELS_SCORES ; 22BA: 20 16 24
         inc     Num_Lives_P1            ; 22C6: E6 5A    
         jsr     Z235B                   ; 22C8: 20 5B 23 
 Z22CB   jsr     Z3152                   ; 22CB: 20 52 31 
-        jmp     Z26AE                   ; 22CE: 4C AE 26 
+        jmp     Copy_C0_00_00_Etc_To_Other_RAM ; 22CE: 4C AE 26 
 ; -----------------------
 Z22D1   jsr     Z2DCB                   ; 22D1: 20 CB 2D 
         jmp     Z22CB                   ; 22D4: 4C CB 22 
@@ -563,7 +566,7 @@ Z22D7   jsr     RESET_COLOR_PIXELS_SCORES ; 22D7: 20 16 24
 Z22E3   jsr     Z28E7                   ; 22E3: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 22E6: 20 9D 25 
         fcb     $00                     ; 22E9: 00       
-        fdb     Screen_RAM+440          ; 22EA: B8 03    
+        fdb     Other_RAM+184           ; 22EA: B8 03    
         fcb     $FF                     ; 22EC: FF       
 Z22ED   ldx     #$01                    ; 22ED: A2 01    
         jmp     Z231A                   ; 22EF: 4C 1A 23 
@@ -571,23 +574,23 @@ Z22ED   ldx     #$01                    ; 22ED: A2 01
 Z22F2   jsr     Z28E7                   ; 22F2: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 22F5: 20 9D 25 
         fcb     $00                     ; 22F8: 00       
-        fdb     Screen_RAM+448          ; 22F9: C0 03    
+        fdb     Other_RAM+192           ; 22F9: C0 03    
         fcb     $FF                     ; 22FB: FF       
         jmp     Z22ED                   ; 22FC: 4C ED 22 
 ; -----------------------
-Copy_Bytes_To_Screen_RAM
+Copy_Bytes_To_Other_RAM
         ldx     #$17                    ; 22FF: A2 17    
-CBTSR1  lda     BYTES_TO_COPY_TO_SCREEN_RAM,x ; 2301: BD 3B 23 
-        sta     Screen_RAM+432,x        ; 2304: 9D B0 03 
+CBTSR1  lda     Bytes_To_Copy_To_Other_RAM,x ; 2301: BD 3B 23 
+        sta     Other_RAM+176,x         ; 2304: 9D B0 03 
         dex                             ; 2307: CA       
         bpl     CBTSR1                  ; 2308: 10 F7    
         rts                             ; 230A: 60       
 ; ===========================================================
-Z230B   jsr     Copy_Bytes_To_Screen_RAM ; 230B: 20 FF 22 
+Z230B   jsr     Copy_Bytes_To_Other_RAM ; 230B: 20 FF 22 
         jsr     Z28E7                   ; 230E: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2311: 20 9D 25 
         fcb     $00                     ; 2314: 00       
-        fdb     BYTES_TO_COPY_TO_SCREEN_RAM ; 2315: 3B 23    
+        fdb     Bytes_To_Copy_To_Other_RAM ; 2315: 3B 23    
         fcb     $FF                     ; 2317: FF       
         ldx     #$03                    ; 2318: A2 03    
 Z231A   txa                             ; 231A: 8A       
@@ -609,16 +612,16 @@ Z231A   txa                             ; 231A: 8A
         jsr     Z28F0                   ; 2337: 20 F0 28 
         rts                             ; 233A: 60       
 ; ===========================================================
-BYTES_TO_COPY_TO_SCREEN_RAM
+Bytes_To_Copy_To_Other_RAM
         fcb     $09,$70,$00,$AF,$01,$00 ; 233B: 09 70 00 AF 01 00 
         fcb     $00,$1C,$04,$20,$00,$3F ; 2341: 00 1C 04 20 00 3F 
         fcb     $00,$01,$10,$18,$04,$50 ; 2347: 00 01 10 18 04 50 
         fcb     $00,$5F,$01,$01,$08,$18 ; 234D: 00 5F 01 01 08 18 
-M2353   fcb     $02,$50,$00,$AF,$00,$01 ; 2353: 02 50 00 AF 00 01 
+BTCTOR_1 fcb    $02,$50,$00,$AF,$00,$01 ; 2353: 02 50 00 AF 00 01 
         fcb     $00,$00                 ; 2359: 00 00    
 Z235B   ldx     #$07                    ; 235B: A2 07    
-Z235D   lda     M2353,x                 ; 235D: BD 53 23 
-        sta     Screen_RAM+384,x        ; 2360: 9D 80 03 
+Z235D   lda     BTCTOR_1,x              ; 235D: BD 53 23 
+        sta     Other_RAM+128,x         ; 2360: 9D 80 03 
         dex                             ; 2363: CA       
         bpl     Z235D                   ; 2364: 10 F7    
         lda     GAME_OPTIONS            ; 2366: AD D3 1F 
@@ -648,7 +651,7 @@ Z238E   clc                             ; 238E: 18
         jsr     Copy_Char_To_UDG_RAM    ; 2393: 20 95 35 
         jsr     Read_ZP_Paramenters     ; 2396: 20 9D 25 
         fcb     $06                     ; 2399: 06       
-        fdb     SOME_DATA               ; 239A: C7 23    
+        fdb     Jetman_Icon             ; 239A: C7 23    
         fcb     $FF                     ; 239C: FF       
         ldy     #$07                    ; 239D: A0 07    
         jmp     CCTUR2                  ; 239F: 4C B6 35 
@@ -663,7 +666,7 @@ Z23A8   lda     #$60                    ; 23A8: A9 60
         sta     ZP_Temp_2_Lo            ; 23B1: 85 06    
         jmp     Copy_Char_To_UDG_RAM    ; 23B3: 4C 95 35 
 ; -----------------------
-Z23B6   lda     ZP_Game_Over_P1_P2      ; 23B6: A5 5E    
+Z23B6   lda     ZP_P1_Or_P2             ; 23B6: A5 5E    
         bne     Z23BD                   ; 23B8: D0 03    
 Z23BA   lda     Num_Lives_P1            ; 23BA: A5 5A    
         rts                             ; 23BC: 60       
@@ -671,13 +674,28 @@ Z23BA   lda     Num_Lives_P1            ; 23BA: A5 5A
 Z23BD   lda     Num_Lives_P2            ; 23BD: A5 5C    
         rts                             ; 23BF: 60       
 ; ===========================================================
-Z23C0   lda     ZP_Game_Over_P1_P2      ; 23C0: A5 5E    
+Z23C0   lda     ZP_P1_Or_P2             ; 23C0: A5 5E    
         beq     Z23BD                   ; 23C2: F0 F9    
         jmp     Z23BA                   ; 23C4: 4C BA 23 
 ; -----------------------
-SOME_DATA
-        fcb     $18                     ; 23C7: 18       
-        fcc     "$<~Z<<f"               ; 23C8: 24 3C 7E 5A 3C 3C 66 
+Jetman_Icon
+        fcb     %00011000               ; 23C7: 18       
+        fcb     %00100100               ; 23C8: 24       
+        fcb     %00111100               ; 23C9: 3C       
+        fcb     %01111110               ; 23CA: 7E       
+        fcb     %01011010               ; 23CB: 5A       
+        fcb     %00111100               ; 23CC: 3C       
+        fcb     %00111100               ; 23CD: 3C       
+        fcb     %01100110               ; 23CE: 66       
+                                        ; ..##...
+                                        ; .#..#..
+                                        ; .####..
+                                        ; ######.
+                                        ; #.##.#.
+                                        ; .####..
+                                        ; .####..
+                                        ; ##..##.
+
 Z23CF   lda     #$7F                    ; 23CF: A9 7F    
         jmp     Z236F                   ; 23D1: 4C 6F 23 
 ; -----------------------
@@ -690,7 +708,7 @@ BACK_23D6
 
         lda     #$04                    ; 23DA: A9 04    
         sta     Num_Lives_P1            ; 23DC: 85 5A    
-        jsr     Copy_Bytes_To_Screen_RAM ; 23DE: 20 FF 22 
+        jsr     Copy_Bytes_To_Other_RAM ; 23DE: 20 FF 22 
         jsr     SWAP_ZP59_ZP5B_SCR_RAM_COPY ; 23E1: 20 F5 23 
         dey                             ; 23E4: 88       
         bne     BACK_23D6               ; 23E5: D0 EF    
@@ -718,10 +736,10 @@ BACK_23F7
 
         ldx     #$17                    ; 2404: A2 17    
 BACK_2406
-        lda     Screen_RAM+432,x        ; 2406: BD B0 03 
+        lda     Other_RAM+176,x         ; 2406: BD B0 03 
         pha                             ; 2409: 48       
         lda     ZP_0028,x               ; 240A: B5 28    
-        sta     Screen_RAM+432,x        ; 240C: 9D B0 03 
+        sta     Other_RAM+176,x         ; 240C: 9D B0 03 
         pla                             ; 240F: 68       
         sta     ZP_0028,x               ; 2410: 95 28    
         dex                             ; 2412: CA       
@@ -964,8 +982,8 @@ Inc_Param_Addr
 IPA1    rts                             ; 25D0: 60       
 ; ===========================================================
 Game_Start
-        jsr     RESET_SCREEN_RAM_0380_03ff ; 25D1: 20 64 27 
-        jsr     ERASEZP                 ; 25D4: 20 5B 27 
+        jsr     Reset_Other_RAM_0380_03ff ; 25D1: 20 64 27 
+        jsr     Erase_ZP                ; 25D4: 20 5B 27 
         jsr     Setup_Player_Lives      ; 25D7: 20 D4 23 
         jsr     Z22BA                   ; 25DA: 20 BA 22 
         jmp     Game_Start_             ; 25DD: 4C FA 25 
@@ -1033,7 +1051,7 @@ SKIP_2630
         bne     Z2669                   ; 2639: D0 2E    
 Z263B   lda     ZP_0000                 ; 263B: A5 00    
         cmp     #$B0                    ; 263D: C9 B0    
-        beq     Z2680                   ; 263F: F0 3F    
+        beq     Copy_ZP22_00_ZP23_00_And_CLI ; 263F: F0 3F    
         and     ZP_0000                 ; 2641: 25 00    
         bne     Main_Loop               ; 2643: D0 C2    
         lda     ZP_HW_IRQ_VAR           ; 2645: A5 21    
@@ -1057,7 +1075,7 @@ Set_Jetman_Movement_Speed
         sta     VIA2_T1_Cnt_Hi          ; 2665: 8D 25 91 
         rts                             ; 2668: 60       
 ; ===========================================================
-Z2669   sei                             ; 2669: 78       
+Z2669   sei                             ; 2669: 78        Set Disable Interrupts flag
         lda     #$00                    ; 266A: A9 00    
         sta     ZP_HW_IRQ_1_OR_0        ; 266C: 85 20    
         lda     ZP_0000                 ; 266E: A5 00    
@@ -1066,14 +1084,16 @@ Z2669   sei                             ; 2669: 78
         sta     ZP_0023                 ; 2674: 85 23    
         jsr     Read_ZP_Paramenters     ; 2676: 20 9D 25 
         fcb     $00                     ; 2679: 00        ZP Offset for 1st address
-        fdb     Screen_RAM+384          ; 267A: 80 03     1st Address
+        fdb     Other_RAM+128           ; 267A: 80 03     1st Address
         fcb     $FF                     ; 267C: FF       
         jmp     Main_Loop               ; 267D: 4C 07 26 
-Z2680   lda     ZP_0022                 ; 2680: A5 22    
+; -----------------------
+Copy_ZP22_00_ZP23_00_And_CLI
+        lda     ZP_0022                 ; 2680: A5 22    
         sta     ZP_0000                 ; 2682: 85 00    
         lda     ZP_0023                 ; 2684: A5 23    
         sta     ZP_0001                 ; 2686: 85 01    
-        cli                             ; 2688: 58       
+        cli                             ; 2688: 58        Clear Disable Interrupts flag
         jmp     Z263B                   ; 2689: 4C 3B 26 
 ; -----------------------
 Subroutine_List
@@ -1089,31 +1109,32 @@ Subroutine_List
         fdb     Subroutine_2E74         ; 269E: 74 2E    
         fdb     Subroutine_2E17         ; 26A0: 17 2E    
         fdb     Subroutine_2E4E         ; 26A2: 4E 2E    
-        fdb     Subroutine_26CD         ; 26A4: CD 26    
+        fdb     Jmp_To_SRList2_SR       ; 26A4: CD 26    
         fdb     Subroutine_261A         ; 26A6: 1A 26    
         fdb     Subroutine_283E         ; 26A8: 3E 28    
         fdb     Subroutine_261A         ; 26AA: 1A 26    
         fdb     Subroutine_219A         ; 26AC: 9A 21    
 
-Z26AE   ldx     #$07                    ; 26AE: A2 07    
-BACK_26B0
-        lda     SCREEN_C0000000,x       ; 26B0: BD C5 26 
-        sta     Screen_RAM+424,x        ; 26B3: 9D A8 03 
+Copy_C0_00_00_Etc_To_Other_RAM
+        ldx     #$07                    ; 26AE: A2 07    
+CCTOR_1 lda     C0_00_00_00_00_00_00_00,x ; 26B0: BD C5 26 
+        sta     Other_RAM+168,x         ; 26B3: 9D A8 03 
         dex                             ; 26B6: CA       
-        bpl     BACK_26B0               ; 26B7: 10 F7    
+        bpl     CCTOR_1                 ; 26B7: 10 F7    
         lda     #$00                    ; 26B9: A9 00    
         sta     VIC_RA_Frq_Osc1         ; 26BB: 8D 0A 90 
         sta     VIC_RB_Frq_Osc2         ; 26BE: 8D 0B 90 
         sta     VIC_RC_Frq_Osc3         ; 26C1: 8D 0C 90 
         rts                             ; 26C4: 60       
 ; ===========================================================
-SCREEN_C0000000
+C0_00_00_00_00_00_00_00
         fcb     $0C,$00,$00,$00,$00,$00 ; 26C5: 0C 00 00 00 00 00 
         fcb     $00,$00                 ; 26CB: 00 00    
-Subroutine_26CD
+; ===========================================================
+Jmp_To_SRList2_SR
         lda     #$01                    ; 26CD: A9 01    
         sta     ZP_Subroutine_Vec_Hi    ; 26CF: 85 60    
-BACK_26D1
+JTSRLSR_1
         ldy     ZP_Subroutine_Vec_Hi    ; 26D1: A4 60    
         lda     (ZP_0000),y             ; 26D3: B1 00    
         asl     a                       ; 26D5: 0A       
@@ -1124,16 +1145,17 @@ BACK_26D1
         sta     ZP_0009                 ; 26DF: 85 09    
         jmp     (ZP_0008)               ; 26E1: 6C 08 00 
 ; -----------------------
-Subroutine_26E4
+Jmp_To_SRList2_SR_
         lda     ZP_Subroutine_Vec_Hi    ; 26E4: A5 60    
         clc                             ; 26E6: 18       
         adc     #$02                    ; 26E7: 69 02    
         sta     ZP_Subroutine_Vec_Hi    ; 26E9: 85 60    
         cmp     #$07                    ; 26EB: C9 07    
-        bcc     BACK_26D1               ; 26ED: 90 E2    
+        bcc     JTSRLSR_1               ; 26ED: 90 E2    
         jmp     Subroutine_261A         ; 26EF: 4C 1A 26 
 ; -----------------------
-Z26F2   lda     ZP_Subroutine_Vec_Hi    ; 26F2: A5 60    
+Copy_ZP_Val_to_ZP1_Val
+        lda     ZP_Subroutine_Vec_Hi    ; 26F2: A5 60    
         tay                             ; 26F4: A8       
         iny                             ; 26F5: C8       
         lda     (ZP_0000),y             ; 26F6: B1 00    
@@ -1143,7 +1165,7 @@ Z26F2   lda     ZP_Subroutine_Vec_Hi    ; 26F2: A5 60
         rts                             ; 26FD: 60       
 ; ===========================================================
 Subroutine_26FE
-        jsr     Z26F2                   ; 26FE: 20 F2 26 
+        jsr     Copy_ZP_Val_to_ZP1_Val  ; 26FE: 20 F2 26 
         beq     Z270A                   ; 2701: F0 07    
         eor     #$FF                    ; 2703: 49 FF    
 Z2705   ora     #$80                    ; 2705: 09 80    
@@ -1160,17 +1182,17 @@ Z2710   pha                             ; 2710: 48
         dex                             ; 2714: CA       
         pla                             ; 2715: 68       
         sta     VIC_RA_Frq_Osc1,x       ; 2716: 9D 0A 90 
-        jmp     Subroutine_26E4         ; 2719: 4C E4 26 
+        jmp     Jmp_To_SRList2_SR_      ; 2719: 4C E4 26 
 ; -----------------------
 Subroutine_271C
-        jsr     Z26F2                   ; 271C: 20 F2 26 
+        jsr     Copy_ZP_Val_to_ZP1_Val  ; 271C: 20 F2 26 
         beq     Z270A                   ; 271F: F0 E9    
         asl     a                       ; 2721: 0A       
         eor     #$F3                    ; 2722: 49 F3    
         jmp     Z2705                   ; 2724: 4C 05 27 
 ; -----------------------
 Subroutine_2727
-        jsr     Z26F2                   ; 2727: 20 F2 26 
+        jsr     Copy_ZP_Val_to_ZP1_Val  ; 2727: 20 F2 26 
         beq     Z270A                   ; 272A: F0 DE    
         asl     a                       ; 272C: 0A       
         asl     a                       ; 272D: 0A       
@@ -1180,22 +1202,22 @@ Subroutine_2727
         jmp     Z2705                   ; 2732: 4C 05 27 
 ; -----------------------
 Subroutine_2735
-        jsr     Z26F2                   ; 2735: 20 F2 26 
+        jsr     Copy_ZP_Val_to_ZP1_Val  ; 2735: 20 F2 26 
         beq     Z270A                   ; 2738: F0 D0    
-        lda     Screen_RAM+435          ; 273A: AD B3 03 
+        lda     Other_RAM+179           ; 273A: AD B3 03 
         lsr     a                       ; 273D: 4A       
         eor     #$FE                    ; 273E: 49 FE    
         jmp     Z2705                   ; 2740: 4C 05 27 
 ; -----------------------
 Subroutine_List2
-        fdb     Subroutine_26E4         ; 2743: E4 26    
+        fdb     Jmp_To_SRList2_SR_      ; 2743: E4 26    
         fdb     Subroutine_26FE         ; 2745: FE 26    
         fdb     Subroutine_271C         ; 2747: 1C 27    
         fdb     Subroutine_2727         ; 2749: 27 27    
         fdb     Subroutine_2735         ; 274B: 35 27    
         fdb     Subroutine_274F         ; 274D: 4F 27    
 Subroutine_274F
-        jsr     Z26F2                   ; 274F: 20 F2 26 
+        jsr     Copy_ZP_Val_to_ZP1_Val  ; 274F: 20 F2 26 
         beq     Z270A                   ; 2752: F0 B6    
         asl     a                       ; 2754: 0A       
         asl     a                       ; 2755: 0A       
@@ -1203,28 +1225,29 @@ Subroutine_274F
         jmp     Z2705                   ; 2758: 4C 05 27 
 ; -----------------------
 ; Erase $100 bytes zero page
-ERASEZP ldx     #$00                    ; 275B: A2 00     Erase $100 bytes zero page
+Erase_ZP ldx    #$00                    ; 275B: A2 00     Erase $100 bytes zero page
         txa                             ; 275D: 8A       
-ERASEZ1 sta     ZP_0000,x               ; 275E: 95 00    
+Erase_ZP_1
+        sta     ZP_0000,x               ; 275E: 95 00    
         inx                             ; 2760: E8       
-        bne     ERASEZ1                 ; 2761: D0 FB    
+        bne     Erase_ZP_1              ; 2761: D0 FB    
         rts                             ; 2763: 60       
 ; ===========================================================
-RESET_SCREEN_RAM_0380_03ff
+Reset_Other_RAM_0380_03ff
         ldx     #$7F                    ; 2764: A2 7F    
         lda     #$00                    ; 2766: A9 00    
 BACK_2768
-        sta     Screen_RAM+384,x        ; 2768: 9D 80 03 
+        sta     Other_RAM+128,x         ; 2768: 9D 80 03 
         dex                             ; 276B: CA       
         bpl     BACK_2768               ; 276C: 10 FA    
         rts                             ; 276E: 60       
 ; ===========================================================
-ERASE_HI_SCORE_SETTINGS_ETC
+Erase_Hi_Score_Settings_Etc
         ldx     #$2F                    ; 276F: A2 2F     Erase $30 bytes at end of UDGs $1fd0-$2000
         lda     #$00                    ; 2771: A9 00    
-ERASE1  sta     SCORE_HI,x              ; 2773: 9D D0 1F 
+Erase_1 sta     SCORE_HI,x              ; 2773: 9D D0 1F 
         dex                             ; 2776: CA       
-        bpl     ERASE1                  ; 2777: 10 FA    
+        bpl     Erase_1                 ; 2777: 10 FA    
         rts                             ; 2779: 60       
 ; ===========================================================
 Check_New_Hi_Score
@@ -1265,7 +1288,8 @@ CPTHS_1 lda     (ZP_0008),y             ; 27A2: B1 08
         bpl     CPTHS_1                 ; 27A7: 10 F9     Return when all bytes copied
         rts                             ; 27A9: 60       
 ; ===========================================================
-Z27AA   ldy     #$00                    ; 27AA: A0 00    
+If_ZP0_EqualsA_Do_27B3
+        ldy     #$00                    ; 27AA: A0 00    
         lda     (ZP_0000),y             ; 27AC: B1 00    
         cmp     #$0A                    ; 27AE: C9 0A    
         bcs     Z27B3                   ; 27B0: B0 01    
@@ -1377,6 +1401,7 @@ Z2851   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2851: 20 E9 35
         fcb     $FF                     ; 286D: FF       
         jsr     GameOverScoreStuff      ; 286E: 20 63 30 
         jmp     Z2F65                   ; 2871: 4C 65 2F 
+; -----------------------
 Z2874   ldy     #$06                    ; 2874: A0 06    
         lda     (ZP_0000),y             ; 2876: B1 00    
         and     #$0E                    ; 2878: 29 0E    
@@ -1427,20 +1452,21 @@ Z28C0   cmp     #$05                    ; 28C0: C9 05
         lda     #$01                    ; 28C4: A9 01    
         jmp     Z2894                   ; 28C6: 4C 94 28 
 ; -----------------------
-Z28C9   ldx     #$47                    ; 28C9: A2 47    
+Reset_Other_RAM_03B8_03FF
+        ldx     #$47                    ; 28C9: A2 47    
         lda     #$00                    ; 28CB: A9 00    
-Z28CD   sta     Screen_RAM+440,x        ; 28CD: 9D B8 03 
+Z28CD   sta     Other_RAM+184,x         ; 28CD: 9D B8 03 
         dex                             ; 28D0: CA       
         bpl     Z28CD                   ; 28D1: 10 FA    
         rts                             ; 28D3: 60       
 ; ===========================================================
 Z28D4   ldx     #$2F                    ; 28D4: A2 2F    
         lda     #$00                    ; 28D6: A9 00    
-Z28D8   sta     Screen_RAM+384,x        ; 28D8: 9D 80 03 
+Z28D8   sta     Other_RAM+128,x         ; 28D8: 9D 80 03 
         dex                             ; 28DB: CA       
         bpl     Z28D8                   ; 28DC: 10 FA    
         ldx     #$2F                    ; 28DE: A2 2F    
-Z28E0   sta     Screen_RAM+456,x        ; 28E0: 9D C8 03 
+Z28E0   sta     Other_RAM+200,x         ; 28E0: 9D C8 03 
         dex                             ; 28E3: CA       
         bpl     Z28E0                   ; 28E4: 10 FA    
         rts                             ; 28E6: 60       
@@ -1483,8 +1509,8 @@ Z2921   cmp     #$05                    ; 2921: C9 05
 Z2927   ldy     #$05                    ; 2927: A0 05    
         sta     (ZP_0000),y             ; 2929: 91 00    
         lda     #$05                    ; 292B: A9 05    
-        sta     Screen_RAM+427          ; 292D: 8D AB 03 
-        sta     Screen_RAM+428          ; 2930: 8D AC 03 
+        sta     Other_RAM+171           ; 292D: 8D AB 03 
+        sta     Other_RAM+172           ; 2930: 8D AC 03 
         rts                             ; 2933: 60       
 ; ===========================================================
 Subroutine_2934
@@ -1531,10 +1557,11 @@ Z2975   ldy     #$00                    ; 2975: A0 00
 Game_Over
         jsr     Check_New_Hi_Score      ; 2987: 20 7A 27 
         jsr     RESET_COLOR_PIXELS_SCORES ; 298A: 20 16 24 
-        lda     ZP_Game_Over_P1_P2      ; 298D: A5 5E    
+        lda     ZP_P1_Or_P2             ; 298D: A5 5E    
         bne     SKIP_2997               ; 298F: D0 06    
         jsr     Display_Game_Over_P1    ; 2991: 20 EE 29 
         jmp     Start_Rst_Game_Sel_Flash ; 2994: 4C 79 20 
+; -----------------------
 SKIP_2997
         jsr     Display_Game_Over_P2    ; 2997: 20 12 2A 
         jmp     Start_Rst_Game_Sel_Flash ; 299A: 4C 79 20 
@@ -1545,12 +1572,12 @@ Sound_Channels_Off_ETC
         sta     VIC_RB_Frq_Osc2         ; 29A2: 8D 0B 90 
         sta     VIC_RC_Frq_Osc3         ; 29A5: 8D 0C 90 
         jsr     Z28D4                   ; 29A8: 20 D4 28 
-        lda     Screen_RAM+444          ; 29AB: AD BC 03 
+        lda     Other_RAM+188           ; 29AB: AD BC 03 
         and     #$FD                    ; 29AE: 29 FD    
-        sta     Screen_RAM+444          ; 29B0: 8D BC 03 
-        lda     Screen_RAM+452          ; 29B3: AD C4 03 
+        sta     Other_RAM+188           ; 29B0: 8D BC 03 
+        lda     Other_RAM+196           ; 29B3: AD C4 03 
         and     #$FD                    ; 29B6: 29 FD    
-        sta     Screen_RAM+452          ; 29B8: 8D C4 03 
+        sta     Other_RAM+196           ; 29B8: 8D C4 03 
         lda     GAME_OPTIONS            ; 29BB: AD D3 1F 
         bit     MASK_01                 ; 29BE: 2C 14 20 
         bne     Z29D0                   ; 29C1: D0 0D    
@@ -1566,14 +1593,14 @@ Z29D0   lda     Num_Lives_P2            ; 29D0: A5 5C
         bne     Z29DB                   ; 29D6: D0 03    
         jsr     Display_Game_Over       ; 29D8: 20 E7 29 
 Z29DB   jsr     SWAP_ZP59_ZP5B_SCR_RAM_COPY ; 29DB: 20 F5 23  Swap between P1 and P2?????????
-        lda     ZP_Game_Over_P1_P2      ; 29DE: A5 5E    
+        lda     ZP_P1_Or_P2             ; 29DE: A5 5E    
         eor     #$FF                    ; 29E0: 49 FF    
-        sta     ZP_Game_Over_P1_P2      ; 29E2: 85 5E    
+        sta     ZP_P1_Or_P2             ; 29E2: 85 5E    
         jmp     Z29C7                   ; 29E4: 4C C7 29 
 ; -----------------------
 Display_Game_Over
         jsr     RESET_COLOR_PIXELS_SCORES ; 29E7: 20 16 24 
-        lda     ZP_Game_Over_P1_P2      ; 29EA: A5 5E     Game Over for P1 or P2?
+        lda     ZP_P1_Or_P2             ; 29EA: A5 5E     Game Over for P1 or P2?
         bne     Display_Game_Over_P2    ; 29EC: D0 24    
 Display_Game_Over_P1
         jsr     Read_ZP_Paramenters     ; 29EE: 20 9D 25 
@@ -1622,7 +1649,7 @@ STR_GAME_OVER_PLAYER_2
 Z2A45   jsr     Z28E7                   ; 2A45: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2A48: 20 9D 25 
         fcb     $00                     ; 2A4B: 00       
-        fdb     Screen_RAM+384          ; 2A4C: 80 03    
+        fdb     Other_RAM+128           ; 2A4C: 80 03    
         fcb     $FF                     ; 2A4E: FF       
         ldy     #$02                    ; 2A4F: A0 02    
         lda     #$01                    ; 2A51: A9 01    
@@ -1644,6 +1671,7 @@ Subroutine_2A6D
         jsr     Z2C5F                   ; 2A6D: 20 5F 2C 
         beq     Z2A75                   ; 2A70: F0 03    
         jmp     Z2C78                   ; 2A72: 4C 78 2C 
+; -----------------------
 Z2A75   jsr     Z2B16                   ; 2A75: 20 16 2B 
         ldy     #$06                    ; 2A78: A0 06    
         lda     (ZP_0000),y             ; 2A7A: B1 00    
@@ -1680,16 +1708,18 @@ Z2AA2   lda     ZP_HW_IRQ_Count3        ; 2AA2: A5 4C
         adc     #$01                    ; 2AB5: 69 01    
 Z2AB7   sta     (ZP_0000),y             ; 2AB7: 91 00    
         jmp     Z2C92                   ; 2AB9: 4C 92 2C 
+; -----------------------
 Subroutine_2ABC
         jsr     Z2C5F                   ; 2ABC: 20 5F 2C 
         bpl     Z2AC4                   ; 2ABF: 10 03    
         jmp     Z2C78                   ; 2AC1: 4C 78 2C 
+; -----------------------
 Z2AC4   jsr     Z2B16                   ; 2AC4: 20 16 2B 
         ldy     #$01                    ; 2AC7: A0 01    
         lda     (ZP_0000),y             ; 2AC9: B1 00    
         iny                             ; 2ACB: C8       
         sec                             ; 2ACC: 38       
-        sbc     Screen_RAM+385          ; 2ACD: ED 81 03 
+        sbc     Other_RAM+129           ; 2ACD: ED 81 03 
         bmi     Z2AFA                   ; 2AD0: 30 28    
         lda     (ZP_0000),y             ; 2AD2: B1 00    
         sec                             ; 2AD4: 38       
@@ -1702,7 +1732,7 @@ Z2ADF   ldy     #$03                    ; 2ADF: A0 03
         lda     (ZP_0000),y             ; 2AE1: B1 00    
         iny                             ; 2AE3: C8       
         sec                             ; 2AE4: 38       
-        sbc     Screen_RAM+387          ; 2AE5: ED 83 03 
+        sbc     Other_RAM+131           ; 2AE5: ED 83 03 
         bmi     Z2B08                   ; 2AE8: 30 1E    
         lda     (ZP_0000),y             ; 2AEA: B1 00    
         sec                             ; 2AEC: 38       
@@ -1712,6 +1742,7 @@ Z2ADF   ldy     #$03                    ; 2ADF: A0 03
 Z2AF3   sbc     #$01                    ; 2AF3: E9 01    
 Z2AF5   sta     (ZP_0000),y             ; 2AF5: 91 00    
 Z2AF7   jmp     Z2C92                   ; 2AF7: 4C 92 2C 
+; -----------------------
 Z2AFA   lda     (ZP_0000),y             ; 2AFA: B1 00    
         clc                             ; 2AFC: 18       
         bmi     Z2B03                   ; 2AFD: 30 04    
@@ -1719,6 +1750,7 @@ Z2AFA   lda     (ZP_0000),y             ; 2AFA: B1 00
         bcs     Z2ADF                   ; 2B01: B0 DC    
 Z2B03   adc     #$01                    ; 2B03: 69 01    
         jmp     Z2ADD                   ; 2B05: 4C DD 2A 
+; -----------------------
 Z2B08   lda     (ZP_0000),y             ; 2B08: B1 00    
         clc                             ; 2B0A: 18       
         bmi     Z2B11                   ; 2B0B: 30 04    
@@ -1726,6 +1758,7 @@ Z2B08   lda     (ZP_0000),y             ; 2B08: B1 00
         bcs     Z2AF7                   ; 2B0F: B0 E6    
 Z2B11   adc     #$01                    ; 2B11: 69 01    
         jmp     Z2AF5                   ; 2B13: 4C F5 2A 
+; -----------------------
 Z2B16   jsr     Z30B3                   ; 2B16: 20 B3 30 
         lda     ZP_Temp_1_Lo            ; 2B19: A5 02    
         bpl     Z2B36                   ; 2B1B: 10 19    
@@ -1754,16 +1787,16 @@ Z2B42   lda     (ZP_0000),y             ; 2B42: B1 00
         sta     (ZP_0000),y             ; 2B48: 91 00    
         rts                             ; 2B4A: 60       
 ; ===========================================================
-Z2B4B   lda     Screen_RAM+384          ; 2B4B: AD 80 03 
+Z2B4B   lda     Other_RAM+128           ; 2B4B: AD 80 03 
         and     #$3F                    ; 2B4E: 29 3F    
         bne     Z2B53                   ; 2B50: D0 01    
 Z2B52   rts                             ; 2B52: 60       
 ; ===========================================================
 Z2B53   cmp     #$03                    ; 2B53: C9 03    
         bcs     Z2B52                   ; 2B55: B0 FB    
-        lda     Screen_RAM+440          ; 2B57: AD B8 03 
+        lda     Other_RAM+184           ; 2B57: AD B8 03 
         bne     Z2B52                   ; 2B5A: D0 F6    
-        lda     Screen_RAM+434          ; 2B5C: AD B2 03 
+        lda     Other_RAM+178           ; 2B5C: AD B2 03 
         cmp     #$06                    ; 2B5F: C9 06    
         bcs     Z2B52                   ; 2B61: B0 EF    
         lda     ZP_HW_IRQ_Count1        ; 2B63: A5 4A    
@@ -1771,44 +1804,46 @@ Z2B53   cmp     #$03                    ; 2B53: C9 03
         and     #$0F                    ; 2B67: 29 0F    
         bne     Z2B52                   ; 2B69: D0 E7    
         ldx     #$07                    ; 2B6B: A2 07    
-Z2B6D   lda     M2B7F,x                 ; 2B6D: BD 7F 2B 
-        sta     Screen_RAM+440,x        ; 2B70: 9D B8 03 
+Z2B6D   lda     _0400002001041818,x     ; 2B6D: BD 7F 2B 
+        sta     Other_RAM+184,x         ; 2B70: 9D B8 03 
         dex                             ; 2B73: CA       
         bpl     Z2B6D                   ; 2B74: 10 F7    
         jsr     Get_Raster_Line_Band    ; 2B76: 20 DE 2B 
-        sta     Screen_RAM+441          ; 2B79: 8D B9 03 
+        sta     Other_RAM+185           ; 2B79: 8D B9 03 
         jmp     Z22E3                   ; 2B7C: 4C E3 22 
 ; -----------------------
-M2B7F   fcb     $04,$00,$00,$20,$01,$04 ; 2B7F: 04 00 00 20 01 04 
+_0400002001041818
+        fcb     $04,$00,$00,$20,$01,$04 ; 2B7F: 04 00 00 20 01 04 
         fcb     $18,$18                 ; 2B85: 18 18    
-M2B87   fcb     $0E,$00,$00,$20,$00,$00 ; 2B87: 0E 00 00 20 00 00 
+_0E00002000000018
+        fcb     $0E,$00,$00,$20,$00,$00 ; 2B87: 0E 00 00 20 00 00 
         fcb     $00,$18                 ; 2B8D: 00 18    
-Z2B8F   lda     Screen_RAM+384          ; 2B8F: AD 80 03 
+Z2B8F   lda     Other_RAM+128           ; 2B8F: AD 80 03 
         and     #$3F                    ; 2B92: 29 3F    
         bne     Z2B97                   ; 2B94: D0 01    
 Z2B96   rts                             ; 2B96: 60       
 ; ===========================================================
 Z2B97   cmp     #$03                    ; 2B97: C9 03    
         bcs     Z2B96                   ; 2B99: B0 FB    
-        lda     Screen_RAM+448          ; 2B9B: AD C0 03 
+        lda     Other_RAM+192           ; 2B9B: AD C0 03 
         bne     Z2B96                   ; 2B9E: D0 F6    
         lda     ZP_HW_IRQ_Count1        ; 2BA0: A5 4A    
         and     #$7F                    ; 2BA2: 29 7F    
         bne     Z2B96                   ; 2BA4: D0 F0    
         ldx     #$07                    ; 2BA6: A2 07    
-Z2BA8   lda     M2B87,x                 ; 2BA8: BD 87 2B 
-        sta     Screen_RAM+448,x        ; 2BAB: 9D C0 03 
+Z2BA8   lda     _0E00002000000018,x     ; 2BA8: BD 87 2B 
+        sta     Other_RAM+192,x         ; 2BAB: 9D C0 03 
         dex                             ; 2BAE: CA       
         bpl     Z2BA8                   ; 2BAF: 10 F7    
         jsr     Get_Raster_Line_Band    ; 2BB1: 20 DE 2B 
-        sta     Screen_RAM+449          ; 2BB4: 8D C1 03 
+        sta     Other_RAM+193           ; 2BB4: 8D C1 03 
         lda     ZP_HW_IRQ_Count3        ; 2BB7: A5 4C    
         and     #$0E                    ; 2BB9: 29 0E    
         bit     MASK_08                 ; 2BBB: 2C 17 20 
         beq     Z2BC2                   ; 2BBE: F0 02    
         and     #$08                    ; 2BC0: 29 08    
 Z2BC2   ora     #$20                    ; 2BC2: 09 20    
-        sta     Screen_RAM+454          ; 2BC4: 8D C6 03 
+        sta     Other_RAM+198           ; 2BC4: 8D C6 03 
 Z2BC7   jsr     Z28E7                   ; 2BC7: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2BCA: 20 9D 25 
         fcb     $00                     ; 2BCD: 00       
@@ -1974,7 +2009,7 @@ Z2CD6   lda     ZP_005d                 ; 2CD6: A5 5D
 ; ===========================================================
 _0025_0035_0045_0055
         fdb     $0025,$0035,$0045,$0055 ; 2CDB: 25 00 35 00 45 00 55 00 
-Z2CE3   lda     Screen_RAM+384          ; 2CE3: AD 80 03 
+Z2CE3   lda     Other_RAM+128           ; 2CE3: AD 80 03 
         and     #$3F                    ; 2CE6: 29 3F    
         cmp     #$01                    ; 2CE8: C9 01    
         beq     Z2CF1                   ; 2CEA: F0 05    
@@ -2042,7 +2077,7 @@ M2D50   fcb     $02,$06,$03,$07,$06,$07 ; 2D50: 02 06 03 07 06 07
 Z2D58   fcb     $A5                     ; 2D58: A5       
         fcc     "]"                     ; 2D59: 5D       
         fcb     $D0,$0D                 ; 2D5A: D0 0D    
-        lda     Screen_RAM+384          ; 2D5C: AD 80 03 
+        lda     Other_RAM+128           ; 2D5C: AD 80 03 
         and     #$3F                    ; 2D5F: 29 3F    
         cmp     #$01                    ; 2D61: C9 01    
         beq     Z2D6E                   ; 2D63: F0 09    
@@ -2055,7 +2090,7 @@ Z2D58   fcb     $A5                     ; 2D58: A5
 Z2D6E   ldy     #$00                    ; 2D6E: A0 00    
         sty     ZP_Temp_1_Lo            ; 2D70: 84 02    
         iny                             ; 2D72: C8       
-        lda     Screen_RAM+385          ; 2D73: AD 81 03 
+        lda     Other_RAM+129           ; 2D73: AD 81 03 
         sec                             ; 2D76: 38       
         sbc     (ZP_0000),y             ; 2D77: F1 00    
         bpl     Z2D80                   ; 2D79: 10 05    
@@ -2066,7 +2101,7 @@ Z2D80   cmp     #$0C                    ; 2D80: C9 0C
         bcs     Z2D9B                   ; 2D82: B0 17    
         iny                             ; 2D84: C8       
         iny                             ; 2D85: C8       
-        lda     Screen_RAM+387          ; 2D86: AD 83 03 
+        lda     Other_RAM+131           ; 2D86: AD 83 03 
         sec                             ; 2D89: 38       
         sbc     (ZP_0000),y             ; 2D8A: F1 00    
         bpl     Z2D9C                   ; 2D8C: 10 0E    
@@ -2082,10 +2117,10 @@ Z2D9B   rts                             ; 2D9B: 60
 Z2D9C   cmp     #$12                    ; 2D9C: C9 12    
         jmp     Z2D95                   ; 2D9E: 4C 95 2D 
 ; -----------------------
-Z2DA1   lda     Screen_RAM+440          ; 2DA1: AD B8 03 
+Z2DA1   lda     Other_RAM+184           ; 2DA1: AD B8 03 
         beq     Z2DA9                   ; 2DA4: F0 03    
         jsr     Z22E3                   ; 2DA6: 20 E3 22 
-Z2DA9   lda     Screen_RAM+448          ; 2DA9: AD C0 03 
+Z2DA9   lda     Other_RAM+192           ; 2DA9: AD C0 03 
         beq     Z2DB5                   ; 2DAC: F0 07    
         cmp     #$0E                    ; 2DAE: C9 0E    
         beq     Z2DC5                   ; 2DB0: F0 13    
@@ -2093,10 +2128,11 @@ Z2DA9   lda     Screen_RAM+448          ; 2DA9: AD C0 03
 Z2DB5   jsr     Z28E7                   ; 2DB5: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2DB8: 20 9D 25 
         fcb     $00                     ; 2DBB: 00       
-        fdb     Screen_RAM+432          ; 2DBC: B0 03    
+        fdb     Other_RAM+176           ; 2DBC: B0 03    
         fcb     $FF                     ; 2DBE: FF       
         jsr     Z2DCB                   ; 2DBF: 20 CB 2D 
         jmp     Z28F0                   ; 2DC2: 4C F0 28 
+; -----------------------
 Z2DC5   jsr     Z2BC7                   ; 2DC5: 20 C7 2B 
         jmp     Z2DB5                   ; 2DC8: 4C B5 2D 
 ; -----------------------
@@ -2154,13 +2190,13 @@ Subroutine_2E17
         sbc     #$01                    ; 2E23: E9 01    
         sta     (ZP_0000),y             ; 2E25: 91 00    
         lda     #$04                    ; 2E27: A9 04    
-        sta     Screen_RAM+427          ; 2E29: 8D AB 03 
+        sta     Other_RAM+171           ; 2E29: 8D AB 03 
         lda     #$02                    ; 2E2C: A9 02    
-        sta     Screen_RAM+428          ; 2E2E: 8D AC 03 
+        sta     Other_RAM+172           ; 2E2E: 8D AC 03 
         jmp     Z2EAC                   ; 2E31: 4C AC 2E 
 ; -----------------------
 Z2E34   inc     ZP_0059                 ; 2E34: E6 59    
-        jsr     Z28C9                   ; 2E36: 20 C9 28 
+        jsr     Reset_Other_RAM_03B8_03FF ; 2E36: 20 C9 28 
         ldy     #$00                    ; 2E39: A0 00    
         lda     #$0B                    ; 2E3B: A9 0B    
         sta     (ZP_0000),y             ; 2E3D: 91 00    
@@ -2175,9 +2211,9 @@ Z2E34   inc     ZP_0059                 ; 2E34: E6 59
 Subroutine_2E4E
         jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2E4E: 20 D7 35 
         lda     #$04                    ; 2E51: A9 04    
-        sta     Screen_RAM+427          ; 2E53: 8D AB 03 
+        sta     Other_RAM+171           ; 2E53: 8D AB 03 
         lda     #$02                    ; 2E56: A9 02    
-        sta     Screen_RAM+428          ; 2E58: 8D AC 03 
+        sta     Other_RAM+172           ; 2E58: 8D AC 03 
         ldy     #$03                    ; 2E5B: A0 03    
         lda     (ZP_0000),y             ; 2E5D: B1 00    
         clc                             ; 2E5F: 18       
@@ -2206,19 +2242,19 @@ Subroutine_2E74
         jsr     Z28E7                   ; 2E8C: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2E8F: 20 9D 25 
         fcb     $00                     ; 2E92: 00       
-        fdb     Screen_RAM+384          ; 2E93: 80 03    
+        fdb     Other_RAM+128           ; 2E93: 80 03    
         fcb     $FF                     ; 2E95: FF       
         jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2E96: 20 E9 35 
         jsr     Z3601                   ; 2E99: 20 01 36 
         lda     #$00                    ; 2E9C: A9 00    
-        sta     Screen_RAM+384          ; 2E9E: 8D 80 03 
+        sta     Other_RAM+128           ; 2E9E: 8D 80 03 
         jsr     Z28F0                   ; 2EA1: 20 F0 28 
         inc     Num_Lives_P1            ; 2EA4: E6 5A    
         jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23 
         jmp     Subroutine_261A         ; 2EA9: 4C 1A 26 
 ; -----------------------
 Z2EAC   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2EAC: 20 E9 35 
-        jsr     Z27AA                   ; 2EAF: 20 AA 27 
+        jsr     If_ZP0_EqualsA_Do_27B3  ; 2EAF: 20 AA 27 
         jsr     LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00 ; 2EB2: 20 DD 2D 
 Z2EB5   jsr     Z2DE8                   ; 2EB5: 20 E8 2D 
         jsr     Z364C                   ; 2EB8: 20 4C 36 
@@ -2294,36 +2330,36 @@ Z2F31   ldy     #$06                    ; 2F31: A0 06
         adc     (ZP_0000),y             ; 2F3D: 71 00    
         cmp     #$AF                    ; 2F3F: C9 AF    
         bcc     Z2FB2                   ; 2F41: 90 6F    
-        lda     Screen_RAM+444          ; 2F43: AD BC 03 
+        lda     Other_RAM+188           ; 2F43: AD BC 03 
         ora     #$01                    ; 2F46: 09 01    
-        sta     Screen_RAM+444          ; 2F48: 8D BC 03 
+        sta     Other_RAM+188           ; 2F48: 8D BC 03 
         jsr     Z3054                   ; 2F4B: 20 54 30 
-        lda     Screen_RAM+436          ; 2F4E: AD B4 03 
+        lda     Other_RAM+180           ; 2F4E: AD B4 03 
         asl     a                       ; 2F51: 0A       
         asl     a                       ; 2F52: 0A       
         asl     a                       ; 2F53: 0A       
         asl     a                       ; 2F54: 0A       
         sta     Keyboard_Data           ; 2F55: 85 13    
-        lda     Screen_RAM+435          ; 2F57: AD B3 03 
+        lda     Other_RAM+179           ; 2F57: AD B3 03 
         sec                             ; 2F5A: 38       
         sbc     Keyboard_Data           ; 2F5B: E5 13    
         sta     ZP_0019                 ; 2F5D: 85 19    
         jsr     Z3057                   ; 2F5F: 20 57 30 
-        inc     Screen_RAM+436          ; 2F62: EE B4 03 
+        inc     Other_RAM+180           ; 2F62: EE B4 03 
 Z2F65   lda     #$00                    ; 2F65: A9 00    
         tay                             ; 2F67: A8       
         sta     (ZP_0000),y             ; 2F68: 91 00    
         lda     #$02                    ; 2F6A: A9 02    
-        sta     Screen_RAM+425          ; 2F6C: 8D A9 03 
+        sta     Other_RAM+169           ; 2F6C: 8D A9 03 
         lda     #$10                    ; 2F6F: A9 10    
-        sta     Screen_RAM+426          ; 2F71: 8D AA 03 
+        sta     Other_RAM+170           ; 2F71: 8D AA 03 
         jmp     Subroutine_261A         ; 2F74: 4C 1A 26 
 ; -----------------------
 Z2F77   ldy     #$03                    ; 2F77: A0 03    
         lda     (ZP_0000),y             ; 2F79: B1 00    
         cmp     #$A8                    ; 2F7B: C9 A8    
         bcc     Z2FB2                   ; 2F7D: 90 33    
-        inc     Screen_RAM+434          ; 2F7F: EE B2 03 
+        inc     Other_RAM+178           ; 2F7F: EE B2 03 
         jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2F82: 20 E9 35 
         jsr     Z2FDA                   ; 2F85: 20 DA 2F 
         jsr     Z305A                   ; 2F88: 20 5A 30 
@@ -2390,29 +2426,29 @@ Z2FEE   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2FEE: 20 D7 35
         fcb     $FF                     ; 2FFF: FF       
         jsr     GameOverScoreStuff      ; 3000: 20 63 30 
         lda     #$01                    ; 3003: A9 01    
-        sta     Screen_RAM+425          ; 3005: 8D A9 03 
+        sta     Other_RAM+169           ; 3005: 8D A9 03 
         lda     #$10                    ; 3008: A9 10    
-        sta     Screen_RAM+426          ; 300A: 8D AA 03 
+        sta     Other_RAM+170           ; 300A: 8D AA 03 
         ldy     #$01                    ; 300D: A0 01    
-        lda     Screen_RAM+385          ; 300F: AD 81 03 
+        lda     Other_RAM+129           ; 300F: AD 81 03 
         sta     (ZP_0000),y             ; 3012: 91 00    
         ldy     #$03                    ; 3014: A0 03    
-        lda     Screen_RAM+387          ; 3016: AD 83 03 
+        lda     Other_RAM+131           ; 3016: AD 83 03 
         sta     (ZP_0000),y             ; 3019: 91 00    
         jmp     Z2FBD                   ; 301B: 4C BD 2F 
 ; -----------------------
 Z301E   ldy     #$01                    ; 301E: A0 01    
-        lda     Screen_RAM+385          ; 3020: AD 81 03 
+        lda     Other_RAM+129           ; 3020: AD 81 03 
         clc                             ; 3023: 18       
         adc     #$04                    ; 3024: 69 04    
         sta     (ZP_0000),y             ; 3026: 91 00    
         iny                             ; 3028: C8       
         iny                             ; 3029: C8       
-        lda     Screen_RAM+387          ; 302A: AD 83 03 
+        lda     Other_RAM+131           ; 302A: AD 83 03 
         sta     (ZP_0000),y             ; 302D: 91 00    
         dey                             ; 302F: 88       
         dey                             ; 3030: 88       
-        lda     Screen_RAM+433          ; 3031: AD B1 03 
+        lda     Other_RAM+177           ; 3031: AD B1 03 
         sec                             ; 3034: 38       
         sbc     (ZP_0000),y             ; 3035: F1 00    
         bpl     Z303E                   ; 3037: 10 05    
@@ -2425,7 +2461,7 @@ Z303E   cmp     #$06                    ; 303E: C9 06
         lda     (ZP_0000),y             ; 3044: B1 00    
         ora     #$04                    ; 3046: 09 04    
         sta     (ZP_0000),y             ; 3048: 91 00    
-        lda     Screen_RAM+433          ; 304A: AD B1 03 
+        lda     Other_RAM+177           ; 304A: AD B1 03 
         ldy     #$01                    ; 304D: A0 01    
         sta     (ZP_0000),y             ; 304F: 91 00    
 Z3051   jmp     Z2FBD                   ; 3051: 4C BD 2F 
@@ -2437,7 +2473,7 @@ Z305A   jsr     Get_Ship_UDG_Addr       ; 305A: 20 E5 2F
         jmp     Z3604                   ; 3060: 4C 04 36 
 ; -----------------------
 GameOverScoreStuff
-        lda     ZP_Game_Over_P1_P2      ; 3063: A5 5E    
+        lda     ZP_P1_Or_P2             ; 3063: A5 5E    
         bne     Read_ZP_Params_P2_Score ; 3065: D0 2A     If P2, setup P2 Score instead of P1 and then return after the param setup below
         jsr     Read_ZP_Paramenters     ; 3067: 20 9D 25 
         fcb     $06                     ; 306A: 06        ZP_Temp_2
@@ -2460,7 +2496,7 @@ Continue_Score_Process
         adc     #$00                    ; 3082: 69 00    
         sta     (ZP_Temp_2_Lo),y        ; 3084: 91 06    
         cld                             ; 3086: D8        Clear Decimal Mode
-        lda     ZP_Game_Over_P1_P2      ; 3087: A5 5E     Decide if working with P1 or P2
+        lda     ZP_P1_Or_P2             ; 3087: A5 5E     Decide if working with P1 or P2
         bne     P2_Score_To_UDG_RAM_    ; 3089: D0 03    
         jmp     P1_Score_To_UDG_RAM     ; 308B: 4C 71 24 
 ; -----------------------
@@ -2473,7 +2509,7 @@ Read_ZP_Params_P2_Score
         fdb     ZP_Score_P2             ; 3095: 54 00     P2 Score in ZP
         fcb     $FF                     ; 3097: FF       
         jmp     Continue_Score_Process  ; 3098: 4C 6E 30 
-; ===========================================================
+; -----------------------
 Z309B   eor     #$FF                    ; 309B: 49 FF    
         adc     #$01                    ; 309D: 69 01    
         iny                             ; 309F: C8       
@@ -2722,8 +2758,10 @@ Z323E   pha                             ; 323E: 48
 ; -----------------------
 Z3254   lda     #$08                    ; 3254: A9 08    
         jmp     Z32A2                   ; 3256: 4C A2 32 
+; -----------------------
         lda     #$F8                    ; 3259: A9 F8    
         jmp     Z32A2                   ; 325B: 4C A2 32 
+; -----------------------
 Z325E   clc                             ; 325E: 18       
         adc     #$01                    ; 325F: 69 01    
         jmp     Z32A2                   ; 3261: 4C A2 32 
@@ -2740,7 +2778,7 @@ Z326F   txa                             ; 326F: 8A
 ; -----------------------
 Subroutine_3273
         jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 3273: 20 D7 35 
-        jsr     Z33F7                   ; 3276: 20 F7 33 
+        jsr     Read_Keyboard_Joystick  ; 3276: 20 F7 33 
         sta     ZP_Player_Movement      ; 3279: 85 1C    
         jsr     Z30B3                   ; 327B: 20 B3 30 
         lda     ZP_Temp_1_Lo            ; 327E: A5 02    
@@ -2863,7 +2901,7 @@ Z3348   adc     #$48                    ; 3348: 69 48
 Subroutine_334D
         lda     ZP_005d                 ; 334D: A5 5D    
         beq     Z336A                   ; 334F: F0 19    
-        jsr     Z3465                   ; 3351: 20 65 34 
+        jsr     Flash_Score             ; 3351: 20 65 34 
         dec     ZP_005d                 ; 3354: C6 5D    
         bne     Z3367                   ; 3356: D0 0F    
         jsr     Z3601                   ; 3358: 20 01 36 
@@ -2874,7 +2912,7 @@ Subroutine_334D
 Z3367   jmp     Subroutine_261A         ; 3367: 4C 1A 26 
 ; -----------------------
 Z336A   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 336A: 20 D7 35 
-        jsr     Z33F7                   ; 336D: 20 F7 33 
+        jsr     Read_Keyboard_Joystick  ; 336D: 20 F7 33 
         jsr     Z30B3                   ; 3370: 20 B3 30 
         lda     ZP_Temp_1_Lo            ; 3373: A5 02    
         bmi     Z337D                   ; 3375: 30 06    
@@ -2929,7 +2967,8 @@ Z33C0   ldy     #$03                    ; 33C0: A0 03
         ror     a                       ; 33D0: 6A       
         jmp     Z32F7                   ; 33D1: 4C F7 32 
 ; -----------------------
-Z33D4   lda     VIA1_Port_A             ; 33D4: AD 11 91 
+Read_Joystick
+        lda     VIA1_Port_A             ; 33D4: AD 11 91 
         rol     a                       ; 33D7: 2A       
         rol     a                       ; 33D8: 2A       
         ora     #$8F                    ; 33D9: 09 8F    
@@ -2948,9 +2987,10 @@ Z33D4   lda     VIA1_Port_A             ; 33D4: AD 11 91
         sta     ZP_Player_Movement      ; 33F4: 85 1C    
         rts                             ; 33F6: 60       
 ; ===========================================================
-Z33F7   lda     GAME_OPTIONS            ; 33F7: AD D3 1F 
-        bit     MASK_02                 ; 33FA: 2C 15 20 
-        bne     Z33D4                   ; 33FD: D0 D5    
+Read_Keyboard_Joystick
+        lda     GAME_OPTIONS            ; 33F7: AD D3 1F 
+        bit     MASK_02                 ; 33FA: 2C 15 20  Joystick selected?
+        bne     Read_Joystick           ; 33FD: D0 D5    
         lda     #$FF                    ; 33FF: A9 FF    
         sta     VIA2_DDR_A              ; 3401: 8D 23 91 
         lda     #$81                    ; 3404: A9 81    
@@ -3006,41 +3046,51 @@ Z33F7   lda     GAME_OPTIONS            ; 33F7: AD D3 1F
         and     ZP_Player_Movement      ; 3460: 25 1C    
         sta     ZP_Player_Movement      ; 3462: 85 1C    
         rts                             ; 3464: 60       
-Z3465   lda     ZP_Game_Over_P1_P2      ; 3465: A5 5E    
-        bne     Z349A                   ; 3467: D0 31    
+; ===========================================================
+Flash_Score
+        lda     ZP_P1_Or_P2             ; 3465: A5 5E    
+        bne     Load_UDG_RAM_for_P2     ; 3467: D0 31     P1 or P2? Branch if P2
         jsr     Read_ZP_Paramenters     ; 3469: 20 9D 25 
-        fcb     $04                     ; 346C: 04        ZP Offset for 1st address
-        fdb     ZP_0000                 ; 346D: 00 00     1st Address
+        fcb     $04                     ; 346C: 04        Store to ZP_UDG_RAM_X
+        fcb     $00,$00                 ; 346D: 00 00     X Y position in pixels
         fcb     $FF                     ; 346F: FF       
-Z3470   jsr     Setup_UDG_RAM_XY        ; 3470: 20 1D 35 
+_Flash_Score_
+        jsr     Setup_UDG_RAM_XY        ; 3470: 20 1D 35 
         lda     ZP_HW_IRQ_Count1        ; 3473: A5 4A    
         and     #$07                    ; 3475: 29 07    
-        bne     Z3499                   ; 3477: D0 20    
-        ldx     #$06                    ; 3479: A2 06    
-Z347B   ldy     #$0F                    ; 347B: A0 0F    
-Z347D   lda     (ZP_UDG_RAM_X),y        ; 347D: B1 04    
-        eor     #$FF                    ; 347F: 49 FF    
-        sta     (ZP_UDG_RAM_X),y        ; 3481: 91 04    
+        bne     Do_RTS                  ; 3477: D0 20    
+        ldx     #$06                    ; 3479: A2 06     Number of 8-bit wide characters to reverse
+Invert_UDG_Columns
+        ldy     #$0F                    ; 347B: A0 0F     Number of pixel lines to reverse
+Invert_UDG_Rows
+        lda     (ZP_UDG_RAM_X),y        ; 347D: B1 04     Get current byte of character
+        eor     #$FF                    ; 347F: 49 FF      invert it
+        sta     (ZP_UDG_RAM_X),y        ; 3481: 91 04      and write it back
         dey                             ; 3483: 88       
-        bpl     Z347D                   ; 3484: 10 F7    
-        dex                             ; 3486: CA       
-        beq     Z3499                   ; 3487: F0 10    
+        bpl     Invert_UDG_Rows         ; 3484: 10 F7     All bytes inverted?
+        dex                             ; 3486: CA         If yes, continue to next column
+        beq     Do_RTS                  ; 3487: F0 10     All columns inverted? If yes, finish
+
+; Move to next column by adding $B0 (#176) pixel to X postion
         lda     ZP_UDG_RAM_X            ; 3489: A5 04    
         clc                             ; 348B: 18       
-        adc     #$B0                    ; 348C: 69 B0    
+        adc     #$B0                    ; 348C: 69 B0     $B0 = height of screen in pixels i.e. move one column right
         sta     ZP_UDG_RAM_X            ; 348E: 85 04    
+
+; Move to top row by adding $B0 (#176) pixeln to X postion i.e. one column
         lda     ZP_UDG_RAM_Y            ; 3490: A5 05    
-        adc     #$00                    ; 3492: 69 00    
+        adc     #$00                    ; 3492: 69 00     Add the carry from the previous $B0 addition for X
         sta     ZP_UDG_RAM_Y            ; 3494: 85 05    
-        jmp     Z347B                   ; 3496: 4C 7B 34 
+        jmp     Invert_UDG_Columns      ; 3496: 4C 7B 34 
 ; -----------------------
-Z3499   rts                             ; 3499: 60       
+Do_RTS  rts                             ; 3499: 60       
 ; ===========================================================
-Z349A   jsr     Read_ZP_Paramenters     ; 349A: 20 9D 25 
+Load_UDG_RAM_for_P2
+        jsr     Read_ZP_Paramenters     ; 349A: 20 9D 25 
         fcb     $04                     ; 349D: 04        Store to ZP_UDG_RAM_X
-        fcb     $80,$00                 ; 349E: 80 00     Character ROM
+        fcb     $80,$00                 ; 349E: 80 00     X Y position in pixels
         fcb     $FF                     ; 34A0: FF       
-        jmp     Z3470                   ; 34A1: 4C 70 34 
+        jmp     _Flash_Score_           ; 34A1: 4C 70 34 
 ; -----------------------
 
 ; ----------------------------------------------------------

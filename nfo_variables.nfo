@@ -57,9 +57,9 @@ label      5a Num_Lives_P1
 label      5b ZP_005b
 label      5c Num_Lives_P2
 label      5d ZP_005d
-label      5e ZP_Game_Over_P1_P2
-label      5f ZP_Subroutine_Vec_Lo
-label      60 ZP_Subroutine_Vec_Hi
+label      5e ZP_P1_Or_P2
+label      5f ZP_Subroutine_Vec_Lo ; This isn't right...address not aligned!!!!!!!!!!!
+label      60 ZP_Subroutine_Vec_Hi ; This isn't right...address not aligned!!!!!!!!!!!
 label      80 ZP_0080
 label      f8 ZP_00f8
 label      fc ZP_00fc
