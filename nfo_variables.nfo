@@ -52,10 +52,10 @@ label      51 ZP_Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54 ZP_Score_P2 ; 3 bytes
 label      57 ZP_Invert ; Used to flash game options & 1UP+score at player start
 label      58 ZP_Counter
-label      59 ZP_0059
-label      5a Num_Lives_P1
-label      5b ZP_005b
-label      5c Num_Lives_P2
+label      59 ZP_Level_Current_Plyr
+label      5a ZP_Num_Lives_P1
+label      5b ZP_Level_Other_Plyr
+label      5c ZP_Num_Lives_P2
 label      5d ZP_005d
 label      5e ZP_P1_Or_P2
 label      5f ZP_Subroutine_Vec_Lo ; This isn't right...address not aligned!!!!!!!!!!!

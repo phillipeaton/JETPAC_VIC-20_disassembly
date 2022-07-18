@@ -631,8 +631,9 @@ lcomment 316B $3E15 is the Mineral UDG address
 comment  31B6 XY_Data_for_3143_Subroutine
 const    31B6-31BE
 word     31B6-31BD
-label    3273 Subroutine_3273
-label    334D Subroutine_334D
+label    3273 Read_Kbd_Jsk_And_Store
+label    334D Flash_Score_Then_Display_Scores
+label    3367 JMP_to_Subroutine_261A
 label    33D4 Read_Joystick
 label    33F7 Read_Keyboard_Joystick
 lcomment 33FA Joystick selected?
