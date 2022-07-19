@@ -192,8 +192,18 @@ label    2301 CBTSR1
 ;        2315
 word     2315
 const    233B-235A
-label    233B Bytes_To_Copy_To_Other_RAM
+label    233B Inital_Object_Data
+lcomment 233B AF = sprite at bottom of screen, could be rocket part?
+break    233F
+lcomment 233F 3F/5F = height of rocket parts at rest on platforms?
+break    2343
+lcomment 2343 50 = x coord of middle rocket part?
+break    2347
+break    234B
+break    234F
 label    2353 BTCTOR_1
+break    2357
+lcomment 2353 Initial position etc of Jetman?
 label    235D BACK_235D
 label    236F LDA_7F_Return
 ;        2373
@@ -247,10 +257,10 @@ label    23D6 BACK_23D6
 comment  23DA
 comment  23E7
 label    23F4 SKIP_23F4
-label    23F5 Swap_ZP59_ZP5B_SCR_RAM_Copy
-label    23F7 BACK_23F7
+label    23F5 Swap_Player_And_Objects
+label    23F7 Swap_Player
 comment  2404
-label    2406 BACK_2406
+label    2406 Swap_Object
 ;        2416
 label    2416 Reset_Color_Pixels_Scores
 lcomment 241C Puts 000000  000000  00 at top of screen
@@ -517,15 +527,14 @@ label    2934 Subroutine_2934
 ;        2967
 label    2967 UDG_Ptr
 word     2967-2974
-break    2968
+break    2969
 label    2968 UDG_Ptr+1
-break    296F
+break    296E
 ;        2987
 label    2987 Game_Over
 ;        2997
 label    2997 SKIP_2997
 label    299D Sound_Channels_Off_ETC
-lcomment 29DB Swap between P1 and P2?????????
 label    29E7 Display_Game_Over
 lcomment 29EA Game Over for P1 or P2?
 label    29EE Display_Game_Over_P1
@@ -595,6 +604,8 @@ label    2C6A Subroutine_2C6A
 const    2CDB-2CE2
 label    2CDB _0025_0035_0045_0055
 word     2CDB-2CE2
+break    2D54
+const    2D59
 ;        2DBC
 word     2DBC
 ;        2DDD
@@ -944,8 +955,8 @@ label    3BBE Jetman_Fly_Right_2
 label    3BF1 Jetman_Fly_Right_3
 label    3C3C Jetman_Fly_Right_4
 lcomment 3C87 $3CD4 = Ship_1_Bott
-label    3C87 UDG_Ships_Lookup_Lo
-label    3C88 UDG_Ships_Lookup_Hi
+label    3C87 UDG_Sprite_Lookup_Lo
+label    3C88 UDG_Sprite_Lookup_Hi
 label    3E46 Alien_Ship_1
 label    3E61 Alien_Ship_2
 label    3E78 Alien_Fuzz_1

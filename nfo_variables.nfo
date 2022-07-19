@@ -38,7 +38,7 @@ label      24 ZP_0024
 label      25 ZP_0025
 label      26 ZP_0026
 label      27 ZP_0027
-label      28 ZP_0028
+label      0028-0039 ZP_Player_Object_Stash
 label      40 ZP_Param_Addr_Lo
 label      41 ZP_Param_Addr_Hi
 label      45 ZP_Game_Sel_F1_Flash
@@ -63,6 +63,24 @@ label      60 ZP_Subroutine_Vec_Hi ; This isn't right...address not aligned!!!!!
 label      80 ZP_0080
 label      f8 ZP_00f8
 label      fc ZP_00fc
+label    0380 Jetman_Looks ; Graphic Selector? Bit 7 = directoin 1=left, 0=right; bit 0&1 01 = flying, 10 = standing
+label    0381 Jetman_X ; Pixel Left=00 Right=B6 or B7
+label    0382 Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
+label    0383 Jetman_Y ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
+label    0383 Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accelerating?
+
+label    03A8 Object_? ;     03B0  09 70 00 AF 01 00 00 1C
+
+                       ;            0  1  2  3  4  5  6  7
+label    03B0 Object_0 ;     03B0  09 70 00 AF 01 00 00 1C
+label    03B8 Object_1 ;     03B8  04 20 00 3F 00 01 10 18
+label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Explosion->00, 04=Rocket_Part/Fuel, 05=fuzzball, 06=saucer, 07=Ball, 08=Cross, 09+=CRASH, 0E=flashing/werthers
+label    03C8 Object_3 ;     03C8  05 57 08 9D 00 02 03 00  1=horizontal postion of alien
+label    03D0 Object_4 ;     03D0  05 91 08 7C 00 06 03 00  2=direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
+label    03D8 Object_5 ;     03D8  05 47 08 85 00 02 00 00  3=height
+label    03E0 Object_6 ;     03E0  05 8B 08 81 00 02 03 00  4=diagonal, jiggles around a lot for a saucer
+label    03E8 Object_7 ;     03E8  05 A6 08 7D 00 02 03 00  5=colour - bottom 3 bits?
+label    03F0 Object_8 ;     03F0  05 19 F8 8D 00 06 00 00
 
 ; Other variables that are somewhat persistent i.e. not reset at game restart
 label    1008 UDG_P1_SCORE_RAW_POSN

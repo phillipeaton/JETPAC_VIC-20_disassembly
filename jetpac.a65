@@ -50,7 +50,7 @@ ZP_0024                 equ     $0024
 ZP_0025                 equ     $0025
 ZP_0026                 equ     $0026
 ZP_0027                 equ     $0027
-ZP_0028                 equ     $0028
+ZP_Player_Object_Stash  equ     $0028
 ZP_Param_Addr_Lo        equ     $0040
 ZP_Param_Addr_Hi        equ     $0041
 ZP_Game_Sel_F7_Flash    equ     $0045
@@ -75,6 +75,14 @@ Screen_RAM              equ     $0200
 Other_RAM               equ     $0300
 Hardware_IRQ            equ     $0314
 NMI_int_vector          equ     $0318
+Jetman_Looks            equ     $0380
+Jetman_X                equ     $0381
+Jetman_At_Rest???       equ     $0383
+Object_?                equ     $03A8
+Object_0                equ     $03B0
+Object_1                equ     $03B8
+Object_2                equ     $03C0
+Object_3                equ     $03C8
 UDG_RAM                 equ     $1000
 UDG_P1_SCORE_RAW_POSN   equ     $1008
 UDG_P1_LIVES_RAW_POSN   equ     $1420
@@ -221,7 +229,7 @@ BACK_2080
         lda     #$0F                    ; 2085: A9 0F    
         sta     VIC_RE_Vol_Color        ; 2087: 8D 0E 90 
         lda     #$00                    ; 208A: A9 00    
-        sta     Other_RAM+168           ; 208C: 8D A8 03 
+        sta     Object_?                ; 208C: 8D A8 03 
 
 ATTRACT_MODE
         inc     ZP_Counter              ; 208F: E6 58    
@@ -565,7 +573,7 @@ Z22D7   jsr     Reset_Color_Pixels_Scores ; 22D7: 20 16 24
 Z22E3   jsr     Z28E7                   ; 22E3: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 22E6: 20 9D 25 
         fcb     $00                     ; 22E9: 00       
-        fdb     Other_RAM+184           ; 22EA: B8 03    
+        fdb     Object_1                ; 22EA: B8 03    
         fcb     $FF                     ; 22EC: FF       
 Z22ED   ldx     #$01                    ; 22ED: A2 01    
         jmp     Z231A                   ; 22EF: 4C 1A 23 
@@ -573,14 +581,14 @@ Z22ED   ldx     #$01                    ; 22ED: A2 01
 Z22F2   jsr     Z28E7                   ; 22F2: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 22F5: 20 9D 25 
         fcb     $00                     ; 22F8: 00       
-        fdb     Other_RAM+192           ; 22F9: C0 03    
+        fdb     Object_2                ; 22F9: C0 03    
         fcb     $FF                     ; 22FB: FF       
         jmp     Z22ED                   ; 22FC: 4C ED 22 
 ; -----------------------
 Copy_Bytes_To_Other_RAM
         ldx     #$17                    ; 22FF: A2 17    
-CBTSR1  lda     Bytes_To_Copy_To_Other_RAM,x ; 2301: BD 3B 23 
-        sta     Other_RAM+176,x         ; 2304: 9D B0 03 
+CBTSR1  lda     Inital_Object_Data,x    ; 2301: BD 3B 23 
+        sta     Object_0,x              ; 2304: 9D B0 03 
         dex                             ; 2307: CA       
         bpl     CBTSR1                  ; 2308: 10 F7    
         rts                             ; 230A: 60       
@@ -589,7 +597,7 @@ Z230B   jsr     Copy_Bytes_To_Other_RAM ; 230B: 20 FF 22
         jsr     Z28E7                   ; 230E: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2311: 20 9D 25 
         fcb     $00                     ; 2314: 00       
-        fdb     Bytes_To_Copy_To_Other_RAM ; 2315: 3B 23    
+        fdb     Inital_Object_Data      ; 2315: 3B 23    
         fcb     $FF                     ; 2317: FF       
         ldx     #$03                    ; 2318: A2 03    
 Z231A   txa                             ; 231A: 8A       
@@ -611,17 +619,19 @@ Z231A   txa                             ; 231A: 8A
         jsr     Z28F0                   ; 2337: 20 F0 28 
         rts                             ; 233A: 60       
 ; ===========================================================
-Bytes_To_Copy_To_Other_RAM
-        fcb     $09,$70,$00,$AF,$01,$00 ; 233B: 09 70 00 AF 01 00 
-        fcb     $00,$1C,$04,$20,$00,$3F ; 2341: 00 1C 04 20 00 3F 
-        fcb     $00,$01,$10,$18,$04,$50 ; 2347: 00 01 10 18 04 50 
-        fcb     $00,$5F,$01,$01,$08,$18 ; 234D: 00 5F 01 01 08 18 
-BTCTOR_1 fcb    $02,$50,$00,$AF,$00,$01 ; 2353: 02 50 00 AF 00 01 
-        fcb     $00,$00                 ; 2359: 00 00    
+Inital_Object_Data
+        fcb     $09,$70,$00,$AF         ; 233B: 09 70 00 AF  AF = sprite at bottom of screen, could be rocket part?
+        fcb     $01,$00,$00,$1C         ; 233F: 01 00 00 1C  3F/5F = height of rocket parts at rest on platforms?
+        fcb     $04,$20,$00,$3F         ; 2343: 04 20 00 3F  50 = x coord of middle rocket part?
+        fcb     $00,$01,$10,$18         ; 2347: 00 01 10 18 
+        fcb     $04,$50,$00,$5F         ; 234B: 04 50 00 5F 
+        fcb     $01,$01,$08,$18         ; 234F: 01 01 08 18 
+BTCTOR_1 fcb    $02,$50,$00,$AF         ; 2353: 02 50 00 AF  Initial position etc of Jetman?
+        fcb     $00,$01,$00,$00         ; 2357: 00 01 00 00 
 Z235B   ldx     #$07                    ; 235B: A2 07    
 BACK_235D
         lda     BTCTOR_1,x              ; 235D: BD 53 23 
-        sta     Other_RAM+128,x         ; 2360: 9D 80 03 
+        sta     Jetman_Looks,x          ; 2360: 9D 80 03 
         dex                             ; 2363: CA       
         bpl     BACK_235D               ; 2364: 10 F7    
         lda     GAME_OPTIONS            ; 2366: AD D3 1F 
@@ -718,7 +728,7 @@ BACK_23D6
         lda     #$04                    ; 23DA: A9 04    
         sta     ZP_Num_Lives_P1         ; 23DC: 85 5A    
         jsr     Copy_Bytes_To_Other_RAM ; 23DE: 20 FF 22 
-        jsr     Swap_ZP59_ZP5B_SCR_RAM_Copy ; 23E1: 20 F5 23 
+        jsr     Swap_Player_And_Objects ; 23E1: 20 F5 23 
         dey                             ; 23E4: 88       
         bne     BACK_23D6               ; 23E5: D0 EF    
 
@@ -731,9 +741,9 @@ BACK_23D6
 SKIP_23F4
         rts                             ; 23F4: 60       
 ; ===========================================================
-Swap_ZP59_ZP5B_SCR_RAM_Copy
+Swap_Player_And_Objects
         ldx     #$01                    ; 23F5: A2 01    
-BACK_23F7
+Swap_Player
         lda     ZP_Level_Current_Plyr,x ; 23F7: B5 59    
         pha                             ; 23F9: 48       
         lda     ZP_Level_Other_Plyr,x   ; 23FA: B5 5B    
@@ -741,18 +751,18 @@ BACK_23F7
         pla                             ; 23FE: 68       
         sta     ZP_Level_Other_Plyr,x   ; 23FF: 95 5B    
         dex                             ; 2401: CA       
-        bpl     BACK_23F7               ; 2402: 10 F3    
+        bpl     Swap_Player             ; 2402: 10 F3    
 
         ldx     #$17                    ; 2404: A2 17    
-BACK_2406
-        lda     Other_RAM+176,x         ; 2406: BD B0 03 
+Swap_Object
+        lda     Object_0,x              ; 2406: BD B0 03 
         pha                             ; 2409: 48       
-        lda     ZP_0028,x               ; 240A: B5 28    
-        sta     Other_RAM+176,x         ; 240C: 9D B0 03 
+        lda     ZP_Player_Object_Stash,x ; 240A: B5 28    
+        sta     Object_0,x              ; 240C: 9D B0 03 
         pla                             ; 240F: 68       
-        sta     ZP_0028,x               ; 2410: 95 28    
+        sta     ZP_Player_Object_Stash,x ; 2410: 95 28    
         dex                             ; 2412: CA       
-        bpl     BACK_2406               ; 2413: 10 F1    
+        bpl     Swap_Object             ; 2413: 10 F1    
         rts                             ; 2415: 60       
 ; ===========================================================
 Reset_Color_Pixels_Scores
@@ -1094,7 +1104,7 @@ Z2669   sei                             ; 2669: 78        Set Disable Interrupts
         sta     ZP_0023                 ; 2674: 85 23    
         jsr     Read_ZP_Paramenters     ; 2676: 20 9D 25 
         fcb     $00                     ; 2679: 00        ZP Offset for 1st address
-        fdb     Other_RAM+128           ; 267A: 80 03     1st Address
+        fdb     Jetman_Looks            ; 267A: 80 03     1st Address
         fcb     $FF                     ; 267C: FF       
         jmp     Main_Loop               ; 267D: 4C 07 26 
 ; -----------------------
@@ -1128,7 +1138,7 @@ Subroutine_List
 Copy_C0_00_00_Etc_To_Other_RAM
         ldx     #$07                    ; 26AE: A2 07    
 CCTOR_1 lda     C0_00_00_00_00_00_00_00,x ; 26B0: BD C5 26 
-        sta     Other_RAM+168,x         ; 26B3: 9D A8 03 
+        sta     Object_?,x              ; 26B3: 9D A8 03 
         dex                             ; 26B6: CA       
         bpl     CCTOR_1                 ; 26B7: 10 F7    
         lda     #$00                    ; 26B9: A9 00    
@@ -1247,7 +1257,7 @@ Reset_Other_RAM_0380_03ff
         ldx     #$7F                    ; 2764: A2 7F    
         lda     #$00                    ; 2766: A9 00    
 BACK_2768
-        sta     Other_RAM+128,x         ; 2768: 9D 80 03 
+        sta     Jetman_Looks,x          ; 2768: 9D 80 03 
         dex                             ; 276B: CA       
         bpl     BACK_2768               ; 276C: 10 FA    
         rts                             ; 276E: 60       
@@ -1465,18 +1475,18 @@ Z28C0   cmp     #$05                    ; 28C0: C9 05
 Reset_Other_RAM_03B8_03FF
         ldx     #$47                    ; 28C9: A2 47    
         lda     #$00                    ; 28CB: A9 00    
-Z28CD   sta     Other_RAM+184,x         ; 28CD: 9D B8 03 
+Z28CD   sta     Object_1,x              ; 28CD: 9D B8 03 
         dex                             ; 28D0: CA       
         bpl     Z28CD                   ; 28D1: 10 FA    
         rts                             ; 28D3: 60       
 ; ===========================================================
 Z28D4   ldx     #$2F                    ; 28D4: A2 2F    
         lda     #$00                    ; 28D6: A9 00    
-Z28D8   sta     Other_RAM+128,x         ; 28D8: 9D 80 03 
+Z28D8   sta     Jetman_Looks,x          ; 28D8: 9D 80 03 
         dex                             ; 28DB: CA       
         bpl     Z28D8                   ; 28DC: 10 FA    
         ldx     #$2F                    ; 28DE: A2 2F    
-Z28E0   sta     Other_RAM+200,x         ; 28E0: 9D C8 03 
+Z28E0   sta     Object_3,x              ; 28E0: 9D C8 03 
         dex                             ; 28E3: CA       
         bpl     Z28E0                   ; 28E4: 10 FA    
         rts                             ; 28E6: 60       
@@ -1602,7 +1612,7 @@ Z29D0   lda     ZP_Num_Lives_P2         ; 29D0: A5 5C
         lda     ZP_Num_Lives_P1         ; 29D4: A5 5A    
         bne     Z29DB                   ; 29D6: D0 03    
         jsr     Display_Game_Over       ; 29D8: 20 E7 29 
-Z29DB   jsr     Swap_ZP59_ZP5B_SCR_RAM_Copy ; 29DB: 20 F5 23  Swap between P1 and P2?????????
+Z29DB   jsr     Swap_Player_And_Objects ; 29DB: 20 F5 23 
         lda     ZP_P1_Or_P2             ; 29DE: A5 5E    
         eor     #$FF                    ; 29E0: 49 FF    
         sta     ZP_P1_Or_P2             ; 29E2: 85 5E    
@@ -1659,7 +1669,7 @@ STR_GAME_OVER_PLAYER_2
 Z2A45   jsr     Z28E7                   ; 2A45: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2A48: 20 9D 25 
         fcb     $00                     ; 2A4B: 00       
-        fdb     Other_RAM+128           ; 2A4C: 80 03    
+        fdb     Jetman_Looks            ; 2A4C: 80 03    
         fcb     $FF                     ; 2A4E: FF       
         ldy     #$02                    ; 2A4F: A0 02    
         lda     #$01                    ; 2A51: A9 01    
@@ -1729,7 +1739,7 @@ Z2AC4   jsr     Z2B16                   ; 2AC4: 20 16 2B
         lda     (ZP_0000),y             ; 2AC9: B1 00    
         iny                             ; 2ACB: C8       
         sec                             ; 2ACC: 38       
-        sbc     Other_RAM+129           ; 2ACD: ED 81 03 
+        sbc     Jetman_X                ; 2ACD: ED 81 03 
         bmi     Z2AFA                   ; 2AD0: 30 28    
         lda     (ZP_0000),y             ; 2AD2: B1 00    
         sec                             ; 2AD4: 38       
@@ -1742,7 +1752,7 @@ Z2ADF   ldy     #$03                    ; 2ADF: A0 03
         lda     (ZP_0000),y             ; 2AE1: B1 00    
         iny                             ; 2AE3: C8       
         sec                             ; 2AE4: 38       
-        sbc     Other_RAM+131           ; 2AE5: ED 83 03 
+        sbc     Jetman_At_Rest???       ; 2AE5: ED 83 03 
         bmi     Z2B08                   ; 2AE8: 30 1E    
         lda     (ZP_0000),y             ; 2AEA: B1 00    
         sec                             ; 2AEC: 38       
@@ -1797,14 +1807,14 @@ Z2B42   lda     (ZP_0000),y             ; 2B42: B1 00
         sta     (ZP_0000),y             ; 2B48: 91 00    
         rts                             ; 2B4A: 60       
 ; ===========================================================
-Z2B4B   lda     Other_RAM+128           ; 2B4B: AD 80 03 
+Z2B4B   lda     Jetman_Looks            ; 2B4B: AD 80 03 
         and     #$3F                    ; 2B4E: 29 3F    
         bne     Z2B53                   ; 2B50: D0 01    
 Z2B52   rts                             ; 2B52: 60       
 ; ===========================================================
 Z2B53   cmp     #$03                    ; 2B53: C9 03    
         bcs     Z2B52                   ; 2B55: B0 FB    
-        lda     Other_RAM+184           ; 2B57: AD B8 03 
+        lda     Object_1                ; 2B57: AD B8 03 
         bne     Z2B52                   ; 2B5A: D0 F6    
         lda     Other_RAM+178           ; 2B5C: AD B2 03 
         cmp     #$06                    ; 2B5F: C9 06    
@@ -1815,7 +1825,7 @@ Z2B53   cmp     #$03                    ; 2B53: C9 03
         bne     Z2B52                   ; 2B69: D0 E7    
         ldx     #$07                    ; 2B6B: A2 07    
 Z2B6D   lda     _0400002001041818,x     ; 2B6D: BD 7F 2B 
-        sta     Other_RAM+184,x         ; 2B70: 9D B8 03 
+        sta     Object_1,x              ; 2B70: 9D B8 03 
         dex                             ; 2B73: CA       
         bpl     Z2B6D                   ; 2B74: 10 F7    
         jsr     Get_Raster_Line_Band    ; 2B76: 20 DE 2B 
@@ -1828,21 +1838,21 @@ _0400002001041818
 _0E00002000000018
         fcb     $0E,$00,$00,$20,$00,$00 ; 2B87: 0E 00 00 20 00 00 
         fcb     $00,$18                 ; 2B8D: 00 18    
-Z2B8F   lda     Other_RAM+128           ; 2B8F: AD 80 03 
+Z2B8F   lda     Jetman_Looks            ; 2B8F: AD 80 03 
         and     #$3F                    ; 2B92: 29 3F    
         bne     Z2B97                   ; 2B94: D0 01    
 Z2B96   rts                             ; 2B96: 60       
 ; ===========================================================
 Z2B97   cmp     #$03                    ; 2B97: C9 03    
         bcs     Z2B96                   ; 2B99: B0 FB    
-        lda     Other_RAM+192           ; 2B9B: AD C0 03 
+        lda     Object_2                ; 2B9B: AD C0 03 
         bne     Z2B96                   ; 2B9E: D0 F6    
         lda     ZP_HW_IRQ_Count1        ; 2BA0: A5 4A    
         and     #$7F                    ; 2BA2: 29 7F    
         bne     Z2B96                   ; 2BA4: D0 F0    
         ldx     #$07                    ; 2BA6: A2 07    
 Z2BA8   lda     _0E00002000000018,x     ; 2BA8: BD 87 2B 
-        sta     Other_RAM+192,x         ; 2BAB: 9D C0 03 
+        sta     Object_2,x              ; 2BAB: 9D C0 03 
         dex                             ; 2BAE: CA       
         bpl     Z2BA8                   ; 2BAF: 10 F7    
         jsr     Get_Raster_Line_Band    ; 2BB1: 20 DE 2B 
@@ -2019,7 +2029,7 @@ Z2CD6   lda     ZP_005d                 ; 2CD6: A5 5D
 ; ===========================================================
 _0025_0035_0045_0055
         fdb     $0025,$0035,$0045,$0055 ; 2CDB: 25 00 35 00 45 00 55 00 
-Z2CE3   lda     Other_RAM+128           ; 2CE3: AD 80 03 
+Z2CE3   lda     Jetman_Looks            ; 2CE3: AD 80 03 
         and     #$3F                    ; 2CE6: 29 3F    
         cmp     #$01                    ; 2CE8: C9 01    
         beq     Z2CF1                   ; 2CEA: F0 05    
@@ -2082,12 +2092,10 @@ Z2D0F   lda     ZP_Level_Current_Plyr   ; 2D0F: A5 59
         jmp     Z3601                   ; 2D49: 4C 01 36 
 ; -----------------------
 M2D4C   fcb     $05,$08,$07,$06         ; 2D4C: 05 08 07 06 
-M2D50   fcb     $02,$06,$03,$07,$06,$07 ; 2D50: 02 06 03 07 06 07 
-        fcb     $02,$04                 ; 2D56: 02 04    
-Z2D58   fcb     $A5                     ; 2D58: A5       
-        fcc     "]"                     ; 2D59: 5D       
-        fcb     $D0,$0D                 ; 2D5A: D0 0D    
-        lda     Other_RAM+128           ; 2D5C: AD 80 03 
+M2D50   fcb     $02,$06,$03,$07         ; 2D50: 02 06 03 07 
+        fcb     $06,$07,$02,$04         ; 2D54: 06 07 02 04 
+Z2D58   fcb     $A5,$5D,$D0,$0D         ; 2D58: A5 5D D0 0D 
+        lda     Jetman_Looks            ; 2D5C: AD 80 03 
         and     #$3F                    ; 2D5F: 29 3F    
         cmp     #$01                    ; 2D61: C9 01    
         beq     Z2D6E                   ; 2D63: F0 09    
@@ -2100,7 +2108,7 @@ Z2D58   fcb     $A5                     ; 2D58: A5
 Z2D6E   ldy     #$00                    ; 2D6E: A0 00    
         sty     ZP_Temp_1_Lo            ; 2D70: 84 02    
         iny                             ; 2D72: C8       
-        lda     Other_RAM+129           ; 2D73: AD 81 03 
+        lda     Jetman_X                ; 2D73: AD 81 03 
         sec                             ; 2D76: 38       
         sbc     (ZP_0000),y             ; 2D77: F1 00    
         bpl     Z2D80                   ; 2D79: 10 05    
@@ -2111,7 +2119,7 @@ Z2D80   cmp     #$0C                    ; 2D80: C9 0C
         bcs     Z2D9B                   ; 2D82: B0 17    
         iny                             ; 2D84: C8       
         iny                             ; 2D85: C8       
-        lda     Other_RAM+131           ; 2D86: AD 83 03 
+        lda     Jetman_At_Rest???       ; 2D86: AD 83 03 
         sec                             ; 2D89: 38       
         sbc     (ZP_0000),y             ; 2D8A: F1 00    
         bpl     Z2D9C                   ; 2D8C: 10 0E    
@@ -2127,10 +2135,10 @@ Z2D9B   rts                             ; 2D9B: 60
 Z2D9C   cmp     #$12                    ; 2D9C: C9 12    
         jmp     Z2D95                   ; 2D9E: 4C 95 2D 
 ; -----------------------
-Z2DA1   lda     Other_RAM+184           ; 2DA1: AD B8 03 
+Z2DA1   lda     Object_1                ; 2DA1: AD B8 03 
         beq     Z2DA9                   ; 2DA4: F0 03    
         jsr     Z22E3                   ; 2DA6: 20 E3 22 
-Z2DA9   lda     Other_RAM+192           ; 2DA9: AD C0 03 
+Z2DA9   lda     Object_2                ; 2DA9: AD C0 03 
         beq     Z2DB5                   ; 2DAC: F0 07    
         cmp     #$0E                    ; 2DAE: C9 0E    
         beq     Z2DC5                   ; 2DB0: F0 13    
@@ -2138,7 +2146,7 @@ Z2DA9   lda     Other_RAM+192           ; 2DA9: AD C0 03
 Z2DB5   jsr     Z28E7                   ; 2DB5: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2DB8: 20 9D 25 
         fcb     $00                     ; 2DBB: 00       
-        fdb     Other_RAM+176           ; 2DBC: B0 03    
+        fdb     Object_0                ; 2DBC: B0 03    
         fcb     $FF                     ; 2DBE: FF       
         jsr     Z2DCB                   ; 2DBF: 20 CB 2D 
         jmp     Z28F0                   ; 2DC2: 4C F0 28 
@@ -2252,12 +2260,12 @@ Subroutine_2E74
         jsr     Z28E7                   ; 2E8C: 20 E7 28 
         jsr     Read_ZP_Paramenters     ; 2E8F: 20 9D 25 
         fcb     $00                     ; 2E92: 00       
-        fdb     Other_RAM+128           ; 2E93: 80 03    
+        fdb     Jetman_Looks            ; 2E93: 80 03    
         fcb     $FF                     ; 2E95: FF       
         jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2E96: 20 E9 35 
         jsr     Z3601                   ; 2E99: 20 01 36 
         lda     #$00                    ; 2E9C: A9 00    
-        sta     Other_RAM+128           ; 2E9E: 8D 80 03 
+        sta     Jetman_Looks            ; 2E9E: 8D 80 03 
         jsr     Z28F0                   ; 2EA1: 20 F0 28 
         inc     ZP_Num_Lives_P1         ; 2EA4: E6 5A    
         jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23 
@@ -2420,9 +2428,9 @@ Z2FDC   lsr     a                       ; 2FDC: 4A
 ; Using A as offset, Load A and Y with Ship UDG address
 Get_Ship_UDG_Addr
         tax                             ; 2FE5: AA       
-        lda     UDG_Ships_Lookup_Lo,x   ; 2FE6: BD 87 3C 
+        lda     UDG_Sprite_Lookup_Lo,x  ; 2FE6: BD 87 3C 
         tay                             ; 2FE9: A8       
-        lda     UDG_Ships_Lookup_Hi,x   ; 2FEA: BD 88 3C 
+        lda     UDG_Sprite_Lookup_Hi,x  ; 2FEA: BD 88 3C 
         rts                             ; 2FED: 60       
 ; ===========================================================
 Z2FEE   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2FEE: 20 D7 35 
@@ -2440,21 +2448,21 @@ Z2FEE   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2FEE: 20 D7 35
         lda     #$10                    ; 3008: A9 10    
         sta     Other_RAM+170           ; 300A: 8D AA 03 
         ldy     #$01                    ; 300D: A0 01    
-        lda     Other_RAM+129           ; 300F: AD 81 03 
+        lda     Jetman_X                ; 300F: AD 81 03 
         sta     (ZP_0000),y             ; 3012: 91 00    
         ldy     #$03                    ; 3014: A0 03    
-        lda     Other_RAM+131           ; 3016: AD 83 03 
+        lda     Jetman_At_Rest???       ; 3016: AD 83 03 
         sta     (ZP_0000),y             ; 3019: 91 00    
         jmp     Z2FBD                   ; 301B: 4C BD 2F 
 ; -----------------------
 Z301E   ldy     #$01                    ; 301E: A0 01    
-        lda     Other_RAM+129           ; 3020: AD 81 03 
+        lda     Jetman_X                ; 3020: AD 81 03 
         clc                             ; 3023: 18       
         adc     #$04                    ; 3024: 69 04    
         sta     (ZP_0000),y             ; 3026: 91 00    
         iny                             ; 3028: C8       
         iny                             ; 3029: C8       
-        lda     Other_RAM+131           ; 302A: AD 83 03 
+        lda     Jetman_At_Rest???       ; 302A: AD 83 03 
         sta     (ZP_0000),y             ; 302D: 91 00    
         dey                             ; 302F: 88       
         dey                             ; 3030: 88       
@@ -3752,7 +3760,7 @@ UDG_Lookup
         fdb     Jetman_Fly_Right_2      ; 385F: BE 3B    
         fdb     Jetman_Fly_Right_3      ; 3861: F1 3B    
         fdb     Jetman_Fly_Right_4      ; 3863: 3C 3C    
-        fdb     UDG_Ships_Lookup_Lo     ; 3865: 87 3C    
+        fdb     UDG_Sprite_Lookup_Lo    ; 3865: 87 3C    
         fdb     Jetman_Fly_Left_3       ; 3867: 8B 3B    
         fdb     Jetman_Fly_Left_2       ; 3869: 40 3B    
         fdb     Jetman_Fly_Left_1       ; 386B: F5 3A    
@@ -4800,9 +4808,9 @@ Jetman_Fly_Right_4
         fcb     %00011000               ; 3C84: 18       
         fcb     %00000010               ; 3C85: 02       
         fcb     %00000000               ; 3C86: 00       
-UDG_Ships_Lookup_Lo
+UDG_Sprite_Lookup_Lo
         fcb     $D4                     ; 3C87: D4        $3CD4 = Ship_1_Bott
-UDG_Ships_Lookup_Hi
+UDG_Sprite_Lookup_Hi
         fcb     $3C                     ; 3C88: 3C       
         fdb     Ship_2_Bott             ; 3C89: 3D 3D    
         fdb     Ship_1_Bott             ; 3C8B: D4 3C    
