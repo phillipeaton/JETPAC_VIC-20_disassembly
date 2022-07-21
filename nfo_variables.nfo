@@ -1,6 +1,6 @@
 ; Zero-Page variables
-label      00 ZP_0000
-label      01 ZP_0001
+label      00 ZP_Obj_List_Ptr_Lo
+label      01 ZP_Obj_List_Ptr_Hi
 label      02 ZP_Temp_1_Lo
 label      03 ZP_Temp_1_Hi
 label      04 ZP_UDG_RAM_X
@@ -58,17 +58,20 @@ label      5b ZP_Level_Other_Plyr
 label      5c ZP_Num_Lives_P2
 label      5d ZP_005d
 label      5e ZP_P1_Or_P2
-label      5f ZP_Subroutine_Vec_Lo ; This isn't right...address not aligned!!!!!!!!!!!
-label      60 ZP_Subroutine_Vec_Hi ; This isn't right...address not aligned!!!!!!!!!!!
+label      5f ZP_Subroutine_Vec_Lo
+label      60 ZP_Subroutine_Vec_Hi
 label      80 ZP_0080
 label      f8 ZP_00f8
 label      fc ZP_00fc
-label    0380 Jetman_Looks ; Graphic Selector? Bit 7 = directoin 1=left, 0=right; bit 0&1 01 = flying, 10 = standing
-label    0381 Jetman_X ; Pixel Left=00 Right=B6 or B7
+label    0380 Jetman_Looks      ; Graphic Selector? Bit 7 = directoin 1=left, 0=right; bit 0&1 01 = flying, 10 = standing
+label    0381 Jetman_X          ; Pixel Left=00 Right=B6 or B7
 label    0382 Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
-label    0383 Jetman_Y ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
+label    0383 Jetman_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
 label    0383 Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accelerating?
 
+label    0380 Object_0380
+label    0388 Other_RAM_1
+label    0390 Object_0390
 label    03A8 Object_? ;     03B0  09 70 00 AF 01 00 00 1C
 
                        ;            0  1  2  3  4  5  6  7

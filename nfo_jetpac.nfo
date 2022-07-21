@@ -159,7 +159,7 @@ lcomment 20E1 No, read keyboard again
 ;        20E3
 comment  20E3
 ;        20F0
-label    20F0 SOMETHING_TO_UDG_RAM
+label    20F0 Something_To_Other_RAM
 const    20F3
 lcomment 20F3 ZP_Temp_2_Lo
 lcomment 20F4
@@ -187,7 +187,7 @@ break    22ED
 ;        22F9
 word     22F9
 ;        22FF
-label    22FF Copy_Bytes_To_Other_RAM
+label    22FF Init_Objects_1_To_3
 label    2301 CBTSR1
 ;        2315
 word     2315
@@ -345,11 +345,17 @@ label    24B9 Display_Game_Select
 ;        24CA
 comment  24CA
 ;        24CE
-word     24CE
+break    24CE
+lcomment 24CE X Y
+lcomment 24CD ZP_UDG_RAM_X
+const    24CF
+break    24D0
 word     24D1
 comment  24D7
-const    24DB
-word     24DB
+lcomment 24DA ZP_UDG_RAM_X
+break    24DB
+lcomment 24DB X Y
+break    24DD
 word     24DE
 comment  24E4
 lcomment 24E7 ZP_Ptr_To_Str
@@ -414,23 +420,41 @@ used     25E0 Hardware_Interrupt_Handler
 label    25F4 SKIP_25F4
 comment  25FA
 label    25FA Game_Start_
+lcomment 25FE $03B0 = "Object_0"
 label    2607 Main_Loop
+lcomment 2609 Load Object Type into A from obj table 0380 upwards
 lcomment 260B Mulitply by two as 2 bytes in an address
+lcomment 260C Object Type becomes offset into Subroutine List
+lcomment 260D Load SR List offset into SR Vec Lo/Hi...
+lcomment 2617 ...and jmp to it
 label    261A Subroutine_261A
+lcomment 261C Test Object Type value
+lcomment 261E If <>00, skip
+lcomment 2622 Is Object address $B0? i.e. Object_0
+lcomment 2624 If not, skip
 label    262A BACK_262A
+comment  2630
+comment  2630 Increment Object Pointer to next Obj i.e. by adding 8
 label    2630 SKIP_2630
+comment  2637
+lcomment 2637 H/W interrupt happened????
+lcomment 2639 If yes, jump
+comment  263B
+lcomment 263B Is Object address $B0? i.e. Object_0
 label    2652 SKIP_2652
 label    2655 SKIP_2655
 ;        265E
 comment  265E Setup Timer 1
 label    265E Set_Jetman_Movement_Speed
+label    2669 IRQ_Stash_Obj_Ptr_Load_Obj_0380
 lcomment 2669 Set Disable Interrupts flag
 ;        2679
+lcomment 2674 YOU ARE HERE !!!!!!!!!!
 const    2679
 lcomment 2679 ZP Offset for 1st address
 lcomment 267A 1st Address
 word     267A
-label    2680 Copy_ZP22_00_ZP23_00_And_CLI
+label    2680 Copy_ZP22_23_To_Obj_Ptr_And_CLI
 lcomment 2688 Clear Disable Interrupts flag
 ;        268C
 label    268C Subroutine_List
@@ -438,7 +462,7 @@ word     268C-26AD
 label    268D Subroutine_List+1
 ;        26AE
 comment  26AE
-label    26AE Copy_C0_00_00_Etc_To_Other_RAM
+label    26AE Init_Object_?
 label    26B0 CCTOR_1
 label    26C5 C0_00_00_00_00_00_00_00
 label    26CD Jmp_To_SRList2_SR
@@ -522,7 +546,7 @@ label    2892 Routine_2892
 label    289F Routine_289F
 label    28A4 Routine_28A4
 label    28B6 Routine_28B6
-label    28C9 Reset_Other_RAM_03B8_03FF
+label    28C9 Reset_Objects_1_To_8
 label    2934 Subroutine_2934
 ;        2967
 label    2967 UDG_Ptr
