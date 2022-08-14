@@ -166,6 +166,8 @@ lcomment 20F4
 word     20F4
 const    20F6
 lcomment 20F6 End of Parameters
+comment  20F7
+comment  20F7 Loop 4 times through other_ram, 8 bytes at a time, if any are 0, branch to 2110
 label    20FB BACK_20FB
 ;        2145
 label    2145 BACK_2145
@@ -180,15 +182,21 @@ word     2206
 word     2209
 word     220C
 break    220F
+label    2285 CLC_ADC_08
+label    228B Move_ZP17_15_to_ZP16_14
+comment  22BD
+comment  22BD Player at level 4, add another life
 ;        22EA
 word     22EA
 ;        22ED
+label    22ED JMP23A1
 break    22ED
 ;        22F9
 word     22F9
 ;        22FF
 label    22FF Init_Objects_1_To_3
 label    2301 CBTSR1
+label    230B Reset_Some_Objects
 ;        2315
 word     2315
 const    233B-235A
@@ -381,7 +389,7 @@ label    2581 STR_F7_JOYSTICK
 label    258E STR_SP_START_GAME
 ;        259D
 comment  259D
-label    259D Read_ZP_Paramenters
+label    259D Read_ZP_Parameters
 lcomment 259D
 lcomment 259D Parameters for this routine are assembled into ROM after the
 lcomment 259D call to this routine and accessed via the return address
@@ -547,12 +555,14 @@ label    289F Routine_289F
 label    28A4 Routine_28A4
 label    28B6 Routine_28B6
 label    28C9 Reset_Objects_1_To_8
-label    2934 Subroutine_2934
+label    28E7 Save_Obj_List_Ptr
+label    28F0 Restore_Obj_List_Ptr
+label    2934 Explosions_Plyr_Life_Lost?
 ;        2967
-label    2967 UDG_Ptr
+label    2967 Explosion_UDG_Ptr
 word     2967-2974
 break    2969
-label    2968 UDG_Ptr+1
+label    2968 Explosion_UDG_Ptr+1
 break    296E
 ;        2987
 label    2987 Game_Over
@@ -666,6 +676,7 @@ lcomment 316B $3E15 is the Mineral UDG address
 comment  31B6 XY_Data_for_3143_Subroutine
 const    31B6-31BE
 word     31B6-31BD
+comment  3259 HOW DO YOU EVER GET HERE?
 label    3273 Read_Kbd_Jsk_And_Store
 label    334D Flash_Score_Then_Display_Scores
 label    3367 JMP_to_Subroutine_261A

@@ -290,10 +290,12 @@ Z20E9   lda     ZP_HW_IRQ_Count1        ; 20E9: A5 4A
         rts                             ; 20EF: 60       
 ; ===========================================================
 Something_To_Other_RAM
-        jsr     Read_ZP_Paramenters     ; 20F0: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 20F0: 20 9D 25 
         fcb     $06                     ; 20F3: 06        ZP_Temp_2_Lo
         fdb     Other_RAM_1             ; 20F4: 88 03    
         fcb     $FF                     ; 20F6: FF        End of Parameters
+
+; Loop 4 times through other_ram, 8 bytes at a time, if any are 0, branch to 2110
         ldx     #$04                    ; 20F7: A2 04    
         ldy     #$00                    ; 20F9: A0 00    
 BACK_20FB
@@ -446,7 +448,7 @@ SKIP_21F1
 Z21FC   lda     ZP_Temp_2_Lo            ; 21FC: A5 06    
         and     #$FB                    ; 21FE: 29 FB    
         sta     ZP_Temp_2_Lo            ; 2200: 85 06    
-Z2202   jsr     Read_ZP_Paramenters     ; 2202: 20 9D 25 
+Z2202   jsr     Read_ZP_Parameters      ; 2202: 20 9D 25 
         fcb     $14                     ; 2205: 14       
         fdb     Other_RAM               ; 2206: 00 03    
         fcb     $16                     ; 2208: 16       
@@ -460,7 +462,7 @@ Z2211   iny                             ; 2211: C8
         eor     ZP_Temp_2_Lo            ; 2214: 45 06    
         and     #$F8                    ; 2216: 29 F8    
         bne     Z2229                   ; 2218: D0 0F    
-        jsr     Z228B                   ; 221A: 20 8B 22 
+        jsr     Move_ZP17_15_to_ZP16_14 ; 221A: 20 8B 22 
         dec     ZP_Temp_1_Lo            ; 221D: C6 02    
         bne     Z2211                   ; 221F: D0 F0    
         lda     #$00                    ; 2221: A9 00    
@@ -494,7 +496,7 @@ Z2248   ldy     #$06                    ; 2248: A0 06
 Z2257   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2257: B1 00    
         sta     ZP_UDG_RAM_X            ; 2259: 85 04    
         bit     MASK_01                 ; 225B: 2C 14 20 
-        beq     Z2285                   ; 225E: F0 25    
+        beq     CLC_ADC_08              ; 225E: F0 25    
         clc                             ; 2260: 18       
         adc     #$F8                    ; 2261: 69 F8    
 Z2263   jsr     Z2298                   ; 2263: 20 98 22 
@@ -504,7 +506,7 @@ Z2263   jsr     Z2298                   ; 2263: 20 98 22
         tya                             ; 226C: 98       
         pha                             ; 226D: 48       
         jsr     Setup_UDG_RAM_XY        ; 226E: 20 1D 35 
-        jsr     Z228B                   ; 2271: 20 8B 22 
+        jsr     Move_ZP17_15_to_ZP16_14 ; 2271: 20 8B 22 
         ldy     #$00                    ; 2274: A0 00    
         lda     ZP_0014                 ; 2276: A5 14    
         eor     (ZP_UDG_RAM_X),y        ; 2278: 51 04    
@@ -515,11 +517,13 @@ Z2263   jsr     Z2298                   ; 2263: 20 98 22
         bne     Z2211                   ; 2280: D0 8F    
         jmp     Z2248                   ; 2282: 4C 48 22 
 ; -----------------------
-Z2285   clc                             ; 2285: 18       
+CLC_ADC_08
+        clc                             ; 2285: 18       
         adc     #$08                    ; 2286: 69 08    
         jmp     Z2263                   ; 2288: 4C 63 22 
 ; -----------------------
-Z228B   lda     ZP_0015                 ; 228B: A5 15    
+Move_ZP17_15_to_ZP16_14
+        lda     ZP_0015                 ; 228B: A5 15    
         sta     ZP_0014                 ; 228D: 85 14    
         lda     ZP_0016                 ; 228F: A5 16    
         sta     ZP_0015                 ; 2291: 85 15    
@@ -554,10 +558,12 @@ Z22B4   pla                             ; 22B4: 68
         rts                             ; 22B9: 60       
 ; ===========================================================
 Z22BA   jsr     Reset_Color_Pixels_Scores ; 22BA: 20 16 24 
+
+; Player at level 4, add another life
         lda     ZP_Level_Current_Plyr   ; 22BD: A5 59    
         and     #$03                    ; 22BF: 29 03    
         bne     Z22D1                   ; 22C1: D0 0E    
-        jsr     Z230B                   ; 22C3: 20 0B 23 
+        jsr     Reset_Some_Objects      ; 22C3: 20 0B 23 
         inc     ZP_Num_Lives_P1         ; 22C6: E6 5A    
         jsr     Z235B                   ; 22C8: 20 5B 23 
 Z22CB   jsr     Z3152                   ; 22CB: 20 52 31 
@@ -571,20 +577,20 @@ Z22D7   jsr     Reset_Color_Pixels_Scores ; 22D7: 20 16 24
         jsr     Z2DA1                   ; 22DD: 20 A1 2D 
         jmp     Z22CB                   ; 22E0: 4C CB 22 
 ; -----------------------
-Z22E3   jsr     Z28E7                   ; 22E3: 20 E7 28 
-        jsr     Read_ZP_Paramenters     ; 22E6: 20 9D 25 
+Z22E3   jsr     Save_Obj_List_Ptr       ; 22E3: 20 E7 28 
+        jsr     Read_ZP_Parameters      ; 22E6: 20 9D 25 
         fcb     $00                     ; 22E9: 00       
         fdb     Object_1                ; 22EA: B8 03    
         fcb     $FF                     ; 22EC: FF       
-Z22ED   ldx     #$01                    ; 22ED: A2 01    
+JMP23A1 ldx     #$01                    ; 22ED: A2 01    
         jmp     Z231A                   ; 22EF: 4C 1A 23 
 ; -----------------------
-Z22F2   jsr     Z28E7                   ; 22F2: 20 E7 28 
-        jsr     Read_ZP_Paramenters     ; 22F5: 20 9D 25 
+Z22F2   jsr     Save_Obj_List_Ptr       ; 22F2: 20 E7 28 
+        jsr     Read_ZP_Parameters      ; 22F5: 20 9D 25 
         fcb     $00                     ; 22F8: 00       
         fdb     Object_2                ; 22F9: C0 03    
         fcb     $FF                     ; 22FB: FF       
-        jmp     Z22ED                   ; 22FC: 4C ED 22 
+        jmp     JMP23A1                 ; 22FC: 4C ED 22 
 ; -----------------------
 Init_Objects_1_To_3
         ldx     #$17                    ; 22FF: A2 17    
@@ -594,9 +600,10 @@ CBTSR1  lda     Inital_Object_Data,x    ; 2301: BD 3B 23
         bpl     CBTSR1                  ; 2308: 10 F7    
         rts                             ; 230A: 60       
 ; ===========================================================
-Z230B   jsr     Init_Objects_1_To_3     ; 230B: 20 FF 22 
-        jsr     Z28E7                   ; 230E: 20 E7 28 
-        jsr     Read_ZP_Paramenters     ; 2311: 20 9D 25 
+Reset_Some_Objects
+        jsr     Init_Objects_1_To_3     ; 230B: 20 FF 22 
+        jsr     Save_Obj_List_Ptr       ; 230E: 20 E7 28 
+        jsr     Read_ZP_Parameters      ; 2311: 20 9D 25 
         fcb     $00                     ; 2314: 00       
         fdb     Inital_Object_Data      ; 2315: 3B 23    
         fcb     $FF                     ; 2317: FF       
@@ -617,7 +624,7 @@ Z231A   txa                             ; 231A: 8A
         tax                             ; 2333: AA       
         dex                             ; 2334: CA       
         bne     Z231A                   ; 2335: D0 E3    
-        jsr     Z28F0                   ; 2337: 20 F0 28 
+        jsr     Restore_Obj_List_Ptr    ; 2337: 20 F0 28 
         rts                             ; 233A: 60       
 ; ===========================================================
 Inital_Object_Data
@@ -643,7 +650,7 @@ LDA_7F_Return
         sta     ZP_005d                 ; 236F: 85 5D    
         dec     ZP_Num_Lives_P1         ; 2371: C6 5A    
 P1_LIVES_TO_UDG_RAM
-        jsr     Read_ZP_Paramenters     ; 2373: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2373: 20 9D 25 
         fcb     $04                     ; 2376: 04        ZP Offset for 1st address
         fdb     UDG_P1_LIVES_RAW_POSN   ; 2377: 20 14     1st Address
         fcb     $FF                     ; 2379: FF        End of Parameters
@@ -651,7 +658,7 @@ P1_LIVES_TO_UDG_RAM
         beq     _Display_2_Spaces???_   ; 237D: F0 23    
         jsr     Z238E                   ; 237F: 20 8E 23 
 P2_Lives_To_UDG_RAM
-        jsr     Read_ZP_Paramenters     ; 2382: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2382: 20 9D 25 
         fcb     $04                     ; 2385: 04        ZP Offset for 1st address
         fdb     UDG_P2_LIVES_RAW_POSN   ; 2386: A0 19     1st Address
         fcb     $FF                     ; 2388: FF        End of Parameters
@@ -663,7 +670,7 @@ Z238E   clc                             ; 238E: 18
         jsr     Copy_Char_To_UDG_RAM    ; 2393: 20 95 35 
 
 ; Display Jetman Icon
-        jsr     Read_ZP_Paramenters     ; 2396: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2396: 20 9D 25 
         fcb     $06                     ; 2399: 06        ZP_Temp_2_Lo
         fdb     Jetman_Icon             ; 239A: C7 23    
         fcb     $FF                     ; 239C: FF       
@@ -821,7 +828,7 @@ STR_1UP_HI_2UP
         fdb     STR_2UP                 ; 246F: 5E 24    
 
 P1_Score_To_UDG_RAM
-        jsr     Read_ZP_Paramenters     ; 2471: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2471: 20 9D 25 
         fcb     $04                     ; 2474: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y, but not in this case
         fdb     UDG_P1_SCORE_RAW_POSN   ; 2475: 08 10     UDG array absolute position to display score at
         fcb     $0E                     ; 2477: 0E        ZP_Ptr_To_Str
@@ -832,7 +839,7 @@ P1_Score_To_UDG_RAM
         jmp     Display_BCD_Bytes       ; 247E: 4C A4 34 
 ; -----------------------
 P2_Score_To_UDG_RAM
-        jsr     Read_ZP_Paramenters     ; 2481: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2481: 20 9D 25 
         fcb     $04                     ; 2484: 04       
         fdb     UDG_P2_SCORE_RAW_POSN   ; 2485: 08 1B    
         fcb     $0E                     ; 2487: 0E       
@@ -843,7 +850,7 @@ P2_Score_To_UDG_RAM
         jmp     Display_BCD_Bytes       ; 248E: 4C A4 34 
 ; -----------------------
 Hi_Score_To_UDG_RAM
-        jsr     Read_ZP_Paramenters     ; 2491: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2491: 20 9D 25 
         fcb     $04                     ; 2494: 04       
         fdb     UDG_HI_SCORE_RAW_POSN   ; 2495: 88 15    
         fcb     $0E                     ; 2497: 0E       
@@ -879,7 +886,7 @@ Display_Game_Select
         lsr     a                       ; 24C6: 4A       
         jsr     Game_Sel_Flash_Period   ; 24C7: 20 A1 24 
 
-        jsr     Read_ZP_Paramenters     ; 24CA: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 24CA: 20 9D 25 
         fcb     $04                     ; 24CD: 04        ZP_UDG_RAM_X
         fcb     $08,$20                 ; 24CE: 08 20     X Y
         fcb     $0E                     ; 24D0: 0E       
@@ -887,7 +894,7 @@ Display_Game_Select
         fcb     $FF                     ; 24D3: FF       
         jsr     Display_String          ; 24D4: 20 CC 34 
 
-        jsr     Read_ZP_Paramenters     ; 24D7: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 24D7: 20 9D 25 
         fcb     $04                     ; 24DA: 04        ZP_UDG_RAM_X
         fcb     $08,$A8                 ; 24DB: 08 A8     X Y
         fcb     $0E                     ; 24DD: 0E       
@@ -895,7 +902,7 @@ Display_Game_Select
         fcb     $FF                     ; 24E0: FF       
         jsr     Display_String          ; 24E1: 20 CC 34 
 
-        jsr     Read_ZP_Paramenters     ; 24E4: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 24E4: 20 9D 25 
         fcb     $0E                     ; 24E7: 0E        ZP_Ptr_To_Str
         fdb     STR_F1_1_PLAYER_GAME    ; 24E8: 50 25     String address
         fcb     $FF                     ; 24EA: FF       
@@ -961,7 +968,7 @@ STR_SP_START_GAME
         fcc     "SP``START`GAM"         ; 258F: 53 50 60 60 53 54 41 52 54 60 47 41 4D 
         fcb     $C5                     ; 259C: C5       
 
-Read_ZP_Paramenters
+Read_ZP_Parameters
         pla                             ; 259D: 68       
                                         ; Parameters for this routine are assembled into ROM after the
                                         ; call to this routine and accessed via the return address
@@ -1108,7 +1115,7 @@ IRQ_Stash_Obj_Ptr_Load_Obj_0380
         sta     ZP_0022                 ; 2670: 85 22    
         lda     ZP_Obj_List_Ptr_Hi      ; 2672: A5 01    
         sta     ZP_0023                 ; 2674: 85 23     YOU ARE HERE !!!!!!!!!!
-        jsr     Read_ZP_Paramenters     ; 2676: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2676: 20 9D 25 
         fcb     $00                     ; 2679: 00        ZP Offset for 1st address
         fdb     Object_0380             ; 267A: 80 03     1st Address
         fcb     $FF                     ; 267C: FF       
@@ -1126,7 +1133,7 @@ Subroutine_List
         fdb     Subroutine_261A         ; 268C: 1A 26    
         fdb     Read_Kbd_Jsk_And_Store  ; 268E: 73 32    
         fdb     Flash_Score_Then_Display_Scores ; 2690: 4D 33    
-        fdb     Subroutine_2934         ; 2692: 34 29    
+        fdb     Explosions_Plyr_Life_Lost? ; 2692: 34 29    
         fdb     Subroutine_2F8E         ; 2694: 8E 2F    
         fdb     Subroutine_2C6A         ; 2696: 6A 2C    
         fdb     Subroutine_2ABC         ; 2698: BC 2A    
@@ -1277,14 +1284,14 @@ Erase_1 sta     SCORE_HI,x              ; 2773: 9D D0 1F
         rts                             ; 2779: 60       
 ; ===========================================================
 Check_New_Hi_Score
-        jsr     Read_ZP_Paramenters     ; 277A: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 277A: 20 9D 25 
         fcb     $00                     ; 277D: 00        ZP_00
         fdb     SCORE_HI                ; 277E: D0 1F     Addr of High Score value
         fcb     $08                     ; 2780: 08        ZP_08
         fdb     ZP_Score_P1             ; 2781: 51 00     Addr of P1 High Score value
         fcb     $FF                     ; 2783: FF       
         jsr     Test_New_Hi_Score       ; 2784: 20 8E 27  Check Player 1 first
-        jsr     Read_ZP_Paramenters     ; 2787: 20 9D 25  then follow through for Player 2
+        jsr     Read_ZP_Parameters      ; 2787: 20 9D 25  then follow through for Player 2
         fcb     $08                     ; 278A: 08        ZP_08
         fdb     ZP_Score_P2             ; 278B: 54 00     Addr of P2 High Score value
         fcb     $FF                     ; 278D: FF       
@@ -1421,7 +1428,7 @@ Z2851   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2851: 20 E9 35
         jsr     Get_Ship_UDG_Addr       ; 285E: 20 E5 2F 
         jsr     Z378D                   ; 2861: 20 8D 37 
         jsr     Z3610                   ; 2864: 20 10 36 
-        jsr     Read_ZP_Paramenters     ; 2867: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2867: 20 9D 25 
         fcb     $02                     ; 286A: 02       
         fcb     $50,$02                 ; 286B: 50 02    
         fcb     $FF                     ; 286D: FF       
@@ -1497,13 +1504,15 @@ Z28E0   sta     Object_3,x              ; 28E0: 9D C8 03
         bpl     Z28E0                   ; 28E4: 10 FA    
         rts                             ; 28E6: 60       
 ; ===========================================================
-Z28E7   lda     ZP_Obj_List_Ptr_Lo      ; 28E7: A5 00    
+Save_Obj_List_Ptr
+        lda     ZP_Obj_List_Ptr_Lo      ; 28E7: A5 00    
         sta     ZP_0024                 ; 28E9: 85 24    
         lda     ZP_Obj_List_Ptr_Hi      ; 28EB: A5 01    
         sta     ZP_0025                 ; 28ED: 85 25    
         rts                             ; 28EF: 60       
 ; ===========================================================
-Z28F0   lda     ZP_0024                 ; 28F0: A5 24    
+Restore_Obj_List_Ptr
+        lda     ZP_0024                 ; 28F0: A5 24    
         sta     ZP_Obj_List_Ptr_Lo      ; 28F2: 85 00    
         lda     ZP_0025                 ; 28F4: A5 25    
         sta     ZP_Obj_List_Ptr_Hi      ; 28F6: 85 01    
@@ -1539,7 +1548,7 @@ Z2927   ldy     #$05                    ; 2927: A0 05
         sta     Other_RAM+172           ; 2930: 8D AC 03 
         rts                             ; 2933: 60       
 ; ===========================================================
-Subroutine_2934
+Explosions_Plyr_Life_Lost?
         inc     ZP_HW_IRQ_VAR           ; 2934: E6 21    
         jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2936: 20 E9 35 
         ldy     #$02                    ; 2939: A0 02    
@@ -1557,15 +1566,16 @@ Z294A   ldy     #$04                    ; 294A: A0 04
         bcs     Z2975                   ; 2950: B0 23    
         asl     a                       ; 2952: 0A       
         tax                             ; 2953: AA       
-        lda     UDG_Ptr,x               ; 2954: BD 67 29 
+        lda     Explosion_UDG_Ptr,x     ; 2954: BD 67 29 
         tay                             ; 2957: A8       
-        lda     UDG_Ptr+1,x             ; 2958: BD 68 29 
+        lda     Explosion_UDG_Ptr+1,x   ; 2958: BD 68 29 
         jsr     Z373D                   ; 295B: 20 3D 37 
         jsr     Z3604                   ; 295E: 20 04 36 
         jsr     Z381F                   ; 2961: 20 1F 38 
         jmp     Subroutine_261A         ; 2964: 4C 1A 26 
 ; -----------------------
-UDG_Ptr fdb     Explosion_1             ; 2967: 74 3F    
+Explosion_UDG_Ptr
+        fdb     Explosion_1             ; 2967: 74 3F    
         fdb     Explosion_1,Explosion_2 ; 2969: 74 3F 9B 3F 
         fdb     Explosion_3             ; 296D: B2 3F    
         fdb     Explosion_1,Explosion_2 ; 296F: 74 3F 9B 3F 
@@ -1629,7 +1639,7 @@ Display_Game_Over
         lda     ZP_P1_Or_P2             ; 29EA: A5 5E     Game Over for P1 or P2?
         bne     Display_Game_Over_P2    ; 29EC: D0 24    
 Display_Game_Over_P1
-        jsr     Read_ZP_Paramenters     ; 29EE: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 29EE: 20 9D 25 
         fcb     $0E                     ; 29F1: 0E        ZP_Ptr_To_Str
         fdb     STR_GAME_OVER_PLAYER_1  ; 29F2: 1F 2A     Pointer to "GAME OVER PLAYER 1"
         fcb     $04                     ; 29F4: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y
@@ -1638,7 +1648,7 @@ Display_Game_Over_P1
 Display_String_
         jsr     Display_String          ; 29F8: 20 CC 34 
 
-        jsr     Read_ZP_Paramenters     ; 29FB: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 29FB: 20 9D 25 
         fcb     $02                     ; 29FE: 02        Into ZP addr 02 and 03...
         fdb     $0000                   ; 29FF: 00 00     ..load 00 and 00
         fcb     $0A                     ; 2A01: 0A        Into ZP addr 0A and 0B
@@ -1656,7 +1666,7 @@ Delay_Loop_Game_Over
         rts                             ; 2A11: 60       
 ; ===========================================================
 Display_Game_Over_P2
-        jsr     Read_ZP_Paramenters     ; 2A12: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2A12: 20 9D 25 
         fcb     $0E                     ; 2A15: 0E        ZP_Ptr_To_Str
         fdb     STR_GAME_OVER_PLAYER_2  ; 2A16: 32 2A     Pointer to "GAME OVER PLAYER 2"
         fcb     $04                     ; 2A18: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y
@@ -1672,8 +1682,8 @@ STR_GAME_OVER_PLAYER_2
         fcb     $01                     ; 2A32: 01       
         fcc     "GAME`OVER`PLAYER`"     ; 2A33: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
         fcb     $F2                     ; 2A44: F2       
-Z2A45   jsr     Z28E7                   ; 2A45: 20 E7 28 
-        jsr     Read_ZP_Paramenters     ; 2A48: 20 9D 25 
+Z2A45   jsr     Save_Obj_List_Ptr       ; 2A45: 20 E7 28 
+        jsr     Read_ZP_Parameters      ; 2A48: 20 9D 25 
         fcb     $00                     ; 2A4B: 00       
         fdb     Object_0380             ; 2A4C: 80 03    
         fcb     $FF                     ; 2A4E: FF       
@@ -1683,7 +1693,7 @@ Z2A45   jsr     Z28E7                   ; 2A45: 20 E7 28
         ldy     #$00                    ; 2A55: A0 00    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A57: B1 00    
         jsr     Z290A                   ; 2A59: 20 0A 29 
-        jmp     Z28F0                   ; 2A5C: 4C F0 28 
+        jmp     Restore_Obj_List_Ptr    ; 2A5C: 4C F0 28 
 ; -----------------------
 Subroutine_2A5F
         jsr     Z2C5F                   ; 2A5F: 20 5F 2C 
@@ -1870,8 +1880,8 @@ Z2BA8   lda     _0E00002000000018,x     ; 2BA8: BD 87 2B
         and     #$08                    ; 2BC0: 29 08    
 Z2BC2   ora     #$20                    ; 2BC2: 09 20    
         sta     Other_RAM+198           ; 2BC4: 8D C6 03 
-Z2BC7   jsr     Z28E7                   ; 2BC7: 20 E7 28 
-        jsr     Read_ZP_Paramenters     ; 2BCA: 20 9D 25 
+Z2BC7   jsr     Save_Obj_List_Ptr       ; 2BC7: 20 E7 28 
+        jsr     Read_ZP_Parameters      ; 2BCA: 20 9D 25 
         fcb     $00                     ; 2BCD: 00       
         fdb     $03C0                   ; 2BCE: C0 03    
         fcb     $FF                     ; 2BD0: FF       
@@ -1879,7 +1889,7 @@ Z2BC7   jsr     Z28E7                   ; 2BC7: 20 E7 28
         ldy     #$06                    ; 2BD4: A0 06    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2BD6: B1 00    
         jsr     Z305A                   ; 2BD8: 20 5A 30 
-        jmp     Z28F0                   ; 2BDB: 4C F0 28 
+        jmp     Restore_Obj_List_Ptr    ; 2BDB: 4C F0 28 
 ; -----------------------
 Get_Raster_Line_Band
         lda     VIC_R4_TV_Raster        ; 2BDE: AD 04 90 
@@ -2149,13 +2159,13 @@ Z2DA9   lda     Object_2                ; 2DA9: AD C0 03
         cmp     #$0E                    ; 2DAE: C9 0E    
         beq     Z2DC5                   ; 2DB0: F0 13    
         jsr     Z22F2                   ; 2DB2: 20 F2 22 
-Z2DB5   jsr     Z28E7                   ; 2DB5: 20 E7 28 
-        jsr     Read_ZP_Paramenters     ; 2DB8: 20 9D 25 
+Z2DB5   jsr     Save_Obj_List_Ptr       ; 2DB5: 20 E7 28 
+        jsr     Read_ZP_Parameters      ; 2DB8: 20 9D 25 
         fcb     $00                     ; 2DBB: 00       
         fdb     Object_0                ; 2DBC: B0 03    
         fcb     $FF                     ; 2DBE: FF       
         jsr     Z2DCB                   ; 2DBF: 20 CB 2D 
-        jmp     Z28F0                   ; 2DC2: 4C F0 28 
+        jmp     Restore_Obj_List_Ptr    ; 2DC2: 4C F0 28 
 ; -----------------------
 Z2DC5   jsr     Z2BC7                   ; 2DC5: 20 C7 2B 
         jmp     Z2DB5                   ; 2DC8: 4C B5 2D 
@@ -2263,8 +2273,8 @@ Subroutine_2E74
         lda     #$0A                    ; 2E86: A9 0A    
         ldy     #$00                    ; 2E88: A0 00    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E8A: 91 00    
-        jsr     Z28E7                   ; 2E8C: 20 E7 28 
-        jsr     Read_ZP_Paramenters     ; 2E8F: 20 9D 25 
+        jsr     Save_Obj_List_Ptr       ; 2E8C: 20 E7 28 
+        jsr     Read_ZP_Parameters      ; 2E8F: 20 9D 25 
         fcb     $00                     ; 2E92: 00       
         fdb     Object_0380             ; 2E93: 80 03    
         fcb     $FF                     ; 2E95: FF       
@@ -2272,7 +2282,7 @@ Subroutine_2E74
         jsr     Z3601                   ; 2E99: 20 01 36 
         lda     #$00                    ; 2E9C: A9 00    
         sta     Object_0380             ; 2E9E: 8D 80 03 
-        jsr     Z28F0                   ; 2EA1: 20 F0 28 
+        jsr     Restore_Obj_List_Ptr    ; 2EA1: 20 F0 28 
         inc     ZP_Num_Lives_P1         ; 2EA4: E6 5A    
         jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23 
         jmp     Subroutine_261A         ; 2EA9: 4C 1A 26 
@@ -2444,7 +2454,7 @@ Z2FEE   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2FEE: 20 D7 35
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2FF3: B1 00    
         ora     #$02                    ; 2FF5: 09 02    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2FF7: 91 00    
-        jsr     Read_ZP_Paramenters     ; 2FF9: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 2FF9: 20 9D 25 
         fcb     $02                     ; 2FFC: 02       
         fdb     Stack                   ; 2FFD: 00 01    
         fcb     $FF                     ; 2FFF: FF       
@@ -2499,7 +2509,7 @@ Z305A   jsr     Get_Ship_UDG_Addr       ; 305A: 20 E5 2F
 GameOverScoreStuff
         lda     ZP_P1_Or_P2             ; 3063: A5 5E    
         bne     Read_ZP_Params_P2_Score ; 3065: D0 2A     If P2, setup P2 Score instead of P1 and then return after the param setup below
-        jsr     Read_ZP_Paramenters     ; 3067: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 3067: 20 9D 25 
         fcb     $06                     ; 306A: 06        ZP_Temp_2
         fdb     ZP_Score_P1             ; 306B: 51 00     P1 Score in ZP
         fcb     $FF                     ; 306D: FF       
@@ -2528,7 +2538,7 @@ P2_Score_To_UDG_RAM_
         jmp     P2_Score_To_UDG_RAM     ; 308E: 4C 81 24 
 ; -----------------------
 Read_ZP_Params_P2_Score
-        jsr     Read_ZP_Paramenters     ; 3091: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 3091: 20 9D 25 
         fcb     $06                     ; 3094: 06        ZP_Temp_2
         fdb     ZP_Score_P2             ; 3095: 54 00     P2 Score in ZP
         fcb     $FF                     ; 3097: FF       
@@ -2783,6 +2793,7 @@ Z323E   pha                             ; 323E: 48
 Z3254   lda     #$08                    ; 3254: A9 08    
         jmp     Z32A2                   ; 3256: 4C A2 32 
 ; -----------------------
+; HOW DO YOU EVER GET HERE?
         lda     #$F8                    ; 3259: A9 F8    
         jmp     Z32A2                   ; 325B: 4C A2 32 
 ; -----------------------
@@ -3076,7 +3087,7 @@ SKIP_345CXXX
 Flash_Score
         lda     ZP_P1_Or_P2             ; 3465: A5 5E    
         bne     Load_UDG_RAM_for_P2     ; 3467: D0 31     P1 or P2? Branch if P2
-        jsr     Read_ZP_Paramenters     ; 3469: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 3469: 20 9D 25 
         fcb     $04                     ; 346C: 04        Store to ZP_UDG_RAM_X
         fcb     $00,$00                 ; 346D: 00 00     X Y position in pixels
         fcb     $FF                     ; 346F: FF       
@@ -3112,7 +3123,7 @@ Invert_UDG_Rows
 Do_RTS  rts                             ; 3499: 60       
 ; ===========================================================
 Load_UDG_RAM_for_P2
-        jsr     Read_ZP_Paramenters     ; 349A: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 349A: 20 9D 25 
         fcb     $04                     ; 349D: 04        Store to ZP_UDG_RAM_X
         fcb     $80,$00                 ; 349E: 80 00     X Y position in pixels
         fcb     $FF                     ; 34A0: FF       
@@ -3267,7 +3278,7 @@ UDG_RAM_Column_Offsets
         fcb     $C6,$D1,$DC,$E7,$F2     ; 3557: C6 D1 DC E7 F2 
 
 RESET_COLOR_RAM
-        jsr     Read_ZP_Paramenters     ; 355C: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 355C: 20 9D 25 
         fcb     $02                     ; 355F: 02        ZP Offset for 1st address
         fdb     ZP_00fc                 ; 3560: FC 00     1st Address
         fcb     $04                     ; 3562: 04        ZP Offset for 2nd address
@@ -3278,7 +3289,7 @@ RESET_COLOR_RAM
         jmp     ERASE_COLOR_RAM_9600    ; 3569: 4C 79 35 
 ; -----------------------
 ERASE_UDG_RAM_1000_1fff
-        jsr     Read_ZP_Paramenters     ; 356C: 20 9D 25 
+        jsr     Read_ZP_Parameters      ; 356C: 20 9D 25 
         fcb     $02                     ; 356F: 02        ZP Offset for 1st address
         fdb     $0FCF                   ; 3570: CF 0F     1st Address
         fcb     $04                     ; 3572: 04        ZP Offset for 2nd address
