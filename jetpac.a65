@@ -1137,8 +1137,8 @@ Subroutine_List
         fdb     Subroutine_2F8E         ; 2694: 8E 2F    
         fdb     Subroutine_2C6A         ; 2696: 6A 2C    
         fdb     Subroutine_2ABC         ; 2698: BC 2A    
-        fdb     Subroutine_2A6D         ; 269A: 6D 2A    
-        fdb     Subroutine_2A5F         ; 269C: 5F 2A    
+        fdb     Subroutine_2A6D         ; 269A: 6D 2A     2A6D and 2A5F almost the same
+        fdb     Subroutine_2A5F         ; 269C: 5F 2A     2A6D and 2A5F almost the same
         fdb     Subroutine_2E74         ; 269E: 74 2E    
         fdb     Subroutine_2E17         ; 26A0: 17 2E    
         fdb     Subroutine_2E4E         ; 26A2: 4E 2E    
@@ -1197,7 +1197,7 @@ Copy_ZP_Val_to_ZP1_Val
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 26FB: 91 00    
         rts                             ; 26FD: 60       
 ; ===========================================================
-Subroutine_26FE
+Subroutine2_26FE
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 26FE: 20 F2 26 
         beq     Z270A                   ; 2701: F0 07    
         eor     #$FF                    ; 2703: 49 FF    
@@ -1217,14 +1217,14 @@ Z2710   pha                             ; 2710: 48
         sta     VIC_RA_Frq_Osc1,x       ; 2716: 9D 0A 90 
         jmp     Jmp_To_SRList2_SR_      ; 2719: 4C E4 26 
 ; -----------------------
-Subroutine_271C
+Subroutine2_271C
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 271C: 20 F2 26 
         beq     Z270A                   ; 271F: F0 E9    
         asl     a                       ; 2721: 0A       
         eor     #$F3                    ; 2722: 49 F3    
         jmp     Z2705                   ; 2724: 4C 05 27 
 ; -----------------------
-Subroutine_2727
+Subroutine2_2727
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 2727: 20 F2 26 
         beq     Z270A                   ; 272A: F0 DE    
         asl     a                       ; 272C: 0A       
@@ -1234,7 +1234,7 @@ Subroutine_2727
         ora     #$0F                    ; 2730: 09 0F    
         jmp     Z2705                   ; 2732: 4C 05 27 
 ; -----------------------
-Subroutine_2735
+Subroutine2_2735
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 2735: 20 F2 26 
         beq     Z270A                   ; 2738: F0 D0    
         lda     Other_RAM+179           ; 273A: AD B3 03 
@@ -1244,12 +1244,12 @@ Subroutine_2735
 ; -----------------------
 Subroutine_List2
         fdb     Jmp_To_SRList2_SR_      ; 2743: E4 26    
-        fdb     Subroutine_26FE         ; 2745: FE 26    
-        fdb     Subroutine_271C         ; 2747: 1C 27    
-        fdb     Subroutine_2727         ; 2749: 27 27    
-        fdb     Subroutine_2735         ; 274B: 35 27    
-        fdb     Subroutine_274F         ; 274D: 4F 27    
-Subroutine_274F
+        fdb     Subroutine2_26FE        ; 2745: FE 26    
+        fdb     Subroutine2_271C        ; 2747: 1C 27    
+        fdb     Subroutine2_2727        ; 2749: 27 27    
+        fdb     Subroutine2_2735        ; 274B: 35 27    
+        fdb     Subroutine2_274F        ; 274D: 4F 27    
+Subroutine2_274F
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 274F: 20 F2 26 
         beq     Z270A                   ; 2752: F0 B6    
         asl     a                       ; 2754: 0A       
@@ -2248,13 +2248,17 @@ Subroutine_2E4E
         sta     Other_RAM+171           ; 2E53: 8D AB 03 
         lda     #$02                    ; 2E56: A9 02    
         sta     Other_RAM+172           ; 2E58: 8D AC 03 
-        ldy     #$03                    ; 2E5B: A0 03    
+
+; Move object Y position down 1 pixel, stopping at bottom i.e. $AF
+        ldy     #$03                    ; 2E5B: A0 03     03 = Height of object
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E5D: B1 00    
         clc                             ; 2E5F: 18       
         adc     #$01                    ; 2E60: 69 01    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E62: 91 00    
-        cmp     #$AF                    ; 2E64: C9 AF    
+        cmp     #$AF                    ; 2E64: C9 AF     Hit bottom of playarea
         bcc     Z2EAC                   ; 2E66: 90 44    
+
+; Set current object type to a crash
         ldy     #$00                    ; 2E68: A0 00    
         lda     #$09                    ; 2E6A: A9 09    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E6C: 91 00    
@@ -2740,7 +2744,7 @@ Z31F2   bit     MASK_08                 ; 31F2: 2C 17 20
         ldy     #$04                    ; 31F7: A0 04    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 31F9: B1 00    
         bmi     Z31CB                   ; 31FB: 30 CE    
-        jmp     Z3321                   ; 31FD: 4C 21 33 
+        jmp     Bottom_After?           ; 31FD: 4C 21 33 
 ; -----------------------
 Z3200   bit     MASK_04                 ; 3200: 2C 16 20 
         bne     Z31BF                   ; 3203: D0 BA    
@@ -2749,11 +2753,12 @@ Z3200   bit     MASK_04                 ; 3200: 2C 16 20
 Z3208   ldy     #$04                    ; 3208: A0 04    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 320A: B1 00    
         beq     Z3218                   ; 320C: F0 0A    
-        bpl     Z3215                   ; 320E: 10 05    
+        bpl     JMP_FLYING              ; 320E: 10 05    
         eor     #$FF                    ; 3210: 49 FF    
-Z3212   jmp     Z32DE                   ; 3212: 4C DE 32 
+Z3212   jmp     Flying_1?               ; 3212: 4C DE 32 
 ; -----------------------
-Z3215   jmp     Z32C7                   ; 3215: 4C C7 32 
+JMP_FLYING
+        jmp     Flying?                 ; 3215: 4C C7 32 
 ; -----------------------
 Z3218   tax                             ; 3218: AA       
         lda     ZP_Player_Movement      ; 3219: A5 1C    
@@ -2762,7 +2767,7 @@ Z3218   tax                             ; 3218: AA
         lda     #$00                    ; 3220: A9 00    
         beq     Z3212                   ; 3222: F0 EE    
 Z3224   txa                             ; 3224: 8A       
-        jmp     Z32C7                   ; 3225: 4C C7 32 
+        jmp     Flying?                 ; 3225: 4C C7 32 
 ; -----------------------
 Z3228   pha                             ; 3228: 48       
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 3229: B1 00    
@@ -2785,30 +2790,32 @@ Z323E   pha                             ; 323E: 48
         cmp     #$08                    ; 3246: C9 08    
         beq     Z32A6                   ; 3248: F0 5C    
         cmp     #$09                    ; 324A: C9 09    
-        beq     Z3254                   ; 324C: F0 06    
+        beq     LDA_08                  ; 324C: F0 06    
         clc                             ; 324E: 18       
         adc     #$01                    ; 324F: 69 01    
         jmp     Z32A2                   ; 3251: 4C A2 32 
 ; -----------------------
-Z3254   lda     #$08                    ; 3254: A9 08    
+LDA_08  lda     #$08                    ; 3254: A9 08    
         jmp     Z32A2                   ; 3256: 4C A2 32 
 ; -----------------------
 ; HOW DO YOU EVER GET HERE?
         lda     #$F8                    ; 3259: A9 F8    
         jmp     Z32A2                   ; 325B: 4C A2 32 
 ; -----------------------
-Z325E   clc                             ; 325E: 18       
+CLC_ADC_01
+        clc                             ; 325E: 18       
         adc     #$01                    ; 325F: 69 01    
         jmp     Z32A2                   ; 3261: 4C A2 32 
 ; -----------------------
-Z3264   clc                             ; 3264: 18       
+CLC_ADC_B8
+        clc                             ; 3264: 18       
         adc     #$B8                    ; 3265: 69 B8    
         jmp     Z32BA                   ; 3267: 4C BA 32 
 ; -----------------------
-Z326A   adc     #$48                    ; 326A: 69 48    
+ADC_48  adc     #$48                    ; 326A: 69 48    
         jmp     Z32BA                   ; 326C: 4C BA 32 
 ; -----------------------
-Z326F   txa                             ; 326F: 8A       
+TXA_    txa                             ; 326F: 8A       
         jmp     Z32A6                   ; 3270: 4C A6 32 
 ; -----------------------
 Read_Kbd_Jsk_And_Store
@@ -2829,11 +2836,11 @@ Z3285   ldy     #$02                    ; 3285: A0 02
         tax                             ; 3291: AA       
         lda     ZP_HW_IRQ_Count1        ; 3292: A5 4A    
         and     #$01                    ; 3294: 29 01    
-        beq     Z326F                   ; 3296: F0 D7    
+        beq     TXA_                    ; 3296: F0 D7    
         txa                             ; 3298: 8A       
         cmp     #$00                    ; 3299: C9 00    
         beq     Z32A6                   ; 329B: F0 09    
-        bmi     Z325E                   ; 329D: 30 BF    
+        bmi     CLC_ADC_01              ; 329D: 30 BF    
         sec                             ; 329F: 38       
         sbc     #$01                    ; 32A0: E9 01    
 Z32A2   ldy     #$02                    ; 32A2: A0 02    
@@ -2849,70 +2856,77 @@ Z32A6   ldy     #$01                    ; 32A6: A0 01
         clc                             ; 32AF: 18       
         adc     (ZP_Obj_List_Ptr_Lo),y  ; 32B0: 71 00    
         cmp     #$F0                    ; 32B2: C9 F0    
-        bcs     Z3264                   ; 32B4: B0 AE    
+        bcs     CLC_ADC_B8              ; 32B4: B0 AE    
         cmp     #$B8                    ; 32B6: C9 B8    
-        bcs     Z326A                   ; 32B8: B0 B0    
+        bcs     ADC_48                  ; 32B8: B0 B0    
 Z32BA   sta     (ZP_Obj_List_Ptr_Lo),y  ; 32BA: 91 00    
         lda     ZP_Temp_1_Lo            ; 32BC: A5 02    
-        bpl     Z32C7                   ; 32BE: 10 07    
+        bpl     Flying?                 ; 32BE: 10 07    
         and     #$0C                    ; 32C0: 29 0C    
-        bne     Z32C7                   ; 32C2: D0 03    
+        bne     Flying?                 ; 32C2: D0 03    
         jmp     Z3208                   ; 32C4: 4C 08 32 
 ; -----------------------
-Z32C7   ldy     #$04                    ; 32C7: A0 04    
+Flying? ldy     #$04                    ; 32C7: A0 04    
         lda     ZP_Player_Movement      ; 32C9: A5 1C    
         bit     MASK_20                 ; 32CB: 2C 19 20 
-        beq     Z3318                   ; 32CE: F0 48    
+        beq     LDA00                   ; 32CE: F0 48    
         bit     MASK_10                 ; 32D0: 2C 18 20 
-        beq     Z330C                   ; 32D3: F0 37    
+        beq     Not_sure_330c           ; 32D3: F0 37    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 32D5: B1 00    
         cmp     #$04                    ; 32D7: C9 04    
-        beq     Z32E0                   ; 32D9: F0 05    
+        beq     Flying_2?               ; 32D9: F0 05    
         clc                             ; 32DB: 18       
         adc     #$01                    ; 32DC: 69 01    
-Z32DE   sta     (ZP_Obj_List_Ptr_Lo),y  ; 32DE: 91 00    
-Z32E0   dey                             ; 32E0: 88       
+Flying_1?
+        sta     (ZP_Obj_List_Ptr_Lo),y  ; 32DE: 91 00    
+Flying_2?
+        dey                             ; 32E0: 88       
         pha                             ; 32E1: 48       
         rol     a                       ; 32E2: 2A       
         pla                             ; 32E3: 68       
         ror     a                       ; 32E4: 6A       
         clc                             ; 32E5: 18       
         adc     (ZP_Obj_List_Ptr_Lo),y  ; 32E6: 71 00    
-        cmp     #$AF                    ; 32E8: C9 AF    
-        bcs     Z331D                   ; 32EA: B0 31    
+        cmp     #$AF                    ; 32E8: C9 AF     AF=Bottom of screen
+        bcs     Bottom?                 ; 32EA: B0 31    
         cmp     #$28                    ; 32EC: C9 28    
-        bcs     Z32F7                   ; 32EE: B0 07    
+        bcs     Flying_3?               ; 32EE: B0 07    
         iny                             ; 32F0: C8       
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 32F1: B1 00    
-        beq     Z32F7                   ; 32F3: F0 02    
+        beq     Flying_3?               ; 32F3: F0 02    
         eor     #$FF                    ; 32F5: 49 FF    
-Z32F7   sta     (ZP_Obj_List_Ptr_Lo),y  ; 32F7: 91 00    
-Z32F9   jsr     Z3646                   ; 32F9: 20 46 36 
+Flying_3?
+        sta     (ZP_Obj_List_Ptr_Lo),y  ; 32F7: 91 00    
+Flying_4?
+        jsr     Z3646                   ; 32F9: 20 46 36 
         jsr     Z381F                   ; 32FC: 20 1F 38 
         lda     ZP_Player_Movement      ; 32FF: A5 1C    
         bit     MASK_08                 ; 3301: 2C 17 20 
-        bne     Z3309                   ; 3304: D0 03    
+        bne     SKIP_Flying_5?          ; 3304: D0 03    
         jsr     Z20E9                   ; 3306: 20 E9 20 
-Z3309   jmp     Subroutine_261A         ; 3309: 4C 1A 26 
+SKIP_Flying_5?
+        jmp     Subroutine_261A         ; 3309: 4C 1A 26 
 ; -----------------------
-Z330C   lda     (ZP_Obj_List_Ptr_Lo),y  ; 330C: B1 00    
+Not_sure_330c
+        lda     (ZP_Obj_List_Ptr_Lo),y  ; 330C: B1 00    
         cmp     #$FC                    ; 330E: C9 FC    
-        beq     Z32E0                   ; 3310: F0 CE    
+        beq     Flying_2?               ; 3310: F0 CE    
         sec                             ; 3312: 38       
         sbc     #$01                    ; 3313: E9 01    
-        jmp     Z32DE                   ; 3315: 4C DE 32 
+        jmp     Flying_1?               ; 3315: 4C DE 32 
 ; -----------------------
-Z3318   lda     #$00                    ; 3318: A9 00    
-        jmp     Z32DE                   ; 331A: 4C DE 32 
+LDA00   lda     #$00                    ; 3318: A9 00    
+        jmp     Flying_1?               ; 331A: 4C DE 32 
 ; -----------------------
-Z331D   lda     #$AF                    ; 331D: A9 AF    
+Bottom? lda     #$AF                    ; 331D: A9 AF    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 331F: 91 00    
-Z3321   ldy     #$00                    ; 3321: A0 00    
+Bottom_After?
+        ldy     #$00                    ; 3321: A0 00    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 3323: B1 00    
         rol     a                       ; 3325: 2A       
         lda     #$04                    ; 3326: A9 04    
         ror     a                       ; 3328: 6A       
-        jmp     Z32F7                   ; 3329: 4C F7 32 
+        jmp     Flying_3?               ; 3329: 4C F7 32 
 ; -----------------------
 Z332C   lda     (ZP_Obj_List_Ptr_Lo),y  ; 332C: B1 00    
         and     #$7F                    ; 332E: 29 7F    
@@ -2935,7 +2949,7 @@ Z3348   adc     #$48                    ; 3348: 69 48
 ; -----------------------
 Flash_Score_Then_Display_Scores
         lda     ZP_005d                 ; 334D: A5 5D    
-        beq     Z336A                   ; 334F: F0 19    
+        beq     Read_Kbd_Jstk           ; 334F: F0 19    
         jsr     Flash_Score             ; 3351: 20 65 34 
         dec     ZP_005d                 ; 3354: C6 5D    
         bne     JMP_to_Subroutine_261A  ; 3356: D0 0F    
@@ -2947,7 +2961,8 @@ Flash_Score_Then_Display_Scores
 JMP_to_Subroutine_261A
         jmp     Subroutine_261A         ; 3367: 4C 1A 26 
 ; -----------------------
-Z336A   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 336A: 20 D7 35 
+Read_Kbd_Jstk
+        jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 336A: 20 D7 35 
         jsr     Read_Keyboard_Joystick  ; 336D: 20 F7 33 
         jsr     Z30B3                   ; 3370: 20 B3 30 
         lda     ZP_Temp_1_Lo            ; 3373: A5 02    
@@ -2986,7 +3001,7 @@ Z33AF   sta     (ZP_Obj_List_Ptr_Lo),y  ; 33AF: 91 00
         lda     ZP_Player_Movement      ; 33B1: A5 1C    
         and     #$10                    ; 33B3: 29 10    
         beq     Z33BA                   ; 33B5: F0 03    
-        jmp     Z32F9                   ; 33B7: 4C F9 32 
+        jmp     Flying_4?               ; 33B7: 4C F9 32 
 ; -----------------------
 Z33BA   ldy     #$04                    ; 33BA: A0 04    
         lda     #$FE                    ; 33BC: A9 FE    
@@ -3001,7 +3016,7 @@ Z33C0   ldy     #$03                    ; 33C0: A0 03
         rol     a                       ; 33CD: 2A       
         lda     #$02                    ; 33CE: A9 02    
         ror     a                       ; 33D0: 6A       
-        jmp     Z32F7                   ; 33D1: 4C F7 32 
+        jmp     Flying_3?               ; 33D1: 4C F7 32 
 ; -----------------------
 Read_Joystick
         lda     VIA1_Port_A             ; 33D4: AD 11 91 

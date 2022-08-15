@@ -468,6 +468,8 @@ lcomment 2688 Clear Disable Interrupts flag
 label    268C Subroutine_List
 word     268C-26AD
 label    268D Subroutine_List+1
+lcomment 269A 2A6D and 2A5F almost the same
+lcomment 269C 2A6D and 2A5F almost the same
 ;        26AE
 comment  26AE
 label    26AE Init_Object_?
@@ -477,15 +479,15 @@ label    26CD Jmp_To_SRList2_SR
 label    26D1 JTSRLSR_1
 label    26E4 Jmp_To_SRList2_SR_
 label    26F2 Copy_ZP_Val_to_ZP1_Val
-label    26FE Subroutine_26FE
-label    271C Subroutine_271C
-label    2727 Subroutine_2727
-label    2735 Subroutine_2735
+label    26FE Subroutine2_26FE
+label    271C Subroutine2_271C
+label    2727 Subroutine2_2727
+label    2735 Subroutine2_2735
 ;        2743
 label    2743 Subroutine_List2
 word     2743-274E
 label    2744 Subroutine_List2+1
-label    274F Subroutine_274F
+label    274F Subroutine2_274F
 ;        275B
 comment  275B Erase $100 bytes zero page
 label    275B Erase_ZP
@@ -646,6 +648,12 @@ word     2DBC
 label    2DDD LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
 label    2E17 Subroutine_2E17
 label    2E4E Subroutine_2E4E
+comment  2E5B
+comment  2E5B Move object Y position down 1 pixel, stopping at bottom i.e. $AF
+lcomment 2E5B 03 = Height of object
+lcomment 2E64 Hit bottom of playarea
+comment  2E68
+comment  2E68 Set current object type to a crash
 label    2E74 Subroutine_2E74
 ;        2E93
 word     2E93
@@ -676,10 +684,28 @@ lcomment 316B $3E15 is the Mineral UDG address
 comment  31B6 XY_Data_for_3143_Subroutine
 const    31B6-31BE
 word     31B6-31BD
+label    3215 JMP_FLYING
+label    3254 LDA_08
 comment  3259 HOW DO YOU EVER GET HERE?
+label    325E CLC_ADC_01
+label    3264 CLC_ADC_B8
+label    326A ADC_48
+label    326F TXA_
 label    3273 Read_Kbd_Jsk_And_Store
+label    32C7 Flying?
+label    32DE Flying_1?
+label    32E0 Flying_2?
+lcomment 32E8 AF=Bottom of screen
+label    32F7 Flying_3?
+label    32F9 Flying_4?
+label    3309 SKIP_Flying_5?
+label    330C Not_sure_330c
+label    3318 LDA00
+label    331D Bottom?
+label    3321 Bottom_After?
 label    334D Flash_Score_Then_Display_Scores
 label    3367 JMP_to_Subroutine_261A
+label    336A Read_Kbd_Jstk
 label    33D4 Read_Joystick
 label    33F7 Read_Keyboard_Joystick
 lcomment 33FA Joystick selected?
