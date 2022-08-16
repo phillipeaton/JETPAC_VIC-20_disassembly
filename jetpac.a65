@@ -80,6 +80,8 @@ Jetman_X                equ     $0381
 Jetman_At_Rest???       equ     $0383
 Other_RAM_1             equ     $0388
 Object_?                equ     $03A8
+Obj_?_03_Height?        equ     $03AB
+Obj_?_03_Diagnl?        equ     $03AC
 Object_0                equ     $03B0
 Object_1                equ     $03B8
 Object_2                equ     $03C0
@@ -557,7 +559,8 @@ Z22B4   pla                             ; 22B4: 68
         and     #$07                    ; 22B7: 29 07    
         rts                             ; 22B9: 60       
 ; ===========================================================
-Z22BA   jsr     Reset_Color_Pixels_Scores ; 22BA: 20 16 24 
+Reset_Level_Add_Extra_Life
+        jsr     Reset_Color_Pixels_Scores ; 22BA: 20 16 24 
 
 ; Player at level 4, add another life
         lda     ZP_Level_Current_Plyr   ; 22BD: A5 59    
@@ -1013,7 +1016,7 @@ Game_Start
         jsr     Reset_Other_RAM_0380_03ff ; 25D1: 20 64 27 
         jsr     Erase_ZP                ; 25D4: 20 5B 27 
         jsr     Setup_Player_Lives      ; 25D7: 20 D4 23 
-        jsr     Z22BA                   ; 25DA: 20 BA 22 
+        jsr     Reset_Level_Add_Extra_Life ; 25DA: 20 BA 22 
         jmp     Game_Start_             ; 25DD: 4C FA 25 
 ; -----------------------
 
@@ -1065,11 +1068,13 @@ Subroutine_261A
         bcc     SKIP_2630               ; 2624: 90 0A     If not, skip
         ldy     #$02                    ; 2626: A0 02    
         ldx     #$00                    ; 2628: A2 00    
-BACK_262A
+
+; Delay loop $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds (Needs Check)
+Delay_Loop_Moving
         dex                             ; 262A: CA       
-        bne     BACK_262A               ; 262B: D0 FD    
+        bne     Delay_Loop_Moving       ; 262B: D0 FD    
         dey                             ; 262D: 88       
-        bne     BACK_262A               ; 262E: D0 FA    
+        bne     Delay_Loop_Moving       ; 262E: D0 FA    
 
 ; Increment Object Pointer to next Obj i.e. by adding 8
 SKIP_2630
@@ -1136,12 +1141,12 @@ Subroutine_List
         fdb     Explosions_Plyr_Life_Lost? ; 2692: 34 29    
         fdb     Subroutine_2F8E         ; 2694: 8E 2F    
         fdb     Subroutine_2C6A         ; 2696: 6A 2C    
-        fdb     Subroutine_2ABC         ; 2698: BC 2A    
+        fdb     Subroutine_2ABC         ; 2698: BC 2A     3 lines the JMP
         fdb     Subroutine_2A6D         ; 269A: 6D 2A     2A6D and 2A5F almost the same
         fdb     Subroutine_2A5F         ; 269C: 5F 2A     2A6D and 2A5F almost the same
         fdb     Subroutine_2E74         ; 269E: 74 2E    
-        fdb     Subroutine_2E17         ; 26A0: 17 2E    
-        fdb     Subroutine_2E4E         ; 26A2: 4E 2E    
+        fdb     Rocket_Goes_Up          ; 26A0: 17 2E    
+        fdb     Rocket_Goes_Down        ; 26A2: 4E 2E    
         fdb     Jmp_To_SRList2_SR       ; 26A4: CD 26    
         fdb     Subroutine_261A         ; 26A6: 1A 26    
         fdb     Subroutine_283E         ; 26A8: 3E 28    
@@ -1544,8 +1549,8 @@ Z2921   cmp     #$05                    ; 2921: C9 05
 Z2927   ldy     #$05                    ; 2927: A0 05    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2929: 91 00    
         lda     #$05                    ; 292B: A9 05    
-        sta     Other_RAM+171           ; 292D: 8D AB 03 
-        sta     Other_RAM+172           ; 2930: 8D AC 03 
+        sta     Obj_?_03_Height?        ; 292D: 8D AB 03 
+        sta     Obj_?_03_Diagnl?        ; 2930: 8D AC 03 
         rts                             ; 2933: 60       
 ; ===========================================================
 Explosions_Plyr_Life_Lost?
@@ -2214,22 +2219,24 @@ Z2DFF   lda     ZP_0019                 ; 2DFF: A5 19
         dec     ZP_001f                 ; 2E14: C6 1F    
         rts                             ; 2E16: 60       
 ; ===========================================================
-Subroutine_2E17
+; Aliens keep moving also
+Rocket_Goes_Up
         jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2E17: 20 D7 35 
-        ldy     #$03                    ; 2E1A: A0 03    
-        lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E1C: B1 00    
-        cmp     #$30                    ; 2E1E: C9 30    
-        bcc     Z2E34                   ; 2E20: 90 12    
+        ldy     #$03                    ; 2E1A: A0 03     Object height offset
+        lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E1C: B1 00     Load object height i.e. Rocket
+        cmp     #$30                    ; 2E1E: C9 30     Object hit top yet
+        bcc     Rocket_At_Top           ; 2E20: 90 12     Yes, branch
         sec                             ; 2E22: 38       
-        sbc     #$01                    ; 2E23: E9 01    
-        sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E25: 91 00    
+        sbc     #$01                    ; 2E23: E9 01     Calculate new height
+        sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E25: 91 00     Store new height i.e one pixel up
         lda     #$04                    ; 2E27: A9 04    
-        sta     Other_RAM+171           ; 2E29: 8D AB 03 
+        sta     Obj_?_03_Height?        ; 2E29: 8D AB 03 
         lda     #$02                    ; 2E2C: A9 02    
-        sta     Other_RAM+172           ; 2E2E: 8D AC 03 
+        sta     Obj_?_03_Diagnl?        ; 2E2E: 8D AC 03 
         jmp     Z2EAC                   ; 2E31: 4C AC 2E 
 ; -----------------------
-Z2E34   inc     ZP_Level_Current_Plyr   ; 2E34: E6 59    
+Rocket_At_Top
+        inc     ZP_Level_Current_Plyr   ; 2E34: E6 59    
         jsr     Reset_Objects_1_To_8    ; 2E36: 20 C9 28 
         ldy     #$00                    ; 2E39: A0 00    
         lda     #$0B                    ; 2E3B: A9 0B    
@@ -2237,17 +2244,18 @@ Z2E34   inc     ZP_Level_Current_Plyr   ; 2E34: E6 59
         tya                             ; 2E3F: 98       
         ldy     #$02                    ; 2E40: A0 02    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E42: 91 00    
-        jsr     Z22BA                   ; 2E44: 20 BA 22 
+        jsr     Reset_Level_Add_Extra_Life ; 2E44: 20 BA 22 
         lda     #$00                    ; 2E47: A9 00    
         sta     ZP_0026                 ; 2E49: 85 26    
         jmp     Subroutine_261A         ; 2E4B: 4C 1A 26 
 ; -----------------------
-Subroutine_2E4E
+; Flames stop a little way before bottom
+Rocket_Goes_Down
         jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2E4E: 20 D7 35 
         lda     #$04                    ; 2E51: A9 04    
-        sta     Other_RAM+171           ; 2E53: 8D AB 03 
+        sta     Obj_?_03_Height?        ; 2E53: 8D AB 03 
         lda     #$02                    ; 2E56: A9 02    
-        sta     Other_RAM+172           ; 2E58: 8D AC 03 
+        sta     Obj_?_03_Diagnl?        ; 2E58: 8D AC 03 
 
 ; Move object Y position down 1 pixel, stopping at bottom i.e. $AF
         ldy     #$03                    ; 2E5B: A0 03     03 = Height of object

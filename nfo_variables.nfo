@@ -72,12 +72,15 @@ label    0383 Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accelerati
 label    0380 Object_0380
 label    0388 Other_RAM_1
 label    0390 Object_0390
-label    03A8 Object_? ;     03B0  09 70 00 AF 01 00 00 1C
+label    03A8 Object_? ;     03A8  ?? ?? ?? ?? ?? ?? ?? ??
+label    03AB Obj_?_03_Height?
+label    03AC Obj_?_03_Diagnl?
+
 
                        ;            0  1  2  3  4  5  6  7
 label    03B0 Object_0 ;     03B0  09 70 00 AF 01 00 00 1C
 label    03B8 Object_1 ;     03B8  04 20 00 3F 00 01 10 18
-label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Explosion->00, 04=Rocket_Part/Fuel, 05=fuzzball, 06=saucer, 07=Ball, 08=Cross, 09+=CRASH, 0E=flashing/werthers
+label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Explosion->00, 04=Rocket_Part/Fuel, 05=fuzzball, 06=saucer, 07=Ball, 08=Cross, 09+=CRASH, 0E=flashing/werthers, 0B=Rocket_Ascend/Decend?
 label    03C8 Object_3 ;     03C8  05 57 08 9D 00 02 03 00  1=horizontal postion of alien
 label    03D0 Object_4 ;     03D0  05 91 08 7C 00 06 03 00  2=direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
 label    03D8 Object_5 ;     03D8  05 47 08 85 00 02 00 00  3=height

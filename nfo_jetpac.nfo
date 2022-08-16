@@ -184,6 +184,7 @@ word     220C
 break    220F
 label    2285 CLC_ADC_08
 label    228B Move_ZP17_15_to_ZP16_14
+label    22BA Reset_Level_Add_Extra_Life
 comment  22BD
 comment  22BD Player at level 4, add another life
 ;        22EA
@@ -440,7 +441,9 @@ lcomment 261C Test Object Type value
 lcomment 261E If <>00, skip
 lcomment 2622 Is Object address $B0? i.e. Object_0
 lcomment 2624 If not, skip
-label    262A BACK_262A
+comment  262A
+comment  262A Delay loop $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds (Needs Check)
+label    262A Delay_Loop_Moving
 comment  2630
 comment  2630 Increment Object Pointer to next Obj i.e. by adding 8
 label    2630 SKIP_2630
@@ -468,6 +471,7 @@ lcomment 2688 Clear Disable Interrupts flag
 label    268C Subroutine_List
 word     268C-26AD
 label    268D Subroutine_List+1
+lcomment 2698 3 lines the JMP
 lcomment 269A 2A6D and 2A5F almost the same
 lcomment 269C 2A6D and 2A5F almost the same
 ;        26AE
@@ -646,8 +650,17 @@ const    2D59
 word     2DBC
 ;        2DDD
 label    2DDD LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
-label    2E17 Subroutine_2E17
-label    2E4E Subroutine_2E4E
+comment  2E17 Aliens keep moving also
+label    2E17 Rocket_Goes_Up
+lcomment 2E1A Object height offset
+lcomment 2E1C Load object height i.e. Rocket
+lcomment 2E1E Object hit top yet
+lcomment 2E20 Yes, branch
+lcomment 2E23 Calculate new height
+lcomment 2E25 Store new height i.e one pixel up
+label    2E34 Rocket_At_Top
+comment  2E4E Flames stop a little way before bottom
+label    2E4E Rocket_Goes_Down
 comment  2E5B
 comment  2E5B Move object Y position down 1 pixel, stopping at bottom i.e. $AF
 lcomment 2E5B 03 = Height of object
