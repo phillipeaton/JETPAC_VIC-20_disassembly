@@ -159,7 +159,7 @@ lcomment 20E1 No, read keyboard again
 ;        20E3
 comment  20E3
 ;        20F0
-label    20F0 Something_To_Other_RAM
+label    20F0 Update_Lazer_Shots
 const    20F3
 lcomment 20F3 ZP_Temp_2_Lo
 lcomment 20F4
@@ -168,22 +168,39 @@ const    20F6
 lcomment 20F6 End of Parameters
 comment  20F7
 comment  20F7 Loop 4 times through other_ram, 8 bytes at a time, if any are 0, branch to 2110
-label    20FB BACK_20FB
+label    20FB Update_Lazer_Shots_Loop
+label    2110 Update_Lazer_Shot
+label    212f Update_Lazer_Shot1
 ;        2145
 label    2145 BACK_2145
 ;        216B
 label    216B _12346737
+label    2173 Update_Lazer_Shot_1
+label    217E Update_Lazer_Shot_2
+label    2187 Update_Lazer_Shot_1_1
+label    218D Update_Lazer_Shot_1_2
 ;        219A
-label    219A Subroutine_219A
+label    219A Fire_Pressed
+label    219A Fire_Pressed_1
 label    21DC SKIP_21DC
 label    21F1 SKIP_21F1
+label    21FC SKIP_21FC
+label    2202 SKIP_2202
 ;        2206
 word     2206
 word     2209
 word     220C
 break    220F
+label    2211 Fire_Pressed_2
+label    2229 SR_2229
+label    2248 SR_2229_1
+label    2257 SR_2257
+label    2263 SR_2257_1
 label    2285 CLC_ADC_08
 label    228B Move_ZP17_15_to_ZP16_14
+label    2298 SR_2298
+label    22A1 SR_2298_1
+label    22B4 SR_2298_1_1
 label    22BA Reset_Level_Add_Extra_Life
 comment  22BD
 comment  22BD Player at level 4, add another life
@@ -200,6 +217,7 @@ label    2301 CBTSR1
 label    230B Reset_Some_Objects
 ;        2315
 word     2315
+label    231A Reset_S_O_1
 const    233B-235A
 label    233B Inital_Object_Data
 lcomment 233B AF = sprite at bottom of screen, could be rocket part?
@@ -436,7 +454,7 @@ lcomment 260B Mulitply by two as 2 bytes in an address
 lcomment 260C Object Type becomes offset into Subroutine List
 lcomment 260D Load SR List offset into SR Vec Lo/Hi...
 lcomment 2617 ...and jmp to it
-label    261A Subroutine_261A
+label    261A Triggers_Every_Frame
 lcomment 261C Test Object Type value
 lcomment 261E If <>00, skip
 lcomment 2622 Is Object address $B0? i.e. Object_0
@@ -478,20 +496,21 @@ lcomment 269C 2A6D and 2A5F almost the same
 comment  26AE
 label    26AE Init_Object_?
 label    26B0 CCTOR_1
-label    26C5 C0_00_00_00_00_00_00_00
+label    26C5 C0_00_00_00_00_00_
+00_00
 label    26CD Jmp_To_SRList2_SR
 label    26D1 JTSRLSR_1
 label    26E4 Jmp_To_SRList2_SR_
 label    26F2 Copy_ZP_Val_to_ZP1_Val
-label    26FE Subroutine2_26FE
-label    271C Subroutine2_271C
-label    2727 Subroutine2_2727
-label    2735 Subroutine2_2735
+label    26FE Object_Picked_Up
+label    271C Gem_Fuel_Picked_Up
+label    2727 Lazer_Shot_Active
+label    2735 Rocket_Flight_Active
 ;        2743
 label    2743 Subroutine_List2
 word     2743-274E
 label    2744 Subroutine_List2+1
-label    274F Subroutine2_274F
+label    274F Collision
 ;        275B
 comment  275B Erase $100 bytes zero page
 label    275B Erase_ZP
@@ -545,7 +564,7 @@ label    283B Ptr_Rocket_Flame_Hi
 label    283C Ptr_Final_Char_Lo
 lcomment 283C Addr of final char UDG
 label    283D Ptr_Final_Char_Hi
-label    283E Subroutine_283E
+label    283E Fire_Pressed
 ;        286B
 break    286B
 const    286B
@@ -619,9 +638,9 @@ break    2A32
 label    2A32 STR_GAME_OVER_PLAYER_2
 ;        2A4C
 word     2A4C
-label    2A5F Subroutine_2A5F
-label    2A6D Subroutine_2A6D
-label    2ABC Subroutine_2ABC
+label    2A5F Lev_Start_1st_Alien_onScr
+label    2A6D Not_Triggered_2A6D
+label    2ABC Not_Triggered_2ABC
 label    2B7F _0400002001041818
 label    2B87 _0E00002000000018
 ;        2B82
@@ -639,7 +658,7 @@ label    2BDE Get_Raster_Line_Band
 break    2BE8-2BF7
 const    2BE8-2BF7
 label    2BE8 Raster_Line_Table
-label    2C6A Subroutine_2C6A
+label    2C6A Stops_All_After_Score_Flash
 ;        2CDB
 const    2CDB-2CE2
 label    2CDB _0025_0035_0045_0055
@@ -670,7 +689,7 @@ comment  2E68 Set current object type to a crash
 label    2E74 Subroutine_2E74
 ;        2E93
 word     2E93
-label    2F8E Subroutine_2F8E
+label    2F8E Stops_All
 ;        2FE5
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
 label    2FE5 Get_Ship_UDG_Addr

@@ -75,16 +75,29 @@ Screen_RAM              equ     $0200
 Other_RAM               equ     $0300
 Hardware_IRQ            equ     $0314
 NMI_int_vector          equ     $0318
-Object_0380             equ     $0380
+Jetman_Looks            equ     $0380
 Jetman_X                equ     $0381
-Jetman_At_Rest???       equ     $0383
-Other_RAM_1             equ     $0388
-Object_?                equ     $03A8
+Jetman_Y                equ     $0383
+Lazer_1                 equ     $0388
+Object_03A8             equ     $03A8
+Object_03A9             equ     $03A9
+Object_03AA             equ     $03AA
 Obj_?_03_Height?        equ     $03AB
 Obj_?_03_Diagnl?        equ     $03AC
+Other_RAM_03AD          equ     $03AD
+Other_RAM_03AE          equ     $03AE
 Object_0                equ     $03B0
+Object_0_Horiz          equ     $03B1
+Object_0_Direct         equ     $03B2
+Object_0_Height         equ     $03B3
+Object_0_Diagon         equ     $03B4
 Object_1                equ     $03B8
+Object_1_Horiz          equ     $03B9
+Object_1_Diagon         equ     $03BC
 Object_2                equ     $03C0
+Object_2_Horiz          equ     $03C1
+Object_2_Diagon         equ     $03C4
+Object_2_???            equ     $03C6
 Object_3                equ     $03C8
 UDG_RAM                 equ     $1000
 UDG_P1_SCORE_RAW_POSN   equ     $1008
@@ -92,8 +105,8 @@ UDG_P1_LIVES_RAW_POSN   equ     $1420
 UDG_HI_SCORE_RAW_POSN   equ     $1588
 UDG_P2_LIVES_RAW_POSN   equ     $19A0
 UDG_P2_SCORE_RAW_POSN   equ     $1B08
-SCORE_HI                equ     $1FD0
-GAME_OPTIONS            equ     $1FD3
+Score_Hi                equ     $1FD0
+Game_Options            equ     $1FD3
 VIC_R0_H_Ctr            equ     $9000
 VIC_R4_TV_Raster        equ     $9004
 VIC_RA_Frq_Osc1         equ     $900A
@@ -232,7 +245,7 @@ BACK_2080
         lda     #$0F                    ; 2085: A9 0F    
         sta     VIC_RE_Vol_Color        ; 2087: 8D 0E 90 
         lda     #$00                    ; 208A: A9 00    
-        sta     Object_?                ; 208C: 8D A8 03 
+        sta     Object_03A8             ; 208C: 8D A8 03 
 
 ATTRACT_MODE
         inc     ZP_Counter              ; 208F: E6 58    
@@ -242,7 +255,7 @@ ATTRACT_MODE
         sta     VIA2_DDR_A              ; 2098: 8D 23 91  Set Port A all bits to output
         lda     #$7F                    ; 209B: A9 7F    
         sta     VIA2_Port_A             ; 209D: 8D 21 91  Select keyboard column to read (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
-        ldx     GAME_OPTIONS            ; 20A0: AE D3 1F  Get game settings ($1fD3 = Just outside UDG RAM)
+        ldx     Game_Options            ; 20A0: AE D3 1F  Get game settings ($1fD3 = Just outside UDG RAM)
         lda     VIA2_Port_B             ; 20A3: AD 20 91  Read keyboard column
         sta     Keyboard_Data           ; 20A6: 85 13     Store keyboard data
         lda     #$10                    ; 20A8: A9 10    
@@ -274,7 +287,7 @@ SKIP_20C6
         tax                             ; 20CF: AA       
 SKIP_20D0
         txa                             ; 20D0: 8A       
-        sta     GAME_OPTIONS            ; 20D1: 8D D3 1F  Store game settings ($1fD3 = Just outside UDG RAM)
+        sta     Game_Options            ; 20D1: 8D D3 1F  Store game settings ($1fD3 = Just outside UDG RAM)
                                         ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
         jsr     Display_Game_Select     ; 20D4: 20 B9 24 
         lda     #$FE                    ; 20D7: A9 FE    
@@ -288,21 +301,21 @@ SKIP_20D0
 ; -----------------------
 Z20E9   lda     ZP_HW_IRQ_Count1        ; 20E9: A5 4A    
         and     #$03                    ; 20EB: 29 03    
-        beq     Something_To_Other_RAM  ; 20ED: F0 01    
+        beq     Update_Lazer_Shots      ; 20ED: F0 01    
         rts                             ; 20EF: 60       
 ; ===========================================================
-Something_To_Other_RAM
+Update_Lazer_Shots
         jsr     Read_ZP_Parameters      ; 20F0: 20 9D 25 
         fcb     $06                     ; 20F3: 06        ZP_Temp_2_Lo
-        fdb     Other_RAM_1             ; 20F4: 88 03    
+        fdb     Lazer_1                 ; 20F4: 88 03    
         fcb     $FF                     ; 20F6: FF        End of Parameters
 
 ; Loop 4 times through other_ram, 8 bytes at a time, if any are 0, branch to 2110
         ldx     #$04                    ; 20F7: A2 04    
         ldy     #$00                    ; 20F9: A0 00    
-BACK_20FB
+Update_Lazer_Shots_Loop
         lda     (ZP_Temp_2_Lo),y        ; 20FB: B1 06    
-        beq     Z2110                   ; 20FD: F0 11    
+        beq     Update_Lazer_Shot       ; 20FD: F0 11    
         lda     ZP_Temp_2_Lo            ; 20FF: A5 06    
         clc                             ; 2101: 18       
         adc     #$08                    ; 2102: 69 08    
@@ -311,10 +324,11 @@ BACK_20FB
         adc     #$00                    ; 2108: 69 00    
         sta     ZP_Temp_2_Hi            ; 210A: 85 07    
         dex                             ; 210C: CA       
-        bne     BACK_20FB               ; 210D: D0 EC    
+        bne     Update_Lazer_Shots_Loop ; 210D: D0 EC    
         rts                             ; 210F: 60       
 ; ===========================================================
-Z2110   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2110: B1 00    
+Update_Lazer_Shot
+        lda     (ZP_Obj_List_Ptr_Lo),y  ; 2110: B1 00    
         tax                             ; 2112: AA       
         and     #$80                    ; 2113: 29 80    
         ora     #$10                    ; 2115: 09 10    
@@ -326,12 +340,13 @@ Z2110   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2110: B1 00
         sta     ZP_0008                 ; 2120: 85 08    
         txa                             ; 2122: 8A       
         and     #$80                    ; 2123: 29 80    
-        beq     Z2173                   ; 2125: F0 4C    
+        beq     Update_Lazer_Shot_1     ; 2125: F0 4C    
         lda     ZP_0008                 ; 2127: A5 08    
         sec                             ; 2129: 38       
         sbc     #$08                    ; 212A: E9 08    
-        jsr     Z2298                   ; 212C: 20 98 22 
-Z212F   sta     ZP_0008                 ; 212F: 85 08    
+        jsr     SR_2298                 ; 212C: 20 98 22 
+Update_Lazer_Shot1
+        sta     ZP_0008                 ; 212F: 85 08    
         iny                             ; 2131: C8       
         iny                             ; 2132: C8       
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2133: B1 00    
@@ -363,38 +378,42 @@ BACK_2145
         lda     _12346737,x             ; 215B: BD 6B 21 
         sta     (ZP_Temp_2_Lo),y        ; 215E: 91 06    
         lda     #$03                    ; 2160: A9 03    
-        sta     Other_RAM+173           ; 2162: 8D AD 03 
+        sta     Other_RAM_03AD          ; 2162: 8D AD 03 
         lda     #$10                    ; 2165: A9 10    
-        sta     Other_RAM+174           ; 2167: 8D AE 03 
+        sta     Other_RAM_03AE          ; 2167: 8D AE 03 
         rts                             ; 216A: 60       
 ; ===========================================================
 _12346737
         fcb     $01,$02,$03,$04,$06,$07 ; 216B: 01 02 03 04 06 07 
         fcb     $03,$07                 ; 2171: 03 07    
-Z2173   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2173: B1 00    
+Update_Lazer_Shot_1
+        lda     (ZP_Obj_List_Ptr_Lo),y  ; 2173: B1 00    
         and     #$07                    ; 2175: 29 07    
-        beq     Z218D                   ; 2177: F0 14    
+        beq     Update_Lazer_Shot_1_2   ; 2177: F0 14    
         lda     ZP_0008                 ; 2179: A5 08    
         clc                             ; 217B: 18       
         adc     #$18                    ; 217C: 69 18    
-Z217E   and     #$FE                    ; 217E: 29 FE    
+Update_Lazer_Shot_2
+        and     #$FE                    ; 217E: 29 FE    
         cmp     #$B8                    ; 2180: C9 B8    
-        bcs     Z2187                   ; 2182: B0 03    
-        jmp     Z212F                   ; 2184: 4C 2F 21 
+        bcs     Update_Lazer_Shot_1_1   ; 2182: B0 03    
+        jmp     Update_Lazer_Shot1      ; 2184: 4C 2F 21 
 ; -----------------------
-Z2187   sec                             ; 2187: 38       
+Update_Lazer_Shot_1_1
+        sec                             ; 2187: 38       
         sbc     #$B8                    ; 2188: E9 B8    
-        jmp     Z212F                   ; 218A: 4C 2F 21 
+        jmp     Update_Lazer_Shot1      ; 218A: 4C 2F 21 
 ; -----------------------
-Z218D   lda     ZP_0008                 ; 218D: A5 08    
+Update_Lazer_Shot_1_2
+        lda     ZP_0008                 ; 218D: A5 08    
         clc                             ; 218F: 18       
         adc     #$10                    ; 2190: 69 10    
-        jmp     Z217E                   ; 2192: 4C 7E 21 
+        jmp     Update_Lazer_Shot_2     ; 2192: 4C 7E 21 
 ; -----------------------
 Z2195   adc     #$08                    ; 2195: 69 08    
         jmp     Z21CB                   ; 2197: 4C CB 21 
 ; -----------------------
-Subroutine_219A
+Fire_Pressed_1
         ldy     #$06                    ; 219A: A0 06    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 219C: B1 00    
         sta     ZP_Temp_2_Hi            ; 219E: 85 07    
@@ -411,7 +430,7 @@ Subroutine_219A
         sta     Keyboard_Data           ; 21B2: 85 13    
         lda     ZP_Temp_2_Lo            ; 21B4: A5 06    
         bit     MASK_04                 ; 21B6: 2C 16 20 
-        beq     Z2202                   ; 21B9: F0 47    
+        beq     SKIP_2202               ; 21B9: F0 47    
         jsr     Setup_Color_RAM_Ptr     ; 21BB: 20 F7 34 
         jsr     Setup_UDG_RAM_XY        ; 21BE: 20 1D 35 
         lda     ZP_Temp_2_Lo            ; 21C1: A5 06    
@@ -419,7 +438,7 @@ Subroutine_219A
         clc                             ; 21C6: 18       
         beq     Z2195                   ; 21C7: F0 CC    
         adc     #$F8                    ; 21C9: 69 F8    
-Z21CB   jsr     Z2298                   ; 21CB: 20 98 22 
+Z21CB   jsr     SR_2298                 ; 21CB: 20 98 22 
         tax                             ; 21CE: AA       
         ldy     #$01                    ; 21CF: A0 01    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 21D1: B1 00    
@@ -427,7 +446,7 @@ Z21CB   jsr     Z2298                   ; 21CB: 20 98 22
         cmp     #$80                    ; 21D4: C9 80    
         bcs     SKIP_21DC               ; 21D6: B0 04    
         lda     (ZP_UDG_RAM_X),y        ; 21D8: B1 04    
-        bne     Z21FC                   ; 21DA: D0 20    
+        bne     SKIP_21FC               ; 21DA: D0 20    
 SKIP_21DC
         txa                             ; 21DC: 8A       
         sta     ZP_Temp_2_Lo            ; 21DD: 85 06    
@@ -446,11 +465,13 @@ SKIP_21F1
         sbc     #$08                    ; 21F4: E9 08    
         sta     ZP_Temp_2_Hi            ; 21F6: 85 07    
         and     #$F8                    ; 21F8: 29 F8    
-        bne     Z2202                   ; 21FA: D0 06    
-Z21FC   lda     ZP_Temp_2_Lo            ; 21FC: A5 06    
+        bne     SKIP_2202               ; 21FA: D0 06    
+SKIP_21FC
+        lda     ZP_Temp_2_Lo            ; 21FC: A5 06    
         and     #$FB                    ; 21FE: 29 FB    
         sta     ZP_Temp_2_Lo            ; 2200: 85 06    
-Z2202   jsr     Read_ZP_Parameters      ; 2202: 20 9D 25 
+SKIP_2202
+        jsr     Read_ZP_Parameters      ; 2202: 20 9D 25 
         fcb     $14                     ; 2205: 14       
         fdb     Other_RAM               ; 2206: 00 03    
         fcb     $16                     ; 2208: 16       
@@ -459,26 +480,27 @@ Z2202   jsr     Read_ZP_Parameters      ; 2202: 20 9D 25
         fdb     ZP_Temp_1_Hi            ; 220C: 03 00    
         fcb     $FF                     ; 220E: FF       
         ldy     #$02                    ; 220F: A0 02    
-Z2211   iny                             ; 2211: C8       
+Fire_Pressed_2
+        iny                             ; 2211: C8       
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2212: B1 00    
         eor     ZP_Temp_2_Lo            ; 2214: 45 06    
         and     #$F8                    ; 2216: 29 F8    
-        bne     Z2229                   ; 2218: D0 0F    
+        bne     SR_2229                 ; 2218: D0 0F    
         jsr     Move_ZP17_15_to_ZP16_14 ; 221A: 20 8B 22 
         dec     ZP_Temp_1_Lo            ; 221D: C6 02    
-        bne     Z2211                   ; 221F: D0 F0    
+        bne     Fire_Pressed_2          ; 221F: D0 F0    
         lda     #$00                    ; 2221: A9 00    
         tay                             ; 2223: A8       
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2224: 91 00    
-        jmp     Subroutine_261A         ; 2226: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2226: 4C 1A 26 
 ; -----------------------
-Z2229   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00    
+SR_2229 lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00    
         bit     MASK_04                 ; 222B: 2C 16 20 
-        bne     Z2257                   ; 222E: D0 27    
+        bne     SR_2257                 ; 222E: D0 27    
         dec     ZP_Temp_2_Hi            ; 2230: C6 07    
         lda     ZP_Temp_2_Hi            ; 2232: A5 07    
         and     #$07                    ; 2234: 29 07    
-        bne     Z2248                   ; 2236: D0 10    
+        bne     SR_2229_1               ; 2236: D0 10    
         lda     ZP_HW_IRQ_Count3        ; 2238: A5 4C    
         and     #$03                    ; 223A: 29 03    
         ora     #$04                    ; 223C: 09 04    
@@ -487,21 +509,23 @@ Z2229   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2242: B1 00    
         ora     #$04                    ; 2244: 09 04    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2246: 91 00    
-Z2248   ldy     #$06                    ; 2248: A0 06    
+SR_2229_1
+        ldy     #$06                    ; 2248: A0 06    
         lda     ZP_Temp_2_Hi            ; 224A: A5 07    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 224C: 91 00    
         ldy     #$02                    ; 224E: A0 02    
         lda     ZP_Temp_2_Lo            ; 2250: A5 06    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2252: 91 00    
-        jmp     Subroutine_261A         ; 2254: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2254: 4C 1A 26 
 ; -----------------------
-Z2257   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2257: B1 00    
+SR_2257 lda     (ZP_Obj_List_Ptr_Lo),y  ; 2257: B1 00    
         sta     ZP_UDG_RAM_X            ; 2259: 85 04    
         bit     MASK_01                 ; 225B: 2C 14 20 
         beq     CLC_ADC_08              ; 225E: F0 25    
         clc                             ; 2260: 18       
         adc     #$F8                    ; 2261: 69 F8    
-Z2263   jsr     Z2298                   ; 2263: 20 98 22 
+SR_2257_1
+        jsr     SR_2298                 ; 2263: 20 98 22 
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2266: 91 00    
         lda     Keyboard_Data           ; 2268: A5 13    
         sta     ZP_UDG_RAM_Y            ; 226A: 85 05    
@@ -516,13 +540,13 @@ Z2263   jsr     Z2298                   ; 2263: 20 98 22
         pla                             ; 227C: 68       
         tay                             ; 227D: A8       
         dec     ZP_Temp_1_Lo            ; 227E: C6 02    
-        bne     Z2211                   ; 2280: D0 8F    
-        jmp     Z2248                   ; 2282: 4C 48 22 
+        bne     Fire_Pressed_2          ; 2280: D0 8F    
+        jmp     SR_2229_1               ; 2282: 4C 48 22 
 ; -----------------------
 CLC_ADC_08
         clc                             ; 2285: 18       
         adc     #$08                    ; 2286: 69 08    
-        jmp     Z2263                   ; 2288: 4C 63 22 
+        jmp     SR_2257_1               ; 2288: 4C 63 22 
 ; -----------------------
 Move_ZP17_15_to_ZP16_14
         lda     ZP_0015                 ; 228B: A5 15    
@@ -533,19 +557,20 @@ Move_ZP17_15_to_ZP16_14
         sta     ZP_0016                 ; 2295: 85 16    
         rts                             ; 2297: 60       
 ; ===========================================================
-Z2298   pha                             ; 2298: 48       
+SR_2298 pha                             ; 2298: 48       
         and     #$F8                    ; 2299: 29 F8    
         cmp     #$B8                    ; 229B: C9 B8    
-        bcs     Z22A1                   ; 229D: B0 02    
+        bcs     SR_2298_1               ; 229D: B0 02    
         pla                             ; 229F: 68       
         rts                             ; 22A0: 60       
 ; ===========================================================
-Z22A1   tya                             ; 22A1: 98       
+SR_2298_1
+        tya                             ; 22A1: 98       
         pha                             ; 22A2: 48       
         ldy     #$00                    ; 22A3: A0 00    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 22A5: B1 00    
         bit     MASK_80                 ; 22A7: 2C 1B 20 
-        beq     Z22B4                   ; 22AA: F0 08    
+        beq     SR_2298_1_1             ; 22AA: F0 08    
         pla                             ; 22AC: 68       
         tay                             ; 22AD: A8       
         pla                             ; 22AE: 68       
@@ -553,7 +578,8 @@ Z22A1   tya                             ; 22A1: 98
         ora     #$B0                    ; 22B1: 09 B0    
         rts                             ; 22B3: 60       
 ; ===========================================================
-Z22B4   pla                             ; 22B4: 68       
+SR_2298_1_1
+        pla                             ; 22B4: 68       
         tay                             ; 22B5: A8       
         pla                             ; 22B6: 68       
         and     #$07                    ; 22B7: 29 07    
@@ -586,7 +612,7 @@ Z22E3   jsr     Save_Obj_List_Ptr       ; 22E3: 20 E7 28
         fdb     Object_1                ; 22EA: B8 03    
         fcb     $FF                     ; 22EC: FF       
 JMP23A1 ldx     #$01                    ; 22ED: A2 01    
-        jmp     Z231A                   ; 22EF: 4C 1A 23 
+        jmp     Reset_S_O_1             ; 22EF: 4C 1A 23 
 ; -----------------------
 Z22F2   jsr     Save_Obj_List_Ptr       ; 22F2: 20 E7 28 
         jsr     Read_ZP_Parameters      ; 22F5: 20 9D 25 
@@ -611,7 +637,8 @@ Reset_Some_Objects
         fdb     Inital_Object_Data      ; 2315: 3B 23    
         fcb     $FF                     ; 2317: FF       
         ldx     #$03                    ; 2318: A2 03    
-Z231A   txa                             ; 231A: 8A       
+Reset_S_O_1
+        txa                             ; 231A: 8A       
         pha                             ; 231B: 48       
         jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 231C: 20 E9 35 
         jsr     Z2FDA                   ; 231F: 20 DA 2F 
@@ -626,7 +653,7 @@ Z231A   txa                             ; 231A: 8A
         pla                             ; 2332: 68       
         tax                             ; 2333: AA       
         dex                             ; 2334: CA       
-        bne     Z231A                   ; 2335: D0 E3    
+        bne     Reset_S_O_1             ; 2335: D0 E3    
         jsr     Restore_Obj_List_Ptr    ; 2337: 20 F0 28 
         rts                             ; 233A: 60       
 ; ===========================================================
@@ -642,10 +669,10 @@ BTCTOR_1 fcb    $02,$50,$00,$AF         ; 2353: 02 50 00 AF  Initial position et
 Z235B   ldx     #$07                    ; 235B: A2 07    
 BACK_235D
         lda     BTCTOR_1,x              ; 235D: BD 53 23 
-        sta     Object_0380,x           ; 2360: 9D 80 03 
+        sta     Jetman_Looks,x          ; 2360: 9D 80 03 
         dex                             ; 2363: CA       
         bpl     BACK_235D               ; 2364: 10 F7    
-        lda     GAME_OPTIONS            ; 2366: AD D3 1F 
+        lda     Game_Options            ; 2366: AD D3 1F 
         and     #$01                    ; 2369: 29 01    
         beq     LDA_7F                  ; 236B: F0 62    
         lda     #$FF                    ; 236D: A9 FF    
@@ -745,7 +772,7 @@ BACK_23D6
 
         lda     #$05                    ; 23E7: A9 05    
         sta     ZP_Num_Lives_P2         ; 23E9: 85 5C    
-        lda     GAME_OPTIONS            ; 23EB: AD D3 1F 
+        lda     Game_Options            ; 23EB: AD D3 1F 
         and     #$01                    ; 23EE: 29 01    
         bne     SKIP_23F4               ; 23F0: D0 02    
         sta     ZP_Num_Lives_P2         ; 23F2: 85 5C    
@@ -857,7 +884,7 @@ Hi_Score_To_UDG_RAM
         fcb     $04                     ; 2494: 04       
         fdb     UDG_HI_SCORE_RAW_POSN   ; 2495: 88 15    
         fcb     $0E                     ; 2497: 0E       
-        fdb     SCORE_HI                ; 2498: D0 1F    
+        fdb     Score_Hi                ; 2498: D0 1F    
         fcb     $02                     ; 249A: 02       
         fdb     ZP_Temp_1_Hi            ; 249B: 03 00    
         fcb     $FF                     ; 249D: FF        End of Parameters
@@ -882,10 +909,10 @@ GSFP2   sta     ZP_Game_Sel_F7_Flash,x  ; 24B2: 95 45
 ; ===========================================================
 Display_Game_Select
         ldx     #$00                    ; 24B9: A2 00    
-        lda     GAME_OPTIONS            ; 24BB: AD D3 1F 
+        lda     Game_Options            ; 24BB: AD D3 1F 
         and     #$01                    ; 24BE: 29 01    
         jsr     Game_Sel_Flash_Period   ; 24C0: 20 A1 24 
-        lda     GAME_OPTIONS            ; 24C3: AD D3 1F 
+        lda     Game_Options            ; 24C3: AD D3 1F 
         lsr     a                       ; 24C6: 4A       
         jsr     Game_Sel_Flash_Period   ; 24C7: 20 A1 24 
 
@@ -1059,7 +1086,7 @@ Main_Loop
         sta     ZP_Subroutine_Vec_Hi    ; 2615: 85 60    
         jmp     (ZP_Subroutine_Vec_Lo)  ; 2617: 6C 5F 00  ..and jmp to it
 ; -----------------------
-Subroutine_261A
+Triggers_Every_Frame
         ldy     #$00                    ; 261A: A0 00    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 261C: B1 00     Test Object Type value
         bne     SKIP_2630               ; 261E: D0 10     If <>00, skip
@@ -1122,7 +1149,7 @@ IRQ_Stash_Obj_Ptr_Load_Obj_0380
         sta     ZP_0023                 ; 2674: 85 23     YOU ARE HERE !!!!!!!!!!
         jsr     Read_ZP_Parameters      ; 2676: 20 9D 25 
         fcb     $00                     ; 2679: 00        ZP Offset for 1st address
-        fdb     Object_0380             ; 267A: 80 03     1st Address
+        fdb     Jetman_Looks            ; 267A: 80 03     1st Address
         fcb     $FF                     ; 267C: FF       
         jmp     Main_Loop               ; 267D: 4C 07 26 
 ; -----------------------
@@ -1135,28 +1162,28 @@ Copy_ZP22_23_To_Obj_Ptr_And_CLI
         jmp     Z263B                   ; 2689: 4C 3B 26 
 ; -----------------------
 Subroutine_List
-        fdb     Subroutine_261A         ; 268C: 1A 26    
+        fdb     Triggers_Every_Frame    ; 268C: 1A 26    
         fdb     Read_Kbd_Jsk_And_Store  ; 268E: 73 32    
         fdb     Flash_Score_Then_Display_Scores ; 2690: 4D 33    
         fdb     Explosions_Plyr_Life_Lost? ; 2692: 34 29    
-        fdb     Subroutine_2F8E         ; 2694: 8E 2F    
-        fdb     Subroutine_2C6A         ; 2696: 6A 2C    
-        fdb     Subroutine_2ABC         ; 2698: BC 2A     3 lines the JMP
-        fdb     Subroutine_2A6D         ; 269A: 6D 2A     2A6D and 2A5F almost the same
-        fdb     Subroutine_2A5F         ; 269C: 5F 2A     2A6D and 2A5F almost the same
+        fdb     Stops_All               ; 2694: 8E 2F    
+        fdb     Stops_All_After_Score_Flash ; 2696: 6A 2C    
+        fdb     Not_Triggered_2ABC      ; 2698: BC 2A     3 lines the JMP
+        fdb     Not_Triggered_2A6D      ; 269A: 6D 2A     2A6D and 2A5F almost the same
+        fdb     Lev_Start_1st_Alien_onScr ; 269C: 5F 2A     2A6D and 2A5F almost the same
         fdb     Subroutine_2E74         ; 269E: 74 2E    
         fdb     Rocket_Goes_Up          ; 26A0: 17 2E    
         fdb     Rocket_Goes_Down        ; 26A2: 4E 2E    
         fdb     Jmp_To_SRList2_SR       ; 26A4: CD 26    
-        fdb     Subroutine_261A         ; 26A6: 1A 26    
-        fdb     Subroutine_283E         ; 26A8: 3E 28    
-        fdb     Subroutine_261A         ; 26AA: 1A 26    
-        fdb     Subroutine_219A         ; 26AC: 9A 21    
+        fdb     Triggers_Every_Frame    ; 26A6: 1A 26    
+        fdb     Fire_Pressed            ; 26A8: 3E 28    
+        fdb     Triggers_Every_Frame    ; 26AA: 1A 26    
+        fdb     Fire_Pressed_1          ; 26AC: 9A 21    
 
 Init_Object_?
         ldx     #$07                    ; 26AE: A2 07    
-CCTOR_1 lda     C0_00_00_00_00_00_00_00,x ; 26B0: BD C5 26 
-        sta     Object_?,x              ; 26B3: 9D A8 03 
+CCTOR_1 lda     C0_00_00_00_00_00_,x    ; 26B0: BD C5 26 
+        sta     Object_03A8,x           ; 26B3: 9D A8 03 
         dex                             ; 26B6: CA       
         bpl     CCTOR_1                 ; 26B7: 10 F7    
         lda     #$00                    ; 26B9: A9 00    
@@ -1165,7 +1192,7 @@ CCTOR_1 lda     C0_00_00_00_00_00_00_00,x ; 26B0: BD C5 26
         sta     VIC_RC_Frq_Osc3         ; 26C1: 8D 0C 90 
         rts                             ; 26C4: 60       
 ; ===========================================================
-C0_00_00_00_00_00_00_00
+C0_00_00_00_00_00_
         fcb     $0C,$00,$00,$00,$00,$00 ; 26C5: 0C 00 00 00 00 00 
         fcb     $00,$00                 ; 26CB: 00 00    
 ; ===========================================================
@@ -1190,7 +1217,7 @@ Jmp_To_SRList2_SR_
         sta     ZP_Subroutine_Vec_Hi    ; 26E9: 85 60    
         cmp     #$07                    ; 26EB: C9 07    
         bcc     JTSRLSR_1               ; 26ED: 90 E2    
-        jmp     Subroutine_261A         ; 26EF: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 26EF: 4C 1A 26 
 ; -----------------------
 Copy_ZP_Val_to_ZP1_Val
         lda     ZP_Subroutine_Vec_Hi    ; 26F2: A5 60    
@@ -1202,7 +1229,7 @@ Copy_ZP_Val_to_ZP1_Val
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 26FB: 91 00    
         rts                             ; 26FD: 60       
 ; ===========================================================
-Subroutine2_26FE
+Object_Picked_Up
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 26FE: 20 F2 26 
         beq     Z270A                   ; 2701: F0 07    
         eor     #$FF                    ; 2703: 49 FF    
@@ -1222,14 +1249,14 @@ Z2710   pha                             ; 2710: 48
         sta     VIC_RA_Frq_Osc1,x       ; 2716: 9D 0A 90 
         jmp     Jmp_To_SRList2_SR_      ; 2719: 4C E4 26 
 ; -----------------------
-Subroutine2_271C
+Gem_Fuel_Picked_Up
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 271C: 20 F2 26 
         beq     Z270A                   ; 271F: F0 E9    
         asl     a                       ; 2721: 0A       
         eor     #$F3                    ; 2722: 49 F3    
         jmp     Z2705                   ; 2724: 4C 05 27 
 ; -----------------------
-Subroutine2_2727
+Lazer_Shot_Active
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 2727: 20 F2 26 
         beq     Z270A                   ; 272A: F0 DE    
         asl     a                       ; 272C: 0A       
@@ -1239,22 +1266,22 @@ Subroutine2_2727
         ora     #$0F                    ; 2730: 09 0F    
         jmp     Z2705                   ; 2732: 4C 05 27 
 ; -----------------------
-Subroutine2_2735
+Rocket_Flight_Active
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 2735: 20 F2 26 
         beq     Z270A                   ; 2738: F0 D0    
-        lda     Other_RAM+179           ; 273A: AD B3 03 
+        lda     Object_0_Height         ; 273A: AD B3 03 
         lsr     a                       ; 273D: 4A       
         eor     #$FE                    ; 273E: 49 FE    
         jmp     Z2705                   ; 2740: 4C 05 27 
 ; -----------------------
 Subroutine_List2
         fdb     Jmp_To_SRList2_SR_      ; 2743: E4 26    
-        fdb     Subroutine2_26FE        ; 2745: FE 26    
-        fdb     Subroutine2_271C        ; 2747: 1C 27    
-        fdb     Subroutine2_2727        ; 2749: 27 27    
-        fdb     Subroutine2_2735        ; 274B: 35 27    
-        fdb     Subroutine2_274F        ; 274D: 4F 27    
-Subroutine2_274F
+        fdb     Object_Picked_Up        ; 2745: FE 26    
+        fdb     Gem_Fuel_Picked_Up      ; 2747: 1C 27    
+        fdb     Lazer_Shot_Active       ; 2749: 27 27    
+        fdb     Rocket_Flight_Active    ; 274B: 35 27    
+        fdb     Collision               ; 274D: 4F 27    
+Collision
         jsr     Copy_ZP_Val_to_ZP1_Val  ; 274F: 20 F2 26 
         beq     Z270A                   ; 2752: F0 B6    
         asl     a                       ; 2754: 0A       
@@ -1275,7 +1302,7 @@ Reset_Other_RAM_0380_03ff
         ldx     #$7F                    ; 2764: A2 7F    
         lda     #$00                    ; 2766: A9 00    
 BACK_2768
-        sta     Object_0380,x           ; 2768: 9D 80 03 
+        sta     Jetman_Looks,x          ; 2768: 9D 80 03 
         dex                             ; 276B: CA       
         bpl     BACK_2768               ; 276C: 10 FA    
         rts                             ; 276E: 60       
@@ -1283,7 +1310,7 @@ BACK_2768
 Erase_Hi_Score_Settings_Etc
         ldx     #$2F                    ; 276F: A2 2F     Erase $30 bytes at end of UDGs $1fd0-$2000
         lda     #$00                    ; 2771: A9 00    
-Erase_1 sta     SCORE_HI,x              ; 2773: 9D D0 1F 
+Erase_1 sta     Score_Hi,x              ; 2773: 9D D0 1F 
         dex                             ; 2776: CA       
         bpl     Erase_1                 ; 2777: 10 FA    
         rts                             ; 2779: 60       
@@ -1291,7 +1318,7 @@ Erase_1 sta     SCORE_HI,x              ; 2773: 9D D0 1F
 Check_New_Hi_Score
         jsr     Read_ZP_Parameters      ; 277A: 20 9D 25 
         fcb     $00                     ; 277D: 00        ZP_00
-        fdb     SCORE_HI                ; 277E: D0 1F     Addr of High Score value
+        fdb     Score_Hi                ; 277E: D0 1F     Addr of High Score value
         fcb     $08                     ; 2780: 08        ZP_08
         fdb     ZP_Score_P1             ; 2781: 51 00     Addr of P1 High Score value
         fcb     $FF                     ; 2783: FF       
@@ -1415,7 +1442,7 @@ Ptr_Final_Char_Lo
         fcb     $F8                     ; 283C: F8        Addr of final char UDG
 Ptr_Final_Char_Hi
         fcb     $3F                     ; 283D: 3F       
-Subroutine_283E
+Fire_Pressed
         jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 283E: 20 D7 35 
         jsr     Z30B3                   ; 2841: 20 B3 30 
         lda     ZP_Temp_1_Lo            ; 2844: A5 02    
@@ -1500,7 +1527,7 @@ Z28CD   sta     Object_1,x              ; 28CD: 9D B8 03
 ; ===========================================================
 Z28D4   ldx     #$2F                    ; 28D4: A2 2F    
         lda     #$00                    ; 28D6: A9 00    
-Z28D8   sta     Object_0380,x           ; 28D8: 9D 80 03 
+Z28D8   sta     Jetman_Looks,x          ; 28D8: 9D 80 03 
         dex                             ; 28DB: CA       
         bpl     Z28D8                   ; 28DC: 10 FA    
         ldx     #$2F                    ; 28DE: A2 2F    
@@ -1577,7 +1604,7 @@ Z294A   ldy     #$04                    ; 294A: A0 04
         jsr     Z373D                   ; 295B: 20 3D 37 
         jsr     Z3604                   ; 295E: 20 04 36 
         jsr     Z381F                   ; 2961: 20 1F 38 
-        jmp     Subroutine_261A         ; 2964: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2964: 4C 1A 26 
 ; -----------------------
 Explosion_UDG_Ptr
         fdb     Explosion_1             ; 2967: 74 3F    
@@ -1593,7 +1620,7 @@ Z2975   ldy     #$00                    ; 2975: A0 00
         and     #$3F                    ; 297E: 29 3F    
         cmp     #$03                    ; 2980: C9 03    
         bcc     Sound_Channels_Off_ETC  ; 2982: 90 19    
-        jmp     Subroutine_261A         ; 2984: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2984: 4C 1A 26 
 ; -----------------------
 Game_Over
         jsr     Check_New_Hi_Score      ; 2987: 20 7A 27 
@@ -1613,20 +1640,20 @@ Sound_Channels_Off_ETC
         sta     VIC_RB_Frq_Osc2         ; 29A2: 8D 0B 90 
         sta     VIC_RC_Frq_Osc3         ; 29A5: 8D 0C 90 
         jsr     Z28D4                   ; 29A8: 20 D4 28 
-        lda     Other_RAM+188           ; 29AB: AD BC 03 
+        lda     Object_1_Diagon         ; 29AB: AD BC 03 
         and     #$FD                    ; 29AE: 29 FD    
-        sta     Other_RAM+188           ; 29B0: 8D BC 03 
-        lda     Other_RAM+196           ; 29B3: AD C4 03 
+        sta     Object_1_Diagon         ; 29B0: 8D BC 03 
+        lda     Object_2_Diagon         ; 29B3: AD C4 03 
         and     #$FD                    ; 29B6: 29 FD    
-        sta     Other_RAM+196           ; 29B8: 8D C4 03 
-        lda     GAME_OPTIONS            ; 29BB: AD D3 1F 
+        sta     Object_2_Diagon         ; 29B8: 8D C4 03 
+        lda     Game_Options            ; 29BB: AD D3 1F 
         bit     MASK_01                 ; 29BE: 2C 14 20 
         bne     Z29D0                   ; 29C1: D0 0D    
 Z29C3   lda     ZP_Num_Lives_P1         ; 29C3: A5 5A    
         beq     Game_Over               ; 29C5: F0 C0    
 Z29C7   jsr     Z22D7                   ; 29C7: 20 D7 22 
         jsr     Z235B                   ; 29CA: 20 5B 23 
-        jmp     Subroutine_261A         ; 29CD: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 29CD: 4C 1A 26 
 ; -----------------------
 Z29D0   lda     ZP_Num_Lives_P2         ; 29D0: A5 5C    
         beq     Z29C3                   ; 29D2: F0 EF    
@@ -1690,7 +1717,7 @@ STR_GAME_OVER_PLAYER_2
 Z2A45   jsr     Save_Obj_List_Ptr       ; 2A45: 20 E7 28 
         jsr     Read_ZP_Parameters      ; 2A48: 20 9D 25 
         fcb     $00                     ; 2A4B: 00       
-        fdb     Object_0380             ; 2A4C: 80 03    
+        fdb     Jetman_Looks            ; 2A4C: 80 03    
         fcb     $FF                     ; 2A4E: FF       
         ldy     #$02                    ; 2A4F: A0 02    
         lda     #$01                    ; 2A51: A9 01    
@@ -1700,7 +1727,7 @@ Z2A45   jsr     Save_Obj_List_Ptr       ; 2A45: 20 E7 28
         jsr     Z290A                   ; 2A59: 20 0A 29 
         jmp     Restore_Obj_List_Ptr    ; 2A5C: 4C F0 28 
 ; -----------------------
-Subroutine_2A5F
+Lev_Start_1st_Alien_onScr
         jsr     Z2C5F                   ; 2A5F: 20 5F 2C 
         bpl     Z2A67                   ; 2A62: 10 03    
         jmp     Z2C78                   ; 2A64: 4C 78 2C 
@@ -1708,7 +1735,7 @@ Subroutine_2A5F
 Z2A67   jsr     Z2B16                   ; 2A67: 20 16 2B 
         jmp     Z2A83                   ; 2A6A: 4C 83 2A 
 ; -----------------------
-Subroutine_2A6D
+Not_Triggered_2A6D
         jsr     Z2C5F                   ; 2A6D: 20 5F 2C 
         beq     Z2A75                   ; 2A70: F0 03    
         jmp     Z2C78                   ; 2A72: 4C 78 2C 
@@ -1750,7 +1777,7 @@ Z2AA2   lda     ZP_HW_IRQ_Count3        ; 2AA2: A5 4C
 Z2AB7   sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AB7: 91 00    
         jmp     Z2C92                   ; 2AB9: 4C 92 2C 
 ; -----------------------
-Subroutine_2ABC
+Not_Triggered_2ABC
         jsr     Z2C5F                   ; 2ABC: 20 5F 2C 
         bpl     Z2AC4                   ; 2ABF: 10 03    
         jmp     Z2C78                   ; 2AC1: 4C 78 2C 
@@ -1773,7 +1800,7 @@ Z2ADF   ldy     #$03                    ; 2ADF: A0 03
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2AE1: B1 00    
         iny                             ; 2AE3: C8       
         sec                             ; 2AE4: 38       
-        sbc     Jetman_At_Rest???       ; 2AE5: ED 83 03 
+        sbc     Jetman_Y                ; 2AE5: ED 83 03 
         bmi     Z2B08                   ; 2AE8: 30 1E    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2AEA: B1 00    
         sec                             ; 2AEC: 38       
@@ -1828,7 +1855,7 @@ Z2B42   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2B42: B1 00
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2B48: 91 00    
         rts                             ; 2B4A: 60       
 ; ===========================================================
-Z2B4B   lda     Object_0380             ; 2B4B: AD 80 03 
+Z2B4B   lda     Jetman_Looks            ; 2B4B: AD 80 03 
         and     #$3F                    ; 2B4E: 29 3F    
         bne     Z2B53                   ; 2B50: D0 01    
 Z2B52   rts                             ; 2B52: 60       
@@ -1837,7 +1864,7 @@ Z2B53   cmp     #$03                    ; 2B53: C9 03
         bcs     Z2B52                   ; 2B55: B0 FB    
         lda     Object_1                ; 2B57: AD B8 03 
         bne     Z2B52                   ; 2B5A: D0 F6    
-        lda     Other_RAM+178           ; 2B5C: AD B2 03 
+        lda     Object_0_Direct         ; 2B5C: AD B2 03 
         cmp     #$06                    ; 2B5F: C9 06    
         bcs     Z2B52                   ; 2B61: B0 EF    
         lda     ZP_HW_IRQ_Count1        ; 2B63: A5 4A    
@@ -1850,7 +1877,7 @@ Z2B6D   lda     _0400002001041818,x     ; 2B6D: BD 7F 2B
         dex                             ; 2B73: CA       
         bpl     Z2B6D                   ; 2B74: 10 F7    
         jsr     Get_Raster_Line_Band    ; 2B76: 20 DE 2B 
-        sta     Other_RAM+185           ; 2B79: 8D B9 03 
+        sta     Object_1_Horiz          ; 2B79: 8D B9 03 
         jmp     Z22E3                   ; 2B7C: 4C E3 22 
 ; -----------------------
 _0400002001041818
@@ -1859,7 +1886,7 @@ _0400002001041818
 _0E00002000000018
         fcb     $0E,$00,$00,$20,$00,$00 ; 2B87: 0E 00 00 20 00 00 
         fcb     $00,$18                 ; 2B8D: 00 18    
-Z2B8F   lda     Object_0380             ; 2B8F: AD 80 03 
+Z2B8F   lda     Jetman_Looks            ; 2B8F: AD 80 03 
         and     #$3F                    ; 2B92: 29 3F    
         bne     Z2B97                   ; 2B94: D0 01    
 Z2B96   rts                             ; 2B96: 60       
@@ -1877,14 +1904,14 @@ Z2BA8   lda     _0E00002000000018,x     ; 2BA8: BD 87 2B
         dex                             ; 2BAE: CA       
         bpl     Z2BA8                   ; 2BAF: 10 F7    
         jsr     Get_Raster_Line_Band    ; 2BB1: 20 DE 2B 
-        sta     Other_RAM+193           ; 2BB4: 8D C1 03 
+        sta     Object_2_Horiz          ; 2BB4: 8D C1 03 
         lda     ZP_HW_IRQ_Count3        ; 2BB7: A5 4C    
         and     #$0E                    ; 2BB9: 29 0E    
         bit     MASK_08                 ; 2BBB: 2C 17 20 
         beq     Z2BC2                   ; 2BBE: F0 02    
         and     #$08                    ; 2BC0: 29 08    
 Z2BC2   ora     #$20                    ; 2BC2: 09 20    
-        sta     Other_RAM+198           ; 2BC4: 8D C6 03 
+        sta     Object_2_???            ; 2BC4: 8D C6 03 
 Z2BC7   jsr     Save_Obj_List_Ptr       ; 2BC7: 20 E7 28 
         jsr     Read_ZP_Parameters      ; 2BCA: 20 9D 25 
         fcb     $00                     ; 2BCD: 00       
@@ -1984,7 +2011,7 @@ Z2C5F   inc     ZP_HW_IRQ_VAR           ; 2C5F: E6 21
         lda     ZP_Temp_1_Lo            ; 2C67: A5 02    
         rts                             ; 2C69: 60       
 ; ===========================================================
-Subroutine_2C6A
+Stops_All_After_Score_Flash
         jsr     Z2C5F                   ; 2C6A: 20 5F 2C 
         bmi     Z2C78                   ; 2C6D: 30 09    
         jsr     Z30B3                   ; 2C6F: 20 B3 30 
@@ -2002,7 +2029,7 @@ Z2C78   lda     ZP_Level_Current_Plyr   ; 2C78: A5 59
         sta     ZP_Temp_1_Hi            ; 2C87: 85 03    
         jsr     GameOverScoreStuff      ; 2C89: 20 63 30 
 Z2C8C   jsr     Z28F9                   ; 2C8C: 20 F9 28 
-        jmp     Subroutine_261A         ; 2C8F: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2C8F: 4C 1A 26 
 ; -----------------------
 Z2C92   jsr     Z2D58                   ; 2C92: 20 58 2D 
         lda     ZP_Temp_1_Lo            ; 2C95: A5 02    
@@ -2036,7 +2063,7 @@ Z2CB3   sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CB3: 91 00
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CC1: 91 00    
         jsr     Z3646                   ; 2CC3: 20 46 36 
         jsr     Z381F                   ; 2CC6: 20 1F 38 
-        jmp     Subroutine_261A         ; 2CC9: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2CC9: 4C 1A 26 
 ; -----------------------
 Z2CCC   adc     #$B8                    ; 2CCC: 69 B8    
         jmp     Z2CB3                   ; 2CCE: 4C B3 2C 
@@ -2050,7 +2077,7 @@ Z2CD6   lda     ZP_005d                 ; 2CD6: A5 5D
 ; ===========================================================
 _0025_0035_0045_0055
         fdb     $0025,$0035,$0045,$0055 ; 2CDB: 25 00 35 00 45 00 55 00 
-Z2CE3   lda     Object_0380             ; 2CE3: AD 80 03 
+Z2CE3   lda     Jetman_Looks            ; 2CE3: AD 80 03 
         and     #$3F                    ; 2CE6: 29 3F    
         cmp     #$01                    ; 2CE8: C9 01    
         beq     Z2CF1                   ; 2CEA: F0 05    
@@ -2116,7 +2143,7 @@ M2D4C   fcb     $05,$08,$07,$06         ; 2D4C: 05 08 07 06
 M2D50   fcb     $02,$06,$03,$07         ; 2D50: 02 06 03 07 
         fcb     $06,$07,$02,$04         ; 2D54: 06 07 02 04 
 Z2D58   fcb     $A5,$5D,$D0,$0D         ; 2D58: A5 5D D0 0D 
-        lda     Object_0380             ; 2D5C: AD 80 03 
+        lda     Jetman_Looks            ; 2D5C: AD 80 03 
         and     #$3F                    ; 2D5F: 29 3F    
         cmp     #$01                    ; 2D61: C9 01    
         beq     Z2D6E                   ; 2D63: F0 09    
@@ -2140,7 +2167,7 @@ Z2D80   cmp     #$0C                    ; 2D80: C9 0C
         bcs     Z2D9B                   ; 2D82: B0 17    
         iny                             ; 2D84: C8       
         iny                             ; 2D85: C8       
-        lda     Jetman_At_Rest???       ; 2D86: AD 83 03 
+        lda     Jetman_Y                ; 2D86: AD 83 03 
         sec                             ; 2D89: 38       
         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D8A: F1 00    
         bpl     Z2D9C                   ; 2D8C: 10 0E    
@@ -2247,7 +2274,7 @@ Rocket_At_Top
         jsr     Reset_Level_Add_Extra_Life ; 2E44: 20 BA 22 
         lda     #$00                    ; 2E47: A9 00    
         sta     ZP_0026                 ; 2E49: 85 26    
-        jmp     Subroutine_261A         ; 2E4B: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2E4B: 4C 1A 26 
 ; -----------------------
 ; Flames stop a little way before bottom
 Rocket_Goes_Down
@@ -2288,16 +2315,16 @@ Subroutine_2E74
         jsr     Save_Obj_List_Ptr       ; 2E8C: 20 E7 28 
         jsr     Read_ZP_Parameters      ; 2E8F: 20 9D 25 
         fcb     $00                     ; 2E92: 00       
-        fdb     Object_0380             ; 2E93: 80 03    
+        fdb     Jetman_Looks            ; 2E93: 80 03    
         fcb     $FF                     ; 2E95: FF       
         jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2E96: 20 E9 35 
         jsr     Z3601                   ; 2E99: 20 01 36 
         lda     #$00                    ; 2E9C: A9 00    
-        sta     Object_0380             ; 2E9E: 8D 80 03 
+        sta     Jetman_Looks            ; 2E9E: 8D 80 03 
         jsr     Restore_Obj_List_Ptr    ; 2EA1: 20 F0 28 
         inc     ZP_Num_Lives_P1         ; 2EA4: E6 5A    
         jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23 
-        jmp     Subroutine_261A         ; 2EA9: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2EA9: 4C 1A 26 
 ; -----------------------
 Z2EAC   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2EAC: 20 E9 35 
         jsr     If_ZP0_EqualsA_Do_27B3  ; 2EAF: 20 AA 27 
@@ -2336,12 +2363,12 @@ Z2ECA   sta     ZP_001b                 ; 2ECA: 85 1B
         lda     #$01                    ; 2EF3: A9 01    
         sta     ZP_001b                 ; 2EF5: 85 1B    
         jsr     Z2F16                   ; 2EF7: 20 16 2F 
-        jmp     Subroutine_261A         ; 2EFA: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2EFA: 4C 1A 26 
 ; -----------------------
 Z2EFD   lda     #$01                    ; 2EFD: A9 01    
         sta     ZP_001b                 ; 2EFF: 85 1B    
 Z2F01   jsr     Z2F07                   ; 2F01: 20 07 2F 
-        jmp     Subroutine_261A         ; 2F04: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2F04: 4C 1A 26 
 ; -----------------------
 Z2F07   ldy     #$01                    ; 2F07: A0 01    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F09: B1 00    
@@ -2376,42 +2403,42 @@ Z2F31   ldy     #$06                    ; 2F31: A0 06
         adc     (ZP_Obj_List_Ptr_Lo),y  ; 2F3D: 71 00    
         cmp     #$AF                    ; 2F3F: C9 AF    
         bcc     Z2FB2                   ; 2F41: 90 6F    
-        lda     Other_RAM+188           ; 2F43: AD BC 03 
+        lda     Object_1_Diagon         ; 2F43: AD BC 03 
         ora     #$01                    ; 2F46: 09 01    
-        sta     Other_RAM+188           ; 2F48: 8D BC 03 
+        sta     Object_1_Diagon         ; 2F48: 8D BC 03 
         jsr     Z3054                   ; 2F4B: 20 54 30 
-        lda     Other_RAM+180           ; 2F4E: AD B4 03 
+        lda     Object_0_Diagon         ; 2F4E: AD B4 03 
         asl     a                       ; 2F51: 0A       
         asl     a                       ; 2F52: 0A       
         asl     a                       ; 2F53: 0A       
         asl     a                       ; 2F54: 0A       
         sta     Keyboard_Data           ; 2F55: 85 13    
-        lda     Other_RAM+179           ; 2F57: AD B3 03 
+        lda     Object_0_Height         ; 2F57: AD B3 03 
         sec                             ; 2F5A: 38       
         sbc     Keyboard_Data           ; 2F5B: E5 13    
         sta     ZP_0019                 ; 2F5D: 85 19    
         jsr     Z3057                   ; 2F5F: 20 57 30 
-        inc     Other_RAM+180           ; 2F62: EE B4 03 
+        inc     Object_0_Diagon         ; 2F62: EE B4 03 
 Z2F65   lda     #$00                    ; 2F65: A9 00    
         tay                             ; 2F67: A8       
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2F68: 91 00    
         lda     #$02                    ; 2F6A: A9 02    
-        sta     Other_RAM+169           ; 2F6C: 8D A9 03 
+        sta     Object_03A9             ; 2F6C: 8D A9 03 
         lda     #$10                    ; 2F6F: A9 10    
-        sta     Other_RAM+170           ; 2F71: 8D AA 03 
-        jmp     Subroutine_261A         ; 2F74: 4C 1A 26 
+        sta     Object_03AA             ; 2F71: 8D AA 03 
+        jmp     Triggers_Every_Frame    ; 2F74: 4C 1A 26 
 ; -----------------------
 Z2F77   ldy     #$03                    ; 2F77: A0 03    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F79: B1 00    
         cmp     #$A8                    ; 2F7B: C9 A8    
         bcc     Z2FB2                   ; 2F7D: 90 33    
-        inc     Other_RAM+178           ; 2F7F: EE B2 03 
+        inc     Object_0_Direct         ; 2F7F: EE B2 03 
         jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2F82: 20 E9 35 
         jsr     Z2FDA                   ; 2F85: 20 DA 2F 
         jsr     Z305A                   ; 2F88: 20 5A 30 
         jmp     Z2F65                   ; 2F8B: 4C 65 2F 
 ; -----------------------
-Subroutine_2F8E
+Stops_All
         jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2F8E: 20 D7 35 
         ldy     #$04                    ; 2F91: A0 04    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F93: B1 00    
@@ -2443,7 +2470,7 @@ Z2FC3   pha                             ; 2FC3: 48
         jsr     Z378D                   ; 2FCE: 20 8D 37 
         jsr     Z364C                   ; 2FD1: 20 4C 36 
         jsr     Z381F                   ; 2FD4: 20 1F 38 
-        jmp     Subroutine_261A         ; 2FD7: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 2FD7: 4C 1A 26 
 ; -----------------------
 Z2FDA   lda     ZP_Level_Current_Plyr   ; 2FDA: A5 59    
 Z2FDC   lsr     a                       ; 2FDC: 4A       
@@ -2472,14 +2499,14 @@ Z2FEE   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2FEE: 20 D7 35
         fcb     $FF                     ; 2FFF: FF       
         jsr     GameOverScoreStuff      ; 3000: 20 63 30 
         lda     #$01                    ; 3003: A9 01    
-        sta     Other_RAM+169           ; 3005: 8D A9 03 
+        sta     Object_03A9             ; 3005: 8D A9 03 
         lda     #$10                    ; 3008: A9 10    
-        sta     Other_RAM+170           ; 300A: 8D AA 03 
+        sta     Object_03AA             ; 300A: 8D AA 03 
         ldy     #$01                    ; 300D: A0 01    
         lda     Jetman_X                ; 300F: AD 81 03 
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 3012: 91 00    
         ldy     #$03                    ; 3014: A0 03    
-        lda     Jetman_At_Rest???       ; 3016: AD 83 03 
+        lda     Jetman_Y                ; 3016: AD 83 03 
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 3019: 91 00    
         jmp     Z2FBD                   ; 301B: 4C BD 2F 
 ; -----------------------
@@ -2490,11 +2517,11 @@ Z301E   ldy     #$01                    ; 301E: A0 01
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 3026: 91 00    
         iny                             ; 3028: C8       
         iny                             ; 3029: C8       
-        lda     Jetman_At_Rest???       ; 302A: AD 83 03 
+        lda     Jetman_Y                ; 302A: AD 83 03 
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 302D: 91 00    
         dey                             ; 302F: 88       
         dey                             ; 3030: 88       
-        lda     Other_RAM+177           ; 3031: AD B1 03 
+        lda     Object_0_Horiz          ; 3031: AD B1 03 
         sec                             ; 3034: 38       
         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 3035: F1 00    
         bpl     Z303E                   ; 3037: 10 05    
@@ -2507,7 +2534,7 @@ Z303E   cmp     #$06                    ; 303E: C9 06
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 3044: B1 00    
         ora     #$04                    ; 3046: 09 04    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 3048: 91 00    
-        lda     Other_RAM+177           ; 304A: AD B1 03 
+        lda     Object_0_Horiz          ; 304A: AD B1 03 
         ldy     #$01                    ; 304D: A0 01    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 304F: 91 00    
 Z3051   jmp     Z2FBD                   ; 3051: 4C BD 2F 
@@ -2913,7 +2940,7 @@ Flying_4?
         bne     SKIP_Flying_5?          ; 3304: D0 03    
         jsr     Z20E9                   ; 3306: 20 E9 20 
 SKIP_Flying_5?
-        jmp     Subroutine_261A         ; 3309: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 3309: 4C 1A 26 
 ; -----------------------
 Not_sure_330c
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 330C: B1 00    
@@ -2967,7 +2994,7 @@ Flash_Score_Then_Display_Scores
         jsr     P1_Score_To_UDG_RAM     ; 3361: 20 71 24 
         jsr     P2_Score_To_UDG_RAM     ; 3364: 20 81 24 
 JMP_to_Subroutine_261A
-        jmp     Subroutine_261A         ; 3367: 4C 1A 26 
+        jmp     Triggers_Every_Frame    ; 3367: 4C 1A 26 
 ; -----------------------
 Read_Kbd_Jstk
         jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 336A: 20 D7 35 
@@ -3047,7 +3074,7 @@ Read_Joystick
         rts                             ; 33F6: 60       
 ; ===========================================================
 Read_Keyboard_Joystick
-        lda     GAME_OPTIONS            ; 33F7: AD D3 1F 
+        lda     Game_Options            ; 33F7: AD D3 1F 
         bit     MASK_02                 ; 33FA: 2C 15 20  Joystick selected?
         bne     Read_Joystick           ; 33FD: D0 D5    
         lda     #$FF                    ; 33FF: A9 FF    

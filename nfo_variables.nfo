@@ -67,20 +67,35 @@ label    0380 Jetman_Looks      ; Graphic Selector? Bit 7 = directoin 1=left, 0=
 label    0381 Jetman_X          ; Pixel Left=00 Right=B6 or B7
 label    0382 Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
 label    0383 Jetman_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
-label    0383 Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accelerating?
-
-label    0380 Object_0380
-label    0388 Other_RAM_1
-label    0390 Object_0390
-label    03A8 Object_? ;     03A8  ?? ?? ?? ?? ?? ?? ?? ??
+label    0384 Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accelerating?
+label    0385 RAM_0385
+label    0386 RAM_0386
+label    0387 RAM_0387
+label    0388 Lazer_1 ; 00 when not fired, following
+label    0390 Lazer_2 ;  bytes cahnge value as beam fades
+label    0398 Lazer_3
+label    03A0 Lazer_2
+label    03A8 Object_03A8 ;  03A8  ?? ?? ?? ?? ?? ?? ?? ??
+label    03A9 Object_03A9
+label    03AA Object_03AA
 label    03AB Obj_?_03_Height?
 label    03AC Obj_?_03_Diagnl?
-
+label    03AD Other_RAM_03AD
+label    03AE Other_RAM_03AE
 
                        ;            0  1  2  3  4  5  6  7
 label    03B0 Object_0 ;     03B0  09 70 00 AF 01 00 00 1C
+label    03B1 Object_0_Horiz
+label    03B2 Object_0_Direct
+label    03B3 Object_0_Height
+label    03B4 Object_0_Diagon
 label    03B8 Object_1 ;     03B8  04 20 00 3F 00 01 10 18
+label    03B9 Object_1_Horiz
+label    03BC Object_1_Diagon
 label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Explosion->00, 04=Rocket_Part/Fuel, 05=fuzzball, 06=saucer, 07=Ball, 08=Cross, 09+=CRASH, 0E=flashing/werthers, 0B=Rocket_Ascend/Decend?
+label    03C1 Object_2_Horiz
+label    03C4 Object_2_Diagon
+label    03C6 Object_2_???
 label    03C8 Object_3 ;     03C8  05 57 08 9D 00 02 03 00  1=horizontal postion of alien
 label    03D0 Object_4 ;     03D0  05 91 08 7C 00 06 03 00  2=direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
 label    03D8 Object_5 ;     03D8  05 47 08 85 00 02 00 00  3=height
@@ -95,6 +110,6 @@ label    1588 UDG_HI_SCORE_RAW_POSN
 label    19a0 UDG_P2_LIVES_RAW_POSN
 label    1b08 UDG_P2_SCORE_RAW_POSN
 
-label    1fd0 SCORE_HI
-label    1fd3 GAME_OPTIONS
+label    1fd0 Score_Hi
+label    1fd3 Game_Options
 
