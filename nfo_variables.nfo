@@ -7,35 +7,35 @@ label      04 ZP_UDG_RAM_X
 label      05 ZP_UDG_RAM_Y
 label      06 ZP_Temp_2_Lo
 label      07 ZP_Temp_2_Hi
-label      08 ZP_0008
-label      09 ZP_0009
+label      08 ZP_0008 ; 42 Occurrences, used with 0009
+label      09 ZP_0009 ; 11 Occurrences, used with 0008
 label      0A ZP_Temp_3_Lo
 label      0B ZP_Temp_3_Hi
 label      0c ZP_Col_RAM_Ptr_Lo
 label      0d ZP_Col_RAM_Ptr_Hi
 label      0E ZP_Ptr_To_Str_Lo
 label      0F ZP_Ptr_To_Str_Hi
-label      10 ZP_0010
-label      11 ZP_0011
-label      12 ZP_0012
+label      10 ZP_0010 ; Save Obj List Params 1
+label      11 ZP_0011 ; Save Obj List Params 1
+label      12 ZP_0012 ; Save Obj List Params 1
 label      13 Keyboard_Data
 label      14 ZP_0014
 label      15 ZP_0015
 label      16 ZP_0016
 label      17 ZP_0017
-label      18 ZP_0018
-label      19 ZP_0019
-label      1A ZP_001a
-label      1B ZP_001b
+label      18 ZP_0018 ; Save_Obj_List_Params 2
+label      19 ZP_0019 ; Save_Obj_List_Params 2
+label      1A ZP_001a ; Save_Obj_List_Params 2
+label      1B ZP_001b ; Save_Obj_List_Params 2
 label      1C ZP_Player_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 label      1E ZP_001e
 label      1F ZP_001f
 label      20 ZP_HW_IRQ_1_OR_0
 label      21 ZP_HW_IRQ_VAR
-label      22 ZP_0022
-label      23 ZP_0023
-label      24 ZP_0024
-label      25 ZP_0025
+label      22 ZP_Save_Obj_List_Ptr_Lo
+label      23 ZP_Save_Obj_List_Ptr_Hi
+label      24 ZP_Save_Obj_List_Ptr_Lo2
+label      25 ZP_Save_Obj_List_Ptr_Hi2
 label      26 ZP_0026
 label      27 ZP_0027
 label      0028-0039 ZP_Player_Object_Stash
@@ -96,11 +96,11 @@ label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Ex
 label    03C1 Object_2_Horiz
 label    03C4 Object_2_Diagon
 label    03C6 Object_2_???
-label    03C8 Object_3 ;     03C8  05 57 08 9D 00 02 03 00  1=horizontal postion of alien
-label    03D0 Object_4 ;     03D0  05 91 08 7C 00 06 03 00  2=direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
-label    03D8 Object_5 ;     03D8  05 47 08 85 00 02 00 00  3=height
-label    03E0 Object_6 ;     03E0  05 8B 08 81 00 02 03 00  4=diagonal, jiggles around a lot for a saucer
-label    03E8 Object_7 ;     03E8  05 A6 08 7D 00 02 03 00  5=colour - bottom 3 bits?
+label    03C8 Object_3 ;     03C8  05 57 08 9D 00 02 03 00  0=horizontal postion of alien
+label    03D0 Object_4 ;     03D0  05 91 08 7C 00 06 03 00  1=direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
+label    03D8 Object_5 ;     03D8  05 47 08 85 00 02 00 00  2=height
+label    03E0 Object_6 ;     03E0  05 8B 08 81 00 02 03 00  3=diagonal, jiggles around a lot for a saucer
+label    03E8 Object_7 ;     03E8  05 A6 08 7D 00 02 03 00  4=colour - bottom 3 bits?
 label    03F0 Object_8 ;     03F0  05 19 F8 8D 00 06 00 00
 
 ; Other variables that are somewhat persistent i.e. not reset at game restart

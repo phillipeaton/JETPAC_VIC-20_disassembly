@@ -44,10 +44,10 @@ ZP_001e                 equ     $001E
 ZP_001f                 equ     $001F
 ZP_HW_IRQ_1_OR_0        equ     $0020
 ZP_HW_IRQ_VAR           equ     $0021
-ZP_0022                 equ     $0022
-ZP_0023                 equ     $0023
-ZP_0024                 equ     $0024
-ZP_0025                 equ     $0025
+ZP_Save_Obj_List_Ptr_Lo equ     $0022
+ZP_Save_Obj_List_Ptr_Hi equ     $0023
+ZP_Save_Obj_List_Ptr_Lo2 equ    $0024
+ZP_Save_Obj_List_Ptr_Hi2 equ    $0025
 ZP_0026                 equ     $0026
 ZP_0027                 equ     $0027
 ZP_Player_Object_Stash  equ     $0028
@@ -640,7 +640,7 @@ Reset_Some_Objects
 Reset_S_O_1
         txa                             ; 231A: 8A       
         pha                             ; 231B: 48       
-        jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 231C: 20 E9 35 
+        jsr     Save_Obj_List_Params2   ; 231C: 20 E9 35 
         jsr     Z2FDA                   ; 231F: 20 DA 2F 
         jsr     Z305A                   ; 2322: 20 5A 30 
         lda     ZP_Obj_List_Ptr_Lo      ; 2325: A5 00    
@@ -1111,11 +1111,11 @@ SKIP_2630
         sta     ZP_Obj_List_Ptr_Lo      ; 2635: 85 00    
 
         lda     ZP_HW_IRQ_1_OR_0        ; 2637: A5 20     H/W interrupt happened????
-        bne     IRQ_Stash_Obj_Ptr_Load_Obj_0380 ; 2639: D0 2E     If yes, jump
+        bne     SEI_Load_Jetman_Data_To_Obj_Ptr ; 2639: D0 2E     If yes, jump
 
 Z263B   lda     ZP_Obj_List_Ptr_Lo      ; 263B: A5 00     Is Object address $B0? i.e. Object_0
         cmp     #$B0                    ; 263D: C9 B0    
-        beq     Copy_ZP22_23_To_Obj_Ptr_And_CLI ; 263F: F0 3F    
+        beq     Restore_Obj_Ptr_CLI     ; 263F: F0 3F    
         and     ZP_Obj_List_Ptr_Lo      ; 2641: 25 00    
         bne     Main_Loop               ; 2643: D0 C2    
         lda     ZP_HW_IRQ_VAR           ; 2645: A5 21    
@@ -1139,24 +1139,24 @@ Set_Jetman_Movement_Speed
         sta     VIA2_T1_Cnt_Hi          ; 2665: 8D 25 91 
         rts                             ; 2668: 60       
 ; ===========================================================
-IRQ_Stash_Obj_Ptr_Load_Obj_0380
+SEI_Load_Jetman_Data_To_Obj_Ptr
         sei                             ; 2669: 78        Set Disable Interrupts flag
         lda     #$00                    ; 266A: A9 00    
         sta     ZP_HW_IRQ_1_OR_0        ; 266C: 85 20    
         lda     ZP_Obj_List_Ptr_Lo      ; 266E: A5 00    
-        sta     ZP_0022                 ; 2670: 85 22    
+        sta     ZP_Save_Obj_List_Ptr_Lo ; 2670: 85 22    
         lda     ZP_Obj_List_Ptr_Hi      ; 2672: A5 01    
-        sta     ZP_0023                 ; 2674: 85 23     YOU ARE HERE !!!!!!!!!!
+        sta     ZP_Save_Obj_List_Ptr_Hi ; 2674: 85 23    
         jsr     Read_ZP_Parameters      ; 2676: 20 9D 25 
         fcb     $00                     ; 2679: 00        ZP Offset for 1st address
         fdb     Jetman_Looks            ; 267A: 80 03     1st Address
         fcb     $FF                     ; 267C: FF       
         jmp     Main_Loop               ; 267D: 4C 07 26 
 ; -----------------------
-Copy_ZP22_23_To_Obj_Ptr_And_CLI
-        lda     ZP_0022                 ; 2680: A5 22    
+Restore_Obj_Ptr_CLI
+        lda     ZP_Save_Obj_List_Ptr_Lo ; 2680: A5 22    
         sta     ZP_Obj_List_Ptr_Lo      ; 2682: 85 00    
-        lda     ZP_0023                 ; 2684: A5 23    
+        lda     ZP_Save_Obj_List_Ptr_Hi ; 2684: A5 23    
         sta     ZP_Obj_List_Ptr_Hi      ; 2686: 85 01    
         cli                             ; 2688: 58        Clear Disable Interrupts flag
         jmp     Z263B                   ; 2689: 4C 3B 26 
@@ -1443,7 +1443,7 @@ Ptr_Final_Char_Lo
 Ptr_Final_Char_Hi
         fcb     $3F                     ; 283D: 3F       
 Fire_Pressed
-        jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 283E: 20 D7 35 
+        jsr     Save_Obj_List_Params    ; 283E: 20 D7 35 
         jsr     Z30B3                   ; 2841: 20 B3 30 
         lda     ZP_Temp_1_Lo            ; 2844: A5 02    
         bmi     Z2851                   ; 2846: 30 09    
@@ -1452,7 +1452,7 @@ Fire_Pressed
         clc                             ; 284C: 18       
         adc     #$02                    ; 284D: 69 02    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 284F: 91 00    
-Z2851   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2851: 20 E9 35 
+Z2851   jsr     Save_Obj_List_Params2   ; 2851: 20 E9 35 
         jsr     Z2D58                   ; 2854: 20 58 2D 
         bpl     Z2874                   ; 2857: 10 1B    
         lda     #$00                    ; 2859: A9 00    
@@ -1538,15 +1538,15 @@ Z28E0   sta     Object_3,x              ; 28E0: 9D C8 03
 ; ===========================================================
 Save_Obj_List_Ptr
         lda     ZP_Obj_List_Ptr_Lo      ; 28E7: A5 00    
-        sta     ZP_0024                 ; 28E9: 85 24    
+        sta     ZP_Save_Obj_List_Ptr_Lo2 ; 28E9: 85 24    
         lda     ZP_Obj_List_Ptr_Hi      ; 28EB: A5 01    
-        sta     ZP_0025                 ; 28ED: 85 25    
+        sta     ZP_Save_Obj_List_Ptr_Hi2 ; 28ED: 85 25    
         rts                             ; 28EF: 60       
 ; ===========================================================
 Restore_Obj_List_Ptr
-        lda     ZP_0024                 ; 28F0: A5 24    
+        lda     ZP_Save_Obj_List_Ptr_Lo2 ; 28F0: A5 24    
         sta     ZP_Obj_List_Ptr_Lo      ; 28F2: 85 00    
-        lda     ZP_0025                 ; 28F4: A5 25    
+        lda     ZP_Save_Obj_List_Ptr_Hi2 ; 28F4: A5 25    
         sta     ZP_Obj_List_Ptr_Hi      ; 28F6: 85 01    
         rts                             ; 28F8: 60       
 ; ===========================================================
@@ -1582,7 +1582,7 @@ Z2927   ldy     #$05                    ; 2927: A0 05
 ; ===========================================================
 Explosions_Plyr_Life_Lost?
         inc     ZP_HW_IRQ_VAR           ; 2934: E6 21    
-        jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2936: 20 E9 35 
+        jsr     Save_Obj_List_Params2   ; 2936: 20 E9 35 
         ldy     #$02                    ; 2939: A0 02    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 293B: B1 00    
         and     ZP_HW_IRQ_Count1        ; 293D: 25 4A    
@@ -1917,7 +1917,7 @@ Z2BC7   jsr     Save_Obj_List_Ptr       ; 2BC7: 20 E7 28
         fcb     $00                     ; 2BCD: 00       
         fdb     $03C0                   ; 2BCE: C0 03    
         fcb     $FF                     ; 2BD0: FF       
-        jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2BD1: 20 E9 35 
+        jsr     Save_Obj_List_Params2   ; 2BD1: 20 E9 35 
         ldy     #$06                    ; 2BD4: A0 06    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2BD6: B1 00    
         jsr     Z305A                   ; 2BD8: 20 5A 30 
@@ -2006,7 +2006,7 @@ Z2C53   lda     ZP_0008                 ; 2C53: A5 08
         rts                             ; 2C5E: 60       
 ; ===========================================================
 Z2C5F   inc     ZP_HW_IRQ_VAR           ; 2C5F: E6 21    
-        jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2C61: 20 D7 35 
+        jsr     Save_Obj_List_Params    ; 2C61: 20 D7 35 
         jsr     Z2BF8                   ; 2C64: 20 F8 2B 
         lda     ZP_Temp_1_Lo            ; 2C67: A5 02    
         rts                             ; 2C69: 60       
@@ -2203,10 +2203,10 @@ Z2DC5   jsr     Z2BC7                   ; 2DC5: 20 C7 2B
         jmp     Z2DB5                   ; 2DC8: 4C B5 2D 
 ; -----------------------
 Z2DCB   jsr     LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00 ; 2DCB: 20 DD 2D 
-        jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2DCE: 20 E9 35 
+        jsr     Save_Obj_List_Params2   ; 2DCE: 20 E9 35 
 Z2DD1   jsr     Z2DE8                   ; 2DD1: 20 E8 2D 
         jsr     Z3604                   ; 2DD4: 20 04 36 
-        jsr     Z2DFF                   ; 2DD7: 20 FF 2D 
+        jsr     Dec_Saved_Obj_List_Params_by_10 ; 2DD7: 20 FF 2D 
         bne     Z2DD1                   ; 2DDA: D0 F5    
         rts                             ; 2DDC: 60       
 ; ===========================================================
@@ -2231,7 +2231,8 @@ Z2DE8   lda     ZP_Level_Current_Plyr   ; 2DE8: A5 59
         jsr     Get_Ship_UDG_Addr       ; 2DF9: 20 E5 2F 
         jmp     Z378D                   ; 2DFC: 4C 8D 37 
 ; -----------------------
-Z2DFF   lda     ZP_0019                 ; 2DFF: A5 19    
+Dec_Saved_Obj_List_Params_by_10
+        lda     ZP_0019                 ; 2DFF: A5 19    
         sec                             ; 2E01: 38       
         sbc     #$10                    ; 2E02: E9 10    
         sta     ZP_0019                 ; 2E04: 85 19    
@@ -2248,7 +2249,7 @@ Z2DFF   lda     ZP_0019                 ; 2DFF: A5 19
 ; ===========================================================
 ; Aliens keep moving also
 Rocket_Goes_Up
-        jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2E17: 20 D7 35 
+        jsr     Save_Obj_List_Params    ; 2E17: 20 D7 35 
         ldy     #$03                    ; 2E1A: A0 03     Object height offset
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E1C: B1 00     Load object height i.e. Rocket
         cmp     #$30                    ; 2E1E: C9 30     Object hit top yet
@@ -2278,7 +2279,7 @@ Rocket_At_Top
 ; -----------------------
 ; Flames stop a little way before bottom
 Rocket_Goes_Down
-        jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2E4E: 20 D7 35 
+        jsr     Save_Obj_List_Params    ; 2E4E: 20 D7 35 
         lda     #$04                    ; 2E51: A9 04    
         sta     Obj_?_03_Height?        ; 2E53: 8D AB 03 
         lda     #$02                    ; 2E56: A9 02    
@@ -2301,7 +2302,7 @@ Rocket_Goes_Down
         jmp     Z2EAC                   ; 2E71: 4C AC 2E 
 ; -----------------------
 Subroutine_2E74
-        jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2E74: 20 D7 35 
+        jsr     Save_Obj_List_Params    ; 2E74: 20 D7 35 
         jsr     Z2D58                   ; 2E77: 20 58 2D 
         lda     ZP_Temp_1_Lo            ; 2E7A: A5 02    
         bpl     Z2EAC                   ; 2E7C: 10 2E    
@@ -2317,7 +2318,7 @@ Subroutine_2E74
         fcb     $00                     ; 2E92: 00       
         fdb     Jetman_Looks            ; 2E93: 80 03    
         fcb     $FF                     ; 2E95: FF       
-        jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2E96: 20 E9 35 
+        jsr     Save_Obj_List_Params2   ; 2E96: 20 E9 35 
         jsr     Z3601                   ; 2E99: 20 01 36 
         lda     #$00                    ; 2E9C: A9 00    
         sta     Jetman_Looks            ; 2E9E: 8D 80 03 
@@ -2326,12 +2327,12 @@ Subroutine_2E74
         jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23 
         jmp     Triggers_Every_Frame    ; 2EA9: 4C 1A 26 
 ; -----------------------
-Z2EAC   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2EAC: 20 E9 35 
+Z2EAC   jsr     Save_Obj_List_Params2   ; 2EAC: 20 E9 35 
         jsr     If_ZP0_EqualsA_Do_27B3  ; 2EAF: 20 AA 27 
         jsr     LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00 ; 2EB2: 20 DD 2D 
 Z2EB5   jsr     Z2DE8                   ; 2EB5: 20 E8 2D 
         jsr     Z364C                   ; 2EB8: 20 4C 36 
-        jsr     Z2DFF                   ; 2EBB: 20 FF 2D 
+        jsr     Dec_Saved_Obj_List_Params_by_10 ; 2EBB: 20 FF 2D 
         bne     Z2EB5                   ; 2EBE: D0 F5    
         lda     ZP_HW_IRQ_Count1        ; 2EC0: A5 4A    
         lsr     a                       ; 2EC2: 4A       
@@ -2433,13 +2434,13 @@ Z2F77   ldy     #$03                    ; 2F77: A0 03
         cmp     #$A8                    ; 2F7B: C9 A8    
         bcc     Z2FB2                   ; 2F7D: 90 33    
         inc     Object_0_Direct         ; 2F7F: EE B2 03 
-        jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2F82: 20 E9 35 
+        jsr     Save_Obj_List_Params2   ; 2F82: 20 E9 35 
         jsr     Z2FDA                   ; 2F85: 20 DA 2F 
         jsr     Z305A                   ; 2F88: 20 5A 30 
         jmp     Z2F65                   ; 2F8B: 4C 65 2F 
 ; -----------------------
 Stops_All
-        jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2F8E: 20 D7 35 
+        jsr     Save_Obj_List_Params    ; 2F8E: 20 D7 35 
         ldy     #$04                    ; 2F91: A0 04    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F93: B1 00    
         bit     MASK_04                 ; 2F95: 2C 16 20 
@@ -2460,7 +2461,7 @@ Z2FB2   ldy     #$03                    ; 2FB2: A0 03
         adc     #$02                    ; 2FB7: 69 02    
         ora     #$01                    ; 2FB9: 09 01    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2FBB: 91 00    
-Z2FBD   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 2FBD: 20 E9 35 
+Z2FBD   jsr     Save_Obj_List_Params2   ; 2FBD: 20 E9 35 
         jsr     Z2FDA                   ; 2FC0: 20 DA 2F 
 Z2FC3   pha                             ; 2FC3: 48       
         jsr     Get_Ship_UDG_Addr       ; 2FC4: 20 E5 2F 
@@ -2488,7 +2489,7 @@ Get_Ship_UDG_Addr
         lda     UDG_Sprite_Lookup_Hi,x  ; 2FEA: BD 88 3C 
         rts                             ; 2FED: 60       
 ; ===========================================================
-Z2FEE   jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 2FEE: 20 D7 35 
+Z2FEE   jsr     Save_Obj_List_Params    ; 2FEE: 20 D7 35 
         ldy     #$04                    ; 2FF1: A0 04    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2FF3: B1 00    
         ora     #$02                    ; 2FF5: 09 02    
@@ -2539,7 +2540,7 @@ Z303E   cmp     #$06                    ; 303E: C9 06
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 304F: 91 00    
 Z3051   jmp     Z2FBD                   ; 3051: 4C BD 2F 
 ; -----------------------
-Z3054   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 3054: 20 E9 35 
+Z3054   jsr     Save_Obj_List_Params2   ; 3054: 20 E9 35 
 Z3057   jsr     Z2FDA                   ; 3057: 20 DA 2F 
 Z305A   jsr     Get_Ship_UDG_Addr       ; 305A: 20 E5 2F 
         jsr     Z373D                   ; 305D: 20 3D 37 
@@ -2854,7 +2855,7 @@ TXA_    txa                             ; 326F: 8A
         jmp     Z32A6                   ; 3270: 4C A6 32 
 ; -----------------------
 Read_Kbd_Jsk_And_Store
-        jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 3273: 20 D7 35 
+        jsr     Save_Obj_List_Params    ; 3273: 20 D7 35 
         jsr     Read_Keyboard_Joystick  ; 3276: 20 F7 33 
         sta     ZP_Player_Movement      ; 3279: 85 1C    
         jsr     Z30B3                   ; 327B: 20 B3 30 
@@ -2997,7 +2998,7 @@ JMP_to_Subroutine_261A
         jmp     Triggers_Every_Frame    ; 3367: 4C 1A 26 
 ; -----------------------
 Read_Kbd_Jstk
-        jsr     COPY_ZP00TO12_ZP01TO10_ZP03TO11 ; 336A: 20 D7 35 
+        jsr     Save_Obj_List_Params    ; 336A: 20 D7 35 
         jsr     Read_Keyboard_Joystick  ; 336D: 20 F7 33 
         jsr     Z30B3                   ; 3370: 20 B3 30 
         lda     ZP_Temp_1_Lo            ; 3373: A5 02    
@@ -3450,7 +3451,7 @@ CCTUR_INV
         bpl     CCTUR_INV               ; 35D2: 10 F7     All lines copied? If no, loop back.
         jmp     CCTUR_NEXT              ; 35D4: 4C BD 35  If yes, routine ends
 ; -----------------------
-COPY_ZP00TO12_ZP01TO10_ZP03TO11
+Save_Obj_List_Params
         ldy     #$00                    ; 35D7: A0 00    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35D9: B1 00    
         sta     ZP_0012                 ; 35DB: 85 12    
@@ -3463,7 +3464,7 @@ COPY_ZP00TO12_ZP01TO10_ZP03TO11
         sta     ZP_0011                 ; 35E6: 85 11    
         rts                             ; 35E8: 60       
 ; ===========================================================
-COPY_ZP0TO1A_1TO18_3TO19_5TO1B
+Save_Obj_List_Params2
         ldy     #$00                    ; 35E9: A0 00    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35EB: B1 00    
         sta     ZP_001a                 ; 35ED: 85 1A    
@@ -3650,7 +3651,7 @@ Z3729   lda     #$00                    ; 3729: A9 00
 ; ===========================================================
 Z3734   jmp     Z36E7                   ; 3734: 4C E7 36 
 ; -----------------------
-Z3737   jsr     COPY_ZP0TO1A_1TO18_3TO19_5TO1B ; 3737: 20 E9 35 
+Z3737   jsr     Save_Obj_List_Params2   ; 3737: 20 E9 35 
         jsr     Z3815                   ; 373A: 20 15 38 
 Z373D   sty     ZP_Ptr_To_Str_Lo        ; 373D: 84 0E    
         tay                             ; 373F: A8       

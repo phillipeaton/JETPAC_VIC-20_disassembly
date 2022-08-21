@@ -475,15 +475,14 @@ label    2655 SKIP_2655
 ;        265E
 comment  265E Setup Timer 1
 label    265E Set_Jetman_Movement_Speed
-label    2669 IRQ_Stash_Obj_Ptr_Load_Obj_0380
+label    2669 SEI_Load_Jetman_Data_To_Obj_Ptr
 lcomment 2669 Set Disable Interrupts flag
 ;        2679
-lcomment 2674 YOU ARE HERE !!!!!!!!!!
 const    2679
 lcomment 2679 ZP Offset for 1st address
 lcomment 267A 1st Address
 word     267A
-label    2680 Copy_ZP22_23_To_Obj_Ptr_And_CLI
+label    2680 Restore_Obj_Ptr_CLI
 lcomment 2688 Clear Disable Interrupts flag
 ;        268C
 label    268C Subroutine_List
@@ -669,6 +668,7 @@ const    2D59
 word     2DBC
 ;        2DDD
 label    2DDD LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
+label    2DFF Dec_Saved_Obj_List_Params_by_10
 comment  2E17 Aliens keep moving also
 label    2E17 Rocket_Goes_Up
 lcomment 2E1A Object height offset
@@ -1012,11 +1012,11 @@ lcomment 35D1 Decrement number of lines counter
 lcomment 35D2 All lines copied? If no, loop back.
 lcomment 35D4 If yes, routine ends
 ;        35D7
-label    35D7 COPY_ZP00TO12_ZP01TO10_ZP03TO11
+label    35D7 Save_Obj_List_Params
 ;        35E2
 comment  35E2
 ;        35E9
-label    35E9 COPY_ZP0TO1A_1TO18_3TO19_5TO1B
+label    35E9 Save_Obj_List_Params2
 comment  35F4
 comment  35FA
 ;        End
