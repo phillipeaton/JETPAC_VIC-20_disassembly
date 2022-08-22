@@ -232,6 +232,11 @@ label    2353 BTCTOR_1
 break    2357
 lcomment 2353 Initial position etc of Jetman?
 label    235D BACK_235D
+lcomment 2366 More time between players when 2 player game
+lcomment 2369 One player game?
+lcomment 236B Yes, jump
+lcomment 236D Set countdown for 2 player game
+lcomment 236F Store countdown
 label    236F LDA_7F_Return
 ;        2373
 label    2373 P1_LIVES_TO_UDG_RAM
@@ -617,7 +622,7 @@ lcomment 2A02 ...load F8 and 00
 word     2A02
 ;        2A05
 comment  2A05
-comment  2A05 Delay loop $100^2 x $08 x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
+comment  2A05 Delay loop $100^2 x ($100-$f8=$08) x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
 label    2A05 Delay_Loop_Game_Over
 lcomment 2A05 5 cycles
 lcomment 2A07 3 cycles when taken, 2 when not taken
@@ -662,6 +667,10 @@ label    2C6A Stops_All_After_Score_Flash
 const    2CDB-2CE2
 label    2CDB _0025_0035_0045_0055
 word     2CDB-2CE2
+label    2CE3 Jetman_Looks???
+label    2CF1 Jetman_Looks_1???
+label    2D0F Jetman_Looks_1_1???
+label    2CFF BACK_2CFF
 break    2D54
 const    2D59
 ;        2DBC
@@ -926,10 +935,10 @@ break    3578
 lcomment 3578 End of Parameters
 ;        3579
 comment  3579
-label    3579 ERASE_COLOR_RAM_9600
-label    357B ERASECR1
+label    3579 ERASE_RAM
+label    357B ERASE_RAM_1
 lcomment 357B
-lcomment 357B Fills memory from 9600-96FC (address at zero page $05) with $01's
+lcomment 357B Fills memory from e.g. 9600-96FC (address at zero page $05) with $01's
 lcomment 357B This is color RAM for 3.5k but unused for 8k+!?
 lcomment 357B ALSO CONTIUNES TO BLANK THE SCREEN, COMPLETING BOTTOM HALF
 lcomment 357B FILLS SCREEN WITH A RUG

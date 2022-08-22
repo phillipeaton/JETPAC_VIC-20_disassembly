@@ -56,13 +56,12 @@ label      59 ZP_Level_Current_Plyr
 label      5a ZP_Num_Lives_P1
 label      5b ZP_Level_Other_Plyr
 label      5c ZP_Num_Lives_P2
-label      5d ZP_005d
+label      5d ZP_Flash_Score_Countdown ; 7f for 1 player, ff for 2 player
 label      5e ZP_P1_Or_P2
 label      5f ZP_Subroutine_Vec_Lo
 label      60 ZP_Subroutine_Vec_Hi
-label      80 ZP_0080
-label      f8 ZP_00f8
-label      fc ZP_00fc
+
+; Non-Page Variables
 label    0380 Jetman_Looks      ; Graphic Selector? Bit 7 = directoin 1=left, 0=right; bit 0&1 01 = flying, 10 = standing
 label    0381 Jetman_X          ; Pixel Left=00 Right=B6 or B7
 label    0382 Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
@@ -111,5 +110,5 @@ label    19a0 UDG_P2_LIVES_RAW_POSN
 label    1b08 UDG_P2_SCORE_RAW_POSN
 
 label    1fd0 Score_Hi
-label    1fd3 Game_Options
+label    1fd3 Game_Options ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
 

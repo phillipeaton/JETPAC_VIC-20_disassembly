@@ -65,11 +65,10 @@ ZP_Level_Current_Plyr   equ     $0059
 ZP_Num_Lives_P1         equ     $005A
 ZP_Level_Other_Plyr     equ     $005B
 ZP_Num_Lives_P2         equ     $005C
-ZP_005d                 equ     $005D
+ZP_Flash_Score_Countdown equ    $005D
 ZP_P1_Or_P2             equ     $005E
 ZP_Subroutine_Vec_Lo    equ     $005F
 ZP_Subroutine_Vec_Hi    equ     $0060
-ZP_00fc                 equ     $00FC
 Stack                   equ     $0100
 Screen_RAM              equ     $0200
 Other_RAM               equ     $0300
@@ -672,12 +671,12 @@ BACK_235D
         sta     Jetman_Looks,x          ; 2360: 9D 80 03 
         dex                             ; 2363: CA       
         bpl     BACK_235D               ; 2364: 10 F7    
-        lda     Game_Options            ; 2366: AD D3 1F 
-        and     #$01                    ; 2369: 29 01    
-        beq     LDA_7F                  ; 236B: F0 62    
-        lda     #$FF                    ; 236D: A9 FF    
+        lda     Game_Options            ; 2366: AD D3 1F  More time between players when 2 player game
+        and     #$01                    ; 2369: 29 01     One player game?
+        beq     LDA_7F                  ; 236B: F0 62     Yes, jump
+        lda     #$FF                    ; 236D: A9 FF     Set countdown for 2 player game
 LDA_7F_Return
-        sta     ZP_005d                 ; 236F: 85 5D    
+        sta     ZP_Flash_Score_Countdown ; 236F: 85 5D     Store countdown
         dec     ZP_Num_Lives_P1         ; 2371: C6 5A    
 P1_LIVES_TO_UDG_RAM
         jsr     Read_ZP_Parameters      ; 2373: 20 9D 25 
@@ -1687,7 +1686,7 @@ Display_String_
         fdb     $00F8                   ; 2A02: F8 00     ..load F8 and 00
         fcb     $FF                     ; 2A04: FF       
 
-; Delay loop $100^2 x $08 x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
+; Delay loop $100^2 x ($100-$f8=$08) x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
 Delay_Loop_Game_Over
         inc     ZP_Temp_1_Lo            ; 2A05: E6 02     5 cycles
         bne     Delay_Loop_Game_Over    ; 2A07: D0 FC     3 cycles when taken, 2 when not taken
@@ -2071,38 +2070,42 @@ Z2CCC   adc     #$B8                    ; 2CCC: 69 B8
 Z2CD1   adc     #$48                    ; 2CD1: 69 48    
         jmp     Z2CB3                   ; 2CD3: 4C B3 2C 
 ; -----------------------
-Z2CD6   lda     ZP_005d                 ; 2CD6: A5 5D    
-        beq     Z2CE3                   ; 2CD8: F0 09    
+Z2CD6   lda     ZP_Flash_Score_Countdown ; 2CD6: A5 5D    
+        beq     Jetman_Looks???         ; 2CD8: F0 09    
         rts                             ; 2CDA: 60       
 ; ===========================================================
 _0025_0035_0045_0055
         fdb     $0025,$0035,$0045,$0055 ; 2CDB: 25 00 35 00 45 00 55 00 
-Z2CE3   lda     Jetman_Looks            ; 2CE3: AD 80 03 
+Jetman_Looks???
+        lda     Jetman_Looks            ; 2CE3: AD 80 03 
         and     #$3F                    ; 2CE6: 29 3F    
         cmp     #$01                    ; 2CE8: C9 01    
-        beq     Z2CF1                   ; 2CEA: F0 05    
+        beq     Jetman_Looks_1???       ; 2CEA: F0 05    
         cmp     #$02                    ; 2CEC: C9 02    
-        beq     Z2CF1                   ; 2CEE: F0 01    
+        beq     Jetman_Looks_1???       ; 2CEE: F0 01    
         rts                             ; 2CF0: 60       
 ; ===========================================================
-Z2CF1   lda     #$C8                    ; 2CF1: A9 C8    
+Jetman_Looks_1???
+        lda     #$C8                    ; 2CF1: A9 C8    
         sta     ZP_Obj_List_Ptr_Lo      ; 2CF3: 85 00    
         lda     #$03                    ; 2CF5: A9 03    
         sta     ZP_Obj_List_Ptr_Hi      ; 2CF7: 85 01    
         lda     #$06                    ; 2CF9: A9 06    
         sta     ZP_Temp_1_Lo            ; 2CFB: 85 02    
         ldy     #$00                    ; 2CFD: A0 00    
-Z2CFF   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2CFF: B1 00    
-        beq     Z2D0F                   ; 2D01: F0 0C    
+BACK_2CFF
+        lda     (ZP_Obj_List_Ptr_Lo),y  ; 2CFF: B1 00    
+        beq     Jetman_Looks_1_1???     ; 2D01: F0 0C    
         lda     ZP_Obj_List_Ptr_Lo      ; 2D03: A5 00    
         clc                             ; 2D05: 18       
         adc     #$08                    ; 2D06: 69 08    
         sta     ZP_Obj_List_Ptr_Lo      ; 2D08: 85 00    
         dec     ZP_Temp_1_Lo            ; 2D0A: C6 02    
-        bne     Z2CFF                   ; 2D0C: D0 F1    
+        bne     BACK_2CFF               ; 2D0C: D0 F1    
         rts                             ; 2D0E: 60       
 ; ===========================================================
-Z2D0F   lda     ZP_Level_Current_Plyr   ; 2D0F: A5 59    
+Jetman_Looks_1_1???
+        lda     ZP_Level_Current_Plyr   ; 2D0F: A5 59    
         and     #$03                    ; 2D11: 29 03    
         tax                             ; 2D13: AA       
         lda     M2D4C,x                 ; 2D14: BD 4C 2D 
@@ -2984,10 +2987,10 @@ Z3348   adc     #$48                    ; 3348: 69 48
         jmp     Z33AF                   ; 334A: 4C AF 33 
 ; -----------------------
 Flash_Score_Then_Display_Scores
-        lda     ZP_005d                 ; 334D: A5 5D    
+        lda     ZP_Flash_Score_Countdown ; 334D: A5 5D    
         beq     Read_Kbd_Jstk           ; 334F: F0 19    
         jsr     Flash_Score             ; 3351: 20 65 34 
-        dec     ZP_005d                 ; 3354: C6 5D    
+        dec     ZP_Flash_Score_Countdown ; 3354: C6 5D    
         bne     JMP_to_Subroutine_261A  ; 3356: D0 0F    
         jsr     Z3601                   ; 3358: 20 01 36 
         jsr     Z381F                   ; 335B: 20 1F 38 
@@ -3331,13 +3334,13 @@ UDG_RAM_Column_Offsets
 RESET_COLOR_RAM
         jsr     Read_ZP_Parameters      ; 355C: 20 9D 25 
         fcb     $02                     ; 355F: 02        ZP Offset for 1st address
-        fdb     ZP_00fc                 ; 3560: FC 00     1st Address
+        fdb     $00FC                   ; 3560: FC 00     1st Address
         fcb     $04                     ; 3562: 04        ZP Offset for 2nd address
         fdb     Color_RAM               ; 3563: 00 96     2nd address
         fcb     $06                     ; 3565: 06        ZP Offset for 3rd address
         fdb     ZP_Obj_List_Ptr_Hi      ; 3566: 01 00     3rd address
         fcb     $FF                     ; 3568: FF        End of Parameters
-        jmp     ERASE_COLOR_RAM_9600    ; 3569: 4C 79 35 
+        jmp     ERASE_RAM               ; 3569: 4C 79 35 
 ; -----------------------
 ERASE_UDG_RAM_1000_1fff
         jsr     Read_ZP_Parameters      ; 356C: 20 9D 25 
@@ -3349,10 +3352,11 @@ ERASE_UDG_RAM_1000_1fff
         fdb     ZP_Obj_List_Ptr_Lo      ; 3576: 00 00     3rd address
         fcb     $FF                     ; 3578: FF        End of Parameters
 
-ERASE_COLOR_RAM_9600
+ERASE_RAM
         ldy     #$00                    ; 3579: A0 00    
-ERASECR1 lda    ZP_Temp_2_Lo            ; 357B: A5 06    
-                                        ; Fills memory from 9600-96FC (address at zero page $05) with $01's
+ERASE_RAM_1
+        lda     ZP_Temp_2_Lo            ; 357B: A5 06    
+                                        ; Fills memory from e.g. 9600-96FC (address at zero page $05) with $01's
                                         ; This is color RAM for 3.5k but unused for 8k+!?
                                         ; ALSO CONTIUNES TO BLANK THE SCREEN, COMPLETING BOTTOM HALF
                                         ; FILLS SCREEN WITH A RUG
@@ -3382,11 +3386,11 @@ ERASECR1 lda    ZP_Temp_2_Lo            ; 357B: A5 06
 ERASECR2 dec    ZP_Temp_1_Lo            ; 3584: C6 02    
         lda     ZP_Temp_1_Lo            ; 3586: A5 02    
         cmp     #$FF                    ; 3588: C9 FF    
-        bne     ERASECR1                ; 358A: D0 EF    
+        bne     ERASE_RAM_1             ; 358A: D0 EF    
         dec     ZP_Temp_1_Hi            ; 358C: C6 03    
         lda     ZP_Temp_1_Hi            ; 358E: A5 03    
         cmp     #$FF                    ; 3590: C9 FF    
-        bne     ERASECR1                ; 3592: D0 E7    
+        bne     ERASE_RAM_1             ; 3592: D0 E7    
         rts                             ; 3594: 60       
 
 ; ----------------------------------------------------------
