@@ -40,16 +40,16 @@ ZP_0019                 equ     $0019
 ZP_001a                 equ     $001A
 ZP_001b                 equ     $001B
 ZP_Player_Movement      equ     $001C
-ZP_001e                 equ     $001E
-ZP_001f                 equ     $001F
+ZP_Ship_UDG_Addr_Offset equ     $001E
+ZP_Ship_UDG_Addr_Color? equ     $001F
 ZP_HW_IRQ_1_OR_0        equ     $0020
 ZP_HW_IRQ_VAR           equ     $0021
 ZP_Save_Obj_List_Ptr_Lo equ     $0022
 ZP_Save_Obj_List_Ptr_Hi equ     $0023
 ZP_Save_Obj_List_Ptr_Lo2 equ    $0024
 ZP_Save_Obj_List_Ptr_Hi2 equ    $0025
-ZP_0026                 equ     $0026
-ZP_0027                 equ     $0027
+ZP_Rocket_Flame_On      equ     $0026
+ZP_Rocket_Flame_Toggle  equ     $0027
 ZP_Player_Object_Stash  equ     $0028
 ZP_Param_Addr_Lo        equ     $0040
 ZP_Param_Addr_Hi        equ     $0041
@@ -246,7 +246,7 @@ BACK_2080
         lda     #$00                    ; 208A: A9 00    
         sta     Object_03A8             ; 208C: 8D A8 03 
 
-ATTRACT_MODE
+Game_Select
         inc     ZP_Counter              ; 208F: E6 58    
         lda     #$00                    ; 2091: A9 00    
         sta     VIA2_DDR_B              ; 2093: 8D 22 91  Set Port B all bits to input
@@ -293,17 +293,18 @@ SKIP_20D0
         sta     VIA2_Port_A             ; 20D9: 8D 21 91  Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
         lda     VIA2_Port_B             ; 20DC: AD 20 91 
         and     #$10                    ; 20DF: 29 10     Space Pressed?
-        bne     ATTRACT_MODE            ; 20E1: D0 AC     No, read keyboard again
+        bne     Game_Select             ; 20E1: D0 AC     No, read keyboard again
 
         jsr     Reset_Color_Pixels_Scores ; 20E3: 20 16 24 
         jmp     Game_Start              ; 20E6: 4C D1 25 
 ; -----------------------
-Z20E9   lda     ZP_HW_IRQ_Count1        ; 20E9: A5 4A    
+Update_Lazer_Shots
+        lda     ZP_HW_IRQ_Count1        ; 20E9: A5 4A    
         and     #$03                    ; 20EB: 29 03    
-        beq     Update_Lazer_Shots      ; 20ED: F0 01    
+        beq     Update_Lazer_Shots_1    ; 20ED: F0 01    
         rts                             ; 20EF: 60       
 ; ===========================================================
-Update_Lazer_Shots
+Update_Lazer_Shots_1
         jsr     Read_ZP_Parameters      ; 20F0: 20 9D 25 
         fcb     $06                     ; 20F3: 06        ZP_Temp_2_Lo
         fdb     Lazer_1                 ; 20F4: 88 03    
@@ -374,7 +375,7 @@ BACK_2145
         lda     ZP_HW_IRQ_Count3        ; 2156: A5 4C    
         and     #$07                    ; 2158: 29 07    
         tax                             ; 215A: AA       
-        lda     _12346737,x             ; 215B: BD 6B 21 
+        lda     Lazer_Color_Table,x     ; 215B: BD 6B 21 
         sta     (ZP_Temp_2_Lo),y        ; 215E: 91 06    
         lda     #$03                    ; 2160: A9 03    
         sta     Other_RAM_03AD          ; 2162: 8D AD 03 
@@ -382,9 +383,9 @@ BACK_2145
         sta     Other_RAM_03AE          ; 2167: 8D AE 03 
         rts                             ; 216A: 60       
 ; ===========================================================
-_12346737
-        fcb     $01,$02,$03,$04,$06,$07 ; 216B: 01 02 03 04 06 07 
-        fcb     $03,$07                 ; 2171: 03 07    
+Lazer_Color_Table
+        fcb     $01,$02,$03,$04         ; 216B: 01 02 03 04  Green not used, messes up colors if it's used
+        fcb     $06,$07,$03,$07         ; 216F: 06 07 03 07 
 Update_Lazer_Shot_1
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2173: B1 00    
         and     #$07                    ; 2175: 29 07    
@@ -1352,38 +1353,44 @@ CPTHS_1 lda     (ZP_0008),y             ; 27A2: B1 08
         bpl     CPTHS_1                 ; 27A7: 10 F9     Return when all bytes copied
         rts                             ; 27A9: 60       
 ; ===========================================================
-If_ZP0_EqualsA_Do_27B3
+Display_Rocket_Flame?
         ldy     #$00                    ; 27AA: A0 00    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 27AC: B1 00    
-        cmp     #$0A                    ; 27AE: C9 0A    
-        bcs     Z27B3                   ; 27B0: B0 01    
+        cmp     #$0A                    ; 27AE: C9 0A     Object $0A = Flame (or maybe Rocket?)
+        bcs     Display_Rocket_Flame    ; 27B0: B0 01    
         rts                             ; 27B2: 60       
 ; ===========================================================
-Z27B3   inc     ZP_0027                 ; 27B3: E6 27    
+Display_Rocket_Flame
+        inc     ZP_Rocket_Flame_Toggle  ; 27B3: E6 27    
+
         lda     ZP_0011                 ; 27B5: A5 11    
         pha                             ; 27B7: 48       
         clc                             ; 27B8: 18       
         adc     #$15                    ; 27B9: 69 15    
         sta     ZP_0011                 ; 27BB: 85 11    
+
         lda     ZP_0019                 ; 27BD: A5 19    
         pha                             ; 27BF: 48       
         clc                             ; 27C0: 18       
         adc     #$15                    ; 27C1: 69 15    
-        sta     ZP_0019                 ; 27C3: 85 19    
-        cmp     #$AF                    ; 27C5: C9 AF    
-        beq     Z2819                   ; 27C7: F0 50    
-        bcs     Z2812                   ; 27C9: B0 47    
-        lda     ZP_0026                 ; 27CB: A5 26    
-        bne     Z27E1                   ; 27CD: D0 12    
+        sta     ZP_0019                 ; 27C3: 85 19     0019 must be height of rocket
+
+        cmp     #$AF                    ; 27C5: C9 AF     Check rocket height
+        beq     Display_Flame           ; 27C7: F0 50     Display Flame
+        bcs     No_Display_Flame        ; 27C9: B0 47     Don't display Flame
+
+        lda     ZP_Rocket_Flame_On      ; 27CB: A5 26    
+        bne     SKIP_27E1               ; 27CD: D0 12    
         lda     #$01                    ; 27CF: A9 01    
-        sta     ZP_0026                 ; 27D1: 85 26    
-        lda     ZP_0027                 ; 27D3: A5 27    
+        sta     ZP_Rocket_Flame_On      ; 27D1: 85 26    
+        lda     ZP_Rocket_Flame_Toggle  ; 27D3: A5 27    
         sec                             ; 27D5: 38       
         sbc     #$01                    ; 27D6: E9 01    
         jsr     Get_Flame_UDG_Addr      ; 27D8: 20 2E 28 
         jsr     Z378D                   ; 27DB: 20 8D 37 
         jsr     Z3610                   ; 27DE: 20 10 36 
-Z27E1   lda     ZP_0027                 ; 27E1: A5 27    
+SKIP_27E1
+        lda     ZP_Rocket_Flame_Toggle  ; 27E1: A5 27    
         pha                             ; 27E3: 48       
         jsr     Get_Flame_UDG_Addr      ; 27E4: 20 2E 28 
         jsr     Z373D                   ; 27E7: 20 3D 37 
@@ -1409,13 +1416,15 @@ Z280B   pla                             ; 280B: 68
         sta     ZP_0011                 ; 280F: 85 11    
         rts                             ; 2811: 60       
 ; ===========================================================
-Z2812   lda     #$00                    ; 2812: A9 00    
-        sta     ZP_0026                 ; 2814: 85 26    
+No_Display_Flame
+        lda     #$00                    ; 2812: A9 00    
+        sta     ZP_Rocket_Flame_On      ; 2814: 85 26    
         jmp     Z280B                   ; 2816: 4C 0B 28 
 ; -----------------------
-Z2819   lda     ZP_0026                 ; 2819: A5 26    
+Display_Flame
+        lda     ZP_Rocket_Flame_On      ; 2819: A5 26    
         beq     Z280B                   ; 281B: F0 EE    
-        lda     ZP_0027                 ; 281D: A5 27    
+        lda     ZP_Rocket_Flame_Toggle  ; 281D: A5 27    
         sec                             ; 281F: 38       
         sbc     #$01                    ; 2820: E9 01    
         jsr     Get_Flame_UDG_Addr      ; 2822: 20 2E 28 
@@ -1453,7 +1462,7 @@ Fire_Pressed
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 284F: 91 00    
 Z2851   jsr     Save_Obj_List_Params2   ; 2851: 20 E9 35 
         jsr     Z2D58                   ; 2854: 20 58 2D 
-        bpl     Z2874                   ; 2857: 10 1B    
+        bpl     Jump_To_Subroutine_List3 ; 2857: 10 1B    
         lda     #$00                    ; 2859: A9 00    
         jsr     Z2FDC                   ; 285B: 20 DC 2F 
         jsr     Get_Ship_UDG_Addr       ; 285E: 20 E5 2F 
@@ -1466,7 +1475,8 @@ Z2851   jsr     Save_Obj_List_Params2   ; 2851: 20 E9 35
         jsr     GameOverScoreStuff      ; 286E: 20 63 30 
         jmp     Z2F65                   ; 2871: 4C 65 2F 
 ; -----------------------
-Z2874   ldy     #$06                    ; 2874: A0 06    
+Jump_To_Subroutine_List3
+        ldy     #$06                    ; 2874: A0 06    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2876: B1 00    
         and     #$0E                    ; 2878: 29 0E    
         tax                             ; 287A: AA       
@@ -1476,45 +1486,48 @@ Z2874   ldy     #$06                    ; 2874: A0 06
         sta     ZP_0009                 ; 2883: 85 09    
         jmp     (ZP_0008)               ; 2885: 6C 08 00 
 Subroutine_List3
-        fdb     Routine_2892            ; 2888: 92 28    
-        fdb     Routine_28A4            ; 288A: A4 28    
-        fdb     Routine_28A4            ; 288C: A4 28    
-        fdb     Routine_289F            ; 288E: 9F 28    
-        fdb     Routine_28B6            ; 2890: B6 28    
-Routine_2892
+        fdb     Set_Obj_Posn_05_To_07   ; 2888: 92 28    
+        fdb     Set_Obj_Posn_05_To_03_Or_00 ; 288A: A4 28    
+        fdb     Set_Obj_Posn_05_To_03_Or_00 ; 288C: A4 28    
+        fdb     Set_Obj_Posn_05_To_06   ; 288E: 9F 28    
+        fdb     Set_Obj_Posn_05_To_01_Or_Other ; 2890: B6 28    
+Set_Obj_Posn_05_To_07
         lda     #$07                    ; 2892: A9 07    
-Z2894   ldy     #$05                    ; 2894: A0 05    
+SR3_Store_To_Obj_Posn_05_06
+        ldy     #$05                    ; 2894: A0 05    
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2896: 91 00    
         ldy     #$06                    ; 2898: A0 06    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 289A: B1 00    
         jmp     Z2FC3                   ; 289C: 4C C3 2F 
 ; -----------------------
-Routine_289F
+Set_Obj_Posn_05_To_06
         lda     #$06                    ; 289F: A9 06    
-        jmp     Z2894                   ; 28A1: 4C 94 28 
+        jmp     SR3_Store_To_Obj_Posn_05_06 ; 28A1: 4C 94 28 
 ; -----------------------
-Routine_28A4
+Set_Obj_Posn_05_To_03_Or_00
         lda     ZP_HW_IRQ_Count1        ; 28A4: A5 4A    
         and     #$1F                    ; 28A6: 29 1F    
         cmp     #$18                    ; 28A8: C9 18    
-        bcs     Z28B1                   ; 28AA: B0 05    
+        bcs     Set_Obj_Posn_05_To_03   ; 28AA: B0 05    
         lda     #$00                    ; 28AC: A9 00    
-        jmp     Z2894                   ; 28AE: 4C 94 28 
+        jmp     SR3_Store_To_Obj_Posn_05_06 ; 28AE: 4C 94 28 
 ; -----------------------
-Z28B1   lda     #$03                    ; 28B1: A9 03    
-        jmp     Z2894                   ; 28B3: 4C 94 28 
+Set_Obj_Posn_05_To_03
+        lda     #$03                    ; 28B1: A9 03    
+        jmp     SR3_Store_To_Obj_Posn_05_06 ; 28B3: 4C 94 28 
 ; -----------------------
-Routine_28B6
+Set_Obj_Posn_05_To_01_Or_Other
         lda     ZP_HW_IRQ_Count1        ; 28B6: A5 4A    
         lsr     a                       ; 28B8: 4A       
         lsr     a                       ; 28B9: 4A       
         and     #$07                    ; 28BA: 29 07    
-        bne     Z28C0                   ; 28BC: D0 02    
+        bne     SKIP_28C0               ; 28BC: D0 02    
         ora     #$01                    ; 28BE: 09 01    
-Z28C0   cmp     #$05                    ; 28C0: C9 05    
-        bne     Z2894                   ; 28C2: D0 D0    
+SKIP_28C0
+        cmp     #$05                    ; 28C0: C9 05    
+        bne     SR3_Store_To_Obj_Posn_05_06 ; 28C2: D0 D0    
         lda     #$01                    ; 28C4: A9 01    
-        jmp     Z2894                   ; 28C6: 4C 94 28 
+        jmp     SR3_Store_To_Obj_Posn_05_06 ; 28C6: 4C 94 28 
 ; -----------------------
 Reset_Objects_1_To_8
         ldx     #$47                    ; 28C9: A2 47    
@@ -2216,16 +2229,16 @@ Z2DD1   jsr     Z2DE8                   ; 2DD1: 20 E8 2D
 LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
         ldy     #$04                    ; 2DDD: A0 04    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2DDF: B1 00    
-        sta     ZP_001f                 ; 2DE1: 85 1F    
+        sta     ZP_Ship_UDG_Addr_Color? ; 2DE1: 85 1F    
         lda     #$00                    ; 2DE3: A9 00    
-        sta     ZP_001e                 ; 2DE5: 85 1E    
+        sta     ZP_Ship_UDG_Addr_Offset ; 2DE5: 85 1E    
         rts                             ; 2DE7: 60       
 ; ===========================================================
 Z2DE8   lda     ZP_Level_Current_Plyr   ; 2DE8: A5 59    
         lsr     a                       ; 2DEA: 4A       
         lsr     a                       ; 2DEB: 4A       
         and     #$03                    ; 2DEC: 29 03    
-        ora     ZP_001e                 ; 2DEE: 05 1E    
+        ora     ZP_Ship_UDG_Addr_Offset ; 2DEE: 05 1E    
         asl     a                       ; 2DF0: 0A       
         pha                             ; 2DF1: 48       
         jsr     Get_Ship_UDG_Addr       ; 2DF2: 20 E5 2F 
@@ -2243,11 +2256,11 @@ Dec_Saved_Obj_List_Params_by_10
         sec                             ; 2E08: 38       
         sbc     #$10                    ; 2E09: E9 10    
         sta     ZP_0011                 ; 2E0B: 85 11    
-        lda     ZP_001e                 ; 2E0D: A5 1E    
+        lda     ZP_Ship_UDG_Addr_Offset ; 2E0D: A5 1E    
         clc                             ; 2E0F: 18       
         adc     #$04                    ; 2E10: 69 04    
-        sta     ZP_001e                 ; 2E12: 85 1E    
-        dec     ZP_001f                 ; 2E14: C6 1F    
+        sta     ZP_Ship_UDG_Addr_Offset ; 2E12: 85 1E    
+        dec     ZP_Ship_UDG_Addr_Color? ; 2E14: C6 1F    
         rts                             ; 2E16: 60       
 ; ===========================================================
 ; Aliens keep moving also
@@ -2277,7 +2290,7 @@ Rocket_At_Top
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E42: 91 00    
         jsr     Reset_Level_Add_Extra_Life ; 2E44: 20 BA 22 
         lda     #$00                    ; 2E47: A9 00    
-        sta     ZP_0026                 ; 2E49: 85 26    
+        sta     ZP_Rocket_Flame_On      ; 2E49: 85 26    
         jmp     Triggers_Every_Frame    ; 2E4B: 4C 1A 26 
 ; -----------------------
 ; Flames stop a little way before bottom
@@ -2331,7 +2344,7 @@ Subroutine_2E74
         jmp     Triggers_Every_Frame    ; 2EA9: 4C 1A 26 
 ; -----------------------
 Z2EAC   jsr     Save_Obj_List_Params2   ; 2EAC: 20 E9 35 
-        jsr     If_ZP0_EqualsA_Do_27B3  ; 2EAF: 20 AA 27 
+        jsr     Display_Rocket_Flame?   ; 2EAF: 20 AA 27 
         jsr     LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00 ; 2EB2: 20 DD 2D 
 Z2EB5   jsr     Z2DE8                   ; 2EB5: 20 E8 2D 
         jsr     Z364C                   ; 2EB8: 20 4C 36 
@@ -2942,7 +2955,7 @@ Flying_4?
         lda     ZP_Player_Movement      ; 32FF: A5 1C    
         bit     MASK_08                 ; 3301: 2C 17 20 
         bne     SKIP_Flying_5?          ; 3304: D0 03    
-        jsr     Z20E9                   ; 3306: 20 E9 20 
+        jsr     Update_Lazer_Shots      ; 3306: 20 E9 20 
 SKIP_Flying_5?
         jmp     Triggers_Every_Frame    ; 3309: 4C 1A 26 
 ; -----------------------

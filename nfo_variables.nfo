@@ -19,25 +19,25 @@ label      10 ZP_0010 ; Save Obj List Params 1
 label      11 ZP_0011 ; Save Obj List Params 1
 label      12 ZP_0012 ; Save Obj List Params 1
 label      13 Keyboard_Data
-label      14 ZP_0014
-label      15 ZP_0015
-label      16 ZP_0016
-label      17 ZP_0017
+label      14 ZP_0014 ; Connected somehow. Shuffled in a subroutine.
+label      15 ZP_0015 ; Connected somehow. Shuffled in a subroutine.
+label      16 ZP_0016 ; Connected somehow. Shuffled in a subroutine.
+label      17 ZP_0017 ; Connected somehow. Shuffled in a subroutine.
 label      18 ZP_0018 ; Save_Obj_List_Params 2
 label      19 ZP_0019 ; Save_Obj_List_Params 2
 label      1A ZP_001a ; Save_Obj_List_Params 2
 label      1B ZP_001b ; Save_Obj_List_Params 2
 label      1C ZP_Player_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
-label      1E ZP_001e
-label      1F ZP_001f
+label      1E ZP_Ship_UDG_Addr_Offset
+label      1F ZP_Ship_UDG_Addr_Color?
 label      20 ZP_HW_IRQ_1_OR_0
 label      21 ZP_HW_IRQ_VAR
 label      22 ZP_Save_Obj_List_Ptr_Lo
 label      23 ZP_Save_Obj_List_Ptr_Hi
 label      24 ZP_Save_Obj_List_Ptr_Lo2
 label      25 ZP_Save_Obj_List_Ptr_Hi2
-label      26 ZP_0026
-label      27 ZP_0027
+label      26 ZP_Rocket_Flame_On ; Turns off at take-off and landing
+label      27 ZP_Rocket_Flame_Toggle ; Counts up throughout the flight, used for flame animation
 label      0028-0039 ZP_Player_Object_Stash
 label      40 ZP_Param_Addr_Lo
 label      41 ZP_Param_Addr_Hi
@@ -91,7 +91,7 @@ label    03B4 Object_0_Diagon
 label    03B8 Object_1 ;     03B8  04 20 00 3F 00 01 10 18
 label    03B9 Object_1_Horiz
 label    03BC Object_1_Diagon
-label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Explosion->00, 04=Rocket_Part/Fuel, 05=fuzzball, 06=saucer, 07=Ball, 08=Cross, 09+=CRASH, 0E=flashing/werthers, 0B=Rocket_Ascend/Decend?
+label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Explosion->00, 04=Rocket_Part/Fuel, 05=fuzzball, 06=saucer, 07=Ball, 08=Cross, 09+=CRASH, 0E=flashing/werthers, 0A=Flame, 0B=Rocket_Ascend/Decend?
 label    03C1 Object_2_Horiz
 label    03C4 Object_2_Diagon
 label    03C6 Object_2_???

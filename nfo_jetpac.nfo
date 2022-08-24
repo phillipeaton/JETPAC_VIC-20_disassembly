@@ -131,7 +131,7 @@ comment  207C
 label    2080 BACK_2080
 comment  2085
 comment  208F
-label    208F ATTRACT_MODE
+label    208F Game_Select
 ;        2093
 lcomment 2093 Set Port B all bits to input
 lcomment 2098 Set Port A all bits to output
@@ -158,8 +158,9 @@ lcomment 20DF Space Pressed?
 lcomment 20E1 No, read keyboard again
 ;        20E3
 comment  20E3
+label    20E9 Update_Lazer_Shots
 ;        20F0
-label    20F0 Update_Lazer_Shots
+label    20F0 Update_Lazer_Shots_1
 const    20F3
 lcomment 20F3 ZP_Temp_2_Lo
 lcomment 20F4
@@ -174,7 +175,9 @@ label    212f Update_Lazer_Shot1
 ;        2145
 label    2145 BACK_2145
 ;        216B
-label    216B _12346737
+label    216B Lazer_Color_Table
+lcomment 216B Green not used, messes up colors if it's used
+break    216F
 label    2173 Update_Lazer_Shot_1
 label    217E Update_Lazer_Shot_2
 label    2187 Update_Lazer_Shot_1_1
@@ -556,7 +559,20 @@ label    27A0 Copy_Player_To_Hi_Score
 lcomment 27A0 3 BCD bytes, 02, 01, 00
 label    27A2 CPTHS_1
 lcomment 27A7 Return when all bytes copied
-label    27AA If_ZP0_EqualsA_Do_27B3
+label    27AA Display_Rocket_Flame?
+lcomment 27AE Object $0A = Flame (or maybe Rocket?)
+label    27B3 Display_Rocket_Flame
+comment  27B5
+comment  27BD
+lcomment 27C3 0019 must be height of rocket
+comment  27C5
+lcomment 27C5 Check rocket height
+lcomment 27C7 Display Flame
+lcomment 27C9 Don't display Flame
+comment  27CB
+label    27E1 SKIP_27E1
+label    2819 Display_Flame
+label    2812 No_Display_Flame
 ;        282E
 comment  282E Using A to toggle, Load A and Y with Ship UDG address
 label    282E Get_Flame_UDG_Addr
@@ -573,16 +589,20 @@ label    283E Fire_Pressed
 break    286B
 const    286B
 break    286D
+label    2874 Jump_To_Subroutine_List3
 ;        2888
 break    2888-2891
 label    2888 Subroutine_List3
 word     2888-2891
 label    2889 Subroutine_List3+1
 ;        2892
-label    2892 Routine_2892
-label    289F Routine_289F
-label    28A4 Routine_28A4
-label    28B6 Routine_28B6
+label    2892 Set_Obj_Posn_05_To_07
+label    2894 SR3_Store_To_Obj_Posn_05_06
+label    289F Set_Obj_Posn_05_To_06
+label    28A4 Set_Obj_Posn_05_To_03_Or_00
+label    28B1 Set_Obj_Posn_05_To_03
+label    28B6 Set_Obj_Posn_05_To_01_Or_Other
+label    28C0 SKIP_28C0
 label    28C9 Reset_Objects_1_To_8
 label    28E7 Save_Obj_List_Ptr
 label    28F0 Restore_Obj_List_Ptr
