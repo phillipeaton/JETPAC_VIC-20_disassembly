@@ -5,12 +5,12 @@ label      02 ZP_Temp_1_Lo
 label      03 ZP_Temp_1_Hi
 label      04 ZP_UDG_RAM_X
 label      05 ZP_UDG_RAM_Y
-label      06 ZP_Temp_2_Lo
-label      07 ZP_Temp_2_Hi
-label      08 ZP_0008 ; 42 Occurrences, used with 0009
-label      09 ZP_0009 ; 11 Occurrences, used with 0008
-label      0A ZP_Temp_3_Lo
-label      0B ZP_Temp_3_Hi
+label      06 ZP_Temp_3_Lo
+label      07 ZP_Temp_3_Hi
+label      08 ZP_Temp_4_Lo ; 42 Occurrences, used with 0009
+label      09 ZP_Temp_4_Hi ; 11 Occurrences, used with 0008
+label      0A ZP_Temp_5_Lo
+label      0B ZP_Temp_5_Hi
 label      0c ZP_Col_RAM_Ptr_Lo
 label      0d ZP_Col_RAM_Ptr_Hi
 label      0E ZP_Ptr_To_Str_Lo
@@ -31,7 +31,7 @@ label      1C ZP_Player_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=f
 label      1E ZP_Ship_UDG_Addr_Offset
 label      1F ZP_Ship_UDG_Addr_Color?
 label      20 ZP_HW_IRQ_1_OR_0
-label      21 ZP_HW_IRQ_VAR
+label      21 ZP_HW_IRQ_Count
 label      22 ZP_Save_Obj_List_Ptr_Lo
 label      23 ZP_Save_Obj_List_Ptr_Hi
 label      24 ZP_Save_Obj_List_Ptr_Lo2
@@ -61,45 +61,77 @@ label      5e ZP_P1_Or_P2
 label      5f ZP_Subroutine_Vec_Lo
 label      60 ZP_Subroutine_Vec_Hi
 
-; Non-Page Variables
-label    0380 Jetman_Looks      ; Graphic Selector? Bit 7 = directoin 1=left, 0=right; bit 0&1 01 = flying, 10 = standing
-label    0381 Jetman_X          ; Pixel Left=00 Right=B6 or B7
-label    0382 Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
-label    0383 Jetman_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
-label    0384 Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accelerating?
-label    0385 RAM_0385
-label    0386 RAM_0386
-label    0387 RAM_0387
-label    0388 Lazer_1 ; 00 when not fired, following
-label    0390 Lazer_2 ;  bytes cahnge value as beam fades
-label    0398 Lazer_3
-label    03A0 Lazer_2
-label    03A8 Object_03A8 ;  03A8  ?? ?? ?? ?? ?? ?? ?? ??
-label    03A9 Object_03A9
-label    03AA Object_03AA
-label    03AB Obj_?_03_Height?
-label    03AC Obj_?_03_Diagnl?
-label    03AD Other_RAM_03AD
-label    03AE Other_RAM_03AE
+; Non-Zero-Page Object Variables
+label    0380 Obj_Jetman_Looks      ; Graphic Selector? Bit 7 = directoin 1=left, 0=right; bit 0&1 01 = flying, 10 = standing
+label    0381 Obj_Jetman_X          ; Pixel Left=00 Right=B6 or B7
+label    0382 Obj_Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
+label    0383 Obj_Jetman_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
+label    0384 Obj_Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accelerating?
+label    0385 Obj_Jetman_0385
+label    0386 Obj_Jetman_0386
+label    0387 Obj_Jetman_0387
+
+label    0388 Obj_Lazer_1 ; 00 when not fired, following bytes cahnge value as beam fades
+
+label    0390 Obj_Lazer_2
+
+label    0398 Obj_Lazer_3
+
+label    03A0 Obj_Lazer_4
+
+label    03A8 Obj_Rocket_0
+label    03A9 Obj_Rocket_1
+label    03AA Obj_Rocket_2
+label    03AB Obj_Rocket_3
+label    03AC Obj_Rocket_4
+label    03AD Obj_Rocket_5
+label    03AE Obj_Rocket_6
+label    03AF Obj_Rocket_7
 
                        ;            0  1  2  3  4  5  6  7
-label    03B0 Object_0 ;     03B0  09 70 00 AF 01 00 00 1C
-label    03B1 Object_0_Horiz
-label    03B2 Object_0_Direct
-label    03B3 Object_0_Height
-label    03B4 Object_0_Diagon
+label    03B0 Obj_Flame_0 ;     03B0  09 70 00 AF 01 00 00 1C
+label    03B1 Obj_Flame_1
+label    03B2 Obj_Flame_2
+label    03B3 Obj_Flame_3
+label    03B4 Obj_Flame_4
+label    03B5 Obj_Flame_5
+label    03B6 Obj_Flame_6
+label    03B7 Obj_Flame_7
+
+; 0th positon = object type:
+; 03=Explosion->00
+; 04=Rocket_Part/Fuel
+; 05=fuzzball
+; 06=saucer
+; 07=Ball
+; 08=Cross
+; 09+=CRASH
+; 0A=Flame;
+; 0B=Also Flame? Rocket_Ascend/Decend?
+; C0=Rocket with 04 10/02 toggling
+; 0D
+; 0E=flashing gem
+
+
 label    03B8 Object_1 ;     03B8  04 20 00 3F 00 01 10 18
 label    03B9 Object_1_Horiz
 label    03BC Object_1_Diagon
+
 label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Explosion->00, 04=Rocket_Part/Fuel, 05=fuzzball, 06=saucer, 07=Ball, 08=Cross, 09+=CRASH, 0E=flashing/werthers, 0A=Flame, 0B=Rocket_Ascend/Decend?
 label    03C1 Object_2_Horiz
 label    03C4 Object_2_Diagon
-label    03C6 Object_2_???
+label    03C6 Object_2_3
+
 label    03C8 Object_3 ;     03C8  05 57 08 9D 00 02 03 00  0=horizontal postion of alien
+
 label    03D0 Object_4 ;     03D0  05 91 08 7C 00 06 03 00  1=direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
+
 label    03D8 Object_5 ;     03D8  05 47 08 85 00 02 00 00  2=height
+
 label    03E0 Object_6 ;     03E0  05 8B 08 81 00 02 03 00  3=diagonal, jiggles around a lot for a saucer
+
 label    03E8 Object_7 ;     03E8  05 A6 08 7D 00 02 03 00  4=colour - bottom 3 bits?
+
 label    03F0 Object_8 ;     03F0  05 19 F8 8D 00 06 00 00
 
 ; Other variables that are somewhat persistent i.e. not reset at game restart

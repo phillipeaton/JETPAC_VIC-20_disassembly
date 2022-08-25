@@ -231,10 +231,15 @@ lcomment 2343 50 = x coord of middle rocket part?
 break    2347
 break    234B
 break    234F
-label    2353 BTCTOR_1
+comment  2353
+label    2353 Initial_Jetman_Obj_Params
+lcomment 2353 Image, X, Move Speed, Y
+lcomment 2357 Movement, ?, ?, ?
 break    2357
-lcomment 2353 Initial position etc of Jetman?
-label    235D BACK_235D
+comment  235B
+label    235B Init_Next_Jetman_Lives_Scores
+label    235D LOOP_INJLS_1
+comment  2366
 lcomment 2366 More time between players when 2 player game
 lcomment 2369 One player game?
 lcomment 236B Yes, jump
@@ -242,6 +247,7 @@ lcomment 236D Set countdown for 2 player game
 lcomment 236F Store countdown
 label    236F LDA_7F_Return
 ;        2373
+comment  2373
 label    2373 P1_LIVES_TO_UDG_RAM
 const    2376
 lcomment 2376 ZP Offset for 1st address
@@ -249,21 +255,25 @@ lcomment 2377 1st Address
 word     2377
 lcomment 2379 End of Parameters
 ;        2382
+comment  2382
 label    2382 P2_Lives_To_UDG_RAM
 const    2385
 lcomment 2385 ZP Offset for 1st address
 lcomment 2386 1st Address
 word     2386
 lcomment 2388 End of Parameters
+comment  238E
+label    238E Number_Lives_To_UDG_RAM
+lcomment 238F $70 = "0" character
 comment  2396
-comment  2396 Display Jetman Icon
+comment  2396 Display Jetman Icon next to number of lives
 lcomment 2399 ZP_Temp_2_Lo
 ;        239A
 word     239A
 lcomment 239D 8 bytes of UDG data to copy
-label    23A2 _Display_2_Spaces???_
+label    23A2 Zero_Lives_To_UDG_RAM_1
 lcomment 23A8 $60 = Space character
-label    23A8 Display_2_Spaces???
+label    23A8 Zero_Lives_To_UDG_RAM
 lcomment 23AF $60 = Space character
 label    23B6 Load_Num_Lives
 label    23BA Load_Num_Lives_P1
@@ -275,29 +285,28 @@ const    23C7-23CE
 break    23C7-23CE
 bin      23C7-23CE
 label    23CF LDA_7F
-lcomment 23CE
-lcomment 23CE ...##...
-lcomment 23CE ..#..#..
-lcomment 23CE ..####..
-lcomment 23CE .######.
-lcomment 23CE .#.##.#.
-lcomment 23CE ..####..
-lcomment 23CE ..####..
+lcomment 23C7 ...##...
+lcomment 23C8 ..#..#..
+lcomment 23C9 ..####..
+lcomment 23CA .######.
+lcomment 23CB .#.##.#.
+lcomment 23CC ..####..
+lcomment 23CD ..####..
 lcomment 23CE .##..##.
-comment  23Cf
+comment  23CF
 ;        23D4
 comment  23D4
 label    23D4 Setup_Player_Lives
-label    23D6 BACK_23D6
+label    23D6 BACK_SPL
 comment  23DA
 comment  23E7
-label    23F4 SKIP_23F4
+label    23F4 SKIP_SPL
 label    23F5 Swap_Player_And_Objects
 label    23F7 Swap_Player
 comment  2404
 label    2406 Swap_Object
 ;        2416
-label    2416 Reset_Color_Pixels_Scores
+label    2416 Reset_Color_UDG_Scores
 lcomment 241C Puts 000000  000000  00 at top of screen
 ;        2425
 label    2425 Display_1UP_HI_2UP_Titles
@@ -305,7 +314,7 @@ comment  2425
 comment  2425 Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
 lcomment 2427 3 strings to display, 1UP, HI and 2UP
 ;        2429
-label    2429 D1H2
+label    2429 BACK_D1H2
 ;        2450
 label    2450 STR_1UP
 break    2457
@@ -501,10 +510,12 @@ lcomment 269A 2A6D and 2A5F almost the same
 lcomment 269C 2A6D and 2A5F almost the same
 ;        26AE
 comment  26AE
-label    26AE Init_Object_?
-label    26B0 CCTOR_1
-label    26C5 C0_00_00_00_00_00_
-00_00
+label    26AE Init_Rocket_Object
+label    26B0 IRO_1
+comment  26B9
+comment  26B9 Probably init sound channels
+label    26C5 Init_Rocket_Table
+break    26C9
 label    26CD Jmp_To_SRList2_SR
 label    26D1 JTSRLSR_1
 label    26E4 Jmp_To_SRList2_SR_
@@ -571,6 +582,9 @@ lcomment 27C7 Display Flame
 lcomment 27C9 Don't display Flame
 comment  27CB
 label    27E1 SKIP_27E1
+comment  280B
+comment  280B Restore 11 and 19 and return
+label    280B BACK_280B
 label    2819 Display_Flame
 label    2812 No_Display_Flame
 ;        282E
@@ -692,7 +706,11 @@ label    2CF1 Jetman_Looks_1???
 label    2D0F Jetman_Looks_1_1???
 label    2CFF BACK_2CFF
 break    2D54
-const    2D59
+label    2D69 SKIP_2D69
+label    2D80 SKIP_2D80
+label    2D95 BACK_2D95
+label    2D9B SKIP_2D9B_RTS
+label    2D9C SKIP_2D9C
 ;        2DBC
 word     2DBC
 ;        2DDD
@@ -770,7 +788,7 @@ label    336A Read_Kbd_Jstk
 label    33D4 Read_Joystick
 label    33F7 Read_Keyboard_Joystick
 lcomment 33FA Joystick selected?
-label    345C SKIP_345CXXX
+label    345C SKIP_345C
 label    3465 Flash_Score
 lcomment 3467 P1 or P2? Branch if P2
 const    346C
