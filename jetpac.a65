@@ -30,7 +30,7 @@ ZP_Ptr_To_Str_Hi        equ     $000F
 ZP_0010                 equ     $0010
 ZP_0011                 equ     $0011
 ZP_0012                 equ     $0012
-Keyboard_Data           equ     $0013
+ZP_Keyboard_Data        equ     $0013
 ZP_0014                 equ     $0014
 ZP_0015                 equ     $0015
 ZP_0016                 equ     $0016
@@ -53,14 +53,14 @@ ZP_Rocket_Flame_Toggle  equ     $0027
 ZP_Player_Object_Stash  equ     $0028
 ZP_Param_Addr_Lo        equ     $0040
 ZP_Param_Addr_Hi        equ     $0041
-ZP_Game_Sel_F7_Flash    equ     $0045
+ZP_Game_Sel_F1_Flash    equ     $0045
 ZP_HW_IRQ_Count1        equ     $004A
 ZP_HW_IRQ_Count2        equ     $004B
 ZP_HW_IRQ_Count3        equ     $004C
 ZP_Score_P1             equ     $0051
 ZP_Score_P2             equ     $0054
 ZP_Invert               equ     $0057
-ZP_Counter              equ     $0058
+ZP_Flash_Counter        equ     $0058
 ZP_Level_Current_Plyr   equ     $0059
 ZP_Num_Lives_P1         equ     $005A
 ZP_Level_Other_Plyr     equ     $005B
@@ -77,7 +77,7 @@ NMI_int_vector          equ     $0318
 Obj_Jetman_Looks        equ     $0380
 Obj_Jetman_X            equ     $0381
 Obj_Jetman_Y            equ     $0383
-Obj_Lazer_1             equ     $0388
+Obj_Lazer_0             equ     $0388
 Obj_Rocket_0            equ     $03A8
 Obj_Rocket_1            equ     $03A9
 Obj_Rocket_2            equ     $03AA
@@ -105,7 +105,7 @@ UDG_HI_SCORE_RAW_POSN   equ     $1588
 UDG_P2_LIVES_RAW_POSN   equ     $19A0
 UDG_P2_SCORE_RAW_POSN   equ     $1B08
 Score_Hi                equ     $1FD0
-Game_Options            equ     $1FD3
+Game_Settings           equ     $1FD3
 VIC_R0_H_Ctr            equ     $9000
 VIC_R4_TV_Raster        equ     $9004
 VIC_RA_Frq_Osc1         equ     $900A
@@ -134,24 +134,27 @@ Kernal_ROM              equ     $E000
         org     $2000
 
         fdb     $201D,$201D             ; 2000: 1D 20 1D 20 
+
 ; Initial value table for VIC setup 16 bytes
 VIC_Init_Tab
-        fcb     $0B                     ; 2004: 0B        VICCRO Left edge of TV picture and interlace switch.
-        fcb     $26                     ; 2005: 26        VICCR1
-        fcb     $97                     ; 2006: 97        VICCR2
-        fcb     $17                     ; 2007: 17        VICCR3
-        fcb     $00                     ; 2008: 00        VICCR4
-        fcb     $8C                     ; 2009: 8C        VICCR5
-        fcb     $00                     ; 200A: 00        VICCR6
-        fcb     $00                     ; 200B: 00        VICCR7
-        fcb     $00                     ; 200C: 00        VICCR8
-        fcb     $00                     ; 200D: 00        VICCR9
-        fcb     $00                     ; 200E: 00        VICCRA
-        fcb     $00                     ; 200F: 00        VICCRB
-        fcb     $00                     ; 2010: 00        VICCRC
-        fcb     $00                     ; 2011: 00        VICCRD
-        fcb     $00                     ; 2012: 00        VICCRE
-        fcb     $08                     ; 2013: 08        VICCRF
+        fcb     $0B                     ; 2004: 0B        VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
+        fcb     $26                     ; 2005: 26        VIC_R1_V_Ctr
+        fcb     $97                     ; 2006: 97        VIC_R2_Num_Cols
+        fcb     $17                     ; 2007: 17        VIC_R3_Num_Rows
+        fcb     $00                     ; 2008: 00        VIC_R4_TV_Raster
+        fcb     $8C                     ; 2009: 8C        VIC_R5_CM_Start
+        fcb     $00                     ; 200A: 00        VIC_R6_H_LightP
+        fcb     $00                     ; 200B: 00        VIC_R7_V_LightP
+        fcb     $00                     ; 200C: 00        VIC_R8_Paddle_X
+        fcb     $00                     ; 200D: 00        VIC_R9_Paddle_Y
+        fcb     $00                     ; 200E: 00        VIC_RA_Frq_Osc1
+        fcb     $00                     ; 200F: 00        VIC_RB_Frq_Osc2
+        fcb     $00                     ; 2010: 00        VIC_RC_Frq_Osc3
+        fcb     $00                     ; 2011: 00        VIC_RD_Frq_Noise
+        fcb     $00                     ; 2012: 00        VIC_RE_Vol_Color
+        fcb     $08                     ; 2013: 08        VIC_RF_BckBdrCol
+
+; Quick lookup or BIT instruction
 MASK_01 fcb     $01                     ; 2014: 01       
 MASK_02 fcb     $02                     ; 2015: 02       
 MASK_04 fcb     $04                     ; 2016: 04       
@@ -169,153 +172,182 @@ NMI_Interrupt_Hardler
 ; ----------------------------------------------------------
 ; Starts here
 ; ----------------------------------------------------------
-        sei                             ; 201D: 78       
+        sei                             ; 201D: 78        Disable Interrupts
         ldx     #$FF                    ; 201E: A2 FF     Reset stack pointer
         txs                             ; 2020: 9A       
         cld                             ; 2021: D8        Clear Decimal flag
-        lda     #$1C                    ; 2022: A9 1C     Setup NMI Interrupt Vector
+
+; Setup NMI interrupt vector to service routine
+        lda     #$1C                    ; 2022: A9 1C    
         sta     NMI_int_vector          ; 2024: 8D 18 03 
         lda     #$20                    ; 2027: A9 20    
         sta     NMI_int_vector+1        ; 2029: 8D 19 03 
+
         jsr     Erase_Hi_Score_Settings_Etc ; 202C: 20 6F 27 
         jsr     Erase_ZP                ; 202F: 20 5B 27 
+
+; Setup I/O direction and enables
         lda     #$00                    ; 2032: A9 00    
         sta     VIA1_DDR_A              ; 2034: 8D 13 91 
         lda     #$80                    ; 2037: A9 80    
         sta     VIA1_Int_Enable         ; 2039: 8D 1E 91 
         lda     #$C0                    ; 203C: A9 C0    
         sta     VIA2_Int_Enable         ; 203E: 8D 2E 91 
+
         jsr     Set_Jetman_Movement_Speed ; 2041: 20 5E 26 
+
+; ??????????????????????????????????????????????
         lda     #$40                    ; 2044: A9 40    
         sta     VIA1_Port_B             ; 2046: 8D 10 91 
         sta     VIA2_Port_B             ; 2049: 8D 20 91 
+
+; Setup IRQ interrupt vector to service routine
         lda     #$E0                    ; 204C: A9 E0    
         sta     Hardware_IRQ            ; 204E: 8D 14 03 
         lda     #$25                    ; 2051: A9 25    
         sta     Hardware_IRQ+1          ; 2053: 8D 15 03 
 
-        ldx     #$0F                    ; 2056: A2 0F     Reset the VIC 16 registers
-Start_1 lda     VIC_Init_Tab,x          ; 2058: BD 04 20 
+; Reset the VIC
+        ldx     #$0F                    ; 2056: A2 0F     16 registers
+Reset_VIC
+        lda     VIC_Init_Tab,x          ; 2058: BD 04 20 
         sta     VIC_R0_H_Ctr,x          ; 205B: 9D 00 90 
         dex                             ; 205E: CA       
-        bpl     Start_1                 ; 205F: 10 F7    
+        bpl     Reset_VIC               ; 205F: 10 F7    
 
+; Setup Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
+; Note each character is a 16x8 tile i.e. double height,
+; thus play area is decimal 23 Rows x 22 Columns
+; 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
+; 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
+; 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
+; 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5
+; 025C  04 0F 1A 25 30 3B 46 51 5C 67 72 7D 88 93 9E A9 B4 BF CA D5 E0 EB F6
+; 0273  05 10 1B 26 31 3C 47 52 5D 68 73 7E 89 94 9F AA B5 C0 CB D6 E1 EC F7
+; 028A  06 11 1C 27 32 3D 48 53 5E 69 74 7F 8A 95 A0 AB B6 C1 CC D7 E2 ED F8
+; 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 E3 EE F9
+; 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA
+; 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
+; 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
         ldx     #$00                    ; 2061: A2 00    
-                                        ; Store ascending numbers step #11 at a time into #23 bytes from $200 as below
-                                        ; then do it #10 more times, but starting at 1 higher each time
-                                        ; Note each character is a 16x8 tile i.e. double height
-                                        ; 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
-                                        ; 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
-                                        ; 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
-                                        ; 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5
-                                        ; 025C  04 0F 1A 25 30 3B 46 51 5C 67 72 7D 88 93 9E A9 B4 BF CA D5 E0 EB F6
-                                        ; 0273  05 10 1B 26 31 3C 47 52 5D 68 73 7E 89 94 9F AA B5 C0 CB D6 E1 EC F7
-                                        ; 028A  06 11 1C 27 32 3D 48 53 5E 69 74 7F 8A 95 A0 AB B6 C1 CC D7 E2 ED F8
-                                        ; 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 E3 EE F9
-                                        ; 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA
-                                        ; 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
-                                        ; 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
         txa                             ; 2063: 8A       
-Start_2 ldy     #$17                    ; 2064: A0 17    
+SR_Cols ldy     #$17                    ; 2064: A0 17    
         pha                             ; 2066: 48       
-Start_3 sta     Screen_RAM,x            ; 2067: 9D 00 02 
+SR_Rows sta     Screen_RAM,x            ; 2067: 9D 00 02 
         clc                             ; 206A: 18       
         adc     #$0B                    ; 206B: 69 0B    
         inx                             ; 206D: E8       
         dey                             ; 206E: 88       
-        bne     Start_3                 ; 206F: D0 F6    
-
+        bne     SR_Rows                 ; 206F: D0 F6    
         pla                             ; 2071: 68       
         clc                             ; 2072: 18       
         adc     #$01                    ; 2073: 69 01    
         cmp     #$0B                    ; 2075: C9 0B    
-        bne     Start_2                 ; 2077: D0 EB    
+        bne     SR_Cols                 ; 2077: D0 EB    
 
 Start_Rst_Game_Sel_Flash
         jsr     Reset_Color_UDG_Scores  ; 2079: 20 16 24 
 
+; Reset game selection flashing highlights
         lda     #$01                    ; 207C: A9 01    
-        ldx     #$05                    ; 207E: A2 05    
-BACK_2080
-        sta     ZP_Game_Sel_F7_Flash,x  ; 2080: 95 45    
+        ldx     #$05                    ; 207E: A2 05     Appears to overlap ZP_HW_IRQ_Count1 ???????????????
+GS_Flash sta    ZP_Game_Sel_F1_Flash,x  ; 2080: 95 45    
         dex                             ; 2082: CA       
-        bpl     BACK_2080               ; 2083: 10 FB    
+        bpl     GS_Flash                ; 2083: 10 FB    
 
+; Setup volume and color
         lda     #$0F                    ; 2085: A9 0F    
         sta     VIC_RE_Vol_Color        ; 2087: 8D 0E 90 
+
+; Initialise_Rocket
         lda     #$00                    ; 208A: A9 00    
         sta     Obj_Rocket_0            ; 208C: 8D A8 03 
 
 Game_Select
-        inc     ZP_Counter              ; 208F: E6 58    
+        inc     ZP_Flash_Counter        ; 208F: E6 58    
         lda     #$00                    ; 2091: A9 00    
         sta     VIA2_DDR_B              ; 2093: 8D 22 91  Set Port B all bits to input
         lda     #$FF                    ; 2096: A9 FF    
         sta     VIA2_DDR_A              ; 2098: 8D 23 91  Set Port A all bits to output
         lda     #$7F                    ; 209B: A9 7F    
         sta     VIA2_Port_A             ; 209D: 8D 21 91  Select keyboard column to read (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
-        ldx     Game_Options            ; 20A0: AE D3 1F  Get game settings ($1fD3 = Just outside UDG RAM)
+        ldx     Game_Settings           ; 20A0: AE D3 1F  Get game settings ($1fD3 = Just outside UDG RAM)
         lda     VIA2_Port_B             ; 20A3: AD 20 91  Read keyboard column
-        sta     Keyboard_Data           ; 20A6: 85 13     Store keyboard data
+        sta     ZP_Keyboard_Data        ; 20A6: 85 13     Store keyboard data
+
+; Test F-Keys pressed or Space to start game
         lda     #$10                    ; 20A8: A9 10    
-        bit     Keyboard_Data           ; 20AA: 24 13     F1 pressed? (1 Player)
-        bne     SKIP_20B2               ; 20AC: D0 04     No, skip
+        bit     ZP_Keyboard_Data        ; 20AA: 24 13     F1 pressed? (1 Player)
+        bne     Test_F3                 ; 20AC: D0 04     No, skip
         txa                             ; 20AE: 8A       
         and     #$02                    ; 20AF: 29 02    
         tax                             ; 20B1: AA       
-SKIP_20B2
-        lda     #$20                    ; 20B2: A9 20    
-        bit     Keyboard_Data           ; 20B4: 24 13     F3 pressed? (2 Player)
-        bne     SKIP_20BC               ; 20B6: D0 04     No, skip
+
+Test_F3 lda     #$20                    ; 20B2: A9 20    
+        bit     ZP_Keyboard_Data        ; 20B4: 24 13     F3 pressed? (2 Player)
+        bne     Test_F5                 ; 20B6: D0 04     No, skip
         txa                             ; 20B8: 8A       
         ora     #$01                    ; 20B9: 09 01    
         tax                             ; 20BB: AA       
-SKIP_20BC
-        lda     #$40                    ; 20BC: A9 40    
-        bit     Keyboard_Data           ; 20BE: 24 13     F5 pressed? (Keyboard)
-        bne     SKIP_20C6               ; 20C0: D0 04     No, skip
+
+Test_F5 lda     #$40                    ; 20BC: A9 40    
+        bit     ZP_Keyboard_Data        ; 20BE: 24 13     F5 pressed? (Keyboard)
+        bne     Test_F7                 ; 20C0: D0 04     No, skip
         txa                             ; 20C2: 8A       
         and     #$01                    ; 20C3: 29 01    
         tax                             ; 20C5: AA       
-SKIP_20C6
-        lda     #$80                    ; 20C6: A9 80    
-        bit     Keyboard_Data           ; 20C8: 24 13     F7 pressed? (Joystick)
-        bne     SKIP_20D0               ; 20CA: D0 04     No, skip
+
+Test_F7 lda     #$80                    ; 20C6: A9 80    
+        bit     ZP_Keyboard_Data        ; 20C8: 24 13     F7 pressed? (Joystick)
+        bne     Test_Space              ; 20CA: D0 04     No, skip
         txa                             ; 20CC: 8A       
         ora     #$02                    ; 20CD: 09 02    
         tax                             ; 20CF: AA       
-SKIP_20D0
+
+Test_Space
         txa                             ; 20D0: 8A       
-        sta     Game_Options            ; 20D1: 8D D3 1F  Store game settings ($1fD3 = Just outside UDG RAM)
+        sta     Game_Settings           ; 20D1: 8D D3 1F  Store game settings ($1fD3 = Just outside UDG RAM)
                                         ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
         jsr     Display_Game_Select     ; 20D4: 20 B9 24 
+
         lda     #$FE                    ; 20D7: A9 FE    
         sta     VIA2_Port_A             ; 20D9: 8D 21 91  Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
         lda     VIA2_Port_B             ; 20DC: AD 20 91 
         and     #$10                    ; 20DF: 29 10     Space Pressed?
-        bne     Game_Select             ; 20E1: D0 AC     No, read keyboard again
+        bne     Game_Select             ; 20E1: D0 AC     No, check for settings again
 
         jsr     Reset_Color_UDG_Scores  ; 20E3: 20 16 24 
         jmp     Game_Start              ; 20E6: 4C D1 25 
-; -----------------------
+
+; ----------------------------------------------------------
+; FUNCTION  : qsqtnsutnosen
+;             soentsnoetus
+;             seiteunst
+; CALLED BY :
+; CALLS     : Nothing
+; ARGUMENTS : sentiseutn
+;             etinseut
+;             setniseutn
+; ----------------------------------------------------------
 Update_Lazer_Shots
         lda     ZP_HW_IRQ_Count1        ; 20E9: A5 4A    
-        and     #$03                    ; 20EB: 29 03    
-        beq     Update_Lazer_Shots_1    ; 20ED: F0 01    
+        and     #$03                    ; 20EB: 29 03     Update once every four calls?
+        beq     Lazer_Shots             ; 20ED: F0 01    
         rts                             ; 20EF: 60       
 ; ===========================================================
-Update_Lazer_Shots_1
+Lazer_Shots
         jsr     Read_ZP_Parameters      ; 20F0: 20 9D 25 
-        fcb     $06                     ; 20F3: 06        ZP_Temp_2_Lo
-        fdb     Obj_Lazer_1             ; 20F4: 88 03    
+        fcb     $06                     ; 20F3: 06        ZP_Temp_3_Lo + Hi
+        fdb     Obj_Lazer_0             ; 20F4: 88 03    
         fcb     $FF                     ; 20F6: FF        End of Parameters
 
-; Loop 4 times through other_ram, 8 bytes at a time, if any are 0, branch to 2110
+; Loop through the four possible lazer shots, branch if any are zero I.E. NOT SHOOTING???????
         ldx     #$04                    ; 20F7: A2 04    
         ldy     #$00                    ; 20F9: A0 00    
-Update_Lazer_Shots_Loop
-        lda     (ZP_Temp_3_Lo),y        ; 20FB: B1 06    
-        beq     Update_Lazer_Shot       ; 20FD: F0 11    
+LS_Loop lda     (ZP_Temp_3_Lo),y        ; 20FB: B1 06    
+        beq     Lazer_Shot              ; 20FD: F0 11    
+
+; Move ZP index address to next 8 bytes i.e. next lazer shot
         lda     ZP_Temp_3_Lo            ; 20FF: A5 06    
         clc                             ; 2101: 18       
         adc     #$08                    ; 2102: 69 08    
@@ -324,28 +356,30 @@ Update_Lazer_Shots_Loop
         adc     #$00                    ; 2108: 69 00    
         sta     ZP_Temp_3_Hi            ; 210A: 85 07    
         dex                             ; 210C: CA       
-        bne     Update_Lazer_Shots_Loop ; 210D: D0 EC    
+        bne     LS_Loop                 ; 210D: D0 EC    
         rts                             ; 210F: 60       
 ; ===========================================================
-Update_Lazer_Shot
-        lda     (ZP_Obj_List_Ptr_Lo),y  ; 2110: B1 00    
-        tax                             ; 2112: AA       
-        and     #$80                    ; 2113: 29 80    
-        ora     #$10                    ; 2115: 09 10    
-        sta     (ZP_Temp_3_Lo),y        ; 2117: 91 06    
-        iny                             ; 2119: C8       
-        lda     (ZP_Obj_List_Ptr_Lo),y  ; 211A: B1 00    
-        and     #$F8                    ; 211C: 29 F8    
-        ora     #$05                    ; 211E: 09 05    
-        sta     ZP_Temp_4_Lo            ; 2120: 85 08    
-        txa                             ; 2122: 8A       
-        and     #$80                    ; 2123: 29 80    
-        beq     Update_Lazer_Shot_1     ; 2125: F0 4C    
+Lazer_Shot
+        lda     (ZP_Obj_List_Ptr_Lo),y  ; 2110: B1 00     Get Jetman attrib 00 i.e. fly/no-fly and facing left/right and ???
+        tax                             ; 2112: AA        Store for later
+        and     #$80                    ; 2113: 29 80     Jetman looking left?
+        ora     #$10                    ; 2115: 09 10     Set bit 4, DON'T KNOW WHAT IT'S USED FOR??????????
+        sta     (ZP_Temp_3_Lo),y        ; 2117: 91 06     Store to inactive lazer attrib 00
+
+        iny                             ; 2119: C8        Move to next Jetman attrib 01
+        lda     (ZP_Obj_List_Ptr_Lo),y  ; 211A: B1 00     Get Jetman attrib 01 i.e. X position
+        and     #$F8                    ; 211C: 29 F8     Zero the bottom 3 bits
+        ora     #$05                    ; 211E: 09 05     Set bits 0 & 2
+        sta     ZP_Temp_4_Lo            ; 2120: 85 08     Store for later
+
+        txa                             ; 2122: 8A        Restore Jetman attrib 00
+        and     #$80                    ; 2123: 29 80     Jetman looking left?
+        beq     Lazer_Jetman_Facing_Right ; 2125: F0 4C     No, branch
         lda     ZP_Temp_4_Lo            ; 2127: A5 08    
         sec                             ; 2129: 38       
         sbc     #$08                    ; 212A: E9 08    
-        jsr     SR_2298                 ; 212C: 20 98 22 
-Update_Lazer_Shot1
+        jsr     Lazer_Jetman_Facing_Left??? ; 212C: 20 98 22 
+Lazer_Shot_
         sta     ZP_Temp_4_Lo            ; 212F: 85 08    
         iny                             ; 2131: C8       
         iny                             ; 2132: C8       
@@ -386,33 +420,44 @@ BACK_2145
 Lazer_Color_Table
         fcb     $01,$02,$03,$04         ; 216B: 01 02 03 04  Green not used, messes up colors if it's used
         fcb     $06,$07,$03,$07         ; 216F: 06 07 03 07 
-Update_Lazer_Shot_1
-        lda     (ZP_Obj_List_Ptr_Lo),y  ; 2173: B1 00    
-        and     #$07                    ; 2175: 29 07    
-        beq     Update_Lazer_Shot_1_2   ; 2177: F0 14    
+
+Lazer_Jetman_Facing_Right
+        lda     (ZP_Obj_List_Ptr_Lo),y  ; 2173: B1 00     Get Jetman attrib 01 i.e. ????????
+        and     #$07                    ; 2175: 29 07     Zero bits 3-7, any bits 0-2 set?
+        beq     Lazer_JFR_2             ; 2177: F0 14     No, branch
         lda     ZP_Temp_4_Lo            ; 2179: A5 08    
         clc                             ; 217B: 18       
         adc     #$18                    ; 217C: 69 18    
-Update_Lazer_Shot_2
-        and     #$FE                    ; 217E: 29 FE    
-        cmp     #$B8                    ; 2180: C9 B8    
-        bcs     Update_Lazer_Shot_1_1   ; 2182: B0 03    
-        jmp     Update_Lazer_Shot1      ; 2184: 4C 2F 21 
+Lazer_JFR_1
+        and     #$FE                    ; 217E: 29 FE     Zero bit 0
+        cmp     #$B8                    ; 2180: C9 B8     TESING AT EDGE OF SCREEN?
+        bcs     Lazer_JFR_1_1           ; 2182: B0 03    
+        jmp     Lazer_Shot_             ; 2184: 4C 2F 21 
 ; -----------------------
-Update_Lazer_Shot_1_1
+Lazer_JFR_1_1
         sec                             ; 2187: 38       
-        sbc     #$B8                    ; 2188: E9 B8    
-        jmp     Update_Lazer_Shot1      ; 218A: 4C 2F 21 
+        sbc     #$B8                    ; 2188: E9 B8     OFFSETTING EDGE OF SCREEN?
+        jmp     Lazer_Shot_             ; 218A: 4C 2F 21 
 ; -----------------------
-Update_Lazer_Shot_1_2
-        lda     ZP_Temp_4_Lo            ; 218D: A5 08    
+Lazer_JFR_2
+        lda     ZP_Temp_4_Lo            ; 218D: A5 08     Restore saved Jetman attrib 00
         clc                             ; 218F: 18       
-        adc     #$10                    ; 2190: 69 10    
-        jmp     Update_Lazer_Shot_2     ; 2192: 4C 7E 21 
+        adc     #$10                    ; 2190: 69 10     Add $10 for some reason??????????
+        jmp     Lazer_JFR_1             ; 2192: 4C 7E 21 
 ; -----------------------
+
+; ----------------------------------------------------------
+; FUNCTION  : qsqtnsutnosen
+;             soentsnoetus
+;             seiteunst
+; CALLED BY :
+; CALLS     : Nothing
+; ARGUMENTS : sentiseutn
+;             etinseut
+;             setniseutn
+; ----------------------------------------------------------
 Z2195   adc     #$08                    ; 2195: 69 08    
         jmp     Z21CB                   ; 2197: 4C CB 21 
-; -----------------------
 Fire_Pressed_1
         ldy     #$06                    ; 219A: A0 06    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 219C: B1 00    
@@ -427,7 +472,7 @@ Fire_Pressed_1
         dey                             ; 21AD: 88       
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 21AE: B1 00    
         sta     ZP_UDG_RAM_Y            ; 21B0: 85 05    
-        sta     Keyboard_Data           ; 21B2: 85 13    
+        sta     ZP_Keyboard_Data        ; 21B2: 85 13    
         lda     ZP_Temp_3_Lo            ; 21B4: A5 06    
         bit     MASK_04                 ; 21B6: 2C 16 20 
         beq     SKIP_2202               ; 21B9: F0 47    
@@ -438,7 +483,7 @@ Fire_Pressed_1
         clc                             ; 21C6: 18       
         beq     Z2195                   ; 21C7: F0 CC    
         adc     #$F8                    ; 21C9: 69 F8    
-Z21CB   jsr     SR_2298                 ; 21CB: 20 98 22 
+Z21CB   jsr     Lazer_Jetman_Facing_Left??? ; 21CB: 20 98 22 
         tax                             ; 21CE: AA       
         ldy     #$01                    ; 21CF: A0 01    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 21D1: B1 00    
@@ -486,7 +531,7 @@ Fire_Pressed_2
         eor     ZP_Temp_3_Lo            ; 2214: 45 06    
         and     #$F8                    ; 2216: 29 F8    
         bne     SR_2229                 ; 2218: D0 0F    
-        jsr     Move_ZP17_15_to_ZP16_14 ; 221A: 20 8B 22 
+        jsr     Lazer_ZP17_15_to_ZP16_14 ; 221A: 20 8B 22 
         dec     ZP_Temp_1_Lo            ; 221D: C6 02    
         bne     Fire_Pressed_2          ; 221F: D0 F0    
         lda     #$00                    ; 2221: A9 00    
@@ -525,14 +570,14 @@ SR_2257 lda     (ZP_Obj_List_Ptr_Lo),y  ; 2257: B1 00
         clc                             ; 2260: 18       
         adc     #$F8                    ; 2261: 69 F8    
 SR_2257_1
-        jsr     SR_2298                 ; 2263: 20 98 22 
+        jsr     Lazer_Jetman_Facing_Left??? ; 2263: 20 98 22 
         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2266: 91 00    
-        lda     Keyboard_Data           ; 2268: A5 13    
+        lda     ZP_Keyboard_Data        ; 2268: A5 13    
         sta     ZP_UDG_RAM_Y            ; 226A: 85 05    
         tya                             ; 226C: 98       
         pha                             ; 226D: 48       
         jsr     Setup_UDG_RAM_XY        ; 226E: 20 1D 35 
-        jsr     Move_ZP17_15_to_ZP16_14 ; 2271: 20 8B 22 
+        jsr     Lazer_ZP17_15_to_ZP16_14 ; 2271: 20 8B 22 
         ldy     #$00                    ; 2274: A0 00    
         lda     ZP_0014                 ; 2276: A5 14    
         eor     (ZP_UDG_RAM_X),y        ; 2278: 51 04    
@@ -548,7 +593,7 @@ CLC_ADC_08
         adc     #$08                    ; 2286: 69 08    
         jmp     SR_2257_1               ; 2288: 4C 63 22 
 ; -----------------------
-Move_ZP17_15_to_ZP16_14
+Lazer_ZP17_15_to_ZP16_14
         lda     ZP_0015                 ; 228B: A5 15    
         sta     ZP_0014                 ; 228D: 85 14    
         lda     ZP_0016                 ; 228F: A5 16    
@@ -557,20 +602,21 @@ Move_ZP17_15_to_ZP16_14
         sta     ZP_0016                 ; 2295: 85 16    
         rts                             ; 2297: 60       
 ; ===========================================================
-SR_2298 pha                             ; 2298: 48       
+Lazer_Jetman_Facing_Left???
+        pha                             ; 2298: 48       
         and     #$F8                    ; 2299: 29 F8    
         cmp     #$B8                    ; 229B: C9 B8    
-        bcs     SR_2298_1               ; 229D: B0 02    
+        bcs     Lazer_JFL               ; 229D: B0 02    
         pla                             ; 229F: 68       
         rts                             ; 22A0: 60       
 ; ===========================================================
-SR_2298_1
+Lazer_JFL
         tya                             ; 22A1: 98       
         pha                             ; 22A2: 48       
         ldy     #$00                    ; 22A3: A0 00    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 22A5: B1 00    
         bit     MASK_80                 ; 22A7: 2C 1B 20 
-        beq     SR_2298_1_1             ; 22AA: F0 08    
+        beq     Lazer_JFL_1             ; 22AA: F0 08    
         pla                             ; 22AC: 68       
         tay                             ; 22AD: A8       
         pla                             ; 22AE: 68       
@@ -578,7 +624,7 @@ SR_2298_1
         ora     #$B0                    ; 22B1: 09 B0    
         rts                             ; 22B3: 60       
 ; ===========================================================
-SR_2298_1_1
+Lazer_JFL_1
         pla                             ; 22B4: 68       
         tay                             ; 22B5: A8       
         pla                             ; 22B6: 68       
@@ -677,7 +723,7 @@ LOOP_INJLS_1
         dex                             ; 2363: CA       
         bpl     LOOP_INJLS_1            ; 2364: 10 F7    
 
-        lda     Game_Options            ; 2366: AD D3 1F  More time between players when 2 player game
+        lda     Game_Settings           ; 2366: AD D3 1F  More time between players when 2 player game
         and     #$01                    ; 2369: 29 01     One player game?
         beq     LDA_7F                  ; 236B: F0 62     Yes, jump
         lda     #$FF                    ; 236D: A9 FF     Set countdown for 2 player game
@@ -772,7 +818,7 @@ BACK_SPL lda    #$00                    ; 23D6: A9 00
 
         lda     #$05                    ; 23E7: A9 05    
         sta     ZP_Num_Lives_P2         ; 23E9: 85 5C    
-        lda     Game_Options            ; 23EB: AD D3 1F 
+        lda     Game_Settings           ; 23EB: AD D3 1F 
         and     #$01                    ; 23EE: 29 01    
         bne     SKIP_SPL                ; 23F0: D0 02    
         sta     ZP_Num_Lives_P2         ; 23F2: 85 5C    
@@ -895,13 +941,13 @@ Game_Sel_Flash_Period
 GSFP1   pha                             ; 24A4: 48       
         and     #$01                    ; 24A5: 29 01     Test settings bit 1, if not set, skip counter logic
         bne     GSFP2                   ; 24A7: D0 09    
-        lda     ZP_Counter              ; 24A9: A5 58     Counter for flash period
+        lda     ZP_Flash_Counter        ; 24A9: A5 58     Counter for flash period
         lsr     a                       ; 24AB: 4A        remove the lsrs and flashes get faster
         lsr     a                       ; 24AC: 4A       
         lsr     a                       ; 24AD: 4A       
         and     #$01                    ; 24AE: 29 01    
         ora     #$80                    ; 24B0: 09 80    
-GSFP2   sta     ZP_Game_Sel_F7_Flash,x  ; 24B2: 95 45    
+GSFP2   sta     ZP_Game_Sel_F1_Flash,x  ; 24B2: 95 45    
         pla                             ; 24B4: 68       
         eor     #$01                    ; 24B5: 49 01    
         inx                             ; 24B7: E8       
@@ -909,10 +955,10 @@ GSFP2   sta     ZP_Game_Sel_F7_Flash,x  ; 24B2: 95 45
 ; ===========================================================
 Display_Game_Select
         ldx     #$00                    ; 24B9: A2 00    
-        lda     Game_Options            ; 24BB: AD D3 1F 
+        lda     Game_Settings           ; 24BB: AD D3 1F 
         and     #$01                    ; 24BE: 29 01    
         jsr     Game_Sel_Flash_Period   ; 24C0: 20 A1 24 
-        lda     Game_Options            ; 24C3: AD D3 1F 
+        lda     Game_Settings           ; 24C3: AD D3 1F 
         lsr     a                       ; 24C6: 4A       
         jsr     Game_Sel_Flash_Period   ; 24C7: 20 A1 24 
 
@@ -949,7 +995,7 @@ DGS1    lda     #$18                    ; 24EF: A9 18
 
         ldy     #$00                    ; 2500: A0 00    
         ldx     ZP_Temp_4_Lo            ; 2502: A6 08    
-        lda     ZP_Game_Sel_F7_Flash,x  ; 2504: B5 45    
+        lda     ZP_Game_Sel_F1_Flash,x  ; 2504: B5 45    
         jsr     DSTR1                   ; 2506: 20 D6 34 
         iny                             ; 2509: C8       
         tya                             ; 250A: 98       
@@ -1663,7 +1709,7 @@ Sound_Channels_Off_ETC
         lda     Object_2_Diagon         ; 29B3: AD C4 03 
         and     #$FD                    ; 29B6: 29 FD    
         sta     Object_2_Diagon         ; 29B8: 8D C4 03 
-        lda     Game_Options            ; 29BB: AD D3 1F 
+        lda     Game_Settings           ; 29BB: AD D3 1F 
         bit     MASK_01                 ; 29BE: 2C 14 20 
         bne     Z29D0                   ; 29C1: D0 0D    
 Z29C3   lda     ZP_Num_Lives_P1         ; 29C3: A5 5A    
@@ -1889,7 +1935,7 @@ Z2B53   cmp     #$03                    ; 2B53: C9 03
         and     #$0F                    ; 2B67: 29 0F    
         bne     Z2B52                   ; 2B69: D0 E7    
         ldx     #$07                    ; 2B6B: A2 07    
-Z2B6D   lda     _0400002001041818,x     ; 2B6D: BD 7F 2B 
+Z2B6D   lda     Init_Rocket_Part_Fuel_Table,x ; 2B6D: BD 7F 2B 
         sta     Object_1,x              ; 2B70: 9D B8 03 
         dex                             ; 2B73: CA       
         bpl     Z2B6D                   ; 2B74: 10 F7    
@@ -1897,10 +1943,10 @@ Z2B6D   lda     _0400002001041818,x     ; 2B6D: BD 7F 2B
         sta     Object_1_Horiz          ; 2B79: 8D B9 03 
         jmp     Z22E3                   ; 2B7C: 4C E3 22 
 ; -----------------------
-_0400002001041818
+Init_Rocket_Part_Fuel_Table
         fcb     $04,$00,$00,$20,$01,$04 ; 2B7F: 04 00 00 20 01 04 
         fcb     $18,$18                 ; 2B85: 18 18    
-_0E00002000000018
+Init_Flashing_Gem_Table
         fcb     $0E,$00,$00,$20,$00,$00 ; 2B87: 0E 00 00 20 00 00 
         fcb     $00,$18                 ; 2B8D: 00 18    
 Z2B8F   lda     Obj_Jetman_Looks        ; 2B8F: AD 80 03 
@@ -1916,7 +1962,7 @@ Z2B97   cmp     #$03                    ; 2B97: C9 03
         and     #$7F                    ; 2BA2: 29 7F    
         bne     Z2B96                   ; 2BA4: D0 F0    
         ldx     #$07                    ; 2BA6: A2 07    
-Z2BA8   lda     _0E00002000000018,x     ; 2BA8: BD 87 2B 
+Z2BA8   lda     Init_Flashing_Gem_Table,x ; 2BA8: BD 87 2B 
         sta     Object_2,x              ; 2BAB: 9D C0 03 
         dex                             ; 2BAE: CA       
         bpl     Z2BA8                   ; 2BAF: 10 F7    
@@ -2376,7 +2422,7 @@ Z2ECA   sta     ZP_001b                 ; 2ECA: 85 1B
         ldy     #$02                    ; 2ED6: A0 02    
         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2ED8: B1 00    
         lsr     a                       ; 2EDA: 4A       
-        sta     Keyboard_Data           ; 2EDB: 85 13    
+        sta     ZP_Keyboard_Data        ; 2EDB: 85 13    
         beq     Z2EFD                   ; 2EDD: F0 1E    
         cmp     #$03                    ; 2EDF: C9 03    
         bcs     Z2F01                   ; 2EE1: B0 1E    
@@ -2386,7 +2432,7 @@ Z2ECA   sta     ZP_001b                 ; 2ECA: 85 1B
         jsr     Z2F07                   ; 2EE9: 20 07 2F 
         lda     #$03                    ; 2EEC: A9 03    
         sec                             ; 2EEE: 38       
-        sbc     Keyboard_Data           ; 2EEF: E5 13    
+        sbc     ZP_Keyboard_Data        ; 2EEF: E5 13    
         sta     ZP_Temp_1_Lo            ; 2EF1: 85 02    
         lda     #$01                    ; 2EF3: A9 01    
         sta     ZP_001b                 ; 2EF5: 85 1B    
@@ -2440,10 +2486,10 @@ Z2F31   ldy     #$06                    ; 2F31: A0 06
         asl     a                       ; 2F52: 0A       
         asl     a                       ; 2F53: 0A       
         asl     a                       ; 2F54: 0A       
-        sta     Keyboard_Data           ; 2F55: 85 13    
+        sta     ZP_Keyboard_Data        ; 2F55: 85 13    
         lda     Obj_Flame_3             ; 2F57: AD B3 03 
         sec                             ; 2F5A: 38       
-        sbc     Keyboard_Data           ; 2F5B: E5 13    
+        sbc     ZP_Keyboard_Data        ; 2F5B: E5 13    
         sta     ZP_0019                 ; 2F5D: 85 19    
         jsr     Z3057                   ; 2F5F: 20 57 30 
         inc     Obj_Flame_4             ; 2F62: EE B4 03 
@@ -3102,7 +3148,7 @@ Read_Joystick
         rts                             ; 33F6: 60       
 ; ===========================================================
 Read_Keyboard_Joystick
-        lda     Game_Options            ; 33F7: AD D3 1F 
+        lda     Game_Settings           ; 33F7: AD D3 1F 
         bit     MASK_02                 ; 33FA: 2C 15 20  Joystick selected?
         bne     Read_Joystick           ; 33FD: D0 D5    
         lda     #$FF                    ; 33FF: A9 FF    
@@ -3541,10 +3587,10 @@ Z362F   lda     (ZP_Ptr_To_Str_Lo),y    ; 362F: B1 0E
         dex                             ; 3636: CA       
         bne     Z362F                   ; 3637: D0 F6    
         pla                             ; 3639: 68       
-        sta     Keyboard_Data           ; 363A: 85 13    
+        sta     ZP_Keyboard_Data        ; 363A: 85 13    
         lda     ZP_Temp_4_Hi            ; 363C: A5 09    
         sec                             ; 363E: 38       
-        sbc     Keyboard_Data           ; 363F: E5 13    
+        sbc     ZP_Keyboard_Data        ; 363F: E5 13    
         sta     ZP_Temp_4_Hi            ; 3641: 85 09    
         jmp     Z3688                   ; 3643: 4C 88 36 
 ; -----------------------
@@ -3579,10 +3625,10 @@ Z3674   lda     (ZP_Temp_3_Lo),y        ; 3674: B1 06
         dex                             ; 367B: CA       
         bne     Z3674                   ; 367C: D0 F6    
         pla                             ; 367E: 68       
-        sta     Keyboard_Data           ; 367F: 85 13    
+        sta     ZP_Keyboard_Data        ; 367F: 85 13    
         lda     ZP_Temp_4_Lo            ; 3681: A5 08    
         sec                             ; 3683: 38       
-        sbc     Keyboard_Data           ; 3684: E5 13    
+        sbc     ZP_Keyboard_Data        ; 3684: E5 13    
         sta     ZP_Temp_4_Lo            ; 3686: 85 08    
 Z3688   lda     ZP_Temp_1_Lo            ; 3688: A5 02    
         beq     Z36AB                   ; 368A: F0 1F    
@@ -3801,9 +3847,9 @@ Z3800   sec                             ; 3800: 38
         asl     a                       ; 3804: 0A       
         asl     a                       ; 3805: 0A       
         asl     a                       ; 3806: 0A       
-Z3807   sta     Keyboard_Data           ; 3807: 85 13    
+Z3807   sta     ZP_Keyboard_Data        ; 3807: 85 13    
         txa                             ; 3809: 8A       
-        ora     Keyboard_Data           ; 380A: 05 13    
+        ora     ZP_Keyboard_Data        ; 380A: 05 13    
         tax                             ; 380C: AA       
         lda     UDG_Lookup,x            ; 380D: BD 5F 38 
         tay                             ; 3810: A8       

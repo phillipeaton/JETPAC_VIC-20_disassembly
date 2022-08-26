@@ -61,26 +61,29 @@ include nfo_variables.nfo         * Zero Page and others with persistency
 word     2000-2003
 ;        2004
 break    2004-2013
+comment  2004
 comment  2004 Initial value table for VIC setup 16 bytes
-lcomment 2004 VICCRO Left edge of TV picture and interlace switch.
 const    2004-201B
 label    2004 VIC_Init_Tab
-lcomment 2005 VICCR1
-lcomment 2006 VICCR2
-lcomment 2007 VICCR3
-lcomment 2008 VICCR4
-lcomment 2009 VICCR5
-lcomment 200A VICCR6
-lcomment 200B VICCR7
-lcomment 200C VICCR8
-lcomment 200D VICCR9
-lcomment 200E VICCRA
-lcomment 200F VICCRB
-lcomment 2010 VICCRC
-lcomment 2011 VICCRD
-lcomment 2012 VICCRE
-lcomment 2013 VICCRF
+lcomment 2004 VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
+lcomment 2005 VIC_R1_V_Ctr
+lcomment 2006 VIC_R2_Num_Cols
+lcomment 2007 VIC_R3_Num_Rows
+lcomment 2008 VIC_R4_TV_Raster
+lcomment 2009 VIC_R5_CM_Start
+lcomment 200A VIC_R6_H_LightP
+lcomment 200B VIC_R7_V_LightP
+lcomment 200C VIC_R8_Paddle_X
+lcomment 200D VIC_R9_Paddle_Y
+lcomment 200E VIC_RA_Frq_Osc1
+lcomment 200F VIC_RB_Frq_Osc2
+lcomment 2010 VIC_RC_Frq_Osc3
+lcomment 2011 VIC_RD_Frq_Noise
+lcomment 2012 VIC_RE_Vol_Color
+lcomment 2013 VIC_RF_BckBdrCol
 ;        2014
+comment  2014
+comment  2014 Quick lookup or BIT instruction
 label    2014 MASK_01
 label    2015 MASK_02
 label    2016 MASK_04
@@ -94,42 +97,56 @@ comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 used     201C NMI_Interrupt_Hardler
 ;        201D
 comment  201D
-comment  201D  ----------------------------------------------------------
-comment  201D  Starts here
-comment  201D  ----------------------------------------------------------
+comment  201D ----------------------------------------------------------
+comment  201D Starts here
+comment  201D ----------------------------------------------------------
+lcomment 201D Disable Interrupts
 lcomment 201E Reset stack pointer
 ;        201e
 lcomment 2021 Clear Decimal flag
-lcomment 2022 Setup NMI Interrupt Vector
+comment  2022
+comment  2022 Setup NMI interrupt vector to service routine
+comment  202C
+comment  2032
+comment  2032 Setup I/O direction and enables
+comment  2041
+comment  2044
+comment  2044 ??????????????????????????????????????????????
+comment  204C
+comment  204C Setup IRQ interrupt vector to service routine
 comment  2056
-lcomment 2056 Reset the VIC 16 registers
-label    2058 Start_1
+comment  2056 Reset the VIC
+lcomment 2056 16 registers
+label    2058 Reset_VIC
 comment  2061
-lcomment 2061
-lcomment 2061 Store ascending numbers step #11 at a time into #23 bytes from $200 as below
-lcomment 2061 then do it #10 more times, but starting at 1 higher each time
-lcomment 2061 Note each character is a 16x8 tile i.e. double height
-lcomment 2061 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
-lcomment 2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
-lcomment 2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
-lcomment 2061 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5
-lcomment 2061 025C  04 0F 1A 25 30 3B 46 51 5C 67 72 7D 88 93 9E A9 B4 BF CA D5 E0 EB F6
-lcomment 2061 0273  05 10 1B 26 31 3C 47 52 5D 68 73 7E 89 94 9F AA B5 C0 CB D6 E1 EC F7
-lcomment 2061 028A  06 11 1C 27 32 3D 48 53 5E 69 74 7F 8A 95 A0 AB B6 C1 CC D7 E2 ED F8
-lcomment 2061 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 E3 EE F9
-lcomment 2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA
-lcomment 2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
-lcomment 2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
+comment  2061 Setup Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
+comment  2061 Note each character is a 16x8 tile i.e. double height,
+comment  2061 thus play area is decimal 23 Rows x 22 Columns
+comment  2061 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
+comment  2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
+comment  2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
+comment  2061 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5
+comment  2061 025C  04 0F 1A 25 30 3B 46 51 5C 67 72 7D 88 93 9E A9 B4 BF CA D5 E0 EB F6
+comment  2061 0273  05 10 1B 26 31 3C 47 52 5D 68 73 7E 89 94 9F AA B5 C0 CB D6 E1 EC F7
+comment  2061 028A  06 11 1C 27 32 3D 48 53 5E 69 74 7F 8A 95 A0 AB B6 C1 CC D7 E2 ED F8
+comment  2061 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 E3 EE F9
+comment  2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA
+comment  2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
+comment  2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
 ;        2064
-label    2064 Start_2
-label    2067 Start_3
-comment  2071
+label    2064 SR_Cols
+label    2067 SR_Rows
 comment  2079
 label    2079 Start_Rst_Game_Sel_Flash
 comment  207C
+comment  207C Reset game selection flashing highlights
+lcomment 207E Appears to overlap ZP_HW_IRQ_Count1 ???????????????
 ;        2080
-label    2080 BACK_2080
+label    2080 GS_Flash
 comment  2085
+comment  2085 Setup volume and color
+comment  208A
+comment  208A Initialise_Rocket
 comment  208F
 label    208F Game_Select
 ;        2093
@@ -140,50 +157,104 @@ lcomment 20A0 Get game settings ($1fD3 = Just outside UDG RAM)
 lcomment 20A3 Read keyboard column
 lcomment 20A6 Store keyboard data
 lcomment 20AA F1 pressed? (1 Player)
+comment  20A8
+comment  20A8 Test F-Keys pressed or Space to start game
 lcomment 20AC No, skip
-label    20B2 SKIP_20B2
+comment  20B2
+label    20B2 Test_F3
 lcomment 20B4 F3 pressed? (2 Player)
 lcomment 20B6 No, skip
-label    20BC SKIP_20BC
+comment  20BC
+label    20BC Test_F5
 lcomment 20BE F5 pressed? (Keyboard)
 lcomment 20C0 No, skip
-label    20C6 SKIP_20C6
+comment  20C6
+label    20C6 Test_F7
 lcomment 20C8 F7 pressed? (Joystick)
 lcomment 20CA No, skip
-label    20D0 SKIP_20D0
+comment  20D0
+label    20D0 Test_Space
 lcomment 20D1 Store game settings ($1fD3 = Just outside UDG RAM)
 lcomment 20D1 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
+comment  20D7
 lcomment 20D9 Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
 lcomment 20DF Space Pressed?
-lcomment 20E1 No, read keyboard again
+lcomment 20E1 No, check for settings again
 ;        20E3
 comment  20E3
+comment  20E9
+comment  20E9 ----------------------------------------------------------
+comment  20E9 FUNCTION  : qsqtnsutnosen
+comment  20E9 \            soentsnoetus
+comment  20E9 \            seiteunst
+comment  20E9 CALLED BY :
+comment  20E9 CALLS     : Nothing
+comment  20E9 ARGUMENTS : sentiseutn
+comment  20E9 \            etinseut
+comment  20E9 \            setniseutn
+comment  20E9 ----------------------------------------------------------
 label    20E9 Update_Lazer_Shots
+lcomment 20EB Update once every four calls?
 ;        20F0
-label    20F0 Update_Lazer_Shots_1
+label    20F0 Lazer_Shots
 const    20F3
-lcomment 20F3 ZP_Temp_2_Lo
+lcomment 20F3 ZP_Temp_3_Lo + Hi
 lcomment 20F4
 word     20F4
 const    20F6
 lcomment 20F6 End of Parameters
 comment  20F7
-comment  20F7 Loop 4 times through other_ram, 8 bytes at a time, if any are 0, branch to 2110
-label    20FB Update_Lazer_Shots_Loop
-label    2110 Update_Lazer_Shot
-label    212f Update_Lazer_Shot1
+comment  20F7 Loop through the four possible lazer shots, branch if any are zero I.E. NOT SHOOTING???????
+label    20FB LS_Loop
+comment  20FF
+comment  20FF Move ZP index address to next 8 bytes i.e. next lazer shot
+label    2110 Lazer_Shot
+lcomment 2110 Get Jetman attrib 00 i.e. fly/no-fly and facing left/right and ???
+lcomment 2112 Store for later
+lcomment 2113 Jetman looking left?
+lcomment 2115 Set bit 4, DON'T KNOW WHAT IT'S USED FOR??????????
+lcomment 2117 Store to inactive lazer attrib 00
+comment  2119
+lcomment 2119 Move to next Jetman attrib 01
+lcomment 211A Get Jetman attrib 01 i.e. X position
+lcomment 211C Zero the bottom 3 bits
+lcomment 211E Set bits 0 & 2
+lcomment 2120 Store for later
+comment  2122
+lcomment 2122 Restore Jetman attrib 00
+lcomment 2123 Jetman looking left?
+lcomment 2125 No, branch
+label    212f Lazer_Shot_
 ;        2145
 label    2145 BACK_2145
 ;        216B
 label    216B Lazer_Color_Table
 lcomment 216B Green not used, messes up colors if it's used
 break    216F
-label    2173 Update_Lazer_Shot_1
-label    217E Update_Lazer_Shot_2
-label    2187 Update_Lazer_Shot_1_1
-label    218D Update_Lazer_Shot_1_2
-;        219A
-label    219A Fire_Pressed
+comment  2173
+label    2173 Lazer_Jetman_Facing_Right
+lcomment 2173 Get Jetman attrib 01 i.e. ????????
+lcomment 2175 Zero bits 3-7, any bits 0-2 set?
+lcomment 2177 No, branch
+label    217E Lazer_JFR_1
+lcomment 217E Zero bit 0
+lcomment 2180 TESING AT EDGE OF SCREEN?
+label    2187 Lazer_JFR_1_1
+lcomment 2188 OFFSETTING EDGE OF SCREEN?
+label    218D Lazer_JFR_2
+lcomment 218D Restore saved Jetman attrib 00
+lcomment 2190 Add $10 for some reason??????????
+comment  2195
+comment  2195 ----------------------------------------------------------
+comment  2195 FUNCTION  : qsqtnsutnosen
+comment  2195 \            soentsnoetus
+comment  2195 \            seiteunst
+comment  2195 CALLED BY :
+comment  2195 CALLS     : Nothing
+comment  2195 ARGUMENTS : sentiseutn
+comment  2195 \            etinseut
+comment  2195 \            setniseutn
+comment  2195 ----------------------------------------------------------
 label    219A Fire_Pressed_1
 label    21DC SKIP_21DC
 label    21F1 SKIP_21F1
@@ -200,10 +271,10 @@ label    2248 SR_2229_1
 label    2257 SR_2257
 label    2263 SR_2257_1
 label    2285 CLC_ADC_08
-label    228B Move_ZP17_15_to_ZP16_14
-label    2298 SR_2298
-label    22A1 SR_2298_1
-label    22B4 SR_2298_1_1
+label    228B Lazer_ZP17_15_to_ZP16_14
+label    2298 Lazer_Jetman_Facing_Left???
+label    22A1 Lazer_JFL
+label    22B4 Lazer_JFL_1
 label    22BA Reset_Level_Add_Extra_Life
 comment  22BD
 comment  22BD Player at level 4, add another life
@@ -679,8 +750,8 @@ word     2A4C
 label    2A5F Lev_Start_1st_Alien_onScr
 label    2A6D Not_Triggered_2A6D
 label    2ABC Not_Triggered_2ABC
-label    2B7F _0400002001041818
-label    2B87 _0E00002000000018
+label    2B7F Init_Rocket_Part_Fuel_Table
+label    2B87 Init_Flashing_Gem_Table
 ;        2B82
 const    2B82
 const    2B8A

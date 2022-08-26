@@ -18,7 +18,7 @@ label      0F ZP_Ptr_To_Str_Hi
 label      10 ZP_0010 ; Save Obj List Params 1
 label      11 ZP_0011 ; Save Obj List Params 1
 label      12 ZP_0012 ; Save Obj List Params 1
-label      13 Keyboard_Data
+label      13 ZP_Keyboard_Data
 label      14 ZP_0014 ; Connected somehow. Shuffled in a subroutine.
 label      15 ZP_0015 ; Connected somehow. Shuffled in a subroutine.
 label      16 ZP_0016 ; Connected somehow. Shuffled in a subroutine.
@@ -41,17 +41,20 @@ label      27 ZP_Rocket_Flame_Toggle ; Counts up throughout the flight, used for
 label      0028-0039 ZP_Player_Object_Stash
 label      40 ZP_Param_Addr_Lo
 label      41 ZP_Param_Addr_Hi
+
 label      45 ZP_Game_Sel_F1_Flash
-label      45 ZP_Game_Sel_F3_Flash
-label      45 ZP_Game_Sel_F5_Flash
-label      45 ZP_Game_Sel_F7_Flash
+label      46 ZP_Game_Sel_F3_Flash
+label      47 ZP_Game_Sel_F5_Flash
+label      48 ZP_Game_Sel_F7_Flash
+label      49 ZP_Game_Sel_Start_Flash
 label      4a ZP_HW_IRQ_Count1
 label      4b ZP_HW_IRQ_Count2
 label      4c ZP_HW_IRQ_Count3
-label      51 ZP_Score_P1 ; 3 bytes (Hi Score is stored where?)
-label      54 ZP_Score_P2 ; 3 bytes
+
+label      51-53 ZP_Score_P1 ; 3 bytes (Hi Score is stored where?)
+label      54-56 ZP_Score_P2 ; 3 bytes
 label      57 ZP_Invert ; Used to flash game options & 1UP+score at player start
-label      58 ZP_Counter
+label      58 ZP_Flash_Counter
 label      59 ZP_Level_Current_Plyr
 label      5a ZP_Num_Lives_P1
 label      5b ZP_Level_Other_Plyr
@@ -71,13 +74,13 @@ label    0385 Obj_Jetman_0385
 label    0386 Obj_Jetman_0386
 label    0387 Obj_Jetman_0387
 
-label    0388 Obj_Lazer_1 ; 00 when not fired, following bytes cahnge value as beam fades
+label    0388 Obj_Lazer_0 ; 00 when not fired, following bytes cahnge value as beam fades
 
-label    0390 Obj_Lazer_2
+label    0390 Obj_Lazer_1
 
-label    0398 Obj_Lazer_3
+label    0398 Obj_Lazer_2
 
-label    03A0 Obj_Lazer_4
+label    03A0 Obj_Lazer_3
 
 label    03A8 Obj_Rocket_0
 label    03A9 Obj_Rocket_1
@@ -106,9 +109,9 @@ label    03B7 Obj_Flame_7
 ; 07=Ball
 ; 08=Cross
 ; 09+=CRASH
-; 0A=Flame;
-; 0B=Also Flame? Rocket_Ascend/Decend?
-; C0=Rocket with 04 10/02 toggling
+; 0A=Rocket Ascend;
+; 0B=Rocket Descend
+; C0=Flame
 ; 0D
 ; 0E=flashing gem
 
@@ -117,6 +120,7 @@ label    03B8 Object_1 ;     03B8  04 20 00 3F 00 01 10 18
 label    03B9 Object_1_Horiz
 label    03BC Object_1_Diagon
 
+; Rocket part or gem
 label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Explosion->00, 04=Rocket_Part/Fuel, 05=fuzzball, 06=saucer, 07=Ball, 08=Cross, 09+=CRASH, 0E=flashing/werthers, 0A=Flame, 0B=Rocket_Ascend/Decend?
 label    03C1 Object_2_Horiz
 label    03C4 Object_2_Diagon
@@ -142,5 +146,5 @@ label    19a0 UDG_P2_LIVES_RAW_POSN
 label    1b08 UDG_P2_SCORE_RAW_POSN
 
 label    1fd0 Score_Hi
-label    1fd3 Game_Options ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
+label    1fd3 Game_Settings ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
 
