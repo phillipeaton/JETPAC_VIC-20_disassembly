@@ -3127,24 +3127,31 @@ Z33C0   ldy     #$03                    ; 33C0: A0 03
         ror     a                       ; 33D0: 6A       
         jmp     Flying_3?               ; 33D1: 4C F7 32 
 ; -----------------------
+
+; VIA Port A Bit 2=Up, Bit 3=Down, Bit 4=Right, Bit 5=Fire
+; VIA Port B Bit 2=Up, Bit 3=Down, Bit 4=Right, Bit 5=Fire
+; Port A read twice, first for 3 directions, second for fire button
+; Port B read once for 4th direction
 Read_Joystick
-        lda     VIA1_Port_A             ; 33D4: AD 11 91 
+        lda     VIA1_Port_A             ; 33D4: AD 11 91  Nothing pressed, byte=$7C = %0111_1100 i.e. inputs low
         rol     a                       ; 33D7: 2A       
-        rol     a                       ; 33D8: 2A       
-        ora     #$8F                    ; 33D9: 09 8F    
-        sta     ZP_Player_Movement      ; 33DB: 85 1C    
-        lda     VIA1_Port_A             ; 33DD: AD 11 91 
+        rol     a                       ; 33D8: 2A        Leaves nnnn_0000 i.e. Fire and 3 directions in top nibble
+        ora     #$8F                    ; 33D9: 09 8F     Set bits 7, 1-4, which ignores Fire. Remember inputs are active low
+        sta     ZP_Player_Movement      ; 33DB: 85 1C     Nothing pressed, byte=$FF at this point
+
+        lda     VIA1_Port_A             ; 33DD: AD 11 91  Nothing pressed, byte=$7C = %0111_1100 i.e. inputs low
         ror     a                       ; 33E0: 6A       
-        ror     a                       ; 33E1: 6A       
-        ora     #$F7                    ; 33E2: 09 F7    
-        and     ZP_Player_Movement      ; 33E4: 25 1C    
-        sta     ZP_Player_Movement      ; 33E6: 85 1C    
+        ror     a                       ; 33E1: 6A        Leaves 000n_nnnn i.e. Fire and 3 directions in top nibble
+        ora     #$F7                    ; 33E2: 09 F7     Set bits 0-2 & 5-8, which ignores fire. Remember inputs are action low
+        and     ZP_Player_Movement      ; 33E4: 25 1C     Merge result into previous reading
+        sta     ZP_Player_Movement      ; 33E6: 85 1C      and store
+
         lda     #$00                    ; 33E8: A9 00    
-        sta     VIA2_DDR_B              ; 33EA: 8D 22 91 
-        lda     VIA2_Port_B             ; 33ED: AD 20 91 
-        ora     #$7F                    ; 33F0: 09 7F    
-        and     ZP_Player_Movement      ; 33F2: 25 1C    
-        sta     ZP_Player_Movement      ; 33F4: 85 1C    
+        sta     VIA2_DDR_B              ; 33EA: 8D 22 91  Set Port B direction all lines read
+        lda     VIA2_Port_B             ; 33ED: AD 20 91  Nothing pressed, byte=$FF = %0111_1100 i.e. inputs low
+        ora     #$7F                    ; 33F0: 09 7F     Set bits 0-6, ignores Fire. Remember inputs are action low
+        and     ZP_Player_Movement      ; 33F2: 25 1C     Merge result into previous reading
+        sta     ZP_Player_Movement      ; 33F4: 85 1C      and store
         rts                             ; 33F6: 60       
 ; ===========================================================
 Read_Keyboard_Joystick

@@ -90,3 +90,22 @@ C= SHIFT Z  X  C  V  B  N  M  ,  .  /  SHIFT  CDN CRT   F7
          [        SPACE BAR       ]
          
 --------------------------------------------------------------------------         
+
+VIA1
+
+$9111   #37137     Port A output register
+                   (PA0) Bit 0=Serial CLK IN
+                   (PA1) Bit 1=Serial DATA IN
+                   (PA2) Bit 2=Joy 0
+                   (PA3) Bit 3=Joy 1
+                   (PA4) Bit 4=Joy 2
+                   (PA5) Bit 5=Lightpen/Fire button
+                   (PA6) Bit 6=Cassette switch sense
+                   (PA7) Bit 7=Serial ATN out
+                   
+$9120   #37152     Port B output register
+                   Keyboard column scan
+                   (PB3) Bit 3=Cassette write line
+                   (PB7) Bit 7=Joy 3                   
+                   
+--------------------------------------------------------------------------         

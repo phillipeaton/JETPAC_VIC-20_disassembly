@@ -856,7 +856,28 @@ label    3321 Bottom_After?
 label    334D Flash_Score_Then_Display_Scores
 label    3367 JMP_to_Subroutine_261A
 label    336A Read_Kbd_Jstk
+comment  33D4
+comment  33D4 VIA Port A Bit 2=Up, Bit 3=Down, Bit 4=Right, Bit 5=Fire
+comment  33D4 VIA Port B Bit 2=Up, Bit 3=Down, Bit 4=Right, Bit 5=Fire
+comment  33D4 Port A read twice, first for 3 directions, second for fire button
+comment  33D4 Port B read once for 4th direction
 label    33D4 Read_Joystick
+lcomment 33D4 Nothing pressed, byte=$7C = %0111_1100 i.e. inputs low
+lcomment 33D8 Leaves nnnn_0000 i.e. Fire and 3 directions in top nibble
+lcomment 33D9 Set bits 7, 1-4, which ignores Fire. Remember inputs are active low
+lcomment 33DB Nothing pressed, byte=$FF at this point
+comment  33DD
+lcomment 33DD Nothing pressed, byte=$7C = %0111_1100 i.e. inputs low
+lcomment 33E1 Leaves 000n_nnnn i.e. Fire and 3 directions in top nibble
+lcomment 33E2 Set bits 0-2 & 5-8, which ignores fire. Remember inputs are action low
+lcomment 33E4 Merge result into previous reading
+lcomment 33E6 \ and store
+comment  33E8
+lcomment 33EA Set Port B direction all lines read
+lcomment 33ED Nothing pressed, byte=$FF = %0111_1100 i.e. inputs low
+lcomment 33F0 Set bits 0-6, ignores Fire. Remember inputs are action low
+lcomment 33F2 Merge result into previous reading
+lcomment 33F4 \ and store
 label    33F7 Read_Keyboard_Joystick
 lcomment 33FA Joystick selected?
 label    345C SKIP_345C
