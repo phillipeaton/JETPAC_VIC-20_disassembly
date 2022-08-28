@@ -1,61 +1,13 @@
-*** GENERAL COMMAND LINE OPTIONS ***
-* Options begin,end,offset,interleave,bus always define settings for the following file
-option dasm 6502            * Select disassembler type
-option out jetpac.a65       * Select output filename of dissasembly
-option offset 2000          * Select start address of supplied binary
-file   jetpac_2000-3fff.bin * Instructs dasmfw to load the given file at the given address
-
-*** OUTPUT FORMATTING OPTIONS ***
-*option addr off     * Show address field output for clean assembler source files
-*option hex on       * Show hex dump output
-option asc off       * Show output of the ASCII equivalent to code/data
-*option cref on      * Show cross-referece table
-*option unused on    * Show unused labels
-;option labellen 32   * Def=8  Reserve spaces for code labels.
-option eqlbllen 24   * Def=8  Reserve spaces for EQU labels.
-option copndlen 24   * Def=24 Reserve spaces for operand part of disassembled instruction with line comment
-option uopndlen 52   * Def=52 Reserve spaces for operand part of disassembled instruction without line comment
-option dbcount 3     * Def=5  Reserve spaces for hex/ascii dump bytes if hex or asc options enabled.
-
-*** DISASSEMBLER OPTIONS ***
-*option pbase 16     * Default parsing base, default is 16
-option defdisp hex  * Default display base, default is hex
-*option cchar //     * Set end of line comment character
-*option cchar ;      * Set end of line comment character
-option upmnemo off   * Upper case mnemonics in output file
-
-*** DISASSEMBLER SPECIFIC OPTIONS ***
-*option conv on       * Convenience mnemonics
-*option forceaddr off * To handle forced direct / extended addressing
-
-******************************************************************************
-*If you think about it, there are various kinds of mutually exclusive options
-*for a memory cell. These are:
-*type (unused / code / data / rmb)
-*size (default char / word; dasmfw also has dword for processors that support 4-byte entities)
-*formatting (bin / char / dec / hex)
-*semantics (const)
-******************************************************************************
-
-******************************************************************************
-* If an address is used in an instruction that clearly indicates it's referencing
-* data (LDA, as a simple example) and there's no label in place for that address,
-* it uses a "M" prefix for generated labels; if the referenced address is clearly
-* code (JMP, for example), it uses a "Z" prefix.
-******************************************************************************
-*insert \ SETLI 128               * a09 Assembler. Sets the line length for listings; nnn is the number of columns that can be printed in a line (40-2000).
-*insert \ processor 6502          * For DASM Assembler? Can't remember...
+include nfo_options.nfo           * dasmfw options
+include nfo_memory_map.nfo        * Include VIC-20 memory map info
+include nfo_separators.nfo        * Include JMP/JSR separator lines
+include nfo_code_data.nfo         * Everything is data, unless it's not
+include nfo_variables.nfo         * Zero Page and others with persistency
 
 insert ; ----------------------------------------------------------
 insert ;  This is the reverse-engineered source code for the
 insert ;  game 'JETPAC' written by Ultimate Play The Game.
 insert ; ----------------------------------------------------------
-
-*** INFO FILE INSTRUCTIONS ***
-include nfo_memory_map.nfo        * Include VIC-20 memory map info
-include nfo_separators.nfo        * Include JMP/JSR separator lines
-include nfo_code_data.nfo         * Everything is data, unless it's not
-include nfo_variables.nfo         * Zero Page and others with persistency
 
 ; Start of disassembly instructions
 word     2000-2003
@@ -669,6 +621,7 @@ label    283B Ptr_Rocket_Flame_Hi
 label    283C Ptr_Final_Char_Lo
 lcomment 283C Addr of final char UDG
 label    283D Ptr_Final_Char_Hi
+comment  283E
 label    283E Fire_Pressed
 ;        286B
 break    286B
@@ -827,6 +780,9 @@ label    3091 Read_ZP_Params_P2_Score
 lcomment 3094 ZP_Temp_2
 lcomment 3095 P2 Score in ZP
 word     3095
+comment  309B
+label    30B3 FROM_RD_KBD_JSTK_Etc
+lcomment 30B3 Triggers with Jetman+3 objects, then Jetman+different 3 objects, etc.
 ;        3143
 lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
 lcomment 316B $3E15 is the Mineral UDG address
@@ -834,20 +790,52 @@ lcomment 316B $3E15 is the Mineral UDG address
 comment  31B6 XY_Data_for_3143_Subroutine
 const    31B6-31BE
 word     31B6-31BD
+comment  31BF
+label    31BF AAAAAAAA
+label    31DF BBBBBBBB
+label    31CE CCCCCCCC
+label    31CB EEEEEEEE
+label    31D7 FFFFFFFF
+label    31D4 GGGGGGGG
+label    31EA HHHHHHHH
+label    31E7 IIIIIIII
+label    31F2 JJJJJJJJ
+label    3200 KKKKKKKK
+label    3208 LLLLLLLL
+label    3212 MMMMMMMM
 label    3215 JMP_FLYING
+label    3218 NNNNNNNN
+lcomment 3218 Save A
+lcomment 321B Test for direction Up
+lcomment 321E No, branch
+lcomment 3224 Restore A
+label    3228 OOOOOOOO
+label    3224 PPPPPPPP
+label    323E QQQQQQQQ
 label    3254 LDA_08
 comment  3259 HOW DO YOU EVER GET HERE?
 label    325E CLC_ADC_01
 label    3264 CLC_ADC_B8
 label    326A ADC_48
 label    326F TXA_
-label    3273 Read_Kbd_Jsk_And_Store
+label    3273 Flying
+lcomment 3276 Returns A=%RLDU_F111
+label    3285 __WWWW__
+label    32A2 __YYYY__
+label    32A6 __ZZZZ__
+label    32BA CSC_ADC_RTN
 label    32C7 Flying?
+lcomment 32CB Test for direction Down
+lcomment 32CE Yes, branch
+lcomment 32D0 Test for direction Up
+lcomment 32D3 Yes, branch
 label    32DE Flying_1?
 label    32E0 Flying_2?
 lcomment 32E8 AF=Bottom of screen
 label    32F7 Flying_3?
 label    32F9 Flying_4?
+lcomment 3301 Test for direction Right
+lcomment 3304 No, branch
 label    3309 SKIP_Flying_5?
 label    330C Not_sure_330c
 label    3318 LDA00
@@ -856,28 +844,32 @@ label    3321 Bottom_After?
 label    334D Flash_Score_Then_Display_Scores
 label    3367 JMP_to_Subroutine_261A
 label    336A Read_Kbd_Jstk
+lcomment 33B3 Test for direction Up
+lcomment 33B5 Yes, branch
 comment  33D4
-comment  33D4 VIA Port A Bit 2=Up, Bit 3=Down, Bit 4=Right, Bit 5=Fire
-comment  33D4 VIA Port B Bit 2=Up, Bit 3=Down, Bit 4=Right, Bit 5=Fire
-comment  33D4 Port A read twice, first for 3 directions, second for fire button
-comment  33D4 Port B read once for 4th direction
+comment  33D4 VIA Port A Bit 2=Up, 3=Down, 4=Left, 5=Fire
+comment  33D4 VIA Port B Bit 7=Left
+comment  33D4 Port A read twice, 1st for Up/Down/Left, 2nd for Fire
+comment  33D4 Port B read once for Right
 label    33D4 Read_Joystick
-lcomment 33D4 Nothing pressed, byte=$7C = %0111_1100 i.e. inputs low
-lcomment 33D8 Leaves nnnn_0000 i.e. Fire and 3 directions in top nibble
-lcomment 33D9 Set bits 7, 1-4, which ignores Fire. Remember inputs are active low
+lcomment 33D4 %xxFL_DU00, reads $7C=%0111_1100 when nothing pressed
+lcomment 33D8 Leaves %FLDU_0000
+lcomment 33D9 Set bits 7, 1-4, leaving %1LDU_1111
 lcomment 33DB Nothing pressed, byte=$FF at this point
 comment  33DD
-lcomment 33DD Nothing pressed, byte=$7C = %0111_1100 i.e. inputs low
-lcomment 33E1 Leaves 000n_nnnn i.e. Fire and 3 directions in top nibble
-lcomment 33E2 Set bits 0-2 & 5-8, which ignores fire. Remember inputs are action low
-lcomment 33E4 Merge result into previous reading
-lcomment 33E6 \ and store
+comment  33DD Read Fire button
+lcomment 33DD Same as above
+lcomment 33E1 Leaves %xxxx_FLDU
+lcomment 33E2 Set bits 0-2 & 5-8, leaving %1111_F111
+lcomment 33E4 Merge result into previous reading and store
+lcomment 33E6 Leaves %1LDU_F111
 comment  33E8
-lcomment 33EA Set Port B direction all lines read
-lcomment 33ED Nothing pressed, byte=$FF = %0111_1100 i.e. inputs low
-lcomment 33F0 Set bits 0-6, ignores Fire. Remember inputs are action low
-lcomment 33F2 Merge result into previous reading
-lcomment 33F4 \ and store
+comment  33E8 Read direction Right
+lcomment 33EA Set Port B direction all lines read, probably
+lcomment 33ED %xxxx_Rxxx, reads $FF=%1111_1111 when nothing pressed
+lcomment 33F0 Set bits 0-6, leaving %R111_1111
+lcomment 33F2 Merge result into previous reading and store
+lcomment 33F4 Leaves %RLDU_F111
 label    33F7 Read_Keyboard_Joystick
 lcomment 33FA Joystick selected?
 label    345C SKIP_345C
@@ -1151,11 +1143,11 @@ lcomment 35D1 Decrement number of lines counter
 lcomment 35D2 All lines copied? If no, loop back.
 lcomment 35D4 If yes, routine ends
 ;        35D7
-label    35D7 Save_Obj_List_Params
+label    35D7 Save_Obj_List_Params_013
 ;        35E2
 comment  35E2
 ;        35E9
-label    35E9 Save_Obj_List_Params2
+label    35E9 Save_Obj_List_Params_0135
 comment  35F4
 comment  35FA
 ;        End

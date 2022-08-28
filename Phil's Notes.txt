@@ -1,3 +1,20 @@
+******************************************************************************
+*If you think about it, there are various kinds of mutually exclusive options
+*for a memory cell. These are:
+*type (unused / code / data / rmb)
+*size (default char / word; dasmfw also has dword for processors that support 4-byte entities)
+*formatting (bin / char / dec / hex)
+*semantics (const)
+******************************************************************************
+
+******************************************************************************
+* If an address is used in an instruction that clearly indicates it's referencing
+* data (LDA, as a simple example) and there's no label in place for that address,
+* it uses a "M" prefix for generated labels; if the referenced address is clearly
+* code (JMP, for example), it uses a "Z" prefix.
+******************************************************************************
+
+
 To debug JETPAC after a warm reset, set breakpoint at $201d then SYS4624 then SYS8221.
 
 Colour mapping is at $9600, #23 columns, #11 rows from 1UP to COPYRIGHT text

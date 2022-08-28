@@ -1,0 +1,32 @@
+*** GENERAL COMMAND LINE OPTIONS ***
+* Options begin,end,offset,interleave,bus always define settings for the following file
+option dasm 6502            * Select disassembler type
+option out jetpac.a65       * Select output filename of dissasembly
+option offset 2000          * Select start address of supplied binary
+file   jetpac_2000-3fff.bin * Instructs dasmfw to load the given file at the given address
+
+*** OUTPUT FORMATTING OPTIONS ***
+*option addr off     * Show address field output for clean assembler source files
+*option hex on       * Show hex dump output
+option asc off       * Show output of the ASCII equivalent to code/data
+*option cref on      * Show cross-referece table
+*option unused on    * Show unused labels
+option labellen 9   * Def=8  Reserve spaces for code labels.
+option eqlbllen 24   * Def=8  Reserve spaces for EQU labels.
+option copndlen 24   * Def=24 Reserve spaces for operand part of disassembled instruction with line comment
+option uopndlen 52   * Def=52 Reserve spaces for operand part of disassembled instruction without line comment
+option dbcount 3     * Def=5  Reserve spaces for hex/ascii dump bytes if hex or asc options enabled.
+
+*** DISASSEMBLER OPTIONS ***
+*option pbase 16     * Default parsing base, default is 16
+option defdisp hex  * Default display base, default is hex
+*option cchar //     * Set end of line comment character
+*option cchar ;      * Set end of line comment character
+option upmnemo off   * Upper case mnemonics in output file
+
+*** DISASSEMBLER SPECIFIC OPTIONS ***
+*option conv on       * Convenience mnemonics
+*option forceaddr off * To handle forced direct / extended addressing
+
+*insert \ SETLI 128               * a09 Assembler. Sets the line length for listings; nnn is the number of columns that can be printed in a line (40-2000).
+*insert \ processor 6502          * For DASM Assembler? Can't remember...

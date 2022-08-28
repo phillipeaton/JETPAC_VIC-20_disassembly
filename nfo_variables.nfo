@@ -27,7 +27,7 @@ label      18 ZP_0018 ; Save_Obj_List_Params 2
 label      19 ZP_0019 ; Save_Obj_List_Params 2
 label      1A ZP_001a ; Save_Obj_List_Params 2
 label      1B ZP_001b ; Save_Obj_List_Params 2
-label      1C ZP_Player_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
+label      1C ZP_Jetman_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 label      1E ZP_Ship_UDG_Addr_Offset
 label      1F ZP_Ship_UDG_Addr_Color?
 label      20 ZP_HW_IRQ_1_OR_0
@@ -101,42 +101,66 @@ label    03B5 Obj_Flame_5
 label    03B6 Obj_Flame_6
 label    03B7 Obj_Flame_7
 
-; 0th positon = object type:
-; 03=Explosion->00
-; 04=Rocket_Part/Fuel
-; 05=fuzzball
-; 06=saucer
-; 07=Ball
-; 08=Cross
-; 09+=CRASH
-; 0A=Rocket Ascend;
-; 0B=Rocket Descend
-; C0=Flame
-; 0D
-; 0E=flashing gem
 
+; Byte 00/08= object type:
+;        03=Explosion->00
+;        04=Rocket_Part/Fuel
+;        05=fuzzball
+;        06=saucer
+;        07=Ball
+;        08=Cross
+;        09+=CRASH
+;        0A=Rocket Ascend;
+;        0B=Rocket Descend
+;        C0=Flame
+;        0D=???
+;        0E=flashing gem
 
-label    03B8 Object_1 ;     03B8  04 20 00 3F 00 01 10 18
-label    03B9 Object_1_Horiz
-label    03BC Object_1_Diagon
+; Rocket top section, then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
+label    03B8 Obj_RTS_Fuel_Type ;
+label    03B9 Obj_RTS_Fuel_Horiz
+label    03BA Obj_RTS_Fuel_2
+label    03BB Obj_RTS_Fuel_3
+label    03BC Obj_RTS_Fuel_Diagon
+label    03BD Obj_RTS_Fuel_5
+label    03BE Obj_RTS_Fuel_6
+label    03BF Obj_RTS_Fuel_7
 
-; Rocket part or gem
-label    03C0 Object_2 ;     03C0  0E 58 00 5E 00 03 28 18  0=object type, 03=Explosion->00, 04=Rocket_Part/Fuel, 05=fuzzball, 06=saucer, 07=Ball, 08=Cross, 09+=CRASH, 0E=flashing/werthers, 0A=Flame, 0B=Rocket_Ascend/Decend?
-label    03C1 Object_2_Horiz
-label    03C4 Object_2_Diagon
-label    03C6 Object_2_3
+; Rocket middle section, then a Gem e.g. 03C0  0E 58 00 5E 00 03 28 18
+label    03C0 Obj_RMS_Gem_Type ;
+label    03C1 Obj_RMS_Gem_Horiz
+label    03C2 Obj_RMS_Gem_2
+label    03C3 Obj_RMS_Gem_3
+label    03C4 Obj_RMS_Gem_Diagon
+label    03C6 Obj_RMS_Gem_5
+label    03C6 Obj_RMS_Gem_6
+label    03C7 Obj_RMS_Gem_7
 
-label    03C8 Object_3 ;     03C8  05 57 08 9D 00 02 03 00  0=horizontal postion of alien
+; Byte 01/09= horizontal postion of alien
+; Byte 02/0A= direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
+; Byte 03/0B= height
+; Byte 04/0C= diagonal, jiggles around a lot for a saucer
+; Byte 05/0D= colour - bottom 3 bits of byte?
 
-label    03D0 Object_4 ;     03D0  05 91 08 7C 00 06 03 00  1=direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
+; Aliens 1-6
+label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00
+label    03C8 Obj_Alien_0_1 ;
+label    03C8 Obj_Alien_0_2 ;
+label    03C8 Obj_Alien_0_3 ;
+label    03C8 Obj_Alien_0_4 ;
+label    03C8 Obj_Alien_0_5 ;
+label    03C8 Obj_Alien_0_6 ;
+label    03C8 Obj_Alien_0_7 ;
 
-label    03D8 Object_5 ;     03D8  05 47 08 85 00 02 00 00  2=height
+label    03D0 Obj_Alien_1_0 ;     03D0  05 91 08 7C 00 06 03 00
 
-label    03E0 Object_6 ;     03E0  05 8B 08 81 00 02 03 00  3=diagonal, jiggles around a lot for a saucer
+label    03D8 Obj_Alien_2_0 ;     03D8  05 47 08 85 00 02 00 00
 
-label    03E8 Object_7 ;     03E8  05 A6 08 7D 00 02 03 00  4=colour - bottom 3 bits?
+label    03E0 Obj_Alien_3_0 ;     03E0  05 8B 08 81 00 02 03 00
 
-label    03F0 Object_8 ;     03F0  05 19 F8 8D 00 06 00 00
+label    03E8 Obj_Alien_4_0 ;     03E8  05 A6 08 7D 00 02 03 00
+
+label    03F0 Obj_Alien_5_0 ;     03F0  05 19 F8 8D 00 06 00 00
 
 ; Other variables that are somewhat persistent i.e. not reset at game restart
 label    1008 UDG_P1_SCORE_RAW_POSN
