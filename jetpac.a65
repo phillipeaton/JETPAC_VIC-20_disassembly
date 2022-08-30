@@ -660,7 +660,7 @@ Z22F2    jsr     Save_Obj_List_Ptr       ; 22F2: 20 E7 28
 ; -----------------------
 Init_Objects_1_To_3
          ldx     #$17                    ; 22FF: A2 17    
-CBTSR1   lda     Inital_Object_Data,x    ; 2301: BD 3B 23 
+CBTSR1   lda     Inital_Screen_Object_Data,x ; 2301: BD 3B 23 
          sta     Obj_Flame_0,x           ; 2304: 9D B0 03 
          dex                             ; 2307: CA       
          bpl     CBTSR1                  ; 2308: 10 F7    
@@ -671,7 +671,7 @@ Reset_Some_Objects
          jsr     Save_Obj_List_Ptr       ; 230E: 20 E7 28 
          jsr     Read_ZP_Parameters      ; 2311: 20 9D 25 
          fcb     $00                     ; 2314: 00       
-         fdb     Inital_Object_Data      ; 2315: 3B 23    
+         fdb     Inital_Screen_Object_Data ; 2315: 3B 23    
          fcb     $FF                     ; 2317: FF       
          ldx     #$03                    ; 2318: A2 03    
 Reset_S_O_1
@@ -694,13 +694,15 @@ Reset_S_O_1
          jsr     Restore_Obj_List_Ptr    ; 2337: 20 F0 28 
          rts                             ; 233A: 60       
 ; ===========================================================
-Inital_Object_Data
-         fcb     $09,$70,$00,$AF         ; 233B: 09 70 00 AF  AF = sprite at bottom of screen, could be rocket part?
-         fcb     $01,$00,$00,$1C         ; 233F: 01 00 00 1C  3F/5F = height of rocket parts at rest on platforms?
-         fcb     $04,$20,$00,$3F         ; 2343: 04 20 00 3F  50 = x coord of middle rocket part?
-         fcb     $00,$01,$10,$18         ; 2347: 00 01 10 18 
-         fcb     $04,$50,$00,$5F         ; 234B: 04 50 00 5F 
-         fcb     $01,$01,$08,$18         ; 234F: 01 01 08 18 
+Inital_Screen_Object_Data
+         fcb     $09,$70,$00,$AF         ; 233B: 09 70 00 AF  $09=Rocket Bottom Section, $70=X, $AF=Y
+         fcb     $01,$00,$00,$1C         ; 233F: 01 00 00 1C  ???
+
+         fcb     $04,$20,$00,$3F         ; 2343: 04 20 00 3F  $04=Rocket Top Section, $20=X, $3F=Y
+         fcb     $00,$01,$10,$18         ; 2347: 00 01 10 18  ???
+
+         fcb     $04,$50,$00,$5F         ; 234B: 04 50 00 5F  $04=Rocket Middle Section, $50=X, $5F=Y
+         fcb     $01,$01,$08,$18         ; 234F: 01 01 08 18  ???
 
 Initial_Jetman_Obj_Params
          fcb     $02,$50,$00,$AF         ; 2353: 02 50 00 AF  Image, X, Move Speed, Y
@@ -2630,7 +2632,8 @@ Read_ZP_Params_P2_Score
          jmp     Continue_Score_Process  ; 3098: 4C 6E 30 
 ; -----------------------
 
-Z309B    eor     #$FF                    ; 309B: 49 FF    
+; NOT AN ENTRY POINT, CALLED FROM 30CB, $30 BYTES DOWN ??????????????
+AAAA     eor     #$FF                    ; 309B: 49 FF    
          adc     #$01                    ; 309D: 69 01    
          iny                             ; 309F: C8       
          iny                             ; 30A0: C8       
@@ -2645,40 +2648,41 @@ Z309B    eor     #$FF                    ; 309B: 49 FF
          sec                             ; 30AB: 38       
          txa                             ; 30AC: 8A       
          sbc     ZP_Temp_5_Hi            ; 30AD: E5 0B    
-         bcs     Z30D4                   ; 30AF: B0 23    
-         bcc     Z30EC                   ; 30B1: 90 39    
+         bcs     CCCC                    ; 30AF: B0 23    
+         bcc     EEEE                    ; 30B1: 90 39    
+; ############### YOU ARE HERE ###############
 FROM_RD_KBD_JSTK_Etc
          ldy     #$01                    ; 30B3: A0 01     Triggers with Jetman+3 objects, then Jetman+different 3 objects, etc.
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 30B5: B1 00    
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 30B5: B1 00     1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
          sta     ZP_Ptr_To_Str_Lo        ; 30B7: 85 0E    
          iny                             ; 30B9: C8       
          iny                             ; 30BA: C8       
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 30BB: B1 00    
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 30BB: B1 00     1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
          sta     ZP_Ptr_To_Str_Hi        ; 30BD: 85 0F    
          jsr     Z3143                   ; 30BF: 20 43 31 
-Z30C2    lda     #$00                    ; 30C2: A9 00    
+BBBB     lda     #$00                    ; 30C2: A9 00    
          sta     ZP_Temp_1_Lo            ; 30C4: 85 02    
          lda     (ZP_Temp_4_Lo),y        ; 30C6: B1 08    
          sec                             ; 30C8: 38       
          sbc     ZP_Ptr_To_Str_Lo        ; 30C9: E5 0E    
-         bcc     Z309B                   ; 30CB: 90 CE    
+         bcc     AAAA                    ; 30CB: 90 CE    
          tax                             ; 30CD: AA       
          lda     #$01                    ; 30CE: A9 01    
          jsr     Z3138                   ; 30D0: 20 38 31 
          txa                             ; 30D3: 8A       
-Z30D4    cmp     #$08                    ; 30D4: C9 08    
-         bcc     Z30DF                   ; 30D6: 90 07    
+CCCC     cmp     #$08                    ; 30D4: C9 08    
+         bcc     DDDD                    ; 30D6: 90 07    
          tax                             ; 30D8: AA       
          lda     #$02                    ; 30D9: A9 02    
          jsr     Z3138                   ; 30DB: 20 38 31 
          txa                             ; 30DE: 8A       
-Z30DF    cmp     #$10                    ; 30DF: C9 10    
+DDDD     cmp     #$10                    ; 30DF: C9 10    
          bcs     Z3118                   ; 30E1: B0 35    
          cmp     #$0C                    ; 30E3: C9 0C    
-         bcc     Z30EC                   ; 30E5: 90 05    
+         bcc     EEEE                    ; 30E5: 90 05    
          lda     #$04                    ; 30E7: A9 04    
          jsr     Z3138                   ; 30E9: 20 38 31 
-Z30EC    iny                             ; 30EC: C8       
+EEEE     iny                             ; 30EC: C8       
          lda     (ZP_Temp_4_Lo),y        ; 30ED: B1 08    
          sec                             ; 30EF: 38       
          sbc     ZP_Ptr_To_Str_Hi        ; 30F0: E5 0F    
@@ -2707,7 +2711,7 @@ Z3118    iny                             ; 3118: C8
 Z3119    iny                             ; 3119: C8       
          iny                             ; 311A: C8       
          dec     ZP_Temp_5_Lo            ; 311B: C6 0A    
-         bne     Z30C2                   ; 311D: D0 A3    
+         bne     BBBB                    ; 311D: D0 A3    
          ldy     #$03                    ; 311F: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 3121: B1 00    
          cmp     #$AE                    ; 3123: C9 AE    

@@ -245,14 +245,18 @@ label    230B Reset_Some_Objects
 word     2315
 label    231A Reset_S_O_1
 const    233B-235A
-label    233B Inital_Object_Data
-lcomment 233B AF = sprite at bottom of screen, could be rocket part?
+label    233B Inital_Screen_Object_Data
+lcomment 233B $09=Rocket Bottom Section, $70=X, $AF=Y
+lcomment 233F ???
 break    233F
-lcomment 233F 3F/5F = height of rocket parts at rest on platforms?
+comment  2343
 break    2343
-lcomment 2343 50 = x coord of middle rocket part?
+lcomment 2343 $04=Rocket Top Section, $20=X, $3F=Y
+lcomment 2347 ???
 break    2347
-break    234B
+comment  234B
+lcomment 234B $04=Rocket Middle Section, $50=X, $5F=Y
+lcomment 234F ???
 break    234F
 comment  2353
 label    2353 Initial_Jetman_Obj_Params
@@ -781,8 +785,23 @@ lcomment 3094 ZP_Temp_2
 lcomment 3095 P2 Score in ZP
 word     3095
 comment  309B
+
+
+
+comment  309B NOT AN ENTRY POINT, CALLED FROM 30CB, $30 BYTES DOWN ??????????????
+label    309B AAAA
+COMMENT  30B3 ############### YOU ARE HERE ###############
 label    30B3 FROM_RD_KBD_JSTK_Etc
 lcomment 30B3 Triggers with Jetman+3 objects, then Jetman+different 3 objects, etc.
+lcomment 30B5 1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
+lcomment 30BB 1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
+label    30C2 BBBB
+label    30D4 CCCC
+label    30DF DDDD
+label    30EC EEEE
+
+
+
 ;        3143
 lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
 lcomment 316B $3E15 is the Mineral UDG address

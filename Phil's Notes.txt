@@ -126,3 +126,8 @@ $9120   #37152     Port B output register
                    (PB7) Bit 7=Joy 3                   
                    
 --------------------------------------------------------------------------         
+
+$5F = Height of item on middle platform e.g. rocket middle section, fuel, gem
+$3F = Height of item on left   platform e.g. rocket top    section, fuel, gem
+
+Rocket middle section is 16 pixels high 

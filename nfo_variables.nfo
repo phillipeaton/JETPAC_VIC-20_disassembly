@@ -106,10 +106,10 @@ label    03B7 Obj_Flame_7
 ;        03=Explosion->00
 ;        04=Rocket_Part/Fuel
 ;        05=fuzzball
-;        06=saucer
+;        06=Saucer
 ;        07=Ball
 ;        08=Cross
-;        09+=CRASH
+;        09=Rocket Bottom Section
 ;        0A=Rocket Ascend;
 ;        0B=Rocket Descend
 ;        C0=Flame
