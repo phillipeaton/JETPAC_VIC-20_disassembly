@@ -2637,7 +2637,8 @@ AAAA     eor     #$FF                    ; 309B: 49 FF
          adc     #$01                    ; 309D: 69 01    
          iny                             ; 309F: C8       
          iny                             ; 30A0: C8       
-         tax                             ; 30A1: AA       
+
+         tax                             ; 30A1: AA        Save A
          lda     (ZP_Temp_4_Lo),y        ; 30A2: B1 08    
          asl     a                       ; 30A4: 0A       
          asl     a                       ; 30A5: 0A       
@@ -2646,95 +2647,104 @@ AAAA     eor     #$FF                    ; 309B: 49 FF
          dey                             ; 30A9: 88       
          dey                             ; 30AA: 88       
          sec                             ; 30AB: 38       
-         txa                             ; 30AC: 8A       
+         txa                             ; 30AC: 8A        Restore A
+
          sbc     ZP_Temp_5_Hi            ; 30AD: E5 0B    
          bcs     CCCC                    ; 30AF: B0 23    
          bcc     EEEE                    ; 30B1: 90 39    
-; ############### YOU ARE HERE ###############
+
+; Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
 FROM_RD_KBD_JSTK_Etc
-         ldy     #$01                    ; 30B3: A0 01     Triggers with Jetman+3 objects, then Jetman+different 3 objects, etc.
+         ldy     #$01                    ; 30B3: A0 01    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 30B5: B1 00     1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
-         sta     ZP_Ptr_To_Str_Lo        ; 30B7: 85 0E    
+         sta     ZP_Ptr_To_Str_Lo        ; 30B7: 85 0E     1st run: Y=50
          iny                             ; 30B9: C8       
          iny                             ; 30BA: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 30BB: B1 00     1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
-         sta     ZP_Ptr_To_Str_Hi        ; 30BD: 85 0F    
-         jsr     Z3143                   ; 30BF: 20 43 31 
+         sta     ZP_Ptr_To_Str_Hi        ; 30BD: 85 0F     1st run: X=5f
+         jsr     _31B6_To_Tmp4_03_To_Tmp5_Yto00 ; 30BF: 20 43 31  Set Temp4 to address of data table at 31B6
 BBBB     lda     #$00                    ; 30C2: A9 00    
-         sta     ZP_Temp_1_Lo            ; 30C4: 85 02    
-         lda     (ZP_Temp_4_Lo),y        ; 30C6: B1 08    
+         sta     ZP_Temp_1_Lo            ; 30C4: 85 02     Set Temp1Lo=0
+         lda     (ZP_Temp_4_Lo),y        ; 30C6: B1 08     31B6: 10 40 03 50 60 01 88 30
          sec                             ; 30C8: 38       
-         sbc     ZP_Ptr_To_Str_Lo        ; 30C9: E5 0E    
-         bcc     AAAA                    ; 30CB: 90 CE    
-         tax                             ; 30CD: AA       
+         sbc     ZP_Ptr_To_Str_Lo        ; 30C9: E5 0E     1st run: 10-50=C0 i.e. -40
+         bcc     AAAA                    ; 30CB: 90 CE     1st run: Branch taken
+
+         tax                             ; 30CD: AA        Save A
          lda     #$01                    ; 30CE: A9 01    
-         jsr     Z3138                   ; 30D0: 20 38 31 
-         txa                             ; 30D3: 8A       
+         jsr     ORA_Temp1Lo_And_StoreTo_Temp1Lo ; 30D0: 20 38 31 
+         txa                             ; 30D3: 8A        Restore A
+
 CCCC     cmp     #$08                    ; 30D4: C9 08    
          bcc     DDDD                    ; 30D6: 90 07    
-         tax                             ; 30D8: AA       
+
+         tax                             ; 30D8: AA        Save A
          lda     #$02                    ; 30D9: A9 02    
-         jsr     Z3138                   ; 30DB: 20 38 31 
-         txa                             ; 30DE: 8A       
+         jsr     ORA_Temp1Lo_And_StoreTo_Temp1Lo ; 30DB: 20 38 31 
+         txa                             ; 30DE: 8A        Restore A
+
 DDDD     cmp     #$10                    ; 30DF: C9 10    
-         bcs     Z3118                   ; 30E1: B0 35    
+         bcs     INY_3                   ; 30E1: B0 35    
          cmp     #$0C                    ; 30E3: C9 0C    
          bcc     EEEE                    ; 30E5: 90 05    
          lda     #$04                    ; 30E7: A9 04    
-         jsr     Z3138                   ; 30E9: 20 38 31 
+         jsr     ORA_Temp1Lo_And_StoreTo_Temp1Lo ; 30E9: 20 38 31 
 EEEE     iny                             ; 30EC: C8       
          lda     (ZP_Temp_4_Lo),y        ; 30ED: B1 08    
          sec                             ; 30EF: 38       
          sbc     ZP_Ptr_To_Str_Hi        ; 30F0: E5 0F    
-         bcc     Z30FD                   ; 30F2: 90 09    
+         bcc     FFFF                    ; 30F2: 90 09    
          cmp     #$04                    ; 30F4: C9 04    
-         bcs     Z3119                   ; 30F6: B0 21    
+         bcs     INY_2                   ; 30F6: B0 21    
          lda     #$88                    ; 30F8: A9 88    
-         jmp     Z3138                   ; 30FA: 4C 38 31 
+         jmp     ORA_Temp1Lo_And_StoreTo_Temp1Lo ; 30FA: 4C 38 31 
 ; -----------------------
-Z30FD    eor     #$FF                    ; 30FD: 49 FF    
+FFFF     eor     #$FF                    ; 30FD: 49 FF    
          sty     ZP_Temp_5_Hi            ; 30FF: 84 0B    
          pha                             ; 3101: 48       
          ldy     #$00                    ; 3102: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 3104: B1 00    
          and     #$3F                    ; 3106: 29 3F    
          cmp     #$01                    ; 3108: C9 01    
-         bne     Z313D                   ; 310A: D0 31    
+         bne     KKKK                    ; 310A: D0 31    
          pla                             ; 310C: 68       
          cmp     #$22                    ; 310D: C9 22    
-Z310F    ldy     ZP_Temp_5_Hi            ; 310F: A4 0B    
-         bcs     Z3119                   ; 3111: B0 06    
+GGGG     ldy     ZP_Temp_5_Hi            ; 310F: A4 0B    
+         bcs     INY_2                   ; 3111: B0 06    
          lda     #$80                    ; 3113: A9 80    
-         jmp     Z3138                   ; 3115: 4C 38 31 
+         jmp     ORA_Temp1Lo_And_StoreTo_Temp1Lo ; 3115: 4C 38 31 
 ; -----------------------
-Z3118    iny                             ; 3118: C8       
-Z3119    iny                             ; 3119: C8       
+; y reg is pointer into lookup table, 3 groups of 3
+INY_3    iny                             ; 3118: C8        3 iny's when moving from Y check to Y check
+INY_2    iny                             ; 3119: C8        2 iny's when moving from X check to X check as y already inc'd
          iny                             ; 311A: C8       
-         dec     ZP_Temp_5_Lo            ; 311B: C6 0A    
+         dec     ZP_Temp_5_Lo            ; 311B: C6 0A     Temp5 used as 3-2-1 countdown
          bne     BBBB                    ; 311D: D0 A3    
          ldy     #$03                    ; 311F: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 3121: B1 00    
          cmp     #$AE                    ; 3123: C9 AE    
-         bcc     Z3130                   ; 3125: 90 09    
+         bcc     IIII                    ; 3125: 90 09    
          lda     #$AF                    ; 3127: A9 AF    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 3129: 91 00    
          lda     #$88                    ; 312B: A9 88    
-Z312D    sta     ZP_Temp_1_Lo            ; 312D: 85 02    
+HHHH     sta     ZP_Temp_1_Lo            ; 312D: 85 02    
          rts                             ; 312F: 60       
 ; ===========================================================
-Z3130    cmp     #$20                    ; 3130: C9 20    
-         bcs     Z313C                   ; 3132: B0 08    
+IIII     cmp     #$20                    ; 3130: C9 20    
+         bcs     JJJJ                    ; 3132: B0 08    
          lda     #$80                    ; 3134: A9 80    
-         bmi     Z312D                   ; 3136: 30 F5    
-Z3138    ora     ZP_Temp_1_Lo            ; 3138: 05 02    
+         bmi     HHHH                    ; 3136: 30 F5    
+ORA_Temp1Lo_And_StoreTo_Temp1Lo
+         ora     ZP_Temp_1_Lo            ; 3138: 05 02    
          sta     ZP_Temp_1_Lo            ; 313A: 85 02    
-Z313C    rts                             ; 313C: 60       
+JJJJ     rts                             ; 313C: 60       
 ; ===========================================================
-Z313D    pla                             ; 313D: 68       
+KKKK     pla                             ; 313D: 68       
          cmp     #$1A                    ; 313E: C9 1A    
-         jmp     Z310F                   ; 3140: 4C 0F 31 
+         jmp     GGGG                    ; 3140: 4C 0F 31 
 ; -----------------------
-Z3143    lda     #$B6                    ; 3143: A9 B6     Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
+_31B6_To_Tmp4_03_To_Tmp5_Yto00
+         lda     #$B6                    ; 3143: A9 B6     Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
          sta     ZP_Temp_4_Lo            ; 3145: 85 08    
          lda     #$31                    ; 3147: A9 31    
          sta     ZP_Temp_4_Hi            ; 3149: 85 09    
@@ -2743,7 +2753,7 @@ Z3143    lda     #$B6                    ; 3143: A9 B6     Loads address to data
          ldy     #$00                    ; 314F: A0 00    
          rts                             ; 3151: 60       
 ; ===========================================================
-Z3152    jsr     Z3143                   ; 3152: 20 43 31 
+Z3152    jsr     _31B6_To_Tmp4_03_To_Tmp5_Yto00 ; 3152: 20 43 31 
 Z3155    lda     (ZP_Temp_4_Lo),y        ; 3155: B1 08    
          sta     ZP_UDG_RAM_X            ; 3157: 85 04    
          iny                             ; 3159: C8       
@@ -2796,9 +2806,10 @@ Z31A8    lda     ZP_Temp_3_Lo            ; 31A8: A5 06
          sta     ZP_Temp_3_Hi            ; 31B3: 85 07    
          rts                             ; 31B5: 60       
 ; ===========================================================
-; XY_Data_for_3143_Subroutine
-         fdb     $4010,$5003,$0160,$3088 ; 31B6: 10 40 03 50 60 01 88 30 
-         fcb     $03                     ; 31BE: 03       
+; XY_Data_for_3143_Subroutine, looks like Y,X,??? for the three platforms
+         fcb     $10,$40,$03             ; 31B6: 10 40 03 
+         fcb     $50,$60,$01             ; 31B9: 50 60 01 
+         fcb     $88,$30,$03             ; 31BC: 88 30 03 
 
 AAAAAAAA ldy     #$02                    ; 31BF: A0 02    
          clc                             ; 31C1: 18       

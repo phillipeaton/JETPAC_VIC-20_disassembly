@@ -790,25 +790,57 @@ comment  309B
 
 comment  309B NOT AN ENTRY POINT, CALLED FROM 30CB, $30 BYTES DOWN ??????????????
 label    309B AAAA
-COMMENT  30B3 ############### YOU ARE HERE ###############
+comment  30A1
+lcomment 30A1 Save A
+lcomment 30AC Restore A
+comment  30AD
+comment  30B3
+comment  30B3 Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
 label    30B3 FROM_RD_KBD_JSTK_Etc
-lcomment 30B3 Triggers with Jetman+3 objects, then Jetman+different 3 objects, etc.
 lcomment 30B5 1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
+lcomment 30B7 1st run: Y=50
 lcomment 30BB 1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
+lcomment 30BD 1st run: X=5f
+lcomment 30BF Set Temp4 to address of data table at 31B6
 label    30C2 BBBB
+lcomment 30C4 Set Temp1Lo=0
+lcomment 30C6 31B6: 10 40 03 50 60 01 88 30
+lcomment 30C9 1st run: 10-50=C0 i.e. -40
+lcomment 30CB 1st run: Branch taken
+comment  30CD
+lcomment 30CD Save A
+lcomment 30D3 Restore A
+comment  30D4
 label    30D4 CCCC
+comment  30D8
+lcomment 30D8 Save A
+lcomment 30DE Restore A
+comment  30DF
 label    30DF DDDD
 label    30EC EEEE
-
-
-
+label    30FD FFFF
+label    310F GGGG
+label    3118 INY_3
+label    3119 INY_2
+comment  3118 y reg is pointer into lookup table, 3 groups of 3
+lcomment 3118 3 iny's when moving from Y check to Y check
+lcomment 3119 2 iny's when moving from X check to X check as y already inc'd
+lcomment 311B Temp5 used as 3-2-1 countdown
+label    312D HHHH
+label    3130 IIII
+label    3138 ORA_Temp1Lo_And_StoreTo_Temp1Lo
+label    313C JJJJ
+label    313D KKKK
 ;        3143
+label    3143 _31B6_To_Tmp4_03_To_Tmp5_Yto00
 lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
 lcomment 316B $3E15 is the Mineral UDG address
 ;        31B6
-comment  31B6 XY_Data_for_3143_Subroutine
+comment  31B6 XY_Data_for_3143_Subroutine, looks like Y,X,??? for the three platforms
 const    31B6-31BE
-word     31B6-31BD
+break    31B9
+break    31BC
+;word     31B6-31BD
 comment  31BF
 label    31BF AAAAAAAA
 label    31DF BBBBBBBB
