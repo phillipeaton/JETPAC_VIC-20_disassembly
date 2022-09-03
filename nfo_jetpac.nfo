@@ -627,6 +627,7 @@ lcomment 283C Addr of final char UDG
 label    283D Ptr_Final_Char_Hi
 comment  283E
 label    283E Fire_Pressed
+lcomment 2841 Remove=Gems all fall through platforms and floor, reentering at top
 ;        286B
 break    286B
 const    286B
@@ -707,6 +708,7 @@ word     2A4C
 label    2A5F Lev_Start_1st_Alien_onScr
 label    2A6D Not_Triggered_2A6D
 label    2ABC Not_Triggered_2ABC
+lcomment 2B16 Remove=(Not triggered on first level, so don't yet know)
 label    2B7F Init_Rocket_Part_Fuel_Table
 label    2B87 Init_Flashing_Gem_Table
 ;        2B82
@@ -725,6 +727,7 @@ break    2BE8-2BF7
 const    2BE8-2BF7
 label    2BE8 Raster_Line_Table
 label    2C6A Stops_All_After_Score_Flash
+lcomment 2C6F Remove=1st Level Aliens don't explode on platform/floor impact
 ;        2CDB
 const    2CDB-2CE2
 label    2CDB _0025_0035_0045_0055
@@ -764,6 +767,7 @@ comment  2E68 Set current object type to a crash
 label    2E74 Subroutine_2E74
 ;        2E93
 word     2E93
+lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
 label    2F8E Stops_All
 ;        2FE5
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
@@ -796,7 +800,7 @@ lcomment 30AC Restore A
 comment  30AD
 comment  30B3
 comment  30B3 Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
-label    30B3 FROM_RD_KBD_JSTK_Etc
+label    30B3 Platform_Collision_Test
 lcomment 30B5 1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
 lcomment 30B7 1st run: Y=50
 lcomment 30BB 1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
@@ -871,6 +875,7 @@ label    326A ADC_48
 label    326F TXA_
 label    3273 Flying
 lcomment 3276 Returns A=%RLDU_F111
+lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
 label    3285 __WWWW__
 label    32A2 __YYYY__
 label    32A6 __ZZZZ__
@@ -895,6 +900,7 @@ label    3321 Bottom_After?
 label    334D Flash_Score_Then_Display_Scores
 label    3367 JMP_to_Subroutine_261A
 label    336A Read_Kbd_Jstk
+lcomment 3370 Remove=Jetman+pickup flies/walks jiggle when standing on a platform
 lcomment 33B3 Test for direction Up
 lcomment 33B5 Yes, branch
 comment  33D4

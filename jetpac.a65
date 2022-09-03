@@ -1486,7 +1486,7 @@ Ptr_Final_Char_Hi
 
 Fire_Pressed
          jsr     Save_Obj_List_Params_013 ; 283E: 20 D7 35 
-         jsr     FROM_RD_KBD_JSTK_Etc    ; 2841: 20 B3 30 
+         jsr     Platform_Collision_Test ; 2841: 20 B3 30  Remove=Gems all fall through platforms and floor, reentering at top
          lda     ZP_Temp_1_Lo            ; 2844: A5 02    
          bmi     Z2851                   ; 2846: 30 09    
          ldy     #$03                    ; 2848: A0 03    
@@ -1870,7 +1870,7 @@ Z2B08    lda     (ZP_Obj_List_Ptr_Lo),y  ; 2B08: B1 00
 Z2B11    adc     #$01                    ; 2B11: 69 01    
          jmp     Z2AF5                   ; 2B13: 4C F5 2A 
 ; -----------------------
-Z2B16    jsr     FROM_RD_KBD_JSTK_Etc    ; 2B16: 20 B3 30 
+Z2B16    jsr     Platform_Collision_Test ; 2B16: 20 B3 30  Remove=(Not triggered on first level, so don't yet know)
          lda     ZP_Temp_1_Lo            ; 2B19: A5 02    
          bpl     Z2B36                   ; 2B1B: 10 19    
          ldy     #$02                    ; 2B1D: A0 02    
@@ -2057,7 +2057,7 @@ Z2C5F    inc     ZP_HW_IRQ_Count         ; 2C5F: E6 21
 Stops_All_After_Score_Flash
          jsr     Z2C5F                   ; 2C6A: 20 5F 2C 
          bmi     Z2C78                   ; 2C6D: 30 09    
-         jsr     FROM_RD_KBD_JSTK_Etc    ; 2C6F: 20 B3 30 
+         jsr     Platform_Collision_Test ; 2C6F: 20 B3 30  Remove=1st Level Aliens don't explode on platform/floor impact
          lda     ZP_Temp_1_Lo            ; 2C72: A5 02    
          bpl     Z2C92                   ; 2C74: 10 1C    
          bmi     Z2C8C                   ; 2C76: 30 14    
@@ -2499,7 +2499,7 @@ Stops_All jsr    Save_Obj_List_Params_013 ; 2F8E: 20 D7 35
          jsr     Z2D58                   ; 2FA4: 20 58 2D 
          lda     ZP_Temp_1_Lo            ; 2FA7: A5 02    
          bmi     Z2FEE                   ; 2FA9: 30 43    
-         jsr     FROM_RD_KBD_JSTK_Etc    ; 2FAB: 20 B3 30 
+         jsr     Platform_Collision_Test ; 2FAB: 20 B3 30  Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
          lda     ZP_Temp_1_Lo            ; 2FAE: A5 02    
          bmi     Z2FBD                   ; 2FB0: 30 0B    
 Z2FB2    ldy     #$03                    ; 2FB2: A0 03    
@@ -2654,7 +2654,7 @@ AAAA     eor     #$FF                    ; 309B: 49 FF
          bcc     EEEE                    ; 30B1: 90 39    
 
 ; Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
-FROM_RD_KBD_JSTK_Etc
+Platform_Collision_Test
          ldy     #$01                    ; 30B3: A0 01    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 30B5: B1 00     1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
          sta     ZP_Ptr_To_Str_Lo        ; 30B7: 85 0E     1st run: Y=50
@@ -2920,7 +2920,7 @@ TXA_     txa                             ; 326F: 8A
 Flying   jsr     Save_Obj_List_Params_013 ; 3273: 20 D7 35 
          jsr     Read_Keyboard_Joystick  ; 3276: 20 F7 33  Returns A=%RLDU_F111
          sta     ZP_Jetman_Movement      ; 3279: 85 1C    
-         jsr     FROM_RD_KBD_JSTK_Etc    ; 327B: 20 B3 30 
+         jsr     Platform_Collision_Test ; 327B: 20 B3 30  Remove=Jetman+fuel/rocket part pick-up fly through platforms
          lda     ZP_Temp_1_Lo            ; 327E: A5 02    
          bpl     __WWWW__                ; 3280: 10 03    
          jmp     JJJJJJJJ                ; 3282: 4C F2 31 
@@ -3059,7 +3059,7 @@ JMP_to_Subroutine_261A
 Read_Kbd_Jstk
          jsr     Save_Obj_List_Params_013 ; 336A: 20 D7 35 
          jsr     Read_Keyboard_Joystick  ; 336D: 20 F7 33 
-         jsr     FROM_RD_KBD_JSTK_Etc    ; 3370: 20 B3 30 
+         jsr     Platform_Collision_Test ; 3370: 20 B3 30  Remove=Jetman+pickup flies/walks jiggle when standing on a platform
          lda     ZP_Temp_1_Lo            ; 3373: A5 02    
          bmi     Z337D                   ; 3375: 30 06    
          ldy     #$03                    ; 3377: A0 03    
