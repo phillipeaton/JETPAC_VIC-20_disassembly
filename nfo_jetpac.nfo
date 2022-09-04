@@ -207,14 +207,17 @@ comment  2195 ARGUMENTS : sentiseutn
 comment  2195 \            etinseut
 comment  2195 \            setniseutn
 comment  2195 ----------------------------------------------------------
+label    2195 F_P_1_0
 label    219A Fire_Pressed_1
+label    21CB F_P_1_1
 label    21DC SKIP_21DC
 label    21F1 SKIP_21F1
 label    21FC SKIP_21FC
 label    2202 SKIP_2202
 ;        2206
 word     2206
-word     2209
+break    2209
+break    220B
 word     220C
 break    220F
 label    2211 Fire_Pressed_2
@@ -230,11 +233,16 @@ label    22B4 Lazer_JFL_1
 label    22BA Reset_Level_Add_Extra_Life
 comment  22BD
 comment  22BD Player at level 4, add another life
+label    22CB RLAEL_1
+label    22D1 RLAEL_2
+label    22D7 RLAEL_3
+label    22E3 Object_RTS_Fuel_Type
 ;        22EA
 word     22EA
 ;        22ED
-label    22ED JMP23A1
+label    22ED JMP_Reset_S_O_1
 break    22ED
+label    22F2 Object_RMS_Gem_Type
 ;        22F9
 word     22F9
 ;        22FF
@@ -265,6 +273,7 @@ lcomment 2357 Movement, ?, ?, ?
 break    2357
 comment  235B
 label    235B Init_Next_Jetman_Lives_Scores
+lcomment 235B Loop through 8 attributes
 label    235D LOOP_INJLS_1
 comment  2366
 lcomment 2366 More time between players when 2 player game
@@ -628,6 +637,8 @@ label    283D Ptr_Final_Char_Hi
 comment  283E
 label    283E Fire_Pressed
 lcomment 2841 Remove=Gems all fall through platforms and floor, reentering at top
+deflabel 2849 ObjParam3_Jiggle?
+label    2851 FP_1
 ;        286B
 break    286B
 const    286B
@@ -789,16 +800,25 @@ lcomment 3094 ZP_Temp_2
 lcomment 3095 P2 Score in ZP
 word     3095
 comment  309B
-
-
-
 comment  309B NOT AN ENTRY POINT, CALLED FROM 30CB, $30 BYTES DOWN ??????????????
-label    309B AAAA
+label    309B PCT_0
 comment  30A1
 lcomment 30A1 Save A
 lcomment 30AC Restore A
 comment  30AD
 comment  30B3
+comment  30B3 ----------------------------------------------------------
+comment  30B3 Platform Collision Test
+comment  30B3 ----------------------------------------------------------
+comment  30B3 FUNCTION  : setsoe
+comment  30B3 \            snethuoistn
+comment  30B3 \            ethonshu.
+comment  30B3 CALLED BY :
+comment  30B3 CALLS     : Nothing
+comment  30B3 ARGUMENTS : ZP_xxxx
+comment  30B3 \            satoehsaeuht
+comment  30B3 \            sathoeusanteho
+comment  30B3 ----------------------------------------------------------
 comment  30B3 Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
 label    30B3 Platform_Collision_Test
 lcomment 30B5 1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
@@ -806,7 +826,7 @@ lcomment 30B7 1st run: Y=50
 lcomment 30BB 1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
 lcomment 30BD 1st run: X=5f
 lcomment 30BF Set Temp4 to address of data table at 31B6
-label    30C2 BBBB
+label    30C2 PCT_1
 lcomment 30C4 Set Temp1Lo=0
 lcomment 30C6 31B6: 10 40 03 50 60 01 88 30
 lcomment 30C9 1st run: 10-50=C0 i.e. -40
@@ -815,36 +835,58 @@ comment  30CD
 lcomment 30CD Save A
 lcomment 30D3 Restore A
 comment  30D4
-label    30D4 CCCC
+label    30D4 PCT_02
 comment  30D8
 lcomment 30D8 Save A
 lcomment 30DE Restore A
 comment  30DF
-label    30DF DDDD
-label    30EC EEEE
-label    30FD FFFF
-label    310F GGGG
+label    30DF PCT_03
+label    30EC PCT_04
+label    30FD PCT_05
+label    310F PCT_06
 label    3118 INY_3
 label    3119 INY_2
 comment  3118 y reg is pointer into lookup table, 3 groups of 3
 lcomment 3118 3 iny's when moving from Y check to Y check
 lcomment 3119 2 iny's when moving from X check to X check as y already inc'd
 lcomment 311B Temp5 used as 3-2-1 countdown
-label    312D HHHH
-label    3130 IIII
+label    312D PCT_07
+label    3130 PCT_08
 label    3138 ORA_Temp1Lo_And_StoreTo_Temp1Lo
-label    313C JJJJ
-label    313D KKKK
+label    313C PCT_09
+label    313D PCT_10
 ;        3143
 label    3143 _31B6_To_Tmp4_03_To_Tmp5_Yto00
 lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
-lcomment 316B $3E15 is the Mineral UDG address
-;        31B6
-comment  31B6 XY_Data_for_3143_Subroutine, looks like Y,X,??? for the three platforms
+label    3152 Draw_Platforms
+label    3155 DP_1
+lcomment 3155 Get X value from lookup table ($10)
+lcomment 3157 \ and store
+comment  3159
+lcomment 315A Get Y value from lookup table ($40)
+lcomment 315C \ and store
+comment  315E
+lcomment 315F Get ??? value from lookup table ($03)
+lcomment 3161 \ and store
+comment  3163
+comment  316B
+comment  316B Load Temp_3 with addr of left end platform UDG char
+comment  3173
+comment  3173 Copy left end platform UDG char to RAM, bytes 9 per column
+comment  3178
+comment  3178 Copy middle platform and right end UDG chars to RAM, 9 bytes per column
+label    317B Loop_Next_Char
+comment  3180
+comment  3186
+comment  3186 Set the color mapping for the platforms to Green
+deflabel 3192 05_GREEN
+label    3193 DP_2
+label    31A2 Next_UDG_Char_Loop_Next_Char
+label    31A8 Next_UDG_Char
+comment  31B6 Platform data for 3143_Subroutine, 3 platforms: X Y #Num_middle_chars
 const    31B6-31BE
 break    31B9
 break    31BC
-;word     31B6-31BD
 comment  31BF
 label    31BF AAAAAAAA
 label    31DF BBBBBBBB
@@ -1257,7 +1299,7 @@ label    3DAF Gold_Bar
 label    3DCA Diamond
 label    3DE3 Plutonium
 label    3E00 Isotope
-label    3E15 Mineral
+label    3E15 Platform ; Not Mineral? So we shift them all up one?
 label    3F74 Explosion_1
 label    3F9B Explosion_2
 label    3FB2 Explosion_3

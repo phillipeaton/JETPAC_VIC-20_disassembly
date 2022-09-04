@@ -141,6 +141,7 @@ label    03C7 Obj_RMS_Gem_7
 ; Byte 03/0B= height
 ; Byte 04/0C= diagonal, jiggles around a lot for a saucer
 ; Byte 05/0D= colour - bottom 3 bits of byte?
+; Byte 06/0E= For Gem, affects colors and flashing of Byte 05
 
 ; Aliens 1-6
 label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00
