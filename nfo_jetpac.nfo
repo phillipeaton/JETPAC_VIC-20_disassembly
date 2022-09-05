@@ -395,6 +395,7 @@ const    248A
 lcomment 248A
 lcomment 248B
 word     248B
+const    248B
 break    248D
 lcomment 248D End of Parameters
 ;        2491
@@ -411,6 +412,7 @@ const    249A
 lcomment 249A
 lcomment 249B
 word     249B
+const    249B
 break    249D
 lcomment 249D End of Parameters
 ;        24A1
@@ -557,6 +559,11 @@ label    26D1 JTSRLSR_1
 label    26E4 Jmp_To_SRList2_SR_
 label    26F2 Copy_ZP_Val_to_ZP1_Val
 label    26FE Object_Picked_Up
+label    2705 Pre_Output_Sound_1
+label    270A Pre_Output_Sound_2
+comment  2710
+comment  2710 A probably contains frequency, Y selects channel via X
+label    2710 Output_Sound
 label    271C Gem_Fuel_Picked_Up
 label    2727 Lazer_Shot_Active
 label    2735 Rocket_Flight_Active
@@ -564,6 +571,7 @@ label    2735 Rocket_Flight_Active
 label    2743 Subroutine_List2
 word     2743-274E
 label    2744 Subroutine_List2+1
+comment  274F
 label    274F Collision
 ;        275B
 comment  275B Erase $100 bytes zero page
@@ -658,6 +666,13 @@ label    28B1 Set_Obj_Posn_05_To_03
 label    28B6 Set_Obj_Posn_05_To_01_Or_Other
 label    28C0 SKIP_28C0
 label    28C9 Reset_Objects_1_To_8
+label    28CD Loop_28CD
+comment  28D4 Init Jetman, Lazers, Rocket and Aliens
+label    28D4 Init_Most_Objects
+label    28D8 Loop_28D8
+comment  28DE
+comment  28DE Init all Alien objects
+label    28E0 Loop_28E0
 label    28E7 Save_Obj_List_Ptr
 label    28F0 Restore_Obj_List_Ptr
 label    2934 Explosions_Plyr_Life_Lost?
@@ -672,6 +687,9 @@ label    2987 Game_Over
 ;        2997
 label    2997 SKIP_2997
 label    299D Sound_Channels_Off_ETC
+comment  29AB
+comment  29B3
+comment  29BB
 label    29E7 Display_Game_Over
 lcomment 29EA Game Over for P1 or P2?
 label    29EE Display_Game_Over_P1
@@ -748,6 +766,7 @@ label    2CF1 Jetman_Looks_1???
 label    2D0F Jetman_Looks_1_1???
 label    2CFF BACK_2CFF
 break    2D54
+comment  2D58
 label    2D69 SKIP_2D69
 label    2D80 SKIP_2D80
 label    2D95 BACK_2D95
@@ -879,7 +898,7 @@ label    317B Loop_Next_Char
 comment  3180
 comment  3186
 comment  3186 Set the color mapping for the platforms to Green
-deflabel 3192 05_GREEN
+deflabel 3192 GREEN_05
 label    3193 DP_2
 label    31A2 Next_UDG_Char_Loop_Next_Char
 label    31A8 Next_UDG_Char
