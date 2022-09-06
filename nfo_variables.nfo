@@ -1,32 +1,32 @@
 ; Zero-Page variables
 label      00 ZP_Obj_List_Ptr_Lo
 label      01 ZP_Obj_List_Ptr_Hi
-label      02 ZP_Temp_1_Lo
-label      03 ZP_Temp_1_Hi
+label      02 ZP_01_Lo
+label      03 ZP_01_Hi
 label      04 ZP_UDG_RAM_X
 label      05 ZP_UDG_RAM_Y
-label      06 ZP_Temp_3_Lo
-label      07 ZP_Temp_3_Hi
-label      08 ZP_Temp_4_Lo ; 42 Occurrences, used with 0009
-label      09 ZP_Temp_4_Hi ; 11 Occurrences, used with 0008
-label      0A ZP_Temp_5_Lo
-label      0B ZP_Temp_5_Hi
+label      06 ZP_03_Lo
+label      07 ZP_03_Hi
+label      08 ZP_04_Lo ; 42 Occurrences, used with 0009
+label      09 ZP_04_Hi ; 11 Occurrences, used with 0008
+label      0A ZP_05_Lo
+label      0B ZP_05_Hi
 label      0c ZP_Col_RAM_Ptr_Lo
 label      0d ZP_Col_RAM_Ptr_Hi
 label      0E ZP_Ptr_To_Str_Lo
 label      0F ZP_Ptr_To_Str_Hi
-label      10 ZP_0010 ; Save Obj List Params 1
-label      11 ZP_0011 ; Save Obj List Params 1
-label      12 ZP_0012 ; Save Obj List Params 1
+label      10 ZP_08_Lo ; Save Obj List Params 1
+label      11 ZP_08_Hi ; Save Obj List Params 1
+label      12 ZP_09_Lo ; Save Obj List Params 1
 label      13 ZP_Keyboard_Data
-label      14 ZP_0014 ; Connected somehow. Shuffled in a subroutine.
-label      15 ZP_0015 ; Connected somehow. Shuffled in a subroutine.
-label      16 ZP_0016 ; Connected somehow. Shuffled in a subroutine.
-label      17 ZP_0017 ; Connected somehow. Shuffled in a subroutine.
-label      18 ZP_0018 ; Save_Obj_List_Params 2
-label      19 ZP_0019 ; Save_Obj_List_Params 2
-label      1A ZP_001a ; Save_Obj_List_Params 2
-label      1B ZP_001b ; Save_Obj_List_Params 2
+label      14 ZP_0A_Lo ; Connected somehow. Shuffled in a subroutine.
+label      15 ZP_0A_Hi ; Connected somehow. Shuffled in a subroutine.
+label      16 ZP_0B_Lo ; Connected somehow. Shuffled in a subroutine.
+label      17 ZP_0B_Hi ; Connected somehow. Shuffled in a subroutine.
+label      18 ZP_0C_Lo ; Save_Obj_List_Params 2
+label      19 ZP_0C_Hi ; Save_Obj_List_Params 2
+label      1A ZP_0D_Lo ; Save_Obj_List_Params 2
+label      1B ZP_0D_Hi ; Save_Obj_List_Params 2
 label      1C ZP_Jetman_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 label      1E ZP_Ship_UDG_Addr_Offset
 label      1F ZP_Ship_UDG_Addr_Color?
@@ -65,7 +65,7 @@ label      5f ZP_Subroutine_Vec_Lo
 label      60 ZP_Subroutine_Vec_Hi
 
 ; Non-Zero-Page Object Variables
-label    0380 Obj_Jetman_Looks      ; Graphic Selector? Bit 7 = directoin 1=left, 0=right; bit 0&1 01 = flying, 10 = standing
+label    0380 Obj_Jetman_Looks      ; Bit7=direction 1=left, 0=right; bit 0&1 01 = flying, 10 = standing
 label    0381 Obj_Jetman_X          ; Pixel Left=00 Right=B6 or B7
 label    0382 Obj_Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
 label    0383 Obj_Jetman_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right

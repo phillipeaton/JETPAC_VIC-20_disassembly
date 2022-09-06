@@ -13,32 +13,32 @@
 
 ZP_Obj_List_Ptr_Lo      equ     $0000
 ZP_Obj_List_Ptr_Hi      equ     $0001
-ZP_Temp_1_Lo            equ     $0002
-ZP_Temp_1_Hi            equ     $0003
+ZP_01_Lo                equ     $0002
+ZP_01_Hi                equ     $0003
 ZP_UDG_RAM_X            equ     $0004
 ZP_UDG_RAM_Y            equ     $0005
-ZP_Temp_3_Lo            equ     $0006
-ZP_Temp_3_Hi            equ     $0007
-ZP_Temp_4_Lo            equ     $0008
-ZP_Temp_4_Hi            equ     $0009
-ZP_Temp_5_Lo            equ     $000A
-ZP_Temp_5_Hi            equ     $000B
+ZP_03_Lo                equ     $0006
+ZP_03_Hi                equ     $0007
+ZP_04_Lo                equ     $0008
+ZP_04_Hi                equ     $0009
+ZP_05_Lo                equ     $000A
+ZP_05_Hi                equ     $000B
 ZP_Col_RAM_Ptr_Lo       equ     $000C
 ZP_Col_RAM_Ptr_Hi       equ     $000D
 ZP_Ptr_To_Str_Lo        equ     $000E
 ZP_Ptr_To_Str_Hi        equ     $000F
-ZP_0010                 equ     $0010
-ZP_0011                 equ     $0011
-ZP_0012                 equ     $0012
+ZP_08_Lo                equ     $0010
+ZP_08_Hi                equ     $0011
+ZP_09_Lo                equ     $0012
 ZP_Keyboard_Data        equ     $0013
-ZP_0014                 equ     $0014
-ZP_0015                 equ     $0015
-ZP_0016                 equ     $0016
-ZP_0017                 equ     $0017
-ZP_0018                 equ     $0018
-ZP_0019                 equ     $0019
-ZP_001a                 equ     $001A
-ZP_001b                 equ     $001B
+ZP_0A_Lo                equ     $0014
+ZP_0A_Hi                equ     $0015
+ZP_0B_Lo                equ     $0016
+ZP_0B_Hi                equ     $0017
+ZP_0C_Lo                equ     $0018
+ZP_0C_Hi                equ     $0019
+ZP_0D_Lo                equ     $001A
+ZP_0D_Hi                equ     $001B
 ZP_Jetman_Movement      equ     $001C
 ZP_Ship_UDG_Addr_Offset equ     $001E
 ZP_Ship_UDG_Addr_Color? equ     $001F
@@ -349,17 +349,17 @@ Lazer_Shots
 ; Loop through the four possible lazer shots, branch if any are zero I.E. NOT SHOOTING???????
          ldx     #$04                    ; 20F7: A2 04    
          ldy     #$00                    ; 20F9: A0 00    
-LS_Loop  lda     (ZP_Temp_3_Lo),y        ; 20FB: B1 06    
+LS_Loop  lda     (ZP_03_Lo),y            ; 20FB: B1 06    
          beq     Lazer_Shot              ; 20FD: F0 11    
 
 ; Move ZP index address to next 8 bytes i.e. next lazer shot
-         lda     ZP_Temp_3_Lo            ; 20FF: A5 06    
+         lda     ZP_03_Lo                ; 20FF: A5 06    
          clc                             ; 2101: 18       
          adc     #$08                    ; 2102: 69 08    
-         sta     ZP_Temp_3_Lo            ; 2104: 85 06    
-         lda     ZP_Temp_3_Hi            ; 2106: A5 07    
+         sta     ZP_03_Lo                ; 2104: 85 06    
+         lda     ZP_03_Hi                ; 2106: A5 07    
          adc     #$00                    ; 2108: 69 00    
-         sta     ZP_Temp_3_Hi            ; 210A: 85 07    
+         sta     ZP_03_Hi                ; 210A: 85 07    
          dex                             ; 210C: CA       
          bne     LS_Loop                 ; 210D: D0 EC    
          rts                             ; 210F: 60       
@@ -369,23 +369,23 @@ Lazer_Shot
          tax                             ; 2112: AA        Store for later
          and     #$80                    ; 2113: 29 80     Jetman looking left?
          ora     #$10                    ; 2115: 09 10     Set bit 4, DON'T KNOW WHAT IT'S USED FOR??????????
-         sta     (ZP_Temp_3_Lo),y        ; 2117: 91 06     Store to inactive lazer attrib 00
+         sta     (ZP_03_Lo),y            ; 2117: 91 06     Store to inactive lazer attrib 00
 
          iny                             ; 2119: C8        Move to next Jetman attrib 01
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 211A: B1 00     Get Jetman attrib 01 i.e. X position
          and     #$F8                    ; 211C: 29 F8     Zero the bottom 3 bits
          ora     #$05                    ; 211E: 09 05     Set bits 0 & 2
-         sta     ZP_Temp_4_Lo            ; 2120: 85 08     Store for later
+         sta     ZP_04_Lo                ; 2120: 85 08     Store for later
 
          txa                             ; 2122: 8A        Restore Jetman attrib 00
          and     #$80                    ; 2123: 29 80     Jetman looking left?
          beq     Lazer_Jetman_Facing_Right ; 2125: F0 4C     No, branch
-         lda     ZP_Temp_4_Lo            ; 2127: A5 08    
+         lda     ZP_04_Lo                ; 2127: A5 08    
          sec                             ; 2129: 38       
          sbc     #$08                    ; 212A: E9 08    
          jsr     Lazer_Jetman_Facing_Left??? ; 212C: 20 98 22 
 Lazer_Shot_
-         sta     ZP_Temp_4_Lo            ; 212F: 85 08    
+         sta     ZP_04_Lo                ; 212F: 85 08    
          iny                             ; 2131: C8       
          iny                             ; 2132: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2133: B1 00    
@@ -393,14 +393,14 @@ Lazer_Shot_
          sbc     #$0D                    ; 2136: E9 0D    
          dey                             ; 2138: 88       
          dey                             ; 2139: 88       
-         sta     (ZP_Temp_3_Lo),y        ; 213A: 91 06    
+         sta     (ZP_03_Lo),y            ; 213A: 91 06    
          ldx     #$03                    ; 213C: A2 03    
          iny                             ; 213E: C8       
-         lda     ZP_Temp_4_Lo            ; 213F: A5 08    
-         sta     (ZP_Temp_3_Lo),y        ; 2141: 91 06    
+         lda     ZP_04_Lo                ; 213F: A5 08    
+         sta     (ZP_03_Lo),y            ; 2141: 91 06    
          and     #$FB                    ; 2143: 29 FB    
 BACK_2145 iny                            ; 2145: C8       
-         sta     (ZP_Temp_3_Lo),y        ; 2146: 91 06    
+         sta     (ZP_03_Lo),y            ; 2146: 91 06    
          dex                             ; 2148: CA       
          bne     BACK_2145               ; 2149: D0 FA    
          iny                             ; 214B: C8       
@@ -408,13 +408,13 @@ BACK_2145 iny                            ; 2145: C8
          and     #$38                    ; 214E: 29 38    
          clc                             ; 2150: 18       
          adc     #$40                    ; 2151: 69 40    
-         sta     (ZP_Temp_3_Lo),y        ; 2153: 91 06    
+         sta     (ZP_03_Lo),y            ; 2153: 91 06    
          iny                             ; 2155: C8       
          lda     ZP_HW_IRQ_Count3        ; 2156: A5 4C    
          and     #$07                    ; 2158: 29 07    
          tax                             ; 215A: AA       
          lda     Lazer_Color_Table,x     ; 215B: BD 6B 21 
-         sta     (ZP_Temp_3_Lo),y        ; 215E: 91 06    
+         sta     (ZP_03_Lo),y            ; 215E: 91 06    
          lda     #$03                    ; 2160: A9 03    
          sta     Obj_Rocket_5            ; 2162: 8D AD 03 
          lda     #$10                    ; 2165: A9 10    
@@ -429,7 +429,7 @@ Lazer_Jetman_Facing_Right
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2173: B1 00     Get Jetman attrib 01 i.e. ????????
          and     #$07                    ; 2175: 29 07     Zero bits 3-7, any bits 0-2 set?
          beq     Lazer_JFR_2             ; 2177: F0 14     No, branch
-         lda     ZP_Temp_4_Lo            ; 2179: A5 08    
+         lda     ZP_04_Lo                ; 2179: A5 08    
          clc                             ; 217B: 18       
          adc     #$18                    ; 217C: 69 18    
 Lazer_JFR_1
@@ -444,7 +444,7 @@ Lazer_JFR_1_1
          jmp     Lazer_Shot_             ; 218A: 4C 2F 21 
 ; -----------------------
 Lazer_JFR_2
-         lda     ZP_Temp_4_Lo            ; 218D: A5 08     Restore saved Jetman attrib 00
+         lda     ZP_04_Lo                ; 218D: A5 08     Restore saved Jetman attrib 00
          clc                             ; 218F: 18       
          adc     #$10                    ; 2190: 69 10     Add $10 for some reason??????????
          jmp     Lazer_JFR_1             ; 2192: 4C 7E 21 
@@ -465,24 +465,24 @@ F_P_1_0  adc     #$08                    ; 2195: 69 08
 Fire_Pressed_1
          ldy     #$06                    ; 219A: A0 06    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 219C: B1 00    
-         sta     ZP_Temp_3_Hi            ; 219E: 85 07    
+         sta     ZP_03_Hi                ; 219E: 85 07    
          iny                             ; 21A0: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 21A1: B1 00    
-         sta     ZP_001b                 ; 21A3: 85 1B    
+         sta     ZP_0D_Hi                ; 21A3: 85 1B    
          ldy     #$02                    ; 21A5: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 21A7: B1 00    
-         sta     ZP_Temp_3_Lo            ; 21A9: 85 06    
+         sta     ZP_03_Lo                ; 21A9: 85 06    
          sta     ZP_UDG_RAM_X            ; 21AB: 85 04    
          dey                             ; 21AD: 88       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 21AE: B1 00    
          sta     ZP_UDG_RAM_Y            ; 21B0: 85 05    
          sta     ZP_Keyboard_Data        ; 21B2: 85 13    
-         lda     ZP_Temp_3_Lo            ; 21B4: A5 06    
+         lda     ZP_03_Lo                ; 21B4: A5 06    
          bit     MASK_04                 ; 21B6: 2C 16 20 
          beq     SKIP_2202               ; 21B9: F0 47    
          jsr     Setup_Color_RAM_Ptr     ; 21BB: 20 F7 34 
          jsr     Setup_UDG_RAM_XY        ; 21BE: 20 1D 35 
-         lda     ZP_Temp_3_Lo            ; 21C1: A5 06    
+         lda     ZP_03_Lo                ; 21C1: A5 06    
          bit     MASK_01                 ; 21C3: 2C 14 20 
          clc                             ; 21C6: 18       
          beq     F_P_1_0                 ; 21C7: F0 CC    
@@ -497,7 +497,7 @@ F_P_1_1  jsr     Lazer_Jetman_Facing_Left??? ; 21CB: 20 98 22
          lda     (ZP_UDG_RAM_X),y        ; 21D8: B1 04    
          bne     SKIP_21FC               ; 21DA: D0 20    
 SKIP_21DC txa                            ; 21DC: 8A       
-         sta     ZP_Temp_3_Lo            ; 21DD: 85 06    
+         sta     ZP_03_Lo                ; 21DD: 85 06    
          lda     (ZP_UDG_RAM_X),y        ; 21DF: B1 04    
          eor     #$FF                    ; 21E1: 49 FF    
          sta     (ZP_UDG_RAM_X),y        ; 21E3: 91 04    
@@ -505,34 +505,34 @@ SKIP_21DC txa                            ; 21DC: 8A
          and     #$0F                    ; 21E7: 29 0F    
          cmp     #$05                    ; 21E9: C9 05    
          beq     SKIP_21F1               ; 21EB: F0 04    
-         lda     ZP_001b                 ; 21ED: A5 1B    
+         lda     ZP_0D_Hi                ; 21ED: A5 1B    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 21EF: 91 0C    
-SKIP_21F1 lda    ZP_Temp_3_Hi            ; 21F1: A5 07    
+SKIP_21F1 lda    ZP_03_Hi                ; 21F1: A5 07    
          sec                             ; 21F3: 38       
          sbc     #$08                    ; 21F4: E9 08    
-         sta     ZP_Temp_3_Hi            ; 21F6: 85 07    
+         sta     ZP_03_Hi                ; 21F6: 85 07    
          and     #$F8                    ; 21F8: 29 F8    
          bne     SKIP_2202               ; 21FA: D0 06    
-SKIP_21FC lda    ZP_Temp_3_Lo            ; 21FC: A5 06    
+SKIP_21FC lda    ZP_03_Lo                ; 21FC: A5 06    
          and     #$FB                    ; 21FE: 29 FB    
-         sta     ZP_Temp_3_Lo            ; 2200: 85 06    
+         sta     ZP_03_Lo                ; 2200: 85 06    
 SKIP_2202 jsr    Read_ZP_Parameters      ; 2202: 20 9D 25 
          fcb     $14                     ; 2205: 14       
          fdb     Other_RAM               ; 2206: 00 03    
          fcb     $16                     ; 2208: 16       
          fcb     $1C,$E0                 ; 2209: 1C E0    
          fcb     $02                     ; 220B: 02       
-         fdb     ZP_Temp_1_Hi            ; 220C: 03 00    
+         fdb     ZP_01_Hi                ; 220C: 03 00    
          fcb     $FF                     ; 220E: FF       
          ldy     #$02                    ; 220F: A0 02    
 Fire_Pressed_2
          iny                             ; 2211: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2212: B1 00    
-         eor     ZP_Temp_3_Lo            ; 2214: 45 06    
+         eor     ZP_03_Lo                ; 2214: 45 06    
          and     #$F8                    ; 2216: 29 F8    
          bne     SR_2229                 ; 2218: D0 0F    
          jsr     Lazer_ZP17_15_to_ZP16_14 ; 221A: 20 8B 22 
-         dec     ZP_Temp_1_Lo            ; 221D: C6 02    
+         dec     ZP_01_Lo                ; 221D: C6 02    
          bne     Fire_Pressed_2          ; 221F: D0 F0    
          lda     #$00                    ; 2221: A9 00    
          tay                             ; 2223: A8       
@@ -542,23 +542,23 @@ Fire_Pressed_2
 SR_2229  lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00    
          bit     MASK_04                 ; 222B: 2C 16 20 
          bne     SR_2257                 ; 222E: D0 27    
-         dec     ZP_Temp_3_Hi            ; 2230: C6 07    
-         lda     ZP_Temp_3_Hi            ; 2232: A5 07    
+         dec     ZP_03_Hi                ; 2230: C6 07    
+         lda     ZP_03_Hi                ; 2232: A5 07    
          and     #$07                    ; 2234: 29 07    
          bne     SR_2229_1               ; 2236: D0 10    
          lda     ZP_HW_IRQ_Count3        ; 2238: A5 4C    
          and     #$03                    ; 223A: 29 03    
          ora     #$04                    ; 223C: 09 04    
-         ora     ZP_Temp_3_Hi            ; 223E: 05 07    
-         sta     ZP_Temp_3_Hi            ; 2240: 85 07    
+         ora     ZP_03_Hi                ; 223E: 05 07    
+         sta     ZP_03_Hi                ; 2240: 85 07    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2242: B1 00    
          ora     #$04                    ; 2244: 09 04    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2246: 91 00    
 SR_2229_1 ldy    #$06                    ; 2248: A0 06    
-         lda     ZP_Temp_3_Hi            ; 224A: A5 07    
+         lda     ZP_03_Hi                ; 224A: A5 07    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 224C: 91 00    
          ldy     #$02                    ; 224E: A0 02    
-         lda     ZP_Temp_3_Lo            ; 2250: A5 06    
+         lda     ZP_03_Lo                ; 2250: A5 06    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2252: 91 00    
          jmp     Triggers_Every_Frame    ; 2254: 4C 1A 26 
 ; -----------------------
@@ -577,12 +577,12 @@ SR_2257_1 jsr    Lazer_Jetman_Facing_Left??? ; 2263: 20 98 22
          jsr     Setup_UDG_RAM_XY        ; 226E: 20 1D 35 
          jsr     Lazer_ZP17_15_to_ZP16_14 ; 2271: 20 8B 22 
          ldy     #$00                    ; 2274: A0 00    
-         lda     ZP_0014                 ; 2276: A5 14    
+         lda     ZP_0A_Lo                ; 2276: A5 14    
          eor     (ZP_UDG_RAM_X),y        ; 2278: 51 04    
          sta     (ZP_UDG_RAM_X),y        ; 227A: 91 04    
          pla                             ; 227C: 68       
          tay                             ; 227D: A8       
-         dec     ZP_Temp_1_Lo            ; 227E: C6 02    
+         dec     ZP_01_Lo                ; 227E: C6 02    
          bne     Fire_Pressed_2          ; 2280: D0 8F    
          jmp     SR_2229_1               ; 2282: 4C 48 22 
 ; -----------------------
@@ -592,12 +592,12 @@ CLC_ADC_08
          jmp     SR_2257_1               ; 2288: 4C 63 22 
 ; -----------------------
 Lazer_ZP17_15_to_ZP16_14
-         lda     ZP_0015                 ; 228B: A5 15    
-         sta     ZP_0014                 ; 228D: 85 14    
-         lda     ZP_0016                 ; 228F: A5 16    
-         sta     ZP_0015                 ; 2291: 85 15    
-         lda     ZP_0017                 ; 2293: A5 17    
-         sta     ZP_0016                 ; 2295: 85 16    
+         lda     ZP_0A_Hi                ; 228B: A5 15    
+         sta     ZP_0A_Lo                ; 228D: 85 14    
+         lda     ZP_0B_Lo                ; 228F: A5 16    
+         sta     ZP_0A_Hi                ; 2291: 85 15    
+         lda     ZP_0B_Hi                ; 2293: A5 17    
+         sta     ZP_0B_Lo                ; 2295: 85 16    
          rts                             ; 2297: 60       
 ; ===========================================================
 Lazer_Jetman_Facing_Left???
@@ -753,7 +753,7 @@ P2_Lives_To_UDG_RAM
 Number_Lives_To_UDG_RAM
          clc                             ; 238E: 18       
          adc     #$70                    ; 238F: 69 70     $70 = "0" character
-         sta     ZP_Temp_3_Lo            ; 2391: 85 06    
+         sta     ZP_03_Lo                ; 2391: 85 06    
          jsr     Copy_Char_To_UDG_RAM    ; 2393: 20 95 35 
 
 ; Display Jetman Icon next to number of lives
@@ -770,10 +770,10 @@ Zero_Lives_To_UDG_RAM_1
 ; -----------------------
 Zero_Lives_To_UDG_RAM
          lda     #$60                    ; 23A8: A9 60     $60 = Space character
-         sta     ZP_Temp_3_Lo            ; 23AA: 85 06    
+         sta     ZP_03_Lo                ; 23AA: 85 06    
          jsr     Copy_Char_To_UDG_RAM    ; 23AC: 20 95 35 
          lda     #$60                    ; 23AF: A9 60     $60 = Space character
-         sta     ZP_Temp_3_Lo            ; 23B1: 85 06    
+         sta     ZP_03_Lo                ; 23B1: 85 06    
          jmp     Copy_Char_To_UDG_RAM    ; 23B3: 4C 95 35 
 ; -----------------------
 Load_Num_Lives
@@ -985,17 +985,17 @@ Display_Game_Select
          fcb     $FF                     ; 24EA: FF       
 
          lda     #$00                    ; 24EB: A9 00    
-         sta     ZP_Temp_4_Lo            ; 24ED: 85 08    
+         sta     ZP_04_Lo                ; 24ED: 85 08    
 DGS1     lda     #$18                    ; 24EF: A9 18    
          sta     ZP_UDG_RAM_X            ; 24F1: 85 04    
-         ldx     ZP_Temp_4_Lo            ; 24F3: A6 08    
+         ldx     ZP_04_Lo                ; 24F3: A6 08    
          lda     Fn_Key_SP_Row_Offsets,x ; 24F5: BD 1F 25 
          sta     ZP_UDG_RAM_Y            ; 24F8: 85 05    
          jsr     Setup_Color_RAM_Ptr     ; 24FA: 20 F7 34 
          jsr     Setup_UDG_RAM_XY        ; 24FD: 20 1D 35 
 
          ldy     #$00                    ; 2500: A0 00    
-         ldx     ZP_Temp_4_Lo            ; 2502: A6 08    
+         ldx     ZP_04_Lo                ; 2502: A6 08    
          lda     ZP_Game_Sel_F1_Flash,x  ; 2504: B5 45    
          jsr     DSTR1                   ; 2506: 20 D6 34 
          iny                             ; 2509: C8       
@@ -1006,8 +1006,8 @@ DGS1     lda     #$18                    ; 24EF: A9 18
          lda     ZP_Ptr_To_Str_Hi        ; 2510: A5 0F    
          adc     #$00                    ; 2512: 69 00    
          sta     ZP_Ptr_To_Str_Hi        ; 2514: 85 0F    
-         inc     ZP_Temp_4_Lo            ; 2516: E6 08    
-         lda     ZP_Temp_4_Lo            ; 2518: A5 08    
+         inc     ZP_04_Lo                ; 2516: E6 08    
+         lda     ZP_04_Lo                ; 2518: A5 08    
          cmp     #$05                    ; 251A: C9 05    
          bne     DGS1                    ; 251C: D0 D1    
          rts                             ; 251E: 60       
@@ -1248,10 +1248,10 @@ JTSRLSR_1 ldy    ZP_Subroutine_Vec_Hi    ; 26D1: A4 60
          asl     a                       ; 26D5: 0A       
          tax                             ; 26D6: AA       
          lda     Subroutine_List2,x      ; 26D7: BD 43 27 
-         sta     ZP_Temp_4_Lo            ; 26DA: 85 08    
+         sta     ZP_04_Lo                ; 26DA: 85 08    
          lda     Subroutine_List2+1,x    ; 26DC: BD 44 27 
-         sta     ZP_Temp_4_Hi            ; 26DF: 85 09    
-         jmp     (ZP_Temp_4_Lo)          ; 26E1: 6C 08 00 
+         sta     ZP_04_Hi                ; 26DF: 85 09    
+         jmp     (ZP_04_Lo)              ; 26E1: 6C 08 00 
 ; -----------------------
 Jmp_To_SRList2_SR_
          lda     ZP_Subroutine_Vec_Hi    ; 26E4: A5 60    
@@ -1380,7 +1380,7 @@ Test_New_Hi_Score
          ldy     #$00                    ; 278E: A0 00    
 Compare_BCD_Byte
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2790: B1 00    
-         cmp     (ZP_Temp_4_Lo),y        ; 2792: D1 08    
+         cmp     (ZP_04_Lo),y            ; 2792: D1 08    
          beq     Move_To_Next_BCD_Byte   ; 2794: F0 03    
          bcc     Copy_Player_To_Hi_Score ; 2796: 90 08     Branch if SCORE_HI < Player Score
          rts                             ; 2798: 60        SCORE_HI >= Player Score, so return
@@ -1394,7 +1394,7 @@ Move_To_Next_BCD_Byte
 ; ===========================================================
 Copy_Player_To_Hi_Score
          ldy     #$02                    ; 27A0: A0 02     3 BCD bytes, 02, 01, 00
-CPTHS_1  lda     (ZP_Temp_4_Lo),y        ; 27A2: B1 08    
+CPTHS_1  lda     (ZP_04_Lo),y            ; 27A2: B1 08    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 27A4: 91 00    
          dey                             ; 27A6: 88       
          bpl     CPTHS_1                 ; 27A7: 10 F9     Return when all bytes copied
@@ -1410,17 +1410,17 @@ Display_Rocket_Flame?
 Display_Rocket_Flame
          inc     ZP_Rocket_Flame_Toggle  ; 27B3: E6 27    
 
-         lda     ZP_0011                 ; 27B5: A5 11    
+         lda     ZP_08_Hi                ; 27B5: A5 11    
          pha                             ; 27B7: 48       
          clc                             ; 27B8: 18       
          adc     #$15                    ; 27B9: 69 15    
-         sta     ZP_0011                 ; 27BB: 85 11    
+         sta     ZP_08_Hi                ; 27BB: 85 11    
 
-         lda     ZP_0019                 ; 27BD: A5 19    
+         lda     ZP_0C_Hi                ; 27BD: A5 19    
          pha                             ; 27BF: 48       
          clc                             ; 27C0: 18       
          adc     #$15                    ; 27C1: 69 15    
-         sta     ZP_0019                 ; 27C3: 85 19     0019 must be height of rocket
+         sta     ZP_0C_Hi                ; 27C3: 85 19     0019 must be height of rocket
 
          cmp     #$AF                    ; 27C5: C9 AF     Check rocket height
          beq     Display_Flame           ; 27C7: F0 50     Display Flame
@@ -1446,9 +1446,9 @@ SKIP_27E1 lda    ZP_Rocket_Flame_Toggle  ; 27E1: A5 27
          jsr     Get_Flame_UDG_Addr      ; 27EE: 20 2E 28 
          jsr     Z378D                   ; 27F1: 20 8D 37 
          jsr     Z364C                   ; 27F4: 20 4C 36 
-         lda     ZP_0018                 ; 27F7: A5 18    
+         lda     ZP_0C_Lo                ; 27F7: A5 18    
          sta     ZP_UDG_RAM_X            ; 27F9: 85 04    
-         lda     ZP_0019                 ; 27FB: A5 19    
+         lda     ZP_0C_Hi                ; 27FB: A5 19    
          sta     ZP_UDG_RAM_Y            ; 27FD: 85 05    
          jsr     Setup_Color_RAM_Ptr     ; 27FF: 20 F7 34 
          lda     #$02                    ; 2802: A9 02    
@@ -1459,9 +1459,9 @@ SKIP_27E1 lda    ZP_Rocket_Flame_Toggle  ; 27E1: A5 27
 
 ; Restore 11 and 19 and return
 BACK_280B pla                            ; 280B: 68       
-         sta     ZP_0019                 ; 280C: 85 19    
+         sta     ZP_0C_Hi                ; 280C: 85 19    
          pla                             ; 280E: 68       
-         sta     ZP_0011                 ; 280F: 85 11    
+         sta     ZP_08_Hi                ; 280F: 85 11    
          rts                             ; 2811: 60       
 ; ===========================================================
 No_Display_Flame
@@ -1502,7 +1502,7 @@ Ptr_Final_Char_Hi
 Fire_Pressed
          jsr     Save_Obj_List_Params_013 ; 283E: 20 D7 35 
          jsr     Platform_Collision_Test ; 2841: 20 B3 30  Remove=Gems all fall through platforms and floor, reentering at top
-         lda     ZP_Temp_1_Lo            ; 2844: A5 02    
+         lda     ZP_01_Lo                ; 2844: A5 02    
          bmi     FP_1                    ; 2846: 30 09    
          ldy     #ObjParam3_Jiggle?      ; 2848: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 284A: B1 00    
@@ -1530,10 +1530,10 @@ Jump_To_Subroutine_List3
          and     #$0E                    ; 2878: 29 0E    
          tax                             ; 287A: AA       
          lda     Subroutine_List3,x      ; 287B: BD 88 28 
-         sta     ZP_Temp_4_Lo            ; 287E: 85 08    
+         sta     ZP_04_Lo                ; 287E: 85 08    
          lda     Subroutine_List3+1,x    ; 2880: BD 89 28 
-         sta     ZP_Temp_4_Hi            ; 2883: 85 09    
-         jmp     (ZP_Temp_4_Lo)          ; 2885: 6C 08 00 
+         sta     ZP_04_Hi                ; 2883: 85 09    
+         jmp     (ZP_04_Lo)              ; 2885: 6C 08 00 
 Subroutine_List3
          fdb     Set_Obj_Posn_05_To_07   ; 2888: 92 28    
          fdb     Set_Obj_Posn_05_To_03_Or_00 ; 288A: A4 28    
@@ -1754,11 +1754,11 @@ Display_String_
 
 ; Delay loop $100^2 x ($100-$f8=$08) x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
 Delay_Loop_Game_Over
-         inc     ZP_Temp_1_Lo            ; 2A05: E6 02     5 cycles
+         inc     ZP_01_Lo                ; 2A05: E6 02     5 cycles
          bne     Delay_Loop_Game_Over    ; 2A07: D0 FC     3 cycles when taken, 2 when not taken
-         inc     ZP_Temp_1_Hi            ; 2A09: E6 03    
+         inc     ZP_01_Hi                ; 2A09: E6 03    
          bne     Delay_Loop_Game_Over    ; 2A0B: D0 F8    
-         inc     ZP_Temp_5_Lo            ; 2A0D: E6 0A    
+         inc     ZP_05_Lo                ; 2A0D: E6 0A    
          bne     Delay_Loop_Game_Over    ; 2A0F: D0 F4    
          rts                             ; 2A11: 60       
 ; ===========================================================
@@ -1893,7 +1893,7 @@ Z2B11    adc     #$01                    ; 2B11: 69 01
          jmp     Z2AF5                   ; 2B13: 4C F5 2A 
 ; -----------------------
 Z2B16    jsr     Platform_Collision_Test ; 2B16: 20 B3 30  Remove=(Not triggered on first level, so don't yet know)
-         lda     ZP_Temp_1_Lo            ; 2B19: A5 02    
+         lda     ZP_01_Lo                ; 2B19: A5 02    
          bpl     Z2B36                   ; 2B1B: 10 19    
          ldy     #$02                    ; 2B1D: A0 02    
          bit     MASK_04                 ; 2B1F: 2C 16 20 
@@ -2013,41 +2013,41 @@ Raster_Line_Table
          fcb     $18                     ; 2BF6: 18       
          fcb     $20                     ; 2BF7: 20       
 Z2BF8    lda     #$88                    ; 2BF8: A9 88    
-         sta     ZP_Temp_4_Lo            ; 2BFA: 85 08    
+         sta     ZP_04_Lo                ; 2BFA: 85 08    
          lda     #$03                    ; 2BFC: A9 03    
-         sta     ZP_Temp_4_Hi            ; 2BFE: 85 09    
+         sta     ZP_04_Hi                ; 2BFE: 85 09    
          lda     #$04                    ; 2C00: A9 04    
-         sta     ZP_Temp_1_Lo            ; 2C02: 85 02    
+         sta     ZP_01_Lo                ; 2C02: 85 02    
          ldy     #$03                    ; 2C04: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2C06: B1 00    
-         sta     ZP_Temp_3_Lo            ; 2C08: 85 06    
+         sta     ZP_03_Lo                ; 2C08: 85 06    
          dey                             ; 2C0A: 88       
          dey                             ; 2C0B: 88       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2C0C: B1 00    
-         sta     ZP_Temp_3_Hi            ; 2C0E: 85 07    
+         sta     ZP_03_Hi                ; 2C0E: 85 07    
 Z2C10    ldy     #$02                    ; 2C10: A0 02    
-         lda     (ZP_Temp_4_Lo),y        ; 2C12: B1 08    
+         lda     (ZP_04_Lo),y            ; 2C12: B1 08    
          bit     MASK_04                 ; 2C14: 2C 16 20 
          bne     Z2C21                   ; 2C17: D0 08    
          iny                             ; 2C19: C8       
-         lda     (ZP_Temp_4_Lo),y        ; 2C1A: B1 08    
+         lda     (ZP_04_Lo),y            ; 2C1A: B1 08    
          bit     MASK_04                 ; 2C1C: 2C 16 20 
          beq     Z2C53                   ; 2C1F: F0 32    
 Z2C21    ldy     #$00                    ; 2C21: A0 00    
-         lda     (ZP_Temp_4_Lo),y        ; 2C23: B1 08    
+         lda     (ZP_04_Lo),y            ; 2C23: B1 08    
          beq     Z2C53                   ; 2C25: F0 2C    
          iny                             ; 2C27: C8       
-         lda     ZP_Temp_3_Lo            ; 2C28: A5 06    
+         lda     ZP_03_Lo                ; 2C28: A5 06    
          sec                             ; 2C2A: 38       
-         sbc     (ZP_Temp_4_Lo),y        ; 2C2B: F1 08    
+         sbc     (ZP_04_Lo),y            ; 2C2B: F1 08    
          cmp     #$10                    ; 2C2D: C9 10    
          bcs     Z2C53                   ; 2C2F: B0 22    
          iny                             ; 2C31: C8       
-         lda     (ZP_Temp_4_Lo),y        ; 2C32: B1 08    
+         lda     (ZP_04_Lo),y            ; 2C32: B1 08    
          and     #$F8                    ; 2C34: 29 F8    
          sbc     #$03                    ; 2C36: E9 03    
          sec                             ; 2C38: 38       
-         sbc     ZP_Temp_3_Hi            ; 2C39: E5 07    
+         sbc     ZP_03_Hi                ; 2C39: E5 07    
          bpl     Z2C42                   ; 2C3B: 10 05    
          eor     #$FF                    ; 2C3D: 49 FF    
          clc                             ; 2C3F: 18       
@@ -2055,32 +2055,32 @@ Z2C21    ldy     #$00                    ; 2C21: A0 00
 Z2C42    cmp     #$20                    ; 2C42: C9 20    
          bcs     Z2C53                   ; 2C44: B0 0D    
          lda     #$80                    ; 2C46: A9 80    
-         sta     ZP_Temp_1_Lo            ; 2C48: 85 02    
+         sta     ZP_01_Lo                ; 2C48: 85 02    
          ldy     #$02                    ; 2C4A: A0 02    
-         lda     (ZP_Temp_4_Lo),y        ; 2C4C: B1 08    
+         lda     (ZP_04_Lo),y            ; 2C4C: B1 08    
          and     #$FB                    ; 2C4E: 29 FB    
-         sta     (ZP_Temp_4_Lo),y        ; 2C50: 91 08    
+         sta     (ZP_04_Lo),y            ; 2C50: 91 08    
          rts                             ; 2C52: 60       
 ; ===========================================================
-Z2C53    lda     ZP_Temp_4_Lo            ; 2C53: A5 08    
+Z2C53    lda     ZP_04_Lo                ; 2C53: A5 08    
          clc                             ; 2C55: 18       
          adc     #$08                    ; 2C56: 69 08    
-         sta     ZP_Temp_4_Lo            ; 2C58: 85 08    
-         dec     ZP_Temp_1_Lo            ; 2C5A: C6 02    
+         sta     ZP_04_Lo                ; 2C58: 85 08    
+         dec     ZP_01_Lo                ; 2C5A: C6 02    
          bne     Z2C10                   ; 2C5C: D0 B2    
          rts                             ; 2C5E: 60       
 ; ===========================================================
 Z2C5F    inc     ZP_HW_IRQ_Count         ; 2C5F: E6 21    
          jsr     Save_Obj_List_Params_013 ; 2C61: 20 D7 35 
          jsr     Z2BF8                   ; 2C64: 20 F8 2B 
-         lda     ZP_Temp_1_Lo            ; 2C67: A5 02    
+         lda     ZP_01_Lo                ; 2C67: A5 02    
          rts                             ; 2C69: 60       
 ; ===========================================================
 Stops_All_After_Score_Flash
          jsr     Z2C5F                   ; 2C6A: 20 5F 2C 
          bmi     Z2C78                   ; 2C6D: 30 09    
          jsr     Platform_Collision_Test ; 2C6F: 20 B3 30  Remove=1st Level Aliens don't explode on platform/floor impact
-         lda     ZP_Temp_1_Lo            ; 2C72: A5 02    
+         lda     ZP_01_Lo                ; 2C72: A5 02    
          bpl     Z2C92                   ; 2C74: 10 1C    
          bmi     Z2C8C                   ; 2C76: 30 14    
 Z2C78    lda     ZP_Level_Current_Plyr   ; 2C78: A5 59    
@@ -2088,16 +2088,16 @@ Z2C78    lda     ZP_Level_Current_Plyr   ; 2C78: A5 59
          asl     a                       ; 2C7C: 0A       
          tax                             ; 2C7D: AA       
          lda     _0025_0035_0045_0055,x  ; 2C7E: BD DB 2C 
-         sta     ZP_Temp_1_Lo            ; 2C81: 85 02    
+         sta     ZP_01_Lo                ; 2C81: 85 02    
          inx                             ; 2C83: E8       
          lda     _0025_0035_0045_0055,x  ; 2C84: BD DB 2C 
-         sta     ZP_Temp_1_Hi            ; 2C87: 85 03    
+         sta     ZP_01_Hi                ; 2C87: 85 03    
          jsr     GameOverScoreStuff      ; 2C89: 20 63 30 
 Z2C8C    jsr     Z28F9                   ; 2C8C: 20 F9 28 
          jmp     Triggers_Every_Frame    ; 2C8F: 4C 1A 26 
 ; -----------------------
 Z2C92    jsr     Z2D58                   ; 2C92: 20 58 2D 
-         lda     ZP_Temp_1_Lo            ; 2C95: A5 02    
+         lda     ZP_01_Lo                ; 2C95: A5 02    
          bpl     Z2C9F                   ; 2C97: 10 06    
          jsr     Z2A45                   ; 2C99: 20 45 2A 
          jmp     Z2C78                   ; 2C9C: 4C 78 2C 
@@ -2157,7 +2157,7 @@ Jetman_Looks_1???
          lda     #$03                    ; 2CF5: A9 03    
          sta     ZP_Obj_List_Ptr_Hi      ; 2CF7: 85 01    
          lda     #$06                    ; 2CF9: A9 06    
-         sta     ZP_Temp_1_Lo            ; 2CFB: 85 02    
+         sta     ZP_01_Lo                ; 2CFB: 85 02    
          ldy     #$00                    ; 2CFD: A0 00    
 BACK_2CFF lda    (ZP_Obj_List_Ptr_Lo),y  ; 2CFF: B1 00    
          beq     Jetman_Looks_1_1???     ; 2D01: F0 0C    
@@ -2165,7 +2165,7 @@ BACK_2CFF lda    (ZP_Obj_List_Ptr_Lo),y  ; 2CFF: B1 00
          clc                             ; 2D05: 18       
          adc     #$08                    ; 2D06: 69 08    
          sta     ZP_Obj_List_Ptr_Lo      ; 2D08: 85 00    
-         dec     ZP_Temp_1_Lo            ; 2D0A: C6 02    
+         dec     ZP_01_Lo                ; 2D0A: C6 02    
          bne     BACK_2CFF               ; 2D0C: D0 F1    
          rts                             ; 2D0E: 60       
 ; ===========================================================
@@ -2196,12 +2196,12 @@ Jetman_Looks_1_1???
          iny                             ; 2D35: C8       
          txa                             ; 2D36: 8A       
          and     #$01                    ; 2D37: 29 01    
-         sta     ZP_Temp_1_Lo            ; 2D39: 85 02    
+         sta     ZP_01_Lo                ; 2D39: 85 02    
          lda     ZP_Level_Current_Plyr   ; 2D3B: A5 59    
          asl     a                       ; 2D3D: 0A       
          and     #$06                    ; 2D3E: 29 06    
          clc                             ; 2D40: 18       
-         adc     ZP_Temp_1_Lo            ; 2D41: 65 02    
+         adc     ZP_01_Lo                ; 2D41: 65 02    
          tax                             ; 2D43: AA       
          lda     M2D50,x                 ; 2D44: BD 50 2D 
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2D47: 91 00    
@@ -2215,18 +2215,19 @@ Z2D58    lda     ZP_Flash_Score_Countdown ; 2D58: A5 5D
          bne     SKIP_2D69               ; 2D5A: D0 0D    
          lda     Obj_Jetman_Looks        ; 2D5C: AD 80 03 
          and     #$3F                    ; 2D5F: 29 3F    
-         cmp     #$01                    ; 2D61: C9 01    
-         beq     Z2D6E                   ; 2D63: F0 09    
-         cmp     #$02                    ; 2D65: C9 02    
-         beq     Z2D6E                   ; 2D67: F0 05    
-SKIP_2D69 lda    #$00                    ; 2D69: A9 00    
-         sta     ZP_Temp_1_Lo            ; 2D6B: 85 02    
+         cmp     #$01                    ; 2D61: C9 01     Jetman flying?
+         beq     Z2D6E                   ; 2D63: F0 09     Yes, branch
+         cmp     #$02                    ; 2D65: C9 02     Jetman standing?
+         beq     Z2D6E                   ; 2D67: F0 05     Yes, branch
+
+SKIP_2D69 lda    #$00                    ; 2D69: A9 00     If Flashing Score, return with ZP_01_Lo=0
+         sta     ZP_01_Lo                ; 2D6B: 85 02    
          rts                             ; 2D6D: 60       
 ; ===========================================================
 Z2D6E    ldy     #$00                    ; 2D6E: A0 00    
-         sty     ZP_Temp_1_Lo            ; 2D70: 84 02    
+         sty     ZP_01_Lo                ; 2D70: 84 02     Reset variable
          iny                             ; 2D72: C8       
-         lda     Obj_Jetman_X            ; 2D73: AD 81 03 
+         lda     Obj_Jetman_X            ; 2D73: AD 81 03  Jetman X position
          sec                             ; 2D76: 38       
          sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D77: F1 00    
          bpl     SKIP_2D80               ; 2D79: 10 05    
@@ -2247,7 +2248,7 @@ SKIP_2D80 cmp    #$0C                    ; 2D80: C9 0C
          cmp     #$0C                    ; 2D93: C9 0C    
 BACK_2D95 bcs    SKIP_2D9B_RTS           ; 2D95: B0 04    
          lda     #$80                    ; 2D97: A9 80    
-         sta     ZP_Temp_1_Lo            ; 2D99: 85 02    
+         sta     ZP_01_Lo                ; 2D99: 85 02    
 SKIP_2D9B_RTS
          rts                             ; 2D9B: 60       
 ; ===========================================================
@@ -2292,7 +2293,7 @@ LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
 Z2DE8    lda     ZP_Level_Current_Plyr   ; 2DE8: A5 59    
          lsr     a                       ; 2DEA: 4A       
          lsr     a                       ; 2DEB: 4A       
-         and     #$03                    ; 2DEC: 29 03    
+         and     #$03                    ; 2DEC: 29 03     Current level modulus 4
          ora     ZP_Ship_UDG_Addr_Offset ; 2DEE: 05 1E    
          asl     a                       ; 2DF0: 0A       
          pha                             ; 2DF1: 48       
@@ -2303,14 +2304,14 @@ Z2DE8    lda     ZP_Level_Current_Plyr   ; 2DE8: A5 59
          jmp     Z378D                   ; 2DFC: 4C 8D 37 
 ; -----------------------
 Dec_Saved_Obj_List_Params_by_10
-         lda     ZP_0019                 ; 2DFF: A5 19    
+         lda     ZP_0C_Hi                ; 2DFF: A5 19    
          sec                             ; 2E01: 38       
          sbc     #$10                    ; 2E02: E9 10    
-         sta     ZP_0019                 ; 2E04: 85 19    
-         lda     ZP_0011                 ; 2E06: A5 11    
+         sta     ZP_0C_Hi                ; 2E04: 85 19    
+         lda     ZP_08_Hi                ; 2E06: A5 11    
          sec                             ; 2E08: 38       
          sbc     #$10                    ; 2E09: E9 10    
-         sta     ZP_0011                 ; 2E0B: 85 11    
+         sta     ZP_08_Hi                ; 2E0B: 85 11    
          lda     ZP_Ship_UDG_Addr_Offset ; 2E0D: A5 1E    
          clc                             ; 2E0F: 18       
          adc     #$04                    ; 2E10: 69 04    
@@ -2332,7 +2333,7 @@ Rocket_Goes_Up
          sta     Obj_Rocket_3            ; 2E29: 8D AB 03 
          lda     #$02                    ; 2E2C: A9 02    
          sta     Obj_Rocket_4            ; 2E2E: 8D AC 03 
-         jmp     Z2EAC                   ; 2E31: 4C AC 2E 
+         jmp     A0000000                ; 2E31: 4C AC 2E 
 ; -----------------------
 Rocket_At_Top
          inc     ZP_Level_Current_Plyr   ; 2E34: E6 59    
@@ -2363,24 +2364,25 @@ Rocket_Goes_Down
          adc     #$01                    ; 2E60: 69 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E62: 91 00    
          cmp     #$AF                    ; 2E64: C9 AF     Hit bottom of playarea
-         bcc     Z2EAC                   ; 2E66: 90 44    
+         bcc     A0000000                ; 2E66: 90 44    
 
 ; Set current object type to a crash
          ldy     #$00                    ; 2E68: A0 00    
          lda     #$09                    ; 2E6A: A9 09    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E6C: 91 00    
          jsr     Init_Next_Jetman_Lives_Scores ; 2E6E: 20 5B 23 
-         jmp     Z2EAC                   ; 2E71: 4C AC 2E 
+         jmp     A0000000                ; 2E71: 4C AC 2E 
 ; -----------------------
+; YOU ARE HERE ###############
 Subroutine_2E74
          jsr     Save_Obj_List_Params_013 ; 2E74: 20 D7 35 
          jsr     Z2D58                   ; 2E77: 20 58 2D 
-         lda     ZP_Temp_1_Lo            ; 2E7A: A5 02    
-         bpl     Z2EAC                   ; 2E7C: 10 2E    
+         lda     ZP_01_Lo                ; 2E7A: A5 02    
+         bpl     A0000000                ; 2E7C: 10 2E    
          ldy     #$02                    ; 2E7E: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E80: B1 00    
          cmp     #$06                    ; 2E82: C9 06    
-         bcc     Z2EAC                   ; 2E84: 90 26    
+         bcc     A0000000                ; 2E84: 90 26    
          lda     #$0A                    ; 2E86: A9 0A    
          ldy     #$00                    ; 2E88: A0 00    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E8A: 91 00    
@@ -2398,59 +2400,62 @@ Subroutine_2E74
          jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23 
          jmp     Triggers_Every_Frame    ; 2EA9: 4C 1A 26 
 ; -----------------------
-Z2EAC    jsr     Save_Obj_List_Params_0135 ; 2EAC: 20 E9 35 
+A0000000 jsr     Save_Obj_List_Params_0135 ; 2EAC: 20 E9 35 
          jsr     Display_Rocket_Flame?   ; 2EAF: 20 AA 27 
          jsr     LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00 ; 2EB2: 20 DD 2D 
-Z2EB5    jsr     Z2DE8                   ; 2EB5: 20 E8 2D 
+LOOP_2EB5 jsr    Z2DE8                   ; 2EB5: 20 E8 2D 
          jsr     Z364C                   ; 2EB8: 20 4C 36 
          jsr     Dec_Saved_Obj_List_Params_by_10 ; 2EBB: 20 FF 2D 
-         bne     Z2EB5                   ; 2EBE: D0 F5    
+         bne     LOOP_2EB5               ; 2EBE: D0 F5    
+
          lda     ZP_HW_IRQ_Count1        ; 2EC0: A5 4A    
          lsr     a                       ; 2EC2: 4A       
          lsr     a                       ; 2EC3: 4A       
          and     #$04                    ; 2EC4: 29 04    
-         bne     Z2ECA                   ; 2EC6: D0 02    
+         bne     SKIP_2ECA               ; 2EC6: D0 02    
          lda     #$01                    ; 2EC8: A9 01    
-Z2ECA    sta     ZP_001b                 ; 2ECA: 85 1B    
+SKIP_2ECA sta    ZP_0D_Hi                ; 2ECA: 85 1B    
          ldy     #$04                    ; 2ECC: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2ECE: B1 00    
-         sta     ZP_Temp_1_Lo            ; 2ED0: 85 02    
+         sta     ZP_01_Lo                ; 2ED0: 85 02    
          cmp     #$03                    ; 2ED2: C9 03    
-         bcc     Z2EFD                   ; 2ED4: 90 27    
+         bcc     A123123                 ; 2ED4: 90 27    
          ldy     #$02                    ; 2ED6: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2ED8: B1 00    
          lsr     a                       ; 2EDA: 4A       
          sta     ZP_Keyboard_Data        ; 2EDB: 85 13    
-         beq     Z2EFD                   ; 2EDD: F0 1E    
+         beq     A123123                 ; 2EDD: F0 1E    
          cmp     #$03                    ; 2EDF: C9 03    
-         bcs     Z2F01                   ; 2EE1: B0 1E    
-         sta     ZP_Temp_1_Lo            ; 2EE3: 85 02    
+         bcs     A456456                 ; 2EE1: B0 1E    
+         sta     ZP_01_Lo                ; 2EE3: 85 02    
          lda     #$04                    ; 2EE5: A9 04    
-         sta     ZP_001b                 ; 2EE7: 85 1B    
-         jsr     Z2F07                   ; 2EE9: 20 07 2F 
+         sta     ZP_0D_Hi                ; 2EE7: 85 1B    
+         jsr     A789789                 ; 2EE9: 20 07 2F 
          lda     #$03                    ; 2EEC: A9 03    
          sec                             ; 2EEE: 38       
          sbc     ZP_Keyboard_Data        ; 2EEF: E5 13    
-         sta     ZP_Temp_1_Lo            ; 2EF1: 85 02    
+         sta     ZP_01_Lo                ; 2EF1: 85 02    
          lda     #$01                    ; 2EF3: A9 01    
-         sta     ZP_001b                 ; 2EF5: 85 1B    
-         jsr     Z2F16                   ; 2EF7: 20 16 2F 
+         sta     ZP_0D_Hi                ; 2EF5: 85 1B    
+         jsr     A111111                 ; 2EF7: 20 16 2F 
          jmp     Triggers_Every_Frame    ; 2EFA: 4C 1A 26 
 ; -----------------------
-Z2EFD    lda     #$01                    ; 2EFD: A9 01    
-         sta     ZP_001b                 ; 2EFF: 85 1B    
-Z2F01    jsr     Z2F07                   ; 2F01: 20 07 2F 
+A123123  lda     #$01                    ; 2EFD: A9 01    
+         sta     ZP_0D_Hi                ; 2EFF: 85 1B    
+A456456  jsr     A789789                 ; 2F01: 20 07 2F 
          jmp     Triggers_Every_Frame    ; 2F04: 4C 1A 26 
 ; -----------------------
-Z2F07    ldy     #$01                    ; 2F07: A0 01    
+A789789  ldy     #$01                    ; 2F07: A0 01    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F09: B1 00    
          sta     ZP_UDG_RAM_X            ; 2F0B: 85 04    
+
          ldy     #$03                    ; 2F0D: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F0F: B1 00    
          sta     ZP_UDG_RAM_Y            ; 2F11: 85 05    
+
          jsr     Setup_Color_RAM_Ptr     ; 2F13: 20 F7 34 
-Z2F16    ldy     #$00                    ; 2F16: A0 00    
-         lda     ZP_001b                 ; 2F18: A5 1B    
+A111111  ldy     #$00                    ; 2F16: A0 00    
+         lda     ZP_0D_Hi                ; 2F18: A5 1B    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 2F1A: 91 0C    
          iny                             ; 2F1C: C8       
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 2F1D: 91 0C    
@@ -2461,8 +2466,8 @@ Z2F16    ldy     #$00                    ; 2F16: A0 00
          lda     ZP_Col_RAM_Ptr_Hi       ; 2F26: A5 0D    
          sbc     #$00                    ; 2F28: E9 00    
          sta     ZP_Col_RAM_Ptr_Hi       ; 2F2A: 85 0D    
-         dec     ZP_Temp_1_Lo            ; 2F2C: C6 02    
-         bne     Z2F16                   ; 2F2E: D0 E6    
+         dec     ZP_01_Lo                ; 2F2C: C6 02    
+         bne     A111111                 ; 2F2E: D0 E6    
          rts                             ; 2F30: 60       
 ; ===========================================================
 Z2F31    ldy     #$06                    ; 2F31: A0 06    
@@ -2488,7 +2493,7 @@ Z2F31    ldy     #$06                    ; 2F31: A0 06
          lda     Obj_Flame_3             ; 2F57: AD B3 03 
          sec                             ; 2F5A: 38       
          sbc     ZP_Keyboard_Data        ; 2F5B: E5 13    
-         sta     ZP_0019                 ; 2F5D: 85 19    
+         sta     ZP_0C_Hi                ; 2F5D: 85 19    
          jsr     Z3057                   ; 2F5F: 20 57 30 
          inc     Obj_Flame_4             ; 2F62: EE B4 03 
 Z2F65    lda     #$00                    ; 2F65: A9 00    
@@ -2520,10 +2525,10 @@ Stops_All jsr    Save_Obj_List_Params_013 ; 2F8E: 20 D7 35
          bit     MASK_01                 ; 2F9F: 2C 14 20 
          beq     Z2FBD                   ; 2FA2: F0 19    
          jsr     Z2D58                   ; 2FA4: 20 58 2D 
-         lda     ZP_Temp_1_Lo            ; 2FA7: A5 02    
+         lda     ZP_01_Lo                ; 2FA7: A5 02    
          bmi     Z2FEE                   ; 2FA9: 30 43    
          jsr     Platform_Collision_Test ; 2FAB: 20 B3 30  Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
-         lda     ZP_Temp_1_Lo            ; 2FAE: A5 02    
+         lda     ZP_01_Lo                ; 2FAE: A5 02    
          bmi     Z2FBD                   ; 2FB0: 30 0B    
 Z2FB2    ldy     #$03                    ; 2FB2: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2FB4: B1 00    
@@ -2627,18 +2632,18 @@ GameOverScoreStuff
 Continue_Score_Process
          ldy     #$02                    ; 306E: A0 02    
          sed                             ; 3070: F8        Set Decimal Mode
-         lda     (ZP_Temp_3_Lo),y        ; 3071: B1 06    
+         lda     (ZP_03_Lo),y            ; 3071: B1 06    
          clc                             ; 3073: 18       
-         adc     ZP_Temp_1_Lo            ; 3074: 65 02    
-         sta     (ZP_Temp_3_Lo),y        ; 3076: 91 06    
+         adc     ZP_01_Lo                ; 3074: 65 02    
+         sta     (ZP_03_Lo),y            ; 3076: 91 06    
          dey                             ; 3078: 88       
-         lda     (ZP_Temp_3_Lo),y        ; 3079: B1 06    
-         adc     ZP_Temp_1_Hi            ; 307B: 65 03    
-         sta     (ZP_Temp_3_Lo),y        ; 307D: 91 06    
+         lda     (ZP_03_Lo),y            ; 3079: B1 06    
+         adc     ZP_01_Hi                ; 307B: 65 03    
+         sta     (ZP_03_Lo),y            ; 307D: 91 06    
          dey                             ; 307F: 88       
-         lda     (ZP_Temp_3_Lo),y        ; 3080: B1 06    
+         lda     (ZP_03_Lo),y            ; 3080: B1 06    
          adc     #$00                    ; 3082: 69 00    
-         sta     (ZP_Temp_3_Lo),y        ; 3084: 91 06    
+         sta     (ZP_03_Lo),y            ; 3084: 91 06    
          cld                             ; 3086: D8        Clear Decimal Mode
          lda     ZP_P1_Or_P2             ; 3087: A5 5E     Decide if working with P1 or P2
          bne     P2_Score_To_UDG_RAM_    ; 3089: D0 03    
@@ -2662,17 +2667,17 @@ PCT_0    eor     #$FF                    ; 309B: 49 FF
          iny                             ; 30A0: C8       
 
          tax                             ; 30A1: AA        Save A
-         lda     (ZP_Temp_4_Lo),y        ; 30A2: B1 08    
+         lda     (ZP_04_Lo),y            ; 30A2: B1 08    
          asl     a                       ; 30A4: 0A       
          asl     a                       ; 30A5: 0A       
          asl     a                       ; 30A6: 0A       
-         sta     ZP_Temp_5_Hi            ; 30A7: 85 0B    
+         sta     ZP_05_Hi                ; 30A7: 85 0B    
          dey                             ; 30A9: 88       
          dey                             ; 30AA: 88       
          sec                             ; 30AB: 38       
          txa                             ; 30AC: 8A        Restore A
 
-         sbc     ZP_Temp_5_Hi            ; 30AD: E5 0B    
+         sbc     ZP_05_Hi                ; 30AD: E5 0B    
          bcs     PCT_02                  ; 30AF: B0 23    
          bcc     PCT_04                  ; 30B1: 90 39    
 
@@ -2699,8 +2704,8 @@ Platform_Collision_Test
          sta     ZP_Ptr_To_Str_Hi        ; 30BD: 85 0F     1st run: X=5f
          jsr     _31B6_To_Tmp4_03_To_Tmp5_Yto00 ; 30BF: 20 43 31  Set Temp4 to address of data table at 31B6
 PCT_1    lda     #$00                    ; 30C2: A9 00    
-         sta     ZP_Temp_1_Lo            ; 30C4: 85 02     Set Temp1Lo=0
-         lda     (ZP_Temp_4_Lo),y        ; 30C6: B1 08     31B6: 10 40 03 50 60 01 88 30
+         sta     ZP_01_Lo                ; 30C4: 85 02     Set Temp1Lo=0
+         lda     (ZP_04_Lo),y            ; 30C6: B1 08     31B6: 10 40 03 50 60 01 88 30
          sec                             ; 30C8: 38       
          sbc     ZP_Ptr_To_Str_Lo        ; 30C9: E5 0E     1st run: 10-50=C0 i.e. -40
          bcc     PCT_0                   ; 30CB: 90 CE     1st run: Branch taken
@@ -2725,7 +2730,7 @@ PCT_03   cmp     #$10                    ; 30DF: C9 10
          lda     #$04                    ; 30E7: A9 04    
          jsr     ORA_Temp1Lo_And_StoreTo_Temp1Lo ; 30E9: 20 38 31 
 PCT_04   iny                             ; 30EC: C8       
-         lda     (ZP_Temp_4_Lo),y        ; 30ED: B1 08    
+         lda     (ZP_04_Lo),y            ; 30ED: B1 08    
          sec                             ; 30EF: 38       
          sbc     ZP_Ptr_To_Str_Hi        ; 30F0: E5 0F    
          bcc     PCT_05                  ; 30F2: 90 09    
@@ -2735,7 +2740,7 @@ PCT_04   iny                             ; 30EC: C8
          jmp     ORA_Temp1Lo_And_StoreTo_Temp1Lo ; 30FA: 4C 38 31 
 ; -----------------------
 PCT_05   eor     #$FF                    ; 30FD: 49 FF    
-         sty     ZP_Temp_5_Hi            ; 30FF: 84 0B    
+         sty     ZP_05_Hi                ; 30FF: 84 0B    
          pha                             ; 3101: 48       
          ldy     #$00                    ; 3102: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 3104: B1 00    
@@ -2744,7 +2749,7 @@ PCT_05   eor     #$FF                    ; 30FD: 49 FF
          bne     PCT_10                  ; 310A: D0 31    
          pla                             ; 310C: 68       
          cmp     #$22                    ; 310D: C9 22    
-PCT_06   ldy     ZP_Temp_5_Hi            ; 310F: A4 0B    
+PCT_06   ldy     ZP_05_Hi                ; 310F: A4 0B    
          bcs     INY_2                   ; 3111: B0 06    
          lda     #$80                    ; 3113: A9 80    
          jmp     ORA_Temp1Lo_And_StoreTo_Temp1Lo ; 3115: 4C 38 31 
@@ -2753,7 +2758,7 @@ PCT_06   ldy     ZP_Temp_5_Hi            ; 310F: A4 0B
 INY_3    iny                             ; 3118: C8        3 iny's when moving from Y check to Y check
 INY_2    iny                             ; 3119: C8        2 iny's when moving from X check to X check as y already inc'd
          iny                             ; 311A: C8       
-         dec     ZP_Temp_5_Lo            ; 311B: C6 0A     Temp5 used as 3-2-1 countdown
+         dec     ZP_05_Lo                ; 311B: C6 0A     Temp5 used as 3-2-1 countdown
          bne     PCT_1                   ; 311D: D0 A3    
          ldy     #$03                    ; 311F: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 3121: B1 00    
@@ -2762,7 +2767,7 @@ INY_2    iny                             ; 3119: C8        2 iny's when moving f
          lda     #$AF                    ; 3127: A9 AF    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 3129: 91 00    
          lda     #$88                    ; 312B: A9 88    
-PCT_07   sta     ZP_Temp_1_Lo            ; 312D: 85 02    
+PCT_07   sta     ZP_01_Lo                ; 312D: 85 02    
          rts                             ; 312F: 60       
 ; ===========================================================
 PCT_08   cmp     #$20                    ; 3130: C9 20    
@@ -2770,8 +2775,8 @@ PCT_08   cmp     #$20                    ; 3130: C9 20
          lda     #$80                    ; 3134: A9 80    
          bmi     PCT_07                  ; 3136: 30 F5    
 ORA_Temp1Lo_And_StoreTo_Temp1Lo
-         ora     ZP_Temp_1_Lo            ; 3138: 05 02    
-         sta     ZP_Temp_1_Lo            ; 313A: 85 02    
+         ora     ZP_01_Lo                ; 3138: 05 02    
+         sta     ZP_01_Lo                ; 313A: 85 02    
 PCT_09   rts                             ; 313C: 60       
 ; ===========================================================
 PCT_10   pla                             ; 313D: 68       
@@ -2780,36 +2785,36 @@ PCT_10   pla                             ; 313D: 68
 ; -----------------------
 _31B6_To_Tmp4_03_To_Tmp5_Yto00
          lda     #$B6                    ; 3143: A9 B6     Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
-         sta     ZP_Temp_4_Lo            ; 3145: 85 08    
+         sta     ZP_04_Lo                ; 3145: 85 08    
          lda     #$31                    ; 3147: A9 31    
-         sta     ZP_Temp_4_Hi            ; 3149: 85 09    
+         sta     ZP_04_Hi                ; 3149: 85 09    
          lda     #$03                    ; 314B: A9 03    
-         sta     ZP_Temp_5_Lo            ; 314D: 85 0A    
+         sta     ZP_05_Lo                ; 314D: 85 0A    
          ldy     #$00                    ; 314F: A0 00    
          rts                             ; 3151: 60       
 ; ===========================================================
 Draw_Platforms
          jsr     _31B6_To_Tmp4_03_To_Tmp5_Yto00 ; 3152: 20 43 31 
-DP_1     lda     (ZP_Temp_4_Lo),y        ; 3155: B1 08     Get X value from lookup table ($10)
+DP_1     lda     (ZP_04_Lo),y            ; 3155: B1 08     Get X value from lookup table ($10)
          sta     ZP_UDG_RAM_X            ; 3157: 85 04      and store
 
          iny                             ; 3159: C8       
-         lda     (ZP_Temp_4_Lo),y        ; 315A: B1 08     Get Y value from lookup table ($40)
+         lda     (ZP_04_Lo),y            ; 315A: B1 08     Get Y value from lookup table ($40)
          sta     ZP_UDG_RAM_Y            ; 315C: 85 05      and store
 
          iny                             ; 315E: C8       
-         lda     (ZP_Temp_4_Lo),y        ; 315F: B1 08     Get ??? value from lookup table ($03)
-         sta     ZP_Temp_5_Hi            ; 3161: 85 0B      and store
+         lda     (ZP_04_Lo),y            ; 315F: B1 08     Get ??? value from lookup table ($03)
+         sta     ZP_05_Hi                ; 3161: 85 0B      and store
 
-         sty     ZP_Temp_1_Hi            ; 3163: 84 03    
+         sty     ZP_01_Hi                ; 3163: 84 03    
          jsr     Setup_Color_RAM_Ptr     ; 3165: 20 F7 34 
          jsr     Setup_UDG_RAM_XY        ; 3168: 20 1D 35 
 
 ; Load Temp_3 with addr of left end platform UDG char
          lda     #$15                    ; 316B: A9 15    
-         sta     ZP_Temp_3_Lo            ; 316D: 85 06    
+         sta     ZP_03_Lo                ; 316D: 85 06    
          lda     #$3E                    ; 316F: A9 3E    
-         sta     ZP_Temp_3_Hi            ; 3171: 85 07    
+         sta     ZP_03_Hi                ; 3171: 85 07    
 
 ; Copy left end platform UDG char to RAM, bytes 9 per column
          ldy     #$09                    ; 3173: A0 09    
@@ -2821,25 +2826,25 @@ Loop_Next_Char
          ldy     #$09                    ; 317B: A0 09    
          jsr     CCTUR2                  ; 317D: 20 B6 35 
 
-         dec     ZP_Temp_5_Hi            ; 3180: C6 0B    
+         dec     ZP_05_Hi                ; 3180: C6 0B    
          beq     Next_UDG_Char_Loop_Next_Char ; 3182: F0 1E    
          bpl     Loop_Next_Char          ; 3184: 10 F5    
 
 ; Set the color mapping for the platforms to Green
-         ldy     ZP_Temp_1_Hi            ; 3186: A4 03    
-         lda     (ZP_Temp_4_Lo),y        ; 3188: B1 08    
+         ldy     ZP_01_Hi                ; 3186: A4 03    
+         lda     (ZP_04_Lo),y            ; 3188: B1 08    
          clc                             ; 318A: 18       
          adc     #$01                    ; 318B: 69 01    
-         sta     ZP_Temp_5_Hi            ; 318D: 85 0B    
+         sta     ZP_05_Hi                ; 318D: 85 0B    
          ldy     #$00                    ; 318F: A0 00    
          lda     #GREEN_05               ; 3191: A9 05    
 DP_2     sta     (ZP_Col_RAM_Ptr_Lo),y   ; 3193: 91 0C    
          iny                             ; 3195: C8       
-         dec     ZP_Temp_5_Hi            ; 3196: C6 0B    
+         dec     ZP_05_Hi                ; 3196: C6 0B    
          bpl     DP_2                    ; 3198: 10 F9    
-         ldy     ZP_Temp_1_Hi            ; 319A: A4 03    
+         ldy     ZP_01_Hi                ; 319A: A4 03    
          iny                             ; 319C: C8       
-         dec     ZP_Temp_5_Lo            ; 319D: C6 0A    
+         dec     ZP_05_Lo                ; 319D: C6 0A    
          bne     DP_1                    ; 319F: D0 B4    
          rts                             ; 31A1: 60       
 ; ===========================================================
@@ -2848,13 +2853,13 @@ Next_UDG_Char_Loop_Next_Char
          jmp     Loop_Next_Char          ; 31A5: 4C 7B 31 
 ; -----------------------
 Next_UDG_Char
-         lda     ZP_Temp_3_Lo            ; 31A8: A5 06    
+         lda     ZP_03_Lo                ; 31A8: A5 06    
          clc                             ; 31AA: 18       
          adc     #$0A                    ; 31AB: 69 0A    
-         sta     ZP_Temp_3_Lo            ; 31AD: 85 06    
-         lda     ZP_Temp_3_Hi            ; 31AF: A5 07    
+         sta     ZP_03_Lo                ; 31AD: 85 06    
+         lda     ZP_03_Hi                ; 31AF: A5 07    
          adc     #$00                    ; 31B1: 69 00    
-         sta     ZP_Temp_3_Hi            ; 31B3: 85 07    
+         sta     ZP_03_Hi                ; 31B3: 85 07    
          rts                             ; 31B5: 60       
 ; ===========================================================
 ; Platform data for 3143_Subroutine, 3 platforms: X Y #Num_middle_chars
@@ -2972,7 +2977,7 @@ Flying   jsr     Save_Obj_List_Params_013 ; 3273: 20 D7 35
          jsr     Read_Keyboard_Joystick  ; 3276: 20 F7 33  Returns A=%RLDU_F111
          sta     ZP_Jetman_Movement      ; 3279: 85 1C    
          jsr     Platform_Collision_Test ; 327B: 20 B3 30  Remove=Jetman+fuel/rocket part pick-up fly through platforms
-         lda     ZP_Temp_1_Lo            ; 327E: A5 02    
+         lda     ZP_01_Lo                ; 327E: A5 02    
          bpl     __WWWW__                ; 3280: 10 03    
          jmp     JJJJJJJJ                ; 3282: 4C F2 31 
 ; -----------------------
@@ -3010,7 +3015,7 @@ __ZZZZ__ ldy     #$01                    ; 32A6: A0 01
          bcs     ADC_48                  ; 32B8: B0 B0    
 CSC_ADC_RTN
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 32BA: 91 00    
-         lda     ZP_Temp_1_Lo            ; 32BC: A5 02    
+         lda     ZP_01_Lo                ; 32BC: A5 02    
          bpl     Flying?                 ; 32BE: 10 07    
          and     #$0C                    ; 32C0: 29 0C    
          bne     Flying?                 ; 32C2: D0 03    
@@ -3111,7 +3116,7 @@ Read_Kbd_Jstk
          jsr     Save_Obj_List_Params_013 ; 336A: 20 D7 35 
          jsr     Read_Keyboard_Joystick  ; 336D: 20 F7 33 
          jsr     Platform_Collision_Test ; 3370: 20 B3 30  Remove=Jetman+pickup flies/walks jiggle when standing on a platform
-         lda     ZP_Temp_1_Lo            ; 3373: A5 02    
+         lda     ZP_01_Lo                ; 3373: A5 02    
          bmi     Z337D                   ; 3375: 30 06    
          ldy     #$03                    ; 3377: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 3379: B1 00    
@@ -3126,7 +3131,7 @@ Z337D    ldy     #$00                    ; 337D: A0 00
          bpl     Z338F                   ; 338B: 10 02    
 Z338D    ldx     #$FF                    ; 338D: A2 FF    
 Z338F    ldy     #$02                    ; 338F: A0 02    
-         lda     ZP_Temp_1_Lo            ; 3391: A5 02    
+         lda     ZP_01_Lo                ; 3391: A5 02    
          bpl     Z339D                   ; 3393: 10 08    
          bit     MASK_02                 ; 3395: 2C 15 20 
          php                             ; 3398: 08       
@@ -3319,7 +3324,7 @@ Display_BCD_Bytes
          lsr     a                       ; 34AB: 4A        12 has become 01
          clc                             ; 34AC: 18       
          adc     #$70                    ; 34AD: 69 70     Add $70, $40 gets subtracted later on
-         sta     ZP_Temp_3_Lo            ; 34AF: 85 06     and resultant $31st char in Char ROM is "1"
+         sta     ZP_03_Lo                ; 34AF: 85 06     and resultant $31st char in Char ROM is "1"
          jsr     Copy_Char_To_UDG_RAM    ; 34B1: 20 95 35 
 
 ; Display 2nd score character
@@ -3327,14 +3332,14 @@ Display_BCD_Bytes
          lda     (ZP_Ptr_To_Str_Lo),y    ; 34B6: B1 0E     Load first score byte again i.e. 12
          and     #$0F                    ; 34B8: 29 0F     Mask top 4 bits, 12 becomes 02
          adc     #$70                    ; 34BA: 69 70    
-         sta     ZP_Temp_3_Lo            ; 34BC: 85 06    
+         sta     ZP_03_Lo                ; 34BC: 85 06    
          jsr     Copy_Char_To_UDG_RAM    ; 34BE: 20 95 35 
 
 ; Increment pointer to next score byte
          inc     ZP_Ptr_To_Str_Lo        ; 34C1: E6 0E    
          bne     SKIP_34C7               ; 34C3: D0 02    
-         inc     ZP_Temp_3_Hi            ; 34C5: E6 07     Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
-SKIP_34C7 dec    ZP_Temp_1_Lo            ; 34C7: C6 02     Decrement number of bytes to display counter
+         inc     ZP_03_Hi                ; 34C5: E6 07     Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
+SKIP_34C7 dec    ZP_01_Lo                ; 34C7: C6 02     Decrement number of bytes to display counter
          bne     Display_BCD_Bytes       ; 34C9: D0 D9     If <> 0 yet, process another byte
          rts                             ; 34CB: 60       
 ; ===========================================================
@@ -3368,7 +3373,7 @@ DSTR1    tax                             ; 34D6: AA        Stash character to X
 
 Display_Character
          lsr     a                       ; 34E3: 4A       
-         sta     ZP_Temp_3_Lo            ; 34E4: 85 06    
+         sta     ZP_03_Lo                ; 34E4: 85 06    
          txa                             ; 34E6: 8A       
          sta     ZP_Invert               ; 34E7: 85 57    
 
@@ -3468,7 +3473,7 @@ ERASE_UDG_RAM_1000_1fff
 
 ERASE_RAM ldy    #$00                    ; 3579: A0 00    
 ERASE_RAM_1
-         lda     ZP_Temp_3_Lo            ; 357B: A5 06    
+         lda     ZP_03_Lo                ; 357B: A5 06    
                                          ; Fills memory from e.g. 9600-96FC (address at zero page $05) with $01's
                                          ; This is color RAM for 3.5k but unused for 8k+!?
                                          ; ALSO CONTIUNES TO BLANK THE SCREEN, COMPLETING BOTTOM HALF
@@ -3496,12 +3501,12 @@ ERASE_RAM_1
          iny                             ; 357F: C8       
          bne     ERASECR2                ; 3580: D0 02    
          inc     ZP_UDG_RAM_Y            ; 3582: E6 05    
-ERASECR2 dec     ZP_Temp_1_Lo            ; 3584: C6 02    
-         lda     ZP_Temp_1_Lo            ; 3586: A5 02    
+ERASECR2 dec     ZP_01_Lo                ; 3584: C6 02    
+         lda     ZP_01_Lo                ; 3586: A5 02    
          cmp     #$FF                    ; 3588: C9 FF    
          bne     ERASE_RAM_1             ; 358A: D0 EF    
-         dec     ZP_Temp_1_Hi            ; 358C: C6 03    
-         lda     ZP_Temp_1_Hi            ; 358E: A5 03    
+         dec     ZP_01_Hi                ; 358C: C6 03    
+         lda     ZP_01_Hi                ; 358E: A5 03    
          cmp     #$FF                    ; 3590: C9 FF    
          bne     ERASE_RAM_1             ; 3592: D0 E7    
          rts                             ; 3594: 60       
@@ -3520,30 +3525,30 @@ ERASECR2 dec     ZP_Temp_1_Lo            ; 3584: C6 02
 ; ----------------------------------------------------------
 Copy_Char_To_UDG_RAM
          lda     #$00                    ; 3595: A9 00     Addr_From = 71 xx as example
-         sta     ZP_Temp_3_Hi            ; 3597: 85 07     Clear address hi-byte
-         lda     ZP_Temp_3_Lo            ; 3599: A5 06     Addr_From = 71 00
+         sta     ZP_03_Hi                ; 3597: 85 07     Clear address hi-byte
+         lda     ZP_03_Lo                ; 3599: A5 06     Addr_From = 71 00
          sec                             ; 359B: 38       
          sbc     #$40                    ; 359C: E9 40    
-         sta     ZP_Temp_3_Lo            ; 359E: 85 06     Addr_From = 31 00, $31st Character ROM character is "1"
+         sta     ZP_03_Lo                ; 359E: 85 06     Addr_From = 31 00, $31st Character ROM character is "1"
 
 ; Multiply Addr_From by 8, as 8 bytes per UDG RAM character definition
          ldx     #$03                    ; 35A0: A2 03    
 CCTUR1   clc                             ; 35A2: 18       
-         rol     ZP_Temp_3_Lo            ; 35A3: 26 06    
-         rol     ZP_Temp_3_Hi            ; 35A5: 26 07     Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
+         rol     ZP_03_Lo                ; 35A3: 26 06    
+         rol     ZP_03_Hi                ; 35A5: 26 07     Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
          dex                             ; 35A7: CA        Left-shifted 3 times? i.e. multiplied by 8
          bne     CCTUR1                  ; 35A8: D0 F8     If no, loop back
 
 ; Add $8000 Character ROM offset to address
-         lda     ZP_Temp_3_Hi            ; 35AA: A5 07    
+         lda     ZP_03_Hi                ; 35AA: A5 07    
          adc     #$80                    ; 35AC: 69 80    
-         sta     ZP_Temp_3_Hi            ; 35AE: 85 07     Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
+         sta     ZP_03_Hi                ; 35AE: 85 07     Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
 
 ; Copy 8 bytes to form a complete character
          ldy     #$07                    ; 35B0: A0 07    
          lda     ZP_Invert               ; 35B2: A5 57     Test the Invert flag
          bmi     CCTUR_INV               ; 35B4: 30 15     If yes, copy bytes with inversion instead
-CCTUR2   lda     (ZP_Temp_3_Lo),y        ; 35B6: B1 06     Copy bytes from given address with Y offset
+CCTUR2   lda     (ZP_03_Lo),y            ; 35B6: B1 06     Copy bytes from given address with Y offset
          sta     (ZP_UDG_RAM_X),y        ; 35B8: 91 04     Copy bytes to given address with Y offset
          dey                             ; 35BA: 88        Decrement number of lines counter
          bpl     CCTUR2                  ; 35BB: 10 F9     All lines copied? If no, loop back.
@@ -3560,7 +3565,7 @@ CCTUR_NEXT
          rts                             ; 35CA: 60       
 
 ; Copy 8 inverted bytes to form a complete character
-CCTUR_INV lda    (ZP_Temp_3_Lo),y        ; 35CB: B1 06     Copy bytes from given address with Y offset
+CCTUR_INV lda    (ZP_03_Lo),y            ; 35CB: B1 06     Copy bytes from given address with Y offset
          eor     #$FF                    ; 35CD: 49 FF     Invert the byte (used to make the byte flash)
          sta     (ZP_UDG_RAM_X),y        ; 35CF: 91 04     Move bytes to given address with Y offset
          dey                             ; 35D1: 88        Decrement number of lines counter
@@ -3570,58 +3575,58 @@ CCTUR_INV lda    (ZP_Temp_3_Lo),y        ; 35CB: B1 06     Copy bytes from given
 Save_Obj_List_Params_013
          ldy     #$00                    ; 35D7: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35D9: B1 00    
-         sta     ZP_0012                 ; 35DB: 85 12    
+         sta     ZP_09_Lo                ; 35DB: 85 12    
          iny                             ; 35DD: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35DE: B1 00    
-         sta     ZP_0010                 ; 35E0: 85 10    
+         sta     ZP_08_Lo                ; 35E0: 85 10    
 
          ldy     #$03                    ; 35E2: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35E4: B1 00    
-         sta     ZP_0011                 ; 35E6: 85 11    
+         sta     ZP_08_Hi                ; 35E6: 85 11    
          rts                             ; 35E8: 60       
 ; ===========================================================
 Save_Obj_List_Params_0135
          ldy     #$00                    ; 35E9: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35EB: B1 00    
-         sta     ZP_001a                 ; 35ED: 85 1A    
+         sta     ZP_0D_Lo                ; 35ED: 85 1A    
          iny                             ; 35EF: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35F0: B1 00    
-         sta     ZP_0018                 ; 35F2: 85 18    
+         sta     ZP_0C_Lo                ; 35F2: 85 18    
 
          ldy     #$03                    ; 35F4: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35F6: B1 00    
-         sta     ZP_0019                 ; 35F8: 85 19    
+         sta     ZP_0C_Hi                ; 35F8: 85 19    
 
          ldy     #$05                    ; 35FA: A0 05    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35FC: B1 00    
-         sta     ZP_001b                 ; 35FE: 85 1B    
+         sta     ZP_0D_Hi                ; 35FE: 85 1B    
          rts                             ; 3600: 60       
 ; ===========================================================
 Z3601    jsr     Z3737                   ; 3601: 20 37 37 
 Z3604    lda     #$00                    ; 3604: A9 00    
-         sta     ZP_0014                 ; 3606: 85 14    
-         sta     ZP_Temp_1_Hi            ; 3608: 85 03    
+         sta     ZP_0A_Lo                ; 3606: 85 14    
+         sta     ZP_01_Hi                ; 3608: 85 03    
          jmp     Z364C                   ; 360A: 4C 4C 36 
 ; -----------------------
 Z360D    jsr     Z378A                   ; 360D: 20 8A 37 
 Z3610    lda     #$00                    ; 3610: A9 00    
-         sta     ZP_0015                 ; 3612: 85 15    
-         sta     ZP_Temp_5_Hi            ; 3614: 85 0B    
+         sta     ZP_0A_Hi                ; 3612: 85 15    
+         sta     ZP_05_Hi                ; 3614: 85 0B    
          jmp     Z364C                   ; 3616: 4C 4C 36 
 ; -----------------------
 Z3619    eor     #$FF                    ; 3619: 49 FF    
          clc                             ; 361B: 18       
          adc     #$01                    ; 361C: 69 01    
-         cmp     ZP_Temp_5_Hi            ; 361E: C5 0B    
+         cmp     ZP_05_Hi                ; 361E: C5 0B    
          bcs     Z3688                   ; 3620: B0 66    
          tax                             ; 3622: AA       
          pha                             ; 3623: 48       
-         sta     ZP_Temp_5_Lo            ; 3624: 85 0A    
-         lda     ZP_Temp_5_Hi            ; 3626: A5 0B    
+         sta     ZP_05_Lo                ; 3624: 85 0A    
+         lda     ZP_05_Hi                ; 3626: A5 0B    
          sec                             ; 3628: 38       
-         sbc     ZP_Temp_5_Lo            ; 3629: E5 0A    
-         sta     ZP_Temp_5_Lo            ; 362B: 85 0A    
-         ldy     ZP_Temp_4_Hi            ; 362D: A4 09    
+         sbc     ZP_05_Lo                ; 3629: E5 0A    
+         sta     ZP_05_Lo                ; 362B: 85 0A    
+         ldy     ZP_04_Hi                ; 362D: A4 09    
 Z362F    lda     (ZP_Ptr_To_Str_Lo),y    ; 362F: B1 0E    
          eor     (ZP_Col_RAM_Ptr_Lo),y   ; 3631: 51 0C    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 3633: 91 0C    
@@ -3630,37 +3635,37 @@ Z362F    lda     (ZP_Ptr_To_Str_Lo),y    ; 362F: B1 0E
          bne     Z362F                   ; 3637: D0 F6    
          pla                             ; 3639: 68       
          sta     ZP_Keyboard_Data        ; 363A: 85 13    
-         lda     ZP_Temp_4_Hi            ; 363C: A5 09    
+         lda     ZP_04_Hi                ; 363C: A5 09    
          sec                             ; 363E: 38       
          sbc     ZP_Keyboard_Data        ; 363F: E5 13    
-         sta     ZP_Temp_4_Hi            ; 3641: 85 09    
+         sta     ZP_04_Hi                ; 3641: 85 09    
          jmp     Z3688                   ; 3643: 4C 88 36 
 ; -----------------------
 Z3646    jsr     Z3737                   ; 3646: 20 37 37 
          jsr     Z378A                   ; 3649: 20 8A 37 
 Z364C    lda     #$FF                    ; 364C: A9 FF    
-         sta     ZP_Temp_4_Lo            ; 364E: 85 08    
-         sta     ZP_Temp_4_Hi            ; 3650: 85 09    
-         lda     ZP_Temp_1_Hi            ; 3652: A5 03    
-         sta     ZP_Temp_1_Lo            ; 3654: 85 02    
-         lda     ZP_Temp_5_Hi            ; 3656: A5 0B    
-         sta     ZP_Temp_5_Lo            ; 3658: 85 0A    
-         lda     ZP_0011                 ; 365A: A5 11    
+         sta     ZP_04_Lo                ; 364E: 85 08    
+         sta     ZP_04_Hi                ; 3650: 85 09    
+         lda     ZP_01_Hi                ; 3652: A5 03    
+         sta     ZP_01_Lo                ; 3654: 85 02    
+         lda     ZP_05_Hi                ; 3656: A5 0B    
+         sta     ZP_05_Lo                ; 3658: 85 0A    
+         lda     ZP_08_Hi                ; 365A: A5 11    
          sec                             ; 365C: 38       
-         sbc     ZP_0019                 ; 365D: E5 19    
+         sbc     ZP_0C_Hi                ; 365D: E5 19    
          beq     Z3688                   ; 365F: F0 27    
          bmi     Z3619                   ; 3661: 30 B6    
-         cmp     ZP_Temp_1_Hi            ; 3663: C5 03    
+         cmp     ZP_01_Hi                ; 3663: C5 03    
          bcs     Z3688                   ; 3665: B0 21    
          tax                             ; 3667: AA       
          pha                             ; 3668: 48       
-         sta     ZP_Temp_1_Lo            ; 3669: 85 02    
-         lda     ZP_Temp_1_Hi            ; 366B: A5 03    
+         sta     ZP_01_Lo                ; 3669: 85 02    
+         lda     ZP_01_Hi                ; 366B: A5 03    
          sec                             ; 366D: 38       
-         sbc     ZP_Temp_1_Lo            ; 366E: E5 02    
-         sta     ZP_Temp_1_Lo            ; 3670: 85 02    
-         ldy     ZP_Temp_4_Lo            ; 3672: A4 08    
-Z3674    lda     (ZP_Temp_3_Lo),y        ; 3674: B1 06    
+         sbc     ZP_01_Lo                ; 366E: E5 02    
+         sta     ZP_01_Lo                ; 3670: 85 02    
+         ldy     ZP_04_Lo                ; 3672: A4 08    
+Z3674    lda     (ZP_03_Lo),y            ; 3674: B1 06    
          eor     (ZP_UDG_RAM_X),y        ; 3676: 51 04    
          sta     (ZP_UDG_RAM_X),y        ; 3678: 91 04    
          dey                             ; 367A: 88       
@@ -3668,40 +3673,40 @@ Z3674    lda     (ZP_Temp_3_Lo),y        ; 3674: B1 06
          bne     Z3674                   ; 367C: D0 F6    
          pla                             ; 367E: 68       
          sta     ZP_Keyboard_Data        ; 367F: 85 13    
-         lda     ZP_Temp_4_Lo            ; 3681: A5 08    
+         lda     ZP_04_Lo                ; 3681: A5 08    
          sec                             ; 3683: 38       
          sbc     ZP_Keyboard_Data        ; 3684: E5 13    
-         sta     ZP_Temp_4_Lo            ; 3686: 85 08    
-Z3688    lda     ZP_Temp_1_Lo            ; 3688: A5 02    
+         sta     ZP_04_Lo                ; 3686: 85 08    
+Z3688    lda     ZP_01_Lo                ; 3688: A5 02    
          beq     Z36AB                   ; 368A: F0 1F    
-         dec     ZP_Temp_1_Lo            ; 368C: C6 02    
-         ldy     ZP_Temp_4_Lo            ; 368E: A4 08    
-         lda     (ZP_Temp_3_Lo),y        ; 3690: B1 06    
+         dec     ZP_01_Lo                ; 368C: C6 02    
+         ldy     ZP_04_Lo                ; 368E: A4 08    
+         lda     (ZP_03_Lo),y            ; 3690: B1 06    
          eor     (ZP_UDG_RAM_X),y        ; 3692: 51 04    
          sta     (ZP_UDG_RAM_X),y        ; 3694: 91 04    
-         dec     ZP_Temp_4_Lo            ; 3696: C6 08    
-         lda     ZP_Temp_5_Lo            ; 3698: A5 0A    
+         dec     ZP_04_Lo                ; 3696: C6 08    
+         lda     ZP_05_Lo                ; 3698: A5 0A    
          beq     Z3688                   ; 369A: F0 EC    
-Z369C    dec     ZP_Temp_5_Lo            ; 369C: C6 0A    
-         ldy     ZP_Temp_4_Hi            ; 369E: A4 09    
+Z369C    dec     ZP_05_Lo                ; 369C: C6 0A    
+         ldy     ZP_04_Hi                ; 369E: A4 09    
          lda     (ZP_Ptr_To_Str_Lo),y    ; 36A0: B1 0E    
          eor     (ZP_Col_RAM_Ptr_Lo),y   ; 36A2: 51 0C    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 36A4: 91 0C    
-         dec     ZP_Temp_4_Hi            ; 36A6: C6 09    
+         dec     ZP_04_Hi                ; 36A6: C6 09    
          jmp     Z3688                   ; 36A8: 4C 88 36 
 ; -----------------------
-Z36AB    lda     ZP_Temp_5_Lo            ; 36AB: A5 0A    
+Z36AB    lda     ZP_05_Lo                ; 36AB: A5 0A    
          bne     Z369C                   ; 36AD: D0 ED    
-         lda     ZP_0014                 ; 36AF: A5 14    
+         lda     ZP_0A_Lo                ; 36AF: A5 14    
          beq     Z3729                   ; 36B1: F0 76    
-         dec     ZP_0014                 ; 36B3: C6 14    
-         lda     ZP_Temp_3_Lo            ; 36B5: A5 06    
+         dec     ZP_0A_Lo                ; 36B3: C6 14    
+         lda     ZP_03_Lo                ; 36B5: A5 06    
          sec                             ; 36B7: 38       
-         sbc     ZP_Temp_1_Hi            ; 36B8: E5 03    
-         sta     ZP_Temp_3_Lo            ; 36BA: 85 06    
-         lda     ZP_Temp_3_Hi            ; 36BC: A5 07    
+         sbc     ZP_01_Hi                ; 36B8: E5 03    
+         sta     ZP_03_Lo                ; 36BA: 85 06    
+         lda     ZP_03_Hi                ; 36BC: A5 07    
          sbc     #$00                    ; 36BE: E9 00    
-         sta     ZP_Temp_3_Hi            ; 36C0: 85 07    
+         sta     ZP_03_Hi                ; 36C0: 85 07    
          lda     ZP_UDG_RAM_X            ; 36C2: A5 04    
          clc                             ; 36C4: 18       
          adc     #$B0                    ; 36C5: 69 B0    
@@ -3722,12 +3727,12 @@ Z36AB    lda     ZP_Temp_5_Lo            ; 36AB: A5 0A
          lda     ZP_UDG_RAM_Y            ; 36E1: A5 05    
          sbc     #$0F                    ; 36E3: E9 0F    
          sta     ZP_UDG_RAM_Y            ; 36E5: 85 05    
-Z36E7    lda     ZP_0015                 ; 36E7: A5 15    
+Z36E7    lda     ZP_0A_Hi                ; 36E7: A5 15    
          beq     Z3722                   ; 36E9: F0 37    
-         dec     ZP_0015                 ; 36EB: C6 15    
+         dec     ZP_0A_Hi                ; 36EB: C6 15    
          lda     ZP_Ptr_To_Str_Lo        ; 36ED: A5 0E    
          sec                             ; 36EF: 38       
-         sbc     ZP_Temp_5_Hi            ; 36F0: E5 0B    
+         sbc     ZP_05_Hi                ; 36F0: E5 0B    
          sta     ZP_Ptr_To_Str_Lo        ; 36F2: 85 0E    
          lda     ZP_Ptr_To_Str_Hi        ; 36F4: A5 0F    
          sbc     #$00                    ; 36F6: E9 00    
@@ -3755,13 +3760,13 @@ Z36E7    lda     ZP_0015                 ; 36E7: A5 15
 Z371F    jmp     Z364C                   ; 371F: 4C 4C 36 
 ; -----------------------
 Z3722    lda     #$00                    ; 3722: A9 00    
-         sta     ZP_Temp_5_Hi            ; 3724: 85 0B    
+         sta     ZP_05_Hi                ; 3724: 85 0B    
          jmp     Z364C                   ; 3726: 4C 4C 36 
 ; -----------------------
 Z3729    lda     #$00                    ; 3729: A9 00    
-         sta     ZP_Temp_1_Hi            ; 372B: 85 03    
-         lda     ZP_0014                 ; 372D: A5 14    
-         ora     ZP_0015                 ; 372F: 05 15    
+         sta     ZP_01_Hi                ; 372B: 85 03    
+         lda     ZP_0A_Lo                ; 372D: A5 14    
+         ora     ZP_0A_Hi                ; 372F: 05 15    
          bne     Z3734                   ; 3731: D0 01    
          rts                             ; 3733: 60       
 ; ===========================================================
@@ -3773,9 +3778,9 @@ Z373D    sty     ZP_Ptr_To_Str_Lo        ; 373D: 84 0E
          tay                             ; 373F: A8       
          dey                             ; 3740: 88       
          sty     ZP_Ptr_To_Str_Hi        ; 3741: 84 0F    
-         lda     ZP_0018                 ; 3743: A5 18    
+         lda     ZP_0C_Lo                ; 3743: A5 18    
          sta     ZP_UDG_RAM_X            ; 3745: 85 04    
-         lda     ZP_0019                 ; 3747: A5 19    
+         lda     ZP_0C_Hi                ; 3747: A5 19    
          sta     ZP_UDG_RAM_Y            ; 3749: 85 05    
          ldy     #$FF                    ; 374B: A0 FF    
          lda     (ZP_Ptr_To_Str_Lo),y    ; 374D: B1 0E    
@@ -3786,7 +3791,7 @@ Z373D    sty     ZP_Ptr_To_Str_Lo        ; 373D: 84 0E
          sec                             ; 3756: 38       
          sbc     #$B8                    ; 3757: E9 B8    
 Z3759    sta     ZP_UDG_RAM_X            ; 3759: 85 04    
-         sta     ZP_0018                 ; 375B: 85 18    
+         sta     ZP_0C_Lo                ; 375B: 85 18    
          jsr     Setup_UDG_RAM_XY        ; 375D: 20 1D 35 
          lda     ZP_UDG_RAM_X            ; 3760: A5 04    
          sec                             ; 3762: 38       
@@ -3797,12 +3802,12 @@ Z3759    sta     ZP_UDG_RAM_X            ; 3759: 85 04
          sta     ZP_Col_RAM_Ptr_Hi       ; 376B: 85 0D    
          ldy     #$FE                    ; 376D: A0 FE    
          lda     (ZP_Ptr_To_Str_Lo),y    ; 376F: B1 0E    
-         sta     ZP_0015                 ; 3771: 85 15    
-         sta     ZP_0016                 ; 3773: 85 16    
+         sta     ZP_0A_Hi                ; 3771: 85 15    
+         sta     ZP_0B_Lo                ; 3773: 85 16    
          dey                             ; 3775: 88       
          lda     (ZP_Ptr_To_Str_Lo),y    ; 3776: B1 0E    
-         sta     ZP_Temp_5_Hi            ; 3778: 85 0B    
-         sta     ZP_0017                 ; 377A: 85 17    
+         sta     ZP_05_Hi                ; 3778: 85 0B    
+         sta     ZP_0B_Hi                ; 377A: 85 17    
          lda     ZP_Ptr_To_Str_Lo        ; 377C: A5 0E    
          sec                             ; 377E: 38       
          sbc     #$03                    ; 377F: E9 03    
@@ -3813,16 +3818,16 @@ Z3759    sta     ZP_UDG_RAM_X            ; 3759: 85 04
          rts                             ; 3789: 60       
 ; ===========================================================
 Z378A    jsr     Z37E6                   ; 378A: 20 E6 37 
-Z378D    sty     ZP_Temp_3_Lo            ; 378D: 84 06    
+Z378D    sty     ZP_03_Lo                ; 378D: 84 06    
          tay                             ; 378F: A8       
          dey                             ; 3790: 88       
-         sty     ZP_Temp_3_Hi            ; 3791: 84 07    
-         lda     ZP_0010                 ; 3793: A5 10    
+         sty     ZP_03_Hi                ; 3791: 84 07    
+         lda     ZP_08_Lo                ; 3793: A5 10    
          sta     ZP_UDG_RAM_X            ; 3795: 85 04    
-         lda     ZP_0011                 ; 3797: A5 11    
+         lda     ZP_08_Hi                ; 3797: A5 11    
          sta     ZP_UDG_RAM_Y            ; 3799: 85 05    
          ldy     #$FF                    ; 379B: A0 FF    
-         lda     (ZP_Temp_3_Lo),y        ; 379D: B1 06    
+         lda     (ZP_03_Lo),y            ; 379D: B1 06    
          clc                             ; 379F: 18       
          adc     ZP_UDG_RAM_X            ; 37A0: 65 04    
          cmp     #$B8                    ; 37A2: C9 B8    
@@ -3839,18 +3844,18 @@ Z37A9    sta     ZP_UDG_RAM_X            ; 37A9: 85 04
          sbc     #$00                    ; 37B7: E9 00    
          sta     ZP_UDG_RAM_Y            ; 37B9: 85 05    
          ldy     #$FE                    ; 37BB: A0 FE    
-         lda     (ZP_Temp_3_Lo),y        ; 37BD: B1 06    
-         sta     ZP_0014                 ; 37BF: 85 14    
+         lda     (ZP_03_Lo),y            ; 37BD: B1 06    
+         sta     ZP_0A_Lo                ; 37BF: 85 14    
          dey                             ; 37C1: 88       
-         lda     (ZP_Temp_3_Lo),y        ; 37C2: B1 06    
-         sta     ZP_Temp_1_Hi            ; 37C4: 85 03    
-         lda     ZP_Temp_3_Lo            ; 37C6: A5 06    
+         lda     (ZP_03_Lo),y            ; 37C2: B1 06    
+         sta     ZP_01_Hi                ; 37C4: 85 03    
+         lda     ZP_03_Lo                ; 37C6: A5 06    
          sec                             ; 37C8: 38       
          sbc     #$03                    ; 37C9: E9 03    
-         sta     ZP_Temp_3_Lo            ; 37CB: 85 06    
-         lda     ZP_Temp_3_Hi            ; 37CD: A5 07    
+         sta     ZP_03_Lo                ; 37CB: 85 06    
+         lda     ZP_03_Hi                ; 37CD: A5 07    
          sbc     #$00                    ; 37CF: E9 00    
-         sta     ZP_Temp_3_Hi            ; 37D1: 85 07    
+         sta     ZP_03_Hi                ; 37D1: 85 07    
          rts                             ; 37D3: 60       
 ; ===========================================================
 Z37D4    pha                             ; 37D4: 48       
@@ -3867,10 +3872,10 @@ Z37D4    pha                             ; 37D4: 48
          adc     #$20                    ; 37E1: 69 20    
          jmp     Z3807                   ; 37E3: 4C 07 38 
 ; -----------------------
-Z37E6    lda     ZP_0010                 ; 37E6: A5 10    
+Z37E6    lda     ZP_08_Lo                ; 37E6: A5 10    
          and     #$06                    ; 37E8: 29 06    
          tax                             ; 37EA: AA       
-         lda     ZP_0012                 ; 37EB: A5 12    
+         lda     ZP_09_Lo                ; 37EB: A5 12    
 Z37ED    tay                             ; 37ED: A8       
          and     #$3F                    ; 37EE: 29 3F    
          cmp     #$03                    ; 37F0: C9 03    
@@ -3898,34 +3903,34 @@ Z3807    sta     ZP_Keyboard_Data        ; 3807: 85 13
          lda     UDG_Lookup+1,x          ; 3811: BD 60 38 
          rts                             ; 3814: 60       
 ; ===========================================================
-Z3815    lda     ZP_0018                 ; 3815: A5 18    
+Z3815    lda     ZP_0C_Lo                ; 3815: A5 18    
          and     #$06                    ; 3817: 29 06    
          tax                             ; 3819: AA       
-         lda     ZP_001a                 ; 381A: A5 1A    
+         lda     ZP_0D_Lo                ; 381A: A5 1A    
          jmp     Z37ED                   ; 381C: 4C ED 37 
-Z381F    lda     ZP_0018                 ; 381F: A5 18    
+Z381F    lda     ZP_0C_Lo                ; 381F: A5 18    
          sta     ZP_UDG_RAM_X            ; 3821: 85 04    
-         lda     ZP_0019                 ; 3823: A5 19    
+         lda     ZP_0C_Hi                ; 3823: A5 19    
          sta     ZP_UDG_RAM_Y            ; 3825: 85 05    
          jsr     Setup_Color_RAM_Ptr     ; 3827: 20 F7 34 
-         lda     ZP_0017                 ; 382A: A5 17    
+         lda     ZP_0B_Hi                ; 382A: A5 17    
          lsr     a                       ; 382C: 4A       
          lsr     a                       ; 382D: 4A       
          lsr     a                       ; 382E: 4A       
          lsr     a                       ; 382F: 4A       
          clc                             ; 3830: 18       
          adc     #$02                    ; 3831: 69 02    
-         sta     ZP_Temp_5_Hi            ; 3833: 85 0B    
-         lda     ZP_0016                 ; 3835: A5 16    
-         sta     ZP_Temp_5_Lo            ; 3837: 85 0A    
-         inc     ZP_Temp_5_Lo            ; 3839: E6 0A    
-Z383B    ldx     ZP_Temp_5_Lo            ; 383B: A6 0A    
+         sta     ZP_05_Hi                ; 3833: 85 0B    
+         lda     ZP_0B_Lo                ; 3835: A5 16    
+         sta     ZP_05_Lo                ; 3837: 85 0A    
+         inc     ZP_05_Lo                ; 3839: E6 0A    
+Z383B    ldx     ZP_05_Lo                ; 383B: A6 0A    
          ldy     #$00                    ; 383D: A0 00    
 Z383F    lda     (ZP_Col_RAM_Ptr_Lo),y   ; 383F: B1 0C    
          and     #$07                    ; 3841: 29 07    
          cmp     #$05                    ; 3843: C9 05    
          beq     Z384B                   ; 3845: F0 04    
-         lda     ZP_001b                 ; 3847: A5 1B    
+         lda     ZP_0D_Hi                ; 3847: A5 1B    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 3849: 91 0C    
 Z384B    iny                             ; 384B: C8       
          dex                             ; 384C: CA       
@@ -3936,7 +3941,7 @@ Z384B    iny                             ; 384B: C8
          cmp     #$17                    ; 3854: C9 17    
          bcc     Z385E                   ; 3856: 90 06    
          sta     ZP_Col_RAM_Ptr_Lo       ; 3858: 85 0C    
-         dec     ZP_Temp_5_Hi            ; 385A: C6 0B    
+         dec     ZP_05_Hi                ; 385A: C6 0B    
          bne     Z383B                   ; 385C: D0 DD    
 Z385E    rts                             ; 385E: 60       
 ; ===========================================================

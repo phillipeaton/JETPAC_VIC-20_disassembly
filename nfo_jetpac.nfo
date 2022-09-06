@@ -767,7 +767,15 @@ label    2D0F Jetman_Looks_1_1???
 label    2CFF BACK_2CFF
 break    2D54
 comment  2D58
+lcomment 2D61 Jetman flying?
+lcomment 2D63 Yes, branch
+lcomment 2D65 Jetman standing?
+lcomment 2D67 Yes, branch
+comment  2D69
 label    2D69 SKIP_2D69
+lcomment 2D69 If Flashing Score, return with ZP_01_Lo=0
+lcomment 2D70 Reset variable
+lcomment 2D73 Jetman X position
 label    2D80 SKIP_2D80
 label    2D95 BACK_2D95
 label    2D9B SKIP_2D9B_RTS
@@ -776,6 +784,7 @@ label    2D9C SKIP_2D9C
 word     2DBC
 ;        2DDD
 label    2DDD LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
+lcomment 2DEC Current level modulus 4
 label    2DFF Dec_Saved_Obj_List_Params_by_10
 comment  2E17 Aliens keep moving also
 label    2E17 Rocket_Goes_Up
@@ -795,10 +804,20 @@ lcomment 2E64 Hit bottom of playarea
 comment  2E68
 comment  2E68 Set current object type to a crash
 label    2E74 Subroutine_2E74
-;        2E93
+comment  2E74 YOU ARE HERE ###############
 word     2E93
-lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
+label    2EAC A0000000
+label    2EB5 LOOP_2EB5
+comment  2EC0
+label    2ECA SKIP_2ECA
+label    2EFD A123123
+label    2F01 A456456
+label    2F07 A789789
+comment  2F0D
+comment  2F13
+label    2F16 A111111
 label    2F8E Stops_All
+lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
 ;        2FE5
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
 label    2FE5 Get_Ship_UDG_Addr
