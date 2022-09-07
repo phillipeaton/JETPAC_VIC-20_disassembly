@@ -131,3 +131,24 @@ $5F = Height of item on middle platform e.g. rocket middle section, fuel, gem
 $3F = Height of item on left   platform e.g. rocket top    section, fuel, gem
 
 Rocket middle section is 16 pixels high 
+
+------------
+
+Assembling with Kick Assembler:
+ZP_Obj_List_Ptr_Lo        equ $0000
+becomes
+.const ZP_Obj_List_Ptr_Lo =   $0000
+
+Take out '?' character in names
+
+; becomes //
+
+fcb becomes .byte
+
+fdb becomes .word
+
+labels get a ':' at the end (but not when referenced)
+
+   org     $2000
+becomes 
+   * =     $2000 "xxx"

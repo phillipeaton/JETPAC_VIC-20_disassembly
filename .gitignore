@@ -11,3 +11,6 @@
 
 # Ignore other prg files used for testing
 matrix.prg
+MAME_debug/*.bin
+MAME_debug/*.txt
+screendumps/*
