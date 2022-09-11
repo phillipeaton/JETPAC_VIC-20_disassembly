@@ -74,13 +74,13 @@ label    0385 Obj_Jetman_0385
 label    0386 Obj_Jetman_0386
 label    0387 Obj_Jetman_0387
 
-label    0388 Obj_Lazer_0 ; 00 when not fired, following bytes cahnge value as beam fades
+label    0388 Obj_Laser_0 ; 00 when not fired, following bytes cahnge value as beam fades
 
-label    0390 Obj_Lazer_1
+label    0390 Obj_Laser_1
 
-label    0398 Obj_Lazer_2
+label    0398 Obj_Laser_2
 
-label    03A0 Obj_Lazer_3
+label    03A0 Obj_Laser_3
 
 label    03A8 Obj_Rocket_0
 label    03A9 Obj_Rocket_1

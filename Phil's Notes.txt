@@ -119,7 +119,9 @@ $9111   #37137     Port A output register
                    (PA5) Bit 5=Lightpen/Fire button
                    (PA6) Bit 6=Cassette switch sense
                    (PA7) Bit 7=Serial ATN out
-                   
+
+VIA2
+
 $9120   #37152     Port B output register
                    Keyboard column scan
                    (PB3) Bit 3=Cassette write line

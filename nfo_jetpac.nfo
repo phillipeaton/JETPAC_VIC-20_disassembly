@@ -8,10 +8,42 @@ insert ; ----------------------------------------------------------
 insert ;  This is the reverse-engineered source code for the
 insert ;  game 'JETPAC' written by Ultimate Play The Game.
 insert ; ----------------------------------------------------------
+insert
+insert ; ----------------------------------------------------------
+insert ;  Usage of Labels
+insert ;  ZP_Obj_List_Ptr_Lo      equ     $0000 - 182
+insert ;  ZP_Obj_List_Ptr_Hi      equ     $0001 -  11
+insert ;  ZP_01_Lo                equ     $0002 -  46
+insert ;  ZP_01_Hi                equ     $0003 -  17
+insert ;  ZP_UDG_RAM_X            equ     $0004 -  56
+insert ;  ZP_UDG_RAM_Y            equ     $0005 -  35
+insert ;  ZP_03_Lo                equ     $0006 -  51
+insert ;  ZP_03_Hi                equ     $0007 -  26
+insert ;  ZP_04_Lo                equ     $0008 -  42
+insert ;  ZP_04_Hi                equ     $0009 -  11
+insert ;  ZP_05_Lo                equ     $000A -  15
+insert ;  ZP_05_Hi                equ     $000B -  18
+insert ;  ZP_Col_RAM_Ptr_Lo       equ     $000C -  28
+insert ;  ZP_Col_RAM_Ptr_Hi       equ     $000D -  10
+insert ;  ZP_Ptr_To_Str_Lo        equ     $000E -  21
+insert ;  ZP_Ptr_To_Str_Hi        equ     $000F -  12
+insert ;  ZP_08_Lo                equ     $0010 -  04
+insert ;  ZP_08_Hi                equ     $0011 -  09
+insert ;  ZP_09_Lo                equ     $0012 -  03
+insert ;  ZP_Keyboard_Data        equ     $0013 -  18
+insert ;  ZP_0A_Lo                equ     $0014 -  08
+insert ;  ZP_0A_Hi                equ     $0015 -  08
+insert ;  ZP_0B_Lo                equ     $0016 -  05
+insert ;  ZP_0B_Hi                equ     $0017 -  04
+insert ;  ZP_0C_Lo                equ     $0018 -  07
+insert ;  ZP_0C_Hi                equ     $0019 -  12
+insert ;  ZP_0D_Lo                equ     $001A -  03
+insert ;  ZP_0D_Hi                equ     $001B -  10
+insert ;
+insert ; ----------------------------------------------------------
 
 ; Start of disassembly instructions
 word     2000-2003
-;        2004
 break    2004-2013
 comment  2004
 comment  2004 Initial value table for VIC setup 16 bytes
@@ -33,9 +65,8 @@ lcomment 2010 VIC_RC_Frq_Osc3
 lcomment 2011 VIC_RD_Frq_Noise
 lcomment 2012 VIC_RE_Vol_Color
 lcomment 2013 VIC_RF_BckBdrCol
-;        2014
 comment  2014
-comment  2014 Quick lookup or BIT instruction
+comment  2014 Quick lookup for BIT instruction
 label    2014 MASK_01
 label    2015 MASK_02
 label    2016 MASK_04
@@ -47,33 +78,33 @@ label    201B MASK_80
 comment  201C
 comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 used     201C NMI_Interrupt_Hardler
-;        201D
 comment  201D
 comment  201D ----------------------------------------------------------
 comment  201D Starts here
 comment  201D ----------------------------------------------------------
 lcomment 201D Disable Interrupts
 lcomment 201E Reset stack pointer
-;        201e
 lcomment 2021 Clear Decimal flag
 comment  2022
-comment  2022 Setup NMI interrupt vector to service routine
+comment  2022 Setup NMI interrupt vector to service routine at $201C
 comment  202C
 comment  2032
-comment  2032 Setup I/O direction and enables
+comment  2032 Setup I/O data direction and interrupt enables
 comment  2041
 comment  2044
-comment  2044 ??????????????????????????????????????????????
+comment  2044 Set VIA outputs for keyboard scan
+lcomment 2046 Data I/O register (User port & RS-232) i.e. not used
+lcomment 2049 Data I/O register (Keybd col scan, Cassette, Joy)
 comment  204C
-comment  204C Setup IRQ interrupt vector to service routine
+comment  204C Setup IRQ interrupt vector to service routine at $25E0
 comment  2056
-comment  2056 Reset the VIC
+comment  2056 Reset the VIC registers
 lcomment 2056 16 registers
 label    2058 Reset_VIC
 comment  2061
-comment  2061 Setup Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
-comment  2061 Note each character is a 16x8 tile i.e. double height,
-comment  2061 thus play area is decimal 23 Rows x 22 Columns
+comment  2061 Initialize Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
+comment  2061 Each character is a 16x8 tile i.e. double height, thus play area
+comment  2061 is decimal 11 Rows x 23 Columns
 comment  2061 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
 comment  2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
 comment  2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
@@ -85,87 +116,95 @@ comment  2061 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 
 comment  2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA
 comment  2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
 comment  2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
-;        2064
-label    2064 SR_Cols
-label    2067 SR_Rows
+label    2064 ISR_Cols
+deflabel 2065 COLUMNS
+label    2067 ISR_Rows
+deflabel 206C ROWS
+deflabel 2076 ROWS
 comment  2079
-label    2079 Start_Rst_Game_Sel_Flash
+label    2079 Reset_Game_Select
 comment  207C
 comment  207C Reset game selection flashing highlights
-lcomment 207E Appears to overlap ZP_HW_IRQ_Count1 ???????????????
-;        2080
-label    2080 GS_Flash
+label    2080 RGS_Flash
 comment  2085
 comment  2085 Setup volume and color
 comment  208A
-comment  208A Initialise_Rocket
+comment  208A Initialise Rocket Object (or is it the Flame?) ?????????????????????
 comment  208F
+comment  208F ----------------------------------------------------------
+comment  208F Game Select Loop
+comment  208F ----------------------------------------------------------
 label    208F Game_Select
 ;        2093
 lcomment 2093 Set Port B all bits to input
 lcomment 2098 Set Port A all bits to output
-lcomment 209D Select keyboard column to read (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
-lcomment 20A0 Get game settings ($1fD3 = Just outside UDG RAM)
+comment  209B
+lcomment 209B Select keyboard column to read
+lcomment 209D \ (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
+lcomment 20A0 Whilst giving keyboard data time to settle?
 lcomment 20A3 Read keyboard column
 lcomment 20A6 Store keyboard data
 lcomment 20AA F1 pressed? (1 Player)
 comment  20A8
 comment  20A8 Test F-Keys pressed or Space to start game
 lcomment 20AC No, skip
+lcomment 20AF Reset Bit0 = 1 Player
 comment  20B2
 label    20B2 Test_F3
 lcomment 20B4 F3 pressed? (2 Player)
 lcomment 20B6 No, skip
+lcomment 20B9 Set Bit0 = 2 Player
 comment  20BC
 label    20BC Test_F5
 lcomment 20BE F5 pressed? (Keyboard)
 lcomment 20C0 No, skip
+lcomment 20C3 Reset Bit1 = Keyboard controls
 comment  20C6
 label    20C6 Test_F7
 lcomment 20C8 F7 pressed? (Joystick)
 lcomment 20CA No, skip
+lcomment 20CD Set Bit1 = Joystick controls
 comment  20D0
+comment  20D0 Store options, update display and test for game start
 label    20D0 Test_Space
-lcomment 20D1 Store game settings ($1fD3 = Just outside UDG RAM)
+lcomment 20D0 Save game settings
 lcomment 20D1 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
 comment  20D7
-lcomment 20D9 Select keyboard column to read (2/Q/CBM/Space/Stop/Ctrl/Left/1)
+lcomment 20D9 Select keyboard column to read
+lcomment 20DC \ (2/Q/CBM/Space/Stop/Ctrl/Left/1)
 lcomment 20DF Space Pressed?
 lcomment 20E1 No, check for settings again
 ;        20E3
 comment  20E3
 comment  20E9
 comment  20E9 ----------------------------------------------------------
-comment  20E9 FUNCTION  : qsqtnsutnosen
-comment  20E9 \            soentsnoetus
-comment  20E9 \            seiteunst
+comment  20E9 FUNCTION  : Update_Laser_Shots
 comment  20E9 CALLED BY :
 comment  20E9 CALLS     : Nothing
 comment  20E9 ARGUMENTS : sentiseutn
 comment  20E9 \            etinseut
 comment  20E9 \            setniseutn
 comment  20E9 ----------------------------------------------------------
-label    20E9 Update_Lazer_Shots
-lcomment 20EB Update once every four calls?
-;        20F0
-label    20F0 Lazer_Shots
+label    20E9 Update_Laser_Shots
+lcomment 20EB Update once every four calls
+comment  20F0
+label    20F0 Laser_Shots
 const    20F3
-lcomment 20F3 ZP_Temp_3_Lo + Hi
+;deflabel 20F3 ZP_03_04
 lcomment 20F4
 word     20F4
 const    20F6
-lcomment 20F6 End of Parameters
 comment  20F7
-comment  20F7 Loop through the four possible lazer shots, branch if any are zero I.E. NOT SHOOTING???????
+comment  20F7 Loop through the four possible Laser shots, branch if any are zero I.E. NOT SHOOTING???????
 label    20FB LS_Loop
 comment  20FF
-comment  20FF Move ZP index address to next 8 bytes i.e. next lazer shot
-label    2110 Lazer_Shot
+comment  20FF Move ZP index address to next 8 bytes i.e. next Laser shot
+label    2110 Laser_Shot
 lcomment 2110 Get Jetman attrib 00 i.e. fly/no-fly and facing left/right and ???
 lcomment 2112 Store for later
 lcomment 2113 Jetman looking left?
 lcomment 2115 Set bit 4, DON'T KNOW WHAT IT'S USED FOR??????????
-lcomment 2117 Store to inactive lazer attrib 00
+lcomment 2117 Store to inactive Laser attrib 00
 comment  2119
 lcomment 2119 Move to next Jetman attrib 01
 lcomment 211A Get Jetman attrib 01 i.e. X position
@@ -176,24 +215,31 @@ comment  2122
 lcomment 2122 Restore Jetman attrib 00
 lcomment 2123 Jetman looking left?
 lcomment 2125 No, branch
-label    212f Lazer_Shot_
-;        2145
+label    212f Laser_Shot_
 label    2145 BACK_2145
-;        216B
-label    216B Lazer_Color_Table
+comment  216B
+label    216B Laser_Color_Table
 lcomment 216B Green not used, messes up colors if it's used
+deflabel 216B WHITE
+deflabel 216C RED
+deflabel 216D CYAN
+deflabel 216E PURPLE
 break    216F
+deflabel 216F BLUE
+deflabel 2170 YELLOW
+deflabel 2171 CYAN
+deflabel 2172 YELLOW
 comment  2173
-label    2173 Lazer_Jetman_Facing_Right
+label    2173 Laser_Jetman_Facing_Right
 lcomment 2173 Get Jetman attrib 01 i.e. ????????
 lcomment 2175 Zero bits 3-7, any bits 0-2 set?
 lcomment 2177 No, branch
-label    217E Lazer_JFR_1
+label    217E Laser_JFR_1
 lcomment 217E Zero bit 0
 lcomment 2180 TESING AT EDGE OF SCREEN?
-label    2187 Lazer_JFR_1_1
+label    2187 Laser_JFR_1_1
 lcomment 2188 OFFSETTING EDGE OF SCREEN?
-label    218D Lazer_JFR_2
+label    218D Laser_JFR_2
 lcomment 218D Restore saved Jetman attrib 00
 lcomment 2190 Add $10 for some reason??????????
 comment  2195
@@ -213,12 +259,14 @@ label    21CB F_P_1_1
 label    21DC SKIP_21DC
 label    21F1 SKIP_21F1
 label    21FC SKIP_21FC
+comment  2202
 label    2202 SKIP_2202
 ;        2206
 word     2206
 break    2209
 break    220B
 word     220C
+comment  220F
 break    220F
 label    2211 Fire_Pressed_2
 label    2229 SR_2229
@@ -226,10 +274,10 @@ label    2248 SR_2229_1
 label    2257 SR_2257
 label    2263 SR_2257_1
 label    2285 CLC_ADC_08
-label    228B Lazer_ZP17_15_to_ZP16_14
-label    2298 Lazer_Jetman_Facing_Left???
-label    22A1 Lazer_JFL
-label    22B4 Lazer_JFL_1
+label    228B Laser_ZP17_15_to_ZP16_14
+label    2298 Laser_Jetman_Facing_Left???
+label    22A1 Laser_JFL
+label    22B4 Laser_JFL_1
 label    22BA Reset_Level_Add_Extra_Life
 comment  22BD
 comment  22BD Player at level 4, add another life
@@ -289,22 +337,17 @@ const    2376
 lcomment 2376 ZP Offset for 1st address
 lcomment 2377 1st Address
 word     2377
-lcomment 2379 End of Parameters
-;        2382
 comment  2382
 label    2382 P2_Lives_To_UDG_RAM
 const    2385
 lcomment 2385 ZP Offset for 1st address
 lcomment 2386 1st Address
 word     2386
-lcomment 2388 End of Parameters
 comment  238E
 label    238E Number_Lives_To_UDG_RAM
 lcomment 238F $70 = "0" character
 comment  2396
 comment  2396 Display Jetman Icon next to number of lives
-lcomment 2399 ZP_Temp_2_Lo
-;        239A
 word     239A
 lcomment 239D 8 bytes of UDG data to copy
 label    23A2 Zero_Lives_To_UDG_RAM_1
@@ -341,8 +384,8 @@ label    23F5 Swap_Player_And_Objects
 label    23F7 Swap_Player
 comment  2404
 label    2406 Swap_Object
-;        2416
-label    2416 Reset_Color_UDG_Scores
+comment  2416
+label    2416 Reset_Screen_Disp_Scores
 lcomment 241C Puts 000000  000000  00 at top of screen
 ;        2425
 label    2425 Display_1UP_HI_2UP_Titles
@@ -369,7 +412,7 @@ lcomment 246D X Y
 word     246F
 ;        2471
 comment  2471
-label    2471 P1_Score_To_UDG_RAM
+label    2471 Display_P1_Score
 lcomment 2474 ZP_UDG_RAM_X ZP_UDG_RAM_Y, but not in this case
 lcomment 2475 UDG array absolute position to display score at
 word     2475
@@ -380,9 +423,7 @@ lcomment 247A ZP_Temp_1
 const    247B
 lcomment 247B 3 bytes of BCD data to display e.g. 12 34 56
 word     247B
-lcomment 247D End of Parameters
-;        2481
-label    2481 P2_Score_To_UDG_RAM
+label    2481 Display_P2_Score
 const    2484
 lcomment 2484
 lcomment 2485
@@ -397,9 +438,7 @@ lcomment 248B
 word     248B
 const    248B
 break    248D
-lcomment 248D End of Parameters
-;        2491
-label    2491 Hi_Score_To_UDG_RAM
+label    2491 Display_Hi_Score
 const    2494
 lcomment 2494
 lcomment 2495
@@ -414,8 +453,6 @@ lcomment 249B
 word     249B
 const    249B
 break    249D
-lcomment 249D End of Parameters
-;        24A1
 label    24A1 Game_Sel_Flash_Period
 label    24A4 GSFP1
 lcomment 24A5 Test settings bit 1, if not set, skip counter logic
@@ -463,7 +500,7 @@ label    2581 STR_F7_JOYSTICK
 label    258E STR_SP_START_GAME
 ;        259D
 comment  259D
-label    259D Read_ZP_Parameters
+label    259D Load_ZP_Parameters
 lcomment 259D
 lcomment 259D Parameters for this routine are assembled into ROM after the
 lcomment 259D call to this routine and accessed via the return address
@@ -477,7 +514,7 @@ lcomment 25A7 Value $FF?
 lcomment 25A9 If No, Skip
 comment  25AE
 ;        25B5
-label    25B5 Read_ZP_Paramenter
+label    25B5 Load_ZP_Parameter
 lcomment 25B5 Stash to X number before string characters (string len?)
 comment  25B6
 lcomment 25B6 Address starts at end of previous opcode operand, so inc it
@@ -498,41 +535,55 @@ label    25D1 Game_Start
 comment  25E0
 comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 used     25E0 Hardware_Interrupt_Handler
-;        25F4
-label    25F4 SKIP_25F4
+lcomment 25E4 Reset VIA2 timer
+label    25F4 HIH_1
 comment  25FA
-label    25FA Game_Start_
+comment  25FA ----------------------------------------------------------
+comment  25FA Game Main Loop
+comment  25FA ----------------------------------------------------------
+label    25FA Main_Loop
 lcomment 25FE $03B0 = "Object_0"
-label    2607 Main_Loop
+lcomment 2606 Enable interrupts
+label    2607 Next_Obj
 lcomment 2609 Load Object Type into A from obj table 0380 upwards
 lcomment 260B Mulitply by two as 2 bytes in an address
 lcomment 260C Object Type becomes offset into Subroutine List
 lcomment 260D Load SR List offset into SR Vec Lo/Hi...
-lcomment 2617 ...and jmp to it
+lcomment 2617 ...and jump to it
+comment  261A
 label    261A Triggers_Every_Frame
 lcomment 261C Test Object Type value
 lcomment 261E If <>00, skip
-lcomment 2622 Is Object address $B0? i.e. Object_0
+lcomment 2622 Is Object address $B0?
 lcomment 2624 If not, skip
-comment  262A
-comment  262A Delay loop $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds (Needs Check)
-label    262A Delay_Loop_Moving
+comment  2626
+comment  2626 Delay loop $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds (Needs Check)
+label    262A Delay_Loop_0A00
 comment  2630
 comment  2630 Increment Object Pointer to next Obj i.e. by adding 8
-label    2630 SKIP_2630
+label    2630 TEF_1
 comment  2637
-lcomment 2637 H/W interrupt happened????
+lcomment 2637 H/W interrupt happened?
 lcomment 2639 If yes, jump
+label    263B SEI_Load_Jetman_Rtn
 comment  263B
 lcomment 263B Is Object address $B0? i.e. Object_0
+comment  2645
 label    2652 SKIP_2652
 label    2655 SKIP_2655
-;        265E
-comment  265E Setup Timer 1
-label    265E Set_Jetman_Movement_Speed
-label    2669 SEI_Load_Jetman_Data_To_Obj_Ptr
+comment  265E
+comment  265E ----------------------------------------------------------
+comment  265E VIA2 timer interrupts used to update Jetman movement
+comment  265E $4FD7 / 1.108Mhz = 54.2Hz interrupt. Screen is 184 pixels
+comment  265E wide. At one pixel walking movement pet interrupt, Jetman
+comment  265E should get across the screen in about 3.5 seconds.
+comment  265E ----------------------------------------------------------
+label    265E Set_Jetman_Mvmt_Speed
+comment  266E
+comment  2669
+label    2669 SEI_Load_Jetman_To_Obj_Ptr
 lcomment 2669 Set Disable Interrupts flag
-;        2679
+comment  2676
 const    2679
 lcomment 2679 ZP Offset for 1st address
 lcomment 267A 1st Address
@@ -565,7 +616,7 @@ comment  2710
 comment  2710 A probably contains frequency, Y selects channel via X
 label    2710 Output_Sound
 label    271C Gem_Fuel_Picked_Up
-label    2727 Lazer_Shot_Active
+label    2727 Laser_Shot_Active
 label    2735 Rocket_Flight_Active
 ;        2743
 label    2743 Subroutine_List2
@@ -575,16 +626,16 @@ comment  274F
 label    274F Collision
 ;        275B
 comment  275B Erase $100 bytes zero page
-label    275B Erase_ZP
+label    275B Erase_ZP_RAM
 lcomment 275B Erase $100 bytes zero page
-label    275E Erase_ZP_1
+label    275E EZR_1
 ;        2764
-label    2764 Reset_Other_RAM_0380_03ff
-label    2768 BACK_2768
+label    2764 Reset_Object_RAM
+label    2768 ROR_1
 ;        276F
-label    276F Erase_Hi_Score_Settings_Etc
+label    276F Erase_HiScore_Setts_Etc
 lcomment 276F Erase $30 bytes at end of UDGs $1fd0-$2000
-label    2773 Erase_1
+label    2773 EHSE_1
 ;        277A
 label    277A Check_New_Hi_Score
 const    277D
@@ -595,7 +646,9 @@ const    2780
 lcomment 2780 ZP_08
 lcomment 2781 Addr of P1 High Score value
 word     2781
+comment  2784
 lcomment 2784 Check Player 1 first
+comment  2787
 lcomment 2787  then follow through for Player 2
 const    278A
 lcomment 278A ZP_08
@@ -645,7 +698,7 @@ label    283D Ptr_Final_Char_Hi
 comment  283E
 label    283E Fire_Pressed
 lcomment 2841 Remove=Gems all fall through platforms and floor, reentering at top
-deflabel 2849 ObjParam3_Jiggle?
+deflabel 2849 OBJPARAM3_JIGGLE?
 label    2851 FP_1
 ;        286B
 break    286B
@@ -667,7 +720,7 @@ label    28B6 Set_Obj_Posn_05_To_01_Or_Other
 label    28C0 SKIP_28C0
 label    28C9 Reset_Objects_1_To_8
 label    28CD Loop_28CD
-comment  28D4 Init Jetman, Lazers, Rocket and Aliens
+comment  28D4 Init Jetman, Lasers, Rocket and Aliens
 label    28D4 Init_Most_Objects
 label    28D8 Loop_28D8
 comment  28DE
@@ -738,12 +791,16 @@ label    2A5F Lev_Start_1st_Alien_onScr
 label    2A6D Not_Triggered_2A6D
 label    2ABC Not_Triggered_2ABC
 lcomment 2B16 Remove=(Not triggered on first level, so don't yet know)
+label    2B4B Obj_Jetman_Looks?
 label    2B7F Init_Rocket_Part_Fuel_Table
 label    2B87 Init_Flashing_Gem_Table
 ;        2B82
 const    2B82
 const    2B8A
-;        2BCD
+comment  2B7F
+comment  2B87
+comment  2B8F
+label    2B8F Obj_Jetman_Looks_2?
 const    2BCD
 lcomment 2BCD
 const    2BCE
@@ -757,14 +814,14 @@ const    2BE8-2BF7
 label    2BE8 Raster_Line_Table
 label    2C6A Stops_All_After_Score_Flash
 lcomment 2C6F Remove=1st Level Aliens don't explode on platform/floor impact
-;        2CDB
+label    2CD6 Flash_Score_Cntr_At_Zero?
 const    2CDB-2CE2
 label    2CDB _0025_0035_0045_0055
 word     2CDB-2CE2
 label    2CE3 Jetman_Looks???
 label    2CF1 Jetman_Looks_1???
-label    2D0F Jetman_Looks_1_1???
 label    2CFF BACK_2CFF
+label    2D0F Jetman_Looks_1_1???
 break    2D54
 comment  2D58
 lcomment 2D61 Jetman flying?
@@ -804,7 +861,6 @@ lcomment 2E64 Hit bottom of playarea
 comment  2E68
 comment  2E68 Set current object type to a crash
 label    2E74 Subroutine_2E74
-comment  2E74 YOU ARE HERE ###############
 word     2E93
 label    2EAC A0000000
 label    2EB5 LOOP_2EB5
@@ -1151,76 +1207,44 @@ lcomment 3542 Addr_To = 78 12 = "F7 JOYSTICK" start position
 const    3545-3557
 label    3545 UDG_RAM_Column_Offsets
 lcomment 3545 Bytes are middle two numbers in addr e.g. 10b0, 1160 etc
-;        355C
 comment  355C
-label    355C RESET_COLOR_RAM
-;        355F
+comment  355C ----------------------------------------------------------
+comment  355C Reset RAM by filling with a data byte
+comment  355C ----------------------------------------------------------
+comment  355C ARGUMENTS : ZP_01 = number of bytes to fill
+comment  355C \            ZP_02 = start address to fill from
+comment  355C \            ZP_04 = Data byte to fill with
+comment  355C ----------------------------------------------------------
+label    355C Reset_Color_RAM
 const    355F
-lcomment 355F ZP Offset for 1st address
-lcomment 3560 1st Address
+lcomment 3560 Number of bytes to fill
 word     3560
-;        3562
 const    3562
-lcomment 3562 ZP Offset for 2nd address
-lcomment 3563 2nd address
+lcomment 3563 Start address of bytes to fill
 word     3563
-;        3565
 const    3565
-lcomment 3565 ZP Offset for 3rd address
-lcomment 3566 3rd address
-word     3566
-;        3568
+lcomment 3566 Data to fill with (i.e. $01)
+const    3566
+break    3566
 break    3568
-lcomment 3568 End of Parameters
-;        356C
-label    356C ERASE_UDG_RAM_1000_1fff
+comment  356C
+label    356C Reset_UDG_RAM
 const    356F
-lcomment 356F ZP Offset for 1st address
+lcomment 3570 Number of bytes to fill
 const    3570
-lcomment 3570 1st Address
 word     3570
-;        3572
 const    3572
-lcomment 3572 ZP Offset for 2nd address
-lcomment 3573 2nd address
+lcomment 3573 Start address of bytes to fill
 word     3573
-;        3575
 const    3575
-lcomment 3575 ZP Offset for 3rd address
-lcomment 3576 3rd address
-word     3576
-;        3578
+lcomment 3576 Data to fill with (i.e. $00)
+const    3576
+break    3576
 break    3578
-lcomment 3578 End of Parameters
-;        3579
 comment  3579
-label    3579 ERASE_RAM
-label    357B ERASE_RAM_1
-lcomment 357B
-lcomment 357B Fills memory from e.g. 9600-96FC (address at zero page $05) with $01's
-lcomment 357B This is color RAM for 3.5k but unused for 8k+!?
-lcomment 357B ALSO CONTIUNES TO BLANK THE SCREEN, COMPLETING BOTTOM HALF
-lcomment 357B FILLS SCREEN WITH A RUG
-lcomment 357B FILLS 1200-1FFF i.e. stanDard RAM
-lcomment 357B This may be a generic memory move operation, as it also is used ot fill screen-ram at $1000
-lcomment 357B 9600  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 9610  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 9620  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 9630  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 9640  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 9650  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 9660  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 9670  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 9680  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 9690  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 96A0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 96B0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 96C0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 96D0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 96E0  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01   ................
-lcomment 357B 96F0  01 01 01 01 01 01 01 01 01 01 01 01 01 00 00 00   ................
-lcomment 357B 9700  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
-label    3584 ERASECR2
+label    3579 Reset_RAM
+label    357B FR_1
+label    3584 FR_2
 ;        3595
 comment  3595
 comment  3595 ----------------------------------------------------------
@@ -1231,7 +1255,7 @@ comment  3595 \            Used-Defined Graphics RAM e.g. to display a
 comment  3595 \            text string or score.
 comment  3595 CALLED BY :
 comment  3595 CALLS     : Nothing
-comment  3595 ARGUMENTS : ZP_Temp_2_Lo = Loaded with character to copy e.g. $71 for "1"
+comment  3595 ARGUMENTS : ??? = Loaded with character to copy e.g. $71 for "1"
 comment  3595 \            ??? BROKEN COMMENTS Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
 comment  3595 \            ??? BROKEN COMMENTS Addr_To gets updated as part of this routine.
 comment  3595 ----------------------------------------------------------
