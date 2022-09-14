@@ -1575,7 +1575,7 @@ Fire_Pressed
          adc     #$02                    ; 284D: 69 02    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 284F: 91 00    
 FP_1     jsr     Save_Obj_List_Params_0135 ; 2851: 20 E9 35 
-         jsr     Z2D58                   ; 2854: 20 58 2D 
+         jsr     Test_Jetman_XY_Vs_Object ; 2854: 20 58 2D 
          bpl     Jump_To_Subroutine_List3 ; 2857: 10 1B    
          lda     #$00                    ; 2859: A9 00    
          jsr     Z2FDC                   ; 285B: 20 DC 2F 
@@ -2166,7 +2166,7 @@ Z2C78    lda     ZP_Level_Current_Plyr   ; 2C78: A5 59
 Z2C8C    jsr     Z28F9                   ; 2C8C: 20 F9 28 
          jmp     Triggers_Every_Frame    ; 2C8F: 4C 1A 26 
 ; -----------------------
-Z2C92    jsr     Z2D58                   ; 2C92: 20 58 2D 
+Z2C92    jsr     Test_Jetman_XY_Vs_Object ; 2C92: 20 58 2D 
          lda     ZP_01_Lo                ; 2C95: A5 02    
          bpl     Z2C9F                   ; 2C97: 10 06    
          jsr     Z2A45                   ; 2C99: 20 45 2A 
@@ -2282,50 +2282,57 @@ M2D4C    fcb     $05,$08,$07,$06         ; 2D4C: 05 08 07 06
 M2D50    fcb     $02,$06,$03,$07         ; 2D50: 02 06 03 07 
          fcb     $06,$07,$02,$04         ; 2D54: 06 07 02 04 
 
-Z2D58    lda     ZP_Flash_Score_Countdown ; 2D58: A5 5D    
+Test_Jetman_XY_Vs_Object
+         lda     ZP_Flash_Score_Countdown ; 2D58: A5 5D    
          bne     SKIP_2D69               ; 2D5A: D0 0D    
          lda     Obj_Jetman_Looks        ; 2D5C: AD 80 03 
          and     #$3F                    ; 2D5F: 29 3F    
-         cmp     #$01                    ; 2D61: C9 01     Jetman flying?
-         beq     Z2D6E                   ; 2D63: F0 09     Yes, branch
-         cmp     #$02                    ; 2D65: C9 02     Jetman standing?
-         beq     Z2D6E                   ; 2D67: F0 05     Yes, branch
+         cmp     #$01                    ; 2D61: C9 01     Jetman flying? THIS ISN'T RIGHT
+         beq     Test_Jetman_XY_Set_ZP_01_Lo ; 2D63: F0 09     Yes, branch
+         cmp     #$02                    ; 2D65: C9 02     Jetman standing? THIS ISN'T RIGHT
+         beq     Test_Jetman_XY_Set_ZP_01_Lo ; 2D67: F0 05     Yes, branch
 
 SKIP_2D69 lda    #$00                    ; 2D69: A9 00     If Flashing Score, return with ZP_01_Lo=0
          sta     ZP_01_Lo                ; 2D6B: 85 02    
          rts                             ; 2D6D: 60       
 ; ===========================================================
-Z2D6E    ldy     #$00                    ; 2D6E: A0 00    
+Test_Jetman_XY_Set_ZP_01_Lo
+         ldy     #$00                    ; 2D6E: A0 00     Default ZP_01_Lo=0 unless tests work out
          sty     ZP_01_Lo                ; 2D70: 84 02     Reset variable
-         iny                             ; 2D72: C8       
-         lda     Obj_Jetman_X            ; 2D73: AD 81 03  Jetman X position
+
+         iny                             ; 2D72: C8        Y=1
+         lda     Obj_Jetman_X            ; 2D73: AD 81 03 
          sec                             ; 2D76: 38       
-         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D77: F1 00    
-         bpl     SKIP_2D80               ; 2D79: 10 05    
+         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D77: F1 00     Compare X-coord vs Jetman's???
+         bpl     JF_1                    ; 2D79: 10 05    
          clc                             ; 2D7B: 18       
          eor     #$FF                    ; 2D7C: 49 FF    
          adc     #$01                    ; 2D7E: 69 01    
-SKIP_2D80 cmp    #$0C                    ; 2D80: C9 0C    
-         bcs     SKIP_2D9B_RTS           ; 2D82: B0 17    
-         iny                             ; 2D84: C8       
-         iny                             ; 2D85: C8       
+
+JF_1     cmp     #$0C                    ; 2D80: C9 0C    
+         bcs     JF_RTS                  ; 2D82: B0 17     Carry Set? Yes, Return
+
+         iny                             ; 2D84: C8        Y=2
+         iny                             ; 2D85: C8        Y=3
          lda     Obj_Jetman_Y            ; 2D86: AD 83 03 
          sec                             ; 2D89: 38       
-         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D8A: F1 00    
-         bpl     SKIP_2D9C               ; 2D8C: 10 0E    
+         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D8A: F1 00     Compare Y-coord vs Jetman's???
+         bpl     JF_3                    ; 2D8C: 10 0E    
          clc                             ; 2D8E: 18       
          eor     #$FF                    ; 2D8F: 49 FF    
          adc     #$01                    ; 2D91: 69 01    
+
          cmp     #$0C                    ; 2D93: C9 0C    
-BACK_2D95 bcs    SKIP_2D9B_RTS           ; 2D95: B0 04    
-         lda     #$80                    ; 2D97: A9 80    
+JF_2     bcs     JF_RTS                  ; 2D95: B0 04     Carry Set? Yes, Return
+
+         lda     #$80                    ; 2D97: A9 80     Set ZP_01_Lo = $80 and return
          sta     ZP_01_Lo                ; 2D99: 85 02    
-SKIP_2D9B_RTS
-         rts                             ; 2D9B: 60       
+JF_RTS   rts                             ; 2D9B: 60       
 ; ===========================================================
-SKIP_2D9C cmp    #$12                    ; 2D9C: C9 12    
-         jmp     BACK_2D95               ; 2D9E: 4C 95 2D 
+JF_3     cmp     #$12                    ; 2D9C: C9 12    
+         jmp     JF_2                    ; 2D9E: 4C 95 2D 
 ; -----------------------
+
 Z2DA1    lda     Obj_RTS_Fuel_Type       ; 2DA1: AD B8 03 
          beq     Z2DA9                   ; 2DA4: F0 03    
          jsr     Object_RTS_Fuel_Type    ; 2DA6: 20 E3 22 
@@ -2446,9 +2453,9 @@ Rocket_Goes_Down
 ; -----------------------
 Subroutine_2E74
          jsr     Save_Obj_List_Params_013 ; 2E74: 20 D7 35 
-         jsr     Z2D58                   ; 2E77: 20 58 2D 
-         lda     ZP_01_Lo                ; 2E7A: A5 02    
-         bpl     A0000000                ; 2E7C: 10 2E    
+         jsr     Test_Jetman_XY_Vs_Object ; 2E77: 20 58 2D 
+         lda     ZP_01_Lo                ; 2E7A: A5 02     Test_Jetman may set ZP_01_Lo
+         bpl     A0000000                ; 2E7C: 10 2E     May be a test to see if Jetman boarded rocket
          ldy     #$02                    ; 2E7E: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E80: B1 00    
          cmp     #$06                    ; 2E82: C9 06    
@@ -2594,7 +2601,7 @@ Stops_All jsr    Save_Obj_List_Params_013 ; 2F8E: 20 D7 35
          bne     Z301E                   ; 2F9D: D0 7F    
          bit     MASK_01                 ; 2F9F: 2C 14 20 
          beq     Z2FBD                   ; 2FA2: F0 19    
-         jsr     Z2D58                   ; 2FA4: 20 58 2D 
+         jsr     Test_Jetman_XY_Vs_Object ; 2FA4: 20 58 2D 
          lda     ZP_01_Lo                ; 2FA7: A5 02    
          bmi     Z2FEE                   ; 2FA9: 30 43    
          jsr     Platform_Collision_Test ; 2FAB: 20 B3 30  Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
@@ -3629,6 +3636,7 @@ Save_Obj_List_Params_013
          ldy     #$00                    ; 35D7: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35D9: B1 00    
          sta     ZP_09_Lo                ; 35DB: 85 12    
+
          iny                             ; 35DD: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35DE: B1 00    
          sta     ZP_08_Lo                ; 35E0: 85 10    

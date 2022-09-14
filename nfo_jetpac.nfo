@@ -824,22 +824,36 @@ label    2CFF BACK_2CFF
 label    2D0F Jetman_Looks_1_1???
 break    2D54
 comment  2D58
-lcomment 2D61 Jetman flying?
+label    2D58 Test_Jetman_XY_Vs_Object
+lcomment 2D61 Jetman flying? THIS ISN'T RIGHT
 lcomment 2D63 Yes, branch
-lcomment 2D65 Jetman standing?
+lcomment 2D65 Jetman standing? THIS ISN'T RIGHT
 lcomment 2D67 Yes, branch
 comment  2D69
 label    2D69 SKIP_2D69
 lcomment 2D69 If Flashing Score, return with ZP_01_Lo=0
+lcomment 2D6E Default ZP_01_Lo=0 unless tests work out
+label    2D6E Test_Jetman_XY_Set_ZP_01_Lo
 lcomment 2D70 Reset variable
-lcomment 2D73 Jetman X position
-label    2D80 SKIP_2D80
-label    2D95 BACK_2D95
-label    2D9B SKIP_2D9B_RTS
-label    2D9C SKIP_2D9C
-;        2DBC
+comment  2D72
+lcomment 2D72 Y=1
+lcomment 2D77 Compare X-coord vs Jetman's???
+comment  2D80
+label    2D80 JF_1
+lcomment 2D82 Carry Set? Yes, Return
+comment  2D84
+lcomment 2D84 Y=2
+lcomment 2D85 Y=3
+lcomment 2D8A Compare Y-coord vs Jetman's???
+comment  2D93
+label    2D95 JF_2
+lcomment 2D95 Carry Set? Yes, Return
+comment  2D97
+lcomment 2D97 Set ZP_01_Lo = $80 and return
+label    2D9B JF_RTS
+label    2D9C JF_3
+comment  2DA1
 word     2DBC
-;        2DDD
 label    2DDD LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
 lcomment 2DEC Current level modulus 4
 label    2DFF Dec_Saved_Obj_List_Params_by_10
@@ -861,6 +875,8 @@ lcomment 2E64 Hit bottom of playarea
 comment  2E68
 comment  2E68 Set current object type to a crash
 label    2E74 Subroutine_2E74
+lcomment 2E7A Test_Jetman may set ZP_01_Lo
+lcomment 2E7C May be a test to see if Jetman boarded rocket
 word     2E93
 label    2EAC A0000000
 label    2EB5 LOOP_2EB5
@@ -1303,11 +1319,9 @@ lcomment 35CF Move bytes to given address with Y offset
 lcomment 35D1 Decrement number of lines counter
 lcomment 35D2 All lines copied? If no, loop back.
 lcomment 35D4 If yes, routine ends
-;        35D7
 label    35D7 Save_Obj_List_Params_013
-;        35E2
+comment  35DD
 comment  35E2
-;        35E9
 label    35E9 Save_Obj_List_Params_0135
 comment  35F4
 comment  35FA

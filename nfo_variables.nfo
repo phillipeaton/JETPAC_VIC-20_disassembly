@@ -61,8 +61,8 @@ label      5b ZP_Level_Other_Plyr
 label      5c ZP_Num_Lives_P2
 label      5d ZP_Flash_Score_Countdown ; 7f for 1 player, ff for 2 player
 label      5e ZP_P1_Or_P2
-label      5f ZP_Subroutine_Vec_Lo
-label      60 ZP_Subroutine_Vec_Hi
+label      5f ZP_Subroutine_Vec_Lo ; NOT WORD ALIGNED
+label      60 ZP_Subroutine_Vec_Hi ; NOT WORD ALIGNED
 
 ; Non-Zero-Page Object Variables
 label    0380 Obj_Jetman_Looks      ; Bit7=direction 1=left, 0=right; bit 0&1 01 = flying, 10 = standing
