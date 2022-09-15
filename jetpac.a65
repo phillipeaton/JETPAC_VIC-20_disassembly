@@ -113,18 +113,18 @@ Obj_Jetman_Looks        equ     $0380
 Obj_Jetman_X            equ     $0381
 Obj_Jetman_Y            equ     $0383
 Obj_Laser_0             equ     $0388
-Obj_Rocket_0            equ     $03A8
-Obj_Rocket_1            equ     $03A9
-Obj_Rocket_2            equ     $03AA
-Obj_Rocket_3            equ     $03AB
-Obj_Rocket_4            equ     $03AC
-Obj_Rocket_5            equ     $03AD
-Obj_Rocket_6            equ     $03AE
-Obj_Flame_0             equ     $03B0
-Obj_Flame_1             equ     $03B1
-Obj_Flame_2             equ     $03B2
-Obj_Flame_3             equ     $03B3
-Obj_Flame_4             equ     $03B4
+Obj_Flame               equ     $03A8
+Obj_Flame_1             equ     $03A9
+Obj_Flame_2             equ     $03AA
+Obj_Flame_3             equ     $03AB
+Obj_Flame_4             equ     $03AC
+Obj_Flame_5             equ     $03AD
+Obj_Flame_6             equ     $03AE
+Obj_Rocket              equ     $03B0
+Obj_Rocket_X            equ     $03B1
+Obj_Rocket_Dir?         equ     $03B2
+Obj_Rocket_Y            equ     $03B3
+Obj_Rocket_Diag?        equ     $03B4
 Obj_RTS_Fuel_Type       equ     $03B8
 Obj_RTS_Fuel_Horiz      equ     $03B9
 Obj_RTS_Fuel_Diagon     equ     $03BC
@@ -165,6 +165,7 @@ Color_RAM               equ     $9600
 ;****************************************************
 
 GREEN_05                equ     $05
+FUELLED_UP              equ     $06
 OBJPARAM3_JIGGLE?       equ     $03
 YELLOW                  equ     $07
 CYAN                    equ     $03
@@ -307,9 +308,9 @@ RGS_Flash sta    ZP_Game_Sel_F1_Flash,x  ; 2080: 95 45
          lda     #$0F                    ; 2085: A9 0F    
          sta     VIC_RE_Vol_Color        ; 2087: 8D 0E 90 
 
-; Initialise Rocket Object (or is it the Flame?) ?????????????????????
+; Initialise Flame object
          lda     #$00                    ; 208A: A9 00    
-         sta     Obj_Rocket_0            ; 208C: 8D A8 03 
+         sta     Obj_Flame               ; 208C: 8D A8 03 
 
 ; ----------------------------------------------------------
 ; Game Select Loop
@@ -462,9 +463,9 @@ BACK_2145 iny                            ; 2145: C8
          lda     Laser_Color_Table,x     ; 215B: BD 6B 21 
          sta     (ZP_03_Lo),y            ; 215E: 91 06    
          lda     #$03                    ; 2160: A9 03    
-         sta     Obj_Rocket_5            ; 2162: 8D AD 03 
+         sta     Obj_Flame_5             ; 2162: 8D AD 03 
          lda     #$10                    ; 2165: A9 10    
-         sta     Obj_Rocket_6            ; 2167: 8D AE 03 
+         sta     Obj_Flame_6             ; 2167: 8D AE 03 
          rts                             ; 216A: 60       
 ; ===========================================================
 
@@ -694,7 +695,7 @@ RLAEL_2  jsr     Z2DCB                   ; 22D1: 20 CB 2D
          jmp     RLAEL_1                 ; 22D4: 4C CB 22 
 ; -----------------------
 RLAEL_3  jsr     Reset_Screen_Disp_Scores ; 22D7: 20 16 24 
-         jsr     P1_LIVES_TO_UDG_RAM     ; 22DA: 20 73 23 
+         jsr     Display_P1_Lives        ; 22DA: 20 73 23 
          jsr     Z2DA1                   ; 22DD: 20 A1 2D 
          jmp     RLAEL_1                 ; 22E0: 4C CB 22 
 ; -----------------------
@@ -719,7 +720,7 @@ Object_RMS_Gem_Type
 Init_Objects_1_To_3
          ldx     #$17                    ; 22FF: A2 17    
 CBTSR1   lda     Inital_Screen_Object_Data,x ; 2301: BD 3B 23 
-         sta     Obj_Flame_0,x           ; 2304: 9D B0 03 
+         sta     Obj_Rocket,x            ; 2304: 9D B0 03 
          dex                             ; 2307: CA       
          bpl     CBTSR1                  ; 2308: 10 F7    
          rts                             ; 230A: 60       
@@ -735,7 +736,7 @@ Reset_Some_Objects
 Reset_S_O_1
          txa                             ; 231A: 8A       
          pha                             ; 231B: 48       
-         jsr     Save_Obj_List_Params_0135 ; 231C: 20 E9 35 
+         jsr     Save_Obj_Type_X_Y_Color ; 231C: 20 E9 35 
          jsr     Z2FDA                   ; 231F: 20 DA 2F 
          jsr     Z305A                   ; 2322: 20 5A 30 
          lda     ZP_Obj_List_Ptr_Lo      ; 2325: A5 00    
@@ -782,16 +783,16 @@ LDA_7F_Return
          sta     ZP_Flash_Score_Countdown ; 236F: 85 5D     Store countdown
          dec     ZP_Num_Lives_P1         ; 2371: C6 5A    
 
-P1_LIVES_TO_UDG_RAM
+Display_P1_Lives
          jsr     Load_ZP_Parameters      ; 2373: 20 9D 25 
          fcb     $04                     ; 2376: 04        ZP Offset for 1st address
          fdb     UDG_P1_LIVES_RAW_POSN   ; 2377: 20 14     1st Address
          fcb     $FF                     ; 2379: FF       
          jsr     Load_Num_Lives          ; 237A: 20 B6 23 
          beq     Zero_Lives_To_UDG_RAM_1 ; 237D: F0 23    
-         jsr     Number_Lives_To_UDG_RAM ; 237F: 20 8E 23 
+         jsr     Display_Number_Lives    ; 237F: 20 8E 23 
 
-P2_Lives_To_UDG_RAM
+Display_P2_Lives
          jsr     Load_ZP_Parameters      ; 2382: 20 9D 25 
          fcb     $04                     ; 2385: 04        ZP Offset for 1st address
          fdb     UDG_P2_LIVES_RAW_POSN   ; 2386: A0 19     1st Address
@@ -799,7 +800,7 @@ P2_Lives_To_UDG_RAM
          jsr     Load_Num_Lives_Inverse  ; 2389: 20 C0 23 
          beq     Zero_Lives_To_UDG_RAM   ; 238C: F0 1A    
 
-Number_Lives_To_UDG_RAM
+Display_Number_Lives
          clc                             ; 238E: 18       
          adc     #$70                    ; 238F: 69 70     $70 = "0" character
          sta     ZP_03_Lo                ; 2391: 85 06    
@@ -815,7 +816,7 @@ Number_Lives_To_UDG_RAM
 ; -----------------------
 Zero_Lives_To_UDG_RAM_1
          jsr     Zero_Lives_To_UDG_RAM   ; 23A2: 20 A8 23 
-         jmp     P2_Lives_To_UDG_RAM     ; 23A5: 4C 82 23 
+         jmp     Display_P2_Lives        ; 23A5: 4C 82 23 
 ; -----------------------
 Zero_Lives_To_UDG_RAM
          lda     #$60                    ; 23A8: A9 60     $60 = Space character
@@ -889,10 +890,10 @@ Swap_Player
 
          ldx     #$17                    ; 2404: A2 17    
 Swap_Object
-         lda     Obj_Flame_0,x           ; 2406: BD B0 03 
+         lda     Obj_Rocket,x            ; 2406: BD B0 03 
          pha                             ; 2409: 48       
          lda     ZP_Player_Object_Stash,x ; 240A: B5 28    
-         sta     Obj_Flame_0,x           ; 240C: 9D B0 03 
+         sta     Obj_Rocket,x            ; 240C: 9D B0 03 
          pla                             ; 240F: 68       
          sta     ZP_Player_Object_Stash,x ; 2410: 95 28    
          dex                             ; 2412: CA       
@@ -1276,7 +1277,7 @@ Subroutine_List
          fdb     Not_Triggered_2ABC      ; 2698: BC 2A     3 lines the JMP
          fdb     Not_Triggered_2A6D      ; 269A: 6D 2A     2A6D and 2A5F almost the same
          fdb     Lev_Start_1st_Alien_onScr ; 269C: 5F 2A     2A6D and 2A5F almost the same
-         fdb     Subroutine_2E74         ; 269E: 74 2E    
+         fdb     Subroutine_2E74_On_IRQ? ; 269E: 74 2E    
          fdb     Rocket_Goes_Up          ; 26A0: 17 2E    
          fdb     Rocket_Goes_Down        ; 26A2: 4E 2E    
          fdb     Jmp_To_SRList2_SR       ; 26A4: CD 26    
@@ -1288,7 +1289,7 @@ Subroutine_List
 Init_Rocket_Object
          ldx     #$07                    ; 26AE: A2 07    
 IRO_1    lda     Init_Rocket_Table,x     ; 26B0: BD C5 26 
-         sta     Obj_Rocket_0,x          ; 26B3: 9D A8 03 
+         sta     Obj_Flame,x             ; 26B3: 9D A8 03 
          dex                             ; 26B6: CA       
          bpl     IRO_1                   ; 26B7: 10 F7    
 
@@ -1380,7 +1381,7 @@ Laser_Shot_Active
 Rocket_Flight_Active
          jsr     Copy_ZP_Val_to_ZP1_Val  ; 2735: 20 F2 26 
          beq     Pre_Output_Sound_2      ; 2738: F0 D0    
-         lda     Obj_Flame_3             ; 273A: AD B3 03 
+         lda     Obj_Rocket_Y            ; 273A: AD B3 03 
          lsr     a                       ; 273D: 4A       
          eor     #$FE                    ; 273E: 49 FE    
          jmp     Pre_Output_Sound_1      ; 2740: 4C 05 27 
@@ -1565,7 +1566,7 @@ Ptr_Final_Char_Hi
          fcb     $3F                     ; 283D: 3F       
 
 Fire_Pressed
-         jsr     Save_Obj_List_Params_013 ; 283E: 20 D7 35 
+         jsr     Save_Obj_Type_X_Y       ; 283E: 20 D7 35 
          jsr     Platform_Collision_Test ; 2841: 20 B3 30  Remove=Gems all fall through platforms and floor, reentering at top
          lda     ZP_01_Lo                ; 2844: A5 02    
          bmi     FP_1                    ; 2846: 30 09    
@@ -1574,8 +1575,8 @@ Fire_Pressed
          clc                             ; 284C: 18       
          adc     #$02                    ; 284D: 69 02    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 284F: 91 00    
-FP_1     jsr     Save_Obj_List_Params_0135 ; 2851: 20 E9 35 
-         jsr     Test_Jetman_XY_Vs_Object ; 2854: 20 58 2D 
+FP_1     jsr     Save_Obj_Type_X_Y_Color ; 2851: 20 E9 35 
+         jsr     Test_Jetman_Obj_Collide ; 2854: 20 58 2D 
          bpl     Jump_To_Subroutine_List3 ; 2857: 10 1B    
          lda     #$00                    ; 2859: A9 00    
          jsr     Z2FDC                   ; 285B: 20 DC 2F 
@@ -1705,13 +1706,13 @@ Z2921    cmp     #$05                    ; 2921: C9 05
 Z2927    ldy     #$05                    ; 2927: A0 05    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2929: 91 00    
          lda     #$05                    ; 292B: A9 05    
-         sta     Obj_Rocket_3            ; 292D: 8D AB 03 
-         sta     Obj_Rocket_4            ; 2930: 8D AC 03 
+         sta     Obj_Flame_3             ; 292D: 8D AB 03 
+         sta     Obj_Flame_4             ; 2930: 8D AC 03 
          rts                             ; 2933: 60       
 ; ===========================================================
 Explosions_Plyr_Life_Lost?
          inc     ZP_HW_IRQ_Count         ; 2934: E6 21    
-         jsr     Save_Obj_List_Params_0135 ; 2936: 20 E9 35 
+         jsr     Save_Obj_Type_X_Y_Color ; 2936: 20 E9 35 
          ldy     #$02                    ; 2939: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 293B: B1 00    
          and     ZP_HW_IRQ_Count1        ; 293D: 25 4A    
@@ -1995,7 +1996,7 @@ Z2B53    cmp     #$03                    ; 2B53: C9 03
          bcs     Z2B52                   ; 2B55: B0 FB    
          lda     Obj_RTS_Fuel_Type       ; 2B57: AD B8 03 
          bne     Z2B52                   ; 2B5A: D0 F6    
-         lda     Obj_Flame_2             ; 2B5C: AD B2 03 
+         lda     Obj_Rocket_Dir?         ; 2B5C: AD B2 03 
          cmp     #$06                    ; 2B5F: C9 06    
          bcs     Z2B52                   ; 2B61: B0 EF    
          lda     ZP_HW_IRQ_Count1        ; 2B63: A5 4A    
@@ -2052,7 +2053,7 @@ Z2BC7    jsr     Save_Obj_List_Ptr       ; 2BC7: 20 E7 28
          fcb     $00                     ; 2BCD: 00       
          fdb     $03C0                   ; 2BCE: C0 03    
          fcb     $FF                     ; 2BD0: FF       
-         jsr     Save_Obj_List_Params_0135 ; 2BD1: 20 E9 35 
+         jsr     Save_Obj_Type_X_Y_Color ; 2BD1: 20 E9 35 
          ldy     #$06                    ; 2BD4: A0 06    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2BD6: B1 00    
          jsr     Z305A                   ; 2BD8: 20 5A 30 
@@ -2141,7 +2142,7 @@ Z2C53    lda     ZP_04_Lo                ; 2C53: A5 08
          rts                             ; 2C5E: 60       
 ; ===========================================================
 Z2C5F    inc     ZP_HW_IRQ_Count         ; 2C5F: E6 21    
-         jsr     Save_Obj_List_Params_013 ; 2C61: 20 D7 35 
+         jsr     Save_Obj_Type_X_Y       ; 2C61: 20 D7 35 
          jsr     Z2BF8                   ; 2C64: 20 F8 2B 
          lda     ZP_01_Lo                ; 2C67: A5 02    
          rts                             ; 2C69: 60       
@@ -2166,7 +2167,7 @@ Z2C78    lda     ZP_Level_Current_Plyr   ; 2C78: A5 59
 Z2C8C    jsr     Z28F9                   ; 2C8C: 20 F9 28 
          jmp     Triggers_Every_Frame    ; 2C8F: 4C 1A 26 
 ; -----------------------
-Z2C92    jsr     Test_Jetman_XY_Vs_Object ; 2C92: 20 58 2D 
+Z2C92    jsr     Test_Jetman_Obj_Collide ; 2C92: 20 58 2D 
          lda     ZP_01_Lo                ; 2C95: A5 02    
          bpl     Z2C9F                   ; 2C97: 10 06    
          jsr     Z2A45                   ; 2C99: 20 45 2A 
@@ -2282,55 +2283,63 @@ M2D4C    fcb     $05,$08,$07,$06         ; 2D4C: 05 08 07 06
 M2D50    fcb     $02,$06,$03,$07         ; 2D50: 02 06 03 07 
          fcb     $06,$07,$02,$04         ; 2D54: 06 07 02 04 
 
-Test_Jetman_XY_Vs_Object
+; ----------------------------------------------------------
+; FUNCTION : Tests if Jetman and the current object have
+;            overlapped i.e. collided. Object can be rocket
+;            part, fuel pod, gem or alien.
+; ENTRY : ZP_Obj_List_Ptr = Current Object
+;         Obj_Jetman_Looks = Status of Jetman
+; EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
+; ----------------------------------------------------------
+Test_Jetman_Obj_Collide
          lda     ZP_Flash_Score_Countdown ; 2D58: A5 5D    
-         bne     SKIP_2D69               ; 2D5A: D0 0D    
+         bne     TJOC_0                  ; 2D5A: D0 0D    
          lda     Obj_Jetman_Looks        ; 2D5C: AD 80 03 
          and     #$3F                    ; 2D5F: 29 3F    
-         cmp     #$01                    ; 2D61: C9 01     Jetman flying? THIS ISN'T RIGHT
-         beq     Test_Jetman_XY_Set_ZP_01_Lo ; 2D63: F0 09     Yes, branch
-         cmp     #$02                    ; 2D65: C9 02     Jetman standing? THIS ISN'T RIGHT
-         beq     Test_Jetman_XY_Set_ZP_01_Lo ; 2D67: F0 05     Yes, branch
+         cmp     #$01                    ; 2D61: C9 01     Jetman flying?
+         beq     TJOC_1                  ; 2D63: F0 09     Yes, branch
+         cmp     #$02                    ; 2D65: C9 02     Jetman standing?
+         beq     TJOC_1                  ; 2D67: F0 05     Yes, branch
 
-SKIP_2D69 lda    #$00                    ; 2D69: A9 00     If Flashing Score, return with ZP_01_Lo=0
+TJOC_0   lda     #$00                    ; 2D69: A9 00     If Flashing Score, no collision
          sta     ZP_01_Lo                ; 2D6B: 85 02    
          rts                             ; 2D6D: 60       
 ; ===========================================================
-Test_Jetman_XY_Set_ZP_01_Lo
-         ldy     #$00                    ; 2D6E: A0 00     Default ZP_01_Lo=0 unless tests work out
+
+TJOC_1   ldy     #$00                    ; 2D6E: A0 00     Default No Collision unless tests work out
          sty     ZP_01_Lo                ; 2D70: 84 02     Reset variable
 
          iny                             ; 2D72: C8        Y=1
          lda     Obj_Jetman_X            ; 2D73: AD 81 03 
          sec                             ; 2D76: 38       
-         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D77: F1 00     Compare X-coord vs Jetman's???
-         bpl     JF_1                    ; 2D79: 10 05    
+         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D77: F1 00     Compare objects X-coord vs Jetman's
+         bpl     TJOC_2                  ; 2D79: 10 05    
          clc                             ; 2D7B: 18       
          eor     #$FF                    ; 2D7C: 49 FF    
          adc     #$01                    ; 2D7E: 69 01    
 
-JF_1     cmp     #$0C                    ; 2D80: C9 0C    
-         bcs     JF_RTS                  ; 2D82: B0 17     Carry Set? Yes, Return
+TJOC_2   cmp     #$0C                    ; 2D80: C9 0C    
+         bcs     TJOC_RTS                ; 2D82: B0 17     Carry Set? Yes, Return
 
          iny                             ; 2D84: C8        Y=2
          iny                             ; 2D85: C8        Y=3
          lda     Obj_Jetman_Y            ; 2D86: AD 83 03 
          sec                             ; 2D89: 38       
-         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D8A: F1 00     Compare Y-coord vs Jetman's???
-         bpl     JF_3                    ; 2D8C: 10 0E    
+         sbc     (ZP_Obj_List_Ptr_Lo),y  ; 2D8A: F1 00     Compare objects Y-coord vs Jetman's
+         bpl     TJOC_4                  ; 2D8C: 10 0E    
          clc                             ; 2D8E: 18       
          eor     #$FF                    ; 2D8F: 49 FF    
          adc     #$01                    ; 2D91: 69 01    
 
          cmp     #$0C                    ; 2D93: C9 0C    
-JF_2     bcs     JF_RTS                  ; 2D95: B0 04     Carry Set? Yes, Return
+TJOC_3   bcs     TJOC_RTS                ; 2D95: B0 04     Carry Set? Yes, return
 
          lda     #$80                    ; 2D97: A9 80     Set ZP_01_Lo = $80 and return
          sta     ZP_01_Lo                ; 2D99: 85 02    
-JF_RTS   rts                             ; 2D9B: 60       
+TJOC_RTS rts                             ; 2D9B: 60       
 ; ===========================================================
-JF_3     cmp     #$12                    ; 2D9C: C9 12    
-         jmp     JF_2                    ; 2D9E: 4C 95 2D 
+TJOC_4   cmp     #$12                    ; 2D9C: C9 12    
+         jmp     TJOC_3                  ; 2D9E: 4C 95 2D 
 ; -----------------------
 
 Z2DA1    lda     Obj_RTS_Fuel_Type       ; 2DA1: AD B8 03 
@@ -2344,7 +2353,7 @@ Z2DA9    lda     Obj_RMS_Gem_Type        ; 2DA9: AD C0 03
 Z2DB5    jsr     Save_Obj_List_Ptr       ; 2DB5: 20 E7 28 
          jsr     Load_ZP_Parameters      ; 2DB8: 20 9D 25 
          fcb     $00                     ; 2DBB: 00       
-         fdb     Obj_Flame_0             ; 2DBC: B0 03    
+         fdb     Obj_Rocket              ; 2DBC: B0 03    
          fcb     $FF                     ; 2DBE: FF       
          jsr     Z2DCB                   ; 2DBF: 20 CB 2D 
          jmp     Restore_Obj_List_Ptr    ; 2DC2: 4C F0 28 
@@ -2353,7 +2362,7 @@ Z2DC5    jsr     Z2BC7                   ; 2DC5: 20 C7 2B
          jmp     Z2DB5                   ; 2DC8: 4C B5 2D 
 ; -----------------------
 Z2DCB    jsr     LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00 ; 2DCB: 20 DD 2D 
-         jsr     Save_Obj_List_Params_0135 ; 2DCE: 20 E9 35 
+         jsr     Save_Obj_Type_X_Y_Color ; 2DCE: 20 E9 35 
 Z2DD1    jsr     Z2DE8                   ; 2DD1: 20 E8 2D 
          jsr     Z3604                   ; 2DD4: 20 04 36 
          jsr     Dec_Saved_Obj_List_Params_by_10 ; 2DD7: 20 FF 2D 
@@ -2399,7 +2408,7 @@ Dec_Saved_Obj_List_Params_by_10
 ; ===========================================================
 ; Aliens keep moving also
 Rocket_Goes_Up
-         jsr     Save_Obj_List_Params_013 ; 2E17: 20 D7 35 
+         jsr     Save_Obj_Type_X_Y       ; 2E17: 20 D7 35 
          ldy     #$03                    ; 2E1A: A0 03     Object height offset
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E1C: B1 00     Load object height i.e. Rocket
          cmp     #$30                    ; 2E1E: C9 30     Object hit top yet
@@ -2408,10 +2417,10 @@ Rocket_Goes_Up
          sbc     #$01                    ; 2E23: E9 01     Calculate new height
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E25: 91 00     Store new height i.e one pixel up
          lda     #$04                    ; 2E27: A9 04    
-         sta     Obj_Rocket_3            ; 2E29: 8D AB 03 
+         sta     Obj_Flame_3             ; 2E29: 8D AB 03 
          lda     #$02                    ; 2E2C: A9 02    
-         sta     Obj_Rocket_4            ; 2E2E: 8D AC 03 
-         jmp     A0000000                ; 2E31: 4C AC 2E 
+         sta     Obj_Flame_4             ; 2E2E: 8D AC 03 
+         jmp     Rocket_Fuelled_Up       ; 2E31: 4C AC 2E 
 ; -----------------------
 Rocket_At_Top
          inc     ZP_Level_Current_Plyr   ; 2E34: E6 59    
@@ -2429,11 +2438,11 @@ Rocket_At_Top
 ; -----------------------
 ; Flames stop a little way before bottom
 Rocket_Goes_Down
-         jsr     Save_Obj_List_Params_013 ; 2E4E: 20 D7 35 
+         jsr     Save_Obj_Type_X_Y       ; 2E4E: 20 D7 35 
          lda     #$04                    ; 2E51: A9 04    
-         sta     Obj_Rocket_3            ; 2E53: 8D AB 03 
+         sta     Obj_Flame_3             ; 2E53: 8D AB 03 
          lda     #$02                    ; 2E56: A9 02    
-         sta     Obj_Rocket_4            ; 2E58: 8D AC 03 
+         sta     Obj_Flame_4             ; 2E58: 8D AC 03 
 
 ; Move object Y position down 1 pixel, stopping at bottom i.e. $AF
          ldy     #$03                    ; 2E5B: A0 03     03 = Height of object
@@ -2442,42 +2451,49 @@ Rocket_Goes_Down
          adc     #$01                    ; 2E60: 69 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E62: 91 00    
          cmp     #$AF                    ; 2E64: C9 AF     Hit bottom of playarea
-         bcc     A0000000                ; 2E66: 90 44    
+         bcc     Rocket_Fuelled_Up       ; 2E66: 90 44    
 
 ; Set current object type to a crash
          ldy     #$00                    ; 2E68: A0 00    
          lda     #$09                    ; 2E6A: A9 09    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E6C: 91 00    
          jsr     Init_Next_Jetman_Lives_Scores ; 2E6E: 20 5B 23 
-         jmp     A0000000                ; 2E71: 4C AC 2E 
+         jmp     Rocket_Fuelled_Up       ; 2E71: 4C AC 2E 
 ; -----------------------
-Subroutine_2E74
-         jsr     Save_Obj_List_Params_013 ; 2E74: 20 D7 35 
-         jsr     Test_Jetman_XY_Vs_Object ; 2E77: 20 58 2D 
-         lda     ZP_01_Lo                ; 2E7A: A5 02     Test_Jetman may set ZP_01_Lo
-         bpl     A0000000                ; 2E7C: 10 2E     May be a test to see if Jetman boarded rocket
+
+; This always seems to be a test for Jetman collide with Rocket
+Subroutine_2E74_On_IRQ?
+         jsr     Save_Obj_Type_X_Y       ; 2E74: 20 D7 35 
+         jsr     Test_Jetman_Obj_Collide ; 2E77: 20 58 2D 
+         lda     ZP_01_Lo                ; 2E7A: A5 02     Set by collision test
+         bpl     Rocket_Fuelled_Up       ; 2E7C: 10 2E     Collision? If no, branch
+
+; Collision handling
          ldy     #$02                    ; 2E7E: A0 02    
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E80: B1 00    
-         cmp     #$06                    ; 2E82: C9 06    
-         bcc     A0000000                ; 2E84: 90 26    
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E80: B1 00     "Direction" paramater???
+         cmp     #FUELLED_UP             ; 2E82: C9 06     Rocket fully fueled up?
+         bcc     Rocket_Fuelled_Up       ; 2E84: 90 26     Yes, branch
          lda     #$0A                    ; 2E86: A9 0A    
          ldy     #$00                    ; 2E88: A0 00    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E8A: 91 00    
          jsr     Save_Obj_List_Ptr       ; 2E8C: 20 E7 28 
+
          jsr     Load_ZP_Parameters      ; 2E8F: 20 9D 25 
          fcb     $00                     ; 2E92: 00       
          fdb     Obj_Jetman_Looks        ; 2E93: 80 03    
          fcb     $FF                     ; 2E95: FF       
-         jsr     Save_Obj_List_Params_0135 ; 2E96: 20 E9 35 
+
+         jsr     Save_Obj_Type_X_Y_Color ; 2E96: 20 E9 35 
          jsr     Z3601                   ; 2E99: 20 01 36 
          lda     #$00                    ; 2E9C: A9 00    
          sta     Obj_Jetman_Looks        ; 2E9E: 8D 80 03 
          jsr     Restore_Obj_List_Ptr    ; 2EA1: 20 F0 28 
          inc     ZP_Num_Lives_P1         ; 2EA4: E6 5A    
-         jsr     P1_LIVES_TO_UDG_RAM     ; 2EA6: 20 73 23 
+         jsr     Display_P1_Lives        ; 2EA6: 20 73 23 
          jmp     Triggers_Every_Frame    ; 2EA9: 4C 1A 26 
 ; -----------------------
-A0000000 jsr     Save_Obj_List_Params_0135 ; 2EAC: 20 E9 35 
+Rocket_Fuelled_Up
+         jsr     Save_Obj_Type_X_Y_Color ; 2EAC: 20 E9 35 
          jsr     Display_Rocket_Flame?   ; 2EAF: 20 AA 27 
          jsr     LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00 ; 2EB2: 20 DD 2D 
 LOOP_2EB5 jsr    Z2DE8                   ; 2EB5: 20 E8 2D 
@@ -2561,38 +2577,38 @@ Z2F31    ldy     #$06                    ; 2F31: A0 06
          ora     #$01                    ; 2F46: 09 01    
          sta     Obj_RTS_Fuel_Diagon     ; 2F48: 8D BC 03 
          jsr     Z3054                   ; 2F4B: 20 54 30 
-         lda     Obj_Flame_4             ; 2F4E: AD B4 03 
+         lda     Obj_Rocket_Diag?        ; 2F4E: AD B4 03 
          asl     a                       ; 2F51: 0A       
          asl     a                       ; 2F52: 0A       
          asl     a                       ; 2F53: 0A       
          asl     a                       ; 2F54: 0A       
          sta     ZP_Keyboard_Data        ; 2F55: 85 13    
-         lda     Obj_Flame_3             ; 2F57: AD B3 03 
+         lda     Obj_Rocket_Y            ; 2F57: AD B3 03 
          sec                             ; 2F5A: 38       
          sbc     ZP_Keyboard_Data        ; 2F5B: E5 13    
          sta     ZP_0C_Hi                ; 2F5D: 85 19    
          jsr     Z3057                   ; 2F5F: 20 57 30 
-         inc     Obj_Flame_4             ; 2F62: EE B4 03 
+         inc     Obj_Rocket_Diag?        ; 2F62: EE B4 03 
 Z2F65    lda     #$00                    ; 2F65: A9 00    
          tay                             ; 2F67: A8       
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2F68: 91 00    
          lda     #$02                    ; 2F6A: A9 02    
-         sta     Obj_Rocket_1            ; 2F6C: 8D A9 03 
+         sta     Obj_Flame_1             ; 2F6C: 8D A9 03 
          lda     #$10                    ; 2F6F: A9 10    
-         sta     Obj_Rocket_2            ; 2F71: 8D AA 03 
+         sta     Obj_Flame_2             ; 2F71: 8D AA 03 
          jmp     Triggers_Every_Frame    ; 2F74: 4C 1A 26 
 ; -----------------------
 Z2F77    ldy     #$03                    ; 2F77: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F79: B1 00    
          cmp     #$A8                    ; 2F7B: C9 A8    
          bcc     Z2FB2                   ; 2F7D: 90 33    
-         inc     Obj_Flame_2             ; 2F7F: EE B2 03 
-         jsr     Save_Obj_List_Params_0135 ; 2F82: 20 E9 35 
+         inc     Obj_Rocket_Dir?         ; 2F7F: EE B2 03 
+         jsr     Save_Obj_Type_X_Y_Color ; 2F82: 20 E9 35 
          jsr     Z2FDA                   ; 2F85: 20 DA 2F 
          jsr     Z305A                   ; 2F88: 20 5A 30 
          jmp     Z2F65                   ; 2F8B: 4C 65 2F 
 ; -----------------------
-Stops_All jsr    Save_Obj_List_Params_013 ; 2F8E: 20 D7 35 
+Stops_All jsr    Save_Obj_Type_X_Y       ; 2F8E: 20 D7 35 
          ldy     #$04                    ; 2F91: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F93: B1 00    
          bit     MASK_04                 ; 2F95: 2C 16 20 
@@ -2601,7 +2617,7 @@ Stops_All jsr    Save_Obj_List_Params_013 ; 2F8E: 20 D7 35
          bne     Z301E                   ; 2F9D: D0 7F    
          bit     MASK_01                 ; 2F9F: 2C 14 20 
          beq     Z2FBD                   ; 2FA2: F0 19    
-         jsr     Test_Jetman_XY_Vs_Object ; 2FA4: 20 58 2D 
+         jsr     Test_Jetman_Obj_Collide ; 2FA4: 20 58 2D 
          lda     ZP_01_Lo                ; 2FA7: A5 02    
          bmi     Z2FEE                   ; 2FA9: 30 43    
          jsr     Platform_Collision_Test ; 2FAB: 20 B3 30  Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
@@ -2613,7 +2629,7 @@ Z2FB2    ldy     #$03                    ; 2FB2: A0 03
          adc     #$02                    ; 2FB7: 69 02    
          ora     #$01                    ; 2FB9: 09 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2FBB: 91 00    
-Z2FBD    jsr     Save_Obj_List_Params_0135 ; 2FBD: 20 E9 35 
+Z2FBD    jsr     Save_Obj_Type_X_Y_Color ; 2FBD: 20 E9 35 
          jsr     Z2FDA                   ; 2FC0: 20 DA 2F 
 Z2FC3    pha                             ; 2FC3: 48       
          jsr     Get_Ship_UDG_Addr       ; 2FC4: 20 E5 2F 
@@ -2641,7 +2657,7 @@ Get_Ship_UDG_Addr
          lda     UDG_Sprite_Lookup_Hi,x  ; 2FEA: BD 88 3C 
          rts                             ; 2FED: 60       
 ; ===========================================================
-Z2FEE    jsr     Save_Obj_List_Params_013 ; 2FEE: 20 D7 35 
+Z2FEE    jsr     Save_Obj_Type_X_Y       ; 2FEE: 20 D7 35 
          ldy     #$04                    ; 2FF1: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2FF3: B1 00    
          ora     #$02                    ; 2FF5: 09 02    
@@ -2652,9 +2668,9 @@ Z2FEE    jsr     Save_Obj_List_Params_013 ; 2FEE: 20 D7 35
          fcb     $FF                     ; 2FFF: FF       
          jsr     GameOverScoreStuff      ; 3000: 20 63 30 
          lda     #$01                    ; 3003: A9 01    
-         sta     Obj_Rocket_1            ; 3005: 8D A9 03 
+         sta     Obj_Flame_1             ; 3005: 8D A9 03 
          lda     #$10                    ; 3008: A9 10    
-         sta     Obj_Rocket_2            ; 300A: 8D AA 03 
+         sta     Obj_Flame_2             ; 300A: 8D AA 03 
          ldy     #$01                    ; 300D: A0 01    
          lda     Obj_Jetman_X            ; 300F: AD 81 03 
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 3012: 91 00    
@@ -2674,7 +2690,7 @@ Z301E    ldy     #$01                    ; 301E: A0 01
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 302D: 91 00    
          dey                             ; 302F: 88       
          dey                             ; 3030: 88       
-         lda     Obj_Flame_1             ; 3031: AD B1 03 
+         lda     Obj_Rocket_X            ; 3031: AD B1 03 
          sec                             ; 3034: 38       
          sbc     (ZP_Obj_List_Ptr_Lo),y  ; 3035: F1 00    
          bpl     Z303E                   ; 3037: 10 05    
@@ -2687,12 +2703,12 @@ Z303E    cmp     #$06                    ; 303E: C9 06
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 3044: B1 00    
          ora     #$04                    ; 3046: 09 04    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 3048: 91 00    
-         lda     Obj_Flame_1             ; 304A: AD B1 03 
+         lda     Obj_Rocket_X            ; 304A: AD B1 03 
          ldy     #$01                    ; 304D: A0 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 304F: 91 00    
 Z3051    jmp     Z2FBD                   ; 3051: 4C BD 2F 
 ; -----------------------
-Z3054    jsr     Save_Obj_List_Params_0135 ; 3054: 20 E9 35 
+Z3054    jsr     Save_Obj_Type_X_Y_Color ; 3054: 20 E9 35 
 Z3057    jsr     Z2FDA                   ; 3057: 20 DA 2F 
 Z305A    jsr     Get_Ship_UDG_Addr       ; 305A: 20 E5 2F 
          jsr     Z373D                   ; 305D: 20 3D 37 
@@ -3050,7 +3066,7 @@ ADC_48   adc     #$48                    ; 326A: 69 48
 TXA_     txa                             ; 326F: 8A       
          jmp     __ZZZZ__                ; 3270: 4C A6 32 
 ; -----------------------
-Flying   jsr     Save_Obj_List_Params_013 ; 3273: 20 D7 35 
+Flying   jsr     Save_Obj_Type_X_Y       ; 3273: 20 D7 35 
          jsr     Read_Keyboard_Joystick  ; 3276: 20 F7 33  Returns A=%RLDU_F111
          sta     ZP_Jetman_Movement      ; 3279: 85 1C    
          jsr     Platform_Collision_Test ; 327B: 20 B3 30  Remove=Jetman+fuel/rocket part pick-up fly through platforms
@@ -3190,7 +3206,7 @@ JMP_to_Subroutine_261A
          jmp     Triggers_Every_Frame    ; 3367: 4C 1A 26 
 ; -----------------------
 Read_Kbd_Jstk
-         jsr     Save_Obj_List_Params_013 ; 336A: 20 D7 35 
+         jsr     Save_Obj_Type_X_Y       ; 336A: 20 D7 35 
          jsr     Read_Keyboard_Joystick  ; 336D: 20 F7 33 
          jsr     Platform_Collision_Test ; 3370: 20 B3 30  Remove=Jetman+pickup flies/walks jiggle when standing on a platform
          lda     ZP_01_Lo                ; 3373: A5 02    
@@ -3632,7 +3648,7 @@ CCTUR_INV lda    (ZP_03_Lo),y            ; 35CB: B1 06     Copy bytes from given
          bpl     CCTUR_INV               ; 35D2: 10 F7     All lines copied? If no, loop back.
          jmp     CCTUR_NEXT              ; 35D4: 4C BD 35  If yes, routine ends
 ; -----------------------
-Save_Obj_List_Params_013
+Save_Obj_Type_X_Y
          ldy     #$00                    ; 35D7: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35D9: B1 00    
          sta     ZP_09_Lo                ; 35DB: 85 12    
@@ -3646,10 +3662,11 @@ Save_Obj_List_Params_013
          sta     ZP_08_Hi                ; 35E6: 85 11    
          rts                             ; 35E8: 60       
 ; ===========================================================
-Save_Obj_List_Params_0135
+Save_Obj_Type_X_Y_Color
          ldy     #$00                    ; 35E9: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35EB: B1 00    
          sta     ZP_0D_Lo                ; 35ED: 85 1A    
+
          iny                             ; 35EF: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35F0: B1 00    
          sta     ZP_0C_Lo                ; 35F2: 85 18    
@@ -3833,7 +3850,7 @@ Z3729    lda     #$00                    ; 3729: A9 00
 ; ===========================================================
 Z3734    jmp     Z36E7                   ; 3734: 4C E7 36 
 ; -----------------------
-Z3737    jsr     Save_Obj_List_Params_0135 ; 3737: 20 E9 35 
+Z3737    jsr     Save_Obj_Type_X_Y_Color ; 3737: 20 E9 35 
          jsr     Z3815                   ; 373A: 20 15 38 
 Z373D    sty     ZP_Ptr_To_Str_Lo        ; 373D: 84 0E    
          tay                             ; 373F: A8       

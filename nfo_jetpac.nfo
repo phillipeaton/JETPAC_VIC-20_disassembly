@@ -129,7 +129,7 @@ label    2080 RGS_Flash
 comment  2085
 comment  2085 Setup volume and color
 comment  208A
-comment  208A Initialise Rocket Object (or is it the Flame?) ?????????????????????
+comment  208A Initialise Flame object
 comment  208F
 comment  208F ----------------------------------------------------------
 comment  208F Game Select Loop
@@ -332,19 +332,19 @@ lcomment 236F Store countdown
 label    236F LDA_7F_Return
 ;        2373
 comment  2373
-label    2373 P1_LIVES_TO_UDG_RAM
+label    2373 Display_P1_Lives
 const    2376
 lcomment 2376 ZP Offset for 1st address
 lcomment 2377 1st Address
 word     2377
 comment  2382
-label    2382 P2_Lives_To_UDG_RAM
+label    2382 Display_P2_Lives
 const    2385
 lcomment 2385 ZP Offset for 1st address
 lcomment 2386 1st Address
 word     2386
 comment  238E
-label    238E Number_Lives_To_UDG_RAM
+label    238E Display_Number_Lives
 lcomment 238F $70 = "0" character
 comment  2396
 comment  2396 Display Jetman Icon next to number of lives
@@ -824,34 +824,43 @@ label    2CFF BACK_2CFF
 label    2D0F Jetman_Looks_1_1???
 break    2D54
 comment  2D58
-label    2D58 Test_Jetman_XY_Vs_Object
-lcomment 2D61 Jetman flying? THIS ISN'T RIGHT
+comment  2D58 ----------------------------------------------------------
+comment  2D58 FUNCTION : Tests if Jetman and the current object have
+comment  2D58 \           overlapped i.e. collided. Object can be rocket
+comment  2D58 \           part, fuel pod, gem or alien.
+comment  2D58 ENTRY : ZP_Obj_List_Ptr = Current Object
+comment  2D58 \        Obj_Jetman_Looks = Status of Jetman
+comment  2D58 EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
+comment  2D58 ----------------------------------------------------------
+label    2D58 Test_Jetman_Obj_Collide
+lcomment 2D61 Jetman flying?
 lcomment 2D63 Yes, branch
-lcomment 2D65 Jetman standing? THIS ISN'T RIGHT
+lcomment 2D65 Jetman standing?
 lcomment 2D67 Yes, branch
 comment  2D69
-label    2D69 SKIP_2D69
-lcomment 2D69 If Flashing Score, return with ZP_01_Lo=0
-lcomment 2D6E Default ZP_01_Lo=0 unless tests work out
-label    2D6E Test_Jetman_XY_Set_ZP_01_Lo
+label    2D69 TJOC_0
+lcomment 2D69 If Flashing Score, no collision
+comment  2D6E
+lcomment 2D6E Default No Collision unless tests work out
+label    2D6E TJOC_1
 lcomment 2D70 Reset variable
 comment  2D72
 lcomment 2D72 Y=1
-lcomment 2D77 Compare X-coord vs Jetman's???
+lcomment 2D77 Compare objects X-coord vs Jetman's
 comment  2D80
-label    2D80 JF_1
+label    2D80 TJOC_2
 lcomment 2D82 Carry Set? Yes, Return
 comment  2D84
 lcomment 2D84 Y=2
 lcomment 2D85 Y=3
-lcomment 2D8A Compare Y-coord vs Jetman's???
+lcomment 2D8A Compare objects Y-coord vs Jetman's
 comment  2D93
-label    2D95 JF_2
-lcomment 2D95 Carry Set? Yes, Return
+label    2D95 TJOC_3
+lcomment 2D95 Carry Set? Yes, return
 comment  2D97
 lcomment 2D97 Set ZP_01_Lo = $80 and return
-label    2D9B JF_RTS
-label    2D9C JF_3
+label    2D9B TJOC_RTS
+label    2D9C TJOC_4
 comment  2DA1
 word     2DBC
 label    2DDD LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
@@ -874,11 +883,21 @@ lcomment 2E5B 03 = Height of object
 lcomment 2E64 Hit bottom of playarea
 comment  2E68
 comment  2E68 Set current object type to a crash
-label    2E74 Subroutine_2E74
-lcomment 2E7A Test_Jetman may set ZP_01_Lo
-lcomment 2E7C May be a test to see if Jetman boarded rocket
+comment  2E74
+comment  2E74 This always seems to be a test for Jetman collide with Rocket
+label    2E74 Subroutine_2E74_On_IRQ?
+lcomment 2E7A Set by collision test
+lcomment 2E7C Collision? If no, branch
+comment  2E7E
+comment  2E7E Collision handling
+lcomment 2E80 "Direction" paramater???
+lcomment 2E82 Rocket fully fueled up?
+deflabel 2E83 FUELLED_UP
+lcomment 2E84 Yes, branch
+comment  2E8F
 word     2E93
-label    2EAC A0000000
+comment  2E96
+label    2EAC Rocket_Fuelled_Up
 label    2EB5 LOOP_2EB5
 comment  2EC0
 label    2ECA SKIP_2ECA
@@ -1319,10 +1338,11 @@ lcomment 35CF Move bytes to given address with Y offset
 lcomment 35D1 Decrement number of lines counter
 lcomment 35D2 All lines copied? If no, loop back.
 lcomment 35D4 If yes, routine ends
-label    35D7 Save_Obj_List_Params_013
+label    35D7 Save_Obj_Type_X_Y
 comment  35DD
 comment  35E2
-label    35E9 Save_Obj_List_Params_0135
+label    35E9 Save_Obj_Type_X_Y_Color
+comment  35EF
 comment  35F4
 comment  35FA
 ;        End
