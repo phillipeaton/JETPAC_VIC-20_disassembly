@@ -112,7 +112,6 @@ NMI_Int_Vector_Hi       equ     $0319
 Obj_Jetman_Looks        equ     $0380
 Obj_Jetman_X            equ     $0381
 Obj_Jetman_Y            equ     $0383
-Obj_Laser_0             equ     $0388
 Obj_Flame               equ     $03A8
 Obj_Flame_1             equ     $03A9
 Obj_Flame_2             equ     $03AA
@@ -122,7 +121,7 @@ Obj_Flame_5             equ     $03AD
 Obj_Flame_6             equ     $03AE
 Obj_Rocket              equ     $03B0
 Obj_Rocket_X            equ     $03B1
-Obj_Rocket_Dir?         equ     $03B2
+Obj_Rocket_Fuel_Lvl     equ     $03B2
 Obj_Rocket_Y            equ     $03B3
 Obj_Rocket_Diag?        equ     $03B4
 Obj_RTS_Fuel_Type       equ     $03B8
@@ -132,13 +131,13 @@ Obj_RMS_Gem_Type        equ     $03C0
 Obj_RMS_Gem_Horiz       equ     $03C1
 Obj_RMS_Gem_Diagon      equ     $03C4
 Obj_RMS_Gem_6           equ     $03C6
-Obj_Alien_0_7           equ     $03C8
+Obj_Alien_0_0           equ     $03C8
 UDG_RAM                 equ     $1000
-UDG_P1_SCORE_RAW_POSN   equ     $1008
-UDG_P1_LIVES_RAW_POSN   equ     $1420
-UDG_HI_SCORE_RAW_POSN   equ     $1588
-UDG_P2_LIVES_RAW_POSN   equ     $19A0
-UDG_P2_SCORE_RAW_POSN   equ     $1B08
+Display_P1_Score_Posn   equ     $1008
+Display_P1_Lives_Posn   equ     $1420
+Display_Hi_Score_Posn   equ     $1588
+Display_P2_Lives_Posn   equ     $19A0
+Display_P2_Score_Posn   equ     $1B08
 Score_Hi                equ     $1FD0
 Game_Settings           equ     $1FD3
 VIC_R0_H_Ctr            equ     $9000
@@ -164,7 +163,8 @@ Color_RAM               equ     $9600
 ; Used Definitions
 ;****************************************************
 
-GREEN_05                equ     $05
+GREEN                   equ     $05
+ROCKET_ASCEND           equ     $0A
 FUELLED_UP              equ     $06
 OBJPARAM3_JIGGLE?       equ     $03
 YELLOW                  equ     $07
@@ -390,7 +390,7 @@ Update_Laser_Shots
 Laser_Shots
          jsr     Load_ZP_Parameters      ; 20F0: 20 9D 25 
          fcb     $06                     ; 20F3: 06       
-         fdb     Obj_Laser_0             ; 20F4: 88 03    
+         fdb     Other_RAM+136           ; 20F4: 88 03    
          fcb     $FF                     ; 20F6: FF       
 
 ; Loop through the four possible Laser shots, branch if any are zero I.E. NOT SHOOTING???????
@@ -786,7 +786,7 @@ LDA_7F_Return
 Display_P1_Lives
          jsr     Load_ZP_Parameters      ; 2373: 20 9D 25 
          fcb     $04                     ; 2376: 04        ZP Offset for 1st address
-         fdb     UDG_P1_LIVES_RAW_POSN   ; 2377: 20 14     1st Address
+         fdb     Display_P1_Lives_Posn   ; 2377: 20 14     1st Address
          fcb     $FF                     ; 2379: FF       
          jsr     Load_Num_Lives          ; 237A: 20 B6 23 
          beq     Zero_Lives_To_UDG_RAM_1 ; 237D: F0 23    
@@ -795,7 +795,7 @@ Display_P1_Lives
 Display_P2_Lives
          jsr     Load_ZP_Parameters      ; 2382: 20 9D 25 
          fcb     $04                     ; 2385: 04        ZP Offset for 1st address
-         fdb     UDG_P2_LIVES_RAW_POSN   ; 2386: A0 19     1st Address
+         fdb     Display_P2_Lives_Posn   ; 2386: A0 19     1st Address
          fcb     $FF                     ; 2388: FF       
          jsr     Load_Num_Lives_Inverse  ; 2389: 20 C0 23 
          beq     Zero_Lives_To_UDG_RAM   ; 238C: F0 1A    
@@ -958,7 +958,7 @@ STR_1UP_HI_2UP
 Display_P1_Score
          jsr     Load_ZP_Parameters      ; 2471: 20 9D 25 
          fcb     $04                     ; 2474: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y, but not in this case
-         fdb     UDG_P1_SCORE_RAW_POSN   ; 2475: 08 10     UDG array absolute position to display score at
+         fdb     Display_P1_Score_Posn   ; 2475: 08 10     UDG array absolute position to display score at
          fcb     $0E                     ; 2477: 0E        ZP_Ptr_To_Str
          fdb     ZP_Score_P1             ; 2478: 51 00     Players score in ZP as BCD e.g. 12 34 56
          fcb     $02                     ; 247A: 02        ZP_Temp_1
@@ -969,7 +969,7 @@ Display_P1_Score
 Display_P2_Score
          jsr     Load_ZP_Parameters      ; 2481: 20 9D 25 
          fcb     $04                     ; 2484: 04       
-         fdb     UDG_P2_SCORE_RAW_POSN   ; 2485: 08 1B    
+         fdb     Display_P2_Score_Posn   ; 2485: 08 1B    
          fcb     $0E                     ; 2487: 0E       
          fdb     ZP_Score_P2             ; 2488: 54 00    
          fcb     $02                     ; 248A: 02       
@@ -980,7 +980,7 @@ Display_P2_Score
 Display_Hi_Score
          jsr     Load_ZP_Parameters      ; 2491: 20 9D 25 
          fcb     $04                     ; 2494: 04       
-         fdb     UDG_HI_SCORE_RAW_POSN   ; 2495: 88 15    
+         fdb     Display_Hi_Score_Posn   ; 2495: 88 15    
          fcb     $0E                     ; 2497: 0E       
          fdb     Score_Hi                ; 2498: D0 1F    
          fcb     $02                     ; 249A: 02       
@@ -1278,8 +1278,8 @@ Subroutine_List
          fdb     Not_Triggered_2A6D      ; 269A: 6D 2A     2A6D and 2A5F almost the same
          fdb     Lev_Start_1st_Alien_onScr ; 269C: 5F 2A     2A6D and 2A5F almost the same
          fdb     Subroutine_2E74_On_IRQ? ; 269E: 74 2E    
-         fdb     Rocket_Goes_Up          ; 26A0: 17 2E    
-         fdb     Rocket_Goes_Down        ; 26A2: 4E 2E    
+         fdb     Rocket_Ascend           ; 26A0: 17 2E    
+         fdb     Rocket_Descend          ; 26A2: 4E 2E    
          fdb     Jmp_To_SRList2_SR       ; 26A4: CD 26    
          fdb     Triggers_Every_Frame    ; 26A6: 1A 26    
          fdb     Fire_Pressed            ; 26A8: 3E 28    
@@ -1511,7 +1511,7 @@ SKIP_27E1 lda    ZP_Rocket_Flame_Toggle  ; 27E1: A5 27
          sbc     #$01                    ; 27EC: E9 01    
          jsr     Get_Flame_UDG_Addr      ; 27EE: 20 2E 28 
          jsr     Z378D                   ; 27F1: 20 8D 37 
-         jsr     Z364C                   ; 27F4: 20 4C 36 
+         jsr     GOTO_364C               ; 27F4: 20 4C 36 
          lda     ZP_0C_Lo                ; 27F7: A5 18    
          sta     ZP_UDG_RAM_X            ; 27F9: 85 04    
          lda     ZP_0C_Hi                ; 27FB: A5 19    
@@ -1661,7 +1661,7 @@ Loop_28D8 sta    Obj_Jetman_Looks,x      ; 28D8: 9D 80 03
 
 ; Init all Alien objects
          ldx     #$2F                    ; 28DE: A2 2F    
-Loop_28E0 sta    Obj_Alien_0_7,x         ; 28E0: 9D C8 03 
+Loop_28E0 sta    Obj_Alien_0_0,x         ; 28E0: 9D C8 03 
          dex                             ; 28E3: CA       
          bpl     Loop_28E0               ; 28E4: 10 FA    
          rts                             ; 28E6: 60       
@@ -1996,7 +1996,7 @@ Z2B53    cmp     #$03                    ; 2B53: C9 03
          bcs     Z2B52                   ; 2B55: B0 FB    
          lda     Obj_RTS_Fuel_Type       ; 2B57: AD B8 03 
          bne     Z2B52                   ; 2B5A: D0 F6    
-         lda     Obj_Rocket_Dir?         ; 2B5C: AD B2 03 
+         lda     Obj_Rocket_Fuel_Lvl     ; 2B5C: AD B2 03 
          cmp     #$06                    ; 2B5F: C9 06    
          bcs     Z2B52                   ; 2B61: B0 EF    
          lda     ZP_HW_IRQ_Count1        ; 2B63: A5 4A    
@@ -2407,7 +2407,7 @@ Dec_Saved_Obj_List_Params_by_10
          rts                             ; 2E16: 60       
 ; ===========================================================
 ; Aliens keep moving also
-Rocket_Goes_Up
+Rocket_Ascend
          jsr     Save_Obj_Type_X_Y       ; 2E17: 20 D7 35 
          ldy     #$03                    ; 2E1A: A0 03     Object height offset
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E1C: B1 00     Load object height i.e. Rocket
@@ -2437,7 +2437,7 @@ Rocket_At_Top
          jmp     Triggers_Every_Frame    ; 2E4B: 4C 1A 26 
 ; -----------------------
 ; Flames stop a little way before bottom
-Rocket_Goes_Down
+Rocket_Descend
          jsr     Save_Obj_Type_X_Y       ; 2E4E: 20 D7 35 
          lda     #$04                    ; 2E51: A9 04    
          sta     Obj_Flame_3             ; 2E53: 8D AB 03 
@@ -2464,16 +2464,18 @@ Rocket_Goes_Down
 ; This always seems to be a test for Jetman collide with Rocket
 Subroutine_2E74_On_IRQ?
          jsr     Save_Obj_Type_X_Y       ; 2E74: 20 D7 35 
-         jsr     Test_Jetman_Obj_Collide ; 2E77: 20 58 2D 
+         jsr     Test_Jetman_Obj_Collide ; 2E77: 20 58 2D  Jetman collided with rocket?
          lda     ZP_01_Lo                ; 2E7A: A5 02     Set by collision test
          bpl     Rocket_Fuelled_Up       ; 2E7C: 10 2E     Collision? If no, branch
 
-; Collision handling
+; Collision occured, handle it
          ldy     #$02                    ; 2E7E: A0 02    
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E80: B1 00     "Direction" paramater???
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2E80: B1 00     Get number of fuel pods delivered into rocket
          cmp     #FUELLED_UP             ; 2E82: C9 06     Rocket fully fueled up?
-         bcc     Rocket_Fuelled_Up       ; 2E84: 90 26     Yes, branch
-         lda     #$0A                    ; 2E86: A9 0A    
+         bcc     Rocket_Fuelled_Up       ; 2E84: 90 26     No, branch
+
+; Set Rocket object to Ascend
+         lda     #ROCKET_ASCEND          ; 2E86: A9 0A    
          ldy     #$00                    ; 2E88: A0 00    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E8A: 91 00    
          jsr     Save_Obj_List_Ptr       ; 2E8C: 20 E7 28 
@@ -2485,6 +2487,7 @@ Subroutine_2E74_On_IRQ?
 
          jsr     Save_Obj_Type_X_Y_Color ; 2E96: 20 E9 35 
          jsr     Z3601                   ; 2E99: 20 01 36 
+
          lda     #$00                    ; 2E9C: A9 00    
          sta     Obj_Jetman_Looks        ; 2E9E: 8D 80 03 
          jsr     Restore_Obj_List_Ptr    ; 2EA1: 20 F0 28 
@@ -2497,7 +2500,7 @@ Rocket_Fuelled_Up
          jsr     Display_Rocket_Flame?   ; 2EAF: 20 AA 27 
          jsr     LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00 ; 2EB2: 20 DD 2D 
 LOOP_2EB5 jsr    Z2DE8                   ; 2EB5: 20 E8 2D 
-         jsr     Z364C                   ; 2EB8: 20 4C 36 
+         jsr     GOTO_364C               ; 2EB8: 20 4C 36 
          jsr     Dec_Saved_Obj_List_Params_by_10 ; 2EBB: 20 FF 2D 
          bne     LOOP_2EB5               ; 2EBE: D0 F5    
 
@@ -2602,7 +2605,7 @@ Z2F77    ldy     #$03                    ; 2F77: A0 03
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F79: B1 00    
          cmp     #$A8                    ; 2F7B: C9 A8    
          bcc     Z2FB2                   ; 2F7D: 90 33    
-         inc     Obj_Rocket_Dir?         ; 2F7F: EE B2 03 
+         inc     Obj_Rocket_Fuel_Lvl     ; 2F7F: EE B2 03  Fuel cell dropped onto rocket ~8 pixels from bottom
          jsr     Save_Obj_Type_X_Y_Color ; 2F82: 20 E9 35 
          jsr     Z2FDA                   ; 2F85: 20 DA 2F 
          jsr     Z305A                   ; 2F88: 20 5A 30 
@@ -2637,7 +2640,7 @@ Z2FC3    pha                             ; 2FC3: 48
          pla                             ; 2FCA: 68       
          jsr     Get_Ship_UDG_Addr       ; 2FCB: 20 E5 2F 
          jsr     Z378D                   ; 2FCE: 20 8D 37 
-         jsr     Z364C                   ; 2FD1: 20 4C 36 
+         jsr     GOTO_364C               ; 2FD1: 20 4C 36 
          jsr     Z381F                   ; 2FD4: 20 1F 38 
          jmp     Triggers_Every_Frame    ; 2FD7: 4C 1A 26 
 ; -----------------------
@@ -2930,7 +2933,7 @@ Loop_Next_Char
          adc     #$01                    ; 318B: 69 01    
          sta     ZP_05_Hi                ; 318D: 85 0B    
          ldy     #$00                    ; 318F: A0 00    
-         lda     #GREEN_05               ; 3191: A9 05    
+         lda     #GREEN                  ; 3191: A9 05    
 DP_2     sta     (ZP_Col_RAM_Ptr_Lo),y   ; 3193: 91 0C    
          iny                             ; 3195: C8       
          dec     ZP_05_Hi                ; 3196: C6 0B    
@@ -3684,19 +3687,19 @@ Z3601    jsr     Z3737                   ; 3601: 20 37 37
 Z3604    lda     #$00                    ; 3604: A9 00    
          sta     ZP_0A_Lo                ; 3606: 85 14    
          sta     ZP_01_Hi                ; 3608: 85 03    
-         jmp     Z364C                   ; 360A: 4C 4C 36 
+         jmp     GOTO_364C               ; 360A: 4C 4C 36 
 ; -----------------------
 Z360D    jsr     Z378A                   ; 360D: 20 8A 37 
 Z3610    lda     #$00                    ; 3610: A9 00    
          sta     ZP_0A_Hi                ; 3612: 85 15    
          sta     ZP_05_Hi                ; 3614: 85 0B    
-         jmp     Z364C                   ; 3616: 4C 4C 36 
+         jmp     GOTO_364C               ; 3616: 4C 4C 36 
 ; -----------------------
 Z3619    eor     #$FF                    ; 3619: 49 FF    
          clc                             ; 361B: 18       
          adc     #$01                    ; 361C: 69 01    
          cmp     ZP_05_Hi                ; 361E: C5 0B    
-         bcs     Z3688                   ; 3620: B0 66    
+         bcs     GOTO_3688               ; 3620: B0 66    
          tax                             ; 3622: AA       
          pha                             ; 3623: 48       
          sta     ZP_05_Lo                ; 3624: 85 0A    
@@ -3717,11 +3720,11 @@ Z362F    lda     (ZP_Ptr_To_Str_Lo),y    ; 362F: B1 0E
          sec                             ; 363E: 38       
          sbc     ZP_Keyboard_Data        ; 363F: E5 13    
          sta     ZP_04_Hi                ; 3641: 85 09    
-         jmp     Z3688                   ; 3643: 4C 88 36 
+         jmp     GOTO_3688               ; 3643: 4C 88 36 
 ; -----------------------
 Z3646    jsr     Z3737                   ; 3646: 20 37 37 
          jsr     Z378A                   ; 3649: 20 8A 37 
-Z364C    lda     #$FF                    ; 364C: A9 FF    
+GOTO_364C lda    #$FF                    ; 364C: A9 FF    
          sta     ZP_04_Lo                ; 364E: 85 08    
          sta     ZP_04_Hi                ; 3650: 85 09    
          lda     ZP_01_Hi                ; 3652: A5 03    
@@ -3731,10 +3734,10 @@ Z364C    lda     #$FF                    ; 364C: A9 FF
          lda     ZP_08_Hi                ; 365A: A5 11    
          sec                             ; 365C: 38       
          sbc     ZP_0C_Hi                ; 365D: E5 19    
-         beq     Z3688                   ; 365F: F0 27    
+         beq     GOTO_3688               ; 365F: F0 27    
          bmi     Z3619                   ; 3661: 30 B6    
          cmp     ZP_01_Hi                ; 3663: C5 03    
-         bcs     Z3688                   ; 3665: B0 21    
+         bcs     GOTO_3688               ; 3665: B0 21    
          tax                             ; 3667: AA       
          pha                             ; 3668: 48       
          sta     ZP_01_Lo                ; 3669: 85 02    
@@ -3743,20 +3746,20 @@ Z364C    lda     #$FF                    ; 364C: A9 FF
          sbc     ZP_01_Lo                ; 366E: E5 02    
          sta     ZP_01_Lo                ; 3670: 85 02    
          ldy     ZP_04_Lo                ; 3672: A4 08    
-Z3674    lda     (ZP_03_Lo),y            ; 3674: B1 06    
+BACK_3674 lda    (ZP_03_Lo),y            ; 3674: B1 06    
          eor     (ZP_UDG_RAM_X),y        ; 3676: 51 04    
          sta     (ZP_UDG_RAM_X),y        ; 3678: 91 04    
          dey                             ; 367A: 88       
          dex                             ; 367B: CA       
-         bne     Z3674                   ; 367C: D0 F6    
+         bne     BACK_3674               ; 367C: D0 F6    
          pla                             ; 367E: 68       
          sta     ZP_Keyboard_Data        ; 367F: 85 13    
          lda     ZP_04_Lo                ; 3681: A5 08    
          sec                             ; 3683: 38       
          sbc     ZP_Keyboard_Data        ; 3684: E5 13    
          sta     ZP_04_Lo                ; 3686: 85 08    
-Z3688    lda     ZP_01_Lo                ; 3688: A5 02    
-         beq     Z36AB                   ; 368A: F0 1F    
+GOTO_3688 lda    ZP_01_Lo                ; 3688: A5 02    
+         beq     SKIP_36AB               ; 368A: F0 1F    
          dec     ZP_01_Lo                ; 368C: C6 02    
          ldy     ZP_04_Lo                ; 368E: A4 08    
          lda     (ZP_03_Lo),y            ; 3690: B1 06    
@@ -3764,17 +3767,17 @@ Z3688    lda     ZP_01_Lo                ; 3688: A5 02
          sta     (ZP_UDG_RAM_X),y        ; 3694: 91 04    
          dec     ZP_04_Lo                ; 3696: C6 08    
          lda     ZP_05_Lo                ; 3698: A5 0A    
-         beq     Z3688                   ; 369A: F0 EC    
-Z369C    dec     ZP_05_Lo                ; 369C: C6 0A    
+         beq     GOTO_3688               ; 369A: F0 EC    
+BACK_36AB dec    ZP_05_Lo                ; 369C: C6 0A    
          ldy     ZP_04_Hi                ; 369E: A4 09    
          lda     (ZP_Ptr_To_Str_Lo),y    ; 36A0: B1 0E    
          eor     (ZP_Col_RAM_Ptr_Lo),y   ; 36A2: 51 0C    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 36A4: 91 0C    
          dec     ZP_04_Hi                ; 36A6: C6 09    
-         jmp     Z3688                   ; 36A8: 4C 88 36 
+         jmp     GOTO_3688               ; 36A8: 4C 88 36 
 ; -----------------------
-Z36AB    lda     ZP_05_Lo                ; 36AB: A5 0A    
-         bne     Z369C                   ; 36AD: D0 ED    
+SKIP_36AB lda    ZP_05_Lo                ; 36AB: A5 0A    
+         bne     BACK_36AB               ; 36AD: D0 ED    
          lda     ZP_0A_Lo                ; 36AF: A5 14    
          beq     Z3729                   ; 36B1: F0 76    
          dec     ZP_0A_Lo                ; 36B3: C6 14    
@@ -3797,7 +3800,7 @@ Z36AB    lda     ZP_05_Lo                ; 36AB: A5 0A
          sbc     #$D1                    ; 36D2: E9 D1    
          lda     ZP_UDG_RAM_Y            ; 36D4: A5 05    
          sbc     #$1E                    ; 36D6: E9 1E    
-         bcc     Z36E7                   ; 36D8: 90 0D    
+         bcc     GOTO_36E7               ; 36D8: 90 0D    
          lda     ZP_UDG_RAM_X            ; 36DA: A5 04    
          sec                             ; 36DC: 38       
          sbc     #$D0                    ; 36DD: E9 D0    
@@ -3805,8 +3808,8 @@ Z36AB    lda     ZP_05_Lo                ; 36AB: A5 0A
          lda     ZP_UDG_RAM_Y            ; 36E1: A5 05    
          sbc     #$0F                    ; 36E3: E9 0F    
          sta     ZP_UDG_RAM_Y            ; 36E5: 85 05    
-Z36E7    lda     ZP_0A_Hi                ; 36E7: A5 15    
-         beq     Z3722                   ; 36E9: F0 37    
+GOTO_36E7 lda    ZP_0A_Hi                ; 36E7: A5 15    
+         beq     SKIP_3722               ; 36E9: F0 37    
          dec     ZP_0A_Hi                ; 36EB: C6 15    
          lda     ZP_Ptr_To_Str_Lo        ; 36ED: A5 0E    
          sec                             ; 36EF: 38       
@@ -3827,7 +3830,7 @@ Z36E7    lda     ZP_0A_Hi                ; 36E7: A5 15
          sbc     #$D1                    ; 370A: E9 D1    
          lda     ZP_Col_RAM_Ptr_Hi       ; 370C: A5 0D    
          sbc     #$1E                    ; 370E: E9 1E    
-         bcc     Z371F                   ; 3710: 90 0D    
+         bcc     SKIP_371F               ; 3710: 90 0D    
          lda     ZP_Col_RAM_Ptr_Lo       ; 3712: A5 0C    
          sec                             ; 3714: 38       
          sbc     #$D0                    ; 3715: E9 D0    
@@ -3835,11 +3838,11 @@ Z36E7    lda     ZP_0A_Hi                ; 36E7: A5 15
          lda     ZP_Col_RAM_Ptr_Hi       ; 3719: A5 0D    
          sbc     #$0F                    ; 371B: E9 0F    
          sta     ZP_Col_RAM_Ptr_Hi       ; 371D: 85 0D    
-Z371F    jmp     Z364C                   ; 371F: 4C 4C 36 
+SKIP_371F jmp    GOTO_364C               ; 371F: 4C 4C 36 
 ; -----------------------
-Z3722    lda     #$00                    ; 3722: A9 00    
+SKIP_3722 lda    #$00                    ; 3722: A9 00    
          sta     ZP_05_Hi                ; 3724: 85 0B    
-         jmp     Z364C                   ; 3726: 4C 4C 36 
+         jmp     GOTO_364C               ; 3726: 4C 4C 36 
 ; -----------------------
 Z3729    lda     #$00                    ; 3729: A9 00    
          sta     ZP_01_Hi                ; 372B: 85 03    
@@ -3848,7 +3851,7 @@ Z3729    lda     #$00                    ; 3729: A9 00
          bne     Z3734                   ; 3731: D0 01    
          rts                             ; 3733: 60       
 ; ===========================================================
-Z3734    jmp     Z36E7                   ; 3734: 4C E7 36 
+Z3734    jmp     GOTO_36E7               ; 3734: 4C E7 36 
 ; -----------------------
 Z3737    jsr     Save_Obj_Type_X_Y_Color ; 3737: 20 E9 35 
          jsr     Z3815                   ; 373A: 20 15 38 

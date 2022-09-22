@@ -867,7 +867,7 @@ label    2DDD LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
 lcomment 2DEC Current level modulus 4
 label    2DFF Dec_Saved_Obj_List_Params_by_10
 comment  2E17 Aliens keep moving also
-label    2E17 Rocket_Goes_Up
+label    2E17 Rocket_Ascend
 lcomment 2E1A Object height offset
 lcomment 2E1C Load object height i.e. Rocket
 lcomment 2E1E Object hit top yet
@@ -876,7 +876,7 @@ lcomment 2E23 Calculate new height
 lcomment 2E25 Store new height i.e one pixel up
 label    2E34 Rocket_At_Top
 comment  2E4E Flames stop a little way before bottom
-label    2E4E Rocket_Goes_Down
+label    2E4E Rocket_Descend
 comment  2E5B
 comment  2E5B Move object Y position down 1 pixel, stopping at bottom i.e. $AF
 lcomment 2E5B 03 = Height of object
@@ -886,17 +886,22 @@ comment  2E68 Set current object type to a crash
 comment  2E74
 comment  2E74 This always seems to be a test for Jetman collide with Rocket
 label    2E74 Subroutine_2E74_On_IRQ?
+lcomment 2E77 Jetman collided with rocket?
 lcomment 2E7A Set by collision test
 lcomment 2E7C Collision? If no, branch
 comment  2E7E
-comment  2E7E Collision handling
-lcomment 2E80 "Direction" paramater???
+comment  2E7E Collision occured, handle it
+lcomment 2E80 Get number of fuel pods delivered into rocket
 lcomment 2E82 Rocket fully fueled up?
 deflabel 2E83 FUELLED_UP
-lcomment 2E84 Yes, branch
+lcomment 2E84 No, branch
+comment  2E86
+comment  2E86 Set Rocket object to Ascend
+deflabel 2E87 ROCKET_ASCEND
 comment  2E8F
 word     2E93
 comment  2E96
+comment  2E9C
 label    2EAC Rocket_Fuelled_Up
 label    2EB5 LOOP_2EB5
 comment  2EC0
@@ -907,6 +912,7 @@ label    2F07 A789789
 comment  2F0D
 comment  2F13
 label    2F16 A111111
+lcomment 2F7F Fuel cell dropped onto rocket ~8 pixels from bottom
 label    2F8E Stops_All
 lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
 ;        2FE5
@@ -1008,7 +1014,7 @@ label    317B Loop_Next_Char
 comment  3180
 comment  3186
 comment  3186 Set the color mapping for the platforms to Green
-deflabel 3192 GREEN_05
+deflabel 3192 GREEN
 label    3193 DP_2
 label    31A2 Next_UDG_Char_Loop_Next_Char
 label    31A8 Next_UDG_Char
@@ -1345,6 +1351,14 @@ label    35E9 Save_Obj_Type_X_Y_Color
 comment  35EF
 comment  35F4
 comment  35FA
+label    364C GOTO_364C
+label    3674 BACK_3674
+label    3688 GOTO_3688
+label    36AB SKIP_36AB
+label    369C BACK_36AB
+label    36E7 GOTO_36E7
+label    371F SKIP_371F
+label    3722 SKIP_3722
 ;        End
 ; End of file contains graphics data
 ;unused  3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS

@@ -22,6 +22,8 @@ option dbcount 3     * Def=5  Reserve spaces for hex/ascii dump bytes if hex or 
 option defdisp hex  * Default display base, default is hex
 *option cchar //     * Set end of line comment character
 *option cchar ;      * Set end of line comment character
+*option multilabel on * Create multiple labels for a single address
+*option autolabel on  * Generate label based on previous label, instead of m1234/z1234
 option upmnemo off   * Upper case mnemonics in output file
 
 *** DISASSEMBLER SPECIFIC OPTIONS ***
