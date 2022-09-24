@@ -899,6 +899,7 @@ comment  2E86
 comment  2E86 Set Rocket object to Ascend
 deflabel 2E87 ROCKET_ASCEND
 comment  2E8F
+comment  2E8F Don't display Jetman next time? Also zeroes Jetman X coord.
 word     2E93
 comment  2E96
 comment  2E9C
@@ -1348,9 +1349,13 @@ label    35D7 Save_Obj_Type_X_Y
 comment  35DD
 comment  35E2
 label    35E9 Save_Obj_Type_X_Y_Color
+lcomment 35EB Object Type
 comment  35EF
+lcomment 35F0 Object X
 comment  35F4
+lcomment 35F6 Object Y
 comment  35FA
+lcomment 35FC Object Color
 label    364C GOTO_364C
 label    3674 BACK_3674
 label    3688 GOTO_3688
@@ -1359,6 +1364,43 @@ label    369C BACK_36AB
 label    36E7 GOTO_36E7
 label    371F SKIP_371F
 label    3722 SKIP_3722
+label    37D4 GOUA_1
+comment  37DB
+comment  37ED
+comment  37ED A=Saved Obj Type, X=Saved Object X AND $06/%110
+comment  37ED But if it's the Jetman Object, Obj Type is instead Jetman Looks
+comment  37ED and so $3F is masking out direction and test for walking AND flying???
+comment  37ED CALLED ONLY FROM 381C
+label    37ED Get_Object_UDG_Addr
+lcomment 37EE Mask out bits 6 & 7
+binary   37EF
+lcomment 37f0 Test bits 0 & 1
+binary   37F1
+lcomment 37F2 If A >= M, branch
+comment  37F5
+comment  37F5 Test Jetman Looks Left/Right Direction???
+comment  37FA
+lcomment 37FC Set bit 3
+binary   37Fd
+comment  3800
+comment  3800 Subtract 1 and muliply by $10 i.e. left shift 4 bits
+label    3800 GOUA_2
+comment  3807
+comment  3807 Set bit in X defined by A, ZP variable being used as temp store
+label    3807 GOUA_3
+comment  380D
+comment  380D Using X just set, get index into the Object UDG table
+lcomment 380D Address lo byte into Y
+lcomment 3811 Address hi byte into A
+label    3815 Get_Object_UDG_Address
+lcomment 3815 Saved Object X
+lcomment 381A Saved Object Type
+comment  381F
+lcomment 381F ######### YOU ARE HERE #########
+label    383B BACK_383B
+label    383F BACK_383F
+label    384B SKIP_384B
+label    385E SKIP_385E
 ;        End
 ; End of file contains graphics data
 ;unused  3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS

@@ -2480,6 +2480,7 @@ Subroutine_2E74_On_IRQ?
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2E8A: 91 00    
          jsr     Save_Obj_List_Ptr       ; 2E8C: 20 E7 28 
 
+; Don't display Jetman next time? Also zeroes Jetman X coord.
          jsr     Load_ZP_Parameters      ; 2E8F: 20 9D 25 
          fcb     $00                     ; 2E92: 00       
          fdb     Obj_Jetman_Looks        ; 2E93: 80 03    
@@ -3667,19 +3668,19 @@ Save_Obj_Type_X_Y
 ; ===========================================================
 Save_Obj_Type_X_Y_Color
          ldy     #$00                    ; 35E9: A0 00    
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35EB: B1 00    
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35EB: B1 00     Object Type
          sta     ZP_0D_Lo                ; 35ED: 85 1A    
 
          iny                             ; 35EF: C8       
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35F0: B1 00    
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35F0: B1 00     Object X
          sta     ZP_0C_Lo                ; 35F2: 85 18    
 
          ldy     #$03                    ; 35F4: A0 03    
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35F6: B1 00    
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35F6: B1 00     Object Y
          sta     ZP_0C_Hi                ; 35F8: 85 19    
 
          ldy     #$05                    ; 35FA: A0 05    
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35FC: B1 00    
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 35FC: B1 00     Object Color
          sta     ZP_0D_Hi                ; 35FE: 85 1B    
          rts                             ; 3600: 60       
 ; ===========================================================
@@ -3854,7 +3855,7 @@ Z3729    lda     #$00                    ; 3729: A9 00
 Z3734    jmp     GOTO_36E7               ; 3734: 4C E7 36 
 ; -----------------------
 Z3737    jsr     Save_Obj_Type_X_Y_Color ; 3737: 20 E9 35 
-         jsr     Z3815                   ; 373A: 20 15 38 
+         jsr     Get_Object_UDG_Address  ; 373A: 20 15 38 
 Z373D    sty     ZP_Ptr_To_Str_Lo        ; 373D: 84 0E    
          tay                             ; 373F: A8       
          dey                             ; 3740: 88       
@@ -3939,57 +3940,75 @@ Z37A9    sta     ZP_UDG_RAM_X            ; 37A9: 85 04
          sta     ZP_03_Hi                ; 37D1: 85 07    
          rts                             ; 37D3: 60       
 ; ===========================================================
-Z37D4    pha                             ; 37D4: 48       
+GOUA_1   pha                             ; 37D4: 48       
          txa                             ; 37D5: 8A       
          lsr     a                       ; 37D6: 4A       
          and     #$02                    ; 37D7: 29 02    
          tax                             ; 37D9: AA       
          pla                             ; 37DA: 68       
+
          sec                             ; 37DB: 38       
          sbc     #$03                    ; 37DC: E9 03    
          asl     a                       ; 37DE: 0A       
          asl     a                       ; 37DF: 0A       
          clc                             ; 37E0: 18       
          adc     #$20                    ; 37E1: 69 20    
-         jmp     Z3807                   ; 37E3: 4C 07 38 
+         jmp     GOUA_3                  ; 37E3: 4C 07 38 
 ; -----------------------
 Z37E6    lda     ZP_08_Lo                ; 37E6: A5 10    
          and     #$06                    ; 37E8: 29 06    
          tax                             ; 37EA: AA       
          lda     ZP_09_Lo                ; 37EB: A5 12    
-Z37ED    tay                             ; 37ED: A8       
-         and     #$3F                    ; 37EE: 29 3F    
-         cmp     #$03                    ; 37F0: C9 03    
-         bcs     Z37D4                   ; 37F2: B0 E0    
+
+; A=Saved Obj Type, X=Saved Object X AND $06/%110
+; But if it's the Jetman Object, Obj Type is instead Jetman Looks
+; and so $3F is masking out direction and test for walking AND flying???
+; CALLED ONLY FROM 381C
+Get_Object_UDG_Addr
+         tay                             ; 37ED: A8       
+         and     #%00111111              ; 37EE: 29 3F     Mask out bits 6 & 7
+         cmp     #%00000011              ; 37F0: C9 03     Test bits 0 & 1
+         bcs     GOUA_1                  ; 37F2: B0 E0     If A >= M, branch
          tya                             ; 37F4: 98       
+
+; Test Jetman Looks Left/Right Direction???
          bit     MASK_80                 ; 37F5: 2C 1B 20 
-         beq     Z3800                   ; 37F8: F0 06    
+         beq     GOUA_2                  ; 37F8: F0 06    
+
          pha                             ; 37FA: 48       
          txa                             ; 37FB: 8A       
-         ora     #$08                    ; 37FC: 09 08    
+         ora     #%00001000              ; 37FC: 09 08     Set bit 3
          tax                             ; 37FE: AA       
          pla                             ; 37FF: 68       
-Z3800    sec                             ; 3800: 38       
+
+; Subtract 1 and muliply by $10 i.e. left shift 4 bits
+GOUA_2   sec                             ; 3800: 38       
          sbc     #$01                    ; 3801: E9 01    
          asl     a                       ; 3803: 0A       
          asl     a                       ; 3804: 0A       
          asl     a                       ; 3805: 0A       
          asl     a                       ; 3806: 0A       
-Z3807    sta     ZP_Keyboard_Data        ; 3807: 85 13    
+
+; Set bit in X defined by A, ZP variable being used as temp store
+GOUA_3   sta     ZP_Keyboard_Data        ; 3807: 85 13    
          txa                             ; 3809: 8A       
          ora     ZP_Keyboard_Data        ; 380A: 05 13    
          tax                             ; 380C: AA       
-         lda     UDG_Lookup,x            ; 380D: BD 5F 38 
+
+; Using X just set, get index into the Object UDG table
+         lda     UDG_Lookup,x            ; 380D: BD 5F 38  Address lo byte into Y
          tay                             ; 3810: A8       
-         lda     UDG_Lookup+1,x          ; 3811: BD 60 38 
+         lda     UDG_Lookup+1,x          ; 3811: BD 60 38  Address hi byte into A
          rts                             ; 3814: 60       
 ; ===========================================================
-Z3815    lda     ZP_0C_Lo                ; 3815: A5 18    
+Get_Object_UDG_Address
+         lda     ZP_0C_Lo                ; 3815: A5 18     Saved Object X
          and     #$06                    ; 3817: 29 06    
          tax                             ; 3819: AA       
-         lda     ZP_0D_Lo                ; 381A: A5 1A    
-         jmp     Z37ED                   ; 381C: 4C ED 37 
-Z381F    lda     ZP_0C_Lo                ; 381F: A5 18    
+         lda     ZP_0D_Lo                ; 381A: A5 1A     Saved Object Type
+         jmp     Get_Object_UDG_Addr     ; 381C: 4C ED 37 
+
+Z381F    lda     ZP_0C_Lo                ; 381F: A5 18     ######### YOU ARE HERE #########
          sta     ZP_UDG_RAM_X            ; 3821: 85 04    
          lda     ZP_0C_Hi                ; 3823: A5 19    
          sta     ZP_UDG_RAM_Y            ; 3825: 85 05    
@@ -4005,26 +4024,26 @@ Z381F    lda     ZP_0C_Lo                ; 381F: A5 18
          lda     ZP_0B_Lo                ; 3835: A5 16    
          sta     ZP_05_Lo                ; 3837: 85 0A    
          inc     ZP_05_Lo                ; 3839: E6 0A    
-Z383B    ldx     ZP_05_Lo                ; 383B: A6 0A    
+BACK_383B ldx    ZP_05_Lo                ; 383B: A6 0A    
          ldy     #$00                    ; 383D: A0 00    
-Z383F    lda     (ZP_Col_RAM_Ptr_Lo),y   ; 383F: B1 0C    
+BACK_383F lda    (ZP_Col_RAM_Ptr_Lo),y   ; 383F: B1 0C    
          and     #$07                    ; 3841: 29 07    
          cmp     #$05                    ; 3843: C9 05    
-         beq     Z384B                   ; 3845: F0 04    
+         beq     SKIP_384B               ; 3845: F0 04    
          lda     ZP_0D_Hi                ; 3847: A5 1B    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 3849: 91 0C    
-Z384B    iny                             ; 384B: C8       
+SKIP_384B iny                            ; 384B: C8       
          dex                             ; 384C: CA       
-         bne     Z383F                   ; 384D: D0 F0    
+         bne     BACK_383F               ; 384D: D0 F0    
          lda     ZP_Col_RAM_Ptr_Lo       ; 384F: A5 0C    
          sec                             ; 3851: 38       
          sbc     #$17                    ; 3852: E9 17    
          cmp     #$17                    ; 3854: C9 17    
-         bcc     Z385E                   ; 3856: 90 06    
+         bcc     SKIP_385E               ; 3856: 90 06    
          sta     ZP_Col_RAM_Ptr_Lo       ; 3858: 85 0C    
          dec     ZP_05_Hi                ; 385A: C6 0B    
-         bne     Z383B                   ; 385C: D0 DD    
-Z385E    rts                             ; 385E: 60       
+         bne     BACK_383B               ; 385C: D0 DD    
+SKIP_385E rts                            ; 385E: 60       
 ; ===========================================================
 UDG_Lookup
          fdb     Jetman_Fly_Right_2      ; 385F: BE 3B    
