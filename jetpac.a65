@@ -456,12 +456,16 @@ BACK_2145 iny                            ; 2145: C8
          clc                             ; 2150: 18       
          adc     #$40                    ; 2151: 69 40    
          sta     (ZP_03_Lo),y            ; 2153: 91 06    
+
+; Load a random laser color using the current 6522 timer value
          iny                             ; 2155: C8       
          lda     ZP_HW_IRQ_Count3        ; 2156: A5 4C    
          and     #$07                    ; 2158: 29 07    
          tax                             ; 215A: AA       
          lda     Laser_Color_Table,x     ; 215B: BD 6B 21 
          sta     (ZP_03_Lo),y            ; 215E: 91 06    
+
+; Not sure what this is for ??????????????
          lda     #$03                    ; 2160: A9 03    
          sta     Obj_Flame_5             ; 2162: 8D AD 03 
          lda     #$10                    ; 2165: A9 10    
@@ -499,7 +503,7 @@ Laser_JFR_2
 ; -----------------------
 
 ; ----------------------------------------------------------
-; FUNCTION  : qsqtnsutnosen
+; FUNCTION  : Fire_Pressed_
 ;             soentsnoetus
 ;             seiteunst
 ; CALLED BY :
@@ -508,43 +512,49 @@ Laser_JFR_2
 ;             etinseut
 ;             setniseutn
 ; ----------------------------------------------------------
-F_P_1_0  adc     #$08                    ; 2195: 69 08    
-         jmp     F_P_1_1                 ; 2197: 4C CB 21 
-Fire_Pressed_1
-         ldy     #$06                    ; 219A: A0 06    
+FP0000   adc     #$08                    ; 2195: 69 08    
+         jmp     FP1111                  ; 2197: 4C CB 21 
+Fire_Pressed_
+         ldy     #$06                    ; 219A: A0 06     ???????
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 219C: B1 00    
          sta     ZP_03_Hi                ; 219E: 85 07    
-         iny                             ; 21A0: C8       
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 21A1: B1 00    
-         sta     ZP_0D_Hi                ; 21A3: 85 1B    
-         ldy     #$02                    ; 21A5: A0 02    
+         iny                             ; 21A0: C8        Y=$07, laser color addr
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 21A1: B1 00     Fetch laser color
+         sta     ZP_0D_Hi                ; 21A3: 85 1B     Store to ZP variable
+
+; Get laser X and Y-coord and store to temp vars
+         ldy     #$02                    ; 21A5: A0 02     Y=$02, X-coord of laser horizontal end point
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 21A7: B1 00    
          sta     ZP_03_Lo                ; 21A9: 85 06    
          sta     ZP_UDG_RAM_X            ; 21AB: 85 04    
-         dey                             ; 21AD: 88       
+         dey                             ; 21AD: 88        Y=$01, Y-coord of laser
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 21AE: B1 00    
          sta     ZP_UDG_RAM_Y            ; 21B0: 85 05    
          sta     ZP_Keyboard_Data        ; 21B2: 85 13    
+
+; Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
          lda     ZP_03_Lo                ; 21B4: A5 06    
          bit     MASK_04                 ; 21B6: 2C 16 20 
-         beq     SKIP_2202               ; 21B9: F0 47    
+         beq     FP5555                  ; 21B9: F0 47    
          jsr     Setup_Color_RAM_Ptr     ; 21BB: 20 F7 34 
          jsr     Setup_UDG_RAM_XY        ; 21BE: 20 1D 35 
+
+; Test if X-coord of laser is on a boundary and wrap if necessary
          lda     ZP_03_Lo                ; 21C1: A5 06    
          bit     MASK_01                 ; 21C3: 2C 14 20 
          clc                             ; 21C6: 18       
-         beq     F_P_1_0                 ; 21C7: F0 CC    
+         beq     FP0000                  ; 21C7: F0 CC    
          adc     #$F8                    ; 21C9: 69 F8    
-F_P_1_1  jsr     Laser_Jetman_Facing_Left??? ; 21CB: 20 98 22 
+FP1111   jsr     Laser_Jetman_Facing_Left??? ; 21CB: 20 98 22 
          tax                             ; 21CE: AA       
          ldy     #$01                    ; 21CF: A0 01    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 21D1: B1 00    
          dey                             ; 21D3: 88       
          cmp     #$80                    ; 21D4: C9 80    
-         bcs     SKIP_21DC               ; 21D6: B0 04    
+         bcs     FP2222                  ; 21D6: B0 04    
          lda     (ZP_UDG_RAM_X),y        ; 21D8: B1 04    
-         bne     SKIP_21FC               ; 21DA: D0 20    
-SKIP_21DC txa                            ; 21DC: 8A       
+         bne     FP4444                  ; 21DA: D0 20    
+FP2222   txa                             ; 21DC: 8A       
          sta     ZP_03_Lo                ; 21DD: 85 06    
          lda     (ZP_UDG_RAM_X),y        ; 21DF: B1 04    
          eor     #$FF                    ; 21E1: 49 FF    
@@ -552,20 +562,20 @@ SKIP_21DC txa                            ; 21DC: 8A
          lda     (ZP_Col_RAM_Ptr_Lo),y   ; 21E5: B1 0C    
          and     #$0F                    ; 21E7: 29 0F    
          cmp     #$05                    ; 21E9: C9 05    
-         beq     SKIP_21F1               ; 21EB: F0 04    
+         beq     FP3333                  ; 21EB: F0 04    
          lda     ZP_0D_Hi                ; 21ED: A5 1B    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 21EF: 91 0C    
-SKIP_21F1 lda    ZP_03_Hi                ; 21F1: A5 07    
+FP3333   lda     ZP_03_Hi                ; 21F1: A5 07    
          sec                             ; 21F3: 38       
          sbc     #$08                    ; 21F4: E9 08    
          sta     ZP_03_Hi                ; 21F6: 85 07    
          and     #$F8                    ; 21F8: 29 F8    
-         bne     SKIP_2202               ; 21FA: D0 06    
-SKIP_21FC lda    ZP_03_Lo                ; 21FC: A5 06    
+         bne     FP5555                  ; 21FA: D0 06    
+FP4444   lda     ZP_03_Lo                ; 21FC: A5 06    
          and     #$FB                    ; 21FE: 29 FB    
          sta     ZP_03_Lo                ; 2200: 85 06    
 
-SKIP_2202 jsr    Load_ZP_Parameters      ; 2202: 20 9D 25 
+FP5555   jsr     Load_ZP_Parameters      ; 2202: 20 9D 25 
          fcb     $14                     ; 2205: 14       
          fdb     Other_RAM               ; 2206: 00 03    
          fcb     $16                     ; 2208: 16       
@@ -575,27 +585,26 @@ SKIP_2202 jsr    Load_ZP_Parameters      ; 2202: 20 9D 25
          fcb     $FF                     ; 220E: FF       
 
          ldy     #$02                    ; 220F: A0 02    
-Fire_Pressed_2
-         iny                             ; 2211: C8       
+FP6666   iny                             ; 2211: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2212: B1 00    
          eor     ZP_03_Lo                ; 2214: 45 06    
          and     #$F8                    ; 2216: 29 F8    
-         bne     SR_2229                 ; 2218: D0 0F    
+         bne     FP7777                  ; 2218: D0 0F    
          jsr     Laser_ZP17_15_to_ZP16_14 ; 221A: 20 8B 22 
          dec     ZP_01_Lo                ; 221D: C6 02    
-         bne     Fire_Pressed_2          ; 221F: D0 F0    
+         bne     FP6666                  ; 221F: D0 F0    
          lda     #$00                    ; 2221: A9 00    
          tay                             ; 2223: A8       
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2224: 91 00    
          jmp     Triggers_Every_Frame    ; 2226: 4C 1A 26 
 ; -----------------------
-SR_2229  lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00    
+FP7777   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00    
          bit     MASK_04                 ; 222B: 2C 16 20 
-         bne     SR_2257                 ; 222E: D0 27    
+         bne     FP9999                  ; 222E: D0 27    
          dec     ZP_03_Hi                ; 2230: C6 07    
          lda     ZP_03_Hi                ; 2232: A5 07    
          and     #$07                    ; 2234: 29 07    
-         bne     SR_2229_1               ; 2236: D0 10    
+         bne     FP8888                  ; 2236: D0 10    
          lda     ZP_HW_IRQ_Count3        ; 2238: A5 4C    
          and     #$03                    ; 223A: 29 03    
          ora     #$04                    ; 223C: 09 04    
@@ -604,7 +613,7 @@ SR_2229  lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2242: B1 00    
          ora     #$04                    ; 2244: 09 04    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2246: 91 00    
-SR_2229_1 ldy    #$06                    ; 2248: A0 06    
+FP8888   ldy     #$06                    ; 2248: A0 06    
          lda     ZP_03_Hi                ; 224A: A5 07    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 224C: 91 00    
          ldy     #$02                    ; 224E: A0 02    
@@ -612,13 +621,13 @@ SR_2229_1 ldy    #$06                    ; 2248: A0 06
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2252: 91 00    
          jmp     Triggers_Every_Frame    ; 2254: 4C 1A 26 
 ; -----------------------
-SR_2257  lda     (ZP_Obj_List_Ptr_Lo),y  ; 2257: B1 00    
+FP9999   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2257: B1 00    
          sta     ZP_UDG_RAM_X            ; 2259: 85 04    
          bit     MASK_01                 ; 225B: 2C 14 20 
          beq     CLC_ADC_08              ; 225E: F0 25    
          clc                             ; 2260: 18       
          adc     #$F8                    ; 2261: 69 F8    
-SR_2257_1 jsr    Laser_Jetman_Facing_Left??? ; 2263: 20 98 22 
+FP1010   jsr     Laser_Jetman_Facing_Left??? ; 2263: 20 98 22 
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2266: 91 00    
          lda     ZP_Keyboard_Data        ; 2268: A5 13    
          sta     ZP_UDG_RAM_Y            ; 226A: 85 05    
@@ -633,13 +642,13 @@ SR_2257_1 jsr    Laser_Jetman_Facing_Left??? ; 2263: 20 98 22
          pla                             ; 227C: 68       
          tay                             ; 227D: A8       
          dec     ZP_01_Lo                ; 227E: C6 02    
-         bne     Fire_Pressed_2          ; 2280: D0 8F    
-         jmp     SR_2229_1               ; 2282: 4C 48 22 
+         bne     FP6666                  ; 2280: D0 8F    
+         jmp     FP8888                  ; 2282: 4C 48 22 
 ; -----------------------
 CLC_ADC_08
          clc                             ; 2285: 18       
          adc     #$08                    ; 2286: 69 08    
-         jmp     SR_2257_1               ; 2288: 4C 63 22 
+         jmp     FP1010                  ; 2288: 4C 63 22 
 ; -----------------------
 Laser_ZP17_15_to_ZP16_14
          lda     ZP_0A_Hi                ; 228B: A5 15    
@@ -1284,7 +1293,7 @@ Subroutine_List
          fdb     Triggers_Every_Frame    ; 26A6: 1A 26    
          fdb     Fire_Pressed            ; 26A8: 3E 28    
          fdb     Triggers_Every_Frame    ; 26AA: 1A 26    
-         fdb     Fire_Pressed_1          ; 26AC: 9A 21    
+         fdb     Fire_Pressed_           ; 26AC: 9A 21    
 
 Init_Rocket_Object
          ldx     #$07                    ; 26AE: A2 07    
@@ -1580,7 +1589,7 @@ FP_1     jsr     Save_Obj_Type_X_Y_Color ; 2851: 20 E9 35
          bpl     Jump_To_Subroutine_List3 ; 2857: 10 1B    
          lda     #$00                    ; 2859: A9 00    
          jsr     Z2FDC                   ; 285B: 20 DC 2F 
-         jsr     Get_Ship_UDG_Addr       ; 285E: 20 E5 2F 
+         jsr     Get_Object_UDG_Addr_Small ; 285E: 20 E5 2F 
          jsr     Z378D                   ; 2861: 20 8D 37 
          jsr     Z3610                   ; 2864: 20 10 36 
          jsr     Load_ZP_Parameters      ; 2867: 20 9D 25 
@@ -2384,10 +2393,10 @@ Z2DE8    lda     ZP_Level_Current_Plyr   ; 2DE8: A5 59
          ora     ZP_Ship_UDG_Addr_Offset ; 2DEE: 05 1E    
          asl     a                       ; 2DF0: 0A       
          pha                             ; 2DF1: 48       
-         jsr     Get_Ship_UDG_Addr       ; 2DF2: 20 E5 2F 
+         jsr     Get_Object_UDG_Addr_Small ; 2DF2: 20 E5 2F 
          jsr     Z373D                   ; 2DF5: 20 3D 37 
          pla                             ; 2DF8: 68       
-         jsr     Get_Ship_UDG_Addr       ; 2DF9: 20 E5 2F 
+         jsr     Get_Object_UDG_Addr_Small ; 2DF9: 20 E5 2F 
          jmp     Z378D                   ; 2DFC: 4C 8D 37 
 ; -----------------------
 Dec_Saved_Obj_List_Params_by_10
@@ -2636,10 +2645,10 @@ Z2FB2    ldy     #$03                    ; 2FB2: A0 03
 Z2FBD    jsr     Save_Obj_Type_X_Y_Color ; 2FBD: 20 E9 35 
          jsr     Z2FDA                   ; 2FC0: 20 DA 2F 
 Z2FC3    pha                             ; 2FC3: 48       
-         jsr     Get_Ship_UDG_Addr       ; 2FC4: 20 E5 2F 
+         jsr     Get_Object_UDG_Addr_Small ; 2FC4: 20 E5 2F 
          jsr     Z373D                   ; 2FC7: 20 3D 37 
          pla                             ; 2FCA: 68       
-         jsr     Get_Ship_UDG_Addr       ; 2FCB: 20 E5 2F 
+         jsr     Get_Object_UDG_Addr_Small ; 2FCB: 20 E5 2F 
          jsr     Z378D                   ; 2FCE: 20 8D 37 
          jsr     GOTO_364C               ; 2FD1: 20 4C 36 
          jsr     Z381F                   ; 2FD4: 20 1F 38 
@@ -2654,7 +2663,7 @@ Z2FDC    lsr     a                       ; 2FDC: 4A
          rts                             ; 2FE4: 60       
 ; ===========================================================
 ; Using A as offset, Load A and Y with Ship UDG address
-Get_Ship_UDG_Addr
+Get_Object_UDG_Addr_Small
          tax                             ; 2FE5: AA       
          lda     UDG_Sprite_Lookup_Lo,x  ; 2FE6: BD 87 3C 
          tay                             ; 2FE9: A8       
@@ -2714,7 +2723,7 @@ Z3051    jmp     Z2FBD                   ; 3051: 4C BD 2F
 ; -----------------------
 Z3054    jsr     Save_Obj_Type_X_Y_Color ; 3054: 20 E9 35 
 Z3057    jsr     Z2FDA                   ; 3057: 20 DA 2F 
-Z305A    jsr     Get_Ship_UDG_Addr       ; 305A: 20 E5 2F 
+Z305A    jsr     Get_Object_UDG_Addr_Small ; 305A: 20 E5 2F 
          jsr     Z373D                   ; 305D: 20 3D 37 
          jmp     Z3604                   ; 3060: 4C 04 36 
 ; -----------------------
@@ -4008,7 +4017,7 @@ Get_Object_UDG_Address
          lda     ZP_0D_Lo                ; 381A: A5 1A     Saved Object Type
          jmp     Get_Object_UDG_Addr     ; 381C: 4C ED 37 
 
-Z381F    lda     ZP_0C_Lo                ; 381F: A5 18     ######### YOU ARE HERE #########
+Z381F    lda     ZP_0C_Lo                ; 381F: A5 18    
          sta     ZP_UDG_RAM_X            ; 3821: 85 04    
          lda     ZP_0C_Hi                ; 3823: A5 19    
          sta     ZP_UDG_RAM_Y            ; 3825: 85 05    
@@ -4074,6 +4083,7 @@ UDG_Lookup
          fdb     Alien_Bubble_2          ; 3891: EB 3E    
          fdb     Alien_Cross_1           ; 3893: 0E 3F    
          fdb     Alien_Cross_2           ; 3895: 41 3F    
+
          fcb     %11100000               ; 3897: E0       
          fcb     %01110000               ; 3898: 70       
          fcb     %10110100               ; 3899: B4       

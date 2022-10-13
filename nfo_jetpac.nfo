@@ -217,6 +217,10 @@ lcomment 2123 Jetman looking left?
 lcomment 2125 No, branch
 label    212f Laser_Shot_
 label    2145 BACK_2145
+comment  2155
+comment  2155 Load a random laser color using the current 6522 timer value
+comment  2160
+comment  2160 Not sure what this is for ??????????????
 comment  216B
 label    216B Laser_Color_Table
 lcomment 216B Green not used, messes up colors if it's used
@@ -244,7 +248,7 @@ lcomment 218D Restore saved Jetman attrib 00
 lcomment 2190 Add $10 for some reason??????????
 comment  2195
 comment  2195 ----------------------------------------------------------
-comment  2195 FUNCTION  : qsqtnsutnosen
+comment  2195 FUNCTION  : Fire_Pressed_
 comment  2195 \            soentsnoetus
 comment  2195 \            seiteunst
 comment  2195 CALLED BY :
@@ -253,14 +257,26 @@ comment  2195 ARGUMENTS : sentiseutn
 comment  2195 \            etinseut
 comment  2195 \            setniseutn
 comment  2195 ----------------------------------------------------------
-label    2195 F_P_1_0
-label    219A Fire_Pressed_1
-label    21CB F_P_1_1
-label    21DC SKIP_21DC
-label    21F1 SKIP_21F1
-label    21FC SKIP_21FC
+label    2195 FP0000
+label    219A Fire_Pressed_
+lcomment 219A ???????
+lcomment 21A0 Y=$07, laser color addr
+lcomment 21A1 Fetch laser color
+lcomment 21A3 Store to ZP variable
+comment  21A5
+comment  21A5 Get laser X and Y-coord and store to temp vars
+lcomment 21A5 Y=$02, X-coord of laser horizontal end point
+lcomment 21AD Y=$01, Y-coord of laser
+comment  21B4
+comment  21B4 Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
+comment  21C1
+comment  21C1 Test if X-coord of laser is on a boundary and wrap if necessary
+label    21CB FP1111
+label    21DC FP2222
+label    21F1 FP3333
+label    21FC FP4444
 comment  2202
-label    2202 SKIP_2202
+label    2202 FP5555
 ;        2206
 word     2206
 break    2209
@@ -268,11 +284,11 @@ break    220B
 word     220C
 comment  220F
 break    220F
-label    2211 Fire_Pressed_2
-label    2229 SR_2229
-label    2248 SR_2229_1
-label    2257 SR_2257
-label    2263 SR_2257_1
+label    2211 FP6666
+label    2229 FP7777
+label    2248 FP8888
+label    2257 FP9999
+label    2263 FP1010
 label    2285 CLC_ADC_08
 label    228B Laser_ZP17_15_to_ZP16_14
 label    2298 Laser_Jetman_Facing_Left???
@@ -918,7 +934,7 @@ label    2F8E Stops_All
 lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
 ;        2FE5
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
-label    2FE5 Get_Ship_UDG_Addr
+label    2FE5 Get_Object_UDG_Addr_Small
 word     2FFD
 label    3063 GameOverScoreStuff
 lcomment 3065 If P2, setup P2 Score instead of P1 and then return after the param setup below
@@ -1396,7 +1412,6 @@ label    3815 Get_Object_UDG_Address
 lcomment 3815 Saved Object X
 lcomment 381A Saved Object Type
 comment  381F
-lcomment 381F ######### YOU ARE HERE #########
 label    383B BACK_383B
 label    383F BACK_383F
 label    384B SKIP_384B
@@ -1408,6 +1423,7 @@ label    385F UDG_Lookup
 label    3860 UDG_Lookup+1
 break    385F-3FFF ; Output one byte per line
 word     385F-3896
+comment  3897
 binary   3897-3C86
 byte     3C87-3C88
 const    3C87-3C88

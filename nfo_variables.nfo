@@ -92,7 +92,7 @@ label    03A0 Obj_Laser_3
 ;        09=Rocket Bottom Section
 ;        0A=Rocket Ascend;
 ;        0B=Rocket Descend
-;        C0=Flame
+;        0C=Flame
 ;        0D=???
 ;        0E=flashing gem
 ; Byte 01/09= horizontal postion of alien
@@ -101,6 +101,16 @@ label    03A0 Obj_Laser_3
 ; Byte 04/0C= diagonal, jiggles around a lot for a saucer
 ; Byte 05/0D= colour - bottom 3 bits of byte?
 ; Byte 06/0E= For Gem, affects colors and flashing of Byte 05
+;        10/90=Laser Shot Left/Right
+; Byte 01/09= Laser Y-coord
+; Byte 02/0A= X-coord of end of laser. Each shot is a different length and thus a different value is stored.
+; Byte 03/4/5/B/C/D= Delayed X-coords of 02/0A, as laser decays.
+; Byte 07/0F= Laser Color
+
+; Laser_Color_Table
+;         fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colors if it's used
+;         fcb     BLUE,YELLOW,CYAN,YELLOW ; 216F: 06 07 03 07
+
 
                           ;            0  1  2  3  4  5  6  7
                           ;     03B0  09 70 00 AF 01 00 00 1C
