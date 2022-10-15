@@ -105,7 +105,7 @@ comment  2061
 comment  2061 Initialize Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
 comment  2061 Each character is a 16x8 tile i.e. double height, thus play area
 comment  2061 is decimal 11 Rows x 23 Columns
-comment  2061 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
+comment  2061 0200  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
 comment  2061 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
 comment  2061 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
 comment  2061 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5
@@ -270,10 +270,26 @@ lcomment 21AD Y=$01, Y-coord of laser
 comment  21B4
 comment  21B4 Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
 comment  21C1
-comment  21C1 Test if X-coord of laser is on a boundary and wrap if necessary
+comment  21C1 Test if X-coord of laser is on a boundary and wrap if necessary ######## NEEDS CONFIRM
+comment  21CB
 label    21CB FP1111
+lcomment 21CE Save A
+lcomment 21D1 Get Y Coord
+lcomment 21D4 Test Y coord bit 7 ???
+lcomment 21D8 Get X Coord
 label    21DC FP2222
+lcomment 21DC Restore A
+comment  21DD
+comment  21DF
+comment  21DF Invert the displayed 8-bit byte on-screen
+comment  21E5
+comment  21E5 Load current tile color, check it's not green, if not update tile color
+lcomment 21E7 Zero top 4 bits
+lcomment 21E9 Test if 0101
+deflabel 21EA GREEN
+lcomment 21ED Tile color
 label    21F1 FP3333
+comment  21F1
 label    21FC FP4444
 comment  2202
 label    2202 FP5555
@@ -292,16 +308,29 @@ label    2263 FP1010
 label    2285 CLC_ADC_08
 label    228B Laser_ZP17_15_to_ZP16_14
 label    2298 Laser_Jetman_Facing_Left???
+comment  2298 Looks like it's doing some checks on the X coord, e.g. laser wraparound
+lcomment 229B $B8=screen width in pixels
 label    22A1 Laser_JFL
+lcomment 22A1 Save Y on Stack
+lcomment 22A5 Get object's type/direction byte
+lcomment 22A7 Test Bit 7 is set i.e. towards left
+lcomment 22AA No, branch
+lcomment 22AC Restore Y from Stack
+comment  22AE
+lcomment 22AF Zero the top 5 bits
+lcomment 22B1 Set bits 7,5,4, now it's 1011 0xxx
 label    22B4 Laser_JFL_1
+comment  22B4 Towards right
+lcomment 22B4 Restore Y from Stack
+lcomment 22B7 Zero the top 5 bits
 label    22BA Reset_Level_Add_Extra_Life
+comment  22B6
 comment  22BD
 comment  22BD Player at level 4, add another life
 label    22CB RLAEL_1
 label    22D1 RLAEL_2
 label    22D7 RLAEL_3
 label    22E3 Object_RTS_Fuel_Type
-;        22EA
 word     22EA
 ;        22ED
 label    22ED JMP_Reset_S_O_1

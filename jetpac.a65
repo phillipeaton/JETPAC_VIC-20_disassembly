@@ -1,4 +1,4 @@
-; dasmfw: Disassembler Framework V0.30
+; dasmfw: Disassembler Framework V0.34
 ; Loaded: binary file "jetpac_2000-3fff.bin"
 ; Loaded: Info file "nfo_jetpac.nfo"
 
@@ -267,7 +267,7 @@ Reset_VIC lda    VIC_Init_Tab,x          ; 2058: BD 04 20
 ; Initialize Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
 ; Each character is a 16x8 tile i.e. double height, thus play area
 ; is decimal 11 Rows x 23 Columns
-; 0216  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
+; 0200  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
 ; 0217  01 0C 17 22 2D 38 43 4E 59 64 6F 7A 85 90 9B A6 B1 BC C7 D2 DD E8 F3
 ; 022E  02 0D 18 23 2E 39 44 4F 5A 65 70 7B 86 91 9C A7 B2 BD C8 D3 DE E9 F4
 ; 0245  03 0E 19 24 2F 3A 45 50 5B 66 71 7C 87 92 9D A8 B3 BE C9 D4 DF EA F5
@@ -539,32 +539,39 @@ Fire_Pressed_
          jsr     Setup_Color_RAM_Ptr     ; 21BB: 20 F7 34 
          jsr     Setup_UDG_RAM_XY        ; 21BE: 20 1D 35 
 
-; Test if X-coord of laser is on a boundary and wrap if necessary
+; Test if X-coord of laser is on a boundary and wrap if necessary ######## NEEDS CONFIRM
          lda     ZP_03_Lo                ; 21C1: A5 06    
          bit     MASK_01                 ; 21C3: 2C 14 20 
          clc                             ; 21C6: 18       
          beq     FP0000                  ; 21C7: F0 CC    
          adc     #$F8                    ; 21C9: 69 F8    
+
 FP1111   jsr     Laser_Jetman_Facing_Left??? ; 21CB: 20 98 22 
-         tax                             ; 21CE: AA       
+         tax                             ; 21CE: AA        Save A
          ldy     #$01                    ; 21CF: A0 01    
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 21D1: B1 00    
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 21D1: B1 00     Get Y Coord
          dey                             ; 21D3: 88       
-         cmp     #$80                    ; 21D4: C9 80    
+         cmp     #$80                    ; 21D4: C9 80     Test Y coord bit 7 ???
          bcs     FP2222                  ; 21D6: B0 04    
-         lda     (ZP_UDG_RAM_X),y        ; 21D8: B1 04    
+         lda     (ZP_UDG_RAM_X),y        ; 21D8: B1 04     Get X Coord
          bne     FP4444                  ; 21DA: D0 20    
-FP2222   txa                             ; 21DC: 8A       
+FP2222   txa                             ; 21DC: 8A        Restore A
+
          sta     ZP_03_Lo                ; 21DD: 85 06    
+
+; Invert the displayed 8-bit byte on-screen
          lda     (ZP_UDG_RAM_X),y        ; 21DF: B1 04    
          eor     #$FF                    ; 21E1: 49 FF    
          sta     (ZP_UDG_RAM_X),y        ; 21E3: 91 04    
+
+; Load current tile color, check it's not green, if not update tile color
          lda     (ZP_Col_RAM_Ptr_Lo),y   ; 21E5: B1 0C    
-         and     #$0F                    ; 21E7: 29 0F    
-         cmp     #$05                    ; 21E9: C9 05    
+         and     #$0F                    ; 21E7: 29 0F     Zero top 4 bits
+         cmp     #GREEN                  ; 21E9: C9 05     Test if 0101
          beq     FP3333                  ; 21EB: F0 04    
-         lda     ZP_0D_Hi                ; 21ED: A5 1B    
+         lda     ZP_0D_Hi                ; 21ED: A5 1B     Tile color
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 21EF: 91 0C    
+
 FP3333   lda     ZP_03_Hi                ; 21F1: A5 07    
          sec                             ; 21F3: 38       
          sbc     #$08                    ; 21F4: E9 08    
@@ -659,32 +666,36 @@ Laser_ZP17_15_to_ZP16_14
          sta     ZP_0B_Lo                ; 2295: 85 16    
          rts                             ; 2297: 60       
 ; ===========================================================
+; Looks like it's doing some checks on the X coord, e.g. laser wraparound
 Laser_Jetman_Facing_Left???
          pha                             ; 2298: 48       
          and     #$F8                    ; 2299: 29 F8    
-         cmp     #$B8                    ; 229B: C9 B8    
+         cmp     #$B8                    ; 229B: C9 B8     $B8=screen width in pixels
          bcs     Laser_JFL               ; 229D: B0 02    
          pla                             ; 229F: 68       
          rts                             ; 22A0: 60       
 ; ===========================================================
-Laser_JFL tya                            ; 22A1: 98       
+Laser_JFL tya                            ; 22A1: 98        Save Y on Stack
          pha                             ; 22A2: 48       
          ldy     #$00                    ; 22A3: A0 00    
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 22A5: B1 00    
-         bit     MASK_80                 ; 22A7: 2C 1B 20 
-         beq     Laser_JFL_1             ; 22AA: F0 08    
-         pla                             ; 22AC: 68       
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 22A5: B1 00     Get object's type/direction byte
+         bit     MASK_80                 ; 22A7: 2C 1B 20  Test Bit 7 is set i.e. towards left
+         beq     Laser_JFL_1             ; 22AA: F0 08     No, branch
+         pla                             ; 22AC: 68        Restore Y from Stack
          tay                             ; 22AD: A8       
+
          pla                             ; 22AE: 68       
-         and     #$07                    ; 22AF: 29 07    
-         ora     #$B0                    ; 22B1: 09 B0    
+         and     #$07                    ; 22AF: 29 07     Zero the top 5 bits
+         ora     #$B0                    ; 22B1: 09 B0     Set bits 7,5,4, now it's 1011 0xxx
          rts                             ; 22B3: 60       
 ; ===========================================================
+; Towards right
 Laser_JFL_1
-         pla                             ; 22B4: 68       
+         pla                             ; 22B4: 68        Restore Y from Stack
          tay                             ; 22B5: A8       
+
          pla                             ; 22B6: 68       
-         and     #$07                    ; 22B7: 29 07    
+         and     #$07                    ; 22B7: 29 07     Zero the top 5 bits
          rts                             ; 22B9: 60       
 ; ===========================================================
 Reset_Level_Add_Extra_Life

@@ -74,13 +74,22 @@ label    0384 Obj_Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accele
 ;label    0386 Obj_Jetman_0386
 ;label    0387 Obj_Jetman_0387
 
-;label    0388 Obj_Laser_0 ; 00 when not fired, following bytes cahnge value as beam fades
+; Byte 00/08= object type: 10/90=Laser Shot Left/Right
+; Byte 01/09= Laser Y-coord
+; Byte 02/0A= X-coord of end of laser. Each shot is a different length and thus a different value is stored.
+; Byte 03/0B= Delayed X-coords of 02/0A, as laser decays.
+; Byte 04/0C= Delayed X-coords of 02/0A, as laser decays.
+; Byte 05/0D= Delayed X-coords of 02/0A, as laser decays.
+; Byte 06/0E= ??????
+; Byte 07/0F= Laser Color
 
-label    0390 Obj_Laser_1
+;label    0388 Obj_Laser_0 ;
 
-label    0398 Obj_Laser_2
+;label    0390 Obj_Laser_1
 
-label    03A0 Obj_Laser_3
+;label    0398 Obj_Laser_2
+
+;label    03A0 Obj_Laser_3
 
 ; Byte 00/08= object type:
 ;        03=Explosion->00
@@ -101,11 +110,6 @@ label    03A0 Obj_Laser_3
 ; Byte 04/0C= diagonal, jiggles around a lot for a saucer
 ; Byte 05/0D= colour - bottom 3 bits of byte?
 ; Byte 06/0E= For Gem, affects colors and flashing of Byte 05
-;        10/90=Laser Shot Left/Right
-; Byte 01/09= Laser Y-coord
-; Byte 02/0A= X-coord of end of laser. Each shot is a different length and thus a different value is stored.
-; Byte 03/4/5/B/C/D= Delayed X-coords of 02/0A, as laser decays.
-; Byte 07/0F= Laser Color
 
 ; Laser_Color_Table
 ;         fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colors if it's used
