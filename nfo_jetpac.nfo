@@ -9,38 +9,6 @@ insert ;  This is the reverse-engineered source code for the
 insert ;  game 'JETPAC' written by Ultimate Play The Game.
 insert ; ----------------------------------------------------------
 insert
-insert ; ----------------------------------------------------------
-insert ;  Usage of Labels
-insert ;  ZP_Obj_List_Ptr_Lo      equ     $0000 - 182
-insert ;  ZP_Obj_List_Ptr_Hi      equ     $0001 -  11
-insert ;  ZP_01_Lo                equ     $0002 -  46
-insert ;  ZP_01_Hi                equ     $0003 -  17
-insert ;  ZP_UDG_RAM_X            equ     $0004 -  56
-insert ;  ZP_UDG_RAM_Y            equ     $0005 -  35
-insert ;  ZP_03_Lo                equ     $0006 -  51
-insert ;  ZP_03_Hi                equ     $0007 -  26
-insert ;  ZP_04_Lo                equ     $0008 -  42
-insert ;  ZP_04_Hi                equ     $0009 -  11
-insert ;  ZP_05_Lo                equ     $000A -  15
-insert ;  ZP_05_Hi                equ     $000B -  18
-insert ;  ZP_Col_RAM_Ptr_Lo       equ     $000C -  28
-insert ;  ZP_Col_RAM_Ptr_Hi       equ     $000D -  10
-insert ;  ZP_Ptr_To_Str_Lo        equ     $000E -  21
-insert ;  ZP_Ptr_To_Str_Hi        equ     $000F -  12
-insert ;  ZP_08_Lo                equ     $0010 -  04
-insert ;  ZP_08_Hi                equ     $0011 -  09
-insert ;  ZP_09_Lo                equ     $0012 -  03
-insert ;  ZP_Keyboard_Data        equ     $0013 -  18
-insert ;  ZP_0A_Lo                equ     $0014 -  08
-insert ;  ZP_0A_Hi                equ     $0015 -  08
-insert ;  ZP_0B_Lo                equ     $0016 -  05
-insert ;  ZP_0B_Hi                equ     $0017 -  04
-insert ;  ZP_0C_Lo                equ     $0018 -  07
-insert ;  ZP_0C_Hi                equ     $0019 -  12
-insert ;  ZP_0D_Lo                equ     $001A -  03
-insert ;  ZP_0D_Hi                equ     $001B -  10
-insert ;
-insert ; ----------------------------------------------------------
 
 ; Start of disassembly instructions
 word     2000-2003
@@ -290,21 +258,49 @@ deflabel 21EA GREEN
 lcomment 21ED Tile color
 label    21F1 FP3333
 comment  21F1
+comment  21F1 Some kind of screen wrap?
 label    21FC FP4444
 comment  2202
+comment  2202 Loads ZP 14/15/16/17 with seed values, which are something to do with the four lasers
 label    2202 FP5555
-;        2206
-word     2206
+break    2206
+break    2208
 break    2209
 break    220B
 word     220C
 comment  220F
-break    220F
+comment  220F Iterate round each of the laser shots that could be active for display
+lcomment 2211 First time round, Y=3, next time 4 and so on
 label    2211 FP6666
+lcomment 2212 Get one of the four laser object paramenters
+lcomment 2216 Zero bottom 3 bits, probably testing if laser shot ended
+lcomment 221D Active laser shots counter at zero?
+lcomment 221F No, process next laser shot
+comment  2221
+comment  2221 All laser shows ended, zero laser shots object type
+comment  2229
+comment  2229 Process laser shot, update parameters in object table
 label    2229 FP7777
+lcomment 2229 Get one of the four laser object paramenters
+lcomment 223A Zero bit top 6 bits
+lcomment 223C Set bit 2, now is 000001xx
+lcomment 2244 Set bit 2
+comment  2248
+comment  2248 Update object list parameteters from ZP temp vars
 label    2248 FP8888
+comment  224E
+comment  2254
+comment  2254 This is the exit point from this subroutine
 label    2257 FP9999
+comment  2257 Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
 label    2263 FP1010
+comment  226C
+comment  226C EXOR-write data in ZP variabule to UDG RAM
+lcomment 226C Save Y
+lcomment 227D Restore Y
+comment  227E
+lcomment 2280 Iterate to next laser shot
+lcomment 2282 Update object list and exit subroutine
 label    2285 CLC_ADC_08
 label    228B Laser_ZP17_15_to_ZP16_14
 label    2298 Laser_Jetman_Facing_Left???

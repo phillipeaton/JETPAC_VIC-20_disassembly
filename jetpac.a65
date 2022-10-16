@@ -7,38 +7,6 @@
 ;  game 'JETPAC' written by Ultimate Play The Game.
 ; ----------------------------------------------------------
 
-; ----------------------------------------------------------
-;  Usage of Labels
-;  ZP_Obj_List_Ptr_Lo      equ     $0000 - 182
-;  ZP_Obj_List_Ptr_Hi      equ     $0001 -  11
-;  ZP_01_Lo                equ     $0002 -  46
-;  ZP_01_Hi                equ     $0003 -  17
-;  ZP_UDG_RAM_X            equ     $0004 -  56
-;  ZP_UDG_RAM_Y            equ     $0005 -  35
-;  ZP_03_Lo                equ     $0006 -  51
-;  ZP_03_Hi                equ     $0007 -  26
-;  ZP_04_Lo                equ     $0008 -  42
-;  ZP_04_Hi                equ     $0009 -  11
-;  ZP_05_Lo                equ     $000A -  15
-;  ZP_05_Hi                equ     $000B -  18
-;  ZP_Col_RAM_Ptr_Lo       equ     $000C -  28
-;  ZP_Col_RAM_Ptr_Hi       equ     $000D -  10
-;  ZP_Ptr_To_Str_Lo        equ     $000E -  21
-;  ZP_Ptr_To_Str_Hi        equ     $000F -  12
-;  ZP_08_Lo                equ     $0010 -  04
-;  ZP_08_Hi                equ     $0011 -  09
-;  ZP_09_Lo                equ     $0012 -  03
-;  ZP_Keyboard_Data        equ     $0013 -  18
-;  ZP_0A_Lo                equ     $0014 -  08
-;  ZP_0A_Hi                equ     $0015 -  08
-;  ZP_0B_Lo                equ     $0016 -  05
-;  ZP_0B_Hi                equ     $0017 -  04
-;  ZP_0C_Lo                equ     $0018 -  07
-;  ZP_0C_Hi                equ     $0019 -  12
-;  ZP_0D_Lo                equ     $001A -  03
-;  ZP_0D_Hi                equ     $001B -  10
-;
-; ----------------------------------------------------------
 
 ;****************************************************
 ; Used Labels
@@ -70,8 +38,8 @@ ZP_0B_Lo                equ     $0016
 ZP_0B_Hi                equ     $0017
 ZP_0C_Lo                equ     $0018
 ZP_0C_Hi                equ     $0019
-ZP_0D_Lo                equ     $001A
-ZP_0D_Hi                equ     $001B
+ZP_Obj_Type             equ     $001A
+ZP_Tile_Color           equ     $001B
 ZP_Jetman_Movement      equ     $001C
 ZP_Ship_UDG_Addr_Offset equ     $001E
 ZP_Ship_UDG_Addr_Color? equ     $001F
@@ -104,7 +72,6 @@ ZP_Subroutine_Vec_Lo    equ     $005F
 ZP_Subroutine_Vec_Hi    equ     $0060
 Stack                   equ     $0100
 Screen_RAM              equ     $0200
-Other_RAM               equ     $0300
 Hardware_IRQ_Lo         equ     $0314
 Hardware_IRQ_Hi         equ     $0315
 NMI_Int_Vector_Lo       equ     $0318
@@ -112,6 +79,7 @@ NMI_Int_Vector_Hi       equ     $0319
 Obj_Jetman_Looks        equ     $0380
 Obj_Jetman_X            equ     $0381
 Obj_Jetman_Y            equ     $0383
+Obj_Laser_0             equ     $0388
 Obj_Flame               equ     $03A8
 Obj_Flame_1             equ     $03A9
 Obj_Flame_2             equ     $03AA
@@ -390,7 +358,7 @@ Update_Laser_Shots
 Laser_Shots
          jsr     Load_ZP_Parameters      ; 20F0: 20 9D 25 
          fcb     $06                     ; 20F3: 06       
-         fdb     Other_RAM+136           ; 20F4: 88 03    
+         fdb     Obj_Laser_0             ; 20F4: 88 03    
          fcb     $FF                     ; 20F6: FF       
 
 ; Loop through the four possible Laser shots, branch if any are zero I.E. NOT SHOOTING???????
@@ -520,7 +488,7 @@ Fire_Pressed_
          sta     ZP_03_Hi                ; 219E: 85 07    
          iny                             ; 21A0: C8        Y=$07, laser color addr
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 21A1: B1 00     Fetch laser color
-         sta     ZP_0D_Hi                ; 21A3: 85 1B     Store to ZP variable
+         sta     ZP_Tile_Color           ; 21A3: 85 1B     Store to ZP variable
 
 ; Get laser X and Y-coord and store to temp vars
          ldy     #$02                    ; 21A5: A0 02     Y=$02, X-coord of laser horizontal end point
@@ -569,9 +537,10 @@ FP2222   txa                             ; 21DC: 8A        Restore A
          and     #$0F                    ; 21E7: 29 0F     Zero top 4 bits
          cmp     #GREEN                  ; 21E9: C9 05     Test if 0101
          beq     FP3333                  ; 21EB: F0 04    
-         lda     ZP_0D_Hi                ; 21ED: A5 1B     Tile color
+         lda     ZP_Tile_Color           ; 21ED: A5 1B     Tile color
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 21EF: 91 0C    
 
+; Some kind of screen wrap?
 FP3333   lda     ZP_03_Hi                ; 21F1: A5 07    
          sec                             ; 21F3: 38       
          sbc     #$08                    ; 21F4: E9 08    
@@ -582,30 +551,36 @@ FP4444   lda     ZP_03_Lo                ; 21FC: A5 06
          and     #$FB                    ; 21FE: 29 FB    
          sta     ZP_03_Lo                ; 2200: 85 06    
 
+; Loads ZP 14/15/16/17 with seed values, which are something to do with the four lasers
 FP5555   jsr     Load_ZP_Parameters      ; 2202: 20 9D 25 
          fcb     $14                     ; 2205: 14       
-         fdb     Other_RAM               ; 2206: 00 03    
+         fcb     $00,$03                 ; 2206: 00 03    
          fcb     $16                     ; 2208: 16       
          fcb     $1C,$E0                 ; 2209: 1C E0    
          fcb     $02                     ; 220B: 02       
          fdb     ZP_01_Hi                ; 220C: 03 00    
          fcb     $FF                     ; 220E: FF       
 
+; Iterate round each of the laser shots that could be active for display
          ldy     #$02                    ; 220F: A0 02    
-FP6666   iny                             ; 2211: C8       
-         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2212: B1 00    
+FP6666   iny                             ; 2211: C8        First time round, Y=3, next time 4 and so on
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2212: B1 00     Get one of the four laser object paramenters
          eor     ZP_03_Lo                ; 2214: 45 06    
-         and     #$F8                    ; 2216: 29 F8    
+         and     #$F8                    ; 2216: 29 F8     Zero bottom 3 bits, probably testing if laser shot ended
          bne     FP7777                  ; 2218: D0 0F    
          jsr     Laser_ZP17_15_to_ZP16_14 ; 221A: 20 8B 22 
-         dec     ZP_01_Lo                ; 221D: C6 02    
-         bne     FP6666                  ; 221F: D0 F0    
+         dec     ZP_01_Lo                ; 221D: C6 02     Active laser shots counter at zero?
+         bne     FP6666                  ; 221F: D0 F0     No, process next laser shot
+
+; All laser shows ended, zero laser shots object type
          lda     #$00                    ; 2221: A9 00    
          tay                             ; 2223: A8       
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2224: 91 00    
          jmp     Triggers_Every_Frame    ; 2226: 4C 1A 26 
 ; -----------------------
-FP7777   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00    
+
+; Process laser shot, update parameters in object table
+FP7777   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00     Get one of the four laser object paramenters
          bit     MASK_04                 ; 222B: 2C 16 20 
          bne     FP9999                  ; 222E: D0 27    
          dec     ZP_03_Hi                ; 2230: C6 07    
@@ -613,21 +588,27 @@ FP7777   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2229: B1 00
          and     #$07                    ; 2234: 29 07    
          bne     FP8888                  ; 2236: D0 10    
          lda     ZP_HW_IRQ_Count3        ; 2238: A5 4C    
-         and     #$03                    ; 223A: 29 03    
-         ora     #$04                    ; 223C: 09 04    
+         and     #$03                    ; 223A: 29 03     Zero bit top 6 bits
+         ora     #$04                    ; 223C: 09 04     Set bit 2, now is 000001xx
          ora     ZP_03_Hi                ; 223E: 05 07    
          sta     ZP_03_Hi                ; 2240: 85 07    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2242: B1 00    
-         ora     #$04                    ; 2244: 09 04    
+         ora     #$04                    ; 2244: 09 04     Set bit 2
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2246: 91 00    
+
+; Update object list parameteters from ZP temp vars
 FP8888   ldy     #$06                    ; 2248: A0 06    
          lda     ZP_03_Hi                ; 224A: A5 07    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 224C: 91 00    
+
          ldy     #$02                    ; 224E: A0 02    
          lda     ZP_03_Lo                ; 2250: A5 06    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2252: 91 00    
+
+; This is the exit point from this subroutine
          jmp     Triggers_Every_Frame    ; 2254: 4C 1A 26 
 ; -----------------------
+; Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
 FP9999   lda     (ZP_Obj_List_Ptr_Lo),y  ; 2257: B1 00    
          sta     ZP_UDG_RAM_X            ; 2259: 85 04    
          bit     MASK_01                 ; 225B: 2C 14 20 
@@ -638,7 +619,9 @@ FP1010   jsr     Laser_Jetman_Facing_Left??? ; 2263: 20 98 22
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2266: 91 00    
          lda     ZP_Keyboard_Data        ; 2268: A5 13    
          sta     ZP_UDG_RAM_Y            ; 226A: 85 05    
-         tya                             ; 226C: 98       
+
+; EXOR-write data in ZP variabule to UDG RAM
+         tya                             ; 226C: 98        Save Y
          pha                             ; 226D: 48       
          jsr     Setup_UDG_RAM_XY        ; 226E: 20 1D 35 
          jsr     Laser_ZP17_15_to_ZP16_14 ; 2271: 20 8B 22 
@@ -647,10 +630,11 @@ FP1010   jsr     Laser_Jetman_Facing_Left??? ; 2263: 20 98 22
          eor     (ZP_UDG_RAM_X),y        ; 2278: 51 04    
          sta     (ZP_UDG_RAM_X),y        ; 227A: 91 04    
          pla                             ; 227C: 68       
-         tay                             ; 227D: A8       
+         tay                             ; 227D: A8        Restore Y
+
          dec     ZP_01_Lo                ; 227E: C6 02    
-         bne     FP6666                  ; 2280: D0 8F    
-         jmp     FP8888                  ; 2282: 4C 48 22 
+         bne     FP6666                  ; 2280: D0 8F     Iterate to next laser shot
+         jmp     FP8888                  ; 2282: 4C 48 22  Update object list and exit subroutine
 ; -----------------------
 CLC_ADC_08
          clc                             ; 2285: 18       
@@ -2531,7 +2515,7 @@ LOOP_2EB5 jsr    Z2DE8                   ; 2EB5: 20 E8 2D
          and     #$04                    ; 2EC4: 29 04    
          bne     SKIP_2ECA               ; 2EC6: D0 02    
          lda     #$01                    ; 2EC8: A9 01    
-SKIP_2ECA sta    ZP_0D_Hi                ; 2ECA: 85 1B    
+SKIP_2ECA sta    ZP_Tile_Color           ; 2ECA: 85 1B    
          ldy     #$04                    ; 2ECC: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2ECE: B1 00    
          sta     ZP_01_Lo                ; 2ED0: 85 02    
@@ -2546,19 +2530,19 @@ SKIP_2ECA sta    ZP_0D_Hi                ; 2ECA: 85 1B
          bcs     A456456                 ; 2EE1: B0 1E    
          sta     ZP_01_Lo                ; 2EE3: 85 02    
          lda     #$04                    ; 2EE5: A9 04    
-         sta     ZP_0D_Hi                ; 2EE7: 85 1B    
+         sta     ZP_Tile_Color           ; 2EE7: 85 1B    
          jsr     A789789                 ; 2EE9: 20 07 2F 
          lda     #$03                    ; 2EEC: A9 03    
          sec                             ; 2EEE: 38       
          sbc     ZP_Keyboard_Data        ; 2EEF: E5 13    
          sta     ZP_01_Lo                ; 2EF1: 85 02    
          lda     #$01                    ; 2EF3: A9 01    
-         sta     ZP_0D_Hi                ; 2EF5: 85 1B    
+         sta     ZP_Tile_Color           ; 2EF5: 85 1B    
          jsr     A111111                 ; 2EF7: 20 16 2F 
          jmp     Triggers_Every_Frame    ; 2EFA: 4C 1A 26 
 ; -----------------------
 A123123  lda     #$01                    ; 2EFD: A9 01    
-         sta     ZP_0D_Hi                ; 2EFF: 85 1B    
+         sta     ZP_Tile_Color           ; 2EFF: 85 1B    
 A456456  jsr     A789789                 ; 2F01: 20 07 2F 
          jmp     Triggers_Every_Frame    ; 2F04: 4C 1A 26 
 ; -----------------------
@@ -2572,7 +2556,7 @@ A789789  ldy     #$01                    ; 2F07: A0 01
 
          jsr     Setup_Color_RAM_Ptr     ; 2F13: 20 F7 34 
 A111111  ldy     #$00                    ; 2F16: A0 00    
-         lda     ZP_0D_Hi                ; 2F18: A5 1B    
+         lda     ZP_Tile_Color           ; 2F18: A5 1B    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 2F1A: 91 0C    
          iny                             ; 2F1C: C8       
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 2F1D: 91 0C    
@@ -3689,7 +3673,7 @@ Save_Obj_Type_X_Y
 Save_Obj_Type_X_Y_Color
          ldy     #$00                    ; 35E9: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35EB: B1 00     Object Type
-         sta     ZP_0D_Lo                ; 35ED: 85 1A    
+         sta     ZP_Obj_Type             ; 35ED: 85 1A    
 
          iny                             ; 35EF: C8       
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35F0: B1 00     Object X
@@ -3701,7 +3685,7 @@ Save_Obj_Type_X_Y_Color
 
          ldy     #$05                    ; 35FA: A0 05    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35FC: B1 00     Object Color
-         sta     ZP_0D_Hi                ; 35FE: 85 1B    
+         sta     ZP_Tile_Color           ; 35FE: 85 1B    
          rts                             ; 3600: 60       
 ; ===========================================================
 Z3601    jsr     Z3737                   ; 3601: 20 37 37 
@@ -4025,7 +4009,7 @@ Get_Object_UDG_Address
          lda     ZP_0C_Lo                ; 3815: A5 18     Saved Object X
          and     #$06                    ; 3817: 29 06    
          tax                             ; 3819: AA       
-         lda     ZP_0D_Lo                ; 381A: A5 1A     Saved Object Type
+         lda     ZP_Obj_Type             ; 381A: A5 1A     Saved Object Type
          jmp     Get_Object_UDG_Addr     ; 381C: 4C ED 37 
 
 Z381F    lda     ZP_0C_Lo                ; 381F: A5 18    
@@ -4050,7 +4034,7 @@ BACK_383F lda    (ZP_Col_RAM_Ptr_Lo),y   ; 383F: B1 0C
          and     #$07                    ; 3841: 29 07    
          cmp     #$05                    ; 3843: C9 05    
          beq     SKIP_384B               ; 3845: F0 04    
-         lda     ZP_0D_Hi                ; 3847: A5 1B    
+         lda     ZP_Tile_Color           ; 3847: A5 1B    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 3849: 91 0C    
 SKIP_384B iny                            ; 384B: C8       
          dex                             ; 384C: CA       

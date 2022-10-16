@@ -1,66 +1,66 @@
-; Zero-Page variables
-label      00 ZP_Obj_List_Ptr_Lo
-label      01 ZP_Obj_List_Ptr_Hi
-label      02 ZP_01_Lo
-label      03 ZP_01_Hi
-label      04 ZP_UDG_RAM_X
-label      05 ZP_UDG_RAM_Y
-label      06 ZP_03_Lo
-label      07 ZP_03_Hi
+; Zero-Page variables ; Usage count
+label      00 ZP_Obj_List_Ptr_Lo ; 182
+label      01 ZP_Obj_List_Ptr_Hi ; 111
+label      02 ZP_01_Lo ; 46
+label      03 ZP_01_Hi ; 17
+label      04 ZP_UDG_RAM_X ; 56
+label      05 ZP_UDG_RAM_Y ; 35
+label      06 ZP_03_Lo ; 51
+label      07 ZP_03_Hi ; 26
 label      08 ZP_04_Lo ; 42 Occurrences, used with 0009
 label      09 ZP_04_Hi ; 11 Occurrences, used with 0008
-label      0A ZP_05_Lo
-label      0B ZP_05_Hi
-label      0c ZP_Col_RAM_Ptr_Lo
-label      0d ZP_Col_RAM_Ptr_Hi
-label      0E ZP_Ptr_To_Str_Lo
-label      0F ZP_Ptr_To_Str_Hi
-label      10 ZP_08_Lo ; Save Obj List Params 1
-label      11 ZP_08_Hi ; Save Obj List Params 1
-label      12 ZP_09_Lo ; Save Obj List Params 1
-label      13 ZP_Keyboard_Data
-label      14 ZP_0A_Lo ; Connected somehow. Shuffled in a subroutine.
-label      15 ZP_0A_Hi ; Connected somehow. Shuffled in a subroutine.
-label      16 ZP_0B_Lo ; Connected somehow. Shuffled in a subroutine.
-label      17 ZP_0B_Hi ; Connected somehow. Shuffled in a subroutine.
-label      18 ZP_0C_Lo ; Save_Obj_List_Params 2
-label      19 ZP_0C_Hi ; Save_Obj_List_Params 2
-label      1A ZP_0D_Lo ; Save_Obj_List_Params 2
-label      1B ZP_0D_Hi ; Save_Obj_List_Params 2
+label      0A ZP_05_Lo ; 15
+label      0B ZP_05_Hi ; 18
+label      0c ZP_Col_RAM_Ptr_Lo ; 28
+label      0d ZP_Col_RAM_Ptr_Hi ; 10
+label      0E ZP_Ptr_To_Str_Lo ; 21
+label      0F ZP_Ptr_To_Str_Hi ; 12
+label      10 ZP_08_Lo ; 04 Save Obj List Params 1
+label      11 ZP_08_Hi ; 09 Save Obj List Params 1
+label      12 ZP_09_Lo ; 03 Save Obj List Params 1
+label      13 ZP_Keyboard_Data ; 18
+label      14 ZP_0A_Lo ; 08 Connected somehow. Shuffled in a subroutine.
+label      15 ZP_0A_Hi ; 08 Connected somehow. Shuffled in a subroutine.
+label      16 ZP_0B_Lo ; 05 Connected somehow. Shuffled in a subroutine.
+label      17 ZP_0B_Hi ; 04 Connected somehow. Shuffled in a subroutine.
+label      18 ZP_0C_Lo ; 07 Save_Obj_List_Params 2
+label      19 ZP_0C_Hi ; 12 Save_Obj_List_Params 2
+label      1A ZP_Obj_Type ; 03 Save_Obj_List_Params 2
+label      1B ZP_Tile_Color ; 10 Save_Obj_List_Params 2
 label      1C ZP_Jetman_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
-label      1E ZP_Ship_UDG_Addr_Offset
-label      1F ZP_Ship_UDG_Addr_Color?
-label      20 ZP_HW_IRQ_1_OR_0
-label      21 ZP_HW_IRQ_Count
-label      22 ZP_Save_Obj_List_Ptr_Lo
-label      23 ZP_Save_Obj_List_Ptr_Hi
-label      24 ZP_Save_Obj_List_Ptr_Lo2
-label      25 ZP_Save_Obj_List_Ptr_Hi2
+label      1E ZP_Ship_UDG_Addr_Offset ;
+label      1F ZP_Ship_UDG_Addr_Color? ;
+label      20 ZP_HW_IRQ_1_OR_0 ;
+label      21 ZP_HW_IRQ_Count ;
+label      22 ZP_Save_Obj_List_Ptr_Lo ;
+label      23 ZP_Save_Obj_List_Ptr_Hi ;
+label      24 ZP_Save_Obj_List_Ptr_Lo2 ;
+label      25 ZP_Save_Obj_List_Ptr_Hi2 ;
 label      26 ZP_Rocket_Flame_On ; Turns off at take-off and landing
 label      27 ZP_Rocket_Flame_Toggle ; Counts up throughout the flight, used for flame animation
-label      0028-0039 ZP_Player_Object_Stash
-label      40 ZP_Param_Addr_Lo
-label      41 ZP_Param_Addr_Hi
+label      0028-0039 ZP_Player_Object_Stash ;
+label      40 ZP_Param_Addr_Lo ;
+label      41 ZP_Param_Addr_Hi ;
 
-label      45 ZP_Game_Sel_F1_Flash
-label      46 ZP_Game_Sel_F3_Flash
-label      47 ZP_Game_Sel_F5_Flash
-label      48 ZP_Game_Sel_F7_Flash
-label      49 ZP_Game_Sel_Start_Flash
-label      4a ZP_HW_IRQ_Count1
-label      4b ZP_HW_IRQ_Count2
-label      4c ZP_HW_IRQ_Count3
+label      45 ZP_Game_Sel_F1_Flash ;
+label      46 ZP_Game_Sel_F3_Flash ;
+label      47 ZP_Game_Sel_F5_Flash ;
+label      48 ZP_Game_Sel_F7_Flash ;
+label      49 ZP_Game_Sel_Start_Flash ;
+label      4a ZP_HW_IRQ_Count1 ;
+label      4b ZP_HW_IRQ_Count2 ;
+label      4c ZP_HW_IRQ_Count3 ;
 
 label      51-53 ZP_Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54-56 ZP_Score_P2 ; 3 bytes
 label      57 ZP_Invert ; Used to flash game options & 1UP+score at player start
-label      58 ZP_Flash_Counter
-label      59 ZP_Level_Current_Plyr
-label      5a ZP_Num_Lives_P1
-label      5b ZP_Level_Other_Plyr
-label      5c ZP_Num_Lives_P2
+label      58 ZP_Flash_Counter ;
+label      59 ZP_Level_Current_Plyr ;
+label      5a ZP_Num_Lives_P1 ;
+label      5b ZP_Level_Other_Plyr ;
+label      5c ZP_Num_Lives_P2 ;
 label      5d ZP_Flash_Score_Countdown ; 7f for 1 player, ff for 2 player
-label      5e ZP_P1_Or_P2
+label      5e ZP_P1_Or_P2 ;
 label      5f ZP_Subroutine_Vec_Lo ; NOT WORD ALIGNED
 label      60 ZP_Subroutine_Vec_Hi ; NOT WORD ALIGNED
 
@@ -77,13 +77,19 @@ label    0384 Obj_Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accele
 ; Byte 00/08= object type: 10/90=Laser Shot Left/Right
 ; Byte 01/09= Laser Y-coord
 ; Byte 02/0A= X-coord of end of laser. Each shot is a different length and thus a different value is stored.
-; Byte 03/0B= Delayed X-coords of 02/0A, as laser decays.
-; Byte 04/0C= Delayed X-coords of 02/0A, as laser decays.
-; Byte 05/0D= Delayed X-coords of 02/0A, as laser decays.
+; Byte 03/0B= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+; Byte 04/0C= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+; Byte 05/0D= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
 ; Byte 06/0E= ??????
 ; Byte 07/0F= Laser Color
+;
+; Laser decay sequence as written to UDG RAM:
+; $FF       $FC       $E0       $00
+; %11111111 %11111100 %11100000 %00000000
 
-;label    0388 Obj_Laser_0 ;
+
+
+label    0388 Obj_Laser_0 ;
 
 ;label    0390 Obj_Laser_1
 

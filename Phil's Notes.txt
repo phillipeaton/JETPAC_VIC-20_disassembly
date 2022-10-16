@@ -154,3 +154,12 @@ labels get a ':' at the end (but not when referenced)
    org     $2000
 becomes 
    * =     $2000 "xxx"
+   
+   
+-------------
+
+Laser decay sequence:
+$FF       $FC       $E0       $00
+%11111111 %11111100 %11100000 %00000000
+
+     0388  10 30 3C 38 38 38 40 01   .0<888@.
