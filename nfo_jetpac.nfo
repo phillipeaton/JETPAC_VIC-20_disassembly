@@ -263,11 +263,15 @@ label    21FC FP4444
 comment  2202
 comment  2202 Loads ZP 14/15/16/17 with seed values, which are something to do with the four lasers
 label    2202 FP5555
+lcomment 2205 ZP_0A_Lo/Hi
+lcomment 2208 ZP_0B_Lo/Hi
+lcomment 220B ZP_01_Lo/Hi
 break    2206
 break    2208
 break    2209
 break    220B
-word     220C
+break    220C
+break    220E
 comment  220F
 comment  220F Iterate round each of the laser shots that could be active for display
 lcomment 2211 First time round, Y=3, next time 4 and so on
@@ -293,9 +297,9 @@ comment  2254
 comment  2254 This is the exit point from this subroutine
 label    2257 FP9999
 comment  2257 Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
-label    2263 FP1010
+label    2263 FPAAAA
 comment  226C
-comment  226C EXOR-write data in ZP variabule to UDG RAM
+comment  226C EXOR-write data in ZP variable to UDG RAM
 lcomment 226C Save Y
 lcomment 227D Restore Y
 comment  227E
@@ -549,7 +553,7 @@ lcomment 259D stored on the stack.
 lcomment 259E Stash return address
 comment  25A3
 ;        25A5
-label    25A5 RZPP1
+label    25A5 LZPP_1
 lcomment 25A5 Load next parameter value, ZP address for next param else $FF
 lcomment 25A7 Value $FF?
 lcomment 25A9 If No, Skip
@@ -656,6 +660,7 @@ label    270A Pre_Output_Sound_2
 comment  2710
 comment  2710 A probably contains frequency, Y selects channel via X
 label    2710 Output_Sound
+comment  2716
 label    271C Gem_Fuel_Picked_Up
 label    2727 Laser_Shot_Active
 label    2735 Rocket_Flight_Active
@@ -853,6 +858,23 @@ label    2BDE Get_Raster_Line_Band
 break    2BE8-2BF7
 const    2BE8-2BF7
 label    2BE8 Raster_Line_Table
+comment  2BF8
+comment  2BF8 $0388=Obj_Laser_0
+comment  2C00
+comment  2C04
+comment  2C04 Store current object X and Y in ZP_03
+lcomment 2C06 Object Y
+lcomment 2C0B Object X
+comment  2C10
+label    2C10 BACK_2C10
+lcomment 2C12 X-coord of end of laser
+lcomment 2C1A Delayed X-coord of end of laser
+comment  2C21
+label    2C21 SKIP_2C21
+label    2C42 SKIP_2C42
+comment  2C4A
+lcomment 2C4A X-coord of end of laser
+label    2C53 ZP_04_TO_NEXT_OBJ
 label    2C6A Stops_All_After_Score_Flash
 lcomment 2C6F Remove=1st Level Aliens don't explode on platform/floor impact
 label    2CD6 Flash_Score_Cntr_At_Zero?
@@ -906,6 +928,8 @@ comment  2DA1
 word     2DBC
 label    2DDD LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
 lcomment 2DEC Current level modulus 4
+comment  2DF1
+comment  2DF9
 label    2DFF Dec_Saved_Obj_List_Params_by_10
 comment  2E17 Aliens keep moving also
 label    2E17 Rocket_Ascend
@@ -1405,6 +1429,19 @@ label    369C BACK_36AB
 label    36E7 GOTO_36E7
 label    371F SKIP_371F
 label    3722 SKIP_3722
+comment  373D
+comment  373D Load Small UDG address from A & Y
+label    373D Load_Small_UDG_Addr_Setup_XY
+comment  3743
+comment  3743 Load UDG RAM XY coordinates
+comment  374B
+lcomment 3752 $B8=screen width in pixels
+lcomment 3757 Wrap
+comment  3767
+comment  376D
+comment  3775
+comment  377C
+comment  3783
 label    37D4 GOUA_1
 comment  37DB
 comment  37ED

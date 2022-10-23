@@ -23,8 +23,8 @@ label      14 ZP_0A_Lo ; 08 Connected somehow. Shuffled in a subroutine.
 label      15 ZP_0A_Hi ; 08 Connected somehow. Shuffled in a subroutine.
 label      16 ZP_0B_Lo ; 05 Connected somehow. Shuffled in a subroutine.
 label      17 ZP_0B_Hi ; 04 Connected somehow. Shuffled in a subroutine.
-label      18 ZP_0C_Lo ; 07 Save_Obj_List_Params 2
-label      19 ZP_0C_Hi ; 12 Save_Obj_List_Params 2
+label      18 ZP_Save_Obj_List_Params2_Lo ; 07 Save_Obj_List_Params 2
+label      19 ZP_Save_Obj_List_Params2_Hi ; 12 Save_Obj_List_Params 2
 label      1A ZP_Obj_Type ; 03 Save_Obj_List_Params 2
 label      1B ZP_Tile_Color ; 10 Save_Obj_List_Params 2
 label      1C ZP_Jetman_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
@@ -74,6 +74,7 @@ label    0384 Obj_Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accele
 ;label    0386 Obj_Jetman_0386
 ;label    0387 Obj_Jetman_0387
 
+
 ; Byte 00/08= object type: 10/90=Laser Shot Left/Right
 ; Byte 01/09= Laser Y-coord
 ; Byte 02/0A= X-coord of end of laser. Each shot is a different length and thus a different value is stored.
@@ -86,8 +87,6 @@ label    0384 Obj_Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accele
 ; Laser decay sequence as written to UDG RAM:
 ; $FF       $FC       $E0       $00
 ; %11111111 %11111100 %11100000 %00000000
-
-
 
 label    0388 Obj_Laser_0 ;
 
