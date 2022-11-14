@@ -23,8 +23,8 @@ label      14 ZP_0A_Lo ; 08 Connected somehow. Shuffled in a subroutine.
 label      15 ZP_0A_Hi ; 08 Connected somehow. Shuffled in a subroutine.
 label      16 ZP_0B_Lo ; 05 Connected somehow. Shuffled in a subroutine.
 label      17 ZP_0B_Hi ; 04 Connected somehow. Shuffled in a subroutine.
-label      18 ZP_Save_Obj_List_Params2_Lo ; 07 Save_Obj_List_Params 2
-label      19 ZP_Save_Obj_List_Params2_Hi ; 12 Save_Obj_List_Params 2
+label      18 ZP_Save_Obj_Lst_Prms2_Lo ; 07 Save_Obj_List_Params 2
+label      19 ZP_Save_Obj_Lst_Prms2_Hi ; 12 Save_Obj_List_Params 2
 label      1A ZP_Obj_Type ; 03 Save_Obj_List_Params 2
 label      1B ZP_Tile_Color ; 10 Save_Obj_List_Params 2
 label      1C ZP_Jetman_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right

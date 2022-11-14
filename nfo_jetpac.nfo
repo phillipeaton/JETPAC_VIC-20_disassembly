@@ -184,7 +184,9 @@ lcomment 2122 Restore Jetman attrib 00
 lcomment 2123 Jetman looking left?
 lcomment 2125 No, branch
 label    212f Laser_Shot_
+comment  213C
 label    2145 BACK_2145
+comment  214B
 comment  2155
 comment  2155 Load a random laser color using the current 6522 timer value
 comment  2160
@@ -439,6 +441,8 @@ comment  2425 Setup address to copy data from ($2450) into UDG array for 1UP HI 
 lcomment 2427 3 strings to display, 1UP, HI and 2UP
 ;        2429
 label    2429 BACK_D1H2
+comment  2441
+comment  244C
 ;        2450
 label    2450 STR_1UP
 break    2457
@@ -610,7 +614,7 @@ label    2630 TEF_1
 comment  2637
 lcomment 2637 H/W interrupt happened?
 lcomment 2639 If yes, jump
-label    263B SEI_Load_Jetman_Rtn
+label    263B Load_Jetman_Rtn
 comment  263B
 lcomment 263B Is Object address $B0? i.e. Object_0
 comment  2645
@@ -746,8 +750,10 @@ label    283E Fire_Pressed
 lcomment 2841 Remove=Gems all fall through platforms and floor, reentering at top
 deflabel 2849 OBJPARAM3_JIGGLE?
 label    2851 FP_1
-;        286B
-break    286B
+;break    286B
+comment  2867
+comment  2867 Jetman pickup Gem/Elements/Gold etc = 250 points
+word     286B
 const    286B
 break    286D
 label    2874 Jump_To_Subroutine_List3
@@ -838,8 +844,8 @@ label    2A6D Not_Triggered_2A6D
 label    2ABC Not_Triggered_2ABC
 lcomment 2B16 Remove=(Not triggered on first level, so don't yet know)
 label    2B4B Obj_Jetman_Looks?
-label    2B7F Init_Rocket_Part_Fuel_Table
-label    2B87 Init_Flashing_Gem_Table
+label    2B7F Init_Rocket_Mod_Fuel_Obj_Tbl
+label    2B87 Init_Flashing_Gem_Obj_Table
 ;        2B82
 const    2B82
 const    2B8A
@@ -847,6 +853,7 @@ comment  2B7F
 comment  2B87
 comment  2B8F
 label    2B8F Obj_Jetman_Looks_2?
+lcomment 2B92 Zero bits 6 & 7 i.e. 00xxxxxx
 const    2BCD
 lcomment 2BCD
 const    2BCE
@@ -877,14 +884,39 @@ lcomment 2C4A X-coord of end of laser
 label    2C53 ZP_04_TO_NEXT_OBJ
 label    2C6A Stops_All_After_Score_Flash
 lcomment 2C6F Remove=1st Level Aliens don't explode on platform/floor impact
+comment  2C78
+label    2C78 Alien_Hit_Update_Score
+label    2C92 Test_Jetman_Collide_Score
 label    2CD6 Flash_Score_Cntr_At_Zero?
 const    2CDB-2CE2
-label    2CDB _0025_0035_0045_0055
+label    2CDB Alien_Points_Lookup
 word     2CDB-2CE2
-label    2CE3 Jetman_Looks???
-label    2CF1 Jetman_Looks_1???
-label    2CFF BACK_2CFF
-label    2D0F Jetman_Looks_1_1???
+label    2CE3 Setup_Objects
+deflabel 2CE9 JETMAN_FLYING
+deflabel 2CED JETMAN_STANDING
+comment  2CF1 Set Object List Pointer to first alien sprite
+label    2CF1 Set_Obj_List_Ptr_To_Alien0
+comment  2CF9
+comment  2CF9 Setup 6 objects
+lcomment 2CFB Counter variable
+label    2CFF Next_Object
+lcomment 2CFF Get object type
+lcomment 2D01 Object not currently used
+comment  2D03
+comment  2D03 Move pointer to next object
+lcomment 2D0A Dec object counter
+comment  2D0F InReg Y always 0
+label    2D0F Initiate_Object
+lcomment 2D11 Zero bits 2-7
+lcomment 2D13 Save current level
+comment  2D1D
+comment  2D28
+comment  2D30
+comment  2D35
+comment  2D3B
+comment  2D47
+label    2D4C Level_Alien_Type_Lookup
+label    2D50 Level_Alien_Color_Lookup
 break    2D54
 comment  2D58
 comment  2D58 ----------------------------------------------------------
@@ -984,18 +1016,32 @@ lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only fall
 ;        2FE5
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
 label    2FE5 Get_Object_UDG_Addr_Small
+comment  2FF9
+comment  2FF9 Jetman pickup Rocket Module / Fuel Pod = 100 points
 word     2FFD
-label    3063 GameOverScoreStuff
+const    2FFD
+comment  3003
+label    3063 Update_Score
 lcomment 3065 If P2, setup P2 Score instead of P1 and then return after the param setup below
-lcomment 306A ZP_Temp_2
+comment  3067
+comment  3067 Read ZP Params P1 Score
+lcomment 306A ZP_03_Lo
 lcomment 306B P1 Score in ZP
 word     306B
 comment  306E
-label    306E Continue_Score_Process
+label    306E Add_3_Digit_BCD_To_Score
+lcomment 306E 3 digits
+comment  3070
+comment  3070 Add units
 lcomment 3070 Set Decimal Mode
+comment  3078
+comment  3078 Add tens
+comment  307F
+comment  307F Add hundreds
 lcomment 3086 Clear Decimal Mode
+comment  3087
 lcomment 3087 Decide if working with P1 or P2
-label    308e P2_Score_To_UDG_RAM_
+label    308e Display_P2_Score_JMP
 label    3091 Read_ZP_Params_P2_Score
 lcomment 3094 ZP_Temp_2
 lcomment 3095 P2 Score in ZP
@@ -1140,10 +1186,22 @@ label    330C Not_sure_330c
 label    3318 LDA00
 label    331D Bottom?
 label    3321 Bottom_After?
-label    334D Flash_Score_Then_Display_Scores
-label    3367 JMP_to_Subroutine_261A
+label    332C RKJ_AAAA_Then_RKJ_5555
+label    3337 RKJ_BBBB_Then_RKJ_5555
+label    3342 Add_B8_Then_RKJ_6666
+label    3348 Add_48_Then_RKJ_6666
+label    334D Flash_Display_Score
+label    3367 JMP_JMP_JMP
 label    336A Read_Kbd_Jstk
 lcomment 3370 Remove=Jetman+pickup flies/walks jiggle when standing on a platform
+label    337D RKJ_1111
+label    338D RKJ_2222
+label    338F RKJ_3333
+label    339D RKJ_4444
+label    339F RKJ_5555
+label    33AF RKJ_6666
+label    33BA RKJ_7777
+label    33C0 RKJ_8888
 lcomment 33B3 Test for direction Up
 lcomment 33B5 Yes, branch
 comment  33D4
@@ -1172,7 +1230,28 @@ lcomment 33F2 Merge result into previous reading and store
 lcomment 33F4 Leaves %RLDU_F111
 label    33F7 Read_Keyboard_Joystick
 lcomment 33FA Joystick selected?
-label    345C SKIP_345C
+lcomment 33FD Yes, branch
+comment  33FF
+comment  33FF Read Keyboard
+comment  340E
+lcomment 3414 Set bits 0-5 i.e. xx111111
+comment  3418
+lcomment 341B Save A
+lcomment 341E Set bits 0-2 and 4-7 i.e. 1111x111
+comment  3424
+lcomment 3424 Restore A
+lcomment 3426 Set bits 0-2 and 4-7 i.e. 1111x111
+comment  342C
+lcomment 3436 Set bits 0-3 and 5-7 i.e. 111x1111
+comment  343C
+lcomment 3447 Set bits 0-3 and 5-7 i.e. 111x1111
+comment  344D
+comment  3455
+lcomment 3455 Save A
+lcomment 3459 Restore A
+comment  345A
+label    345C Read_Keyboard_Joystick_1
+lcomment 345E Set bits 0-4 and 6-7 i.e. 11x11111
 label    3465 Flash_Score
 lcomment 3467 P1 or P2? Branch if P2
 const    346C
@@ -1333,6 +1412,7 @@ const    3565
 lcomment 3566 Data to fill with (i.e. $01)
 const    3566
 break    3566
+word     3566
 break    3568
 comment  356C
 label    356C Reset_UDG_RAM
@@ -1350,8 +1430,8 @@ break    3576
 break    3578
 comment  3579
 label    3579 Reset_RAM
-label    357B FR_1
-label    3584 FR_2
+label    357B RR_1
+label    3584 RR_2
 ;        3595
 comment  3595
 comment  3595 ----------------------------------------------------------
