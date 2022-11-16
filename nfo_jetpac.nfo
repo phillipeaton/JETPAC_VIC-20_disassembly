@@ -652,7 +652,7 @@ label    26AE Init_Rocket_Object
 label    26B0 IRO_1
 comment  26B9
 comment  26B9 Probably init sound channels
-label    26C5 Init_Rocket_Table
+label    26C5 Init_Rocket_Obj_Table
 break    26C9
 label    26CD Jmp_To_SRList2_SR
 label    26D1 JTSRLSR_1
@@ -780,6 +780,26 @@ comment  28DE Init all Alien objects
 label    28E0 Loop_28E0
 label    28E7 Save_Obj_List_Ptr
 label    28F0 Restore_Obj_List_Ptr
+label    28F9 Change_Object_To_Explosion
+comment  28FC
+comment  28FC Reset Alien object direction
+comment  2902
+comment  2902 Setup Alien object color flashing/cycling
+lcomment 2906 Zero bits 0-5 i.e. xx000000
+lcomment 2908 Set bits 0-1 i.e. xxxxxx11
+comment  290E
+comment  290E Change Alien object type to an Explosion
+comment  2914
+comment  2914 Reset diagonal jiggles
+comment  2919
+comment  2919 Change Alien/Explosion object colour based on timer
+lcomment 291B Zero bits 3-8 i.e. 00000xxx
+lcomment 291F Set bit 0 i.e. xxxxxxx1
+label    2921 SKIP_2921
+label    2927 SKIP_2927
+lcomment 2925 Color code
+comment  292B
+comment  292B Reset Flame object parameters???
 label    2934 Explosions_Plyr_Life_Lost?
 ;        2967
 label    2967 Explosion_UDG_Ptr
@@ -857,7 +877,7 @@ lcomment 2B92 Zero bits 6 & 7 i.e. 00xxxxxx
 const    2BCD
 lcomment 2BCD
 const    2BCE
-lcomment 2BCE
+lcomment 2BCE Rocket middle module then Fuel object
 word     2BCE
 ;        2BDE
 label    2BDE Get_Raster_Line_Band

@@ -1297,7 +1297,7 @@ Subroutine_List
 
 Init_Rocket_Object
          ldx     #$07                    ; 26AE: A2 07    
-IRO_1    lda     Init_Rocket_Table,x     ; 26B0: BD C5 26 
+IRO_1    lda     Init_Rocket_Obj_Table,x ; 26B0: BD C5 26 
          sta     Obj_Flame,x             ; 26B3: 9D A8 03 
          dex                             ; 26B6: CA       
          bpl     IRO_1                   ; 26B7: 10 F7    
@@ -1309,7 +1309,7 @@ IRO_1    lda     Init_Rocket_Table,x     ; 26B0: BD C5 26
          sta     VIC_RC_Frq_Osc3         ; 26C1: 8D 0C 90 
          rts                             ; 26C4: 60       
 ; ===========================================================
-Init_Rocket_Table
+Init_Rocket_Obj_Table
          fcb     $0C,$00,$00,$00         ; 26C5: 0C 00 00 00 
          fcb     $00,$00,$00,$00         ; 26C9: 00 00 00 00 
 ; ===========================================================
@@ -1692,31 +1692,44 @@ Restore_Obj_List_Ptr
          sta     ZP_Obj_List_Ptr_Hi      ; 28F6: 85 01    
          rts                             ; 28F8: 60       
 ; ===========================================================
-Z28F9    jsr     Z360D                   ; 28F9: 20 0D 36 
+Change_Object_To_Explosion
+         jsr     Z360D                   ; 28F9: 20 0D 36 
+
+; Reset Alien object direction
          lda     #$00                    ; 28FC: A9 00    
          ldy     #$02                    ; 28FE: A0 02    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2900: 91 00    
+
+; Setup Alien object color flashing/cycling
          ldy     #$00                    ; 2902: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2904: B1 00    
-         and     #$C0                    ; 2906: 29 C0    
-         ora     #$03                    ; 2908: 09 03    
+         and     #$C0                    ; 2906: 29 C0     Zero bits 0-5 i.e. xx000000
+         ora     #$03                    ; 2908: 09 03     Set bits 0-1 i.e. xxxxxx11
 Z290A    ldy     #$06                    ; 290A: A0 06    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 290C: 91 00    
+
+; Change Alien object type to an Explosion
          ldy     #$00                    ; 290E: A0 00    
          lda     #$03                    ; 2910: A9 03    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2912: 91 00    
+
+; Reset diagonal jiggles
          tya                             ; 2914: 98       
          ldy     #$04                    ; 2915: A0 04    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2917: 91 00    
+
+; Change Alien/Explosion object colour based on timer
          lda     ZP_HW_IRQ_Count3        ; 2919: A5 4C    
-         and     #$07                    ; 291B: 29 07    
-         bne     Z2921                   ; 291D: D0 02    
-         ora     #$01                    ; 291F: 09 01    
-Z2921    cmp     #$05                    ; 2921: C9 05    
-         bne     Z2927                   ; 2923: D0 02    
-         lda     #$06                    ; 2925: A9 06    
-Z2927    ldy     #$05                    ; 2927: A0 05    
+         and     #$07                    ; 291B: 29 07     Zero bits 3-8 i.e. 00000xxx
+         bne     SKIP_2921               ; 291D: D0 02    
+         ora     #$01                    ; 291F: 09 01     Set bit 0 i.e. xxxxxxx1
+SKIP_2921 cmp    #$05                    ; 2921: C9 05    
+         bne     SKIP_2927               ; 2923: D0 02    
+         lda     #$06                    ; 2925: A9 06     Color code
+SKIP_2927 ldy    #$05                    ; 2927: A0 05    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2929: 91 00    
+
+; Reset Flame object parameters???
          lda     #$05                    ; 292B: A9 05    
          sta     Obj_Flame_3             ; 292D: 8D AB 03 
          sta     Obj_Flame_4             ; 2930: 8D AC 03 
@@ -2063,7 +2076,7 @@ Z2BC2    ora     #$20                    ; 2BC2: 09 20
 Z2BC7    jsr     Save_Obj_List_Ptr       ; 2BC7: 20 E7 28 
          jsr     Load_ZP_Parameters      ; 2BCA: 20 9D 25 
          fcb     $00                     ; 2BCD: 00       
-         fdb     $03C0                   ; 2BCE: C0 03    
+         fdb     $03C0                   ; 2BCE: C0 03     Rocket middle module then Fuel object
          fcb     $FF                     ; 2BD0: FF       
          jsr     Save_Obj_Type_X_Y_Color ; 2BD1: 20 E9 35 
          ldy     #$06                    ; 2BD4: A0 06    
@@ -2187,7 +2200,7 @@ Alien_Hit_Update_Score
          lda     Alien_Points_Lookup,x   ; 2C84: BD DB 2C 
          sta     ZP_01_Hi                ; 2C87: 85 03    
          jsr     Update_Score            ; 2C89: 20 63 30 
-Z2C8C    jsr     Z28F9                   ; 2C8C: 20 F9 28 
+Z2C8C    jsr     Change_Object_To_Explosion ; 2C8C: 20 F9 28 
          jmp     Triggers_Every_Frame    ; 2C8F: 4C 1A 26 
 ; -----------------------
 Test_Jetman_Collide_Score
