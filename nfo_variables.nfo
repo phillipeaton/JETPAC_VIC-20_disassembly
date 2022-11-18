@@ -1,28 +1,28 @@
 ; Zero-Page variables ; Usage count
 label      00 ZP_Obj_List_Ptr_Lo ; 182
 label      01 ZP_Obj_List_Ptr_Hi ; 111
-label      02 ZP_01_Lo ; 46
-label      03 ZP_01_Hi ; 17
+label      02 ZP_02 ; 46
+label      03 ZP_03 ; 17
 label      04 ZP_UDG_RAM_X ; 56
 label      05 ZP_UDG_RAM_Y ; 35
-label      06 ZP_03_Lo ; 51
-label      07 ZP_03_Hi ; 26
-label      08 ZP_04_Lo ; 42 Occurrences, used with 0009
-label      09 ZP_04_Hi ; 11 Occurrences, used with 0008
-label      0A ZP_05_Lo ; 15
-label      0B ZP_05_Hi ; 18
+label      06 ZP_06 ; 51
+label      07 ZP_07 ; 26
+label      08 ZP_08 ; 42 Occurrences, used with 0009
+label      09 ZP_09 ; 11 Occurrences, used with 0008
+label      0A ZP_0A ; 15
+label      0B ZP_0B ; 18
 label      0c ZP_Col_RAM_Ptr_Lo ; 28
 label      0d ZP_Col_RAM_Ptr_Hi ; 10
 label      0E ZP_Ptr_To_Str_Lo ; 21
 label      0F ZP_Ptr_To_Str_Hi ; 12
-label      10 ZP_08_Lo ; 04 Save Obj List Params 1
-label      11 ZP_08_Hi ; 09 Save Obj List Params 1
-label      12 ZP_09_Lo ; 03 Save Obj List Params 1
-label      13 ZP_Keyboard_Data ; 18
-label      14 ZP_0A_Lo ; 08 Connected somehow. Shuffled in a subroutine.
-label      15 ZP_0A_Hi ; 08 Connected somehow. Shuffled in a subroutine.
-label      16 ZP_0B_Lo ; 05 Connected somehow. Shuffled in a subroutine.
-label      17 ZP_0B_Hi ; 04 Connected somehow. Shuffled in a subroutine.
+label      10 ZP_10 ; 04 Save Obj List Params 1
+label      11 ZP_11 ; 09 Save Obj List Params 1
+label      12 ZP_12 ; 03 Save Obj List Params 1
+label      13 ZP_13 ; 18
+label      14 ZP_14 ; 08 Connected somehow. Shuffled in a subroutine.
+label      15 ZP_15 ; 08 Connected somehow. Shuffled in a subroutine.
+label      16 ZP_16 ; 05 Connected somehow. Shuffled in a subroutine.
+label      17 ZP_17 ; 04 Connected somehow. Shuffled in a subroutine.
 label      18 ZP_Save_Obj_Lst_Prms2_Lo ; 07 Save_Obj_List_Params 2
 label      19 ZP_Save_Obj_Lst_Prms2_Hi ; 12 Save_Obj_List_Params 2
 label      1A ZP_Obj_Type ; 03 Save_Obj_List_Params 2

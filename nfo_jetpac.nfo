@@ -1388,8 +1388,8 @@ const    3512-351C
 label    3512 Color_RAM_Row_Offsets
 ;        351D
 comment  351D
-label    351D Setup_UDG_RAM_XY
-lcomment 351D Addr_To = 18 68, as example
+label    351D CONVERT_XY_TO_UDG_RAM_ADDR
+lcomment 351D Addr_To = 18 68, as example i.e. X=$18 pixels from left, Y=$68 pixels from top
 lcomment 351F Addr_To = 18 xx, 68 stashed to Y
 comment  3520
 lcomment 3520 Get Addr_To lo-byte, divide by 8, example = $18/8=3
@@ -1522,8 +1522,11 @@ lcomment 35F6 Object Y
 comment  35FA
 lcomment 35FC Object Color
 label    364C GOTO_364C
+comment  365A
 label    3674 BACK_3674
+comment  3668
 label    3688 GOTO_3688
+comment  367F
 label    36AB SKIP_36AB
 label    369C BACK_36AB
 label    36E7 GOTO_36E7
@@ -1542,13 +1545,32 @@ comment  376D
 comment  3775
 comment  377C
 comment  3783
+lcomment 378A Returns UDG Addr Lo in Y, Hi in A
+comment  378D
+comment  378D Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
+comment  3793
+comment  3793 Setup UDG RAM X & Y
+comment  379B
+comment  379B Convert XY pixel coords to address, managing X axis wrap ($B8)
+comment  37AE
+comment  37AE Subtract 1 from addr lo byte, not sure why
+comment  37B5
+comment  37B5 Subtract 1 from addr hi byte, not sure why
+comment  37BB
+comment  37C1
+comment  37C6
+comment  37CD
 label    37D4 GOUA_1
 comment  37DB
+lcomment 37E8 Zero bits
+label    37E6 Get_Obj_UDG_Addr_0
+bin      37E9
 comment  37ED
-comment  37ED A=Saved Obj Type, X=Saved Object X AND $06/%110
+comment  37ED InReg: A=Saved Obj Type, X=Saved Object X AND $06/%110
 comment  37ED But if it's the Jetman Object, Obj Type is instead Jetman Looks
 comment  37ED and so $3F is masking out direction and test for walking AND flying???
-comment  37ED CALLED ONLY FROM 381C
+comment  37ED OutReg: UDG Addr Lo in Y, Hi in A
+comment  37ED CALLED ONLY FROM 381C or run into from 37E6
 label    37ED Get_Object_UDG_Addr
 lcomment 37EE Mask out bits 6 & 7
 binary   37EF
