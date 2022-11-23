@@ -2,13 +2,13 @@
 label      00 ZP_Obj_List_Ptr_Lo ; 182
 label      01 ZP_Obj_List_Ptr_Hi ; 111
 label      02 ZP_02 ; 46
-label      03 ZP_03 ; 17
+label      03 ZP_03 ; 17 Sprite width in bytes
 label      04 ZP_UDG_RAM_X ; 56
 label      05 ZP_UDG_RAM_Y ; 35
-label      06 ZP_06 ; 51
-label      07 ZP_07 ; 26
-label      08 ZP_08 ; 42 Occurrences, used with 0009
-label      09 ZP_09 ; 11 Occurrences, used with 0008
+label      06 ZP_06 ; 51 06/07 used as addr of sprite data + several other 06 only uses
+label      07 ZP_07 ; 26 Used with 06
+label      08 ZP_08 ; 42 Used with 09
+label      09 ZP_09 ; 11 Used with 08
 label      0A ZP_0A ; 15
 label      0B ZP_0B ; 18
 label      0c ZP_Col_RAM_Ptr_Lo ; 28
@@ -19,7 +19,7 @@ label      10 ZP_10 ; 04 Save Obj List Params 1
 label      11 ZP_11 ; 09 Save Obj List Params 1
 label      12 ZP_12 ; 03 Save Obj List Params 1
 label      13 ZP_13 ; 18
-label      14 ZP_14 ; 08 Connected somehow. Shuffled in a subroutine.
+label      14 ZP_14_Spr_Width_Pix ; 08 Connected somehow. Shuffled in a subroutine.
 label      15 ZP_15 ; 08 Connected somehow. Shuffled in a subroutine.
 label      16 ZP_16 ; 05 Connected somehow. Shuffled in a subroutine.
 label      17 ZP_17 ; 04 Connected somehow. Shuffled in a subroutine.

@@ -1546,20 +1546,26 @@ comment  3775
 comment  377C
 comment  3783
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
+label    378A Set_UDG_RAM_Ptr_Spr_Dimensions
 comment  378D
 comment  378D Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
+label    378D Set_UDG_RAM_Ptr_Spr_Dimens_
 comment  3793
 comment  3793 Setup UDG RAM X & Y
 comment  379B
 comment  379B Convert XY pixel coords to address, managing X axis wrap ($B8)
+deflabel 37A3 SCREEN_WIDTH_PIXELS
+deflabel 37A8 SCREEN_WIDTH_PIXELS
+label    37A9 No_X_Wrap
 comment  37AE
-comment  37AE Subtract 1 from addr lo byte, not sure why
-comment  37B5
-comment  37B5 Subtract 1 from addr hi byte, not sure why
+comment  37AE Subtract $FF from 16-bit UDG_RAM addr?
 comment  37BB
+comment  37BB Get/store sprite width in characters (zero-based)
 comment  37C1
+comment  37C1 Get/store sprite height in pixels
 comment  37C6
-comment  37CD
+comment  37C6 Subtract $01 from 16-bit sprite UDG addr, i.e. so address
+comment  37C6 avoids the sprite dimension bytes
 label    37D4 GOUA_1
 comment  37DB
 lcomment 37E8 Zero bits
@@ -1595,11 +1601,22 @@ lcomment 3811 Address hi byte into A
 label    3815 Get_Object_UDG_Address
 lcomment 3815 Saved Object X
 lcomment 381A Saved Object Type
+label    381F Update_Color_RAM
 comment  381F
+comment  3827
+comment  3827 Setup Color RAM Pointer using UDG RAM X and Y
+comment  382A
+comment  382A Divide ZP_17 by $10, height of a color tile?
+comment  3835
+comment  3835 Outer loop decrementing ZP_0B
+comment  3835 Inner loop decrementing ZP_0A
 label    383B BACK_383B
 label    383F BACK_383F
+comment  383F
 label    384B SKIP_384B
-label    385E SKIP_385E
+comment  384F
+comment  385A
+label    385E DO_RTS
 ;        End
 ; End of file contains graphics data
 ;unused  3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
@@ -1607,13 +1624,16 @@ label    385F UDG_Lookup
 label    3860 UDG_Lookup+1
 break    385F-3FFF ; Output one byte per line
 word     385F-3896
+;
+; Sprites and UDG start here
+;
 comment  3897
 binary   3897-3C86
 byte     3C87-3C88
 const    3C87-3C88
 word     3C89-3CB0
 binary   3CB1-3FFF
-;        38CA
+;
 label    38CA Jetman_Fly_Right_1
 label    38FD Jetman_Walk_Right_1
 label    3930 Jetman_Walk_Right_2

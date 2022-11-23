@@ -32,7 +32,7 @@ ZP_10                   equ     $0010
 ZP_11                   equ     $0011
 ZP_12                   equ     $0012
 ZP_13                   equ     $0013
-ZP_14                   equ     $0014
+ZP_14_Spr_Width_Pix     equ     $0014
 ZP_15                   equ     $0015
 ZP_16                   equ     $0016
 ZP_17                   equ     $0017
@@ -130,6 +130,7 @@ Color_RAM               equ     $9600
 ; Used Definitions
 ;****************************************************
 
+SCREEN_WIDTH_PIXELS     equ     $B8
 GREEN                   equ     $05
 ROCKET_ASCEND           equ     $0A
 FUELLED_UP              equ     $06
@@ -629,7 +630,7 @@ FPAAAA   jsr     Laser_Jetman_Facing_Left??? ; 2263: 20 98 22
          jsr     CONVERT_XY_TO_UDG_RAM_ADDR ; 226E: 20 1D 35 
          jsr     Laser_ZP17_15_to_ZP16_14 ; 2271: 20 8B 22 
          ldy     #$00                    ; 2274: A0 00    
-         lda     ZP_14                   ; 2276: A5 14    
+         lda     ZP_14_Spr_Width_Pix     ; 2276: A5 14    
          eor     (ZP_UDG_RAM_X),y        ; 2278: 51 04    
          sta     (ZP_UDG_RAM_X),y        ; 227A: 91 04    
          pla                             ; 227C: 68       
@@ -646,7 +647,7 @@ CLC_ADC_08
 ; -----------------------
 Laser_ZP17_15_to_ZP16_14
          lda     ZP_15                   ; 228B: A5 15    
-         sta     ZP_14                   ; 228D: 85 14    
+         sta     ZP_14_Spr_Width_Pix     ; 228D: 85 14    
          lda     ZP_16                   ; 228F: A5 16    
          sta     ZP_15                   ; 2291: 85 15    
          lda     ZP_17                   ; 2293: A5 17    
@@ -1510,7 +1511,7 @@ Display_Rocket_Flame
          sec                             ; 27D5: 38       
          sbc     #$01                    ; 27D6: E9 01    
          jsr     Get_Flame_UDG_Addr      ; 27D8: 20 2E 28 
-         jsr     Z378D                   ; 27DB: 20 8D 37 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 27DB: 20 8D 37 
          jsr     Z3610                   ; 27DE: 20 10 36 
 SKIP_27E1 lda    ZP_Rocket_Flame_Toggle  ; 27E1: A5 27    
          pha                             ; 27E3: 48       
@@ -1520,7 +1521,7 @@ SKIP_27E1 lda    ZP_Rocket_Flame_Toggle  ; 27E1: A5 27
          sec                             ; 27EB: 38       
          sbc     #$01                    ; 27EC: E9 01    
          jsr     Get_Flame_UDG_Addr      ; 27EE: 20 2E 28 
-         jsr     Z378D                   ; 27F1: 20 8D 37 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 27F1: 20 8D 37 
          jsr     GOTO_364C               ; 27F4: 20 4C 36 
          lda     ZP_Save_Obj_Lst_Prms2_Lo ; 27F7: A5 18    
          sta     ZP_UDG_RAM_X            ; 27F9: 85 04    
@@ -1552,7 +1553,7 @@ Display_Flame
          sec                             ; 281F: 38       
          sbc     #$01                    ; 2820: E9 01    
          jsr     Get_Flame_UDG_Addr      ; 2822: 20 2E 28 
-         jsr     Z378D                   ; 2825: 20 8D 37 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 2825: 20 8D 37 
          jsr     Z3610                   ; 2828: 20 10 36 
          jmp     BACK_280B               ; 282B: 4C 0B 28 
 ; -----------------------
@@ -1591,7 +1592,7 @@ FP_1     jsr     Save_Obj_Type_X_Y_Color ; 2851: 20 E9 35
          lda     #$00                    ; 2859: A9 00    
          jsr     Z2FDC                   ; 285B: 20 DC 2F 
          jsr     Get_Object_UDG_Addr_Small ; 285E: 20 E5 2F 
-         jsr     Z378D                   ; 2861: 20 8D 37 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 2861: 20 8D 37 
          jsr     Z3610                   ; 2864: 20 10 36 
 
 ; Jetman pickup Gem/Elements/Gold etc = 250 points
@@ -1758,7 +1759,7 @@ Z294A    ldy     #$04                    ; 294A: A0 04
          lda     Explosion_UDG_Ptr+1,x   ; 2958: BD 68 29 
          jsr     Load_Small_UDG_Addr_Setup_XY ; 295B: 20 3D 37 
          jsr     Z3604                   ; 295E: 20 04 36 
-         jsr     Z381F                   ; 2961: 20 1F 38 
+         jsr     Update_Color_RAM        ; 2961: 20 1F 38 
          jmp     Triggers_Every_Frame    ; 2964: 4C 1A 26 
 ; -----------------------
 Explosion_UDG_Ptr
@@ -2235,7 +2236,7 @@ Z2CB3    sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CB3: 91 00
          adc     (ZP_Obj_List_Ptr_Lo),y  ; 2CBF: 71 00    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CC1: 91 00    
          jsr     Z3646                   ; 2CC3: 20 46 36 
-         jsr     Z381F                   ; 2CC6: 20 1F 38 
+         jsr     Update_Color_RAM        ; 2CC6: 20 1F 38 
          jmp     Triggers_Every_Frame    ; 2CC9: 4C 1A 26 
 ; -----------------------
 Z2CCC    adc     #$B8                    ; 2CCC: 69 B8    
@@ -2442,7 +2443,7 @@ Z2DE8    lda     ZP_Level_Current_Plyr   ; 2DE8: A5 59
          pla                             ; 2DF8: 68       
 
          jsr     Get_Object_UDG_Addr_Small ; 2DF9: 20 E5 2F 
-         jmp     Z378D                   ; 2DFC: 4C 8D 37 
+         jmp     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 2DFC: 4C 8D 37 
 ; -----------------------
 Dec_Saved_Obj_List_Params_by_10
          lda     ZP_Save_Obj_Lst_Prms2_Hi ; 2DFF: A5 19    
@@ -2694,9 +2695,9 @@ Z2FC3    pha                             ; 2FC3: 48
          jsr     Load_Small_UDG_Addr_Setup_XY ; 2FC7: 20 3D 37 
          pla                             ; 2FCA: 68       
          jsr     Get_Object_UDG_Addr_Small ; 2FCB: 20 E5 2F 
-         jsr     Z378D                   ; 2FCE: 20 8D 37 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 2FCE: 20 8D 37 
          jsr     GOTO_364C               ; 2FD1: 20 4C 36 
-         jsr     Z381F                   ; 2FD4: 20 1F 38 
+         jsr     Update_Color_RAM        ; 2FD4: 20 1F 38 
          jmp     Triggers_Every_Frame    ; 2FD7: 4C 1A 26 
 ; -----------------------
 Z2FDA    lda     ZP_Level_Current_Plyr   ; 2FDA: A5 59    
@@ -3213,7 +3214,7 @@ Flying_2? dey                            ; 32E0: 88
          eor     #$FF                    ; 32F5: 49 FF    
 Flying_3? sta    (ZP_Obj_List_Ptr_Lo),y  ; 32F7: 91 00    
 Flying_4? jsr    Z3646                   ; 32F9: 20 46 36 
-         jsr     Z381F                   ; 32FC: 20 1F 38 
+         jsr     Update_Color_RAM        ; 32FC: 20 1F 38 
          lda     ZP_Jetman_Movement      ; 32FF: A5 1C    
          bit     MASK_08                 ; 3301: 2C 17 20  Test for direction Right
          bne     SKIP_Flying_5?          ; 3304: D0 03     No, branch
@@ -3272,7 +3273,7 @@ Flash_Display_Score
          dec     ZP_Flash_Score_Countdown ; 3354: C6 5D    
          bne     JMP_JMP_JMP             ; 3356: D0 0F    
          jsr     Z3601                   ; 3358: 20 01 36 
-         jsr     Z381F                   ; 335B: 20 1F 38 
+         jsr     Update_Color_RAM        ; 335B: 20 1F 38 
          jsr     Display_1UP_HI_2UP_Titles ; 335E: 20 25 24 
          jsr     Display_P1_Score        ; 3361: 20 71 24 
          jsr     Display_P2_Score        ; 3364: 20 81 24 
@@ -3767,11 +3768,11 @@ Save_Obj_Type_X_Y_Color
 ; ===========================================================
 Z3601    jsr     Z3737                   ; 3601: 20 37 37 
 Z3604    lda     #$00                    ; 3604: A9 00    
-         sta     ZP_14                   ; 3606: 85 14    
+         sta     ZP_14_Spr_Width_Pix     ; 3606: 85 14    
          sta     ZP_03                   ; 3608: 85 03    
          jmp     GOTO_364C               ; 360A: 4C 4C 36 
 ; -----------------------
-Z360D    jsr     Z378A                   ; 360D: 20 8A 37 
+Z360D    jsr     Set_UDG_RAM_Ptr_Spr_Dimensions ; 360D: 20 8A 37 
 Z3610    lda     #$00                    ; 3610: A9 00    
          sta     ZP_15                   ; 3612: 85 15    
          sta     ZP_0B                   ; 3614: 85 0B    
@@ -3805,7 +3806,7 @@ Z362F    lda     (ZP_Ptr_To_Str_Lo),y    ; 362F: B1 0E
          jmp     GOTO_3688               ; 3643: 4C 88 36 
 ; -----------------------
 Z3646    jsr     Z3737                   ; 3646: 20 37 37 
-         jsr     Z378A                   ; 3649: 20 8A 37 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimensions ; 3649: 20 8A 37 
 GOTO_364C lda    #$FF                    ; 364C: A9 FF    
          sta     ZP_08                   ; 364E: 85 08    
          sta     ZP_09                   ; 3650: 85 09    
@@ -3863,9 +3864,9 @@ BACK_36AB dec    ZP_0A                   ; 369C: C6 0A
 ; -----------------------
 SKIP_36AB lda    ZP_0A                   ; 36AB: A5 0A    
          bne     BACK_36AB               ; 36AD: D0 ED    
-         lda     ZP_14                   ; 36AF: A5 14    
+         lda     ZP_14_Spr_Width_Pix     ; 36AF: A5 14    
          beq     Z3729                   ; 36B1: F0 76    
-         dec     ZP_14                   ; 36B3: C6 14    
+         dec     ZP_14_Spr_Width_Pix     ; 36B3: C6 14    
          lda     ZP_06                   ; 36B5: A5 06    
          sec                             ; 36B7: 38       
          sbc     ZP_03                   ; 36B8: E5 03    
@@ -3931,7 +3932,7 @@ SKIP_3722 lda    #$00                    ; 3722: A9 00
 ; -----------------------
 Z3729    lda     #$00                    ; 3729: A9 00    
          sta     ZP_03                   ; 372B: 85 03    
-         lda     ZP_14                   ; 372D: A5 14    
+         lda     ZP_14_Spr_Width_Pix     ; 372D: A5 14    
          ora     ZP_15                   ; 372F: 05 15    
          bne     Z3734                   ; 3731: D0 01    
          rts                             ; 3733: 60       
@@ -3994,10 +3995,12 @@ Z3759    sta     ZP_UDG_RAM_X            ; 3759: 85 04
          sta     ZP_Ptr_To_Str_Hi        ; 3787: 85 0F    
          rts                             ; 3789: 60       
 ; ===========================================================
-Z378A    jsr     Get_Obj_UDG_Addr_0      ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
+Set_UDG_RAM_Ptr_Spr_Dimensions
+         jsr     Get_Obj_UDG_Addr_0      ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
 
 ; Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
-Z378D    sty     ZP_06                   ; 378D: 84 06    
+Set_UDG_RAM_Ptr_Spr_Dimens_
+         sty     ZP_06                   ; 378D: 84 06    
          tay                             ; 378F: A8       
          dey                             ; 3790: 88       
          sty     ZP_07                   ; 3791: 84 07    
@@ -4013,37 +4016,38 @@ Z378D    sty     ZP_06                   ; 378D: 84 06
          lda     (ZP_06),y               ; 379D: B1 06    
          clc                             ; 379F: 18       
          adc     ZP_UDG_RAM_X            ; 37A0: 65 04    
-         cmp     #$B8                    ; 37A2: C9 B8    
-         bcc     Z37A9                   ; 37A4: 90 03    
+         cmp     #SCREEN_WIDTH_PIXELS    ; 37A2: C9 B8    
+         bcc     No_X_Wrap               ; 37A4: 90 03    
          sec                             ; 37A6: 38       
-         sbc     #$B8                    ; 37A7: E9 B8    
-Z37A9    sta     ZP_UDG_RAM_X            ; 37A9: 85 04    
+         sbc     #SCREEN_WIDTH_PIXELS    ; 37A7: E9 B8    
+No_X_Wrap sta    ZP_UDG_RAM_X            ; 37A9: 85 04    
          jsr     CONVERT_XY_TO_UDG_RAM_ADDR ; 37AB: 20 1D 35 
 
-; Subtract 1 from addr lo byte, not sure why
+; Subtract $FF from 16-bit UDG_RAM addr?
          lda     ZP_UDG_RAM_X            ; 37AE: A5 04    
          sec                             ; 37B0: 38       
          sbc     #$FF                    ; 37B1: E9 FF    
          sta     ZP_UDG_RAM_X            ; 37B3: 85 04    
-
-; Subtract 1 from addr hi byte, not sure why
          lda     ZP_UDG_RAM_Y            ; 37B5: A5 05    
          sbc     #$00                    ; 37B7: E9 00    
          sta     ZP_UDG_RAM_Y            ; 37B9: 85 05    
 
+; Get/store sprite width in characters (zero-based)
          ldy     #$FE                    ; 37BB: A0 FE    
          lda     (ZP_06),y               ; 37BD: B1 06    
-         sta     ZP_14                   ; 37BF: 85 14    
+         sta     ZP_14_Spr_Width_Pix     ; 37BF: 85 14    
 
+; Get/store sprite height in pixels
          dey                             ; 37C1: 88       
          lda     (ZP_06),y               ; 37C2: B1 06    
          sta     ZP_03                   ; 37C4: 85 03    
 
+; Subtract $01 from 16-bit sprite UDG addr, i.e. so address
+; avoids the sprite dimension bytes
          lda     ZP_06                   ; 37C6: A5 06    
          sec                             ; 37C8: 38       
          sbc     #$03                    ; 37C9: E9 03    
          sta     ZP_06                   ; 37CB: 85 06    
-
          lda     ZP_07                   ; 37CD: A5 07    
          sbc     #$00                    ; 37CF: E9 00    
          sta     ZP_07                   ; 37D1: 85 07    
@@ -4119,11 +4123,16 @@ Get_Object_UDG_Address
          lda     ZP_Obj_Type             ; 381A: A5 1A     Saved Object Type
          jmp     Get_Object_UDG_Addr     ; 381C: 4C ED 37 
 
-Z381F    lda     ZP_Save_Obj_Lst_Prms2_Lo ; 381F: A5 18    
+Update_Color_RAM
+         lda     ZP_Save_Obj_Lst_Prms2_Lo ; 381F: A5 18    
          sta     ZP_UDG_RAM_X            ; 3821: 85 04    
          lda     ZP_Save_Obj_Lst_Prms2_Hi ; 3823: A5 19    
          sta     ZP_UDG_RAM_Y            ; 3825: 85 05    
+
+; Setup Color RAM Pointer using UDG RAM X and Y
          jsr     Setup_Color_RAM_Ptr     ; 3827: 20 F7 34 
+
+; Divide ZP_17 by $10, height of a color tile?
          lda     ZP_17                   ; 382A: A5 17    
          lsr     a                       ; 382C: 4A       
          lsr     a                       ; 382D: 4A       
@@ -4132,11 +4141,15 @@ Z381F    lda     ZP_Save_Obj_Lst_Prms2_Lo ; 381F: A5 18
          clc                             ; 3830: 18       
          adc     #$02                    ; 3831: 69 02    
          sta     ZP_0B                   ; 3833: 85 0B    
+
+; Outer loop decrementing ZP_0B
+; Inner loop decrementing ZP_0A
          lda     ZP_16                   ; 3835: A5 16    
          sta     ZP_0A                   ; 3837: 85 0A    
          inc     ZP_0A                   ; 3839: E6 0A    
 BACK_383B ldx    ZP_0A                   ; 383B: A6 0A    
          ldy     #$00                    ; 383D: A0 00    
+
 BACK_383F lda    (ZP_Col_RAM_Ptr_Lo),y   ; 383F: B1 0C    
          and     #$07                    ; 3841: 29 07    
          cmp     #$05                    ; 3843: C9 05    
@@ -4146,15 +4159,17 @@ BACK_383F lda    (ZP_Col_RAM_Ptr_Lo),y   ; 383F: B1 0C
 SKIP_384B iny                            ; 384B: C8       
          dex                             ; 384C: CA       
          bne     BACK_383F               ; 384D: D0 F0    
+
          lda     ZP_Col_RAM_Ptr_Lo       ; 384F: A5 0C    
          sec                             ; 3851: 38       
          sbc     #$17                    ; 3852: E9 17    
          cmp     #$17                    ; 3854: C9 17    
-         bcc     SKIP_385E               ; 3856: 90 06    
+         bcc     DO_RTS                  ; 3856: 90 06    
          sta     ZP_Col_RAM_Ptr_Lo       ; 3858: 85 0C    
+
          dec     ZP_0B                   ; 385A: C6 0B    
          bne     BACK_383B               ; 385C: D0 DD    
-SKIP_385E rts                            ; 385E: 60       
+DO_RTS   rts                             ; 385E: 60       
 ; ===========================================================
 UDG_Lookup
          fdb     Jetman_Fly_Right_2      ; 385F: BE 3B    
