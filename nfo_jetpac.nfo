@@ -644,10 +644,6 @@ lcomment 2688 Clear Disable Interrupts flag
 label    268C Subroutine_List
 word     268C-26AD
 label    268D Subroutine_List+1
-lcomment 2698 3 lines the JMP
-lcomment 269A 2A6D and 2A5F almost the same
-lcomment 269C 2A6D and 2A5F almost the same
-;        26AE
 comment  26AE
 label    26AE Init_Rocket_Object
 label    26B0 IRO_1
@@ -886,23 +882,38 @@ label    2BDE Get_Raster_Line_Band
 break    2BE8-2BF7
 const    2BE8-2BF7
 label    2BE8 Raster_Line_Table
+label    2BF8 Test_Laser_Hits_2
 comment  2BF8
-comment  2BF8 $0388=Obj_Laser_0
+comment  2BF8 Store Obj_Laser_0 address in ZP_08/09 ($0388)
+comment  2BF8 Replace call with RTS at 2C64 and you can't shoot any aliens
 comment  2C00
+comment  2C00 Store number of lasers (4) for processing to ZP_02
 comment  2C04
-comment  2C04 Store current object X and Y in ZP_03
+comment  2C04 Store current object (not the laser) X and Y in ZP_06/07
 lcomment 2C06 Object Y
 lcomment 2C0B Object X
 comment  2C10
+comment  2C10 Test if laser X-coords have bit 2 set, not sure why
 label    2C10 BACK_2C10
 lcomment 2C12 X-coord of end of laser
 lcomment 2C1A Delayed X-coord of end of laser
 comment  2C21
+comment  2C21 Test if next object is in use
 label    2C21 SKIP_2C21
 label    2C42 SKIP_2C42
+comment  2C27
+comment  2C31
+comment  2C3D
+comment  2C46
+comment  2C46 Return $80 in ZP_02
 comment  2C4A
-lcomment 2C4A X-coord of end of laser
-label    2C53 ZP_04_TO_NEXT_OBJ
+comment  2C4A Zero bit 2 i.e. xxxxx0xx
+; lcomment 2C4A X-coord of end of laser
+comment  2C53 Increment current object address and decrement object counter
+label    2C53 Goto_Next_Obj
+comment  2C5A
+comment  2C5A Decrement object counter, return when all processed
+label    2C5F Test_Laser_Hits
 label    2C6A Level_0_Fuzzball?
 lcomment 2C6F Remove=1st Level Aliens don't explode on platform/floor impact
 comment  2C78
