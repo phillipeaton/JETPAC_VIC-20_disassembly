@@ -1461,7 +1461,7 @@ Subroutine_List
          fdb     Flash_Display_Score     ; 2690: 4D 33    
          fdb     Explosions_Plyr_Life_Lost? ; 2692: 34 29    
          fdb     Stops_All               ; 2694: 8E 2F    
-         fdb     Level_0_Fuzzball?       ; 2696: 6A 2C    
+         fdb     Level_0_Fuzzball        ; 2696: 6A 2C    
          fdb     Level_3_Saucer          ; 2698: BC 2A    
          fdb     Level_2_Balls           ; 269A: 6D 2A    
          fdb     Level_1_Plusses         ; 269C: 5F 2A    
@@ -2146,152 +2146,211 @@ Z2A45    jsr     Save_Obj_List_Ptr       ; 2A45: 20 E7 28
          fcb     $00                     ; 2A4B: 00       
          fdb     Obj_Jetman_Looks        ; 2A4C: 80 03    
          fcb     $FF                     ; 2A4E: FF       
+
          ldy     #$02                    ; 2A4F: A0 02    
          lda     #$01                    ; 2A51: A9 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A53: 91 00    
+
          ldy     #$00                    ; 2A55: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A57: B1 00    
          jsr     Z290A                   ; 2A59: 20 0A 29 
          jmp     Restore_Obj_List_Ptr    ; 2A5C: 4C F0 28 
 ; -----------------------
+
+; 88     888888 Yb    dP 888888 88                  .d
+; 88     88__    Yb  dP  88__   88                .d88
+; 88  .o 88""     YbdP   88""   88  .o              88
+; 88ood8 888888    YP    888888 88ood8 oooooooooo   88 oooooooooo
+
+; 88""Yb 88     88   88 .dP"Y8 .dP"Y8 888888 .dP"Y8
+; 88__dP 88     88   88 `Ybo." `Ybo." 88__   `Ybo."
+; 88"""  88  .o Y8   8P o.`Y8b o.`Y8b 88""   o.`Y8b
+; 88     88ood8 `YbodP' 8bodP' 8bodP' 888888 8bodP'
+
 Level_1_Plusses
          jsr     Test_Laser_Hits         ; 2A5F: 20 5F 2C 
-         bpl     Z2A67                   ; 2A62: 10 03    
+         bpl     Level_1_Plusses_1       ; 2A62: 10 03    
          jmp     Alien_Hit_Update_Score  ; 2A64: 4C 78 2C 
 ; -----------------------
 ; L_BRS_($2A67)_($2A62) OK
-Z2A67    jsr     Z2B16                   ; 2A67: 20 16 2B 
-         jmp     Z2A83                   ; 2A6A: 4C 83 2A 
+Level_1_Plusses_1
+         jsr     Platform_Collision_Aliens ; 2A67: 20 16 2B 
+         jmp     L2L3_2                  ; 2A6A: 4C 83 2A 
 ; -----------------------
+
+; 88     888888 Yb    dP 888888 88                oP"Yb.
+; 88     88__    Yb  dP  88__   88                "' dP'
+; 88  .o 88""     YbdP   88""   88  .o              dP'
+; 88ood8 888888    YP    888888 88ood8 oooooooooo .d8888 oooooooooo
+
+; 88""Yb    db    88     88     .dP"Y8
+; 88__dP   dPYb   88     88     `Ybo."
+; 88""Yb  dP__Yb  88  .o 88  .o o.`Y8b
+; 88oodP dP""""Yb 88ood8 88ood8 8bodP'
+
 Level_2_Balls
          jsr     Test_Laser_Hits         ; 2A6D: 20 5F 2C 
-         beq     Z2A75                   ; 2A70: F0 03    
+         beq     Level_2_Balls_1         ; 2A70: F0 03    
          jmp     Alien_Hit_Update_Score  ; 2A72: 4C 78 2C 
 ; -----------------------
 ; L_BRS_($2A75)_($2A70) OK
-Z2A75    jsr     Z2B16                   ; 2A75: 20 16 2B 
+Level_2_Balls_1
+         jsr     Platform_Collision_Aliens ; 2A75: 20 16 2B 
+
          ldy     #$06                    ; 2A78: A0 06    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A7A: B1 00    
-         beq     Z2AA2                   ; 2A7C: F0 24    
+         beq     L2L3_6                  ; 2A7C: F0 24    
          sec                             ; 2A7E: 38       
          sbc     #$01                    ; 2A7F: E9 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A81: 91 00    
+
 ; L_JMP_($2A83)_($2A6A) OK
-Z2A83    ldy     #$02                    ; 2A83: A0 02    
+L2L3_2   ldy     #$02                    ; 2A83: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A85: B1 00    
-         bmi     Z2A9E                   ; 2A87: 30 15    
+         bmi     L2L3_5                  ; 2A87: 30 15    
          lda     #$08                    ; 2A89: A9 08    
 ; L_BRS_($2A8B)_($2AA0) OK
-Z2A8B    sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A8B: 91 00    
+L2L3_3   sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A8B: 91 00    
+
          ldy     #$04                    ; 2A8D: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A8F: B1 00    
-         bmi     Z2A9A                   ; 2A91: 30 07    
+         bmi     L2L3_4                  ; 2A91: 30 07    
          lda     #$08                    ; 2A93: A9 08    
 ; L_BRS_($2A95)_($2A9C) OK
-Z2A95    sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A95: 91 00    
+L2L3_EXIT_1
+         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A95: 91 00    
          jmp     Test_Jetman_Collide_Score ; 2A97: 4C 92 2C 
 ; -----------------------
 ; L_BRS_($2A9A)_($2A91) OK
-Z2A9A    lda     #$F8                    ; 2A9A: A9 F8    
-         bmi     Z2A95                   ; 2A9C: 30 F7    
+L2L3_4   lda     #$F8                    ; 2A9A: A9 F8    
+         bmi     L2L3_EXIT_1             ; 2A9C: 30 F7    
 ; L_BRS_($2A9E)_($2A87) OK
-Z2A9E    lda     #$F8                    ; 2A9E: A9 F8    
-         bmi     Z2A8B                   ; 2AA0: 30 E9    
+L2L3_5   lda     #$F8                    ; 2A9E: A9 F8    
+         bmi     L2L3_3                  ; 2AA0: 30 E9    
 ; L_BRS_($2AA2)_($2A7C) OK
-Z2AA2    lda     ZP_HW_IRQ_Count3        ; 2AA2: A5 4C    
+L2L3_6   lda     ZP_HW_IRQ_Count3        ; 2AA2: A5 4C    
          and     #$0F                    ; 2AA4: 29 0F    
          adc     #$10                    ; 2AA6: 69 10    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AA8: 91 00    
+
          ldy     #$04                    ; 2AAA: A0 04    
          and     #$04                    ; 2AAC: 29 04    
          bit     ZP_HW_IRQ_Count3        ; 2AAE: 24 4C    
-         bmi     Z2AB7                   ; 2AB0: 30 05    
+         bmi     L2L3_EXIT_2             ; 2AB0: 30 05    
          eor     #$FF                    ; 2AB2: 49 FF    
          clc                             ; 2AB4: 18       
          adc     #$01                    ; 2AB5: 69 01    
 ; L_BRS_($2AB7)_($2AB0) OK
-Z2AB7    sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AB7: 91 00    
+L2L3_EXIT_2
+         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AB7: 91 00    
          jmp     Test_Jetman_Collide_Score ; 2AB9: 4C 92 2C 
 ; -----------------------
+
+; 88     888888 Yb    dP 888888 88                88888
+; 88     88__    Yb  dP  88__   88                  .dP
+; 88  .o 88""     YbdP   88""   88  .o            o `Yb
+; 88ood8 888888    YP    888888 88ood8 oooooooooo YbodP oooooooooo
+
+; _dP"Y8    db    88   88  dP""b8 888888 88""Yb
+; `Ybo."   dPYb   88   88 dP   `" 88__   88__dP
+; o.`Y8b  dP__Yb  Y8   8P Yb      88""   88"Yb
+; 8bodP' dP""""Yb `YbodP'  YboodP 888888 88  Yb
+
 Level_3_Saucer
          jsr     Test_Laser_Hits         ; 2ABC: 20 5F 2C 
-         bpl     Z2AC4                   ; 2ABF: 10 03    
+         bpl     Level_3_Saucer_1        ; 2ABF: 10 03    
          jmp     Alien_Hit_Update_Score  ; 2AC1: 4C 78 2C 
 ; -----------------------
 ; L_BRS_($2AC4)_($2ABF) OK
-Z2AC4    jsr     Z2B16                   ; 2AC4: 20 16 2B 
+Level_3_Saucer_1
+         jsr     Platform_Collision_Aliens ; 2AC4: 20 16 2B 
+
          ldy     #$01                    ; 2AC7: A0 01    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2AC9: B1 00    
          iny                             ; 2ACB: C8       
          sec                             ; 2ACC: 38       
          sbc     Obj_Jetman_X            ; 2ACD: ED 81 03 
-         bmi     Z2AFA                   ; 2AD0: 30 28    
+         bmi     Level_3_Saucer_7        ; 2AD0: 30 28    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2AD2: B1 00    
          sec                             ; 2AD4: 38       
-         bpl     Z2ADB                   ; 2AD5: 10 04    
+         bpl     Level_3_Saucer_2        ; 2AD5: 10 04    
          cmp     #$FC                    ; 2AD7: C9 FC    
-         bcc     Z2ADF                   ; 2AD9: 90 04    
+         bcc     Level_3_Saucer_4        ; 2AD9: 90 04    
 ; L_BRS_($2ADB)_($2AD5) OK
-Z2ADB    sbc     #$01                    ; 2ADB: E9 01    
+Level_3_Saucer_2
+         sbc     #$01                    ; 2ADB: E9 01    
 ; L_JMP_($2ADD)_($2B05) OK
-Z2ADD    sta     (ZP_Obj_List_Ptr_Lo),y  ; 2ADD: 91 00    
+Level_3_Saucer_3
+         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2ADD: 91 00    
 ; L_BRS_($2ADF)_($2AD9) OK
 ; L_BRS_($2ADF)_($2B01) OK
-Z2ADF    ldy     #$03                    ; 2ADF: A0 03    
+Level_3_Saucer_4
+         ldy     #$03                    ; 2ADF: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2AE1: B1 00    
          iny                             ; 2AE3: C8       
          sec                             ; 2AE4: 38       
          sbc     Obj_Jetman_Y            ; 2AE5: ED 83 03 
-         bmi     Z2B08                   ; 2AE8: 30 1E    
+         bmi     Level_3_Saucer_9        ; 2AE8: 30 1E    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2AEA: B1 00    
          sec                             ; 2AEC: 38       
-         bpl     Z2AF3                   ; 2AED: 10 04    
+         bpl     Level_3_Saucer_5        ; 2AED: 10 04    
          cmp     #$FC                    ; 2AEF: C9 FC    
-         bcc     Z2AF7                   ; 2AF1: 90 04    
+         bcc     Level_3_Saucer_EXIT     ; 2AF1: 90 04    
 ; L_BRS_($2AF3)_($2AED) OK
-Z2AF3    sbc     #$01                    ; 2AF3: E9 01    
+Level_3_Saucer_5
+         sbc     #$01                    ; 2AF3: E9 01    
 ; L_JMP_($2AF5)_($2B13) OK
-Z2AF5    sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AF5: 91 00    
+Level_3_Saucer_6
+         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AF5: 91 00    
 ; L_BRS_($2AF7)_($2AF1) OK
 ; L_BRS_($2AF7)_($2B0F) OK
-Z2AF7    jmp     Test_Jetman_Collide_Score ; 2AF7: 4C 92 2C 
+Level_3_Saucer_EXIT
+         jmp     Test_Jetman_Collide_Score ; 2AF7: 4C 92 2C 
 ; -----------------------
 ; L_BRS_($2AFA)_($2AD0) OK
-Z2AFA    lda     (ZP_Obj_List_Ptr_Lo),y  ; 2AFA: B1 00    
+Level_3_Saucer_7
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2AFA: B1 00    
          clc                             ; 2AFC: 18       
-         bmi     Z2B03                   ; 2AFD: 30 04    
+         bmi     Level_3_Saucer_8        ; 2AFD: 30 04    
          cmp     #$04                    ; 2AFF: C9 04    
-         bcs     Z2ADF                   ; 2B01: B0 DC    
+         bcs     Level_3_Saucer_4        ; 2B01: B0 DC    
 ; L_BRS_($2B03)_($2AFD) OK
-Z2B03    adc     #$01                    ; 2B03: 69 01    
-         jmp     Z2ADD                   ; 2B05: 4C DD 2A 
+Level_3_Saucer_8
+         adc     #$01                    ; 2B03: 69 01    
+         jmp     Level_3_Saucer_3        ; 2B05: 4C DD 2A 
 ; -----------------------
 ; L_BRS_($2B08)_($2AE8) OK
-Z2B08    lda     (ZP_Obj_List_Ptr_Lo),y  ; 2B08: B1 00    
+Level_3_Saucer_9
+         lda     (ZP_Obj_List_Ptr_Lo),y  ; 2B08: B1 00    
          clc                             ; 2B0A: 18       
-         bmi     Z2B11                   ; 2B0B: 30 04    
+         bmi     Level_3_Saucer_a        ; 2B0B: 30 04    
          cmp     #$04                    ; 2B0D: C9 04    
-         bcs     Z2AF7                   ; 2B0F: B0 E6    
+         bcs     Level_3_Saucer_EXIT     ; 2B0F: B0 E6    
 ; L_BRS_($2B11)_($2B0B) OK
-Z2B11    adc     #$01                    ; 2B11: 69 01    
-         jmp     Z2AF5                   ; 2B13: 4C F5 2A 
+Level_3_Saucer_a
+         adc     #$01                    ; 2B11: 69 01    
+         jmp     Level_3_Saucer_6        ; 2B13: 4C F5 2A 
 ; -----------------------
 ; L_JSR_($2B16)_($2A67) OK
 ; L_JSR_($2B16)_($2A75) OK
 ; L_JSR_($2B16)_($2AC4) OK
-Z2B16    jsr     Platform_Collision_Test ; 2B16: 20 B3 30  Remove=(Not triggered on first level, so don't yet know)
+Platform_Collision_Aliens
+         jsr     Platform_Collision_Test ; 2B16: 20 B3 30  Remove=(Not triggered on first level, so don't yet know)
          lda     ZP_02                   ; 2B19: A5 02    
-         bpl     Z2B36                   ; 2B1B: 10 19    
+         bpl     PCA_RTS                 ; 2B1B: 10 19    
+
          ldy     #$02                    ; 2B1D: A0 02    
          bit     MASK_04                 ; 2B1F: 2C 16 20 
-         bne     Z2B37                   ; 2B22: D0 13    
+         bne     PCA_2222                ; 2B22: D0 13    
+
          ldy     #$04                    ; 2B24: A0 04    
          bit     MASK_08                 ; 2B26: 2C 17 20 
-         bne     Z2B42                   ; 2B29: D0 17    
+         bne     PCA_3333                ; 2B29: D0 17    
+
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2B2B: B1 00    
-         bpl     Z2B36                   ; 2B2D: 10 07    
+         bpl     PCA_RTS                 ; 2B2D: 10 07    
 ; L_BRS_($2B2F)_($2B40) OK
-Z2B2F    eor     #$FF                    ; 2B2F: 49 FF    
+PCA_1111 eor     #$FF                    ; 2B2F: 49 FF    
          clc                             ; 2B31: 18       
          adc     #$03                    ; 2B32: 69 03    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2B34: 91 00    
@@ -2299,18 +2358,19 @@ Z2B2F    eor     #$FF                    ; 2B2F: 49 FF
 ; L_BRS_($2B36)_($2B2D) OK
 ; L_BRS_($2B36)_($2B3E) OK
 ; L_BRS_($2B36)_($2B44) OK
-Z2B36    rts                             ; 2B36: 60       
+PCA_RTS  rts                             ; 2B36: 60       
 ; ===========================================================
 ; L_BRS_($2B37)_($2B22) OK
-Z2B37    bit     MASK_01                 ; 2B37: 2C 14 20 
-         bne     Z2B42                   ; 2B3A: D0 06    
+PCA_2222 bit     MASK_01                 ; 2B37: 2C 14 20 
+         bne     PCA_3333                ; 2B3A: D0 06    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2B3C: B1 00    
-         bpl     Z2B36                   ; 2B3E: 10 F6    
-         bmi     Z2B2F                   ; 2B40: 30 ED    
+         bpl     PCA_RTS                 ; 2B3E: 10 F6    
+         bmi     PCA_1111                ; 2B40: 30 ED    
+
 ; L_BRS_($2B42)_($2B29) OK
 ; L_BRS_($2B42)_($2B3A) OK
-Z2B42    lda     (ZP_Obj_List_Ptr_Lo),y  ; 2B42: B1 00    
-         bmi     Z2B36                   ; 2B44: 30 F0    
+PCA_3333 lda     (ZP_Obj_List_Ptr_Lo),y  ; 2B42: B1 00    
+         bmi     PCA_RTS                 ; 2B44: 30 F0    
          eor     #$FF                    ; 2B46: 49 FF    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2B48: 91 00    
          rts                             ; 2B4A: 60       
@@ -2433,7 +2493,7 @@ Raster_Line_Table
 ; Store Obj_Laser_0 address in ZP_08/09 ($0388)
 ; Replace call with RTS at 2C64 and you can't shoot any aliens
 ; L_JSR_($2BF8)_($2C64) OK
-Test_Laser_Hits_2
+Test_Laser_Hits_1
          lda     #$88                    ; 2BF8: A9 88    
          sta     ZP_08                   ; 2BFA: 85 08    
          lda     #$03                    ; 2BFC: A9 03    
@@ -2525,17 +2585,17 @@ Goto_Next_Obj
 Test_Laser_Hits
          inc     ZP_HW_IRQ_Count         ; 2C5F: E6 21    
          jsr     Save_Obj_Type_X_Y       ; 2C61: 20 D7 35 
-         jsr     Test_Laser_Hits_2       ; 2C64: 20 F8 2B 
+         jsr     Test_Laser_Hits_1       ; 2C64: 20 F8 2B 
          lda     ZP_02                   ; 2C67: A5 02    
          rts                             ; 2C69: 60       
 ; ===========================================================
-Level_0_Fuzzball?
+Level_0_Fuzzball
          jsr     Test_Laser_Hits         ; 2C6A: 20 5F 2C 
          bmi     Alien_Hit_Update_Score  ; 2C6D: 30 09    
          jsr     Platform_Collision_Test ; 2C6F: 20 B3 30  Remove=1st Level Aliens don't explode on platform/floor impact
          lda     ZP_02                   ; 2C72: A5 02    
          bpl     Test_Jetman_Collide_Score ; 2C74: 10 1C    
-         bmi     Z2C8C                   ; 2C76: 30 14    
+         bmi     Jetman_Explosion        ; 2C76: 30 14    
 
 ; L_JMP_($2C78)_($2A64) OK
 ; L_JMP_($2C78)_($2A72) OK
@@ -2554,7 +2614,8 @@ Alien_Hit_Update_Score
          sta     ZP_03                   ; 2C87: 85 03    
          jsr     Update_Score            ; 2C89: 20 63 30 
 ; L_BRS_($2C8C)_($2C76) OK
-Z2C8C    jsr     Change_Object_To_Explosion ; 2C8C: 20 F9 28 
+Jetman_Explosion
+         jsr     Change_Object_To_Explosion ; 2C8C: 20 F9 28 
          jmp     Triggers_Every_Frame    ; 2C8F: 4C 1A 26 
 ; -----------------------
 ; L_JMP_($2C92)_($2A97) OK
