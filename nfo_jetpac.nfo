@@ -507,7 +507,7 @@ label    24A1 Game_Sel_Flash_Period
 label    24A4 GSFP1
 lcomment 24A5 Test settings bit 1, if not set, skip counter logic
 lcomment 24A9 Counter for flash period
-lcomment 24AB remove the lsrs and flashes get faster
+lcomment 24AB remove the lasers? and flashes get faster
 ;        24B2
 label    24B2 GSFP2
 label    24B9 Display_Game_Select
@@ -784,6 +784,8 @@ comment  2902
 comment  2902 Setup Alien object color flashing/cycling
 lcomment 2906 Zero bits 0-5 i.e. xx000000
 lcomment 2908 Set bits 0-1 i.e. xxxxxx11
+comment  290A
+label    290A Store_object_type
 comment  290E
 comment  290E Change Alien object type to an Explosion
 comment  2914
@@ -854,25 +856,32 @@ label    2A1F STR_GAME_OVER_PLAYER_1
 ;        2A32
 break    2A32
 label    2A32 STR_GAME_OVER_PLAYER_2
-;        2A4C
+label    2A45 Test_Jetman_Collide_Score_0
 word     2A4C
 comment  2A4F
+comment  2A4F Set alien horizontal position to edge of screen
 comment  2A55
+comment  2A55 Object type
 label    2A5F Level_1_Plusses
 label    2A67 Level_1_Plusses_1
 label    2A6D Level_2_Balls
 label    2A75 Level_2_Balls_1
 comment  2A78
+comment  2A78 Read countdown, branch if zero, else decrement
 comment  2A83
-label    2A83 L2L3_2
-label    2A8B L2L3_3
+label    2A83 Test_Alien_Direction
+label    2A8B Set_Alien_Direction
 comment  2A8D
-label    2A95 L2L3_EXIT_1
-label    2A9A L2L3_4
-label    2A9E L2L3_5
-label    2AA2 L2L3_6
+comment  2A8D Test_Alien_Diagonal?
+label    2A95 Set_Alien_Diagonal?
+label    2A9A Alien_Diagonal_Set_F8
+label    2A9E Alien_Direction_Left
+comment  2AA2
+comment  2AA2 Use IRQ counter for randomness, range $10-$1F
+label    2AA2 Reset_Countdown_Timer
 comment  2AAA
-label    2AB7 L2L3_EXIT_2
+comment  2AAA Invert diagonal direction up/down, randomly via IRQ
+label    2AB7 Set_Alien_Diagonal_2?
 label    2ABC Level_3_Saucer
 
 label    2AC4 Level_3_Saucer_1
@@ -956,9 +965,19 @@ label    2C5F Test_Laser_Hits
 label    2C6A Level_0_Fuzzball
 lcomment 2C6F Remove=1st Level Aliens don't explode on platform/floor impact
 comment  2C78
+comment  2C78 Use current player level to create offset into points table
 label    2C78 Alien_Hit_Update_Score
-label    2C8C Jetman_Explosion
+comment  2C7E
+comment  2C7E Get score high byte and save
+comment  2C84
+comment  2C84 Get score low byte and save
+label    2C8C Object_To_Explosion
+comment  2C8C
 label    2C92 Test_Jetman_Collide_Score
+label    2C9F Test_Jetman_Collide_Score_1
+label    2CB3 Test_Jetman_Collide_Score_2
+label    2CCC Test_Jetman_Collide_Score_3
+label    2CD1 Test_Jetman_Collide_Score_4
 label    2CD6 Flash_Score_Cntr_At_Zero?
 const    2CDB-2CE2
 label    2CDB Alien_Points_Lookup

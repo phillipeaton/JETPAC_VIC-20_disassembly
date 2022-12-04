@@ -1107,7 +1107,7 @@ GSFP1    pha                             ; 24A4: 48
          and     #$01                    ; 24A5: 29 01     Test settings bit 1, if not set, skip counter logic
          bne     GSFP2                   ; 24A7: D0 09    
          lda     ZP_Flash_Counter        ; 24A9: A5 58     Counter for flash period
-         lsr     a                       ; 24AB: 4A        remove the lsrs and flashes get faster
+         lsr     a                       ; 24AB: 4A        remove the lasers? and flashes get faster
          lsr     a                       ; 24AC: 4A       
          lsr     a                       ; 24AD: 4A       
          and     #$01                    ; 24AE: 29 01    
@@ -1120,6 +1120,17 @@ GSFP2    sta     ZP_Game_Sel_F1_Flash,x  ; 24B2: 95 45
          rts                             ; 24B8: 60       
 ; ===========================================================
 ; L_JSR_($24B9)_($20D4) OK
+
+; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
+;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
+;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
+; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP    oooooooooo
+
+;  dP""b8    db    8b    d8 888888            .dP"Y8 888888 88     888888  dP""b8 888888
+; dP   `"   dPYb   88b  d88 88__              `Ybo." 88__   88     88__   dP   `"   88
+; Yb  "88  dP__Yb  88YbdP88 88""              o.`Y8b 88""   88  .o 88""   Yb        88
+;  YboodP dP""""Yb 88 YY 88 888888 oooooooooo 8bodP' 888888 88ood8 888888  YboodP   88
+
 Display_Game_Select
          ldx     #$00                    ; 24B9: A2 00    
          lda     Game_Settings           ; 24BB: AD D3 1F 
@@ -1455,6 +1466,17 @@ Restore_Obj_Ptr_CLI
          cli                             ; 2688: 58        Clear Disable Interrupts flag
          jmp     Load_Jetman_Rtn         ; 2689: 4C 3B 26 
 ; -----------------------
+
+; .dP"Y8 88   88 88""Yb 88""Yb  dP"Yb  88   88 888888 88 88b 88 888888
+; `Ybo." 88   88 88__dP 88__dP dP   Yb 88   88   88   88 88Yb88 88__
+; o.`Y8b Y8   8P 88""Yb 88"Yb  Yb   dP Y8   8P   88   88 88 Y88 88""
+; 8bodP' `YbodP' 88oodP 88  Yb  YbodP  `YbodP'   88   88 88  Y8 888888
+
+;            88     88 .dP"Y8 888888
+;            88     88 `Ybo."   88
+;            88  .o 88 o.`Y8b   88
+; oooooooooo 88ood8 88 8bodP'   88
+
 Subroutine_List
          fdb     Triggers_Every_Frame    ; 268C: 1A 26    
          fdb     Flying                  ; 268E: 73 32    
@@ -1955,8 +1977,10 @@ Change_Object_To_Explosion
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2904: B1 00    
          and     #$C0                    ; 2906: 29 C0     Zero bits 0-5 i.e. xx000000
          ora     #$03                    ; 2908: 09 03     Set bits 0-1 i.e. xxxxxx11
+
 ; L_JSR_($290A)_($2A59) OK
-Z290A    ldy     #$06                    ; 290A: A0 06    
+Store_object_type
+         ldy     #$06                    ; 290A: A0 06    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 290C: 91 00    
 
 ; Change Alien object type to an Explosion
@@ -2141,19 +2165,22 @@ STR_GAME_OVER_PLAYER_2
          fcc     "GAME`OVER`PLAYER`"     ; 2A33: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
          fcb     $F2                     ; 2A44: F2       
 ; L_JSR_($2A45)_($2C99) OK
-Z2A45    jsr     Save_Obj_List_Ptr       ; 2A45: 20 E7 28 
+Test_Jetman_Collide_Score_0
+         jsr     Save_Obj_List_Ptr       ; 2A45: 20 E7 28 
          jsr     Load_ZP_Parameters      ; 2A48: 20 9D 25 
          fcb     $00                     ; 2A4B: 00       
          fdb     Obj_Jetman_Looks        ; 2A4C: 80 03    
          fcb     $FF                     ; 2A4E: FF       
 
+; Set alien horizontal position to edge of screen
          ldy     #$02                    ; 2A4F: A0 02    
          lda     #$01                    ; 2A51: A9 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A53: 91 00    
 
+; Object type
          ldy     #$00                    ; 2A55: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A57: B1 00    
-         jsr     Z290A                   ; 2A59: 20 0A 29 
+         jsr     Store_object_type       ; 2A59: 20 0A 29 
          jmp     Restore_Obj_List_Ptr    ; 2A5C: 4C F0 28 
 ; -----------------------
 
@@ -2175,7 +2202,7 @@ Level_1_Plusses
 ; L_BRS_($2A67)_($2A62) OK
 Level_1_Plusses_1
          jsr     Platform_Collision_Aliens ; 2A67: 20 16 2B 
-         jmp     L2L3_2                  ; 2A6A: 4C 83 2A 
+         jmp     Test_Alien_Direction    ; 2A6A: 4C 83 2A 
 ; -----------------------
 
 ; 88     888888 Yb    dP 888888 88                oP"Yb.
@@ -2197,51 +2224,61 @@ Level_2_Balls
 Level_2_Balls_1
          jsr     Platform_Collision_Aliens ; 2A75: 20 16 2B 
 
+; Read countdown, branch if zero, else decrement
          ldy     #$06                    ; 2A78: A0 06    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A7A: B1 00    
-         beq     L2L3_6                  ; 2A7C: F0 24    
+         beq     Reset_Countdown_Timer   ; 2A7C: F0 24    
          sec                             ; 2A7E: 38       
          sbc     #$01                    ; 2A7F: E9 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A81: 91 00    
 
 ; L_JMP_($2A83)_($2A6A) OK
-L2L3_2   ldy     #$02                    ; 2A83: A0 02    
+Test_Alien_Direction
+         ldy     #$02                    ; 2A83: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A85: B1 00    
-         bmi     L2L3_5                  ; 2A87: 30 15    
+         bmi     Alien_Direction_Left    ; 2A87: 30 15    
          lda     #$08                    ; 2A89: A9 08    
 ; L_BRS_($2A8B)_($2AA0) OK
-L2L3_3   sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A8B: 91 00    
+Set_Alien_Direction
+         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A8B: 91 00    
 
+; Test_Alien_Diagonal?
          ldy     #$04                    ; 2A8D: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A8F: B1 00    
-         bmi     L2L3_4                  ; 2A91: 30 07    
+         bmi     Alien_Diagonal_Set_F8   ; 2A91: 30 07    
          lda     #$08                    ; 2A93: A9 08    
 ; L_BRS_($2A95)_($2A9C) OK
-L2L3_EXIT_1
+Set_Alien_Diagonal?
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A95: 91 00    
          jmp     Test_Jetman_Collide_Score ; 2A97: 4C 92 2C 
 ; -----------------------
 ; L_BRS_($2A9A)_($2A91) OK
-L2L3_4   lda     #$F8                    ; 2A9A: A9 F8    
-         bmi     L2L3_EXIT_1             ; 2A9C: 30 F7    
+Alien_Diagonal_Set_F8
+         lda     #$F8                    ; 2A9A: A9 F8    
+         bmi     Set_Alien_Diagonal?     ; 2A9C: 30 F7    
 ; L_BRS_($2A9E)_($2A87) OK
-L2L3_5   lda     #$F8                    ; 2A9E: A9 F8    
-         bmi     L2L3_3                  ; 2AA0: 30 E9    
+Alien_Direction_Left
+         lda     #$F8                    ; 2A9E: A9 F8    
+         bmi     Set_Alien_Direction     ; 2AA0: 30 E9    
+
+; Use IRQ counter for randomness, range $10-$1F
 ; L_BRS_($2AA2)_($2A7C) OK
-L2L3_6   lda     ZP_HW_IRQ_Count3        ; 2AA2: A5 4C    
+Reset_Countdown_Timer
+         lda     ZP_HW_IRQ_Count3        ; 2AA2: A5 4C    
          and     #$0F                    ; 2AA4: 29 0F    
          adc     #$10                    ; 2AA6: 69 10    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AA8: 91 00    
 
+; Invert diagonal direction up/down, randomly via IRQ
          ldy     #$04                    ; 2AAA: A0 04    
          and     #$04                    ; 2AAC: 29 04    
          bit     ZP_HW_IRQ_Count3        ; 2AAE: 24 4C    
-         bmi     L2L3_EXIT_2             ; 2AB0: 30 05    
+         bmi     Set_Alien_Diagonal_2?   ; 2AB0: 30 05    
          eor     #$FF                    ; 2AB2: 49 FF    
          clc                             ; 2AB4: 18       
          adc     #$01                    ; 2AB5: 69 01    
 ; L_BRS_($2AB7)_($2AB0) OK
-L2L3_EXIT_2
+Set_Alien_Diagonal_2?
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AB7: 91 00    
          jmp     Test_Jetman_Collide_Score ; 2AB9: 4C 92 2C 
 ; -----------------------
@@ -2251,7 +2288,7 @@ L2L3_EXIT_2
 ; 88  .o 88""     YbdP   88""   88  .o            o `Yb
 ; 88ood8 888888    YP    888888 88ood8 oooooooooo YbodP oooooooooo
 
-; _dP"Y8    db    88   88  dP""b8 888888 88""Yb
+; .dP"Y8    db    88   88  dP""b8 888888 88""Yb
 ; `Ybo."   dPYb   88   88 dP   `" 88__   88__dP
 ; o.`Y8b  dP__Yb  Y8   8P Yb      88""   88"Yb
 ; 8bodP' dP""""Yb `YbodP'  YboodP 888888 88  Yb
@@ -2589,14 +2626,26 @@ Test_Laser_Hits
          lda     ZP_02                   ; 2C67: A5 02    
          rts                             ; 2C69: 60       
 ; ===========================================================
+
+; 88     888888 Yb    dP 888888 88                 dP"Yb
+; 88     88__    Yb  dP  88__   88                dP   Yb
+; 88  .o 88""     YbdP   88""   88  .o            Yb   dP
+; 88ood8 888888    YP    888888 88ood8 oooooooooo  YbodP  oooooooooo
+
+; 888888 88   88 8888P 8888P 88""Yb    db    88     88
+; 88__   88   88   dP    dP  88__dP   dPYb   88     88
+; 88""   Y8   8P  dP    dP   88""Yb  dP__Yb  88  .o 88  .o
+; 88     `YbodP' d8888 d8888 88oodP dP""""Yb 88ood8 88ood8
+
 Level_0_Fuzzball
          jsr     Test_Laser_Hits         ; 2C6A: 20 5F 2C 
          bmi     Alien_Hit_Update_Score  ; 2C6D: 30 09    
          jsr     Platform_Collision_Test ; 2C6F: 20 B3 30  Remove=1st Level Aliens don't explode on platform/floor impact
          lda     ZP_02                   ; 2C72: A5 02    
          bpl     Test_Jetman_Collide_Score ; 2C74: 10 1C    
-         bmi     Jetman_Explosion        ; 2C76: 30 14    
+         bmi     Object_To_Explosion     ; 2C76: 30 14    
 
+; Use current player level to create offset into points table
 ; L_JMP_($2C78)_($2A64) OK
 ; L_JMP_($2C78)_($2A72) OK
 ; L_JMP_($2C78)_($2AC1) OK
@@ -2607,14 +2656,19 @@ Alien_Hit_Update_Score
          and     #$03                    ; 2C7A: 29 03    
          asl     a                       ; 2C7C: 0A       
          tax                             ; 2C7D: AA       
+
+; Get score high byte and save
          lda     Alien_Points_Lookup,x   ; 2C7E: BD DB 2C 
          sta     ZP_02                   ; 2C81: 85 02    
          inx                             ; 2C83: E8       
+
+; Get score low byte and save
          lda     Alien_Points_Lookup,x   ; 2C84: BD DB 2C 
          sta     ZP_03                   ; 2C87: 85 03    
          jsr     Update_Score            ; 2C89: 20 63 30 
+
 ; L_BRS_($2C8C)_($2C76) OK
-Jetman_Explosion
+Object_To_Explosion
          jsr     Change_Object_To_Explosion ; 2C8C: 20 F9 28 
          jmp     Triggers_Every_Frame    ; 2C8F: 4C 1A 26 
 ; -----------------------
@@ -2625,12 +2679,13 @@ Jetman_Explosion
 Test_Jetman_Collide_Score
          jsr     Test_Jetman_Obj_Collide ; 2C92: 20 58 2D 
          lda     ZP_02                   ; 2C95: A5 02    
-         bpl     Z2C9F                   ; 2C97: 10 06    
-         jsr     Z2A45                   ; 2C99: 20 45 2A 
+         bpl     Test_Jetman_Collide_Score_1 ; 2C97: 10 06    
+         jsr     Test_Jetman_Collide_Score_0 ; 2C99: 20 45 2A 
          jmp     Alien_Hit_Update_Score  ; 2C9C: 4C 78 2C 
 ; -----------------------
 ; L_BRS_($2C9F)_($2C97) OK
-Z2C9F    ldy     #$02                    ; 2C9F: A0 02    
+Test_Jetman_Collide_Score_1
+         ldy     #$02                    ; 2C9F: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2CA1: B1 00    
          dey                             ; 2CA3: 88       
          pha                             ; 2CA4: 48       
@@ -2640,12 +2695,13 @@ Z2C9F    ldy     #$02                    ; 2C9F: A0 02
          clc                             ; 2CA8: 18       
          adc     (ZP_Obj_List_Ptr_Lo),y  ; 2CA9: 71 00    
          cmp     #$F0                    ; 2CAB: C9 F0    
-         bcs     Z2CCC                   ; 2CAD: B0 1D    
+         bcs     Test_Jetman_Collide_Score_3 ; 2CAD: B0 1D    
          cmp     #$B8                    ; 2CAF: C9 B8    
-         bcs     Z2CD1                   ; 2CB1: B0 1E    
+         bcs     Test_Jetman_Collide_Score_4 ; 2CB1: B0 1E    
 ; L_JMP_($2CB3)_($2CCE) OK
 ; L_JMP_($2CB3)_($2CD3) OK
-Z2CB3    sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CB3: 91 00    
+Test_Jetman_Collide_Score_2
+         sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CB3: 91 00    
          ldy     #$04                    ; 2CB5: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2CB7: B1 00    
          dey                             ; 2CB9: 88       
@@ -2661,12 +2717,14 @@ Z2CB3    sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CB3: 91 00
          jmp     Triggers_Every_Frame    ; 2CC9: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2CCC)_($2CAD) OK
-Z2CCC    adc     #$B8                    ; 2CCC: 69 B8    
-         jmp     Z2CB3                   ; 2CCE: 4C B3 2C 
+Test_Jetman_Collide_Score_3
+         adc     #$B8                    ; 2CCC: 69 B8    
+         jmp     Test_Jetman_Collide_Score_2 ; 2CCE: 4C B3 2C 
 ; -----------------------
 ; L_BRS_($2CD1)_($2CB1) OK
-Z2CD1    adc     #$48                    ; 2CD1: 69 48    
-         jmp     Z2CB3                   ; 2CD3: 4C B3 2C 
+Test_Jetman_Collide_Score_4
+         adc     #$48                    ; 2CD1: 69 48    
+         jmp     Test_Jetman_Collide_Score_2 ; 2CD3: 4C B3 2C 
 ; -----------------------
 ; L_JSR_($2CD6)_($2652) OK
 Flash_Score_Cntr_At_Zero?

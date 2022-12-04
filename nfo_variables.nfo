@@ -84,6 +84,10 @@ label    0384 Obj_Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accele
 ; Byte 06/0E= ??????
 ; Byte 07/0F= Laser Color
 ;
+; Laser_Color_Table
+;         fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colors if it's used
+;         fcb     BLUE,YELLOW,CYAN,YELLOW ; 216F: 06 07 03 07
+;
 ; Laser decay sequence as written to UDG RAM:
 ; $FF       $FC       $E0       $00
 ; %11111111 %11111100 %11100000 %00000000
@@ -109,17 +113,6 @@ label    0388 Obj_Laser_0 ;
 ;        0C=Flame
 ;        0D=???
 ;        0E=flashing gem
-; Byte 01/09= horizontal postion of alien
-; Byte 02/0A= direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
-; Byte 03/0B= height
-; Byte 04/0C= diagonal, jiggles around a lot for a saucer
-; Byte 05/0D= colour - bottom 3 bits of byte?
-; Byte 06/0E= For Gem, affects colors and flashing of Byte 05
-
-; Laser_Color_Table
-;         fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colors if it's used
-;         fcb     BLUE,YELLOW,CYAN,YELLOW ; 216F: 06 07 03 07
-
 
                           ;            0  1  2  3  4  5  6  7
                           ;     03B0  09 70 00 AF 01 00 00 1C
@@ -162,6 +155,14 @@ label    03C4 Obj_RMS_Gem_Diagon
 label    03C6 Obj_RMS_Gem_6
 label    03C7 Obj_RMS_Gem_7
 
+
+; Byte 00/08= object type
+; Byte 01/09= horizontal postion of alien
+; Byte 02/0A= direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
+; Byte 03/0B= height
+; Byte 04/0C= diagonal, jiggles around a lot for a saucer, might be a countdown?
+; Byte 05/0D= colour - bottom 3 bits of byte?
+; Byte 06/0E= For Gem, affects colors and flashing of Byte 05
 
 ; Aliens 1-6
 label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00
