@@ -996,16 +996,26 @@ lcomment 2D01 Object not currently used
 comment  2D03
 comment  2D03 Move pointer to next object
 lcomment 2D0A Dec object counter
+comment  2D0F Initiate new alien sprite
 comment  2D0F InReg Y always 0
-label    2D0F Initiate_Object
+comment  2D0F Set type depending on current level i.e. 0, 1, 2 or 3
+label    2D0F Init_Alien_Sprite
 lcomment 2D11 Zero bits 2-7
 lcomment 2D13 Save current level
+comment  2D19
+comment  2D19 Set initial X position to 1
 comment  2D1D
+comment  2D1D Set initial direction randomly using IRQ counter
 comment  2D28
+comment  2D28 Set initial Y position randomly using IRQ already in X
 comment  2D30
+comment  2D30 Set diagonal movement randomly or not
 comment  2D35
+comment  2D35 Set object colour randomly, store 0 or 1 in ZP_02
 comment  2D3B
-comment  2D47
+comment  2D3B Set object colour randomly, lookup table has 2 colours per level
+binary   2D3F
+comment  2D49
 label    2D4C Level_Alien_Type_Lookup
 label    2D50 Level_Alien_Color_Lookup
 break    2D54
@@ -1145,11 +1155,26 @@ label    2F8E Stops_All
 lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
 label    2FE5 Get_Object_UDG_Addr_Small
+label    2FEE Jetman_Collide_Rocket_Fuel
+comment  2FEE At point when Jetman picks up Rocket or Fuel module
+lcomment 2FF1 Diag attrib? Not sure...
+lcomment 2FF5 Zero all bits except bit 1 i.e. 000000x0
 comment  2FF9
 comment  2FF9 Jetman pickup Rocket Module / Fuel Pod = 100 points
 word     2FFD
 const    2FFD
 comment  3003
+lcomment 3005 Flame sprite X pos??
+lcomment 300A Flame sprite direction?
+lcomment 3012 Store current Jetman sprite X pos into current object?
+lcomment 3019 Store current Jetman sprite Y pos into current object?
+label    301E Copy_Jetman_XY_To_Sprite
+comment  3028
+comment  302F
+label    303E Copy_Jetman_XY_To_Sprite_0
+comment  3042
+comment  304A
+label    3051 Copy_Jetman_XY_To_Sprite_1
 label    3054 Load_Rocket_OR_Fuel_UDGs
 label    3057 Load_Rocket_OR_Fuel_UDGs_1
 label    305A Load_Rocket_OR_Fuel_UDGs_2
@@ -1444,7 +1469,7 @@ lcomment 34B8 Mask top 4 bits, 12 becomes 02
 comment  34C1
 comment  34C1 Increment pointer to next score byte
 lcomment 34C5 Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
-label    34C7 SKIP_34C7
+label    34C7 Display_BCD_Bytes_0
 lcomment 34C7 Decrement number of bytes to display counter
 lcomment 34C9 If <> 0 yet, process another byte
 ;        34CC
@@ -1633,6 +1658,23 @@ comment  35F4
 lcomment 35F6 Object Y
 comment  35FA
 lcomment 35FC Object Color
+comment  3601
+comment  3601
+comment  3601
+comment  3601
+comment  3601
+comment  3601
+comment  3601
+comment  3601
+comment  3601
+comment  360D
+comment  360D
+comment  3623
+comment  362D
+comment  3635
+comment  363A
+comment  363C
+comment  3643
 label    364C GOTO_364C
 comment  3652
 comment  365A
@@ -1645,14 +1687,20 @@ label    369C BACK_36AB
 label    36E7 GOTO_36E7
 label    371F SKIP_371F
 label    3722 SKIP_3722
+comment  3737
+comment  3737
+label    3737 Load_Small_UDG_Addr_Setup_XY_0
 comment  373D
 comment  373D Load Small UDG address from A & Y
 label    373D Load_Small_UDG_Addr_Setup_XY
 comment  3743
 comment  3743 Load UDG RAM XY coordinates
 comment  374B
+comment  374B Load and store UDG addr, including X co-ord wrap
 lcomment 3752 $B8=screen width in pixels
 lcomment 3757 Wrap
+label    3759 Load_Small_UDG_Addr_Setup_XY_1
+comment  375D
 comment  3767
 comment  376D
 comment  3775
@@ -1679,6 +1727,7 @@ comment  37C1 Get/store sprite height in pixels
 comment  37C6
 comment  37C6 Subtract $01 from 16-bit sprite UDG addr, i.e. so address
 comment  37C6 avoids the sprite dimension bytes
+comment  37CD
 label    37D4 GOUA_1
 comment  37DB
 lcomment 37E8 Zero bits
@@ -1691,7 +1740,7 @@ comment  37ED and so $3F is masking out direction and test for walking AND flyin
 comment  37ED OutReg: UDG Addr Lo in Y, Hi in A
 comment  37ED CALLED ONLY FROM 381C or run into from 37E6
 label    37ED Get_Object_UDG_Addr
-lcomment 37EE Mask out bits 6 & 7
+lcomment 37EE Zero bits 6 & 7
 binary   37EF
 lcomment 37f0 Test bits 0 & 1
 binary   37F1
@@ -1723,13 +1772,15 @@ comment  382A Divide ZP_17 by $10, height of a color tile?
 comment  3835
 comment  3835 Outer loop decrementing ZP_0B
 comment  3835 Inner loop decrementing ZP_0A
-label    383B BACK_383B
-label    383F BACK_383F
+label    383B Update_Color_RAM_0
+label    383F Update_Color_RAM_1
 comment  383F
-label    384B SKIP_384B
+comment  3847
+comment  384B
+label    384B Update_Color_RAM_2
 comment  384F
 comment  385A
-label    385E DO_RTS
+label    385E Update_Color_RAM_2_RTS
 ;        End
 ; End of file contains graphics data
 ;unused  3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
