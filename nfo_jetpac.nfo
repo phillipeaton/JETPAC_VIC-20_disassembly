@@ -1101,10 +1101,48 @@ label    2F07 A789789
 comment  2F0D
 comment  2F13
 label    2F16 A111111
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+comment  2F31
+label    2F31 Stops_All_0
+comment  2F3A
+comment  2F43
+comment  2F4E
+comment  2F57
+comment  2F5F
+label    2F65 Stops_All_1
+comment  2F6A
+label    2F77 Stops_All_2
+comment  2F91
+label    2FB2 Stops_All_3
+comment  2FBD
+label    2FBD Stops_All_4
+label    2FC3 Stops_All_5
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA Returns UDG sprite data index to Rocket Middle Section/Fuel depending on level
+label    2FDA Get_Spr_Addr_Rocket_Top_OR_Fuel
 lcomment 2F7F Fuel cell dropped onto rocket ~8 pixels from bottom
 label    2F8E Stops_All
 lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
-;        2FE5
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
 label    2FE5 Get_Object_UDG_Addr_Small
 comment  2FF9
@@ -1112,6 +1150,9 @@ comment  2FF9 Jetman pickup Rocket Module / Fuel Pod = 100 points
 word     2FFD
 const    2FFD
 comment  3003
+label    3054 Load_Rocket_OR_Fuel_UDGs
+label    3057 Load_Rocket_OR_Fuel_UDGs_1
+label    305A Load_Rocket_OR_Fuel_UDGs_2
 label    3063 Update_Score
 lcomment 3065 If P2, setup P2 Score instead of P1 and then return after the param setup below
 comment  3067
@@ -1593,6 +1634,7 @@ lcomment 35F6 Object Y
 comment  35FA
 lcomment 35FC Object Color
 label    364C GOTO_364C
+comment  3652
 comment  365A
 label    3674 BACK_3674
 comment  3668
@@ -1723,6 +1765,7 @@ label    3C3C Jetman_Fly_Right_4
 lcomment 3C87 $3CD4 = Ship_1_Bott
 label    3C87 UDG_Sprite_Lookup_Lo
 label    3C88 UDG_Sprite_Lookup_Hi
+lcomment 3C9F Multiple entries for simple UDG sprite indexing based on player level
 label    3E46 Alien_Ship_1
 label    3E61 Alien_Ship_2
 label    3E78 Alien_Fuzz_1

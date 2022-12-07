@@ -142,7 +142,7 @@ label    03B9 Obj_RTS_Fuel_Horiz
 ;label    03BB Obj_RTS_Fuel_3
 label    03BC Obj_RTS_Fuel_Diagon
 ;label    03BD Obj_RTS_Fuel_5
-;label    03BE Obj_RTS_Fuel_6
+;label    03BE Obj_RTS_Fuel_6 ; Index into sprite array, calculated together with level number
 ;label    03BF Obj_RTS_Fuel_7
 
 ; Rocket middle section, then a Gem e.g. 03C0  0E 58 00 5E 00 03 28 18

@@ -805,8 +805,8 @@ Reset_S_O_1
          txa                             ; 231A: 8A       
          pha                             ; 231B: 48       
          jsr     Save_Obj_Type_X_Y_Color ; 231C: 20 E9 35 
-         jsr     Z2FDA                   ; 231F: 20 DA 2F 
-         jsr     Z305A                   ; 2322: 20 5A 30 
+         jsr     Get_Spr_Addr_Rocket_Top_OR_Fuel ; 231F: 20 DA 2F 
+         jsr     Load_Rocket_OR_Fuel_UDGs_2 ; 2322: 20 5A 30 
          lda     ZP_Obj_List_Ptr_Lo      ; 2325: A5 00    
          clc                             ; 2327: 18       
          adc     #$08                    ; 2328: 69 08    
@@ -1846,7 +1846,7 @@ FP_1     jsr     Save_Obj_Type_X_Y_Color ; 2851: 20 E9 35
          fdb     $0250                   ; 286B: 50 02    
          fcb     $FF                     ; 286D: FF       
          jsr     Update_Score            ; 286E: 20 63 30 
-         jmp     Z2F65                   ; 2871: 4C 65 2F 
+         jmp     Stops_All_1             ; 2871: 4C 65 2F 
 ; -----------------------
 ; L_BRS_($2874)_($2857) OK
 Jump_To_Subroutine_List3
@@ -1877,7 +1877,7 @@ SR3_Store_To_Obj_Posn_05_06
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2896: 91 00    
          ldy     #$06                    ; 2898: A0 06    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 289A: B1 00    
-         jmp     Z2FC3                   ; 289C: 4C C3 2F 
+         jmp     Stops_All_5             ; 289C: 4C C3 2F 
 ; -----------------------
 Set_Obj_Posn_05_To_06
          lda     #$06                    ; 289F: A9 06    
@@ -2184,6 +2184,15 @@ Test_Jetman_Collide_Score_0
          jmp     Restore_Obj_List_Ptr    ; 2A5C: 4C F0 28 
 ; -----------------------
 
+
+
+
+
+
+
+
+
+
 ; 88     888888 Yb    dP 888888 88                  .d
 ; 88     88__    Yb  dP  88__   88                .d88
 ; 88  .o 88""     YbdP   88""   88  .o              88
@@ -2204,6 +2213,15 @@ Level_1_Plusses_1
          jsr     Platform_Collision_Aliens ; 2A67: 20 16 2B 
          jmp     Test_Alien_Direction    ; 2A6A: 4C 83 2A 
 ; -----------------------
+
+
+
+
+
+
+
+
+
 
 ; 88     888888 Yb    dP 888888 88                oP"Yb.
 ; 88     88__    Yb  dP  88__   88                "' dP'
@@ -2282,6 +2300,15 @@ Set_Alien_Diagonal_2?
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AB7: 91 00    
          jmp     Test_Jetman_Collide_Score ; 2AB9: 4C 92 2C 
 ; -----------------------
+
+
+
+
+
+
+
+
+
 
 ; 88     888888 Yb    dP 888888 88                88888
 ; 88     88__    Yb  dP  88__   88                  .dP
@@ -2497,7 +2524,7 @@ Z2BC7    jsr     Save_Obj_List_Ptr       ; 2BC7: 20 E7 28
          jsr     Save_Obj_Type_X_Y_Color ; 2BD1: 20 E9 35 
          ldy     #$06                    ; 2BD4: A0 06    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2BD6: B1 00    
-         jsr     Z305A                   ; 2BD8: 20 5A 30 
+         jsr     Load_Rocket_OR_Fuel_UDGs_2 ; 2BD8: 20 5A 30 
          jmp     Restore_Obj_List_Ptr    ; 2BDB: 4C F0 28 
 ; -----------------------
 ; L_JSR_($2BDE)_($2B76) OK
@@ -2626,6 +2653,15 @@ Test_Laser_Hits
          lda     ZP_02                   ; 2C67: A5 02    
          rts                             ; 2C69: 60       
 ; ===========================================================
+
+
+
+
+
+
+
+
+
 
 ; 88     888888 Yb    dP 888888 88                 dP"Yb
 ; 88     88__    Yb  dP  88__   88                dP   Yb
@@ -2975,6 +3011,26 @@ Dec_Saved_Obj_List_Params_by_10
          rts                             ; 2E16: 60       
 ; ===========================================================
 ; Aliens keep moving also
+
+
+
+
+
+
+
+
+
+
+; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
+; 88__dP dP   Yb dP   `" 88odP  88__     88
+; 88"Yb  Yb   dP Yb      88"Yb  88""     88
+; 88  Yb  YbodP   YboodP 88  Yb 888888   88   oooooooooo
+; \
+;    db    .dP"Y8  dP""b8 888888 88b 88 8888b.
+;   dPYb   `Ybo." dP   `" 88__   88Yb88  8I  Yb
+;  dP__Yb  o.`Y8b Yb      88""   88 Y88  8I  dY
+; dP""""Yb 8bodP'  YboodP 888888 88  Y8 8888Y"
+
 Rocket_Ascend
          jsr     Save_Obj_Type_X_Y       ; 2E17: 20 D7 35 
          ldy     #$03                    ; 2E1A: A0 03     Object height offset
@@ -3006,6 +3062,26 @@ Rocket_At_Top
          jmp     Triggers_Every_Frame    ; 2E4B: 4C 1A 26 
 ; -----------------------
 ; Flames stop a little way before bottom
+
+
+
+
+
+
+
+
+
+
+; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
+; 88__dP dP   Yb dP   `" 88odP  88__     88
+; 88"Yb  Yb   dP Yb      88"Yb  88""     88
+; 88  Yb  YbodP   YboodP 88  Yb 888888   88   oooooooooo
+; \
+; 8888b.  888888 .dP"Y8  dP""b8 888888 88b 88 8888b.
+;  8I  Yb 88__   `Ybo." dP   `" 88__   88Yb88  8I  Yb
+;  8I  dY 88""   o.`Y8b Yb      88""   88 Y88  8I  dY
+; 8888Y"  888888 8bodP'  YboodP 888888 88  Y8 8888Y"
+
 Rocket_Descend
          jsr     Save_Obj_Type_X_Y       ; 2E4E: 20 D7 35 
          lda     #$04                    ; 2E51: A9 04    
@@ -3150,38 +3226,59 @@ A111111  ldy     #$00                    ; 2F16: A0 00
          bne     A111111                 ; 2F2E: D0 E6    
          rts                             ; 2F30: 60       
 ; ===========================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
 ; L_BRS_($2F31)_($2F98) OK
-Z2F31    ldy     #$06                    ; 2F31: A0 06    
+Stops_All_0
+         ldy     #$06                    ; 2F31: A0 06    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F33: B1 00    
          cmp     #$18                    ; 2F35: C9 18    
-         beq     Z2F77                   ; 2F37: F0 3E    
+         beq     Stops_All_2             ; 2F37: F0 3E    
          asl     a                       ; 2F39: 0A       
+
          ldy     #$03                    ; 2F3A: A0 03    
          clc                             ; 2F3C: 18       
          adc     (ZP_Obj_List_Ptr_Lo),y  ; 2F3D: 71 00    
          cmp     #$AF                    ; 2F3F: C9 AF    
-         bcc     Z2FB2                   ; 2F41: 90 6F    
+         bcc     Stops_All_3             ; 2F41: 90 6F    
+
          lda     Obj_RTS_Fuel_Diagon     ; 2F43: AD BC 03 
          ora     #$01                    ; 2F46: 09 01    
          sta     Obj_RTS_Fuel_Diagon     ; 2F48: 8D BC 03 
-         jsr     Z3054                   ; 2F4B: 20 54 30 
+         jsr     Load_Rocket_OR_Fuel_UDGs ; 2F4B: 20 54 30 
+
          lda     Obj_Rocket_Diag?        ; 2F4E: AD B4 03 
          asl     a                       ; 2F51: 0A       
          asl     a                       ; 2F52: 0A       
          asl     a                       ; 2F53: 0A       
          asl     a                       ; 2F54: 0A       
          sta     ZP_13                   ; 2F55: 85 13    
+
          lda     Obj_Rocket_Y            ; 2F57: AD B3 03 
          sec                             ; 2F5A: 38       
          sbc     ZP_13                   ; 2F5B: E5 13    
          sta     ZP_Save_Obj_Lst_Prms2_Hi ; 2F5D: 85 19    
-         jsr     Z3057                   ; 2F5F: 20 57 30 
+
+         jsr     Load_Rocket_OR_Fuel_UDGs_1 ; 2F5F: 20 57 30 
          inc     Obj_Rocket_Diag?        ; 2F62: EE B4 03 
 ; L_JMP_($2F65)_($2871) OK
 ; L_JMP_($2F65)_($2F8B) OK
-Z2F65    lda     #$00                    ; 2F65: A9 00    
+Stops_All_1
+         lda     #$00                    ; 2F65: A9 00    
          tay                             ; 2F67: A8       
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2F68: 91 00    
+
          lda     #$02                    ; 2F6A: A9 02    
          sta     Obj_Flame_1             ; 2F6C: 8D A9 03 
          lda     #$10                    ; 2F6F: A9 10    
@@ -3189,47 +3286,64 @@ Z2F65    lda     #$00                    ; 2F65: A9 00
          jmp     Triggers_Every_Frame    ; 2F74: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2F77)_($2F37) OK
-Z2F77    ldy     #$03                    ; 2F77: A0 03    
+Stops_All_2
+         ldy     #$03                    ; 2F77: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F79: B1 00    
          cmp     #$A8                    ; 2F7B: C9 A8    
-         bcc     Z2FB2                   ; 2F7D: 90 33    
+         bcc     Stops_All_3             ; 2F7D: 90 33    
          inc     Obj_Rocket_Fuel_Lvl     ; 2F7F: EE B2 03  Fuel cell dropped onto rocket ~8 pixels from bottom
          jsr     Save_Obj_Type_X_Y_Color ; 2F82: 20 E9 35 
-         jsr     Z2FDA                   ; 2F85: 20 DA 2F 
-         jsr     Z305A                   ; 2F88: 20 5A 30 
-         jmp     Z2F65                   ; 2F8B: 4C 65 2F 
+         jsr     Get_Spr_Addr_Rocket_Top_OR_Fuel ; 2F85: 20 DA 2F 
+         jsr     Load_Rocket_OR_Fuel_UDGs_2 ; 2F88: 20 5A 30 
+         jmp     Stops_All_1             ; 2F8B: 4C 65 2F 
 ; -----------------------
+
+; .dP"Y8 888888  dP"Yb  88""Yb .dP"Y8
+; `Ybo."   88   dP   Yb 88__dP `Ybo."
+; o.`Y8b   88   Yb   dP 88"""  o.`Y8b
+; 8bodP'   88    YbodP  88     8bodP'
+; \
+;               db    88     88
+;              dPYb   88     88
+;             dP__Yb  88  .o 88  .o
+; oooooooooo dP""""Yb 88ood8 88ood8
+
 Stops_All jsr    Save_Obj_Type_X_Y       ; 2F8E: 20 D7 35 
+
          ldy     #$04                    ; 2F91: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F93: B1 00    
          bit     MASK_04                 ; 2F95: 2C 16 20 
-         bne     Z2F31                   ; 2F98: D0 97    
+         bne     Stops_All_0             ; 2F98: D0 97    
          bit     MASK_02                 ; 2F9A: 2C 15 20 
          bne     Z301E                   ; 2F9D: D0 7F    
          bit     MASK_01                 ; 2F9F: 2C 14 20 
-         beq     Z2FBD                   ; 2FA2: F0 19    
+         beq     Stops_All_4             ; 2FA2: F0 19    
          jsr     Test_Jetman_Obj_Collide ; 2FA4: 20 58 2D 
          lda     ZP_02                   ; 2FA7: A5 02    
          bmi     Z2FEE                   ; 2FA9: 30 43    
          jsr     Platform_Collision_Test ; 2FAB: 20 B3 30  Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
          lda     ZP_02                   ; 2FAE: A5 02    
-         bmi     Z2FBD                   ; 2FB0: 30 0B    
+         bmi     Stops_All_4             ; 2FB0: 30 0B    
 ; L_BRS_($2FB2)_($2F41) OK
 ; L_BRS_($2FB2)_($2F7D) OK
-Z2FB2    ldy     #$03                    ; 2FB2: A0 03    
+Stops_All_3
+         ldy     #$03                    ; 2FB2: A0 03    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2FB4: B1 00    
          clc                             ; 2FB6: 18       
          adc     #$02                    ; 2FB7: 69 02    
          ora     #$01                    ; 2FB9: 09 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2FBB: 91 00    
+
 ; L_BRS_($2FBD)_($2FA2) OK
 ; L_BRS_($2FBD)_($2FB0) OK
 ; L_JMP_($2FBD)_($301B) OK
 ; L_JMP_($2FBD)_($3051) OK
-Z2FBD    jsr     Save_Obj_Type_X_Y_Color ; 2FBD: 20 E9 35 
-         jsr     Z2FDA                   ; 2FC0: 20 DA 2F 
+Stops_All_4
+         jsr     Save_Obj_Type_X_Y_Color ; 2FBD: 20 E9 35 
+         jsr     Get_Spr_Addr_Rocket_Top_OR_Fuel ; 2FC0: 20 DA 2F 
 ; L_JMP_($2FC3)_($289C) OK
-Z2FC3    pha                             ; 2FC3: 48       
+Stops_All_5
+         pha                             ; 2FC3: 48       
          jsr     Get_Object_UDG_Addr_Small ; 2FC4: 20 E5 2F 
          jsr     Load_Small_UDG_Addr_Setup_XY ; 2FC7: 20 3D 37 
          pla                             ; 2FCA: 68       
@@ -3239,11 +3353,23 @@ Z2FC3    pha                             ; 2FC3: 48
          jsr     Update_Color_RAM        ; 2FD4: 20 1F 38 
          jmp     Triggers_Every_Frame    ; 2FD7: 4C 1A 26 
 ; -----------------------
+
+
+
+
+
+
+
+
+
+
+; Returns UDG sprite data index to Rocket Middle Section/Fuel depending on level
 ; L_JSR_($2FDA)_($231F) OK
 ; L_JSR_($2FDA)_($2F85) OK
 ; L_JSR_($2FDA)_($2FC0) OK
 ; L_JSR_($2FDA)_($3057) OK
-Z2FDA    lda     ZP_Level_Current_Plyr   ; 2FDA: A5 59    
+Get_Spr_Addr_Rocket_Top_OR_Fuel
+         lda     ZP_Level_Current_Plyr   ; 2FDA: A5 59    
 ; L_JSR_($2FDC)_($285B) OK
 Z2FDC    lsr     a                       ; 2FDC: 4A       
          and     #$06                    ; 2FDD: 29 06    
@@ -3290,7 +3416,7 @@ Z2FEE    jsr     Save_Obj_Type_X_Y       ; 2FEE: 20 D7 35
          ldy     #$03                    ; 3014: A0 03    
          lda     Obj_Jetman_Y            ; 3016: AD 83 03 
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 3019: 91 00    
-         jmp     Z2FBD                   ; 301B: 4C BD 2F 
+         jmp     Stops_All_4             ; 301B: 4C BD 2F 
 ; -----------------------
 ; L_BRS_($301E)_($2F9D) OK
 Z301E    ldy     #$01                    ; 301E: A0 01    
@@ -3322,16 +3448,19 @@ Z303E    cmp     #$06                    ; 303E: C9 06
          ldy     #$01                    ; 304D: A0 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 304F: 91 00    
 ; L_BRS_($3051)_($3040) OK
-Z3051    jmp     Z2FBD                   ; 3051: 4C BD 2F 
+Z3051    jmp     Stops_All_4             ; 3051: 4C BD 2F 
 ; -----------------------
 ; L_JSR_($3054)_($2F4B) OK
-Z3054    jsr     Save_Obj_Type_X_Y_Color ; 3054: 20 E9 35 
+Load_Rocket_OR_Fuel_UDGs
+         jsr     Save_Obj_Type_X_Y_Color ; 3054: 20 E9 35 
 ; L_JSR_($3057)_($2F5F) OK
-Z3057    jsr     Z2FDA                   ; 3057: 20 DA 2F 
+Load_Rocket_OR_Fuel_UDGs_1
+         jsr     Get_Spr_Addr_Rocket_Top_OR_Fuel ; 3057: 20 DA 2F 
 ; L_JSR_($305A)_($2322) OK
 ; L_JSR_($305A)_($2BD8) OK
 ; L_JSR_($305A)_($2F88) OK
-Z305A    jsr     Get_Object_UDG_Addr_Small ; 305A: 20 E5 2F 
+Load_Rocket_OR_Fuel_UDGs_2
+         jsr     Get_Object_UDG_Addr_Small ; 305A: 20 E5 2F 
          jsr     Load_Small_UDG_Addr_Setup_XY ; 305D: 20 3D 37 
          jmp     Z3604                   ; 3060: 4C 04 36 
 ; -----------------------
@@ -4590,6 +4719,7 @@ Z3646    jsr     Z3737                   ; 3646: 20 37 37
 GOTO_364C lda    #$FF                    ; 364C: A9 FF    
          sta     ZP_08                   ; 364E: 85 08    
          sta     ZP_09                   ; 3650: 85 09    
+
          lda     ZP_03                   ; 3652: A5 03    
          sta     ZP_02                   ; 3654: 85 02    
          lda     ZP_0B                   ; 3656: A5 0B    
@@ -6066,7 +6196,7 @@ UDG_Sprite_Lookup_Hi
          fdb     Ship_2_Top              ; 3C99: 83 3D    
          fdb     Ship_1_Top              ; 3C9B: 1A 3D    
          fdb     Ship_2_Top              ; 3C9D: 83 3D    
-         fdb     Fuel                    ; 3C9F: 9C 3D    
+         fdb     Fuel                    ; 3C9F: 9C 3D     Multiple entries for simple UDG sprite indexing based on player level
          fdb     Fuel                    ; 3CA1: 9C 3D    
          fdb     Fuel                    ; 3CA3: 9C 3D    
          fdb     Fuel                    ; 3CA5: 9C 3D    
