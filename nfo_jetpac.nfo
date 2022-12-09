@@ -594,33 +594,48 @@ comment  25FA ----------------------------------------------------------
 label    25FA Main_Loop
 lcomment 25FE $03B0 = "Object_0"
 lcomment 2606 Enable interrupts
-label    2607 Next_Obj
+label    2607 Main_Loop_Next_Obj
 lcomment 2609 Load Object Type into A from obj table 0380 upwards
 lcomment 260B Mulitply by two as 2 bytes in an address
 lcomment 260C Object Type becomes offset into Subroutine List
 lcomment 260D Load SR List offset into SR Vec Lo/Hi...
 lcomment 2617 ...and jump to it
 comment  261A
-label    261A Triggers_Every_Frame
+label    261A Inc_Sprite_Pointer
 lcomment 261C Test Object Type value
 lcomment 261E If <>00, skip
+comment  2620
+comment  2620 Test if sprite is a rocket module
 lcomment 2622 Is Object address $B0?
 lcomment 2624 If not, skip
 comment  2626
-comment  2626 Delay loop $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds (Needs Check)
+comment  2626 Delay loop
+comment  2626 $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds
 label    262A Delay_Loop_0A00
 comment  2630
 comment  2630 Increment Object Pointer to next Obj i.e. by adding 8
-label    2630 TEF_1
+label    2630 Inc_Sprite_Ptr_1
 comment  2637
+comment  2637 If interrupt happened, update Jetman, it has higher priority
 lcomment 2637 H/W interrupt happened?
 lcomment 2639 If yes, jump
-label    263B Load_Jetman_Rtn
+label    263B Inc_Sprite_Ptr_Cont
 comment  263B
-lcomment 263B Is Object address $B0? i.e. Object_0
+lcomment 263D Is Object address a rocket module?
 comment  2645
-label    2652 SKIP_2652
-label    2655 SKIP_2655
+comment  264B
+comment  2652
+comment  2652 Test if score flash time is zero, if yes, setup sprites
+label    2652 Inc_Sprite_Ptr_2
+label    2655 Inc_Sprite_Ptr_3
+comment  265E
+comment  265E
+comment  265E
+comment  265E
+comment  265E
+comment  265E
+comment  265E
+comment  265E
 comment  265E
 comment  265E ----------------------------------------------------------
 comment  265E VIA2 timer interrupts used to update Jetman movement
@@ -631,7 +646,7 @@ comment  265E ----------------------------------------------------------
 label    265E Set_Jetman_Mvmt_Speed
 comment  266E
 comment  2669
-label    2669 SEI_Load_Jetman_To_Obj_Ptr
+label    2669 SEI_Obj_Ptr_To_Jetman
 lcomment 2669 Set Disable Interrupts flag
 comment  2676
 const    2679
@@ -779,19 +794,19 @@ label    28E7 Save_Obj_List_Ptr
 label    28F0 Restore_Obj_List_Ptr
 label    28F9 Change_Object_To_Explosion
 comment  28FC
-comment  28FC Reset Alien object direction
+comment  28FC Reset Alien? object direction
 comment  2902
-comment  2902 Setup Alien object color flashing/cycling
+comment  2902 Setup Alien? object color flashing/cycling
 lcomment 2906 Zero bits 0-5 i.e. xx000000
 lcomment 2908 Set bits 0-1 i.e. xxxxxx11
 comment  290A
-label    290A Store_object_type
+label    290A Store_Object_Type
 comment  290E
-comment  290E Change Alien object type to an Explosion
+comment  290E Change sprite type to an Explosion
 comment  2914
 comment  2914 Reset diagonal jiggles
 comment  2919
-comment  2919 Change Alien/Explosion object colour based on timer
+comment  2919 Change Alien?/Explosion object colour based on timer
 lcomment 291B Zero bits 3-8 i.e. 00000xxx
 lcomment 291F Set bit 0 i.e. xxxxxxx1
 label    2921 SKIP_2921
@@ -856,10 +871,10 @@ label    2A1F STR_GAME_OVER_PLAYER_1
 ;        2A32
 break    2A32
 label    2A32 STR_GAME_OVER_PLAYER_2
-label    2A45 Test_Jetman_Collide_Score_0
+label    2A45 Spr_Ptr_To_Jetman
 word     2A4C
 comment  2A4F
-comment  2A4F Set alien horizontal position to edge of screen
+comment  2A4F Set Jetman Move Speed to 1
 comment  2A55
 comment  2A55 Object type
 label    2A5F Level_1_Plusses
@@ -973,16 +988,34 @@ comment  2C84
 comment  2C84 Get score low byte and save
 label    2C8C Object_To_Explosion
 comment  2C8C
-label    2C92 Test_Jetman_Collide_Score
-label    2C9F Test_Jetman_Collide_Score_1
-label    2CB3 Test_Jetman_Collide_Score_2
-label    2CCC Test_Jetman_Collide_Score_3
-label    2CD1 Test_Jetman_Collide_Score_4
-label    2CD6 Flash_Score_Cntr_At_Zero?
+comment  2C92
+comment  2C92
+comment  2C92
+comment  2C92
+comment  2C92
+label    2C92 Update_Sprite_Posn_Collide
+lcomment
+label    2C9F Update_Sprite_Posn
+comment  2C9F
+comment  2C9F Get sprite direction/speed and use to create new X value
+comment  2CAB
+comment  2CAB Take care of X screen wrapping
+label    2CB3 Update_Sprite_Posn_X
+comment  2CB5
+comment  2CB5 Get sprite direction/speed and use to create new Y value
+comment  2CC3
+label    2CCC Upd_Sprite_Posn_Wrap_X_1
+label    2CD1 Upd_Sprite_Posn_Wrap_X_2
+comment  2CD6
+comment  2CD6
+comment  2CD6
+comment  2CD6
+comment  2CD6
+label    2CD6 Spr_Ptr_To_Alien_0_Flsh_Ctr
 const    2CDB-2CE2
 label    2CDB Alien_Points_Lookup
 word     2CDB-2CE2
-label    2CE3 Setup_Objects
+label    2CE3 Spr_Ptr_To_Alien_0_Jetman
 deflabel 2CE9 JETMAN_FLYING
 deflabel 2CED JETMAN_STANDING
 comment  2CF1 Set Object List Pointer to first alien sprite
@@ -1319,7 +1352,7 @@ label    325E CLC_ADC_01
 label    3264 CLC_ADC_B8
 label    326A ADC_48
 label    326F TXA_
-label    3273 Flying
+label    3273 Update_Jetman_Flying?
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
 label    3285 __WWWW__

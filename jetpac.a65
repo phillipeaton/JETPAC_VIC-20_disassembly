@@ -75,7 +75,7 @@ Hardware_IRQ_Lo         equ     $0314
 Hardware_IRQ_Hi         equ     $0315
 NMI_Int_Vector_Lo       equ     $0318
 NMI_Int_Vector_Hi       equ     $0319
-Obj_Jetman_Looks        equ     $0380
+Obj_Jetman              equ     $0380
 Obj_Jetman_X            equ     $0381
 Obj_Jetman_Y            equ     $0383
 Obj_Laser_0             equ     $0388
@@ -611,7 +611,7 @@ FP6666   iny                             ; 2211: C8        First time round, Y=3
          lda     #$00                    ; 2221: A9 00    
          tay                             ; 2223: A8       
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2224: 91 00    
-         jmp     Triggers_Every_Frame    ; 2226: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2226: 4C 1A 26 
 ; -----------------------
 
 ; Process laser shot, update parameters in object table
@@ -644,7 +644,7 @@ FP8888   ldy     #$06                    ; 2248: A0 06
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2252: 91 00    
 
 ; This is the exit point from this subroutine
-         jmp     Triggers_Every_Frame    ; 2254: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2254: 4C 1A 26 
 ; -----------------------
 ; Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
 ; L_BRS_($2257)_($222E) OK
@@ -843,7 +843,7 @@ Init_Next_Jetman_Lives_Scores
 ; L_BRS_($235D)_($2364) OK
 LOOP_INJLS_1
          lda     Initial_Jetman_Obj_Params,x ; 235D: BD 53 23 
-         sta     Obj_Jetman_Looks,x      ; 2360: 9D 80 03 
+         sta     Obj_Jetman,x            ; 2360: 9D 80 03 
          dex                             ; 2363: CA       
          bpl     LOOP_INJLS_1            ; 2364: 10 F7    
 
@@ -1387,7 +1387,8 @@ Main_Loop lda    #$00                    ; 25FA: A9 00
          cli                             ; 2606: 58        Enable interrupts
 ; L_BRS_($2607)_($2643) OK
 ; L_JMP_($2607)_($267D) OK
-Next_Obj ldy     #$00                    ; 2607: A0 00    
+Main_Loop_Next_Obj
+         ldy     #$00                    ; 2607: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2609: B1 00     Load Object Type into A from obj table 0380 upwards
          asl     a                       ; 260B: 0A        Mulitply by two as 2 bytes in an address
          tay                             ; 260C: A8        Object Type becomes offset into Subroutine List
@@ -1424,25 +1425,28 @@ Next_Obj ldy     #$00                    ; 2607: A0 00
 
 
 
-; 888888 88""Yb 88  dP""b8  dP""b8 888888 88""Yb .dP"Y8
-;   88   88__dP 88 dP   `" dP   `" 88__   88__dP `Ybo."
-;   88   88"Yb  88 Yb  "88 Yb  "88 88""   88"Yb  o.`Y8b
-;   88   88  Yb 88  YboodP  YboodP 888888 88  Yb 8bodP' oooooooooo
+; 88 88b 88  dP""b8            .dP"Y8 88""Yb 88""Yb 88 888888 888888
+; 88 88Yb88 dP   `"            `Ybo." 88__dP 88__dP 88   88   88__
+; 88 88 Y88 Yb                 o.`Y8b 88"""  88"Yb  88   88   88""
+; 88 88  Y8  YboodP oooooooooo 8bodP' 88     88  Yb 88   88   888888
 ; \
-; 888888 Yb    dP 888888 88""Yb Yb  dP            888888 88""Yb    db    8b    d8 888888
-; 88__    Yb  dP  88__   88__dP  YbdP             88__   88__dP   dPYb   88b  d88 88__
-; 88""     YbdP   88""   88"Yb    8P              88""   88"Yb   dP__Yb  88YbdP88 88""
-; 888888    YP    888888 88  Yb  dP    oooooooooo 88     88  Yb dP""""Yb 88 YY 88 888888
+;            88""Yb  dP"Yb  88 88b 88 888888 888888 88""Yb
+;            88__dP dP   Yb 88 88Yb88   88   88__   88__dP
+;            88"""  Yb   dP 88 88 Y88   88   88""   88"Yb
+; oooooooooo 88      YbodP  88 88  Y8   88   888888 88  Yb
 
-Triggers_Every_Frame
+Inc_Sprite_Pointer
          ldy     #$00                    ; 261A: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 261C: B1 00     Test Object Type value
-         bne     TEF_1                   ; 261E: D0 10     If <>00, skip
+         bne     Inc_Sprite_Ptr_1        ; 261E: D0 10     If <>00, skip
+
+; Test if sprite is a rocket module
          lda     ZP_Obj_List_Ptr_Lo      ; 2620: A5 00    
          cmp     #$B0                    ; 2622: C9 B0     Is Object address $B0?
-         bcc     TEF_1                   ; 2624: 90 0A     If not, skip
+         bcc     Inc_Sprite_Ptr_1        ; 2624: 90 0A     If not, skip
 
-; Delay loop $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds (Needs Check)
+; Delay loop
+; $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds
          ldy     #$02                    ; 2626: A0 02    
          ldx     #$00                    ; 2628: A2 00    
 ; L_BRS_($262A)_($262B) OK
@@ -1456,34 +1460,49 @@ Delay_Loop_0A00
 ; Increment Object Pointer to next Obj i.e. by adding 8
 ; L_BRS_($2630)_($261E) OK
 ; L_BRS_($2630)_($2624) OK
-TEF_1    lda     ZP_Obj_List_Ptr_Lo      ; 2630: A5 00    
+Inc_Sprite_Ptr_1
+         lda     ZP_Obj_List_Ptr_Lo      ; 2630: A5 00    
          clc                             ; 2632: 18       
          adc     #$08                    ; 2633: 69 08    
          sta     ZP_Obj_List_Ptr_Lo      ; 2635: 85 00    
 
+; If interrupt happened, update Jetman, it has higher priority
          lda     ZP_HW_IRQ_1_OR_0        ; 2637: A5 20     H/W interrupt happened?
-         bne     SEI_Load_Jetman_To_Obj_Ptr ; 2639: D0 2E     If yes, jump
+         bne     SEI_Obj_Ptr_To_Jetman   ; 2639: D0 2E     If yes, jump
 
 ; L_JMP_($263B)_($2689) OK
-Load_Jetman_Rtn
-         lda     ZP_Obj_List_Ptr_Lo      ; 263B: A5 00     Is Object address $B0? i.e. Object_0
-         cmp     #$B0                    ; 263D: C9 B0    
+Inc_Sprite_Ptr_Cont
+         lda     ZP_Obj_List_Ptr_Lo      ; 263B: A5 00    
+         cmp     #$B0                    ; 263D: C9 B0     Is Object address a rocket module?
          beq     Restore_Obj_Ptr_CLI     ; 263F: F0 3F    
          and     ZP_Obj_List_Ptr_Lo      ; 2641: 25 00    
-         bne     Next_Obj                ; 2643: D0 C2    
+         bne     Main_Loop_Next_Obj      ; 2643: D0 C2    
 
          lda     ZP_HW_IRQ_Count         ; 2645: A5 21    
          cmp     #$04                    ; 2647: C9 04    
-         bcc     SKIP_2652               ; 2649: 90 07    
+         bcc     Inc_Sprite_Ptr_2        ; 2649: 90 07    
+
          lda     VIC_R4_TV_Raster        ; 264B: AD 04 90 
          and     #$07                    ; 264E: 29 07    
-         bne     SKIP_2655               ; 2650: D0 03    
+         bne     Inc_Sprite_Ptr_3        ; 2650: D0 03    
+
+; Test if score flash time is zero, if yes, setup sprites
 ; L_BRS_($2652)_($2649) OK
-SKIP_2652 jsr    Flash_Score_Cntr_At_Zero? ; 2652: 20 D6 2C 
+Inc_Sprite_Ptr_2
+         jsr     Spr_Ptr_To_Alien_0_Flsh_Ctr ; 2652: 20 D6 2C 
 ; L_BRS_($2655)_($2650) OK
-SKIP_2655 jsr    Obj_Jetman_Looks?       ; 2655: 20 4B 2B 
+Inc_Sprite_Ptr_3
+         jsr     Obj_Jetman_Looks?       ; 2655: 20 4B 2B 
          jsr     Obj_Jetman_Looks_2?     ; 2658: 20 8F 2B 
          jmp     Main_Loop               ; 265B: 4C FA 25 
+
+
+
+
+
+
+
+
 
 ; ----------------------------------------------------------
 ; VIA2 timer interrupts used to update Jetman movement
@@ -1502,7 +1521,7 @@ Set_Jetman_Mvmt_Speed
 ; ===========================================================
 
 ; L_BRS_($2669)_($2639) OK
-SEI_Load_Jetman_To_Obj_Ptr
+SEI_Obj_Ptr_To_Jetman
          sei                             ; 2669: 78        Set Disable Interrupts flag
          lda     #$00                    ; 266A: A9 00    
          sta     ZP_HW_IRQ_1_OR_0        ; 266C: 85 20    
@@ -1514,9 +1533,9 @@ SEI_Load_Jetman_To_Obj_Ptr
 
          jsr     Load_ZP_Parameters      ; 2676: 20 9D 25 
          fcb     $00                     ; 2679: 00        ZP Offset for 1st address
-         fdb     Obj_Jetman_Looks        ; 267A: 80 03     1st Address
+         fdb     Obj_Jetman              ; 267A: 80 03     1st Address
          fcb     $FF                     ; 267C: FF       
-         jmp     Next_Obj                ; 267D: 4C 07 26 
+         jmp     Main_Loop_Next_Obj      ; 267D: 4C 07 26 
 ; -----------------------
 ; L_BRS_($2680)_($263F) OK
 Restore_Obj_Ptr_CLI
@@ -1525,7 +1544,7 @@ Restore_Obj_Ptr_CLI
          lda     ZP_Save_Obj_List_Ptr_Hi ; 2684: A5 23    
          sta     ZP_Obj_List_Ptr_Hi      ; 2686: 85 01    
          cli                             ; 2688: 58        Clear Disable Interrupts flag
-         jmp     Load_Jetman_Rtn         ; 2689: 4C 3B 26 
+         jmp     Inc_Sprite_Ptr_Cont     ; 2689: 4C 3B 26 
 ; -----------------------
 
 
@@ -1548,8 +1567,8 @@ Restore_Obj_Ptr_CLI
 ; oooooooooo 88ood8 88 8bodP'   88
 
 Subroutine_List
-         fdb     Triggers_Every_Frame    ; 268C: 1A 26    
-         fdb     Flying                  ; 268E: 73 32    
+         fdb     Inc_Sprite_Pointer      ; 268C: 1A 26    
+         fdb     Update_Jetman_Flying?   ; 268E: 73 32    
          fdb     Flash_Display_Score     ; 2690: 4D 33    
          fdb     Explosions_Plyr_Life_Lost? ; 2692: 34 29    
          fdb     Stops_All               ; 2694: 8E 2F    
@@ -1561,9 +1580,9 @@ Subroutine_List
          fdb     Rocket_Ascend           ; 26A0: 17 2E    
          fdb     Rocket_Descend          ; 26A2: 4E 2E    
          fdb     Jmp_To_SRList2_SR       ; 26A4: CD 26    
-         fdb     Triggers_Every_Frame    ; 26A6: 1A 26    
+         fdb     Inc_Sprite_Pointer      ; 26A6: 1A 26    
          fdb     Fire_Pressed            ; 26A8: 3E 28    
-         fdb     Triggers_Every_Frame    ; 26AA: 1A 26    
+         fdb     Inc_Sprite_Pointer      ; 26AA: 1A 26    
          fdb     Fire_Pressed_           ; 26AC: 9A 21    
 
 ; L_JMP_($26AE)_($22CE) OK
@@ -1608,7 +1627,7 @@ Jmp_To_SRList2_SR_
          sta     ZP_Subroutine_Vec_Hi    ; 26E9: 85 60    
          cmp     #$07                    ; 26EB: C9 07    
          bcc     JTSRLSR_1               ; 26ED: 90 E2    
-         jmp     Triggers_Every_Frame    ; 26EF: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 26EF: 4C 1A 26 
 ; -----------------------
 ; L_JSR_($26F2)_($26FE) OK
 ; L_JSR_($26F2)_($271C) OK
@@ -1718,7 +1737,7 @@ Reset_Object_RAM
          ldx     #$7F                    ; 2764: A2 7F    
          lda     #$00                    ; 2766: A9 00    
 ; L_BRS_($2768)_($276C) OK
-ROR_1    sta     Obj_Jetman_Looks,x      ; 2768: 9D 80 03 
+ROR_1    sta     Obj_Jetman,x            ; 2768: 9D 80 03 
          dex                             ; 276B: CA       
          bpl     ROR_1                   ; 276C: 10 FA    
          rts                             ; 276E: 60       
@@ -1995,7 +2014,7 @@ Init_Most_Objects
          ldx     #$2F                    ; 28D4: A2 2F    
          lda     #$00                    ; 28D6: A9 00    
 ; L_BRS_($28D8)_($28DC) OK
-Loop_28D8 sta    Obj_Jetman_Looks,x      ; 28D8: 9D 80 03 
+Loop_28D8 sta    Obj_Jetman,x            ; 28D8: 9D 80 03 
          dex                             ; 28DB: CA       
          bpl     Loop_28D8               ; 28DC: 10 FA    
 
@@ -2037,23 +2056,23 @@ Restore_Obj_List_Ptr
 Change_Object_To_Explosion
          jsr     Z360D                   ; 28F9: 20 0D 36 
 
-; Reset Alien object direction
+; Reset Alien? object direction
          lda     #$00                    ; 28FC: A9 00    
          ldy     #$02                    ; 28FE: A0 02    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2900: 91 00    
 
-; Setup Alien object color flashing/cycling
+; Setup Alien? object color flashing/cycling
          ldy     #$00                    ; 2902: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2904: B1 00    
          and     #$C0                    ; 2906: 29 C0     Zero bits 0-5 i.e. xx000000
          ora     #$03                    ; 2908: 09 03     Set bits 0-1 i.e. xxxxxx11
 
 ; L_JSR_($290A)_($2A59) OK
-Store_object_type
+Store_Object_Type
          ldy     #$06                    ; 290A: A0 06    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 290C: 91 00    
 
-; Change Alien object type to an Explosion
+; Change sprite type to an Explosion
          ldy     #$00                    ; 290E: A0 00    
          lda     #$03                    ; 2910: A9 03    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2912: 91 00    
@@ -2063,7 +2082,7 @@ Store_object_type
          ldy     #$04                    ; 2915: A0 04    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2917: 91 00    
 
-; Change Alien/Explosion object colour based on timer
+; Change Alien?/Explosion object colour based on timer
          lda     ZP_HW_IRQ_Count3        ; 2919: A5 4C    
          and     #$07                    ; 291B: 29 07     Zero bits 3-8 i.e. 00000xxx
          bne     SKIP_2921               ; 291D: D0 02    
@@ -2107,7 +2126,7 @@ Z294A    ldy     #$04                    ; 294A: A0 04
          jsr     Load_Small_UDG_Addr_Setup_XY ; 295B: 20 3D 37 
          jsr     Z3604                   ; 295E: 20 04 36 
          jsr     Update_Color_RAM        ; 2961: 20 1F 38 
-         jmp     Triggers_Every_Frame    ; 2964: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2964: 4C 1A 26 
 ; -----------------------
 Explosion_UDG_Ptr
          fdb     Explosion_1             ; 2967: 74 3F    
@@ -2124,7 +2143,7 @@ Z2975    ldy     #$00                    ; 2975: A0 00
          and     #$3F                    ; 297E: 29 3F    
          cmp     #$03                    ; 2980: C9 03    
          bcc     Sound_Channels_Off_ETC  ; 2982: 90 19    
-         jmp     Triggers_Every_Frame    ; 2984: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2984: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2987)_($29C5) OK
 Game_Over jsr    Check_New_Hi_Score      ; 2987: 20 7A 27 
@@ -2163,7 +2182,7 @@ Z29C3    lda     ZP_Num_Lives_P1         ; 29C3: A5 5A
 ; L_JMP_($29C7)_($29E4) OK
 Z29C7    jsr     RLAEL_3                 ; 29C7: 20 D7 22 
          jsr     Init_Next_Jetman_Lives_Scores ; 29CA: 20 5B 23 
-         jmp     Triggers_Every_Frame    ; 29CD: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 29CD: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($29D0)_($29C1) OK
 Z29D0    lda     ZP_Num_Lives_P2         ; 29D0: A5 5C    
@@ -2235,14 +2254,14 @@ STR_GAME_OVER_PLAYER_2
          fcc     "GAME`OVER`PLAYER`"     ; 2A33: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
          fcb     $F2                     ; 2A44: F2       
 ; L_JSR_($2A45)_($2C99) OK
-Test_Jetman_Collide_Score_0
+Spr_Ptr_To_Jetman
          jsr     Save_Obj_List_Ptr       ; 2A45: 20 E7 28 
          jsr     Load_ZP_Parameters      ; 2A48: 20 9D 25 
          fcb     $00                     ; 2A4B: 00       
-         fdb     Obj_Jetman_Looks        ; 2A4C: 80 03    
+         fdb     Obj_Jetman              ; 2A4C: 80 03    
          fcb     $FF                     ; 2A4E: FF       
 
-; Set alien horizontal position to edge of screen
+; Set Jetman Move Speed to 1
          ldy     #$02                    ; 2A4F: A0 02    
          lda     #$01                    ; 2A51: A9 01    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A53: 91 00    
@@ -2250,7 +2269,7 @@ Test_Jetman_Collide_Score_0
 ; Object type
          ldy     #$00                    ; 2A55: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2A57: B1 00    
-         jsr     Store_object_type       ; 2A59: 20 0A 29 
+         jsr     Store_Object_Type       ; 2A59: 20 0A 29 
          jmp     Restore_Obj_List_Ptr    ; 2A5C: 4C F0 28 
 ; -----------------------
 
@@ -2338,7 +2357,7 @@ Set_Alien_Direction
 ; L_BRS_($2A95)_($2A9C) OK
 Set_Alien_Diagonal?
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2A95: 91 00    
-         jmp     Test_Jetman_Collide_Score ; 2A97: 4C 92 2C 
+         jmp     Update_Sprite_Posn_Collide ; 2A97: 4C 92 2C 
 ; -----------------------
 ; L_BRS_($2A9A)_($2A91) OK
 Alien_Diagonal_Set_F8
@@ -2368,7 +2387,7 @@ Reset_Countdown_Timer
 ; L_BRS_($2AB7)_($2AB0) OK
 Set_Alien_Diagonal_2?
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2AB7: 91 00    
-         jmp     Test_Jetman_Collide_Score ; 2AB9: 4C 92 2C 
+         jmp     Update_Sprite_Posn_Collide ; 2AB9: 4C 92 2C 
 ; -----------------------
 
 
@@ -2439,7 +2458,7 @@ Level_3_Saucer_6
 ; L_BRS_($2AF7)_($2AF1) OK
 ; L_BRS_($2AF7)_($2B0F) OK
 Level_3_Saucer_EXIT
-         jmp     Test_Jetman_Collide_Score ; 2AF7: 4C 92 2C 
+         jmp     Update_Sprite_Posn_Collide ; 2AF7: 4C 92 2C 
 ; -----------------------
 ; L_BRS_($2AFA)_($2AD0) OK
 Level_3_Saucer_7
@@ -2511,7 +2530,7 @@ PCA_3333 lda     (ZP_Obj_List_Ptr_Lo),y  ; 2B42: B1 00
 ; ===========================================================
 ; L_JSR_($2B4B)_($2655) OK
 Obj_Jetman_Looks?
-         lda     Obj_Jetman_Looks        ; 2B4B: AD 80 03 
+         lda     Obj_Jetman              ; 2B4B: AD 80 03 
          and     #$3F                    ; 2B4E: 29 3F    
          bne     Z2B53                   ; 2B50: D0 01    
 ; L_BRS_($2B52)_($2B55) OK
@@ -2553,7 +2572,7 @@ Init_Flashing_Gem_Obj_Table
 
 ; L_JSR_($2B8F)_($2658) OK
 Obj_Jetman_Looks_2?
-         lda     Obj_Jetman_Looks        ; 2B8F: AD 80 03 
+         lda     Obj_Jetman              ; 2B8F: AD 80 03 
          and     #$3F                    ; 2B92: 29 3F     Zero bits 6 & 7 i.e. 00xxxxxx
          bne     Z2B97                   ; 2B94: D0 01    
 ; L_BRS_($2B96)_($2B99) OK
@@ -2748,7 +2767,7 @@ Level_0_Fuzzball
          bmi     Alien_Hit_Update_Score  ; 2C6D: 30 09    
          jsr     Platform_Collision_Test ; 2C6F: 20 B3 30  Remove=1st Level Aliens don't explode on platform/floor impact
          lda     ZP_02                   ; 2C72: A5 02    
-         bpl     Test_Jetman_Collide_Score ; 2C74: 10 1C    
+         bpl     Update_Sprite_Posn_Collide ; 2C74: 10 1C    
          bmi     Object_To_Explosion     ; 2C76: 30 14    
 
 ; Use current player level to create offset into points table
@@ -2776,21 +2795,28 @@ Alien_Hit_Update_Score
 ; L_BRS_($2C8C)_($2C76) OK
 Object_To_Explosion
          jsr     Change_Object_To_Explosion ; 2C8C: 20 F9 28 
-         jmp     Triggers_Every_Frame    ; 2C8F: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2C8F: 4C 1A 26 
 ; -----------------------
+
+
+
+
+
 ; L_JMP_($2C92)_($2A97) OK
 ; L_JMP_($2C92)_($2AB9) OK
 ; L_JMP_($2C92)_($2AF7) OK
 ; L_BRS_($2C92)_($2C74) OK
-Test_Jetman_Collide_Score
+Update_Sprite_Posn_Collide
          jsr     Test_Jetman_Obj_Collide ; 2C92: 20 58 2D 
          lda     ZP_02                   ; 2C95: A5 02    
-         bpl     Test_Jetman_Collide_Score_1 ; 2C97: 10 06    
-         jsr     Test_Jetman_Collide_Score_0 ; 2C99: 20 45 2A 
+         bpl     Update_Sprite_Posn      ; 2C97: 10 06    
+         jsr     Spr_Ptr_To_Jetman       ; 2C99: 20 45 2A 
          jmp     Alien_Hit_Update_Score  ; 2C9C: 4C 78 2C 
 ; -----------------------
+
+; Get sprite direction/speed and use to create new X value
 ; L_BRS_($2C9F)_($2C97) OK
-Test_Jetman_Collide_Score_1
+Update_Sprite_Posn
          ldy     #$02                    ; 2C9F: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2CA1: B1 00    
          dey                             ; 2CA3: 88       
@@ -2800,14 +2826,18 @@ Test_Jetman_Collide_Score_1
          ror     a                       ; 2CA7: 6A       
          clc                             ; 2CA8: 18       
          adc     (ZP_Obj_List_Ptr_Lo),y  ; 2CA9: 71 00    
+
+; Take care of X screen wrapping
          cmp     #$F0                    ; 2CAB: C9 F0    
-         bcs     Test_Jetman_Collide_Score_3 ; 2CAD: B0 1D    
+         bcs     Upd_Sprite_Posn_Wrap_X_1 ; 2CAD: B0 1D    
          cmp     #$B8                    ; 2CAF: C9 B8    
-         bcs     Test_Jetman_Collide_Score_4 ; 2CB1: B0 1E    
+         bcs     Upd_Sprite_Posn_Wrap_X_2 ; 2CB1: B0 1E    
 ; L_JMP_($2CB3)_($2CCE) OK
 ; L_JMP_($2CB3)_($2CD3) OK
-Test_Jetman_Collide_Score_2
+Update_Sprite_Posn_X
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CB3: 91 00    
+
+; Get sprite direction/speed and use to create new Y value
          ldy     #$04                    ; 2CB5: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2CB7: B1 00    
          dey                             ; 2CB9: 88       
@@ -2818,31 +2848,37 @@ Test_Jetman_Collide_Score_2
          clc                             ; 2CBE: 18       
          adc     (ZP_Obj_List_Ptr_Lo),y  ; 2CBF: 71 00    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CC1: 91 00    
+
          jsr     Z3646                   ; 2CC3: 20 46 36 
          jsr     Update_Color_RAM        ; 2CC6: 20 1F 38 
-         jmp     Triggers_Every_Frame    ; 2CC9: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2CC9: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2CCC)_($2CAD) OK
-Test_Jetman_Collide_Score_3
+Upd_Sprite_Posn_Wrap_X_1
          adc     #$B8                    ; 2CCC: 69 B8    
-         jmp     Test_Jetman_Collide_Score_2 ; 2CCE: 4C B3 2C 
+         jmp     Update_Sprite_Posn_X    ; 2CCE: 4C B3 2C 
 ; -----------------------
 ; L_BRS_($2CD1)_($2CB1) OK
-Test_Jetman_Collide_Score_4
+Upd_Sprite_Posn_Wrap_X_2
          adc     #$48                    ; 2CD1: 69 48    
-         jmp     Test_Jetman_Collide_Score_2 ; 2CD3: 4C B3 2C 
+         jmp     Update_Sprite_Posn_X    ; 2CD3: 4C B3 2C 
 ; -----------------------
+
+
+
+
+
 ; L_JSR_($2CD6)_($2652) OK
-Flash_Score_Cntr_At_Zero?
+Spr_Ptr_To_Alien_0_Flsh_Ctr
          lda     ZP_Flash_Score_Countdown ; 2CD6: A5 5D    
-         beq     Setup_Objects           ; 2CD8: F0 09    
+         beq     Spr_Ptr_To_Alien_0_Jetman ; 2CD8: F0 09    
          rts                             ; 2CDA: 60       
 ; ===========================================================
 Alien_Points_Lookup
          fdb     $0025,$0035,$0045,$0055 ; 2CDB: 25 00 35 00 45 00 55 00 
 ; L_BRS_($2CE3)_($2CD8) OK
-Setup_Objects
-         lda     Obj_Jetman_Looks        ; 2CE3: AD 80 03 
+Spr_Ptr_To_Alien_0_Jetman
+         lda     Obj_Jetman              ; 2CE3: AD 80 03 
          and     #$3F                    ; 2CE6: 29 3F    
          cmp     #JETMAN_FLYING          ; 2CE8: C9 01    
          beq     Set_Obj_List_Ptr_To_Alien0 ; 2CEA: F0 05    
@@ -2953,7 +2989,7 @@ Level_Alien_Color_Lookup
 Test_Jetman_Obj_Collide
          lda     ZP_Flash_Score_Countdown ; 2D58: A5 5D    
          bne     TJOC_0                  ; 2D5A: D0 0D    
-         lda     Obj_Jetman_Looks        ; 2D5C: AD 80 03 
+         lda     Obj_Jetman              ; 2D5C: AD 80 03 
          and     #$3F                    ; 2D5F: 29 3F    
          cmp     #$01                    ; 2D61: C9 01     Jetman flying?
          beq     TJOC_1                  ; 2D63: F0 09     Yes, branch
@@ -3138,7 +3174,7 @@ Rocket_At_Top
          jsr     Reset_Level_Add_Extra_Life ; 2E44: 20 BA 22 
          lda     #$00                    ; 2E47: A9 00    
          sta     ZP_Rocket_Flame_On      ; 2E49: 85 26    
-         jmp     Triggers_Every_Frame    ; 2E4B: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2E4B: 4C 1A 26 
 ; -----------------------
 ; Flames stop a little way before bottom
 
@@ -3207,18 +3243,18 @@ Subroutine_2E74_On_IRQ?
 ; Don't display Jetman next time? Also zeroes Jetman X coord.
          jsr     Load_ZP_Parameters      ; 2E8F: 20 9D 25 
          fcb     $00                     ; 2E92: 00       
-         fdb     Obj_Jetman_Looks        ; 2E93: 80 03    
+         fdb     Obj_Jetman              ; 2E93: 80 03    
          fcb     $FF                     ; 2E95: FF       
 
          jsr     Save_Obj_Type_X_Y_Color ; 2E96: 20 E9 35 
          jsr     Z3601                   ; 2E99: 20 01 36 
 
          lda     #$00                    ; 2E9C: A9 00    
-         sta     Obj_Jetman_Looks        ; 2E9E: 8D 80 03 
+         sta     Obj_Jetman              ; 2E9E: 8D 80 03 
          jsr     Restore_Obj_List_Ptr    ; 2EA1: 20 F0 28 
          inc     ZP_Num_Lives_P1         ; 2EA4: E6 5A    
          jsr     Display_P1_Lives        ; 2EA6: 20 73 23 
-         jmp     Triggers_Every_Frame    ; 2EA9: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2EA9: 4C 1A 26 
 ; -----------------------
 ; L_JMP_($2EAC)_($2E31) OK
 ; L_BRS_($2EAC)_($2E66) OK
@@ -3266,7 +3302,7 @@ SKIP_2ECA sta    ZP_Tile_Color           ; 2ECA: 85 1B
          lda     #$01                    ; 2EF3: A9 01    
          sta     ZP_Tile_Color           ; 2EF5: 85 1B    
          jsr     A111111                 ; 2EF7: 20 16 2F 
-         jmp     Triggers_Every_Frame    ; 2EFA: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2EFA: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2EFD)_($2ED4) OK
 ; L_BRS_($2EFD)_($2EDD) OK
@@ -3274,7 +3310,7 @@ A123123  lda     #$01                    ; 2EFD: A9 01
          sta     ZP_Tile_Color           ; 2EFF: 85 1B    
 ; L_BRS_($2F01)_($2EE1) OK
 A456456  jsr     A789789                 ; 2F01: 20 07 2F 
-         jmp     Triggers_Every_Frame    ; 2F04: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2F04: 4C 1A 26 
 ; -----------------------
 ; L_JSR_($2F07)_($2EE9) OK
 ; L_JSR_($2F07)_($2F01) OK
@@ -3362,7 +3398,7 @@ Stops_All_1
          sta     Obj_Flame_1             ; 2F6C: 8D A9 03 
          lda     #$10                    ; 2F6F: A9 10    
          sta     Obj_Flame_2             ; 2F71: 8D AA 03 
-         jmp     Triggers_Every_Frame    ; 2F74: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2F74: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2F77)_($2F37) OK
 Stops_All_2
@@ -3430,7 +3466,7 @@ Stops_All_5
          jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 2FCE: 20 8D 37 
          jsr     GOTO_364C               ; 2FD1: 20 4C 36 
          jsr     Update_Color_RAM        ; 2FD4: 20 1F 38 
-         jmp     Triggers_Every_Frame    ; 2FD7: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 2FD7: 4C 1A 26 
 ; -----------------------
 
 
@@ -3980,7 +4016,8 @@ ADC_48   adc     #$48                    ; 326A: 69 48
 TXA_     txa                             ; 326F: 8A       
          jmp     __ZZZZ__                ; 3270: 4C A6 32 
 ; -----------------------
-Flying   jsr     Save_Obj_Type_X_Y       ; 3273: 20 D7 35 
+Update_Jetman_Flying?
+         jsr     Save_Obj_Type_X_Y       ; 3273: 20 D7 35 
          jsr     Read_Keyboard_Joystick  ; 3276: 20 F7 33  Returns A=%RLDU_F111
          sta     ZP_Jetman_Movement      ; 3279: 85 1C    
          jsr     Platform_Collision_Test ; 327B: 20 B3 30  Remove=Jetman+fuel/rocket part pick-up fly through platforms
@@ -4095,7 +4132,7 @@ Flying_4? jsr    Z3646                   ; 32F9: 20 46 36
          jsr     Update_Laser_Shots      ; 3306: 20 E9 20 
 ; L_BRS_($3309)_($3304) OK
 SKIP_Flying_5?
-         jmp     Triggers_Every_Frame    ; 3309: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 3309: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($330C)_($32D3) OK
 Not_sure_330c
@@ -4149,6 +4186,31 @@ Add_48_Then_RKJ_6666
          adc     #$48                    ; 3348: 69 48    
          jmp     RKJ_6666                ; 334A: 4C AF 33 
 ; -----------------------
+
+
+
+
+
+
+
+
+
+
+; 888888 88        db    .dP"Y8 88  88
+; 88__   88       dPYb   `Ybo." 88  88
+; 88""   88  .o  dP__Yb  o.`Y8b 888888
+; 88     88ood8 dP""""Yb 8bodP' 88  88 oooooooooo
+; \
+; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
+;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
+;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
+; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
+; \
+;            .dP"Y8  dP""b8  dP"Yb  88""Yb 888888
+;            `Ybo." dP   `" dP   Yb 88__dP 88__
+;            o.`Y8b Yb      Yb   dP 88"Yb  88""
+; oooooooooo 8bodP'  YboodP  YbodP  88  Yb 888888
+
 Flash_Display_Score
          lda     ZP_Flash_Score_Countdown ; 334D: A5 5D    
          beq     Read_Kbd_Jstk           ; 334F: F0 19    
@@ -4162,7 +4224,7 @@ Flash_Display_Score
          jsr     Display_P2_Score        ; 3364: 20 81 24 
 ; L_BRS_($3367)_($3356) OK
 JMP_JMP_JMP
-         jmp     Triggers_Every_Frame    ; 3367: 4C 1A 26 
+         jmp     Inc_Sprite_Pointer      ; 3367: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($336A)_($334F) OK
 Read_Kbd_Jstk

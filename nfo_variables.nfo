@@ -65,7 +65,7 @@ label      5f ZP_Subroutine_Vec_Lo ; NOT WORD ALIGNED
 label      60 ZP_Subroutine_Vec_Hi ; NOT WORD ALIGNED
 
 ; Non-Zero-Page Object Variables
-label    0380 Obj_Jetman_Looks      ; Bit7=direction 1=left, 0=right; bit 0&1 00 = Not there (hit by alien), 01 = flying, 10 = standing
+label    0380 Obj_Jetman            ; Bit7=direction 1=left, 0=right; bit 0&1 00 = Not there (hit by alien), 01 = flying, 10 = standing
 label    0381 Obj_Jetman_X          ; Pixel Left=00 Right=B6 or B7
 label    0382 Obj_Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
 label    0383 Obj_Jetman_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
@@ -157,10 +157,10 @@ label    03C7 Obj_RMS_Gem_7
 
 
 ; Byte 00/08= object type
-; Byte 01/09= horizontal postion of alien
-; Byte 02/0A= direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
-; Byte 03/0B= height
-; Byte 04/0C= diagonal, jiggles around a lot for a saucer, might be a countdown?
+; Byte 01/09= X postion of alien
+; Byte 02/0A= X direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
+; Byte 03/0B= Y position
+; Byte 04/0C= Y Direction, probably the same as X, might be a countdown for gravity?
 ; Byte 05/0D= colour - bottom 3 bits of byte?
 ; Byte 06/0E= For Gem, affects colors and flashing of Byte 05
 
