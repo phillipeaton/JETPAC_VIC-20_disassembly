@@ -3,6 +3,33 @@
 <mamecommentfile version="1">
     <system name="vic20p">
         <cpu tag=":ue10">
+            <comment address="8196" color="16711680" crc="70204EC9">
+                VIC_Init_Tab
+            </comment>
+            <comment address="8212" color="16711680" crc="B6CC4292">
+                MASK_01
+            </comment>
+            <comment address="8213" color="16711680" crc="3C0C8EA1">
+                MASK_02
+            </comment>
+            <comment address="8214" color="16711680" crc="2B6E5FC9">
+                MASK_04
+            </comment>
+            <comment address="8215" color="16711680" crc="DCD967BF">
+                MASK_08
+            </comment>
+            <comment address="8216" color="16711680" crc="30752066">
+                MASK_10
+            </comment>
+            <comment address="8217" color="16711680" crc="DACD53D7">
+                MASK_20
+            </comment>
+            <comment address="8218" color="16711680" crc="A4DEAE1D">
+                MASK_40
+            </comment>
+            <comment address="8219" color="16711680" crc="0C86CB24">
+                MASK_80
+            </comment>
             <comment address="8222" color="16711680" crc="D202EF8D">
                 Reset stack pointer
             </comment>
@@ -18,311 +45,788 @@
             <comment address="8278" color="16711680" crc="4D57D105">
                 Reset the VIC 16 registers
             </comment>
+            <comment address="8280" color="16711680" crc="6DC5519D">
+                Reset_VIC
+            </comment>
+            <comment address="8292" color="16711680" crc="6C0D2BD1">
+                ISR_Cols
+            </comment>
+            <comment address="8295" color="16711680" crc="E484939D">
+                ISR_Rows
+            </comment>
+            <comment address="8313" color="16711680" crc="E797CEF4">
+                Reset_Game_Select
+            </comment>
+            <comment address="8320" color="16711680" crc="4B59D9BF">
+                RGS_Flash
+            </comment>
+            <comment address="8335" color="16711680" crc="2C4D9F53">
+                Game_Select
+            </comment>
+            <comment address="8370" color="16711680" crc="05723597">
+                Test_F3
+            </comment>
+            <comment address="8380" color="16711680" crc="48C054CF">
+                Test_F5
+            </comment>
+            <comment address="8390" color="16711680" crc="D3A4967F">
+                Test_F7
+            </comment>
+            <comment address="8400" color="16711680" crc="DF6F85B3">
+                Test_Space
+            </comment>
             <comment address="8425" color="16711680" crc="04A0F2DD">
-                ===========================================================
+                Update_Laser_Shots
             </comment>
             <comment address="8432" color="16711680" crc="48E7BFE2">
-                -----------------------------------------------------------
+                Laser_Shots
+            </comment>
+            <comment address="8443" color="16711680" crc="55642833">
+                LS_Loop
             </comment>
             <comment address="8464" color="16711680" crc="BC078D06">
-                -----------------------------------------------------------
+                Laser_Shot
+            </comment>
+            <comment address="8495" color="16711680" crc="09F6F6C3">
+                Laser_Shot_
+            </comment>
+            <comment address="8517" color="16711680" crc="47BDA50F">
+                BACK_2145
             </comment>
             <comment address="8555" color="16711680" crc="B6CC4292">
-                -----------------------------------------------------------
+                Laser_Color_Table
+            </comment>
+            <comment address="8563" color="16711680" crc="BC078D06">
+                Laser_Jetman_Facing_Right
+            </comment>
+            <comment address="8574" color="16711680" crc="5F9A520F">
+                Laser_JFR_1
             </comment>
             <comment address="8583" color="16711680" crc="FA005713">
-                ===========================================================
+                Laser_JFR_1_1
             </comment>
             <comment address="8589" color="16711680" crc="9C72D261">
-                ===========================================================
+                Laser_JFR_2
             </comment>
             <comment address="8597" color="16711680" crc="FB3D4A23">
-                ===========================================================
+                FP0000
             </comment>
             <comment address="8602" color="16711680" crc="06BD0B23">
-                ===========================================================
+                Fire_Pressed_
+            </comment>
+            <comment address="8651" color="16711680" crc="ABF4DE04">
+                FP1111
+            </comment>
+            <comment address="8668" color="16711680" crc="DF6F85B3">
+                FP2222
+            </comment>
+            <comment address="8689" color="16711680" crc="0CCDCFF0">
+                FP3333
+            </comment>
+            <comment address="8700" color="16711680" crc="7BCAFF66">
+                FP4444
+            </comment>
+            <comment address="8706" color="16711680" crc="48E7BFE2">
+                FP5555
+            </comment>
+            <comment address="8721" color="16711680" crc="47BDA50F">
+                FP6666
             </comment>
             <comment address="8745" color="16711680" crc="BC078D06">
-                ===========================================================
+                FP7777
+            </comment>
+            <comment address="8776" color="16711680" crc="06BD0B23">
+                FP8888
             </comment>
             <comment address="8791" color="16711680" crc="BC078D06">
-                ===========================================================
+                FP9999
+            </comment>
+            <comment address="8803" color="16711680" crc="ABF4DE04">
+                FPAAAA
             </comment>
             <comment address="8837" color="16711680" crc="C16E77DB">
-                ===========================================================
+                CLC_ADC_08
             </comment>
             <comment address="8843" color="16711680" crc="FF74BEB8">
-                ===========================================================
+                Laser_ZP17_15_to_ZP16_14
             </comment>
             <comment address="8856" color="16711680" crc="AA05262F">
-                -----------------------------------------------------------
+                Laser_Jetman_Facing_Left???
             </comment>
             <comment address="8865" color="16711680" crc="2CD6F4FB">
-                -----------------------------------------------------------
+                Laser_JFL
             </comment>
             <comment address="8884" color="16711680" crc="916B06E7">
-                -----------------------------------------------------------
+                Laser_JFL_1
             </comment>
             <comment address="8890" color="16711680" crc="E797CEF4">
-                -----------------------------------------------------------
+                Reset_Level_Add_Extra_Life
+            </comment>
+            <comment address="8907" color="16711680" crc="1E5FA01E">
+                RLAEL_1
             </comment>
             <comment address="8913" color="16711680" crc="AADDCD02">
-                ===========================================================
+                RLAEL_2
             </comment>
             <comment address="8919" color="16711680" crc="E797CEF4">
-                ===========================================================
+                RLAEL_3
             </comment>
             <comment address="8931" color="16711680" crc="E3865223">
-                ===========================================================
+                Object_RTS_Fuel_Type
+            </comment>
+            <comment address="8941" color="16711680" crc="AAEFFC02">
+                JMP_Reset_S_O_1
             </comment>
             <comment address="8946" color="16711680" crc="E3865223">
-                ===========================================================
+                Object_RMS_Gem_Type
+            </comment>
+            <comment address="8959" color="16711680" crc="5E3B4953">
+                Init_Objects_1_To_3
+            </comment>
+            <comment address="8961" color="16711680" crc="AC122A1B">
+                CBTSR1
             </comment>
             <comment address="8971" color="16711680" crc="81482364">
-                -----------------------------------------------------------
+                Reset_Some_Objects
+            </comment>
+            <comment address="8986" color="16711680" crc="DF6F85B3">
+                Reset_S_O_1
             </comment>
             <comment address="9019" color="16711680" crc="C01ED88A">
-                -----------------------------------------------------------
+                Inital_Screen_Object_Data
+            </comment>
+            <comment address="9043" color="16711680" crc="3C0C8EA1">
+                Initial_Jetman_Obj_Params
+            </comment>
+            <comment address="9051" color="16711680" crc="438C5937">
+                Init_Next_Jetman_Lives_Scores
+            </comment>
+            <comment address="9053" color="16711680" crc="0136CBB4">
+                LOOP_INJLS_1
+            </comment>
+            <comment address="9071" color="16711680" crc="12F753B8">
+                LDA_7F_Return
+            </comment>
+            <comment address="9075" color="16711680" crc="48E7BFE2">
+                Display_P1_Lives
+            </comment>
+            <comment address="9090" color="16711680" crc="48E7BFE2">
+                Display_P2_Lives
+            </comment>
+            <comment address="9102" color="16711680" crc="C16E77DB">
+                Display_Number_Lives
             </comment>
             <comment address="9122" color="16711680" crc="03B5D861">
-                ===========================================================
+                Zero_Lives_To_UDG_RAM_1
             </comment>
             <comment address="9128" color="16711680" crc="73AE7407">
-                ===========================================================
+                Zero_Lives_To_UDG_RAM
             </comment>
             <comment address="9142" color="16711680" crc="1E7A26A0">
-                ===========================================================
+                Load_Num_Lives
+            </comment>
+            <comment address="9146" color="16711680" crc="1917E2B9">
+                Load_Num_Lives_P1
             </comment>
             <comment address="9149" color="16711680" crc="F074478C">
-                -----------------------------------------------------------
+                Load_Num_Lives_P2
             </comment>
             <comment address="9152" color="16711680" crc="1E7A26A0">
-                -----------------------------------------------------------
+                Load_Num_Lives_Inverse
             </comment>
             <comment address="9159" color="16711680" crc="C16E77DB">
-                ===========================================================
+                Jetman_Icon
+            </comment>
+            <comment address="9167" color="16711680" crc="FEA679F2">
+                LDA_7F
+            </comment>
+            <comment address="9172" color="16711680" crc="01D0CF3A">
+                Setup_Player_Lives
+            </comment>
+            <comment address="9174" color="16711680" crc="3E1C155F">
+                BACK_SPL
+            </comment>
+            <comment address="9204" color="16711680" crc="9FB08ED5">
+                SKIP_SPL
             </comment>
             <comment address="9205" color="16711680" crc="AAEFFC02">
-                -----------------------------------------------------------
+                Swap_Player_And_Objects
+            </comment>
+            <comment address="9207" color="16711680" crc="CADCA152">
+                Swap_Player
+            </comment>
+            <comment address="9222" color="16711680" crc="4F0B4B53">
+                Swap_Object
             </comment>
             <comment address="9238" color="16711680" crc="87B14989">
-                -----------------------------------------------------------
+                Reset_Screen_Disp_Scores
+            </comment>
+            <comment address="9253" color="16711680" crc="DDE8CC94">
+                Display_1UP_HI_2UP_Titles
+            </comment>
+            <comment address="9257" color="16711680" crc="164ECF62">
+                BACK_D1H2
             </comment>
             <comment address="9296" color="16711680" crc="157042E6">
-                -----------------------------------------------------------
+                STR_1UP
+            </comment>
+            <comment address="9303" color="16711680" crc="432AE560">
+                STR_HI
+            </comment>
+            <comment address="9310" color="16711680" crc="157042E6">
+                STR_2UP
+            </comment>
+            <comment address="9317" color="16711680" crc="D202EF8D">
+                STR_1UP_HI_2UP
+            </comment>
+            <comment address="9329" color="16711680" crc="48E7BFE2">
+                Display_P1_Score
+            </comment>
+            <comment address="9345" color="16711680" crc="48E7BFE2">
+                Display_P2_Score
+            </comment>
+            <comment address="9361" color="16711680" crc="48E7BFE2">
+                Display_Hi_Score
+            </comment>
+            <comment address="9377" color="16711680" crc="316402CE">
+                Game_Sel_Flash_Period
+            </comment>
+            <comment address="9380" color="16711680" crc="AA05262F">
+                GSFP1
+            </comment>
+            <comment address="9394" color="16711680" crc="4B59D9BF">
+                GSFP2
             </comment>
             <comment address="9401" color="16711680" crc="DDE8CC94">
-                -----------------------------------------------------------
+                Display_Game_Select
+            </comment>
+            <comment address="9455" color="16711680" crc="2D708D09">
+                DGS1
             </comment>
             <comment address="9503" color="16711680" crc="FA005713">
-                -----------------------------------------------------------
+                Fn_Key_SP_Row_Offsets
+            </comment>
+            <comment address="9508" color="16711680" crc="B7173394">
+                STRING_COPYRIGHT_1983_ACG
+            </comment>
+            <comment address="9530" color="16711680" crc="CECB8B30">
+                STR_JETPAC_GAME_SELECT
+            </comment>
+            <comment address="9552" color="16711680" crc="D202EF8D">
+                STR_F1_1_PLAYER_GAME
+            </comment>
+            <comment address="9570" color="16711680" crc="D202EF8D">
+                STR_F3_2_PLAYER_GAME
+            </comment>
+            <comment address="9588" color="16711680" crc="D202EF8D">
+                STR_F5_KEYBOARD
+            </comment>
+            <comment address="9601" color="16711680" crc="D202EF8D">
+                STR_F7_JOYSTICK
+            </comment>
+            <comment address="9614" color="16711680" crc="D202EF8D">
+                STR_SP_START_GAME
+            </comment>
+            <comment address="9629" color="16711680" crc="916B06E7">
+                Load_ZP_Parameters
+            </comment>
+            <comment address="9637" color="16711680" crc="CADBCC96">
+                LZPP_1
             </comment>
             <comment address="9653" color="16711680" crc="E401A57B">
-                -----------------------------------------------------------
+                Load_ZP_Parameter
             </comment>
             <comment address="9674" color="16711680" crc="3F210705">
-                ===========================================================
+                Inc_Param_Addr
+            </comment>
+            <comment address="9680" color="16711680" crc="9FB08ED5">
+                IPA1
             </comment>
             <comment address="9681" color="16711680" crc="6397843A">
-                -----------------------------------------------------------
+                Game_Start
             </comment>
             <comment address="9696" color="16711680" crc="491B25C9">
                 ===========================================================
             </comment>
+            <comment address="9716" color="16711680" crc="916B06E7">
+                HIH_1
+            </comment>
+            <comment address="9722" color="16711680" crc="3E1C155F">
+                Main_Loop
+            </comment>
+            <comment address="9735" color="16711680" crc="EFDEAE16">
+                Main_Loop_Next_Obj
+            </comment>
             <comment address="9754" color="16711680" crc="EFDEAE16">
-                ===========================================================
+                Inc_Sprite_Pointer
+            </comment>
+            <comment address="9770" color="16711680" crc="A9B3C423">
+                Delay_Loop_0A00
+            </comment>
+            <comment address="9776" color="16711680" crc="92A95A53">
+                Inc_Sprite_Ptr_1
+            </comment>
+            <comment address="9787" color="16711680" crc="92A95A53">
+                Inc_Sprite_Ptr_Cont
+            </comment>
+            <comment address="9810" color="16711680" crc="22B69188">
+                Inc_Sprite_Ptr_2
+            </comment>
+            <comment address="9813" color="16711680" crc="783DF07C">
+                Inc_Sprite_Ptr_3
             </comment>
             <comment address="9822" color="16711680" crc="26AB5228">
-                ===========================================================
+                Set_Jetman_Mvmt_Speed
             </comment>
             <comment address="9833" color="16711680" crc="8CDC1683">
-                -----------------------------------------------------------
+                SEI_Obj_Ptr_To_Jetman
+            </comment>
+            <comment address="9856" color="16711680" crc="47C91BB7">
+                Restore_Obj_Ptr_CLI
             </comment>
             <comment address="9868" color="16711680" crc="2F6016F7">
-                ===========================================================
+                Subroutine_List
+            </comment>
+            <comment address="9869" color="16711680" crc="4B0BB15D">
+                Subroutine_List+1
+            </comment>
+            <comment address="9902" color="16711680" crc="438C5937">
+                Init_Rocket_Object
+            </comment>
+            <comment address="9904" color="16711680" crc="564712A7">
+                IRO_1
             </comment>
             <comment address="9925" color="16711680" crc="F65B2076">
-                -----------------------------------------------------------
+                Init_Rocket_Obj_Table
+            </comment>
+            <comment address="9933" color="16711680" crc="491B25C9">
+                Jmp_To_SRList2_SR
+            </comment>
+            <comment address="9937" color="16711680" crc="C6000A4A">
+                JTSRLSR_1
             </comment>
             <comment address="9955" color="16711680" crc="D202EF8D">
                 ===========================================================
             </comment>
+            <comment address="9956" color="16711680" crc="DF1B3B0B">
+                Jmp_To_SRList2_SR_
+            </comment>
             <comment address="9970" color="16711680" crc="DF1B3B0B">
-                ===========================================================
+                Copy_ZP_Val_to_ZP1_Val
             </comment>
             <comment address="9982" color="16711680" crc="338B9930">
-                -----------------------------------------------------------
+                Object_Picked_Up
+            </comment>
+            <comment address="9989" color="16711680" crc="7DA32A96">
+                Pre_Output_Sound_1
             </comment>
             <comment address="9994" color="16711680" crc="3E1C155F">
-                ===========================================================
+                Pre_Output_Sound_2
+            </comment>
+            <comment address="10000" color="16711680" crc="AA05262F">
+                Output_Sound
             </comment>
             <comment address="10012" color="16711680" crc="338B9930">
-                ===========================================================
+                Gem_Fuel_Picked_Up
             </comment>
             <comment address="10023" color="16711680" crc="338B9930">
-                ===========================================================
+                Laser_Shot_Active
             </comment>
             <comment address="10037" color="16711680" crc="338B9930">
-                ===========================================================
+                Rocket_Flight_Active
             </comment>
             <comment address="10051" color="16711680" crc="A9C6A1EA">
-                ===========================================================
+                Subroutine_List2
+            </comment>
+            <comment address="10052" color="16711680" crc="D8024EC0">
+                Subroutine_List2+1
+            </comment>
+            <comment address="10063" color="16711680" crc="338B9930">
+                Collision
             </comment>
             <comment address="10075" color="16711680" crc="DDE8CC94">
-                ===========================================================
+                Erase_ZP_RAM
+            </comment>
+            <comment address="10078" color="16711680" crc="4DEF6CA0">
+                EZR_1
             </comment>
             <comment address="10084" color="16711680" crc="1D52A039">
-                -----------------------------------------------------------
+                Reset_Object_RAM
+            </comment>
+            <comment address="10088" color="16711680" crc="A8003B40">
+                ROR_1
             </comment>
             <comment address="10095" color="16711680" crc="7639F1CD">
-                -----------------------------------------------------------
+                Erase_HiScore_Setts_Etc
+            </comment>
+            <comment address="10099" color="16711680" crc="06BA3A5B">
+                EHSE_1
+            </comment>
+            <comment address="10106" color="16711680" crc="48E7BFE2">
+                Check_New_Hi_Score
             </comment>
             <comment address="10109" color="16711680" crc="D202EF8D">
                 -----------------------------------------------------------
             </comment>
+            <comment address="10126" color="16711680" crc="EFDEAE16">
+                Test_New_Hi_Score
+            </comment>
+            <comment address="10128" color="16711680" crc="BC078D06">
+                Compare_BCD_Byte
+            </comment>
             <comment address="10137" color="16711680" crc="47BDA50F">
-                -----------------------------------------------------------
+                Move_To_Next_BCD_Byte
+            </comment>
+            <comment address="10144" color="16711680" crc="01D0CF3A">
+                Copy_Player_To_Hi_Score
+            </comment>
+            <comment address="10146" color="16711680" crc="B2DC0534">
+                CPTHS_1
+            </comment>
+            <comment address="10154" color="16711680" crc="EFDEAE16">
+                Display_Rocket_Flame?
             </comment>
             <comment address="10163" color="16711680" crc="ECF7F3FE">
-                -----------------------------------------------------------
+                Display_Rocket_Flame
+            </comment>
+            <comment address="10209" color="16711680" crc="37A3EF38">
+                SKIP_27E1
+            </comment>
+            <comment address="10251" color="16711680" crc="916B06E7">
+                BACK_280B
             </comment>
             <comment address="10258" color="16711680" crc="3E1C155F">
-                -----------------------------------------------------------
+                No_Display_Flame
             </comment>
             <comment address="10265" color="16711680" crc="40A4DFAE">
-                ===========================================================
+                Display_Flame
             </comment>
             <comment address="10286" color="16711680" crc="440B4703">
-                ===========================================================
+                Get_Flame_UDG_Addr
             </comment>
             <comment address="10298" color="16711680" crc="0BF00E98">
-                -----------------------------------------------------------
+                Ptr_Rocket_Flame_Lo
+            </comment>
+            <comment address="10299" color="16711680" crc="BA753D37">
+                Ptr_Rocket_Flame_Hi
+            </comment>
+            <comment address="10300" color="16711680" crc="616495A3">
+                Ptr_Final_Char_Lo
+            </comment>
+            <comment address="10301" color="16711680" crc="5D45186A">
+                Ptr_Final_Char_Hi
+            </comment>
+            <comment address="10302" color="16711680" crc="5FC60809">
+                Fire_Pressed
+            </comment>
+            <comment address="10321" color="16711680" crc="1E031374">
+                FP_1
+            </comment>
+            <comment address="10356" color="16711680" crc="06BD0B23">
+                Jump_To_Subroutine_List3
             </comment>
             <comment address="10375" color="16711680" crc="D202EF8D">
                 ===========================================================
             </comment>
+            <comment address="10376" color="16711680" crc="CC031DE5">
+                Subroutine_List3
+            </comment>
+            <comment address="10377" color="16711680" crc="E7B74777">
+                Subroutine_List3+1
+            </comment>
+            <comment address="10386" color="16711680" crc="A07880FC">
+                Set_Obj_Posn_05_To_07
+            </comment>
+            <comment address="10388" color="16711680" crc="9FB45A99">
+                SR3_Store_To_Obj_Posn_05_06
+            </comment>
             <comment address="10399" color="16711680" crc="D77FB06A">
-                ===========================================================
+                Set_Obj_Posn_05_To_06
             </comment>
             <comment address="10404" color="16711680" crc="04A0F2DD">
-                ===========================================================
+                Set_Obj_Posn_05_To_03_Or_00
             </comment>
             <comment address="10417" color="16711680" crc="A71544E5">
-                ===========================================================
+                Set_Obj_Posn_05_To_03
             </comment>
             <comment address="10422" color="16711680" crc="04A0F2DD">
-                ===========================================================
+                Set_Obj_Posn_05_To_01_Or_Other
+            </comment>
+            <comment address="10432" color="16711680" crc="2B8B8A77">
+                SKIP_28C0
             </comment>
             <comment address="10441" color="16711680" crc="355018A7">
-                ===========================================================
+                Reset_Objects_1_To_8
+            </comment>
+            <comment address="10445" color="16711680" crc="BF9F87BB">
+                Loop_28CD
             </comment>
             <comment address="10452" color="16711680" crc="7639F1CD">
-                -----------------------------------------------------------
+                Init_Most_Objects
+            </comment>
+            <comment address="10456" color="16711680" crc="A8003B40">
+                Loop_28D8
+            </comment>
+            <comment address="10464" color="16711680" crc="90A0FE4D">
+                Loop_28E0
             </comment>
             <comment address="10471" color="16711680" crc="92A95A53">
-                -----------------------------------------------------------
+                Save_Obj_List_Ptr
             </comment>
             <comment address="10480" color="16711680" crc="AEAABE82">
-                -----------------------------------------------------------
+                Restore_Obj_List_Ptr
             </comment>
             <comment address="10489" color="16711680" crc="BD187426">
-                -----------------------------------------------------------
+                Change_Object_To_Explosion
+            </comment>
+            <comment address="10506" color="16711680" crc="06BD0B23">
+                Store_Object_Type
+            </comment>
+            <comment address="10529" color="16711680" crc="2B8B8A77">
+                SKIP_2921
+            </comment>
+            <comment address="10535" color="16711680" crc="9FB45A99">
+                SKIP_2927
             </comment>
             <comment address="10548" color="16711680" crc="059456CB">
-                -----------------------------------------------------------
+                Explosions_Plyr_Life_Lost?
             </comment>
             <comment address="10599" color="16711680" crc="BCEC8330">
-                ===========================================================
+                Explosion_UDG_Ptr
+            </comment>
+            <comment address="10600" color="16711680" crc="2D43EA70">
+                Explosion_UDG_Ptr+1
             </comment>
             <comment address="10631" color="16711680" crc="B7D6BBE5">
-                ===========================================================
+                Game_Over
+            </comment>
+            <comment address="10647" color="16711680" crc="644326F7">
+                SKIP_2997
             </comment>
             <comment address="10653" color="16711680" crc="3E1C155F">
-                ===========================================================
+                Sound_Channels_Off_ETC
             </comment>
             <comment address="10704" color="16711680" crc="F074478C">
                 ===========================================================
             </comment>
             <comment address="10727" color="16711680" crc="E797CEF4">
-                ===========================================================
+                Display_Game_Over
+            </comment>
+            <comment address="10734" color="16711680" crc="48E7BFE2">
+                Display_Game_Over_P1
+            </comment>
+            <comment address="10744" color="16711680" crc="81F7F305">
+                Display_String_
+            </comment>
+            <comment address="10757" color="16711680" crc="A7F327B9">
+                Delay_Loop_Game_Over
             </comment>
             <comment address="10770" color="16711680" crc="48E7BFE2">
-                -----------------------------------------------------------
+                Display_Game_Over_P2
+            </comment>
+            <comment address="10783" color="16711680" crc="B07AF78D">
+                STR_GAME_OVER_PLAYER_1
+            </comment>
+            <comment address="10802" color="16711680" crc="B07AF78D">
+                STR_GAME_OVER_PLAYER_2
+            </comment>
+            <comment address="10821" color="16711680" crc="E3865223">
+                Spr_Ptr_To_Jetman
             </comment>
             <comment address="10847" color="16711680" crc="C8F7B28A">
-                ===========================================================
+                Level_1_Plusses
             </comment>
             <comment address="10855" color="16711680" crc="7728D365">
-                ===========================================================
+                Level_1_Plusses_1
             </comment>
             <comment address="10861" color="16711680" crc="C8F7B28A">
-                ===========================================================
+                Level_2_Balls
+            </comment>
+            <comment address="10869" color="16711680" crc="7728D365">
+                Level_2_Balls_1
+            </comment>
+            <comment address="10883" color="16711680" crc="01D0CF3A">
+                Test_Alien_Direction
+            </comment>
+            <comment address="10891" color="16711680" crc="2983A9A4">
+                Set_Alien_Direction
+            </comment>
+            <comment address="10901" color="16711680" crc="2983A9A4">
+                Set_Alien_Diagonal?
             </comment>
             <comment address="10906" color="16711680" crc="8D7A6F71">
-                ===========================================================
+                Alien_Diagonal_Set_F8
+            </comment>
+            <comment address="10910" color="16711680" crc="8D7A6F71">
+                Alien_Direction_Left
+            </comment>
+            <comment address="10914" color="16711680" crc="EDC357E8">
+                Reset_Countdown_Timer
+            </comment>
+            <comment address="10935" color="16711680" crc="2983A9A4">
+                Set_Alien_Diagonal_2?
+            </comment>
+            <comment address="10940" color="16711680" crc="C8F7B28A">
+                Level_3_Saucer
+            </comment>
+            <comment address="10948" color="16711680" crc="7728D365">
+                Level_3_Saucer_1
+            </comment>
+            <comment address="10971" color="16711680" crc="B9626ACC">
+                Level_3_Saucer_2
+            </comment>
+            <comment address="10973" color="16711680" crc="2983A9A4">
+                Level_3_Saucer_3
+            </comment>
+            <comment address="10975" color="16711680" crc="76D7FFAC">
+                Level_3_Saucer_4
+            </comment>
+            <comment address="10995" color="16711680" crc="B9626ACC">
+                Level_3_Saucer_5
+            </comment>
+            <comment address="10997" color="16711680" crc="2983A9A4">
+                Level_3_Saucer_6
+            </comment>
+            <comment address="10999" color="16711680" crc="F76E29CD">
+                Level_3_Saucer_EXIT
+            </comment>
+            <comment address="11002" color="16711680" crc="BC078D06">
+                Level_3_Saucer_7
+            </comment>
+            <comment address="11011" color="16711680" crc="82E1F287">
+                Level_3_Saucer_8
+            </comment>
+            <comment address="11016" color="16711680" crc="BC078D06">
+                Level_3_Saucer_9
+            </comment>
+            <comment address="11025" color="16711680" crc="82E1F287">
+                Level_3_Saucer_a
+            </comment>
+            <comment address="11030" color="16711680" crc="2E3D5225">
+                Platform_Collision_Aliens
+            </comment>
+            <comment address="11055" color="16711680" crc="4D60093E">
+                PCA_1111
+            </comment>
+            <comment address="11062" color="16711680" crc="9FB08ED5">
+                PCA_RTS
             </comment>
             <comment address="11063" color="16711680" crc="DBD6910B">
-                -----------------------------------------------------------
+                PCA_2222
+            </comment>
+            <comment address="11074" color="16711680" crc="BC078D06">
+                PCA_3333
             </comment>
             <comment address="11083" color="16711680" crc="8C6BDED0">
-                -----------------------------------------------------------
+                Obj_Jetman_Looks?
             </comment>
             <comment address="11091" color="16711680" crc="C2E82F42">
                 -----------------------------------------------------------
             </comment>
             <comment address="11135" color="16711680" crc="25B5D7FB">
-                ===========================================================
+                Init_Rocket_Mod_Fuel_Obj_Tbl
+            </comment>
+            <comment address="11143" color="16711680" crc="F5DFF418">
+                Init_Flashing_Gem_Obj_Table
+            </comment>
+            <comment address="11151" color="16711680" crc="8C6BDED0">
+                Obj_Jetman_Looks_2?
             </comment>
             <comment address="11159" color="16711680" crc="C2E82F42">
                 -----------------------------------------------------------
             </comment>
             <comment address="11230" color="16711680" crc="BA824161">
-                ===========================================================
+                Get_Raster_Line_Band
             </comment>
             <comment address="11240" color="16711680" crc="D202EF8D">
-                -----------------------------------------------------------
+                Raster_Line_Table
+            </comment>
+            <comment address="11256" color="16711680" crc="DD7F1E4D">
+                Test_Laser_Hits_1
+            </comment>
+            <comment address="11280" color="16711680" crc="01D0CF3A">
+                BACK_2C10
+            </comment>
+            <comment address="11297" color="16711680" crc="EFDEAE16">
+                SKIP_2C21
+            </comment>
+            <comment address="11330" color="16711680" crc="608F5E30">
+                SKIP_2C42
             </comment>
             <comment address="11347" color="16711680" crc="9C72D261">
-                -----------------------------------------------------------
+                Goto_Next_Obj
             </comment>
             <comment address="11359" color="16711680" crc="059456CB">
-                -----------------------------------------------------------
+                Test_Laser_Hits
             </comment>
             <comment address="11370" color="16711680" crc="C8F7B28A">
-                -----------------------------------------------------------
+                Level_0_Fuzzball
+            </comment>
+            <comment address="11384" color="16711680" crc="801EB303">
+                Alien_Hit_Update_Score
+            </comment>
+            <comment address="11404" color="16711680" crc="37C76DFC">
+                Object_To_Explosion
             </comment>
             <comment address="11410" color="16711680" crc="F0B114DB">
-                ===========================================================
+                Update_Sprite_Posn_Collide
             </comment>
             <comment address="11423" color="16711680" crc="01D0CF3A">
-                ===========================================================
+                Update_Sprite_Posn
+            </comment>
+            <comment address="11443" color="16711680" crc="2983A9A4">
+                Update_Sprite_Posn_X
             </comment>
             <comment address="11468" color="16711680" crc="305CF9AF">
-                ===========================================================
+                Upd_Sprite_Posn_Wrap_X_1
             </comment>
             <comment address="11473" color="16711680" crc="8DE10BB3">
-                ===========================================================
+                Upd_Sprite_Posn_Wrap_X_2
             </comment>
             <comment address="11478" color="16711680" crc="8773771A">
-                ===========================================================
+                Spr_Ptr_To_Alien_0_Flsh_Ctr
             </comment>
             <comment address="11483" color="16711680" crc="A92AC218">
-                -----------------------------------------------------------
+                Alien_Points_Lookup
+            </comment>
+            <comment address="11491" color="16711680" crc="8C6BDED0">
+                Spr_Ptr_To_Alien_0_Jetman
             </comment>
             <comment address="11505" color="16711680" crc="ABA35FDD">
-                -----------------------------------------------------------
+                Set_Obj_List_Ptr_To_Alien0
+            </comment>
+            <comment address="11519" color="16711680" crc="BC078D06">
+                Next_Object
             </comment>
             <comment address="11535" color="16711680" crc="801EB303">
-                -----------------------------------------------------------
+                Init_Alien_Sprite
             </comment>
             <comment address="11596" color="16711680" crc="32756E88">
-                ===========================================================
+                Level_Alien_Type_Lookup
+            </comment>
+            <comment address="11600" color="16711680" crc="3C0C8EA1">
+                Level_Alien_Color_Lookup
+            </comment>
+            <comment address="11608" color="16711680" crc="8773771A">
+                Test_Jetman_Obj_Collide
+            </comment>
+            <comment address="11625" color="16711680" crc="3E1C155F">
+                TJOC_0
             </comment>
             <comment address="11630" color="16711680" crc="EFDEAE16">
-                -----------------------------------------------------------
+                TJOC_1
+            </comment>
+            <comment address="11648" color="16711680" crc="525732D3">
+                TJOC_2
+            </comment>
+            <comment address="11669" color="16711680" crc="A271785E">
+                TJOC_3
+            </comment>
+            <comment address="11675" color="16711680" crc="9FB08ED5">
+                TJOC_RTS
             </comment>
             <comment address="11676" color="16711680" crc="A8580FB0">
-                -----------------------------------------------------------
+                TJOC_4
             </comment>
             <comment address="11681" color="16711680" crc="9BF4622B">
                 ===========================================================
@@ -331,211 +835,424 @@
                 ===========================================================
             </comment>
             <comment address="11741" color="16711680" crc="E8B36A0F">
-                -----------------------------------------------------------
+                LOAD_ZP1E_ZP1F_W_UDG_RAM_X_00
             </comment>
             <comment address="11752" color="16711680" crc="801EB303">
                 -----------------------------------------------------------
             </comment>
             <comment address="11775" color="16711680" crc="F6C2F293">
-                ===========================================================
+                Dec_Saved_Obj_List_Params_by_10
             </comment>
             <comment address="11799" color="16711680" crc="5FC60809">
-                -----------------------------------------------------------
+                Rocket_Ascend
             </comment>
             <comment address="11828" color="16711680" crc="5B4AAFC5">
-                ===========================================================
+                Rocket_At_Top
             </comment>
             <comment address="11854" color="16711680" crc="5FC60809">
-                ===========================================================
+                Rocket_Descend
             </comment>
             <comment address="11892" color="16711680" crc="5FC60809">
-                ===========================================================
+                Subroutine_2E74_On_IRQ?
             </comment>
             <comment address="11948" color="16711680" crc="1E031374">
-                ===========================================================
+                Rocket_Fuelled_Up
+            </comment>
+            <comment address="11957" color="16711680" crc="1474BA63">
+                LOOP_2EB5
+            </comment>
+            <comment address="11978" color="16711680" crc="8D48B71D">
+                SKIP_2ECA
             </comment>
             <comment address="12029" color="16711680" crc="491B25C9">
-                ===========================================================
+                A123123
+            </comment>
+            <comment address="12033" color="16711680" crc="239C346C">
+                A456456
             </comment>
             <comment address="12039" color="16711680" crc="98D99E80">
-                ===========================================================
+                A789789
+            </comment>
+            <comment address="12054" color="16711680" crc="EFDEAE16">
+                A111111
             </comment>
             <comment address="12081" color="16711680" crc="06BD0B23">
-                -----------------------------------------------------------
+                Stops_All_0
+            </comment>
+            <comment address="12133" color="16711680" crc="3E1C155F">
+                Stops_All_1
             </comment>
             <comment address="12151" color="16711680" crc="76D7FFAC">
-                ===========================================================
+                Stops_All_2
             </comment>
             <comment address="12174" color="16711680" crc="5FC60809">
-                ===========================================================
+                Stops_All
+            </comment>
+            <comment address="12210" color="16711680" crc="76D7FFAC">
+                Stops_All_3
+            </comment>
+            <comment address="12221" color="16711680" crc="1E031374">
+                Stops_All_4
+            </comment>
+            <comment address="12227" color="16711680" crc="AA05262F">
+                Stops_All_5
             </comment>
             <comment address="12250" color="16711680" crc="801EB303">
-                ===========================================================
+                Get_Spr_Addr_Rocket_Top_OR_Fuel
             </comment>
             <comment address="12261" color="16711680" crc="E401A57B">
-                -----------------------------------------------------------
+                Get_Object_UDG_Addr_Small
             </comment>
             <comment address="12270" color="16711680" crc="5FC60809">
-                -----------------------------------------------------------
+                Jetman_Collide_Rocket_Fuel
             </comment>
             <comment address="12318" color="16711680" crc="98D99E80">
-                ===========================================================
+                Copy_Jetman_XY_To_Sprite
+            </comment>
+            <comment address="12350" color="16711680" crc="B282DBCD">
+                Copy_Jetman_XY_To_Sprite_0
+            </comment>
+            <comment address="12369" color="16711680" crc="7C7B401A">
+                Copy_Jetman_XY_To_Sprite_1
             </comment>
             <comment address="12372" color="16711680" crc="1E031374">
-                ===========================================================
+                Load_Rocket_OR_Fuel_UDGs
+            </comment>
+            <comment address="12375" color="16711680" crc="170A8F3E">
+                Load_Rocket_OR_Fuel_UDGs_1
+            </comment>
+            <comment address="12378" color="16711680" crc="4FD4A502">
+                Load_Rocket_OR_Fuel_UDGs_2
             </comment>
             <comment address="12387" color="16711680" crc="1E7A26A0">
-                ===========================================================
+                Update_Score
+            </comment>
+            <comment address="12398" color="16711680" crc="01D0CF3A">
+                Add_3_Digit_BCD_To_Score
             </comment>
             <comment address="12430" color="16711680" crc="985AE06D">
-                ===========================================================
+                Display_P2_Score_JMP
             </comment>
             <comment address="12433" color="16711680" crc="48E7BFE2">
-                ===========================================================
+                Read_ZP_Params_P2_Score
+            </comment>
+            <comment address="12443" color="16711680" crc="4D60093E">
+                PCT_0
+            </comment>
+            <comment address="12467" color="16711680" crc="98D99E80">
+                Platform_Collision_Test
+            </comment>
+            <comment address="12482" color="16711680" crc="3E1C155F">
+                PCT_1
+            </comment>
+            <comment address="12500" color="16711680" crc="553AF6CA">
+                PCT_02
+            </comment>
+            <comment address="12511" color="16711680" crc="46566E9C">
+                PCT_03
+            </comment>
+            <comment address="12524" color="16711680" crc="47BDA50F">
+                PCT_04
             </comment>
             <comment address="12541" color="16711680" crc="4D60093E">
-                ===========================================================
+                PCT_05
+            </comment>
+            <comment address="12559" color="16711680" crc="1C60B29A">
+                PCT_06
             </comment>
             <comment address="12568" color="16711680" crc="47BDA50F">
-                ===========================================================
+                INY_3
+            </comment>
+            <comment address="12569" color="16711680" crc="47BDA50F">
+                INY_2
+            </comment>
+            <comment address="12589" color="16711680" crc="E9231FDD">
+                PCT_07
             </comment>
             <comment address="12592" color="16711680" crc="608F5E30">
-                -----------------------------------------------------------
+                PCT_08
+            </comment>
+            <comment address="12600" color="16711680" crc="D2A08796">
+                ORA_Temp1Lo_And_StoreTo_Temp1Lo
+            </comment>
+            <comment address="12604" color="16711680" crc="9FB08ED5">
+                PCT_09
             </comment>
             <comment address="12605" color="16711680" crc="916B06E7">
-                -----------------------------------------------------------
+                PCT_10
             </comment>
             <comment address="12611" color="16711680" crc="1C1E03E6">
-                ===========================================================
+                _31B6_To_Tmp4_03_To_Tmp5_Yto00
             </comment>
             <comment address="12626" color="16711680" crc="4D86830E">
-                -----------------------------------------------------------
+                Draw_Platforms
+            </comment>
+            <comment address="12629" color="16711680" crc="B2DC0534">
+                DP_1
+            </comment>
+            <comment address="12667" color="16711680" crc="960216B2">
+                Loop_Next_Char
+            </comment>
+            <comment address="12691" color="16711680" crc="2035E58F">
+                DP_2
             </comment>
             <comment address="12706" color="16711680" crc="F00CA929">
-                -----------------------------------------------------------
+                Next_UDG_Char_Loop_Next_Char
             </comment>
             <comment address="12712" color="16711680" crc="7BCAFF66">
-                ===========================================================
+                Next_UDG_Char
             </comment>
             <comment address="12726" color="16711680" crc="7DC7413E">
                 -----------------------------------------------------------
             </comment>
+            <comment address="12735" color="16711680" crc="01D0CF3A">
+                AAAAAAAA
+            </comment>
+            <comment address="12747" color="16711680" crc="08E29038">
+                EEEEEEEE
+            </comment>
             <comment address="12750" color="16711680" crc="CB0166E1">
-                ===========================================================
+                CCCCCCCC
+            </comment>
+            <comment address="12756" color="16711680" crc="D227225D">
+                GGGGGGGG
             </comment>
             <comment address="12759" color="16711680" crc="EFDEAE16">
-                ===========================================================
+                FFFFFFFF
+            </comment>
+            <comment address="12767" color="16711680" crc="BC078D06">
+                BBBBBBBB
+            </comment>
+            <comment address="12775" color="16711680" crc="D227225D">
+                IIIIIIII
             </comment>
             <comment address="12778" color="16711680" crc="EFDEAE16">
-                ===========================================================
+                HHHHHHHH
+            </comment>
+            <comment address="12786" color="16711680" crc="F0FBC2C8">
+                JJJJJJJJ
             </comment>
             <comment address="12800" color="16711680" crc="E9E0F389">
-                ===========================================================
+                KKKKKKKK
             </comment>
             <comment address="12808" color="16711680" crc="E8B36A0F">
-                ===========================================================
+                LLLLLLLL
+            </comment>
+            <comment address="12818" color="16711680" crc="51AD14A7">
+                MMMMMMMM
             </comment>
             <comment address="12821" color="16711680" crc="CAADBDBF">
-                ===========================================================
+                JMP_FLYING
             </comment>
             <comment address="12824" color="16711680" crc="E401A57B">
-                ===========================================================
+                NNNNNNNN
+            </comment>
+            <comment address="12836" color="16711680" crc="DF6F85B3">
+                PPPPPPPP
             </comment>
             <comment address="12840" color="16711680" crc="AA05262F">
-                ===========================================================
+                OOOOOOOO
             </comment>
             <comment address="12862" color="16711680" crc="AA05262F">
-                ===========================================================
+                QQQQQQQQ
             </comment>
             <comment address="12884" color="16711680" crc="30C79D6D">
-                ===========================================================
+                LDA_08
+            </comment>
+            <comment address="12894" color="16711680" crc="C16E77DB">
+                CLC_ADC_01
             </comment>
             <comment address="12900" color="16711680" crc="C16E77DB">
-                ===========================================================
+                CLC_ADC_B8
             </comment>
             <comment address="12906" color="16711680" crc="8DE10BB3">
-                ===========================================================
+                ADC_48
             </comment>
             <comment address="12911" color="16711680" crc="DF6F85B3">
-                ===========================================================
+                TXA_
             </comment>
             <comment address="12915" color="16711680" crc="5FC60809">
-                ===========================================================
+                Update_Jetman_Flying?
             </comment>
             <comment address="12933" color="16711680" crc="01D0CF3A">
-                ===========================================================
+                __WWWW__
+            </comment>
+            <comment address="12962" color="16711680" crc="01D0CF3A">
+                __YYYY__
+            </comment>
+            <comment address="12966" color="16711680" crc="98D99E80">
+                __ZZZZ__
+            </comment>
+            <comment address="12986" color="16711680" crc="2983A9A4">
+                CSC_ADC_RTN
             </comment>
             <comment address="12999" color="16711680" crc="E8B36A0F">
-                ===========================================================
+                Flying?
+            </comment>
+            <comment address="13022" color="16711680" crc="2983A9A4">
+                Flying_1?
+            </comment>
+            <comment address="13024" color="16711680" crc="3161E49F">
+                Flying_2?
+            </comment>
+            <comment address="13047" color="16711680" crc="2983A9A4">
+                Flying_3?
+            </comment>
+            <comment address="13049" color="16711680" crc="AE95E2E8">
+                Flying_4?
+            </comment>
+            <comment address="13065" color="16711680" crc="E4E1D290">
+                SKIP_Flying_5?
             </comment>
             <comment address="13068" color="16711680" crc="BC078D06">
-                ===========================================================
+                Not_sure_330c
             </comment>
             <comment address="13080" color="16711680" crc="3E1C155F">
-                ===========================================================
+                LDA00
             </comment>
             <comment address="13085" color="16711680" crc="7875AB26">
-                ===========================================================
+                Bottom?
+            </comment>
+            <comment address="13089" color="16711680" crc="EFDEAE16">
+                Bottom_After?
             </comment>
             <comment address="13100" color="16711680" crc="BC078D06">
-                ===========================================================
+                RKJ_AAAA_Then_RKJ_5555
             </comment>
             <comment address="13111" color="16711680" crc="BC078D06">
-                ===========================================================
+                RKJ_BBBB_Then_RKJ_5555
             </comment>
             <comment address="13122" color="16711680" crc="C16E77DB">
-                ===========================================================
+                Add_B8_Then_RKJ_6666
             </comment>
             <comment address="13128" color="16711680" crc="8DE10BB3">
-                ===========================================================
+                Add_48_Then_RKJ_6666
             </comment>
             <comment address="13133" color="16711680" crc="8773771A">
-                ===========================================================
+                Flash_Display_Score
+            </comment>
+            <comment address="13159" color="16711680" crc="E4E1D290">
+                JMP_JMP_JMP
             </comment>
             <comment address="13162" color="16711680" crc="5FC60809">
-                ===========================================================
+                Read_Kbd_Jstk
+            </comment>
+            <comment address="13181" color="16711680" crc="EFDEAE16">
+                RKJ_1111
+            </comment>
+            <comment address="13197" color="16711680" crc="F0EA2319">
+                RKJ_2222
+            </comment>
+            <comment address="13199" color="16711680" crc="01D0CF3A">
+                RKJ_3333
+            </comment>
+            <comment address="13213" color="16711680" crc="3E1C155F">
+                RKJ_4444
+            </comment>
+            <comment address="13215" color="16711680" crc="01D0CF3A">
+                RKJ_5555
+            </comment>
+            <comment address="13231" color="16711680" crc="2983A9A4">
+                RKJ_6666
             </comment>
             <comment address="13242" color="16711680" crc="E8B36A0F">
-                ===========================================================
+                RKJ_7777
+            </comment>
+            <comment address="13248" color="16711680" crc="76D7FFAC">
+                RKJ_8888
             </comment>
             <comment address="13268" color="16711680" crc="FA3097E3">
-                ===========================================================
+                Read_Joystick
             </comment>
             <comment address="13303" color="16711680" crc="09FC8C08">
-                -----------------------------------------------------------
+                Read_Keyboard_Joystick
+            </comment>
+            <comment address="13404" color="16711680" crc="7F6567CB">
+                Read_Keyboard_Joystick_1
+            </comment>
+            <comment address="13413" color="16711680" crc="1E7A26A0">
+                Flash_Score
+            </comment>
+            <comment address="13424" color="16711680" crc="6ED337CD">
+                _Flash_Score_
+            </comment>
+            <comment address="13435" color="16711680" crc="7F61B387">
+                Invert_UDG_Columns
+            </comment>
+            <comment address="13437" color="16711680" crc="BB6A491F">
+                Invert_UDG_Rows
             </comment>
             <comment address="13465" color="16711680" crc="9FB08ED5">
-                ===========================================================
+                Do_RTS
             </comment>
             <comment address="13466" color="16711680" crc="48E7BFE2">
-                -----------------------------------------------------------
+                Load_UDG_RAM_for_P2
+            </comment>
+            <comment address="13476" color="16711680" crc="EFDEAE16">
+                Display_BCD_Bytes
+            </comment>
+            <comment address="13511" color="16711680" crc="3277031B">
+                Display_BCD_Bytes_0
             </comment>
             <comment address="13516" color="16711680" crc="BD451C3D">
-                -----------------------------------------------------------
+                Display_String
+            </comment>
+            <comment address="13526" color="16711680" crc="E401A57B">
+                DSTR1
             </comment>
             <comment address="13539" color="16711680" crc="440B4703">
-                ===========================================================
+                Display_Character
             </comment>
             <comment address="13559" color="16711680" crc="95C49E4A">
-                -----------------------------------------------------------
+                Setup_Color_RAM_Ptr
             </comment>
             <comment address="13586" color="16711680" crc="D202EF8D">
-                -----------------------------------------------------------
+                Color_RAM_Row_Offsets
+            </comment>
+            <comment address="13597" color="16711680" crc="E2C3AEDC">
+                CONVERT_XY_TO_UDG_RAM_ADDR
+            </comment>
+            <comment address="13617" color="16711680" crc="10EE7160">
+                SURP1
             </comment>
             <comment address="13637" color="16711680" crc="D202EF8D">
-                -----------------------------------------------------------
+                UDG_RAM_Column_Offsets
+            </comment>
+            <comment address="13660" color="16711680" crc="48E7BFE2">
+                Reset_Color_RAM
+            </comment>
+            <comment address="13676" color="16711680" crc="48E7BFE2">
+                Reset_UDG_RAM
+            </comment>
+            <comment address="13689" color="16711680" crc="EFDEAE16">
+                Reset_RAM
+            </comment>
+            <comment address="13691" color="16711680" crc="7BCAFF66">
+                RR_1
+            </comment>
+            <comment address="13700" color="16711680" crc="3277031B">
+                RR_2
             </comment>
             <comment address="13717" color="16711680" crc="3E1C155F">
-                -----------------------------------------------------------
+                Copy_Char_To_UDG_RAM
+            </comment>
+            <comment address="13730" color="16711680" crc="C16E77DB">
+                CCTUR1
+            </comment>
+            <comment address="13750" color="16711680" crc="55642833">
+                CCTUR2
+            </comment>
+            <comment address="13757" color="16711680" crc="95C49E4A">
+                CCTUR_NEXT
             </comment>
             <comment address="13771" color="16711680" crc="55642833">
-                -----------------------------------------------------------
+                CCTUR_INV
             </comment>
             <comment address="13783" color="16711680" crc="EFDEAE16">
-                ===========================================================
+                Save_Obj_Type_X_Y
             </comment>
             <comment address="13801" color="16711680" crc="EFDEAE16">
-                -----------------------------------------------------------
+                Save_Obj_Type_X_Y_Color
             </comment>
             <comment address="13825" color="16711680" crc="EFB69AC9">
                 -----------------------------------------------------------
@@ -549,11 +1266,29 @@
             <comment address="13894" color="16711680" crc="EFB69AC9">
                 ===========================================================
             </comment>
+            <comment address="13900" color="16711680" crc="131EFAD2">
+                GOTO_364C
+            </comment>
+            <comment address="13940" color="16711680" crc="55642833">
+                BACK_3674
+            </comment>
+            <comment address="13960" color="16711680" crc="7CA73B7F">
+                GOTO_3688
+            </comment>
+            <comment address="13980" color="16711680" crc="3CAC8B29">
+                BACK_36AB
+            </comment>
             <comment address="13995" color="16711680" crc="727CB34D">
-                ===========================================================
+                SKIP_36AB
+            </comment>
+            <comment address="14055" color="16711680" crc="FF74BEB8">
+                GOTO_36E7
+            </comment>
+            <comment address="14111" color="16711680" crc="15B73826">
+                SKIP_371F
             </comment>
             <comment address="14114" color="16711680" crc="3E1C155F">
-                ===========================================================
+                SKIP_3722
             </comment>
             <comment address="14121" color="16711680" crc="3E1C155F">
                 ===========================================================
@@ -562,22 +1297,181 @@
                 -----------------------------------------------------------
             </comment>
             <comment address="14135" color="16711680" crc="1E031374">
-                ===========================================================
+                Load_Small_UDG_Addr_Setup_XY_0
+            </comment>
+            <comment address="14141" color="16711680" crc="F98E62B7">
+                Load_Small_UDG_Addr_Setup_XY
+            </comment>
+            <comment address="14169" color="16711680" crc="0040BAE8">
+                Load_Small_UDG_Addr_Setup_XY_1
             </comment>
             <comment address="14218" color="16711680" crc="77956E97">
-                -----------------------------------------------------------
+                Set_UDG_RAM_Ptr_Spr_Dimensions
+            </comment>
+            <comment address="14221" color="16711680" crc="F755EA85">
+                Set_UDG_RAM_Ptr_Spr_Dimens_
+            </comment>
+            <comment address="14249" color="16711680" crc="0040BAE8">
+                No_X_Wrap
             </comment>
             <comment address="14292" color="16711680" crc="AA05262F">
-                -----------------------------------------------------------
+                GOUA_1
             </comment>
             <comment address="14310" color="16711680" crc="8F1E4A37">
-                ===========================================================
+                Get_Obj_UDG_Addr_0
+            </comment>
+            <comment address="14317" color="16711680" crc="0A0FC457">
+                Get_Object_UDG_Addr
+            </comment>
+            <comment address="14336" color="16711680" crc="FA005713">
+                GOUA_2
+            </comment>
+            <comment address="14343" color="16711680" crc="83933F2F">
+                GOUA_3
             </comment>
             <comment address="14357" color="16711680" crc="81C5C205">
-                -----------------------------------------------------------
+                Get_Object_UDG_Address
+            </comment>
+            <comment address="14367" color="16711680" crc="81C5C205">
+                Update_Color_RAM
+            </comment>
+            <comment address="14395" color="16711680" crc="5951E08E">
+                Update_Color_RAM_0
+            </comment>
+            <comment address="14399" color="16711680" crc="B5B1C12D">
+                Update_Color_RAM_1
+            </comment>
+            <comment address="14411" color="16711680" crc="47BDA50F">
+                Update_Color_RAM_2
+            </comment>
+            <comment address="14430" color="16711680" crc="9FB08ED5">
+                Update_Color_RAM_2_RTS
             </comment>
             <comment address="14431" color="16711680" crc="C68927BA">
-                -----------------------------------------------------------
+                UDG_Lookup
+            </comment>
+            <comment address="14432" color="16711680" crc="6BD3EABB">
+                UDG_Lookup+1
+            </comment>
+            <comment address="14538" color="16711680" crc="4FA2902F">
+                Jetman_Fly_Right_1
+            </comment>
+            <comment address="14589" color="16711680" crc="E13E4804">
+                Jetman_Walk_Right_1
+            </comment>
+            <comment address="14640" color="16711680" crc="D202EF8D">
+                Jetman_Walk_Right_2
+            </comment>
+            <comment address="14715" color="16711680" crc="D202EF8D">
+                Jetman_Walk_Right_3
+            </comment>
+            <comment address="14790" color="16711680" crc="7A5A8AB4">
+                Jetman_Walk_Right_4
+            </comment>
+            <comment address="14841" color="16711680" crc="F21F6233">
+                Jetman_Walk_Left_1
+            </comment>
+            <comment address="14892" color="16711680" crc="D202EF8D">
+                Jetman_Walk_Left_2
+            </comment>
+            <comment address="14967" color="16711680" crc="D202EF8D">
+                Jetman_Walk_Left_3
+            </comment>
+            <comment address="15042" color="16711680" crc="E13E4804">
+                Jetman_Walk_Left_4
+            </comment>
+            <comment address="15093" color="16711680" crc="D202EF8D">
+                Jetman_Fly_Left_1
+            </comment>
+            <comment address="15168" color="16711680" crc="D202EF8D">
+                Jetman_Fly_Left_2
+            </comment>
+            <comment address="15243" color="16711680" crc="7A5A8AB4">
+                Jetman_Fly_Left_3
+            </comment>
+            <comment address="15294" color="16711680" crc="F21F6233">
+                Jetman_Fly_Right_2
+            </comment>
+            <comment address="15345" color="16711680" crc="D202EF8D">
+                Jetman_Fly_Right_3
+            </comment>
+            <comment address="15420" color="16711680" crc="D202EF8D">
+                Jetman_Fly_Right_4
+            </comment>
+            <comment address="15495" color="16711680" crc="8BE26E63">
+                UDG_Sprite_Lookup_Lo
+            </comment>
+            <comment address="15496" color="16711680" crc="E0B0C149">
+                UDG_Sprite_Lookup_Hi
+            </comment>
+            <comment address="15572" color="16711680" crc="B6A6F2B2">
+                Ship_1_Bott
+            </comment>
+            <comment address="15607" color="16711680" crc="97E20994">
+                Ship_1_Mid
+            </comment>
+            <comment address="15642" color="16711680" crc="81DA1886">
+                Ship_1_Top
+            </comment>
+            <comment address="15677" color="16711680" crc="59BC5767">
+                Ship_2_Bott
+            </comment>
+            <comment address="15712" color="16711680" crc="FA005713">
+                Ship_2_Mid
+            </comment>
+            <comment address="15747" color="16711680" crc="C16E77DB">
+                Ship_2_Top
+            </comment>
+            <comment address="15772" color="16711680" crc="616495A3">
+                Fuel
+            </comment>
+            <comment address="15791" color="16711680" crc="379E37AD">
+                Gold_Bar
+            </comment>
+            <comment address="15818" color="16711680" crc="616495A3">
+                Diamond
+            </comment>
+            <comment address="15843" color="16711680" crc="E13E4804">
+                Plutonium
+            </comment>
+            <comment address="15872" color="16711680" crc="7A0A8FC5">
+                Isotope
+            </comment>
+            <comment address="15893" color="16711680" crc="1164DE66">
+                Platform
+            </comment>
+            <comment address="15942" color="16711680" crc="D202EF8D">
+                Alien_Ship_1
+            </comment>
+            <comment address="15969" color="16711680" crc="DCD967BF">
+                Alien_Ship_2
+            </comment>
+            <comment address="15992" color="16711680" crc="D202EF8D">
+                Alien_Fuzz_1
+            </comment>
+            <comment address="16025" color="16711680" crc="ACC19B3D">
+                Alien_Fuzz_2
+            </comment>
+            <comment address="16056" color="16711680" crc="D202EF8D">
+                Alien_Bubble_1
+            </comment>
+            <comment address="16107" color="16711680" crc="E13E4804">
+                Alien_Bubble_2
+            </comment>
+            <comment address="16142" color="16711680" crc="D202EF8D">
+                Alien_Cross_1
+            </comment>
+            <comment address="16193" color="16711680" crc="DA26B48D">
+                Alien_Cross_2
+            </comment>
+            <comment address="16244" color="16711680" crc="E13E4804">
+                Explosion_1
+            </comment>
+            <comment address="16283" color="16711680" crc="C791A4E9">
+                Explosion_2
+            </comment>
+            <comment address="16306" color="16711680" crc="2C9FF4DF">
+                Explosion_3
             </comment>
         </cpu>
     </system>
