@@ -209,16 +209,16 @@ label    218D Laser_JFR_2
 lcomment 218D Restore saved Jetman attrib 00
 lcomment 2190 Add $10 for some reason??????????
 comment  2195
-comment  2195 ----------------------------------------------------------
-comment  2195 FUNCTION  : Fire_Pressed_
-comment  2195 \            soentsnoetus
-comment  2195 \            seiteunst
-comment  2195 CALLED BY :
-comment  2195 CALLS     : Nothing
-comment  2195 ARGUMENTS : sentiseutn
-comment  2195 \            etinseut
-comment  2195 \            setniseutn
-comment  2195 ----------------------------------------------------------
+;comment  2195 ----------------------------------------------------------
+;comment  2195 FUNCTION  : Fire_Pressed_
+;comment  2195 \            soentsnoetus
+;comment  2195 \            seiteunst
+;comment  2195 CALLED BY :
+;comment  2195 CALLS     : Nothing
+;comment  2195 ARGUMENTS : sentiseutn
+;comment  2195 \            etinseut
+;comment  2195 \            setniseutn
+;comment  2195 ----------------------------------------------------------
 label    2195 FP0000
 label    219A Fire_Pressed_
 lcomment 219A ???????
@@ -321,9 +321,9 @@ label    22BA Reset_Level_Add_Extra_Life
 comment  22B6
 comment  22BD
 comment  22BD Player at level 4, add another life
-label    22CB RLAEL_1
-label    22D1 RLAEL_2
-label    22D7 RLAEL_3
+label    22CB Reset_Lev_Add_Extra_Life_1
+label    22D1 Reset_Lev_Add_Extra_Life_2
+label    22D7 Reset_Lev_Add_Extra_Life_3
 label    22E3 Object_RTS_Fuel_Type
 word     22EA
 label    22ED JMP_Reset_S_O_1
@@ -644,15 +644,16 @@ lcomment 26A8 0E
 lcomment 26AA 0F
 lcomment 26AC 10
 label    26AE Init_Rocket_Object
-label    26B0 IRO_1
+label    26B0 Init_Rocket_Object_1
 comment  26B9
 comment  26B9 Probably init sound channels
 label    26C5 Init_Rocket_Obj_Table
 break    26C9
-label    26CD Jmp_To_SRList2_SR
-label    26D1 JTSRLSR_1
-label    26E4 Jmp_To_SRList2_SR_
-label    26F2 Copy_ZP_Val_to_ZP1_Val
+label    26CD Sound_Loop_Start
+label    26D1 Sound_Loop
+label    26E4 Goto_Next_Sound
+label    2DE8 XXXX_6
+label    26F2 Dec_Obj_Param
 label    26FE Object_Picked_Up
 label    2705 Pre_Output_Sound_1
 label    270A Pre_Output_Sound_2
@@ -670,13 +671,12 @@ comment  274F
 label    274F Collision
 comment  275B Erase $100 bytes zero page
 label    275B Erase_ZP_RAM
-lcomment 275B Erase $100 bytes zero page
-label    275E EZR_1
-label    2764 Reset_Object_RAM
-label    2768 ROR_1
+label    275E Erase_ZP_RAM_1
+label    2764 Erase_Object_RAM
+label    2768 Erase_Object_RAM_1
+comment  276F Erase $30 bytes at end of UDGs $1fd0-$2000
 label    276F Erase_HiScore_Setts_Etc
-lcomment 276F Erase $30 bytes at end of UDGs $1fd0-$2000
-label    2773 EHSE_1
+label    2773 Erase_HiScore_Setts_Etc_1
 label    277A Check_New_Hi_Score
 const    277D
 lcomment 277D ZP_00
@@ -705,11 +705,11 @@ lcomment 279B All BCD bytes checked?
 lcomment 279D No, check the next BCD byte
 label    27A0 Copy_Player_To_Hi_Score
 lcomment 27A0 3 BCD bytes, 02, 01, 00
-label    27A2 CPTHS_1
+label    27A2 Copy_Player_To_Hi_Score_1
 lcomment 27A7 Return when all bytes copied
-label    27AA Display_Rocket_Flame?
+label    27AA Display_Rocket_Flame
 lcomment 27AE Object $0A = Flame (or maybe Rocket?)
-label    27B3 Display_Rocket_Flame
+label    27B3 Display_Rocket_Flame_1
 comment  27B5
 comment  27BD
 lcomment 27C3 0019 must be height of rocket
@@ -718,10 +718,10 @@ lcomment 27C5 Check rocket height
 lcomment 27C7 Display Flame
 lcomment 27C9 Don't display Flame
 comment  27CB
-label    27E1 SKIP_27E1
+label    27E1 Display_Rocket_Flame_2
 comment  280B
 comment  280B Restore 11 and 19 and return
-label    280B BACK_280B
+label    280B Display_Rocket_Flame_3
 label    2819 Display_Flame
 label    2812 No_Display_Flame
 comment  282E Using A to toggle, Load A and Y with Ship UDG address
@@ -755,9 +755,9 @@ label    289F Set_Obj_Posn_05_To_06
 label    28A4 Set_Obj_Posn_05_To_03_Or_00
 label    28B1 Set_Obj_Posn_05_To_03
 label    28B6 Set_Obj_Posn_05_To_01_Or_Other
-label    28C0 SKIP_28C0
+label    28C0 Set_Obj_Posn_05_To_01_Or_Oth_1
 label    28C9 Reset_Objects_1_To_8
-label    28CD Loop_28CD
+label    28CD Reset_Objects_1_To_8_1
 comment  28D4 Init Jetman, Lasers, Rocket and Aliens
 label    28D4 Init_Most_Objects
 label    28D8 Loop_28D8
@@ -783,23 +783,29 @@ comment  2919
 comment  2919 Change Alien?/Explosion object colour based on timer
 lcomment 291B Zero bits 3-8 i.e. 00000xxx
 lcomment 291F Set bit 0 i.e. xxxxxxx1
-label    2921 SKIP_2921
-label    2927 SKIP_2927
+label    2921 Store_Object_Type_1
+label    2927 Store_Object_Type_2
 lcomment 2925 Color code
 comment  292B
 comment  292B Reset Flame object parameters???
 label    2934 Explosions
+label    294A Explosions_1
 label    2967 Explosion_UDG_Ptr
 word     2967-2974
 break    2969
 label    2968 Explosion_UDG_Ptr+1
 break    296E
+label    2975 Explosions_2
 label    2987 Game_Over
-label    2997 SKIP_2997
+label    2997 Game_Over_1
 label    299D Sound_Channels_Off_ETC
 comment  29AB
 comment  29B3
 comment  29BB
+label    29C3 Sound_Channels_Off_ETC_1
+label    29C7 Sound_Channels_Off_ETC_2
+label    29D0 Sound_Channels_Off_ETC_3
+label    29DB Sound_Channels_Off_ETC_4
 label    29E7 Display_Game_Over
 lcomment 29EA Game Over for P1 or P2?
 label    29EE Display_Game_Over_P1
@@ -1088,7 +1094,7 @@ comment  2E68
 comment  2E68 Set current object type to a crash
 comment  2E74
 comment  2E74 This always seems to be a test for Jetman collide with Rocket
-label    2E74 Subroutine_2E74_On_IRQ?
+label    2E74 Rocket_Bottom_Module
 lcomment 2E77 Jetman collided with rocket?
 lcomment 2E7A Set by collision test
 lcomment 2E7C Collision? If no, branch
@@ -1327,9 +1333,9 @@ label    326F TXA_
 label    3273 Update_Jetman
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
-label    3285 __WWWW__
-label    32A2 __YYYY__
-label    32A6 __ZZZZ__
+label    3285 Update_Jetman_1
+label    32A2 Update_Jetman_2
+label    32A6 Update_Jetman_3
 label    32BA CSC_ADC_RTN
 label    32C7 Flying?
 lcomment 32CB Test for direction Down
@@ -1348,22 +1354,22 @@ label    330C Not_sure_330c
 label    3318 LDA00
 label    331D Bottom?
 label    3321 Bottom_After?
-label    332C RKJ_AAAA_Then_RKJ_5555
-label    3337 RKJ_BBBB_Then_RKJ_5555
-label    3342 Add_B8_Then_RKJ_6666
-label    3348 Add_48_Then_RKJ_6666
+label    332C Set_Obj_List_Ptr_Lo_To_7F
+label    3337 Set_Obj_List_Ptr_Lo_To_80
+label    3342 Add_B8
+label    3348 Add_48
 label    334D Flash_Display_Score
-label    3367 JMP_JMP_JMP
+label    3367 Flash_Display_Score_1
 label    336A Read_Kbd_Jstk
 lcomment 3370 Remove=Jetman+pickup flies/walks jiggle when standing on a platform
-label    337D RKJ_1111
-label    338D RKJ_2222
-label    338F RKJ_3333
-label    339D RKJ_4444
-label    339F RKJ_5555
-label    33AF RKJ_6666
-label    33BA RKJ_7777
-label    33C0 RKJ_8888
+label    337D Read_Kbd_Jstk_1
+label    338D Read_Kbd_Jstk_2
+label    338F Read_Kbd_Jstk_3
+label    339D Read_Kbd_Jstk_4
+label    339F Read_Kbd_Jstk_5
+label    33AF Read_Kbd_Jstk_6
+label    33BA Read_Kbd_Jstk_7
+label    33C0 Read_Kbd_Jstk_8
 lcomment 33B3 Test for direction Up
 lcomment 33B5 Yes, branch
 comment  33D4
