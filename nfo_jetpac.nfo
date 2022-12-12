@@ -1113,28 +1113,15 @@ word     2E93
 comment  2E96
 comment  2E9C
 label    2EAC Rocket_Fuelled_Up
-label    2EB5 LOOP_2EB5
+label    2EB5 Rocket_Fuelled_Up_1
 comment  2EC0
-label    2ECA SKIP_2ECA
-label    2EFD A123123
-label    2F01 A456456
-label    2F07 A789789
+label    2ECA Rocket_Fuelled_Up_2
+label    2EFD Rocket_Fuelled_Up_3
+label    2F01 Rocket_Fuelled_Up_4
+label    2F07 Rocket_Fuelled_Up_5
 comment  2F0D
 comment  2F13
-label    2F16 A111111
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
+label    2F16 Rocket_Fuelled_Up_6
 label    2F31 Stops_All_0
 comment  2F3A
 comment  2F43
@@ -1580,8 +1567,8 @@ break    3576
 break    3578
 comment  3579
 label    3579 Reset_RAM
-label    357B RR_1
-label    3584 RR_2
+label    357B Reset_RAM_1
+label    3584 Reset_RAM_2
 comment  3595
 comment  3595 ----------------------------------------------------------
 comment  3595 Copy Character ROM Character to User-Defined Graphics Memory
@@ -1602,7 +1589,7 @@ lcomment 3599 Addr_From = 71 00
 lcomment 359E Addr_From = 31 00, $31st Character ROM character is "1"
 comment  35A0
 comment  35A0 Multiply Addr_From by 8, as 8 bytes per UDG RAM character definition
-label    35A2 CCTUR1
+label    35A2 Copy_Char_To_UDG_RAM_1
 lcomment 35A5 Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
 lcomment 35A7 Left-shifted 3 times? i.e. multiplied by 8
 lcomment 35A8 If no, loop back
@@ -1613,19 +1600,19 @@ comment  35B0
 comment  35B0 Copy 8 bytes to form a complete character
 lcomment 35B2 Test the Invert flag
 lcomment 35B4 If yes, copy bytes with inversion instead
-label    35B6 CCTUR2
+label    35B6 Copy_Char_To_UDG_RAM_2
 lcomment 35B6 Copy bytes from given address with Y offset
 lcomment 35B8 Copy bytes to given address with Y offset
 lcomment 35BA Decrement number of lines counter
 lcomment 35BB All lines copied? If no, loop back.
 comment  35BD
 comment  35BD Move the next character address to the next column
-label    35BD CCTUR_NEXT
+label    35BD Copy_Char_To_UDG_RAM_NEXT
 lcomment 35C0 #B0=176=number of vertical pixels i.e. move to next char right
 lcomment 35C6 Increment address hi-byte if previous addition overflowed
 comment  35CB
 comment  35CB Copy 8 inverted bytes to form a complete character
-label    35CB CCTUR_INV
+label    35CB Copy_Char_To_UDG_RAM_INV
 lcomment 35CB Copy bytes from given address with Y offset
 lcomment 35CD Invert the byte (used to make the byte flash)
 lcomment 35CF Move bytes to given address with Y offset
@@ -1644,37 +1631,36 @@ lcomment 35F6 Object Y
 comment  35FA
 lcomment 35FC Object Color
 comment  3601
-comment  3601
-comment  3601
-comment  3601
-comment  3601
-comment  3601
-comment  3601
-comment  3601
-comment  3601
+label    3601 AAAAAA
+label    3604 BBBBBB
 comment  360D
-comment  360D
+label    360D CCCCCC
+label    3610 DDDDDD
+label    3619 YYYYYY_1
+label    362F YYYYYY_2
 comment  3623
 comment  362D
 comment  3635
 comment  363A
 comment  363C
+label    3646 YYYYYY_ALT
 comment  3643
-label    364C GOTO_364C
+label    364C YYYYYY
 comment  3652
 comment  365A
-label    3674 BACK_3674
+label    3674 YYYYYY_3
 comment  3668
-label    3688 GOTO_3688
+label    3688 ZZZZZZ
 comment  367F
-label    36AB SKIP_36AB
-label    369C BACK_36AB
-label    36E7 GOTO_36E7
-label    371F SKIP_371F
-label    3722 SKIP_3722
+label    369C ZZZZZZ_1
+label    36AB ZZZZZZ_2
+label    36E7 ZZZZZZ_3
+label    371F ZZZZZZ_4
+label    3722 ZZZZZZ_5
+label    3729 ZZZZZZ_6
+label    3734 ZZZZZZ_7
 comment  3737
-comment  3737
-label    3737 Load_Small_UDG_Addr_Setup_XY_0
+label    3737 Load_Small_UDG_Addr_Setup_XY_
 comment  373D
 comment  373D Load Small UDG address from A & Y
 label    373D Load_Small_UDG_Addr_Setup_XY
@@ -1692,10 +1678,10 @@ comment  3775
 comment  377C
 comment  3783
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
-label    378A Set_UDG_RAM_Ptr_Spr_Dimensions
+label    378A Set_UDG_RAM_Ptr_Spr_Dimen_
 comment  378D
 comment  378D Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
-label    378D Set_UDG_RAM_Ptr_Spr_Dimens_
+label    378D Set_UDG_RAM_Ptr_Spr_Dimen
 comment  3793
 comment  3793 Setup UDG RAM X & Y
 comment  379B
@@ -1713,10 +1699,11 @@ comment  37C6
 comment  37C6 Subtract $01 from 16-bit sprite UDG addr, i.e. so address
 comment  37C6 avoids the sprite dimension bytes
 comment  37CD
-label    37D4 GOUA_1
+comment  37D4
+label    37D4 Get_Obj_UDG_Addr_1
 comment  37DB
 lcomment 37E8 Zero bits
-label    37E6 Get_Obj_UDG_Addr_0
+label    37E6 Get_Obj_UDG_Addr_
 bin      37E9
 comment  37ED
 comment  37ED InReg: A=Saved Obj Type, X=Saved Object X AND $06/%110
@@ -1724,7 +1711,7 @@ comment  37ED But if it's the Jetman Object, Obj Type is instead Jetman Looks
 comment  37ED and so $3F is masking out direction and test for walking AND flying???
 comment  37ED OutReg: UDG Addr Lo in Y, Hi in A
 comment  37ED CALLED ONLY FROM 381C or run into from 37E6
-label    37ED Get_Object_UDG_Addr
+label    37ED Get_Obj_UDG_Addr_2
 lcomment 37EE Zero bits 6 & 7
 binary   37EF
 lcomment 37f0 Test bits 0 & 1
@@ -1737,15 +1724,15 @@ lcomment 37FC Set bit 3
 binary   37Fd
 comment  3800
 comment  3800 Subtract 1 and muliply by $10 i.e. left shift 4 bits
-label    3800 GOUA_2
+label    3800 Get_Obj_UDG_Addr_3
 comment  3807
 comment  3807 Set bit in X defined by A, ZP variable being used as temp store
-label    3807 GOUA_3
+label    3807 Get_Obj_UDG_Addr_4
 comment  380D
 comment  380D Using X just set, get index into the Object UDG table
 lcomment 380D Address lo byte into Y
 lcomment 3811 Address hi byte into A
-label    3815 Get_Object_UDG_Address
+label    3815 Get_Object_UDG_Addr
 lcomment 3815 Saved Object X
 lcomment 381A Saved Object Type
 label    381F Update_Color_RAM
@@ -1757,15 +1744,15 @@ comment  382A Divide ZP_17 by $10, height of a color tile?
 comment  3835
 comment  3835 Outer loop decrementing ZP_0B
 comment  3835 Inner loop decrementing ZP_0A
-label    383B Update_Color_RAM_0
-label    383F Update_Color_RAM_1
+label    383B Update_Color_RAM_1
+label    383F Update_Color_RAM_2
 comment  383F
 comment  3847
 comment  384B
-label    384B Update_Color_RAM_2
+label    384B Update_Color_RAM_3
 comment  384F
 comment  385A
-label    385E Update_Color_RAM_2_RTS
+label    385E Update_Color_RAM_RTS
 ;
 ; End of file contains graphics data
 ;

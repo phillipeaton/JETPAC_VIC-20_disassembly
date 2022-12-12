@@ -903,7 +903,7 @@ Display_Number_Lives
          fdb     Jetman_Icon             ; 239A: C7 23    
          fcb     $FF                     ; 239C: FF       
          ldy     #$07                    ; 239D: A0 07     8 bytes of UDG data to copy
-         jmp     CCTUR2                  ; 239F: 4C B6 35 
+         jmp     Copy_Char_To_UDG_RAM_2  ; 239F: 4C B6 35 
 ; -----------------------
 ; L_BRS_($23A2)_($237D) OK
 Zero_Lives_To_UDG_RAM_1
@@ -1148,7 +1148,7 @@ GSFP2    sta     ZP_Game_Sel_F1_Flash,x  ; 24B2: 95 45
 ;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
 ;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
 ; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP    oooooooooo
-
+; \
 ;  dP""b8    db    8b    d8 888888            .dP"Y8 888888 88     888888  dP""b8 888888
 ; dP   `"   dPYb   88b  d88 88__              `Ybo." 88__   88     88__   dP   `"   88
 ; Yb  "88  dP__Yb  88YbdP88 88""              o.`Y8b 88""   88  .o 88""   Yb        88
@@ -1439,15 +1439,15 @@ Main_Loop ldy    #$00                    ; 2607: A0 00
 
 
 
-; 88 88b 88  dP""b8            .dP"Y8 88""Yb 88""Yb 88 888888 888888
-; 88 88Yb88 dP   `"            `Ybo." 88__dP 88__dP 88   88   88__
-; 88 88 Y88 Yb                 o.`Y8b 88"""  88"Yb  88   88   88""
-; 88 88  Y8  YboodP oooooooooo 8bodP' 88     88  Yb 88   88   888888
+;  dP""b8  dP"Yb  888888  dP"Yb             88b 88 888888 Yb  dP 888888
+; dP   `" dP   Yb   88   dP   Yb            88Yb88 88__    YbdP    88
+; Yb  "88 Yb   dP   88   Yb   dP            88 Y88 88""    dPYb    88
+;  YboodP  YbodP    88    YbodP  oooooooooo 88  Y8 888888 dP  Yb   88
 ; \
-;            88""Yb  dP"Yb  88 88b 88 888888 888888 88""Yb
-;            88__dP dP   Yb 88 88Yb88   88   88__   88__dP
-;            88"""  Yb   dP 88 88 Y88   88   88""   88"Yb
-; oooooooooo 88      YbodP  88 88  Y8   88   888888 88  Yb
+;            .dP"Y8 88""Yb 88""Yb 88 888888 888888
+;            `Ybo." 88__dP 88__dP 88   88   88__
+;            o.`Y8b 88"""  88"Yb  88   88   88""
+; oooooooooo 8bodP' 88     88  Yb 88   88   888888
 
 Goto_Next_Sprite
          ldy     #$00                    ; 261A: A0 00    
@@ -1576,7 +1576,7 @@ Restore_Obj_Ptr_CLI
 ; `Ybo." 88   88 88__dP 88__dP dP   Yb 88   88   88   88 88Yb88 88__
 ; o.`Y8b Y8   8P 88""Yb 88"Yb  Yb   dP Y8   8P   88   88 88 Y88 88""
 ; 8bodP' `YbodP' 88oodP 88  Yb  YbodP  `YbodP'   88   88 88  Y8 888888
-
+; \
 ;            88     88 .dP"Y8 888888
 ;            88     88 `Ybo."   88
 ;            88  .o 88 o.`Y8b   88
@@ -1645,7 +1645,7 @@ Init_Rocket_Obj_Table
 ; `Ybo."   88     dPYb   88__dP   88
 ; o.`Y8b   88    dP__Yb  88"Yb    88
 ; 8bodP'   88   dP""""Yb 88  Yb   88   oooooooooo
-; \
+
 Sound_Loop_Start
          lda     #$01                    ; 26CD: A9 01    
          sta     ZP_Subroutine_Vec_Hi    ; 26CF: 85 60    
@@ -1779,7 +1779,7 @@ Collision jsr    Dec_Obj_Param           ; 274F: 20 F2 26
 ; 88__   88__dP   dPYb   `Ybo." 88__              88__dP   dPYb   88b  d88
 ; 88""   88"Yb   dP__Yb  o.`Y8b 88""              88"Yb   dP__Yb  88YbdP88
 ; 888888 88  Yb dP""""Yb 8bodP' 888888 oooooooooo 88  Yb dP""""Yb 88 YY 88
-; \
+
 Erase_ZP_RAM
          ldx     #$00                    ; 275B: A2 00    
          txa                             ; 275D: 8A       
@@ -1896,8 +1896,8 @@ Display_Rocket_Flame_1
          sec                             ; 27D5: 38       
          sbc     #$01                    ; 27D6: E9 01    
          jsr     Get_Flame_UDG_Addr      ; 27D8: 20 2E 28 
-         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 27DB: 20 8D 37 
-         jsr     Z3610                   ; 27DE: 20 10 36 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimen ; 27DB: 20 8D 37 
+         jsr     DDDDDD                  ; 27DE: 20 10 36 
 ; L_BRS_($27E1)_($27CD) OK
 Display_Rocket_Flame_2
          lda     ZP_Rocket_Flame_Toggle  ; 27E1: A5 27    
@@ -1908,8 +1908,8 @@ Display_Rocket_Flame_2
          sec                             ; 27EB: 38       
          sbc     #$01                    ; 27EC: E9 01    
          jsr     Get_Flame_UDG_Addr      ; 27EE: 20 2E 28 
-         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 27F1: 20 8D 37 
-         jsr     GOTO_364C               ; 27F4: 20 4C 36 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimen ; 27F1: 20 8D 37 
+         jsr     YYYYYY                  ; 27F4: 20 4C 36 
          lda     ZP_Save_Obj_Lst_Prms2_Lo ; 27F7: A5 18    
          sta     ZP_UDG_RAM_X            ; 27F9: 85 04    
          lda     ZP_Save_Obj_Lst_Prms2_Hi ; 27FB: A5 19    
@@ -1946,8 +1946,8 @@ Display_Flame
          sec                             ; 281F: 38       
          sbc     #$01                    ; 2820: E9 01    
          jsr     Get_Flame_UDG_Addr      ; 2822: 20 2E 28 
-         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 2825: 20 8D 37 
-         jsr     Z3610                   ; 2828: 20 10 36 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimen ; 2825: 20 8D 37 
+         jsr     DDDDDD                  ; 2828: 20 10 36 
          jmp     Display_Rocket_Flame_3  ; 282B: 4C 0B 28 
 ; -----------------------
 ; Using A to toggle, Load A and Y with Ship UDG address
@@ -2010,8 +2010,8 @@ FP_1     jsr     Save_Obj_Type_X_Y_Color ; 2851: 20 E9 35
          lda     #$00                    ; 2859: A9 00    
          jsr     Get_Spr_Addr_Rckt_Top_OR_Fuel_1 ; 285B: 20 DC 2F 
          jsr     Get_Object_UDG_Addr_Small ; 285E: 20 E5 2F 
-         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 2861: 20 8D 37 
-         jsr     Z3610                   ; 2864: 20 10 36 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimen ; 2861: 20 8D 37 
+         jsr     DDDDDD                  ; 2864: 20 10 36 
 
 ; Jetman pickup Gem/Elements/Gold etc = 250 points
          jsr     Load_ZP_Parameters      ; 2867: 20 9D 25 
@@ -2140,7 +2140,7 @@ Restore_Obj_List_Ptr
 ; ===========================================================
 ; L_JSR_($28F9)_($2C8C) OK
 Change_Object_To_Explosion
-         jsr     Z360D                   ; 28F9: 20 0D 36 
+         jsr     CCCCCC                  ; 28F9: 20 0D 36 
 
 ; Reset Alien? object direction
          lda     #$00                    ; 28FC: A9 00    
@@ -2213,7 +2213,7 @@ Explosions_1
          tay                             ; 2957: A8       
          lda     Explosion_UDG_Ptr+1,x   ; 2958: BD 68 29 
          jsr     Load_Small_UDG_Addr_Setup_XY ; 295B: 20 3D 37 
-         jsr     Z3604                   ; 295E: 20 04 36 
+         jsr     BBBBBB                  ; 295E: 20 04 36 
          jsr     Update_Color_RAM        ; 2961: 20 1F 38 
          jmp     Goto_Next_Sprite        ; 2964: 4C 1A 26 
 ; -----------------------
@@ -2381,7 +2381,7 @@ Spr_Ptr_To_Jetman
 ; 88     88__    Yb  dP  88__   88                .d88
 ; 88  .o 88""     YbdP   88""   88  .o              88
 ; 88ood8 888888    YP    888888 88ood8 oooooooooo   88 oooooooooo
-
+; \
 ; 88""Yb 88     88   88 .dP"Y8 .dP"Y8 888888 .dP"Y8
 ; 88__dP 88     88   88 `Ybo." `Ybo." 88__   `Ybo."
 ; 88"""  88  .o Y8   8P o.`Y8b o.`Y8b 88""   o.`Y8b
@@ -2411,7 +2411,7 @@ Level_1_Plusses_1
 ; 88     88__    Yb  dP  88__   88                "' dP'
 ; 88  .o 88""     YbdP   88""   88  .o              dP'
 ; 88ood8 888888    YP    888888 88ood8 oooooooooo .d8888 oooooooooo
-
+; \
 ; 88""Yb    db    88     88     .dP"Y8
 ; 88__dP   dPYb   88     88     `Ybo."
 ; 88""Yb  dP__Yb  88  .o 88  .o o.`Y8b
@@ -2498,7 +2498,7 @@ Set_Alien_Diagonal_2?
 ; 88     88__    Yb  dP  88__   88                  .dP
 ; 88  .o 88""     YbdP   88""   88  .o            o `Yb
 ; 88ood8 888888    YP    888888 88ood8 oooooooooo YbodP oooooooooo
-
+; \
 ; .dP"Y8    db    88   88  dP""b8 888888 88""Yb
 ; `Ybo."   dPYb   88   88 dP   `" 88__   88__dP
 ; o.`Y8b  dP__Yb  Y8   8P Yb      88""   88"Yb
@@ -2857,7 +2857,7 @@ Test_Laser_Hits
 ; 88     88__    Yb  dP  88__   88                dP   Yb
 ; 88  .o 88""     YbdP   88""   88  .o            Yb   dP
 ; 88ood8 888888    YP    888888 88ood8 oooooooooo  YbodP  oooooooooo
-
+; \
 ; 888888 88   88 8888P 8888P 88""Yb    db    88     88
 ; 88__   88   88   dP    dP  88__dP   dPYb   88     88
 ; 88""   Y8   8P  dP    dP   88""Yb  dP__Yb  88  .o 88  .o
@@ -2950,7 +2950,7 @@ Update_Sprite_Posn_X
          adc     (ZP_Obj_List_Ptr_Lo),y  ; 2CBF: 71 00    
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2CC1: 91 00    
 
-         jsr     Z3646                   ; 2CC3: 20 46 36 
+         jsr     YYYYYY_ALT              ; 2CC3: 20 46 36 
          jsr     Update_Color_RAM        ; 2CC6: 20 1F 38 
          jmp     Goto_Next_Sprite        ; 2CC9: 4C 1A 26 
 ; -----------------------
@@ -3067,7 +3067,7 @@ Init_Alien_Sprite
          lda     Level_Alien_Color_Lookup,x ; 2D44: BD 50 2D 
          sta     (ZP_Obj_List_Ptr_Lo),y  ; 2D47: 91 00    
 
-         jmp     Z3601                   ; 2D49: 4C 01 36 
+         jmp     AAAAAA                  ; 2D49: 4C 01 36 
 ; -----------------------
 Level_Alien_Type_Lookup
          fcb     $05,$08,$07,$06         ; 2D4C: 05 08 07 06 
@@ -3176,7 +3176,7 @@ XXXX_4   jsr     Set_Sprite_UDG_Color    ; 2DCB: 20 DD 2D
          jsr     Save_Obj_Type_X_Y_Color ; 2DCE: 20 E9 35 
 ; L_BRS_($2DD1)_($2DDA) OK
 XXXX_5   jsr     XXXX_6                  ; 2DD1: 20 E8 2D 
-         jsr     Z3604                   ; 2DD4: 20 04 36 
+         jsr     BBBBBB                  ; 2DD4: 20 04 36 
          jsr     Dec_Saved_Obj_List_Params_by_10 ; 2DD7: 20 FF 2D 
          bne     XXXX_5                  ; 2DDA: D0 F5    
          rts                             ; 2DDC: 60       
@@ -3206,7 +3206,7 @@ XXXX_6   lda     ZP_Level_Current_Plyr   ; 2DE8: A5 59
          pla                             ; 2DF8: 68       
 
          jsr     Get_Object_UDG_Addr_Small ; 2DF9: 20 E5 2F 
-         jmp     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 2DFC: 4C 8D 37 
+         jmp     Set_UDG_RAM_Ptr_Spr_Dimen ; 2DFC: 4C 8D 37 
 ; -----------------------
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
@@ -3373,7 +3373,7 @@ Rocket_Bottom_Module
          fcb     $FF                     ; 2E95: FF       
 
          jsr     Save_Obj_Type_X_Y_Color ; 2E96: 20 E9 35 
-         jsr     Z3601                   ; 2E99: 20 01 36 
+         jsr     AAAAAA                  ; 2E99: 20 01 36 
 
          lda     #$00                    ; 2E9C: A9 00    
          sta     Obj_Jetman              ; 2E9E: 8D 80 03 
@@ -3387,60 +3387,85 @@ Rocket_Bottom_Module
 ; L_JMP_($2EAC)_($2E71) OK
 ; L_BRS_($2EAC)_($2E7C) OK
 ; L_BRS_($2EAC)_($2E84) OK
+
+
+
+
+
+
+
+
+
+
+; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
+; 88__dP dP   Yb dP   `" 88odP  88__     88
+; 88"Yb  Yb   dP Yb      88"Yb  88""     88
+; 88  Yb  YbodP   YboodP 88  Yb 888888   88   oooooooooo
+; \
+; 888888 88   88 888888 88     88     888888 8888b.             88   88 88""Yb
+; 88__   88   88 88__   88     88     88__    8I  Yb            88   88 88__dP
+; 88""   Y8   8P 88""   88  .o 88  .o 88""    8I  dY            Y8   8P 88"""
+; 88     `YbodP' 888888 88ood8 88ood8 888888 8888Y"  oooooooooo `YbodP' 88
+
 Rocket_Fuelled_Up
          jsr     Save_Obj_Type_X_Y_Color ; 2EAC: 20 E9 35 
          jsr     Display_Rocket_Flame    ; 2EAF: 20 AA 27 
          jsr     Set_Sprite_UDG_Color    ; 2EB2: 20 DD 2D 
 ; L_BRS_($2EB5)_($2EBE) OK
-LOOP_2EB5 jsr    XXXX_6                  ; 2EB5: 20 E8 2D 
-         jsr     GOTO_364C               ; 2EB8: 20 4C 36 
+Rocket_Fuelled_Up_1
+         jsr     XXXX_6                  ; 2EB5: 20 E8 2D 
+         jsr     YYYYYY                  ; 2EB8: 20 4C 36 
          jsr     Dec_Saved_Obj_List_Params_by_10 ; 2EBB: 20 FF 2D 
-         bne     LOOP_2EB5               ; 2EBE: D0 F5    
+         bne     Rocket_Fuelled_Up_1     ; 2EBE: D0 F5    
 
          lda     ZP_HW_IRQ_Count1        ; 2EC0: A5 4A    
          lsr     a                       ; 2EC2: 4A       
          lsr     a                       ; 2EC3: 4A       
          and     #$04                    ; 2EC4: 29 04    
-         bne     SKIP_2ECA               ; 2EC6: D0 02    
+         bne     Rocket_Fuelled_Up_2     ; 2EC6: D0 02    
          lda     #$01                    ; 2EC8: A9 01    
 ; L_BRS_($2ECA)_($2EC6) OK
-SKIP_2ECA sta    ZP_Tile_Color           ; 2ECA: 85 1B    
+Rocket_Fuelled_Up_2
+         sta     ZP_Tile_Color           ; 2ECA: 85 1B    
          ldy     #$04                    ; 2ECC: A0 04    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2ECE: B1 00    
          sta     ZP_02                   ; 2ED0: 85 02    
          cmp     #$03                    ; 2ED2: C9 03    
-         bcc     A123123                 ; 2ED4: 90 27    
+         bcc     Rocket_Fuelled_Up_3     ; 2ED4: 90 27    
          ldy     #$02                    ; 2ED6: A0 02    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2ED8: B1 00    
          lsr     a                       ; 2EDA: 4A       
          sta     ZP_13                   ; 2EDB: 85 13    
-         beq     A123123                 ; 2EDD: F0 1E    
+         beq     Rocket_Fuelled_Up_3     ; 2EDD: F0 1E    
          cmp     #$03                    ; 2EDF: C9 03    
-         bcs     A456456                 ; 2EE1: B0 1E    
+         bcs     Rocket_Fuelled_Up_4     ; 2EE1: B0 1E    
          sta     ZP_02                   ; 2EE3: 85 02    
          lda     #$04                    ; 2EE5: A9 04    
          sta     ZP_Tile_Color           ; 2EE7: 85 1B    
-         jsr     A789789                 ; 2EE9: 20 07 2F 
+         jsr     Rocket_Fuelled_Up_5     ; 2EE9: 20 07 2F 
          lda     #$03                    ; 2EEC: A9 03    
          sec                             ; 2EEE: 38       
          sbc     ZP_13                   ; 2EEF: E5 13    
          sta     ZP_02                   ; 2EF1: 85 02    
          lda     #$01                    ; 2EF3: A9 01    
          sta     ZP_Tile_Color           ; 2EF5: 85 1B    
-         jsr     A111111                 ; 2EF7: 20 16 2F 
+         jsr     Rocket_Fuelled_Up_6     ; 2EF7: 20 16 2F 
          jmp     Goto_Next_Sprite        ; 2EFA: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2EFD)_($2ED4) OK
 ; L_BRS_($2EFD)_($2EDD) OK
-A123123  lda     #$01                    ; 2EFD: A9 01    
+Rocket_Fuelled_Up_3
+         lda     #$01                    ; 2EFD: A9 01    
          sta     ZP_Tile_Color           ; 2EFF: 85 1B    
 ; L_BRS_($2F01)_($2EE1) OK
-A456456  jsr     A789789                 ; 2F01: 20 07 2F 
+Rocket_Fuelled_Up_4
+         jsr     Rocket_Fuelled_Up_5     ; 2F01: 20 07 2F 
          jmp     Goto_Next_Sprite        ; 2F04: 4C 1A 26 
 ; -----------------------
 ; L_JSR_($2F07)_($2EE9) OK
 ; L_JSR_($2F07)_($2F01) OK
-A789789  ldy     #$01                    ; 2F07: A0 01    
+Rocket_Fuelled_Up_5
+         ldy     #$01                    ; 2F07: A0 01    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F09: B1 00    
          sta     ZP_UDG_RAM_X            ; 2F0B: 85 04    
 
@@ -3451,7 +3476,8 @@ A789789  ldy     #$01                    ; 2F07: A0 01
          jsr     Setup_Color_RAM_Ptr     ; 2F13: 20 F7 34 
 ; L_JSR_($2F16)_($2EF7) OK
 ; L_BRS_($2F16)_($2F2E) OK
-A111111  ldy     #$00                    ; 2F16: A0 00    
+Rocket_Fuelled_Up_6
+         ldy     #$00                    ; 2F16: A0 00    
          lda     ZP_Tile_Color           ; 2F18: A5 1B    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 2F1A: 91 0C    
          iny                             ; 2F1C: C8       
@@ -3464,23 +3490,30 @@ A111111  ldy     #$00                    ; 2F16: A0 00
          sbc     #$00                    ; 2F28: E9 00    
          sta     ZP_Col_RAM_Ptr_Hi       ; 2F2A: 85 0D    
          dec     ZP_02                   ; 2F2C: C6 02    
-         bne     A111111                 ; 2F2E: D0 E6    
+         bne     Rocket_Fuelled_Up_6     ; 2F2E: D0 E6    
          rts                             ; 2F30: 60       
 ; ===========================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
 ; L_BRS_($2F31)_($2F98) OK
+
+
+
+
+
+
+
+
+
+
+; .dP"Y8 888888  dP"Yb  88""Yb .dP"Y8
+; `Ybo."   88   dP   Yb 88__dP `Ybo."
+; o.`Y8b   88   Yb   dP 88"""  o.`Y8b
+; 8bodP'   88    YbodP  88     8bodP'
+; \
+;               db    88     88
+;              dPYb   88     88
+;             dP__Yb  88  .o 88  .o
+; oooooooooo dP""""Yb 88ood8 88ood8
+
 Stops_All_0
          ldy     #$06                    ; 2F31: A0 06    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 2F33: B1 00    
@@ -3538,17 +3571,6 @@ Stops_All_2
          jsr     Load_Rocket_OR_Fuel_UDGs_2 ; 2F88: 20 5A 30 
          jmp     Stops_All_1             ; 2F8B: 4C 65 2F 
 ; -----------------------
-
-; .dP"Y8 888888  dP"Yb  88""Yb .dP"Y8
-; `Ybo."   88   dP   Yb 88__dP `Ybo."
-; o.`Y8b   88   Yb   dP 88"""  o.`Y8b
-; 8bodP'   88    YbodP  88     8bodP'
-; \
-;               db    88     88
-;              dPYb   88     88
-;             dP__Yb  88  .o 88  .o
-; oooooooooo dP""""Yb 88ood8 88ood8
-
 Stops_All jsr    Save_Obj_Type_X_Y       ; 2F8E: 20 D7 35 
 
          ldy     #$04                    ; 2F91: A0 04    
@@ -3589,8 +3611,8 @@ Stops_All_5
          jsr     Load_Small_UDG_Addr_Setup_XY ; 2FC7: 20 3D 37 
          pla                             ; 2FCA: 68       
          jsr     Get_Object_UDG_Addr_Small ; 2FCB: 20 E5 2F 
-         jsr     Set_UDG_RAM_Ptr_Spr_Dimens_ ; 2FCE: 20 8D 37 
-         jsr     GOTO_364C               ; 2FD1: 20 4C 36 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimen ; 2FCE: 20 8D 37 
+         jsr     YYYYYY                  ; 2FD1: 20 4C 36 
          jsr     Update_Color_RAM        ; 2FD4: 20 1F 38 
          jmp     Goto_Next_Sprite        ; 2FD7: 4C 1A 26 
 ; -----------------------
@@ -3713,7 +3735,7 @@ Load_Rocket_OR_Fuel_UDGs_1
 Load_Rocket_OR_Fuel_UDGs_2
          jsr     Get_Object_UDG_Addr_Small ; 305A: 20 E5 2F 
          jsr     Load_Small_UDG_Addr_Setup_XY ; 305D: 20 3D 37 
-         jmp     Z3604                   ; 3060: 4C 04 36 
+         jmp     BBBBBB                  ; 3060: 4C 04 36 
 ; -----------------------
 ; L_JSR_($3063)_($286E) OK
 ; L_JSR_($3063)_($2C89) OK
@@ -3957,7 +3979,7 @@ DP_1     lda     (ZP_08),y               ; 3155: B1 08     Get X value from look
 
 ; Copy left end platform UDG char to RAM, bytes 9 per column
          ldy     #$09                    ; 3173: A0 09    
-         jsr     CCTUR2                  ; 3175: 20 B6 35 
+         jsr     Copy_Char_To_UDG_RAM_2  ; 3175: 20 B6 35 
 
 ; Copy middle platform and right end UDG chars to RAM, 9 bytes per column
          jsr     Next_UDG_Char           ; 3178: 20 A8 31 
@@ -3965,7 +3987,7 @@ DP_1     lda     (ZP_08),y               ; 3155: B1 08     Get X value from look
 ; L_JMP_($317B)_($31A5) OK
 Loop_Next_Char
          ldy     #$09                    ; 317B: A0 09    
-         jsr     CCTUR2                  ; 317D: 20 B6 35 
+         jsr     Copy_Char_To_UDG_RAM_2  ; 317D: 20 B6 35 
 
          dec     ZP_0B                   ; 3180: C6 0B    
          beq     Next_UDG_Char_Loop_Next_Char ; 3182: F0 1E    
@@ -4254,7 +4276,7 @@ Flying_2? dey                            ; 32E0: 88
 ; L_JMP_($32F7)_($33D1) OK
 Flying_3? sta    (ZP_Obj_List_Ptr_Lo),y  ; 32F7: 91 00    
 ; L_JMP_($32F9)_($33B7) OK
-Flying_4? jsr    Z3646                   ; 32F9: 20 46 36 
+Flying_4? jsr    YYYYYY_ALT              ; 32F9: 20 46 36 
          jsr     Update_Color_RAM        ; 32FC: 20 1F 38 
          lda     ZP_Jetman_Movement      ; 32FF: A5 1C    
          bit     MASK_08                 ; 3301: 2C 17 20  Test for direction Right
@@ -4345,7 +4367,7 @@ Flash_Display_Score
          jsr     Flash_Score             ; 3351: 20 65 34 
          dec     ZP_Flash_Score_Countdown ; 3354: C6 5D    
          bne     Flash_Display_Score_1   ; 3356: D0 0F    
-         jsr     Z3601                   ; 3358: 20 01 36 
+         jsr     AAAAAA                  ; 3358: 20 01 36 
          jsr     Update_Color_RAM        ; 335B: 20 1F 38 
          jsr     Display_1UP_HI_2UP_Titles ; 335E: 20 25 24 
          jsr     Display_P1_Score        ; 3361: 20 71 24 
@@ -4772,6 +4794,21 @@ UDG_RAM_Column_Offsets
 ;             ZP_04 = Data byte to fill with
 ; ----------------------------------------------------------
 ; L_JSR_($355C)_($2416) OK
+
+
+
+
+
+
+
+
+
+
+; 88""Yb 888888 .dP"Y8 888888 888888            88""Yb    db    8b    d8
+; 88__dP 88__   `Ybo." 88__     88              88__dP   dPYb   88b  d88
+; 88"Yb  88""   o.`Y8b 88""     88              88"Yb   dP__Yb  88YbdP88
+; 88  Yb 888888 8bodP' 888888   88   oooooooooo 88  Yb dP""""Yb 88 YY 88
+
 Reset_Color_RAM
          jsr     Load_ZP_Parameters      ; 355C: 20 9D 25 
          fcb     $02                     ; 355F: 02       
@@ -4799,20 +4836,22 @@ Reset_UDG_RAM
 Reset_RAM ldy    #$00                    ; 3579: A0 00    
 ; L_BRS_($357B)_($358A) OK
 ; L_BRS_($357B)_($3592) OK
-RR_1     lda     ZP_06                   ; 357B: A5 06    
+Reset_RAM_1
+         lda     ZP_06                   ; 357B: A5 06    
          sta     (ZP_UDG_RAM_X),y        ; 357D: 91 04    
          iny                             ; 357F: C8       
-         bne     RR_2                    ; 3580: D0 02    
+         bne     Reset_RAM_2             ; 3580: D0 02    
          inc     ZP_UDG_RAM_Y            ; 3582: E6 05    
 ; L_BRS_($3584)_($3580) OK
-RR_2     dec     ZP_02                   ; 3584: C6 02    
+Reset_RAM_2
+         dec     ZP_02                   ; 3584: C6 02    
          lda     ZP_02                   ; 3586: A5 02    
          cmp     #$FF                    ; 3588: C9 FF    
-         bne     RR_1                    ; 358A: D0 EF    
+         bne     Reset_RAM_1             ; 358A: D0 EF    
          dec     ZP_03                   ; 358C: C6 03    
          lda     ZP_03                   ; 358E: A5 03    
          cmp     #$FF                    ; 3590: C9 FF    
-         bne     RR_1                    ; 3592: D0 E7    
+         bne     Reset_RAM_1             ; 3592: D0 E7    
          rts                             ; 3594: 60       
 
 ; ----------------------------------------------------------
@@ -4844,11 +4883,12 @@ Copy_Char_To_UDG_RAM
 ; Multiply Addr_From by 8, as 8 bytes per UDG RAM character definition
          ldx     #$03                    ; 35A0: A2 03    
 ; L_BRS_($35A2)_($35A8) OK
-CCTUR1   clc                             ; 35A2: 18       
+Copy_Char_To_UDG_RAM_1
+         clc                             ; 35A2: 18       
          rol     ZP_06                   ; 35A3: 26 06    
          rol     ZP_07                   ; 35A5: 26 07     Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
          dex                             ; 35A7: CA        Left-shifted 3 times? i.e. multiplied by 8
-         bne     CCTUR1                  ; 35A8: D0 F8     If no, loop back
+         bne     Copy_Char_To_UDG_RAM_1  ; 35A8: D0 F8     If no, loop back
 
 ; Add $8000 Character ROM offset to address
          lda     ZP_07                   ; 35AA: A5 07    
@@ -4858,19 +4898,20 @@ CCTUR1   clc                             ; 35A2: 18
 ; Copy 8 bytes to form a complete character
          ldy     #$07                    ; 35B0: A0 07    
          lda     ZP_Invert               ; 35B2: A5 57     Test the Invert flag
-         bmi     CCTUR_INV               ; 35B4: 30 15     If yes, copy bytes with inversion instead
+         bmi     Copy_Char_To_UDG_RAM_INV ; 35B4: 30 15     If yes, copy bytes with inversion instead
 ; L_JMP_($35B6)_($239F) OK
 ; L_JSR_($35B6)_($3175) OK
 ; L_JSR_($35B6)_($317D) OK
 ; L_BRS_($35B6)_($35BB) OK
-CCTUR2   lda     (ZP_06),y               ; 35B6: B1 06     Copy bytes from given address with Y offset
+Copy_Char_To_UDG_RAM_2
+         lda     (ZP_06),y               ; 35B6: B1 06     Copy bytes from given address with Y offset
          sta     (ZP_UDG_RAM_X),y        ; 35B8: 91 04     Copy bytes to given address with Y offset
          dey                             ; 35BA: 88        Decrement number of lines counter
-         bpl     CCTUR2                  ; 35BB: 10 F9     All lines copied? If no, loop back.
+         bpl     Copy_Char_To_UDG_RAM_2  ; 35BB: 10 F9     All lines copied? If no, loop back.
 
 ; Move the next character address to the next column
 ; L_JMP_($35BD)_($35D4) OK
-CCTUR_NEXT
+Copy_Char_To_UDG_RAM_NEXT
          lda     ZP_UDG_RAM_X            ; 35BD: A5 04    
          clc                             ; 35BF: 18       
          adc     #$B0                    ; 35C0: 69 B0     #B0=176=number of vertical pixels i.e. move to next char right
@@ -4879,16 +4920,18 @@ CCTUR_NEXT
          adc     #$00                    ; 35C6: 69 00     Increment address hi-byte if previous addition overflowed
          sta     ZP_UDG_RAM_Y            ; 35C8: 85 05    
          rts                             ; 35CA: 60       
+; ===========================================================
 
 ; Copy 8 inverted bytes to form a complete character
 ; L_BRS_($35CB)_($35B4) OK
 ; L_BRS_($35CB)_($35D2) OK
-CCTUR_INV lda    (ZP_06),y               ; 35CB: B1 06     Copy bytes from given address with Y offset
+Copy_Char_To_UDG_RAM_INV
+         lda     (ZP_06),y               ; 35CB: B1 06     Copy bytes from given address with Y offset
          eor     #$FF                    ; 35CD: 49 FF     Invert the byte (used to make the byte flash)
          sta     (ZP_UDG_RAM_X),y        ; 35CF: 91 04     Move bytes to given address with Y offset
          dey                             ; 35D1: 88        Decrement number of lines counter
-         bpl     CCTUR_INV               ; 35D2: 10 F7     All lines copied? If no, loop back.
-         jmp     CCTUR_NEXT              ; 35D4: 4C BD 35  If yes, routine ends
+         bpl     Copy_Char_To_UDG_RAM_INV ; 35D2: 10 F7     All lines copied? If no, loop back.
+         jmp     Copy_Char_To_UDG_RAM_NEXT ; 35D4: 4C BD 35  If yes, routine ends
 ; -----------------------
 ; L_JSR_($35D7)_($283E) OK
 ; L_JSR_($35D7)_($2C61) OK
@@ -4899,6 +4942,26 @@ CCTUR_INV lda    (ZP_06),y               ; 35CB: B1 06     Copy bytes from given
 ; L_JSR_($35D7)_($2FEE) OK
 ; L_JSR_($35D7)_($3273) OK
 ; L_JSR_($35D7)_($336A) OK
+
+
+
+
+
+
+
+
+
+
+; .dP"Y8    db    Yb    dP 888888            .dP"Y8 88""Yb 88""Yb 88 888888 888888
+; `Ybo."   dPYb    Yb  dP  88__              `Ybo." 88__dP 88__dP 88   88   88__
+; o.`Y8b  dP__Yb    YbdP   88""              o.`Y8b 88"""  88"Yb  88   88   88""
+; 8bodP' dP""""Yb    YP    888888 oooooooooo 8bodP' 88     88  Yb 88   88   888888
+; \
+;            88""Yb    db    88""Yb    db    8b    d8 .dP"Y8
+;            88__dP   dPYb   88__dP   dPYb   88b  d88 `Ybo."
+;            88"""   dP__Yb  88"Yb   dP__Yb  88YbdP88 o.`Y8b
+; oooooooooo 88     dP""""Yb 88  Yb dP""""Yb 88 YY 88 8bodP'
+
 Save_Obj_Type_X_Y
          ldy     #$00                    ; 35D7: A0 00    
          lda     (ZP_Obj_List_Ptr_Lo),y  ; 35D9: B1 00    
@@ -4943,44 +5006,50 @@ Save_Obj_Type_X_Y_Color
          rts                             ; 3600: 60       
 ; ===========================================================
 
-
-
-
-
-
-
-
-
 ; L_JMP_($3601)_($2D49) OK
 ; L_JSR_($3601)_($2E99) OK
 ; L_JSR_($3601)_($3358) OK
-Z3601    jsr     Load_Small_UDG_Addr_Setup_XY_0 ; 3601: 20 37 37 
+
+
+
+
+
+
+
+
+
+
+;    db    88""Yb  dP""b8 8888b.             Yb  dP Yb  dP 8888P
+;   dPYb   88__dP dP   `"  8I  Yb             YbdP   YbdP    dP
+;  dP__Yb  88""Yb Yb       8I  dY             dPYb    8P    dP
+; dP""""Yb 88oodP  YboodP 8888Y"  oooooooooo dP  Yb  dP    d8888
+
+AAAAAA   jsr     Load_Small_UDG_Addr_Setup_XY_ ; 3601: 20 37 37 
 ; L_JSR_($3604)_($295E) OK
 ; L_JSR_($3604)_($2DD4) OK
 ; L_JMP_($3604)_($3060) OK
-Z3604    lda     #$00                    ; 3604: A9 00    
+BBBBBB   lda     #$00                    ; 3604: A9 00    
          sta     ZP_14_Spr_Width_Pix     ; 3606: 85 14    
          sta     ZP_03                   ; 3608: 85 03    
-         jmp     GOTO_364C               ; 360A: 4C 4C 36 
+         jmp     YYYYYY                  ; 360A: 4C 4C 36 
 ; -----------------------
 
-
 ; L_JSR_($360D)_($28F9) OK
-Z360D    jsr     Set_UDG_RAM_Ptr_Spr_Dimensions ; 360D: 20 8A 37 
+CCCCCC   jsr     Set_UDG_RAM_Ptr_Spr_Dimen_ ; 360D: 20 8A 37 
 ; L_JSR_($3610)_($27DE) OK
 ; L_JSR_($3610)_($2828) OK
 ; L_JSR_($3610)_($2864) OK
-Z3610    lda     #$00                    ; 3610: A9 00    
+DDDDDD   lda     #$00                    ; 3610: A9 00    
          sta     ZP_15                   ; 3612: 85 15    
          sta     ZP_0B                   ; 3614: 85 0B    
-         jmp     GOTO_364C               ; 3616: 4C 4C 36 
+         jmp     YYYYYY                  ; 3616: 4C 4C 36 
 ; -----------------------
 ; L_BRS_($3619)_($3661) OK
-Z3619    eor     #$FF                    ; 3619: 49 FF    
+YYYYYY_1 eor     #$FF                    ; 3619: 49 FF    
          clc                             ; 361B: 18       
          adc     #$01                    ; 361C: 69 01    
          cmp     ZP_0B                   ; 361E: C5 0B    
-         bcs     GOTO_3688               ; 3620: B0 66    
+         bcs     ZZZZZZ                  ; 3620: B0 66    
          tax                             ; 3622: AA       
 
          pha                             ; 3623: 48       
@@ -4992,13 +5061,13 @@ Z3619    eor     #$FF                    ; 3619: 49 FF
 
          ldy     ZP_09                   ; 362D: A4 09    
 ; L_BRS_($362F)_($3637) OK
-Z362F    lda     (ZP_Ptr_To_Str_Lo),y    ; 362F: B1 0E    
+YYYYYY_2 lda     (ZP_Ptr_To_Str_Lo),y    ; 362F: B1 0E    
          eor     (ZP_Col_RAM_Ptr_Lo),y   ; 3631: 51 0C    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 3633: 91 0C    
 
          dey                             ; 3635: 88       
          dex                             ; 3636: CA       
-         bne     Z362F                   ; 3637: D0 F6    
+         bne     YYYYYY_2                ; 3637: D0 F6    
          pla                             ; 3639: 68       
 
          sta     ZP_13                   ; 363A: 85 13    
@@ -5008,12 +5077,13 @@ Z362F    lda     (ZP_Ptr_To_Str_Lo),y    ; 362F: B1 0E
          sbc     ZP_13                   ; 363F: E5 13    
          sta     ZP_09                   ; 3641: 85 09    
 
-         jmp     GOTO_3688               ; 3643: 4C 88 36 
+         jmp     ZZZZZZ                  ; 3643: 4C 88 36 
 ; -----------------------
 ; L_JSR_($3646)_($2CC3) OK
 ; L_JSR_($3646)_($32F9) OK
-Z3646    jsr     Load_Small_UDG_Addr_Setup_XY_0 ; 3646: 20 37 37 
-         jsr     Set_UDG_RAM_Ptr_Spr_Dimensions ; 3649: 20 8A 37 
+YYYYYY_ALT
+         jsr     Load_Small_UDG_Addr_Setup_XY_ ; 3646: 20 37 37 
+         jsr     Set_UDG_RAM_Ptr_Spr_Dimen_ ; 3649: 20 8A 37 
 ; L_JSR_($364C)_($27F4) OK
 ; L_JSR_($364C)_($2EB8) OK
 ; L_JSR_($364C)_($2FD1) OK
@@ -5021,7 +5091,7 @@ Z3646    jsr     Load_Small_UDG_Addr_Setup_XY_0 ; 3646: 20 37 37
 ; L_JMP_($364C)_($3616) OK
 ; L_JMP_($364C)_($371F) OK
 ; L_JMP_($364C)_($3726) OK
-GOTO_364C lda    #$FF                    ; 364C: A9 FF    
+YYYYYY   lda     #$FF                    ; 364C: A9 FF    
          sta     ZP_08                   ; 364E: 85 08    
          sta     ZP_09                   ; 3650: 85 09    
 
@@ -5033,10 +5103,10 @@ GOTO_364C lda    #$FF                    ; 364C: A9 FF
          lda     ZP_11                   ; 365A: A5 11    
          sec                             ; 365C: 38       
          sbc     ZP_Save_Obj_Lst_Prms2_Hi ; 365D: E5 19    
-         beq     GOTO_3688               ; 365F: F0 27    
-         bmi     Z3619                   ; 3661: 30 B6    
+         beq     ZZZZZZ                  ; 365F: F0 27    
+         bmi     YYYYYY_1                ; 3661: 30 B6    
          cmp     ZP_03                   ; 3663: C5 03    
-         bcs     GOTO_3688               ; 3665: B0 21    
+         bcs     ZZZZZZ                  ; 3665: B0 21    
          tax                             ; 3667: AA       
 
          pha                             ; 3668: 48       
@@ -5047,12 +5117,12 @@ GOTO_364C lda    #$FF                    ; 364C: A9 FF
          sta     ZP_02                   ; 3670: 85 02    
          ldy     ZP_08                   ; 3672: A4 08    
 ; L_BRS_($3674)_($367C) OK
-BACK_3674 lda    (ZP_06),y               ; 3674: B1 06    
+YYYYYY_3 lda     (ZP_06),y               ; 3674: B1 06    
          eor     (ZP_UDG_RAM_X),y        ; 3676: 51 04    
          sta     (ZP_UDG_RAM_X),y        ; 3678: 91 04    
          dey                             ; 367A: 88       
          dex                             ; 367B: CA       
-         bne     BACK_3674               ; 367C: D0 F6    
+         bne     YYYYYY_3                ; 367C: D0 F6    
          pla                             ; 367E: 68       
 
          sta     ZP_13                   ; 367F: 85 13    
@@ -5066,8 +5136,8 @@ BACK_3674 lda    (ZP_06),y               ; 3674: B1 06
 ; L_BRS_($3688)_($3665) OK
 ; L_BRS_($3688)_($369A) OK
 ; L_JMP_($3688)_($36A8) OK
-GOTO_3688 lda    ZP_02                   ; 3688: A5 02    
-         beq     SKIP_36AB               ; 368A: F0 1F    
+ZZZZZZ   lda     ZP_02                   ; 3688: A5 02    
+         beq     ZZZZZZ_2                ; 368A: F0 1F    
          dec     ZP_02                   ; 368C: C6 02    
          ldy     ZP_08                   ; 368E: A4 08    
          lda     (ZP_06),y               ; 3690: B1 06    
@@ -5075,21 +5145,21 @@ GOTO_3688 lda    ZP_02                   ; 3688: A5 02
          sta     (ZP_UDG_RAM_X),y        ; 3694: 91 04    
          dec     ZP_08                   ; 3696: C6 08    
          lda     ZP_0A                   ; 3698: A5 0A    
-         beq     GOTO_3688               ; 369A: F0 EC    
+         beq     ZZZZZZ                  ; 369A: F0 EC    
 ; L_BRS_($369C)_($36AD) OK
-BACK_36AB dec    ZP_0A                   ; 369C: C6 0A    
+ZZZZZZ_1 dec     ZP_0A                   ; 369C: C6 0A    
          ldy     ZP_09                   ; 369E: A4 09    
          lda     (ZP_Ptr_To_Str_Lo),y    ; 36A0: B1 0E    
          eor     (ZP_Col_RAM_Ptr_Lo),y   ; 36A2: 51 0C    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 36A4: 91 0C    
          dec     ZP_09                   ; 36A6: C6 09    
-         jmp     GOTO_3688               ; 36A8: 4C 88 36 
+         jmp     ZZZZZZ                  ; 36A8: 4C 88 36 
 ; -----------------------
 ; L_BRS_($36AB)_($368A) OK
-SKIP_36AB lda    ZP_0A                   ; 36AB: A5 0A    
-         bne     BACK_36AB               ; 36AD: D0 ED    
+ZZZZZZ_2 lda     ZP_0A                   ; 36AB: A5 0A    
+         bne     ZZZZZZ_1                ; 36AD: D0 ED    
          lda     ZP_14_Spr_Width_Pix     ; 36AF: A5 14    
-         beq     Z3729                   ; 36B1: F0 76    
+         beq     ZZZZZZ_6                ; 36B1: F0 76    
          dec     ZP_14_Spr_Width_Pix     ; 36B3: C6 14    
          lda     ZP_06                   ; 36B5: A5 06    
          sec                             ; 36B7: 38       
@@ -5110,7 +5180,7 @@ SKIP_36AB lda    ZP_0A                   ; 36AB: A5 0A
          sbc     #$D1                    ; 36D2: E9 D1    
          lda     ZP_UDG_RAM_Y            ; 36D4: A5 05    
          sbc     #$1E                    ; 36D6: E9 1E    
-         bcc     GOTO_36E7               ; 36D8: 90 0D    
+         bcc     ZZZZZZ_3                ; 36D8: 90 0D    
          lda     ZP_UDG_RAM_X            ; 36DA: A5 04    
          sec                             ; 36DC: 38       
          sbc     #$D0                    ; 36DD: E9 D0    
@@ -5120,8 +5190,8 @@ SKIP_36AB lda    ZP_0A                   ; 36AB: A5 0A
          sta     ZP_UDG_RAM_Y            ; 36E5: 85 05    
 ; L_BRS_($36E7)_($36D8) OK
 ; L_JMP_($36E7)_($3734) OK
-GOTO_36E7 lda    ZP_15                   ; 36E7: A5 15    
-         beq     SKIP_3722               ; 36E9: F0 37    
+ZZZZZZ_3 lda     ZP_15                   ; 36E7: A5 15    
+         beq     ZZZZZZ_5                ; 36E9: F0 37    
          dec     ZP_15                   ; 36EB: C6 15    
          lda     ZP_Ptr_To_Str_Lo        ; 36ED: A5 0E    
          sec                             ; 36EF: 38       
@@ -5142,7 +5212,7 @@ GOTO_36E7 lda    ZP_15                   ; 36E7: A5 15
          sbc     #$D1                    ; 370A: E9 D1    
          lda     ZP_Col_RAM_Ptr_Hi       ; 370C: A5 0D    
          sbc     #$1E                    ; 370E: E9 1E    
-         bcc     SKIP_371F               ; 3710: 90 0D    
+         bcc     ZZZZZZ_4                ; 3710: 90 0D    
          lda     ZP_Col_RAM_Ptr_Lo       ; 3712: A5 0C    
          sec                             ; 3714: 38       
          sbc     #$D0                    ; 3715: E9 D0    
@@ -5151,31 +5221,50 @@ GOTO_36E7 lda    ZP_15                   ; 36E7: A5 15
          sbc     #$0F                    ; 371B: E9 0F    
          sta     ZP_Col_RAM_Ptr_Hi       ; 371D: 85 0D    
 ; L_BRS_($371F)_($3710) OK
-SKIP_371F jmp    GOTO_364C               ; 371F: 4C 4C 36 
+ZZZZZZ_4 jmp     YYYYYY                  ; 371F: 4C 4C 36 
 ; -----------------------
 ; L_BRS_($3722)_($36E9) OK
-SKIP_3722 lda    #$00                    ; 3722: A9 00    
+ZZZZZZ_5 lda     #$00                    ; 3722: A9 00    
          sta     ZP_0B                   ; 3724: 85 0B    
-         jmp     GOTO_364C               ; 3726: 4C 4C 36 
+         jmp     YYYYYY                  ; 3726: 4C 4C 36 
 ; -----------------------
 ; L_BRS_($3729)_($36B1) OK
-Z3729    lda     #$00                    ; 3729: A9 00    
+ZZZZZZ_6 lda     #$00                    ; 3729: A9 00    
          sta     ZP_03                   ; 372B: 85 03    
          lda     ZP_14_Spr_Width_Pix     ; 372D: A5 14    
          ora     ZP_15                   ; 372F: 05 15    
-         bne     Z3734                   ; 3731: D0 01    
+         bne     ZZZZZZ_7                ; 3731: D0 01    
          rts                             ; 3733: 60       
 ; ===========================================================
 ; L_BRS_($3734)_($3731) OK
-Z3734    jmp     GOTO_36E7               ; 3734: 4C E7 36 
+ZZZZZZ_7 jmp     ZZZZZZ_3                ; 3734: 4C E7 36 
 ; -----------------------
-
 
 ; L_JSR_($3737)_($3601) OK
 ; L_JSR_($3737)_($3646) OK
-Load_Small_UDG_Addr_Setup_XY_0
+
+
+
+
+
+
+
+
+
+
+; 88      dP"Yb     db    8888b.             .dP"Y8 8b    d8    db    88     88
+; 88     dP   Yb   dPYb    8I  Yb            `Ybo." 88b  d88   dPYb   88     88
+; 88  .o Yb   dP  dP__Yb   8I  dY            o.`Y8b 88YbdP88  dP__Yb  88  .o 88  .o
+; 88ood8  YbodP  dP""""Yb 8888Y"  oooooooooo 8bodP' 88 YY 88 dP""""Yb 88ood8 88ood8
+; \
+;            88   88 8888b.   dP""b8               db    8888b.  8888b.  88""Yb
+;            88   88  8I  Yb dP   `"              dPYb    8I  Yb  8I  Yb 88__dP
+;            Y8   8P  8I  dY Yb  "88             dP__Yb   8I  dY  8I  dY 88"Yb
+; oooooooooo `YbodP' 8888Y"   YboodP oooooooooo dP""""Yb 8888Y"  8888Y"  88  Yb
+
+Load_Small_UDG_Addr_Setup_XY_
          jsr     Save_Obj_Type_X_Y_Color ; 3737: 20 E9 35 
-         jsr     Get_Object_UDG_Address  ; 373A: 20 15 38 
+         jsr     Get_Object_UDG_Addr     ; 373A: 20 15 38 
 
 ; Load Small UDG address from A & Y
 ; L_JSR_($373D)_($27E7) OK
@@ -5241,8 +5330,28 @@ Load_Small_UDG_Addr_Setup_XY_1
 ; ===========================================================
 ; L_JSR_($378A)_($360D) OK
 ; L_JSR_($378A)_($3649) OK
-Set_UDG_RAM_Ptr_Spr_Dimensions
-         jsr     Get_Obj_UDG_Addr_0      ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
+
+
+
+
+
+
+
+
+
+
+; .dP"Y8 888888 888888            88   88 8888b.   dP""b8
+; `Ybo." 88__     88              88   88  8I  Yb dP   `"
+; o.`Y8b 88""     88              Y8   8P  8I  dY Yb  "88
+; 8bodP' 888888   88   oooooooooo `YbodP' 8888Y"   YboodP oooooooooo
+; \
+; 88""Yb    db    8b    d8            88""Yb 888888 88""Yb
+; 88__dP   dPYb   88b  d88            88__dP   88   88__dP
+; 88"Yb   dP__Yb  88YbdP88            88"""    88   88"Yb
+; 88  Yb dP""""Yb 88 YY 88 oooooooooo 88       88   88  Yb
+
+Set_UDG_RAM_Ptr_Spr_Dimen_
+         jsr     Get_Obj_UDG_Addr_       ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
 
 ; Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
 ; L_JSR_($378D)_($27DB) OK
@@ -5251,7 +5360,7 @@ Set_UDG_RAM_Ptr_Spr_Dimensions
 ; L_JSR_($378D)_($2861) OK
 ; L_JMP_($378D)_($2DFC) OK
 ; L_JSR_($378D)_($2FCE) OK
-Set_UDG_RAM_Ptr_Spr_Dimens_
+Set_UDG_RAM_Ptr_Spr_Dimen
          sty     ZP_06                   ; 378D: 84 06    
          tay                             ; 378F: A8       
          dey                             ; 3790: 88       
@@ -5307,8 +5416,30 @@ No_X_Wrap sta    ZP_UDG_RAM_X            ; 37A9: 85 04
          sta     ZP_07                   ; 37D1: 85 07    
          rts                             ; 37D3: 60       
 ; ===========================================================
+
 ; L_BRS_($37D4)_($37F2) OK
-GOUA_1   pha                             ; 37D4: 48       
+
+
+
+
+
+
+
+
+
+
+;  dP""b8 888888 888888             dP"Yb  88""Yb  88888 888888  dP""b8 888888
+; dP   `" 88__     88              dP   Yb 88__dP     88 88__   dP   `"   88
+; Yb  "88 88""     88              Yb   dP 88""Yb o.  88 88""   Yb        88
+;  YboodP 888888   88   oooooooooo  YbodP  88oodP "bodP' 888888  YboodP   88
+; \
+;            88   88 8888b.   dP""b8               db    8888b.  8888b.  88""Yb
+;            88   88  8I  Yb dP   `"              dPYb    8I  Yb  8I  Yb 88__dP
+;            Y8   8P  8I  dY Yb  "88             dP__Yb   8I  dY  8I  dY 88"Yb
+; oooooooooo `YbodP' 8888Y"   YboodP oooooooooo dP""""Yb 8888Y"  8888Y"  88  Yb
+
+Get_Obj_UDG_Addr_1
+         pha                             ; 37D4: 48       
          txa                             ; 37D5: 8A       
          lsr     a                       ; 37D6: 4A       
          and     #$02                    ; 37D7: 29 02    
@@ -5321,10 +5452,10 @@ GOUA_1   pha                             ; 37D4: 48
          asl     a                       ; 37DF: 0A       
          clc                             ; 37E0: 18       
          adc     #$20                    ; 37E1: 69 20    
-         jmp     GOUA_3                  ; 37E3: 4C 07 38 
+         jmp     Get_Obj_UDG_Addr_4      ; 37E3: 4C 07 38 
 ; -----------------------
 ; L_JSR_($37E6)_($378A) OK
-Get_Obj_UDG_Addr_0
+Get_Obj_UDG_Addr_
          lda     ZP_10                   ; 37E6: A5 10    
          and     #%00000110              ; 37E8: 29 06     Zero bits
          tax                             ; 37EA: AA       
@@ -5336,16 +5467,16 @@ Get_Obj_UDG_Addr_0
 ; OutReg: UDG Addr Lo in Y, Hi in A
 ; CALLED ONLY FROM 381C or run into from 37E6
 ; L_JMP_($37ED)_($381C) OK
-Get_Object_UDG_Addr
+Get_Obj_UDG_Addr_2
          tay                             ; 37ED: A8       
          and     #%00111111              ; 37EE: 29 3F     Zero bits 6 & 7
          cmp     #%00000011              ; 37F0: C9 03     Test bits 0 & 1
-         bcs     GOUA_1                  ; 37F2: B0 E0     If A >= M, branch
+         bcs     Get_Obj_UDG_Addr_1      ; 37F2: B0 E0     If A >= M, branch
          tya                             ; 37F4: 98       
 
 ; Test Jetman Looks Left/Right Direction???
          bit     MASK_80                 ; 37F5: 2C 1B 20 
-         beq     GOUA_2                  ; 37F8: F0 06    
+         beq     Get_Obj_UDG_Addr_3      ; 37F8: F0 06    
 
          pha                             ; 37FA: 48       
          txa                             ; 37FB: 8A       
@@ -5355,7 +5486,8 @@ Get_Object_UDG_Addr
 
 ; Subtract 1 and muliply by $10 i.e. left shift 4 bits
 ; L_BRS_($3800)_($37F8) OK
-GOUA_2   sec                             ; 3800: 38       
+Get_Obj_UDG_Addr_3
+         sec                             ; 3800: 38       
          sbc     #$01                    ; 3801: E9 01    
          asl     a                       ; 3803: 0A       
          asl     a                       ; 3804: 0A       
@@ -5364,7 +5496,8 @@ GOUA_2   sec                             ; 3800: 38
 
 ; Set bit in X defined by A, ZP variable being used as temp store
 ; L_JMP_($3807)_($37E3) OK
-GOUA_3   sta     ZP_13                   ; 3807: 85 13    
+Get_Obj_UDG_Addr_4
+         sta     ZP_13                   ; 3807: 85 13    
          txa                             ; 3809: 8A       
          ora     ZP_13                   ; 380A: 05 13    
          tax                             ; 380C: AA       
@@ -5376,18 +5509,38 @@ GOUA_3   sta     ZP_13                   ; 3807: 85 13
          rts                             ; 3814: 60       
 ; ===========================================================
 ; L_JSR_($3815)_($373A) OK
-Get_Object_UDG_Address
+Get_Object_UDG_Addr
          lda     ZP_Save_Obj_Lst_Prms2_Lo ; 3815: A5 18     Saved Object X
          and     #$06                    ; 3817: 29 06    
          tax                             ; 3819: AA       
          lda     ZP_Obj_Type             ; 381A: A5 1A     Saved Object Type
-         jmp     Get_Object_UDG_Addr     ; 381C: 4C ED 37 
+         jmp     Get_Obj_UDG_Addr_2      ; 381C: 4C ED 37 
 
 ; L_JSR_($381F)_($2961) OK
 ; L_JSR_($381F)_($2CC6) OK
 ; L_JSR_($381F)_($2FD4) OK
 ; L_JSR_($381F)_($32FC) OK
 ; L_JSR_($381F)_($335B) OK
+
+
+
+
+
+
+
+
+
+
+; 88   88 88""Yb 8888b.     db    888888 888888
+; 88   88 88__dP  8I  Yb   dPYb     88   88__
+; Y8   8P 88"""   8I  dY  dP__Yb    88   88""
+; `YbodP' 88     8888Y"  dP""""Yb   88   888888 oooooooooo
+; \
+;  dP""b8  dP"Yb  88      dP"Yb  88""Yb            88""Yb    db    8b    d8
+; dP   `" dP   Yb 88     dP   Yb 88__dP            88__dP   dPYb   88b  d88
+; Yb      Yb   dP 88  .o Yb   dP 88"Yb             88"Yb   dP__Yb  88YbdP88
+;  YboodP  YbodP  88ood8  YbodP  88  Yb oooooooooo 88  Yb dP""""Yb 88 YY 88
+
 Update_Color_RAM
          lda     ZP_Save_Obj_Lst_Prms2_Lo ; 381F: A5 18    
          sta     ZP_UDG_RAM_X            ; 3821: 85 04    
@@ -5413,39 +5566,59 @@ Update_Color_RAM
          sta     ZP_0A                   ; 3837: 85 0A    
          inc     ZP_0A                   ; 3839: E6 0A    
 ; L_BRS_($383B)_($385C) OK
-Update_Color_RAM_0
+Update_Color_RAM_1
          ldx     ZP_0A                   ; 383B: A6 0A    
          ldy     #$00                    ; 383D: A0 00    
 
 ; L_BRS_($383F)_($384D) OK
-Update_Color_RAM_1
+Update_Color_RAM_2
          lda     (ZP_Col_RAM_Ptr_Lo),y   ; 383F: B1 0C    
          and     #$07                    ; 3841: 29 07    
          cmp     #$05                    ; 3843: C9 05    
-         beq     Update_Color_RAM_2      ; 3845: F0 04    
+         beq     Update_Color_RAM_3      ; 3845: F0 04    
 
          lda     ZP_Tile_Color           ; 3847: A5 1B    
          sta     (ZP_Col_RAM_Ptr_Lo),y   ; 3849: 91 0C    
 
 ; L_BRS_($384B)_($3845) OK
-Update_Color_RAM_2
+Update_Color_RAM_3
          iny                             ; 384B: C8       
          dex                             ; 384C: CA       
-         bne     Update_Color_RAM_1      ; 384D: D0 F0    
+         bne     Update_Color_RAM_2      ; 384D: D0 F0    
 
          lda     ZP_Col_RAM_Ptr_Lo       ; 384F: A5 0C    
          sec                             ; 3851: 38       
          sbc     #$17                    ; 3852: E9 17    
          cmp     #$17                    ; 3854: C9 17    
-         bcc     Update_Color_RAM_2_RTS  ; 3856: 90 06    
+         bcc     Update_Color_RAM_RTS    ; 3856: 90 06    
          sta     ZP_Col_RAM_Ptr_Lo       ; 3858: 85 0C    
 
          dec     ZP_0B                   ; 385A: C6 0B    
-         bne     Update_Color_RAM_0      ; 385C: D0 DD    
+         bne     Update_Color_RAM_1      ; 385C: D0 DD    
 ; L_BRS_($385E)_($3856) OK
-Update_Color_RAM_2_RTS
+Update_Color_RAM_RTS
          rts                             ; 385E: 60       
 ; ===========================================================
+
+
+
+
+
+
+
+
+
+
+; 88   88 .dP"Y8 888888 88""Yb            8888b.  888888 888888
+; 88   88 `Ybo." 88__   88__dP             8I  Yb 88__   88__
+; Y8   8P o.`Y8b 88""   88"Yb              8I  dY 88""   88""
+; `YbodP' 8bodP' 888888 88  Yb oooooooooo 8888Y"  888888 88     oooooooooo
+; \
+;  dP""b8 88""Yb    db    88""Yb 88  88 88  dP""b8 .dP"Y8
+; dP   `" 88__dP   dPYb   88__dP 88  88 88 dP   `" `Ybo."
+; Yb  "88 88"Yb   dP__Yb  88"""  888888 88 Yb      o.`Y8b
+;  YboodP 88  Yb dP""""Yb 88     88  88 88  YboodP 8bodP'
+
 UDG_Lookup
          fdb     Jetman_Fly_Right_2      ; 385F: BE 3B    
          fdb     Jetman_Fly_Right_3      ; 3861: F1 3B    

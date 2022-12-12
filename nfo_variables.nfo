@@ -107,7 +107,7 @@ label    0388 Obj_Laser_0 ;
 ;        06=Saucer
 ;        07=Ball
 ;        08=Cross
-;        09=Rocket Bottom Module
+ ;        09=Rocket Bottom Module
 ;        0A=Rocket Ascend;
 ;        0B=Rocket Descend
 ;        0C=Flame
