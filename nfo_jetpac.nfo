@@ -1414,7 +1414,7 @@ lcomment 346C Store to ZP_UDG_RAM_X
 lcomment 346D X Y position in pixels
 const    346D
 break    346F
-label    3470 _Flash_Score_
+label    3470 Flash_Score_1
 lcomment 3479 Number of 8-bit wide characters to reverse
 label    347B Invert_UDG_Columns
 lcomment 347B Number of pixel lines to reverse
@@ -1510,7 +1510,7 @@ lcomment 350F to pointer hi-byte.
 const    3512-351C
 label    3512 Color_RAM_Row_Offsets
 comment  351D
-label    351D CONVERT_XY_TO_UDG_RAM_ADDR
+label    351D Convert_XY_to_UDG_RAM_Addr
 lcomment 351D Addr_To = 18 68, as example i.e. X=$18 pixels from left, Y=$68 pixels from top
 lcomment 351F Addr_To = 18 xx, 68 stashed to Y
 comment  3520
@@ -1521,7 +1521,7 @@ lcomment 352B Reset Addr_To hi-byte to 00
 lcomment 352D Addr_To = 21 xx
 comment  352F
 lcomment 352F Rotate left Addr_To by 4 bits
-label    3531 SURP1
+label    3531 Convert_XY_to_UDG_RAM_Addr_1
 lcomment 3536 Addr_To = 1x x2
 comment  3538
 lcomment 3538 Get stashed Y = 68 to A
