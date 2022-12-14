@@ -220,7 +220,7 @@ comment  2195
 ;comment  2195 \            setniseutn
 ;comment  2195 ----------------------------------------------------------
 label    2195 FP0000
-label    219A Fire_Pressed_
+label    219A FIRE_PRESSED_
 lcomment 219A ???????
 lcomment 21A0 Y=$07, laser color addr
 lcomment 21A1 Fetch laser color
@@ -568,7 +568,7 @@ lcomment 260C Object Type becomes offset into Subroutine List
 lcomment 260D Load SR List offset into SR Vec Lo/Hi...
 lcomment 2617 ...and jump to it
 comment  261A
-label    261A Goto_Next_Sprite
+label    261A GOTO_NEXT_SPRITE
 lcomment 261C Test Object Type value
 lcomment 261E If <>00, skip
 comment  2620
@@ -595,14 +595,6 @@ comment  2652
 comment  2652 Test if score flash time is zero, if yes, setup sprites
 label    2652 Inc_Sprite_Ptr_2
 label    2655 Inc_Sprite_Ptr_3
-comment  265E
-comment  265E
-comment  265E
-comment  265E
-comment  265E
-comment  265E
-comment  265E
-comment  265E
 comment  265E
 comment  265E ----------------------------------------------------------
 comment  265E VIA2 timer interrupts used to update Jetman movement
@@ -649,7 +641,7 @@ comment  26B9
 comment  26B9 Probably init sound channels
 label    26C5 Init_Rocket_Obj_Table
 break    26C9
-label    26CD Sound_Loop_Start
+label    26CD SOUND_LOOP_START
 label    26D1 Sound_Loop
 label    26E4 Goto_Next_Sound
 label    2DE8 XXXX_6
@@ -734,7 +726,7 @@ label    283C Ptr_Final_Char_Lo
 lcomment 283C Addr of final char UDG
 label    283D Ptr_Final_Char_Hi
 comment  283E
-label    283E Fire_Pressed
+label    283E FIRE_PRESSED
 lcomment 2841 Remove=Gems all fall through platforms and floor, reentering at top
 ;deflabel 2849 OBJPARAM3_JIGGLE?
 label    2851 FP_1
@@ -788,7 +780,7 @@ label    2927 Store_Object_Type_2
 lcomment 2925 Color code
 comment  292B
 comment  292B Reset Flame object parameters???
-label    2934 Explosions
+label    2934 EXPLOSIONS
 label    294A Explosions_1
 label    2967 Explosion_UDG_Ptr
 word     2967-2974
@@ -847,9 +839,9 @@ comment  2A4F
 comment  2A4F Set Jetman Move Speed to 1
 comment  2A55
 comment  2A55 Object type
-label    2A5F Level_1_Plusses
+label    2A5F LEVEL_1_PLUSSES
 label    2A67 Level_1_Plusses_1
-label    2A6D Level_2_Balls
+label    2A6D LEVEL_2_BALLS
 label    2A75 Level_2_Balls_1
 comment  2A78
 comment  2A78 Read countdown, branch if zero, else decrement
@@ -867,7 +859,7 @@ label    2AA2 Reset_Countdown_Timer
 comment  2AAA
 comment  2AAA Invert diagonal direction up/down, randomly via IRQ
 label    2AB7 Set_Alien_Diagonal_2?
-label    2ABC Level_3_Saucer
+label    2ABC LEVEL_3_SAUCER
 label    2AC4 Level_3_Saucer_1
 comment  2AC7
 label    2ADB Level_3_Saucer_2
@@ -949,7 +941,7 @@ label    2C53 Goto_Next_Obj
 comment  2C5A
 comment  2C5A Decrement object counter, return when all processed
 label    2C5F Test_Laser_Hits
-label    2C6A Level_0_Fuzzball
+label    2C6A LEVEL_0_FUZZBALL
 lcomment 2C6F Remove=1st Level Aliens don't explode on platform/floor impact
 comment  2C78
 comment  2C78 Use current player level to create offset into points table
@@ -1076,7 +1068,7 @@ comment  2DF1
 comment  2DF9
 label    2DFF Dec_Saved_Obj_List_Params_by_10
 comment  2E17 Aliens keep moving also
-label    2E17 Rocket_Ascend
+label    2E17 ROCKET_ASCEND
 lcomment 2E1A Object height offset
 lcomment 2E1C Load object height i.e. Rocket
 lcomment 2E1E Object hit top yet
@@ -1085,7 +1077,7 @@ lcomment 2E23 Calculate new height
 lcomment 2E25 Store new height i.e one pixel up
 label    2E34 Rocket_At_Top
 comment  2E4E Flames stop a little way before bottom
-label    2E4E Rocket_Descend
+label    2E4E ROCKET_DESCEND
 comment  2E5B
 comment  2E5B Move object Y position down 1 pixel, stopping at bottom i.e. $AF
 lcomment 2E5B 03 = Height of object
@@ -1094,7 +1086,7 @@ comment  2E68
 comment  2E68 Set current object type to a crash
 comment  2E74
 comment  2E74 This always seems to be a test for Jetman collide with Rocket
-label    2E74 Rocket_Bottom_Module
+label    2E74 ROCKET_BOTTOM_MODULE
 lcomment 2E77 Jetman collided with rocket?
 lcomment 2E7A Set by collision test
 lcomment 2E7C Collision? If no, branch
@@ -1106,7 +1098,7 @@ deflabel 2E83 FUELLED_UP
 lcomment 2E84 No, branch
 comment  2E86
 comment  2E86 Set Rocket object to Ascend
-deflabel 2E87 ROCKET_ASCEND
+deflabel 2E87 ROCKET_ASCENDING
 comment  2E8F
 comment  2E8F Don't display Jetman next time? Also zeroes Jetman X coord.
 word     2E93
@@ -1137,20 +1129,11 @@ comment  2FBD
 label    2FBD Stops_All_4
 label    2FC3 Stops_All_5
 comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
 comment  2FDA Returns UDG sprite data index to Rocket Middle Section/Fuel depending on level
 label    2FDA Get_Spr_Addr_Rocket_Top_OR_Fuel
 label    2FDC Get_Spr_Addr_Rckt_Top_OR_Fuel_1
 lcomment 2F7F Fuel cell dropped onto rocket ~8 pixels from bottom
-label    2F8E Stops_All
+label    2F8E STOPS_ALL
 lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
 label    2FE5 Get_Object_UDG_Addr_Small
@@ -1203,7 +1186,6 @@ lcomment 3094 ZP_Temp_2
 lcomment 3095 P2 Score in ZP
 word     3095
 comment  309B
-comment  309B NOT AN ENTRY POINT, CALLED FROM 30CB, $30 BYTES DOWN ??????????????
 label    309B PCT_0
 comment  30A1
 lcomment 30A1 Save A
@@ -1317,7 +1299,7 @@ label    325E CLC_ADC_01
 label    3264 CLC_ADC_B8
 label    326A ADC_48
 label    326F TXA_
-label    3273 Update_Jetman
+label    3273 UPDATE_JETMAN
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
 label    3285 Update_Jetman_1
@@ -1345,18 +1327,18 @@ label    332C Set_Obj_List_Ptr_Lo_To_7F
 label    3337 Set_Obj_List_Ptr_Lo_To_80
 label    3342 Add_B8
 label    3348 Add_48
-label    334D Flash_Display_Score
-label    3367 Flash_Display_Score_1
-label    336A Read_Kbd_Jstk
+label    334D READ_CONTROLS
+label    3367 Flash_Display_Score_JMP
+label    336A Read_Controls_1
 lcomment 3370 Remove=Jetman+pickup flies/walks jiggle when standing on a platform
-label    337D Read_Kbd_Jstk_1
-label    338D Read_Kbd_Jstk_2
-label    338F Read_Kbd_Jstk_3
-label    339D Read_Kbd_Jstk_4
-label    339F Read_Kbd_Jstk_5
-label    33AF Read_Kbd_Jstk_6
-label    33BA Read_Kbd_Jstk_7
-label    33C0 Read_Kbd_Jstk_8
+label    337D Read_Controls_2
+label    338D Read_Controls_3
+label    338F Read_Controls_4
+label    339D Read_Controls_5
+label    339F Jetman_Movement_1
+label    33AF Jetman_Movement_2
+label    33BA Jetman_Movement_3
+label    33C0 Jetman_Movement_4
 lcomment 33B3 Test for direction Up
 lcomment 33B5 Yes, branch
 comment  33D4
@@ -1405,7 +1387,7 @@ comment  3455
 lcomment 3455 Save A
 lcomment 3459 Restore A
 comment  345A
-label    345C Read_Keyboard_Joystick_1
+label    345C Read_Keyboard_1
 lcomment 345E Set bits 0-4 and 6-7 i.e. 11x11111
 label    3465 Flash_Score
 lcomment 3467 P1 or P2? Branch if P2
@@ -1431,7 +1413,7 @@ comment  3490
 comment  3490 Move to top row by adding $B0 (#176) pixeln to X postion i.e. one column
 lcomment 348C $B0 = height of screen in pixels i.e. move one column right
 lcomment 3492 Add the carry from the previous $B0 addition for X
-label    3499 Do_RTS
+label    3499 Flash_Score_RTS
 label    349A Load_UDG_RAM_for_P2
 lcomment 349D Store to ZP_UDG_RAM_X
 const    349E
