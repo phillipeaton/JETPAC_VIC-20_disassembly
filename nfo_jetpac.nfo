@@ -29,14 +29,15 @@ lcomment 2012 VIC_RE_Vol_Color
 lcomment 2013 VIC_RF_BckBdrCol
 comment  2014
 comment  2014 Quick lookup for BIT instruction
-label    2014 MASK_01
-label    2015 MASK_02
-label    2016 MASK_04
-label    2017 MASK_08
-label    2018 MASK_10
-label    2019 MASK_20
-label    201A MASK_40
-label    201B MASK_80
+binary   2014-201B
+label    2014 MASK_00000001
+label    2015 MASK_00000010
+label    2016 MASK_00000100
+label    2017 MASK_00001000
+label    2018 MASK_00010000
+label    2019 MASK_00100000
+label    201A MASK_01000000
+label    201B MASK_10000000
 comment  201C
 comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 used     201C NMI_Interrupt_Hardler
@@ -145,21 +146,20 @@ comment  20E9 ARGUMENTS : sentiseutn
 comment  20E9 \            etinseut
 comment  20E9 \            setniseutn
 comment  20E9 ----------------------------------------------------------
-label    20E9 Update_Laser_Shots
+label    20E9 Update_Laser_Objects
 lcomment 20EB Update once every four calls
 comment  20F0
-label    20F0 Laser_Shots
+label    20F0 Update_Laser_Objects_1
 const    20F3
-;deflabel 20F3 ZP_03_04
 lcomment 20F4
 word     20F4
 const    20F6
 comment  20F7
 comment  20F7 Loop through the four possible Laser shots, branch if any are zero I.E. NOT SHOOTING???????
-label    20FB LS_Loop
+label    20FB Update_Laser_Objects_2
 comment  20FF
 comment  20FF Move ZP index address to next 8 bytes i.e. next Laser shot
-label    2110 Laser_Shot
+label    2110 Update_Laser_Object
 lcomment 2110 Get Jetman attrib 00 i.e. fly/no-fly and facing left/right and ???
 lcomment 2112 Store for later
 lcomment 2113 Jetman looking left?
@@ -175,9 +175,9 @@ comment  2122
 lcomment 2122 Restore Jetman attrib 00
 lcomment 2123 Jetman looking left?
 lcomment 2125 No, branch
-label    212f Laser_Shot_
+label    212f Update_Laser_Object_1
 comment  213C
-label    2145 BACK_2145
+label    2145 Update_Laser_Object_2
 comment  214B
 comment  2155
 comment  2155 Load a random laser color using the current 6522 timer value
@@ -200,12 +200,12 @@ label    2173 Laser_Jetman_Facing_Right
 lcomment 2173 Get Jetman attrib 01 i.e. ????????
 lcomment 2175 Zero bits 3-7, any bits 0-2 set?
 lcomment 2177 No, branch
-label    217E Laser_JFR_1
+label    217E Laser_Jetman_Facing_Right_1
 lcomment 217E Zero bit 0
 lcomment 2180 TESING AT EDGE OF SCREEN?
-label    2187 Laser_JFR_1_1
+label    2187 Laser_Jetman_Facing_Right_2
 lcomment 2188 OFFSETTING EDGE OF SCREEN?
-label    218D Laser_JFR_2
+label    218D Laser_Jetman_Facing_Right_3
 lcomment 218D Restore saved Jetman attrib 00
 lcomment 2190 Add $10 for some reason??????????
 comment  2195
@@ -219,8 +219,8 @@ comment  2195
 ;comment  2195 \            etinseut
 ;comment  2195 \            setniseutn
 ;comment  2195 ----------------------------------------------------------
-label    2195 FP0000
-label    219A FIRE_PRESSED_
+label    2195 Fire_Pressed_0
+label    219A DISPLAY_LASERS
 lcomment 219A ???????
 lcomment 21A0 Y=$07, laser color addr
 lcomment 21A1 Fetch laser color
@@ -288,7 +288,6 @@ comment  2248 Update object list parameteters from ZP temp vars
 label    2248 FP8888
 comment  224E
 comment  2254
-comment  2254 This is the exit point from this subroutine
 label    2257 FP9999
 comment  2257 Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
 label    2263 FPAAAA
@@ -301,10 +300,10 @@ lcomment 2280 Iterate to next laser shot
 lcomment 2282 Update object list and exit subroutine
 label    2285 CLC_ADC_08
 label    228B Laser_ZP17_15_to_ZP16_14
-label    2298 Laser_Jetman_Facing_Left???
+label    2298 Laser_Wrap?
 comment  2298 Looks like it's doing some checks on the X coord, e.g. laser wraparound
 lcomment 229B $B8=screen width in pixels
-label    22A1 Laser_JFL
+label    22A1 Laser_Wrap_1?
 lcomment 22A1 Save Y on Stack
 lcomment 22A5 Get object's type/direction byte
 lcomment 22A7 Test Bit 7 is set i.e. towards left
@@ -313,7 +312,7 @@ lcomment 22AC Restore Y from Stack
 comment  22AE
 lcomment 22AF Zero the top 5 bits
 lcomment 22B1 Set bits 7,5,4, now it's 1011 0xxx
-label    22B4 Laser_JFL_1
+label    22B4 Laser_JFL_2
 comment  22B4 Towards right
 lcomment 22B4 Restore Y from Stack
 lcomment 22B7 Zero the top 5 bits
@@ -568,7 +567,7 @@ lcomment 260C Object Type becomes offset into Subroutine List
 lcomment 260D Load SR List offset into SR Vec Lo/Hi...
 lcomment 2617 ...and jump to it
 comment  261A
-label    261A GOTO_NEXT_SPRITE
+label    261A GOTO_NEXT_OBJECT
 lcomment 261C Test Object Type value
 lcomment 261E If <>00, skip
 comment  2620
@@ -749,6 +748,11 @@ label    28B1 Set_Obj_Posn_05_To_03
 label    28B6 Set_Obj_Posn_05_To_01_Or_Other
 label    28C0 Set_Obj_Posn_05_To_01_Or_Oth_1
 label    28C9 Reset_Objects_1_To_8
+comment  28CD
+comment  28CD
+comment  28CD
+comment  28CD
+comment  28CD
 label    28CD Reset_Objects_1_To_8_1
 comment  28D4 Init Jetman, Lasers, Rocket and Aliens
 label    28D4 Init_Most_Objects
@@ -758,6 +762,11 @@ comment  28DE Init all Alien objects
 label    28E0 Loop_28E0
 label    28E7 Save_Obj_List_Ptr
 label    28F0 Restore_Obj_List_Ptr
+comment  28F9
+comment  28F9
+comment  28F9
+comment  28F9
+comment  28F9
 label    28F9 Change_Object_To_Explosion
 comment  28FC
 comment  28FC Reset Alien? object direction
@@ -1114,7 +1123,7 @@ label    2F07 Rocket_Fuelled_Up_5
 comment  2F0D
 comment  2F13
 label    2F16 Rocket_Fuelled_Up_6
-label    2F31 Stops_All_0
+label    2F31 Rocket_Part_Or_Fuel_Drop_Dock
 comment  2F3A
 comment  2F43
 comment  2F4E
@@ -1123,17 +1132,37 @@ comment  2F5F
 label    2F65 Stops_All_1
 comment  2F6A
 label    2F77 Stops_All_2
-comment  2F91
 label    2FB2 Stops_All_3
 comment  2FBD
-label    2FBD Stops_All_4
-label    2FC3 Stops_All_5
+comment  2FBD
+comment  2FBD
+comment  2FBD
+comment  2FBD
+label    2FBD Setup_Sprite_Addr_Rocket_Fuel
+label    2FC3 Setup_Sprite_Addr
 comment  2FDA
 comment  2FDA Returns UDG sprite data index to Rocket Middle Section/Fuel depending on level
 label    2FDA Get_Spr_Addr_Rocket_Top_OR_Fuel
 label    2FDC Get_Spr_Addr_Rckt_Top_OR_Fuel_1
 lcomment 2F7F Fuel cell dropped onto rocket ~8 pixels from bottom
-label    2F8E STOPS_ALL
+comment  2F8E On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
+comment  2F8E On game startup 03B8+04=00, 03C0+4=01
+comment  2F8E Pickup  middle section 03B8+04=00, 03C0+4=03
+comment  2F8E Falling middle section 03B8+04=00, 03C0+4=07
+comment  2F8E Docked  middle section 03B8+04=01, 03C0+4=07
+comment  2F8E 03C0 turns into a 0E_Valuable, 03B8 goes round the same cycle as 03C0
+comment  2F8E 03B8 becomes a fuel cell
+comment  2F8E When middle rocket section deposited, only 03B8 checked, despite dropped valuable
+comment  2F8E When top rocket section lifted, still only 03B8 checked, despite dropped valuable
+comment  2F8E When top rocket section deposited and fuel dropped, still only 03B8 checked
+comment  2F8E When fuel picked-up and dropping onto rocket, still 03B8 checked.
+comment  2F8E When fuel drops into rocket, for a short time, no interrupt until next fuel cell drops 03B8
+label    2F8E ROCKET_PART_OR_FUEL
+comment  2F91
+comment  2F91 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Docked
+deflabel 2F92 LIFECYCLE_STATE
+comment  2FA4
+comment  2FA7
 lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
 label    2FE5 Get_Object_UDG_Addr_Small
@@ -1150,7 +1179,7 @@ lcomment 3005 Flame sprite X pos??
 lcomment 300A Flame sprite direction?
 lcomment 3012 Store current Jetman sprite X pos into current object?
 lcomment 3019 Store current Jetman sprite Y pos into current object?
-label    301E Copy_Jetman_XY_To_Sprite
+label    301E Copy_Jetman_XY_To_Object
 comment  3028
 comment  302F
 label    303E Copy_Jetman_XY_To_Sprite_0

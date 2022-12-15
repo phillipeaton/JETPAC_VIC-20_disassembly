@@ -12,138 +12,139 @@
 ; Used Labels
 ;****************************************************
 
-ZP_Obj_List_Ptr_Lo      equ     $0000
-ZP_Obj_List_Ptr_Hi      equ     $0001
-ZP_02                   equ     $0002
-ZP_03                   equ     $0003
-ZP_UDG_RAM_X            equ     $0004
-ZP_UDG_RAM_Y            equ     $0005
-ZP_06                   equ     $0006
-ZP_07                   equ     $0007
-ZP_08                   equ     $0008
-ZP_09                   equ     $0009
-ZP_0A                   equ     $000A
-ZP_0B                   equ     $000B
-ZP_Col_RAM_Ptr_Lo       equ     $000C
-ZP_Col_RAM_Ptr_Hi       equ     $000D
-ZP_Ptr_To_Str_Lo        equ     $000E
-ZP_Ptr_To_Str_Hi        equ     $000F
-ZP_10                   equ     $0010
-ZP_11                   equ     $0011
-ZP_12                   equ     $0012
-ZP_13                   equ     $0013
-ZP_14_Spr_Width_Pix     equ     $0014
-ZP_15                   equ     $0015
-ZP_16                   equ     $0016
-ZP_17                   equ     $0017
-ZP_Save_Obj_Lst_Prms2_Lo equ    $0018
-ZP_Save_Obj_Lst_Prms2_Hi equ    $0019
-ZP_Obj_Type             equ     $001A
-ZP_Tile_Color           equ     $001B
-ZP_Jetman_Movement      equ     $001C
-ZP_Ship_UDG_Addr_Offset equ     $001E
-ZP_Ship_UDG_Addr_Color? equ     $001F
-ZP_HW_IRQ_1_OR_0        equ     $0020
-ZP_HW_IRQ_Count         equ     $0021
-ZP_Save_Obj_List_Ptr_Lo equ     $0022
-ZP_Save_Obj_List_Ptr_Hi equ     $0023
-ZP_Save_Obj_List_Ptr_Lo2 equ    $0024
-ZP_Save_Obj_List_Ptr_Hi2 equ    $0025
-ZP_Rocket_Flame_On      equ     $0026
-ZP_Rocket_Flame_Toggle  equ     $0027
-ZP_Player_Object_Stash  equ     $0028
-ZP_Param_Addr_Lo        equ     $0040
-ZP_Param_Addr_Hi        equ     $0041
-ZP_Game_Sel_F1_Flash    equ     $0045
-ZP_HW_IRQ_Count1        equ     $004A
-ZP_HW_IRQ_Count2        equ     $004B
-ZP_HW_IRQ_Count3        equ     $004C
-ZP_Score_P1             equ     $0051
-ZP_Score_P2             equ     $0054
-ZP_Invert               equ     $0057
-ZP_Flash_Counter        equ     $0058
-ZP_Level_Current_Plyr   equ     $0059
-ZP_Num_Lives_P1         equ     $005A
-ZP_Level_Other_Plyr     equ     $005B
-ZP_Num_Lives_P2         equ     $005C
-ZP_Flash_Score_Countdown equ    $005D
-ZP_P1_Or_P2             equ     $005E
-ZP_Subroutine_Vec_Lo    equ     $005F
-ZP_Subroutine_Vec_Hi    equ     $0060
-Screen_RAM              equ     $0200
-Hardware_IRQ_Lo         equ     $0314
-Hardware_IRQ_Hi         equ     $0315
-NMI_Int_Vector_Lo       equ     $0318
-NMI_Int_Vector_Hi       equ     $0319
-Obj_Jetman              equ     $0380
-Obj_Jetman_X            equ     $0381
-Obj_Jetman_Y            equ     $0383
-Obj_Laser_0             equ     $0388
-Obj_Flame               equ     $03A8
-Obj_Flame_1             equ     $03A9
-Obj_Flame_2             equ     $03AA
-Obj_Flame_3             equ     $03AB
-Obj_Flame_4             equ     $03AC
-Obj_Flame_5             equ     $03AD
-Obj_Flame_6             equ     $03AE
-Obj_Rocket              equ     $03B0
-Obj_Rocket_X            equ     $03B1
-Obj_Rocket_Fuel_Lvl     equ     $03B2
-Obj_Rocket_Y            equ     $03B3
-Obj_Rocket_Diag?        equ     $03B4
-Obj_RTS_Fuel_Type       equ     $03B8
-Obj_RTS_Fuel_Horiz      equ     $03B9
-Obj_RTS_Fuel_Diagon     equ     $03BC
-Obj_RMS_Gem_Type        equ     $03C0
-Obj_RMS_Gem_Horiz       equ     $03C1
-Obj_RMS_Gem_Diagon      equ     $03C4
-Obj_RMS_Gem_6           equ     $03C6
-Obj_Alien_0_0           equ     $03C8
-UDG_RAM                 equ     $1000
-Display_P1_Score_Posn   equ     $1008
-Display_P1_Lives_Posn   equ     $1420
-Display_Hi_Score_Posn   equ     $1588
-Display_P2_Lives_Posn   equ     $19A0
-Display_P2_Score_Posn   equ     $1B08
-Score_Hi                equ     $1FD0
-Game_Settings           equ     $1FD3
-VIC_R0_H_Ctr            equ     $9000
-VIC_R4_TV_Raster        equ     $9004
-VIC_RA_Frq_Osc1         equ     $900A
-VIC_RB_Frq_Osc2         equ     $900B
-VIC_RC_Frq_Osc3         equ     $900C
-VIC_RE_Vol_Color        equ     $900E
-VIA1_Port_B             equ     $9110
-VIA1_Port_A             equ     $9111
-VIA1_DDR_A              equ     $9113
-VIA1_Int_Enable         equ     $911E
-VIA2_Port_B             equ     $9120
-VIA2_Port_A             equ     $9121
-VIA2_DDR_B              equ     $9122
-VIA2_DDR_A              equ     $9123
-VIA2_T1_Cnt_Lo          equ     $9124
-VIA2_T1_Cnt_Hi          equ     $9125
-VIA2_Int_Enable         equ     $912E
-Color_RAM               equ     $9600
+ZP_Obj_List_Ptr_Lo              equ     $0000
+ZP_Obj_List_Ptr_Hi              equ     $0001
+ZP_02                           equ     $0002
+ZP_03                           equ     $0003
+ZP_UDG_RAM_X                    equ     $0004
+ZP_UDG_RAM_Y                    equ     $0005
+ZP_06                           equ     $0006
+ZP_07                           equ     $0007
+ZP_08                           equ     $0008
+ZP_09                           equ     $0009
+ZP_0A                           equ     $000A
+ZP_0B                           equ     $000B
+ZP_Col_RAM_Ptr_Lo               equ     $000C
+ZP_Col_RAM_Ptr_Hi               equ     $000D
+ZP_Ptr_To_Str_Lo                equ     $000E
+ZP_Ptr_To_Str_Hi                equ     $000F
+ZP_Saved_Obj_X                  equ     $0010
+ZP_Saved_Obj_Y                  equ     $0011
+ZP_Saved_Obj_Type               equ     $0012
+ZP_13                           equ     $0013
+ZP_14_Spr_Width_Pix             equ     $0014
+ZP_15                           equ     $0015
+ZP_16                           equ     $0016
+ZP_17                           equ     $0017
+ZP_Save_Obj_Lst_Prms2_Lo        equ     $0018
+ZP_Save_Obj_Lst_Prms2_Hi        equ     $0019
+ZP_Obj_Type                     equ     $001A
+ZP_Tile_Color                   equ     $001B
+ZP_Jetman_Movement              equ     $001C
+ZP_Ship_UDG_Addr_Offset         equ     $001E
+ZP_Ship_UDG_Addr_Color?         equ     $001F
+ZP_HW_IRQ_1_OR_0                equ     $0020
+ZP_HW_IRQ_Count                 equ     $0021
+ZP_Save_Obj_List_Ptr_Lo         equ     $0022
+ZP_Save_Obj_List_Ptr_Hi         equ     $0023
+ZP_Save_Obj_List_Ptr_Lo2        equ     $0024
+ZP_Save_Obj_List_Ptr_Hi2        equ     $0025
+ZP_Rocket_Flame_On              equ     $0026
+ZP_Rocket_Flame_Toggle          equ     $0027
+ZP_Player_Object_Stash          equ     $0028
+ZP_Param_Addr_Lo                equ     $0040
+ZP_Param_Addr_Hi                equ     $0041
+ZP_Game_Sel_F1_Flash            equ     $0045
+ZP_HW_IRQ_Count1                equ     $004A
+ZP_HW_IRQ_Count2                equ     $004B
+ZP_HW_IRQ_Count3                equ     $004C
+ZP_Score_P1                     equ     $0051
+ZP_Score_P2                     equ     $0054
+ZP_Invert                       equ     $0057
+ZP_Flash_Counter                equ     $0058
+ZP_Level_Current_Plyr           equ     $0059
+ZP_Num_Lives_P1                 equ     $005A
+ZP_Level_Other_Plyr             equ     $005B
+ZP_Num_Lives_P2                 equ     $005C
+ZP_Flash_Score_Countdown        equ     $005D
+ZP_P1_Or_P2                     equ     $005E
+ZP_Subroutine_Vec_Lo            equ     $005F
+ZP_Subroutine_Vec_Hi            equ     $0060
+Screen_RAM                      equ     $0200
+Hardware_IRQ_Lo                 equ     $0314
+Hardware_IRQ_Hi                 equ     $0315
+NMI_Int_Vector_Lo               equ     $0318
+NMI_Int_Vector_Hi               equ     $0319
+Obj_Jetman                      equ     $0380
+Obj_Jetman_X                    equ     $0381
+Obj_Jetman_Y                    equ     $0383
+Obj_Laser_0                     equ     $0388
+Obj_Flame                       equ     $03A8
+Obj_Flame_1                     equ     $03A9
+Obj_Flame_2                     equ     $03AA
+Obj_Flame_3                     equ     $03AB
+Obj_Flame_4                     equ     $03AC
+Obj_Flame_5                     equ     $03AD
+Obj_Flame_6                     equ     $03AE
+Obj_Rocket                      equ     $03B0
+Obj_Rocket_X                    equ     $03B1
+Obj_Rocket_Fuel_Lvl             equ     $03B2
+Obj_Rocket_Y                    equ     $03B3
+Obj_Rocket_Direction?           equ     $03B4
+Obj_RTS_Fuel_Type               equ     $03B8
+Obj_rTS_Fuel_X                  equ     $03B9
+Obj_RTS_Status                  equ     $03BC
+Obj_RMS_Gem_Type                equ     $03C0
+Obj_RMS_Gem_X                   equ     $03C1
+Obj_RMS_Status                  equ     $03C4
+Obj_RMS_Gem_6                   equ     $03C6
+Obj_Alien_0_0                   equ     $03C8
+UDG_RAM                         equ     $1000
+Display_P1_Score_Posn           equ     $1008
+Display_P1_Lives_Posn           equ     $1420
+Display_Hi_Score_Posn           equ     $1588
+Display_P2_Lives_Posn           equ     $19A0
+Display_P2_Score_Posn           equ     $1B08
+Score_Hi                        equ     $1FD0
+Game_Settings                   equ     $1FD3
+VIC_R0_H_Ctr                    equ     $9000
+VIC_R4_TV_Raster                equ     $9004
+VIC_RA_Frq_Osc1                 equ     $900A
+VIC_RB_Frq_Osc2                 equ     $900B
+VIC_RC_Frq_Osc3                 equ     $900C
+VIC_RE_Vol_Color                equ     $900E
+VIA1_Port_B                     equ     $9110
+VIA1_Port_A                     equ     $9111
+VIA1_DDR_A                      equ     $9113
+VIA1_Int_Enable                 equ     $911E
+VIA2_Port_B                     equ     $9120
+VIA2_Port_A                     equ     $9121
+VIA2_DDR_B                      equ     $9122
+VIA2_DDR_A                      equ     $9123
+VIA2_T1_Cnt_Lo                  equ     $9124
+VIA2_T1_Cnt_Hi                  equ     $9125
+VIA2_Int_Enable                 equ     $912E
+Color_RAM                       equ     $9600
 
 ;****************************************************
 ; Used Definitions
 ;****************************************************
 
-SCREEN_WIDTH_PIXELS     equ     $B8
-GREEN                   equ     $05
-ROCKET_ASCENDING        equ     $0A
-FUELLED_UP              equ     $06
-JETMAN_STANDING         equ     $02
-JETMAN_FLYING           equ     $01
-YELLOW                  equ     $07
-CYAN                    equ     $03
-BLUE                    equ     $06
-PURPLE                  equ     $04
-RED                     equ     $02
-WHITE                   equ     $01
-ROWS                    equ     $0B
-COLUMNS                 equ     $17
+SCREEN_WIDTH_PIXELS             equ     $B8
+GREEN                           equ     $05
+LIFECYCLE_STATE                 equ     $04
+ROCKET_ASCENDING                equ     $0A
+FUELLED_UP                      equ     $06
+JETMAN_STANDING                 equ     $02
+JETMAN_FLYING                   equ     $01
+YELLOW                          equ     $07
+CYAN                            equ     $03
+BLUE                            equ     $06
+PURPLE                          equ     $04
+RED                             equ     $02
+WHITE                           equ     $01
+ROWS                            equ     $0B
+COLUMNS                         equ     $17
 
 ;****************************************************
 ; Program's Code Areas
@@ -174,22 +175,22 @@ VIC_Init_Tab
   fcb     $08                             ; 2013: 08        VIC_RF_BckBdrCol
 
 ; Quick lookup for BIT instruction
-MASK_01
-  fcb     $01                             ; 2014: 01       
-MASK_02
-  fcb     $02                             ; 2015: 02       
-MASK_04
-  fcb     $04                             ; 2016: 04       
-MASK_08
-  fcb     $08                             ; 2017: 08       
-MASK_10
-  fcb     $10                             ; 2018: 10       
-MASK_20
-  fcb     $20                             ; 2019: 20       
-MASK_40
-  fcb     $40                             ; 201A: 40       
-MASK_80
-  fcb     $80                             ; 201B: 80       
+MASK_00000001
+  fcb     %00000001                       ; 2014: 01       
+MASK_00000010
+  fcb     %00000010                       ; 2015: 02       
+MASK_00000100
+  fcb     %00000100                       ; 2016: 04       
+MASK_00001000
+  fcb     %00001000                       ; 2017: 08       
+MASK_00010000
+  fcb     %00010000                       ; 2018: 10       
+MASK_00100000
+  fcb     %00100000                       ; 2019: 20       
+MASK_01000000
+  fcb     %01000000                       ; 201A: 40       
+MASK_10000000
+  fcb     %10000000                       ; 201B: 80       
 
 ; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 NMI_Interrupt_Hardler
@@ -302,6 +303,21 @@ RGS_Flash
 ; ----------------------------------------------------------
 ; Game Select Loop
 ; ----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+;  dP""b8    db    8b    d8 888888            .dP"Y8 888888 88     888888  dP""b8 888888
+; dP   `"   dPYb   88b  d88 88__              `Ybo." 88__   88     88__   dP   `"   88
+; Yb  "88  dP__Yb  88YbdP88 88""              o.`Y8b 88""   88  .o 88""   Yb        88
+;  YboodP dP""""Yb 88 YY 88 888888 oooooooooo 8bodP' 888888 88ood8 888888  YboodP   88
+
 ; L_BRS_($208F)_($20E1) OK
 Game_Select
   inc     ZP_Flash_Counter                ; 208F: E6 58    
@@ -376,16 +392,41 @@ Test_Space
 ;             etinseut
 ;             setniseutn
 ; ----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+; 88   88 88""Yb 8888b.     db    888888 888888
+; 88   88 88__dP  8I  Yb   dPYb     88   88__
+; Y8   8P 88"""   8I  dY  dP__Yb    88   88""
+; `YbodP' 88     8888Y"  dP""""Yb   88   888888 oooooooooo
+; \
+; 88        db    .dP"Y8 888888 88""Yb
+; 88       dPYb   `Ybo." 88__   88__dP
+; 88  .o  dP__Yb  o.`Y8b 88""   88"Yb
+; 88ood8 dP""""Yb 8bodP' 888888 88  Yb oooooooooo
+; \
+;  dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
+; dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
+; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
+;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
+
 ; L_JSR_($20E9)_($3306) OK
-Update_Laser_Shots
+Update_Laser_Objects
   lda     ZP_HW_IRQ_Count1                ; 20E9: A5 4A    
   and     #$03                            ; 20EB: 29 03     Update once every four calls
-  beq     Laser_Shots                     ; 20ED: F0 01    
+  beq     Update_Laser_Objects_1          ; 20ED: F0 01    
   rts                                     ; 20EF: 60       
 ; ===========================================================
 
 ; L_BRS_($20F0)_($20ED) OK
-Laser_Shots
+Update_Laser_Objects_1
   jsr     Load_ZP_Parameters              ; 20F0: 20 9D 25 
   fcb     $06                             ; 20F3: 06       
   fdb     Obj_Laser_0                     ; 20F4: 88 03    
@@ -395,9 +436,9 @@ Laser_Shots
   ldx     #$04                            ; 20F7: A2 04    
   ldy     #$00                            ; 20F9: A0 00    
 ; L_BRS_($20FB)_($210D) OK
-LS_Loop
+Update_Laser_Objects_2
   lda     (ZP_06),y                       ; 20FB: B1 06    
-  beq     Laser_Shot                      ; 20FD: F0 11    
+  beq     Update_Laser_Object             ; 20FD: F0 11    
 
 ; Move ZP index address to next 8 bytes i.e. next Laser shot
   lda     ZP_06                           ; 20FF: A5 06    
@@ -408,11 +449,11 @@ LS_Loop
   adc     #$00                            ; 2108: 69 00    
   sta     ZP_07                           ; 210A: 85 07    
   dex                                     ; 210C: CA       
-  bne     LS_Loop                         ; 210D: D0 EC    
+  bne     Update_Laser_Objects_2          ; 210D: D0 EC    
   rts                                     ; 210F: 60       
 ; ===========================================================
 ; L_BRS_($2110)_($20FD) OK
-Laser_Shot
+Update_Laser_Object
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2110: B1 00     Get Jetman attrib 00 i.e. fly/no-fly and facing left/right and ???
   tax                                     ; 2112: AA        Store for later
   and     #$80                            ; 2113: 29 80     Jetman looking left?
@@ -431,10 +472,10 @@ Laser_Shot
   lda     ZP_08                           ; 2127: A5 08    
   sec                                     ; 2129: 38       
   sbc     #$08                            ; 212A: E9 08    
-  jsr     Laser_Jetman_Facing_Left???     ; 212C: 20 98 22 
+  jsr     Laser_Wrap?                     ; 212C: 20 98 22 
 ; L_JMP_($212F)_($2184) OK
 ; L_JMP_($212F)_($218A) OK
-Laser_Shot_
+Update_Laser_Object_1
   sta     ZP_08                           ; 212F: 85 08    
   iny                                     ; 2131: C8       
   iny                                     ; 2132: C8       
@@ -451,11 +492,11 @@ Laser_Shot_
   sta     (ZP_06),y                       ; 2141: 91 06    
   and     #$FB                            ; 2143: 29 FB    
 ; L_BRS_($2145)_($2149) OK
-BACK_2145
+Update_Laser_Object_2
   iny                                     ; 2145: C8       
   sta     (ZP_06),y                       ; 2146: 91 06    
   dex                                     ; 2148: CA       
-  bne     BACK_2145                       ; 2149: D0 FA    
+  bne     Update_Laser_Object_2           ; 2149: D0 FA    
 
   iny                                     ; 214B: C8       
   lda     ZP_HW_IRQ_Count3                ; 214C: A5 4C    
@@ -488,59 +529,59 @@ Laser_Color_Table
 Laser_Jetman_Facing_Right
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2173: B1 00     Get Jetman attrib 01 i.e. ????????
   and     #$07                            ; 2175: 29 07     Zero bits 3-7, any bits 0-2 set?
-  beq     Laser_JFR_2                     ; 2177: F0 14     No, branch
+  beq     Laser_Jetman_Facing_Right_3     ; 2177: F0 14     No, branch
   lda     ZP_08                           ; 2179: A5 08    
   clc                                     ; 217B: 18       
   adc     #$18                            ; 217C: 69 18    
 ; L_JMP_($217E)_($2192) OK
-Laser_JFR_1
+Laser_Jetman_Facing_Right_1
   and     #$FE                            ; 217E: 29 FE     Zero bit 0
   cmp     #$B8                            ; 2180: C9 B8     TESING AT EDGE OF SCREEN?
-  bcs     Laser_JFR_1_1                   ; 2182: B0 03    
-  jmp     Laser_Shot_                     ; 2184: 4C 2F 21 
+  bcs     Laser_Jetman_Facing_Right_2     ; 2182: B0 03    
+  jmp     Update_Laser_Object_1           ; 2184: 4C 2F 21 
 ; -----------------------
 ; L_BRS_($2187)_($2182) OK
-Laser_JFR_1_1
+Laser_Jetman_Facing_Right_2
   sec                                     ; 2187: 38       
   sbc     #$B8                            ; 2188: E9 B8     OFFSETTING EDGE OF SCREEN?
-  jmp     Laser_Shot_                     ; 218A: 4C 2F 21 
+  jmp     Update_Laser_Object_1           ; 218A: 4C 2F 21 
 ; -----------------------
 ; L_BRS_($218D)_($2177) OK
-Laser_JFR_2
+Laser_Jetman_Facing_Right_3
   lda     ZP_08                           ; 218D: A5 08     Restore saved Jetman attrib 00
   clc                                     ; 218F: 18       
   adc     #$10                            ; 2190: 69 10     Add $10 for some reason??????????
-  jmp     Laser_JFR_1                     ; 2192: 4C 7E 21 
+  jmp     Laser_Jetman_Facing_Right_1     ; 2192: 4C 7E 21 
 ; -----------------------
 
+
+
+
+
+
+
+
+
+
+
+; #####################################################################################
+; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
+;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
+;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
+; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP    oooooooooo
+; \
+; 88        db    .dP"Y8 888888 88""Yb .dP"Y8
+; 88       dPYb   `Ybo." 88__   88__dP `Ybo."
+; 88  .o  dP__Yb  o.`Y8b 88""   88"Yb  o.`Y8b
+; 88ood8 dP""""Yb 8bodP' 888888 88  Yb 8bodP'
+; #####################################################################################
+
 ; L_BRS_($2195)_($21C7) OK
-FP0000
+Fire_Pressed_0
   adc     #$08                            ; 2195: 69 08    
   jmp     FP1111                          ; 2197: 4C CB 21 
 ; -----------------------
-
-
-
-
-
-
-
-
-
-
-; #####################################################################################
-; 888888 88 88""Yb 888888
-; 88__   88 88__dP 88__
-; 88""   88 88"Yb  88""
-; 88     88 88  Yb 888888 oooooooooo
-; \
-; 88""Yb 88""Yb 888888 .dP"Y8 .dP"Y8 888888 8888b.
-; 88__dP 88__dP 88__   `Ybo." `Ybo." 88__    8I  Yb
-; 88"""  88"Yb  88""   o.`Y8b o.`Y8b 88""    8I  dY
-; 88     88  Yb 888888 8bodP' 8bodP' 888888 8888Y"  oooooooooo
-; #####################################################################################
-
-FIRE_PRESSED_
+DISPLAY_LASERS
   ldy     #$06                            ; 219A: A0 06     ???????
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 219C: B1 00    
   sta     ZP_07                           ; 219E: 85 07    
@@ -560,21 +601,21 @@ FIRE_PRESSED_
 
 ; Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
   lda     ZP_06                           ; 21B4: A5 06    
-  bit     MASK_04                         ; 21B6: 2C 16 20 
+  bit     MASK_00000100                   ; 21B6: 2C 16 20 
   beq     FP5555                          ; 21B9: F0 47    
   jsr     Setup_Color_RAM_Ptr             ; 21BB: 20 F7 34 
   jsr     Convert_XY_to_UDG_RAM_Addr      ; 21BE: 20 1D 35 
 
 ; Test if X-coord of laser is on a boundary and wrap if necessary ######## NEEDS CONFIRM
   lda     ZP_06                           ; 21C1: A5 06    
-  bit     MASK_01                         ; 21C3: 2C 14 20 
+  bit     MASK_00000001                   ; 21C3: 2C 14 20 
   clc                                     ; 21C6: 18       
-  beq     FP0000                          ; 21C7: F0 CC    
+  beq     Fire_Pressed_0                  ; 21C7: F0 CC    
   adc     #$F8                            ; 21C9: 69 F8    
 
 ; L_JMP_($21CB)_($2197) OK
 FP1111
-  jsr     Laser_Jetman_Facing_Left???     ; 21CB: 20 98 22 
+  jsr     Laser_Wrap?                     ; 21CB: 20 98 22 
   tax                                     ; 21CE: AA        Save A
   ldy     #$01                            ; 21CF: A0 01    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 21D1: B1 00     Get Y Coord
@@ -648,14 +689,14 @@ FP6666
   lda     #$00                            ; 2221: A9 00    
   tay                                     ; 2223: A8       
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2224: 91 00    
-  jmp     GOTO_NEXT_SPRITE                ; 2226: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2226: 4C 1A 26 
 ; -----------------------
 
 ; Process laser shot, update parameters in object table
 ; L_BRS_($2229)_($2218) OK
 FP7777
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2229: B1 00     Get one of the four laser object paramenters
-  bit     MASK_04                         ; 222B: 2C 16 20 
+  bit     MASK_00000100                   ; 222B: 2C 16 20 
   bne     FP9999                          ; 222E: D0 27    
   dec     ZP_07                           ; 2230: C6 07    
   lda     ZP_07                           ; 2232: A5 07    
@@ -682,21 +723,20 @@ FP8888
   lda     ZP_06                           ; 2250: A5 06    
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2252: 91 00    
 
-; This is the exit point from this subroutine
-  jmp     GOTO_NEXT_SPRITE                ; 2254: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2254: 4C 1A 26 
 ; -----------------------
 ; Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
 ; L_BRS_($2257)_($222E) OK
 FP9999
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2257: B1 00    
   sta     ZP_UDG_RAM_X                    ; 2259: 85 04    
-  bit     MASK_01                         ; 225B: 2C 14 20 
+  bit     MASK_00000001                   ; 225B: 2C 14 20 
   beq     CLC_ADC_08                      ; 225E: F0 25    
   clc                                     ; 2260: 18       
   adc     #$F8                            ; 2261: 69 F8    
 ; L_JMP_($2263)_($2288) OK
 FPAAAA
-  jsr     Laser_Jetman_Facing_Left???     ; 2263: 20 98 22 
+  jsr     Laser_Wrap?                     ; 2263: 20 98 22 
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2266: 91 00    
   lda     ZP_13                           ; 2268: A5 13    
   sta     ZP_UDG_RAM_Y                    ; 226A: 85 05    
@@ -738,22 +778,22 @@ Laser_ZP17_15_to_ZP16_14
 ; L_JSR_($2298)_($212C) OK
 ; L_JSR_($2298)_($21CB) OK
 ; L_JSR_($2298)_($2263) OK
-Laser_Jetman_Facing_Left???
+Laser_Wrap?
   pha                                     ; 2298: 48       
   and     #$F8                            ; 2299: 29 F8    
   cmp     #$B8                            ; 229B: C9 B8     $B8=screen width in pixels
-  bcs     Laser_JFL                       ; 229D: B0 02    
+  bcs     Laser_Wrap_1?                   ; 229D: B0 02    
   pla                                     ; 229F: 68       
   rts                                     ; 22A0: 60       
 ; ===========================================================
 ; L_BRS_($22A1)_($229D) OK
-Laser_JFL
+Laser_Wrap_1?
   tya                                     ; 22A1: 98        Save Y on Stack
   pha                                     ; 22A2: 48       
   ldy     #$00                            ; 22A3: A0 00    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 22A5: B1 00     Get object's type/direction byte
-  bit     MASK_80                         ; 22A7: 2C 1B 20  Test Bit 7 is set i.e. towards left
-  beq     Laser_JFL_1                     ; 22AA: F0 08     No, branch
+  bit     MASK_10000000                   ; 22A7: 2C 1B 20  Test Bit 7 is set i.e. towards left
+  beq     Laser_JFL_2                     ; 22AA: F0 08     No, branch
   pla                                     ; 22AC: 68        Restore Y from Stack
   tay                                     ; 22AD: A8       
 
@@ -764,7 +804,7 @@ Laser_JFL
 ; ===========================================================
 ; Towards right
 ; L_BRS_($22B4)_($22AA) OK
-Laser_JFL_1
+Laser_JFL_2
   pla                                     ; 22B4: 68        Restore Y from Stack
   tay                                     ; 22B5: A8       
 
@@ -772,6 +812,33 @@ Laser_JFL_1
   and     #$07                            ; 22B7: 29 07     Zero the top 5 bits
   rts                                     ; 22B9: 60       
 ; ===========================================================
+
+
+
+
+
+
+
+
+
+
+; #####################################################################################
+; 88""Yb 888888 .dP"Y8 888888 888888            88     888888 Yb    dP 888888 88
+; 88__dP 88__   `Ybo." 88__     88              88     88__    Yb  dP  88__   88
+; 88"Yb  88""   o.`Y8b 88""     88              88  .o 88""     YbdP   88""   88  .o
+; 88  Yb 888888 8bodP' 888888   88   oooooooooo 88ood8 888888    YP    888888 88ood8
+; \
+;               db    8888b.  8888b.             888888 Yb  dP 888888 88""Yb    db
+;              dPYb    8I  Yb  8I  Yb            88__    YbdP    88   88__dP   dPYb
+;             dP__Yb   8I  dY  8I  dY            88""    dPYb    88   88"Yb   dP__Yb
+; oooooooooo dP""""Yb 8888Y"  8888Y"  oooooooooo 888888 dP  Yb   88   88  Yb dP""""Yb oooooooooo
+; \
+; 88     88 888888 888888
+; 88     88 88__   88__
+; 88  .o 88 88""   88""
+; 88ood8 88 88     888888
+; #####################################################################################
+
 ; L_JSR_($22BA)_($25DA) OK
 ; L_JSR_($22BA)_($2E44) OK
 Reset_Level_Add_Extra_Life
@@ -1473,12 +1540,12 @@ Main_Loop
 ;  dP""b8  dP"Yb  888888  dP"Yb             88b 88 888888 Yb  dP 888888
 ; dP   `" dP   Yb   88   dP   Yb            88Yb88 88__    YbdP    88
 ; Yb  "88 Yb   dP   88   Yb   dP            88 Y88 88""    dPYb    88
-;  YboodP  YbodP    88    YbodP  oooooooooo 88  Y8 888888 dP  Yb   88
+;  YboodP  YbodP    88    YbodP  oooooooooo 88  Y8 888888 dP  Yb   88   oooooooooo
 ; \
-;            .dP"Y8 88""Yb 88""Yb 88 888888 888888
-;            `Ybo." 88__dP 88__dP 88   88   88__
-;            o.`Y8b 88"""  88"Yb  88   88   88""
-; oooooooooo 8bodP' 88     88  Yb 88   88   888888
+;  dP"Yb  88""Yb  88888 888888  dP""b8 888888
+; dP   Yb 88__dP     88 88__   dP   `"   88
+; Yb   dP 88""Yb o.  88 88""   Yb        88
+;  YbodP  88oodP "bodP' 888888  YboodP   88
 ; #####################################################################################
 
 ; L_JMP_($261A)_($2226) OK
@@ -1497,7 +1564,7 @@ Main_Loop
 ; L_JMP_($261A)_($2FD7) OK
 ; L_JMP_($261A)_($3309) OK
 ; L_JMP_($261A)_($3367) OK
-GOTO_NEXT_SPRITE
+GOTO_NEXT_OBJECT
   ldy     #$00                            ; 261A: A0 00    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 261C: B1 00     Test Object Type value
   bne     Inc_Sprite_Ptr_1                ; 261E: D0 10     If <>00, skip
@@ -1643,11 +1710,11 @@ Restore_Obj_Ptr_CLI
 ; oooooooooo 88ood8 88 8bodP'   88
 
 Subroutine_List
-  fdb     GOTO_NEXT_SPRITE                ; 268C: 1A 26     00
+  fdb     GOTO_NEXT_OBJECT                ; 268C: 1A 26     00
   fdb     UPDATE_JETMAN                   ; 268E: 73 32     01
   fdb     READ_CONTROLS                   ; 2690: 4D 33     02
   fdb     EXPLOSIONS                      ; 2692: 34 29     03
-  fdb     STOPS_ALL                       ; 2694: 8E 2F     04
+  fdb     ROCKET_PART_OR_FUEL             ; 2694: 8E 2F     04
   fdb     LEVEL_0_FUZZBALL                ; 2696: 6A 2C     05
   fdb     LEVEL_3_SAUCER                  ; 2698: BC 2A     06
   fdb     LEVEL_2_BALLS                   ; 269A: 6D 2A     07
@@ -1656,10 +1723,10 @@ Subroutine_List
   fdb     ROCKET_ASCEND                   ; 26A0: 17 2E     0A
   fdb     ROCKET_DESCEND                  ; 26A2: 4E 2E     0B
   fdb     SOUND_LOOP_START                ; 26A4: CD 26     0C
-  fdb     GOTO_NEXT_SPRITE                ; 26A6: 1A 26     0D
+  fdb     GOTO_NEXT_OBJECT                ; 26A6: 1A 26     0D
   fdb     FIRE_PRESSED                    ; 26A8: 3E 28     0E
-  fdb     GOTO_NEXT_SPRITE                ; 26AA: 1A 26     0F
-  fdb     FIRE_PRESSED_                   ; 26AC: 9A 21     10
+  fdb     GOTO_NEXT_OBJECT                ; 26AA: 1A 26     0F
+  fdb     DISPLAY_LASERS                  ; 26AC: 9A 21     10
 ; L_JMP_($26AE)_($22CE) OK
 Init_Rocket_Object
   ldx     #$07                            ; 26AE: A2 07    
@@ -1731,7 +1798,7 @@ Goto_Next_Sound
   sta     ZP_Subroutine_Vec_Hi            ; 26E9: 85 60    
   cmp     #$07                            ; 26EB: C9 07    
   bcc     Sound_Loop                      ; 26ED: 90 E2    
-  jmp     GOTO_NEXT_SPRITE                ; 26EF: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 26EF: 4C 1A 26 
 ; -----------------------
 ; L_JSR_($26F2)_($26FE) OK
 ; L_JSR_($26F2)_($271C) OK
@@ -1978,11 +2045,11 @@ Display_Rocket_Flame
 Display_Rocket_Flame_1
   inc     ZP_Rocket_Flame_Toggle          ; 27B3: E6 27    
 
-  lda     ZP_11                           ; 27B5: A5 11    
+  lda     ZP_Saved_Obj_Y                  ; 27B5: A5 11    
   pha                                     ; 27B7: 48       
   clc                                     ; 27B8: 18       
   adc     #$15                            ; 27B9: 69 15    
-  sta     ZP_11                           ; 27BB: 85 11    
+  sta     ZP_Saved_Obj_Y                  ; 27BB: 85 11    
 
   lda     ZP_Save_Obj_Lst_Prms2_Hi        ; 27BD: A5 19    
   pha                                     ; 27BF: 48       
@@ -2035,7 +2102,7 @@ Display_Rocket_Flame_3
   pla                                     ; 280B: 68       
   sta     ZP_Save_Obj_Lst_Prms2_Hi        ; 280C: 85 19    
   pla                                     ; 280E: 68       
-  sta     ZP_11                           ; 280F: 85 11    
+  sta     ZP_Saved_Obj_Y                  ; 280F: 85 11    
   rts                                     ; 2811: 60       
 ; ===========================================================
 ; L_BRS_($2812)_($27C9) OK
@@ -2159,7 +2226,7 @@ SR3_Store_To_Obj_Posn_05_06
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2896: 91 00    
   ldy     #$06                            ; 2898: A0 06    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 289A: B1 00    
-  jmp     Stops_All_5                     ; 289C: 4C C3 2F 
+  jmp     Setup_Sprite_Addr               ; 289C: 4C C3 2F 
 ; -----------------------
 Set_Obj_Posn_05_To_06
   lda     #$06                            ; 289F: A9 06    
@@ -2196,6 +2263,11 @@ Set_Obj_Posn_05_To_01_Or_Oth_1
 Reset_Objects_1_To_8
   ldx     #$47                            ; 28C9: A2 47    
   lda     #$00                            ; 28CB: A9 00    
+
+
+
+
+
 ; L_BRS_($28CD)_($28D1) OK
 Reset_Objects_1_To_8_1
   sta     Obj_RTS_Fuel_Type,x             ; 28CD: 9D B8 03 
@@ -2249,6 +2321,11 @@ Restore_Obj_List_Ptr
   sta     ZP_Obj_List_Ptr_Hi              ; 28F6: 85 01    
   rts                                     ; 28F8: 60       
 ; ===========================================================
+
+
+
+
+
 ; L_JSR_($28F9)_($2C8C) OK
 Change_Object_To_Explosion
   jsr     CCCCCC                          ; 28F9: 20 0D 36 
@@ -2343,7 +2420,7 @@ Explosions_1
   jsr     Load_Small_UDG_Addr_Setup_XY    ; 295B: 20 3D 37 
   jsr     BBBBBB                          ; 295E: 20 04 36 
   jsr     Update_Color_RAM                ; 2961: 20 1F 38 
-  jmp     GOTO_NEXT_SPRITE                ; 2964: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2964: 4C 1A 26 
 ; -----------------------
 Explosion_UDG_Ptr
   fdb     Explosion_1                     ; 2967: 74 3F    
@@ -2361,7 +2438,7 @@ Explosions_2
   and     #$3F                            ; 297E: 29 3F    
   cmp     #$03                            ; 2980: C9 03    
   bcc     Sound_Channels_Off_ETC          ; 2982: 90 19    
-  jmp     GOTO_NEXT_SPRITE                ; 2984: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2984: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2987)_($29C5) OK
 Game_Over
@@ -2385,16 +2462,16 @@ Sound_Channels_Off_ETC
   sta     VIC_RC_Frq_Osc3                 ; 29A5: 8D 0C 90 
   jsr     Init_Most_Objects               ; 29A8: 20 D4 28 
 
-  lda     Obj_RTS_Fuel_Diagon             ; 29AB: AD BC 03 
+  lda     Obj_RTS_Status                  ; 29AB: AD BC 03 
   and     #$FD                            ; 29AE: 29 FD    
-  sta     Obj_RTS_Fuel_Diagon             ; 29B0: 8D BC 03 
+  sta     Obj_RTS_Status                  ; 29B0: 8D BC 03 
 
-  lda     Obj_RMS_Gem_Diagon              ; 29B3: AD C4 03 
+  lda     Obj_RMS_Status                  ; 29B3: AD C4 03 
   and     #$FD                            ; 29B6: 29 FD    
-  sta     Obj_RMS_Gem_Diagon              ; 29B8: 8D C4 03 
+  sta     Obj_RMS_Status                  ; 29B8: 8D C4 03 
 
   lda     Game_Settings                   ; 29BB: AD D3 1F 
-  bit     MASK_01                         ; 29BE: 2C 14 20 
+  bit     MASK_00000001                   ; 29BE: 2C 14 20 
   bne     Sound_Channels_Off_ETC_3        ; 29C1: D0 0D    
 ; L_BRS_($29C3)_($29D2) OK
 Sound_Channels_Off_ETC_1
@@ -2404,7 +2481,7 @@ Sound_Channels_Off_ETC_1
 Sound_Channels_Off_ETC_2
   jsr     Reset_Lev_Add_Extra_Life_3      ; 29C7: 20 D7 22 
   jsr     Init_Next_Jetman_Lives_Scores   ; 29CA: 20 5B 23 
-  jmp     GOTO_NEXT_SPRITE                ; 29CD: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 29CD: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($29D0)_($29C1) OK
 Sound_Channels_Off_ETC_3
@@ -2722,11 +2799,11 @@ Platform_Collision_Aliens
   bpl     PCA_RTS                         ; 2B1B: 10 19    
 
   ldy     #$02                            ; 2B1D: A0 02    
-  bit     MASK_04                         ; 2B1F: 2C 16 20 
+  bit     MASK_00000100                   ; 2B1F: 2C 16 20 
   bne     PCA_2222                        ; 2B22: D0 13    
 
   ldy     #$04                            ; 2B24: A0 04    
-  bit     MASK_08                         ; 2B26: 2C 17 20 
+  bit     MASK_00001000                   ; 2B26: 2C 17 20 
   bne     PCA_3333                        ; 2B29: D0 17    
 
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B2B: B1 00    
@@ -2746,7 +2823,7 @@ PCA_RTS
 ; ===========================================================
 ; L_BRS_($2B37)_($2B22) OK
 PCA_2222
-  bit     MASK_01                         ; 2B37: 2C 14 20 
+  bit     MASK_00000001                   ; 2B37: 2C 14 20 
   bne     PCA_3333                        ; 2B3A: D0 06    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B3C: B1 00    
   bpl     PCA_RTS                         ; 2B3E: 10 F6    
@@ -2794,7 +2871,7 @@ Obj_Jetman_NotEqu_3F_1
   dex                                     ; 2B73: CA       
   bpl     Obj_Jetman_NotEqu_3F_1          ; 2B74: 10 F7    
   jsr     Get_Raster_Line_Band            ; 2B76: 20 DE 2B 
-  sta     Obj_RTS_Fuel_Horiz              ; 2B79: 8D B9 03 
+  sta     Obj_rTS_Fuel_X                  ; 2B79: 8D B9 03 
   jmp     Object_RTS_Fuel_Type            ; 2B7C: 4C E3 22 
 ; -----------------------
 
@@ -2832,10 +2909,10 @@ Obj_Jetman_NotEqu_3F2_1
   dex                                     ; 2BAE: CA       
   bpl     Obj_Jetman_NotEqu_3F2_1         ; 2BAF: 10 F7    
   jsr     Get_Raster_Line_Band            ; 2BB1: 20 DE 2B 
-  sta     Obj_RMS_Gem_Horiz               ; 2BB4: 8D C1 03 
+  sta     Obj_RMS_Gem_X                   ; 2BB4: 8D C1 03 
   lda     ZP_HW_IRQ_Count3                ; 2BB7: A5 4C    
   and     #$0E                            ; 2BB9: 29 0E    
-  bit     MASK_08                         ; 2BBB: 2C 17 20 
+  bit     MASK_00001000                   ; 2BBB: 2C 17 20 
   beq     Obj_Jetman_NotEqu_3F2_2         ; 2BBE: F0 02    
   and     #$08                            ; 2BC0: 29 08    
 ; L_BRS_($2BC2)_($2BBE) OK
@@ -2909,11 +2986,11 @@ Test_Laser_Hits_1
 BACK_2C10
   ldy     #$02                            ; 2C10: A0 02    
   lda     (ZP_08),y                       ; 2C12: B1 08     X-coord of end of laser
-  bit     MASK_04                         ; 2C14: 2C 16 20 
+  bit     MASK_00000100                   ; 2C14: 2C 16 20 
   bne     SKIP_2C21                       ; 2C17: D0 08    
   iny                                     ; 2C19: C8       
   lda     (ZP_08),y                       ; 2C1A: B1 08     Delayed X-coord of end of laser
-  bit     MASK_04                         ; 2C1C: 2C 16 20 
+  bit     MASK_00000100                   ; 2C1C: 2C 16 20 
   beq     Goto_Next_Obj                   ; 2C1F: F0 32    
 
 ; Test if next object is in use
@@ -3039,7 +3116,7 @@ Alien_Hit_Update_Score
 ; L_BRS_($2C8C)_($2C76) OK
 Object_To_Explosion
   jsr     Change_Object_To_Explosion      ; 2C8C: 20 F9 28 
-  jmp     GOTO_NEXT_SPRITE                ; 2C8F: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2C8F: 4C 1A 26 
 ; -----------------------
 
 
@@ -3095,7 +3172,7 @@ Update_Sprite_Posn_X
 
   jsr     YYYYYY_ALT                      ; 2CC3: 20 46 36 
   jsr     Update_Color_RAM                ; 2CC6: 20 1F 38 
-  jmp     GOTO_NEXT_SPRITE                ; 2CC9: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2CC9: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2CCC)_($2CAD) OK
 Upd_Sprite_Posn_Wrap_X_1
@@ -3371,10 +3448,10 @@ Dec_Saved_Obj_List_Params_by_10
   sec                                     ; 2E01: 38       
   sbc     #$10                            ; 2E02: E9 10    
   sta     ZP_Save_Obj_Lst_Prms2_Hi        ; 2E04: 85 19    
-  lda     ZP_11                           ; 2E06: A5 11    
+  lda     ZP_Saved_Obj_Y                  ; 2E06: A5 11    
   sec                                     ; 2E08: 38       
   sbc     #$10                            ; 2E09: E9 10    
-  sta     ZP_11                           ; 2E0B: 85 11    
+  sta     ZP_Saved_Obj_Y                  ; 2E0B: 85 11    
   lda     ZP_Ship_UDG_Addr_Offset         ; 2E0D: A5 1E    
   clc                                     ; 2E0F: 18       
   adc     #$04                            ; 2E10: 69 04    
@@ -3433,7 +3510,7 @@ Rocket_At_Top
   jsr     Reset_Level_Add_Extra_Life      ; 2E44: 20 BA 22 
   lda     #$00                            ; 2E47: A9 00    
   sta     ZP_Rocket_Flame_On              ; 2E49: 85 26    
-  jmp     GOTO_NEXT_SPRITE                ; 2E4B: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2E4B: 4C 1A 26 
 ; -----------------------
 ; Flames stop a little way before bottom
 
@@ -3542,7 +3619,7 @@ ROCKET_BOTTOM_MODULE
   jsr     Restore_Obj_List_Ptr            ; 2EA1: 20 F0 28 
   inc     ZP_Num_Lives_P1                 ; 2EA4: E6 5A    
   jsr     Display_P1_Lives                ; 2EA6: 20 73 23 
-  jmp     GOTO_NEXT_SPRITE                ; 2EA9: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2EA9: 4C 1A 26 
 ; -----------------------
 
 
@@ -3612,7 +3689,7 @@ Rocket_Fuelled_Up_2
   lda     #$01                            ; 2EF3: A9 01    
   sta     ZP_Tile_Color                   ; 2EF5: 85 1B    
   jsr     Rocket_Fuelled_Up_6             ; 2EF7: 20 16 2F 
-  jmp     GOTO_NEXT_SPRITE                ; 2EFA: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2EFA: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2EFD)_($2ED4) OK
 ; L_BRS_($2EFD)_($2EDD) OK
@@ -3622,7 +3699,7 @@ Rocket_Fuelled_Up_3
 ; L_BRS_($2F01)_($2EE1) OK
 Rocket_Fuelled_Up_4
   jsr     Rocket_Fuelled_Up_5             ; 2F01: 20 07 2F 
-  jmp     GOTO_NEXT_SPRITE                ; 2F04: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2F04: 4C 1A 26 
 ; -----------------------
 ; L_JSR_($2F07)_($2EE9) OK
 ; L_JSR_($2F07)_($2F01) OK
@@ -3678,7 +3755,7 @@ Rocket_Fuelled_Up_6
 ; #####################################################################################
 
 ; L_BRS_($2F31)_($2F98) OK
-Stops_All_0
+Rocket_Part_Or_Fuel_Drop_Dock
   ldy     #$06                            ; 2F31: A0 06    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F33: B1 00    
   cmp     #$18                            ; 2F35: C9 18    
@@ -3691,12 +3768,12 @@ Stops_All_0
   cmp     #$AF                            ; 2F3F: C9 AF    
   bcc     Stops_All_3                     ; 2F41: 90 6F    
 
-  lda     Obj_RTS_Fuel_Diagon             ; 2F43: AD BC 03 
+  lda     Obj_RTS_Status                  ; 2F43: AD BC 03 
   ora     #$01                            ; 2F46: 09 01    
-  sta     Obj_RTS_Fuel_Diagon             ; 2F48: 8D BC 03 
+  sta     Obj_RTS_Status                  ; 2F48: 8D BC 03 
   jsr     Load_Rocket_OR_Fuel_UDGs        ; 2F4B: 20 54 30 
 
-  lda     Obj_Rocket_Diag?                ; 2F4E: AD B4 03 
+  lda     Obj_Rocket_Direction?           ; 2F4E: AD B4 03 
   asl     a                               ; 2F51: 0A       
   asl     a                               ; 2F52: 0A       
   asl     a                               ; 2F53: 0A       
@@ -3709,7 +3786,7 @@ Stops_All_0
   sta     ZP_Save_Obj_Lst_Prms2_Hi        ; 2F5D: 85 19    
 
   jsr     Load_Rocket_OR_Fuel_UDGs_1      ; 2F5F: 20 57 30 
-  inc     Obj_Rocket_Diag?                ; 2F62: EE B4 03 
+  inc     Obj_Rocket_Direction?           ; 2F62: EE B4 03 
 ; L_JMP_($2F65)_($2871) OK
 ; L_JMP_($2F65)_($2F8B) OK
 Stops_All_1
@@ -3721,7 +3798,7 @@ Stops_All_1
   sta     Obj_Flame_1                     ; 2F6C: 8D A9 03 
   lda     #$10                            ; 2F6F: A9 10    
   sta     Obj_Flame_2                     ; 2F71: 8D AA 03 
-  jmp     GOTO_NEXT_SPRITE                ; 2F74: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2F74: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2F77)_($2F37) OK
 Stops_All_2
@@ -3735,23 +3812,38 @@ Stops_All_2
   jsr     Load_Rocket_OR_Fuel_UDGs_2      ; 2F88: 20 5A 30 
   jmp     Stops_All_1                     ; 2F8B: 4C 65 2F 
 ; -----------------------
-STOPS_ALL
+; On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
+; On game startup 03B8+04=00, 03C0+4=01
+; Pickup  middle section 03B8+04=00, 03C0+4=03
+; Falling middle section 03B8+04=00, 03C0+4=07
+; Docked  middle section 03B8+04=01, 03C0+4=07
+; 03C0 turns into a 0E_Valuable, 03B8 goes round the same cycle as 03C0
+; 03B8 becomes a fuel cell
+; When middle rocket section deposited, only 03B8 checked, despite dropped valuable
+; When top rocket section lifted, still only 03B8 checked, despite dropped valuable
+; When top rocket section deposited and fuel dropped, still only 03B8 checked
+; When fuel picked-up and dropping onto rocket, still 03B8 checked.
+; When fuel drops into rocket, for a short time, no interrupt until next fuel cell drops 03B8
+ROCKET_PART_OR_FUEL
   jsr     Save_Obj_Type_X_Y               ; 2F8E: 20 D7 35 
 
-  ldy     #$04                            ; 2F91: A0 04    
+; 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Docked
+  ldy     #LIFECYCLE_STATE                ; 2F91: A0 04    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F93: B1 00    
-  bit     MASK_04                         ; 2F95: 2C 16 20 
-  bne     Stops_All_0                     ; 2F98: D0 97    
-  bit     MASK_02                         ; 2F9A: 2C 15 20 
-  bne     Copy_Jetman_XY_To_Sprite        ; 2F9D: D0 7F    
-  bit     MASK_01                         ; 2F9F: 2C 14 20 
-  beq     Stops_All_4                     ; 2FA2: F0 19    
+  bit     MASK_00000100                   ; 2F95: 2C 16 20 
+  bne     Rocket_Part_Or_Fuel_Drop_Dock   ; 2F98: D0 97    
+  bit     MASK_00000010                   ; 2F9A: 2C 15 20 
+  bne     Copy_Jetman_XY_To_Object        ; 2F9D: D0 7F    
+  bit     MASK_00000001                   ; 2F9F: 2C 14 20 
+  beq     Setup_Sprite_Addr_Rocket_Fuel   ; 2FA2: F0 19    
+
   jsr     Test_Jetman_Obj_Collide         ; 2FA4: 20 58 2D 
+
   lda     ZP_02                           ; 2FA7: A5 02    
   bmi     Jetman_Collide_Rocket_Fuel      ; 2FA9: 30 43    
   jsr     Platform_Collision_Test         ; 2FAB: 20 B3 30  Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
   lda     ZP_02                           ; 2FAE: A5 02    
-  bmi     Stops_All_4                     ; 2FB0: 30 0B    
+  bmi     Setup_Sprite_Addr_Rocket_Fuel   ; 2FB0: 30 0B    
 ; L_BRS_($2FB2)_($2F41) OK
 ; L_BRS_($2FB2)_($2F7D) OK
 Stops_All_3
@@ -3762,15 +3854,19 @@ Stops_All_3
   ora     #$01                            ; 2FB9: 09 01    
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2FBB: 91 00    
 
+
+
+
+
 ; L_BRS_($2FBD)_($2FA2) OK
 ; L_BRS_($2FBD)_($2FB0) OK
 ; L_JMP_($2FBD)_($301B) OK
 ; L_JMP_($2FBD)_($3051) OK
-Stops_All_4
+Setup_Sprite_Addr_Rocket_Fuel
   jsr     Save_Obj_Type_X_Y_Color         ; 2FBD: 20 E9 35 
   jsr     Get_Spr_Addr_Rocket_Top_OR_Fuel ; 2FC0: 20 DA 2F 
 ; L_JMP_($2FC3)_($289C) OK
-Stops_All_5
+Setup_Sprite_Addr
   pha                                     ; 2FC3: 48       
   jsr     Get_Object_UDG_Addr_Small       ; 2FC4: 20 E5 2F 
   jsr     Load_Small_UDG_Addr_Setup_XY    ; 2FC7: 20 3D 37 
@@ -3779,7 +3875,7 @@ Stops_All_5
   jsr     Set_UDG_RAM_Ptr_Spr_Dimen       ; 2FCE: 20 8D 37 
   jsr     YYYYYY                          ; 2FD1: 20 4C 36 
   jsr     Update_Color_RAM                ; 2FD4: 20 1F 38 
-  jmp     GOTO_NEXT_SPRITE                ; 2FD7: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 2FD7: 4C 1A 26 
 ; -----------------------
 
 ; Returns UDG sprite data index to Rocket Middle Section/Fuel depending on level
@@ -3883,10 +3979,10 @@ Jetman_Collide_Rocket_Fuel
   ldy     #$03                            ; 3014: A0 03    
   lda     Obj_Jetman_Y                    ; 3016: AD 83 03 
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 3019: 91 00     Store current Jetman sprite Y pos into current object?
-  jmp     Stops_All_4                     ; 301B: 4C BD 2F 
+  jmp     Setup_Sprite_Addr_Rocket_Fuel   ; 301B: 4C BD 2F 
 ; -----------------------
 ; L_BRS_($301E)_($2F9D) OK
-Copy_Jetman_XY_To_Sprite
+Copy_Jetman_XY_To_Object
   ldy     #$01                            ; 301E: A0 01    
   lda     Obj_Jetman_X                    ; 3020: AD 81 03 
   clc                                     ; 3023: 18       
@@ -3922,7 +4018,7 @@ Copy_Jetman_XY_To_Sprite_0
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 304F: 91 00    
 ; L_BRS_($3051)_($3040) OK
 Copy_Jetman_XY_To_Sprite_1
-  jmp     Stops_All_4                     ; 3051: 4C BD 2F 
+  jmp     Setup_Sprite_Addr_Rocket_Fuel   ; 3051: 4C BD 2F 
 ; -----------------------
 ; L_JSR_($3054)_($2F4B) OK
 Load_Rocket_OR_Fuel_UDGs
@@ -4340,7 +4436,7 @@ Next_UDG_Char
 AAAAAAAA
   ldy     #$02                            ; 31BF: A0 02    
   clc                                     ; 31C1: 18       
-  bit     MASK_01                         ; 31C2: 2C 14 20 
+  bit     MASK_00000001                   ; 31C2: 2C 14 20 
   beq     BBBBBBBB                        ; 31C5: F0 18    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 31C7: B1 00    
   bpl     CCCCCCCC                        ; 31C9: 10 03    
@@ -4382,7 +4478,7 @@ HHHHHHHH
   bmi     IIIIIIII                        ; 31F0: 30 F5    
 ; L_JMP_($31F2)_($3282) OK
 JJJJJJJJ
-  bit     MASK_08                         ; 31F2: 2C 17 20 
+  bit     MASK_00001000                   ; 31F2: 2C 17 20 
   beq     KKKKKKKK                        ; 31F5: F0 09    
   ldy     #$04                            ; 31F7: A0 04    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 31F9: B1 00    
@@ -4391,7 +4487,7 @@ JJJJJJJJ
 ; -----------------------
 ; L_BRS_($3200)_($31F5) OK
 KKKKKKKK
-  bit     MASK_04                         ; 3200: 2C 16 20 
+  bit     MASK_00000100                   ; 3200: 2C 16 20 
   bne     AAAAAAAA                        ; 3203: D0 BA    
   jmp     Update_Jetman_1                 ; 3205: 4C 85 32 
 ; -----------------------
@@ -4414,7 +4510,7 @@ JMP_FLYING
 NNNNNNNN
   tax                                     ; 3218: AA        Save A
   lda     ZP_Jetman_Movement              ; 3219: A5 1C    
-  bit     MASK_10                         ; 321B: 2C 18 20  Test for direction Up
+  bit     MASK_00010000                   ; 321B: 2C 18 20  Test for direction Up
   bne     PPPPPPPP                        ; 321E: D0 04     No, branch
   lda     #$00                            ; 3220: A9 00    
   beq     MMMMMMMM                        ; 3222: F0 EE    
@@ -4562,9 +4658,9 @@ CSC_ADC_RTN
 Flying?
   ldy     #$04                            ; 32C7: A0 04    
   lda     ZP_Jetman_Movement              ; 32C9: A5 1C    
-  bit     MASK_20                         ; 32CB: 2C 19 20  Test for direction Down
+  bit     MASK_00100000                   ; 32CB: 2C 19 20  Test for direction Down
   beq     LDA00                           ; 32CE: F0 48     Yes, branch
-  bit     MASK_10                         ; 32D0: 2C 18 20  Test for direction Up
+  bit     MASK_00010000                   ; 32D0: 2C 18 20  Test for direction Up
   beq     Not_sure_330c                   ; 32D3: F0 37     Yes, branch
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 32D5: B1 00    
   cmp     #$04                            ; 32D7: C9 04    
@@ -4605,12 +4701,12 @@ Flying_4?
   jsr     YYYYYY_ALT                      ; 32F9: 20 46 36 
   jsr     Update_Color_RAM                ; 32FC: 20 1F 38 
   lda     ZP_Jetman_Movement              ; 32FF: A5 1C    
-  bit     MASK_08                         ; 3301: 2C 17 20  Test for direction Right
+  bit     MASK_00001000                   ; 3301: 2C 17 20  Test for direction Right
   bne     SKIP_Flying_5?                  ; 3304: D0 03     No, branch
-  jsr     Update_Laser_Shots              ; 3306: 20 E9 20 
+  jsr     Update_Laser_Objects            ; 3306: 20 E9 20 
 ; L_BRS_($3309)_($3304) OK
 SKIP_Flying_5?
-  jmp     GOTO_NEXT_SPRITE                ; 3309: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 3309: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($330C)_($32D3) OK
 Not_sure_330c
@@ -4701,7 +4797,7 @@ READ_CONTROLS
   jsr     Display_P2_Score                ; 3364: 20 81 24 
 ; L_BRS_($3367)_($3356) OK
 Flash_Display_Score_JMP
-  jmp     GOTO_NEXT_SPRITE                ; 3367: 4C 1A 26 
+  jmp     GOTO_NEXT_OBJECT                ; 3367: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($336A)_($334F) OK
 Read_Controls_1
@@ -4731,7 +4827,7 @@ Read_Controls_4
   ldy     #$02                            ; 338F: A0 02    
   lda     ZP_02                           ; 3391: A5 02    
   bpl     Read_Controls_5                 ; 3393: 10 08    
-  bit     MASK_02                         ; 3395: 2C 15 20 
+  bit     MASK_00000010                   ; 3395: 2C 15 20 
   php                                     ; 3398: 08       
   txa                                     ; 3399: 8A       
   plp                                     ; 339A: 28       
@@ -4839,7 +4935,7 @@ Read_Joystick
 ; L_JSR_($33F7)_($336D) OK
 Read_Keyboard_Joystick
   lda     Game_Settings                   ; 33F7: AD D3 1F 
-  bit     MASK_02                         ; 33FA: 2C 15 20  Joystick selected?
+  bit     MASK_00000010                   ; 33FA: 2C 15 20  Joystick selected?
   bne     Read_Joystick                   ; 33FD: D0 D5     Yes, branch
 
 ; Read Keyboard
@@ -5420,15 +5516,15 @@ Copy_Char_To_UDG_RAM_INV
 Save_Obj_Type_X_Y
   ldy     #$00                            ; 35D7: A0 00    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 35D9: B1 00    
-  sta     ZP_12                           ; 35DB: 85 12    
+  sta     ZP_Saved_Obj_Type               ; 35DB: 85 12    
 
   iny                                     ; 35DD: C8       
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 35DE: B1 00    
-  sta     ZP_10                           ; 35E0: 85 10    
+  sta     ZP_Saved_Obj_X                  ; 35E0: 85 10    
 
   ldy     #$03                            ; 35E2: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 35E4: B1 00    
-  sta     ZP_11                           ; 35E6: 85 11    
+  sta     ZP_Saved_Obj_Y                  ; 35E6: 85 11    
   rts                                     ; 35E8: 60       
 ; ===========================================================
 ; L_JSR_($35E9)_($231C) OK
@@ -5562,7 +5658,7 @@ YYYYYY
   lda     ZP_0B                           ; 3656: A5 0B    
   sta     ZP_0A                           ; 3658: 85 0A    
 
-  lda     ZP_11                           ; 365A: A5 11    
+  lda     ZP_Saved_Obj_Y                  ; 365A: A5 11    
   sec                                     ; 365C: 38       
   sbc     ZP_Save_Obj_Lst_Prms2_Hi        ; 365D: E5 19    
   beq     ZZZZZZ                          ; 365F: F0 27    
@@ -5838,9 +5934,9 @@ Set_UDG_RAM_Ptr_Spr_Dimen
   sty     ZP_07                           ; 3791: 84 07    
 
 ; Setup UDG RAM X & Y
-  lda     ZP_10                           ; 3793: A5 10    
+  lda     ZP_Saved_Obj_X                  ; 3793: A5 10    
   sta     ZP_UDG_RAM_X                    ; 3795: 85 04    
-  lda     ZP_11                           ; 3797: A5 11    
+  lda     ZP_Saved_Obj_Y                  ; 3797: A5 11    
   sta     ZP_UDG_RAM_Y                    ; 3799: 85 05    
 
 ; Convert XY pixel coords to address, managing X axis wrap ($B8)
@@ -5928,10 +6024,10 @@ Get_Obj_UDG_Addr_1
 ; -----------------------
 ; L_JSR_($37E6)_($378A) OK
 Get_Obj_UDG_Addr_
-  lda     ZP_10                           ; 37E6: A5 10    
+  lda     ZP_Saved_Obj_X                  ; 37E6: A5 10    
   and     #%00000110                      ; 37E8: 29 06     Zero bits
   tax                                     ; 37EA: AA       
-  lda     ZP_12                           ; 37EB: A5 12    
+  lda     ZP_Saved_Obj_Type               ; 37EB: A5 12    
 
 ; InReg: A=Saved Obj Type, X=Saved Object X AND $06/%110
 ; But if it's the Jetman Object, Obj Type is instead Jetman Looks
@@ -5947,7 +6043,7 @@ Get_Obj_UDG_Addr_2
   tya                                     ; 37F4: 98       
 
 ; Test Jetman Looks Left/Right Direction???
-  bit     MASK_80                         ; 37F5: 2C 1B 20 
+  bit     MASK_10000000                   ; 37F5: 2C 1B 20 
   beq     Get_Obj_UDG_Addr_3              ; 37F8: F0 06    
 
   pha                                     ; 37FA: 48       

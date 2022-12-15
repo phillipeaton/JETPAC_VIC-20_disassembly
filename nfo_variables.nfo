@@ -13,11 +13,11 @@ label      0A ZP_0A ; 15
 label      0B ZP_0B ; 18
 label      0c ZP_Col_RAM_Ptr_Lo ; 28
 label      0d ZP_Col_RAM_Ptr_Hi ; 10
-label      0E ZP_Ptr_To_Str_Lo ; 21
-label      0F ZP_Ptr_To_Str_Hi ; 12
-label      10 ZP_10 ; 04 Save Obj List Params 1
-label      11 ZP_11 ; 09 Save Obj List Params 1
-label      12 ZP_12 ; 03 Save Obj List Params 1
+label      0E ZP_Ptr_To_Str_Lo  ; 21
+label      0F ZP_Ptr_To_Str_Hi  ; 12
+label      10 ZP_Saved_Obj_X    ; 04
+label      11 ZP_Saved_Obj_Y    ; 09
+label      12 ZP_Saved_Obj_Type ; 03
 label      13 ZP_13 ; 18
 label      14 ZP_14_Spr_Width_Pix ; 08 Connected somehow. Shuffled in a subroutine.
 label      15 ZP_15 ; 08 Connected somehow. Shuffled in a subroutine.
@@ -130,38 +130,40 @@ label    03B0 Obj_Rocket     ; Type = 09, 0A when ascending, 0B when decending
 label    03B1 Obj_Rocket_X
 label    03B2 Obj_Rocket_Fuel_Lvl ; Number of fuel cells, 6=full
 label    03B3 Obj_Rocket_Y
-label    03B4 Obj_Rocket_Diag?
+label    03B4 Obj_Rocket_Direction?
 ;label    03B5 Obj_Rocket_5
 ;label    03B6 Obj_Rocket_6
 ;label    03B7 Obj_Rocket_7
 
 ; Rocket top section, then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
 label    03B8 Obj_RTS_Fuel_Type ; Type = 04 always
-label    03B9 Obj_RTS_Fuel_Horiz
+label    03B9 Obj_rTS_Fuel_X
 ;label    03BA Obj_RTS_Fuel_2
 ;label    03BB Obj_RTS_Fuel_3
-label    03BC Obj_RTS_Fuel_Diagon
+label    03BC Obj_RTS_Status
 ;label    03BD Obj_RTS_Fuel_5
 ;label    03BE Obj_RTS_Fuel_6 ; Index into sprite array, calculated together with level number
 ;label    03BF Obj_RTS_Fuel_7
 
 ; Rocket middle section, then a Gem e.g. 03C0  0E 58 00 5E 00 03 28 18
 label    03C0 Obj_RMS_Gem_Type ;
-label    03C1 Obj_RMS_Gem_Horiz
+label    03C1 Obj_RMS_Gem_X
 ;label    03C2 Obj_RMS_Gem_2
 ;label    03C3 Obj_RMS_Gem_3
-label    03C4 Obj_RMS_Gem_Diagon
+label    03C4 Obj_RMS_Status
 ;label    03C5 Obj_RMS_Gem_5
 label    03C6 Obj_RMS_Gem_6
 label    03C7 Obj_RMS_Gem_7
 
 
 ; Byte 00/08= object type
-; Byte 01/09= X postion of alien
+; Byte 01/09= X postion
 ; Byte 02/0A= X direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
 ; Byte 03/0B= Y position
-; Byte 04/0C= Y Direction, probably the same as X, might be a countdown for gravity?
-; Byte 05/0D= colour - bottom 3 bits of byte?
+; Byte 04/0C= Y Direction, Level 0:   x0=horizontal, x1-7=descending 7= fast 0=slow
+;                          Level 1/2: 08=down, f8=up, always x8
+;                          Level 3:   Same as 1/2 but xF seen at Jetman explode
+; Byte 05/0D= colour - bottom 3 bits of byte
 ; Byte 06/0E= For Gem, affects colors and flashing of Byte 05
 
 ; Aliens 1-6
@@ -184,13 +186,14 @@ label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00
 
 ;label    03F0 Obj_Alien_5_0 ;     03F0  05 19 F8 8D 00 06 00 00
 
-; Other variables that are somewhat persistent i.e. not reset at game restart
+; UDG RAM positions of score data
 label    1008 Display_P1_Score_Posn
 label    1420 Display_P1_Lives_Posn
 label    1588 Display_Hi_Score_Posn
 label    19a0 Display_P2_Lives_Posn
 label    1b08 Display_P2_Score_Posn
 
+; Other variables that are somewhat persistent i.e. not reset at game restart
 label    1fd0 Score_Hi
 label    1fd3 Game_Settings ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
 
