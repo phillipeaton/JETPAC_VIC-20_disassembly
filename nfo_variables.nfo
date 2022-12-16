@@ -1,32 +1,32 @@
 ; Zero-Page variables ; Usage count
 label      00 ZP_Obj_List_Ptr_Lo ; 182
 label      01 ZP_Obj_List_Ptr_Hi ; 111
-label      02 ZP_02 ; 46
-label      03 ZP_03 ; 17 Sprite width in bytes
+label      02 ZP_02_Obj_Height_Cntdn_1 ; 46
+label      03 ZP_03_Sprite_Height ; 17 Sprite width in bytes
 label      04 ZP_UDG_RAM_X ; 56
 label      05 ZP_UDG_RAM_Y ; 35
-label      06 ZP_06 ; 51 06/07 used as addr of sprite data + several other 06 only uses
-label      07 ZP_07 ; 26 Used with 06
-label      08 ZP_08 ; 42 Used with 09
+label      06 ZP_06_Sprite_Data_Addr_Lo ; 51 06/07 used as addr of sprite data + several other 06 only uses
+label      07 ZP_07_Sprite_Data_Addr_Hi  ; 26 Used with 06
+label      08 ZP_08_Sprite_Data_Index ; 42 Used with 09
 label      09 ZP_09 ; 11 Used with 08
-label      0A ZP_0A ; 15
+label      0A ZP_0A_Obj_Height_Cntdn_1 ; 15
 label      0B ZP_0B ; 18
 label      0c ZP_Col_RAM_Ptr_Lo ; 28
 label      0d ZP_Col_RAM_Ptr_Hi ; 10
-label      0E ZP_Ptr_To_Str_Lo  ; 21
-label      0F ZP_Ptr_To_Str_Hi  ; 12
-label      10 ZP_Saved_Obj_X    ; 04
-label      11 ZP_Saved_Obj_Y    ; 09
-label      12 ZP_Saved_Obj_Type ; 03
+label      0E ZP_Addr_Ptr_Lo  ; 21
+label      0F ZP_Addr_Ptr_Hi  ; 12
+label      10 ZP_Obj_X_Position_1    ; 04
+label      11 ZP_Obj_Y_Position_1    ; 09
+label      12 ZP_Obj_Type_1 ; 03
 label      13 ZP_13 ; 18
-label      14 ZP_14_Spr_Width_Pix ; 08 Connected somehow. Shuffled in a subroutine.
+label      14 ZP_Sprite_Width_Pixels ; 08 Connected somehow. Shuffled in a subroutine.
 label      15 ZP_15 ; 08 Connected somehow. Shuffled in a subroutine.
 label      16 ZP_16 ; 05 Connected somehow. Shuffled in a subroutine.
 label      17 ZP_17 ; 04 Connected somehow. Shuffled in a subroutine.
-label      18 ZP_Save_Obj_Lst_Prms2_Lo ; 07 Save_Obj_List_Params 2
-label      19 ZP_Save_Obj_Lst_Prms2_Hi ; 12 Save_Obj_List_Params 2
-label      1A ZP_Obj_Type ; 03 Save_Obj_List_Params 2
-label      1B ZP_Tile_Color ; 10 Save_Obj_List_Params 2
+label      18 ZP_Obj_X_Position_2 ; 07
+label      19 ZP_Obj_Y_Position_2 ; 12
+label      1A ZP_Obj_Type_2 ; 03 Save_Obj_List_Params 2
+label      1B ZP_Obj_Color_2 ; 10 Save_Obj_List_Params 2
 label      1C ZP_Jetman_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 label      1E ZP_Ship_UDG_Addr_Offset ;
 label      1F ZP_Ship_UDG_Addr_Color? ;
@@ -55,9 +55,9 @@ label      51-53 ZP_Score_P1 ; 3 bytes (Hi Score is stored where?)
 label      54-56 ZP_Score_P2 ; 3 bytes
 label      57 ZP_Invert ; Used to flash game options & 1UP+score at player start
 label      58 ZP_Flash_Counter ;
-label      59 ZP_Level_Current_Plyr ;
+label      59 ZP_Level_Current_Player ;
 label      5a ZP_Num_Lives_P1 ;
-label      5b ZP_Level_Other_Plyr ;
+label      5b ZP_Level_Other_Player ;
 label      5c ZP_Num_Lives_P2 ;
 label      5d ZP_Flash_Score_Countdown ; 7f for 1 player, ff for 2 player
 label      5e ZP_P1_Or_P2 ;

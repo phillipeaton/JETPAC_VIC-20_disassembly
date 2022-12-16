@@ -14,32 +14,32 @@
 
 ZP_Obj_List_Ptr_Lo              equ     $0000
 ZP_Obj_List_Ptr_Hi              equ     $0001
-ZP_02                           equ     $0002
-ZP_03                           equ     $0003
+ZP_02_Obj_Height_Cntdn_1        equ     $0002
+ZP_03_Sprite_Height             equ     $0003
 ZP_UDG_RAM_X                    equ     $0004
 ZP_UDG_RAM_Y                    equ     $0005
-ZP_06                           equ     $0006
-ZP_07                           equ     $0007
-ZP_08                           equ     $0008
+ZP_06_Sprite_Data_Addr_Lo       equ     $0006
+ZP_07_Sprite_Data_Addr_Hi       equ     $0007
+ZP_08_Sprite_Data_Index         equ     $0008
 ZP_09                           equ     $0009
-ZP_0A                           equ     $000A
+ZP_0A_Obj_Height_Cntdn_1        equ     $000A
 ZP_0B                           equ     $000B
 ZP_Col_RAM_Ptr_Lo               equ     $000C
 ZP_Col_RAM_Ptr_Hi               equ     $000D
-ZP_Ptr_To_Str_Lo                equ     $000E
-ZP_Ptr_To_Str_Hi                equ     $000F
-ZP_Saved_Obj_X                  equ     $0010
-ZP_Saved_Obj_Y                  equ     $0011
-ZP_Saved_Obj_Type               equ     $0012
+ZP_Addr_Ptr_Lo                  equ     $000E
+ZP_Addr_Ptr_Hi                  equ     $000F
+ZP_Obj_X_Position_1             equ     $0010
+ZP_Obj_Y_Position_1             equ     $0011
+ZP_Obj_Type_1                   equ     $0012
 ZP_13                           equ     $0013
-ZP_14_Spr_Width_Pix             equ     $0014
+ZP_Sprite_Width_Pixels          equ     $0014
 ZP_15                           equ     $0015
 ZP_16                           equ     $0016
 ZP_17                           equ     $0017
-ZP_Save_Obj_Lst_Prms2_Lo        equ     $0018
-ZP_Save_Obj_Lst_Prms2_Hi        equ     $0019
-ZP_Obj_Type                     equ     $001A
-ZP_Tile_Color                   equ     $001B
+ZP_Obj_X_Position_2             equ     $0018
+ZP_Obj_Y_Position_2             equ     $0019
+ZP_Obj_Type_2                   equ     $001A
+ZP_Obj_Color_2                  equ     $001B
 ZP_Jetman_Movement              equ     $001C
 ZP_Ship_UDG_Addr_Offset         equ     $001E
 ZP_Ship_UDG_Addr_Color?         equ     $001F
@@ -62,9 +62,9 @@ ZP_Score_P1                     equ     $0051
 ZP_Score_P2                     equ     $0054
 ZP_Invert                       equ     $0057
 ZP_Flash_Counter                equ     $0058
-ZP_Level_Current_Plyr           equ     $0059
+ZP_Level_Current_Player         equ     $0059
 ZP_Num_Lives_P1                 equ     $005A
-ZP_Level_Other_Plyr             equ     $005B
+ZP_Level_Other_Player           equ     $005B
 ZP_Num_Lives_P2                 equ     $005C
 ZP_Flash_Score_Countdown        equ     $005D
 ZP_P1_Or_P2                     equ     $005E
@@ -131,7 +131,11 @@ Color_RAM                       equ     $9600
 ;****************************************************
 
 SCREEN_WIDTH_PIXELS             equ     $B8
+OBJECT_COLOR                    equ     $05
+OBJECT_Y_POSITION               equ     $03
+OBJECT_TYPE                     equ     $00
 GREEN                           equ     $05
+OBJECT_SPRITE_INDEX             equ     $06
 LIFECYCLE_STATE                 equ     $04
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
@@ -437,17 +441,17 @@ Update_Laser_Objects_1
   ldy     #$00                            ; 20F9: A0 00    
 ; L_BRS_($20FB)_($210D) OK
 Update_Laser_Objects_2
-  lda     (ZP_06),y                       ; 20FB: B1 06    
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 20FB: B1 06    
   beq     Update_Laser_Object             ; 20FD: F0 11    
 
 ; Move ZP index address to next 8 bytes i.e. next Laser shot
-  lda     ZP_06                           ; 20FF: A5 06    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 20FF: A5 06    
   clc                                     ; 2101: 18       
   adc     #$08                            ; 2102: 69 08    
-  sta     ZP_06                           ; 2104: 85 06    
-  lda     ZP_07                           ; 2106: A5 07    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 2104: 85 06    
+  lda     ZP_07_Sprite_Data_Addr_Hi       ; 2106: A5 07    
   adc     #$00                            ; 2108: 69 00    
-  sta     ZP_07                           ; 210A: 85 07    
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 210A: 85 07    
   dex                                     ; 210C: CA       
   bne     Update_Laser_Objects_2          ; 210D: D0 EC    
   rts                                     ; 210F: 60       
@@ -458,25 +462,25 @@ Update_Laser_Object
   tax                                     ; 2112: AA        Store for later
   and     #$80                            ; 2113: 29 80     Jetman looking left?
   ora     #$10                            ; 2115: 09 10     Set bit 4, DON'T KNOW WHAT IT'S USED FOR??????????
-  sta     (ZP_06),y                       ; 2117: 91 06     Store to inactive Laser attrib 00
+  sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 2117: 91 06     Store to inactive Laser attrib 00
 
   iny                                     ; 2119: C8        Move to next Jetman attrib 01
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 211A: B1 00     Get Jetman attrib 01 i.e. X position
   and     #$F8                            ; 211C: 29 F8     Zero the bottom 3 bits
   ora     #$05                            ; 211E: 09 05     Set bits 0 & 2
-  sta     ZP_08                           ; 2120: 85 08     Store for later
+  sta     ZP_08_Sprite_Data_Index         ; 2120: 85 08     Store for later
 
   txa                                     ; 2122: 8A        Restore Jetman attrib 00
   and     #$80                            ; 2123: 29 80     Jetman looking left?
   beq     Laser_Jetman_Facing_Right       ; 2125: F0 4C     No, branch
-  lda     ZP_08                           ; 2127: A5 08    
+  lda     ZP_08_Sprite_Data_Index         ; 2127: A5 08    
   sec                                     ; 2129: 38       
   sbc     #$08                            ; 212A: E9 08    
   jsr     Laser_Wrap?                     ; 212C: 20 98 22 
 ; L_JMP_($212F)_($2184) OK
 ; L_JMP_($212F)_($218A) OK
 Update_Laser_Object_1
-  sta     ZP_08                           ; 212F: 85 08    
+  sta     ZP_08_Sprite_Data_Index         ; 212F: 85 08    
   iny                                     ; 2131: C8       
   iny                                     ; 2132: C8       
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2133: B1 00    
@@ -484,17 +488,17 @@ Update_Laser_Object_1
   sbc     #$0D                            ; 2136: E9 0D    
   dey                                     ; 2138: 88       
   dey                                     ; 2139: 88       
-  sta     (ZP_06),y                       ; 213A: 91 06    
+  sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 213A: 91 06    
 
   ldx     #$03                            ; 213C: A2 03    
   iny                                     ; 213E: C8       
-  lda     ZP_08                           ; 213F: A5 08    
-  sta     (ZP_06),y                       ; 2141: 91 06    
+  lda     ZP_08_Sprite_Data_Index         ; 213F: A5 08    
+  sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 2141: 91 06    
   and     #$FB                            ; 2143: 29 FB    
 ; L_BRS_($2145)_($2149) OK
 Update_Laser_Object_2
   iny                                     ; 2145: C8       
-  sta     (ZP_06),y                       ; 2146: 91 06    
+  sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 2146: 91 06    
   dex                                     ; 2148: CA       
   bne     Update_Laser_Object_2           ; 2149: D0 FA    
 
@@ -503,7 +507,7 @@ Update_Laser_Object_2
   and     #$38                            ; 214E: 29 38    
   clc                                     ; 2150: 18       
   adc     #$40                            ; 2151: 69 40    
-  sta     (ZP_06),y                       ; 2153: 91 06    
+  sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 2153: 91 06    
 
 ; Load a random laser color using the current 6522 timer value
   iny                                     ; 2155: C8       
@@ -511,7 +515,7 @@ Update_Laser_Object_2
   and     #$07                            ; 2158: 29 07    
   tax                                     ; 215A: AA       
   lda     Laser_Color_Table,x             ; 215B: BD 6B 21 
-  sta     (ZP_06),y                       ; 215E: 91 06    
+  sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 215E: 91 06    
 
 ; Not sure what this is for ??????????????
   lda     #$03                            ; 2160: A9 03    
@@ -530,7 +534,7 @@ Laser_Jetman_Facing_Right
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2173: B1 00     Get Jetman attrib 01 i.e. ????????
   and     #$07                            ; 2175: 29 07     Zero bits 3-7, any bits 0-2 set?
   beq     Laser_Jetman_Facing_Right_3     ; 2177: F0 14     No, branch
-  lda     ZP_08                           ; 2179: A5 08    
+  lda     ZP_08_Sprite_Data_Index         ; 2179: A5 08    
   clc                                     ; 217B: 18       
   adc     #$18                            ; 217C: 69 18    
 ; L_JMP_($217E)_($2192) OK
@@ -548,7 +552,7 @@ Laser_Jetman_Facing_Right_2
 ; -----------------------
 ; L_BRS_($218D)_($2177) OK
 Laser_Jetman_Facing_Right_3
-  lda     ZP_08                           ; 218D: A5 08     Restore saved Jetman attrib 00
+  lda     ZP_08_Sprite_Data_Index         ; 218D: A5 08     Restore saved Jetman attrib 00
   clc                                     ; 218F: 18       
   adc     #$10                            ; 2190: 69 10     Add $10 for some reason??????????
   jmp     Laser_Jetman_Facing_Right_1     ; 2192: 4C 7E 21 
@@ -584,15 +588,15 @@ Fire_Pressed_0
 DISPLAY_LASERS
   ldy     #$06                            ; 219A: A0 06     ???????
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 219C: B1 00    
-  sta     ZP_07                           ; 219E: 85 07    
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 219E: 85 07    
   iny                                     ; 21A0: C8        Y=$07, laser color addr
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 21A1: B1 00     Fetch laser color
-  sta     ZP_Tile_Color                   ; 21A3: 85 1B     Store to ZP variable
+  sta     ZP_Obj_Color_2                  ; 21A3: 85 1B     Store to ZP variable
 
 ; Get laser X and Y-coord and store to temp vars
   ldy     #$02                            ; 21A5: A0 02     Y=$02, X-coord of laser horizontal end point
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 21A7: B1 00    
-  sta     ZP_06                           ; 21A9: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 21A9: 85 06    
   sta     ZP_UDG_RAM_X                    ; 21AB: 85 04    
   dey                                     ; 21AD: 88        Y=$01, Y-coord of laser
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 21AE: B1 00    
@@ -600,14 +604,14 @@ DISPLAY_LASERS
   sta     ZP_13                           ; 21B2: 85 13    
 
 ; Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
-  lda     ZP_06                           ; 21B4: A5 06    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 21B4: A5 06    
   bit     MASK_00000100                   ; 21B6: 2C 16 20 
   beq     FP5555                          ; 21B9: F0 47    
   jsr     Setup_Color_RAM_Ptr             ; 21BB: 20 F7 34 
   jsr     Convert_XY_to_UDG_RAM_Addr      ; 21BE: 20 1D 35 
 
 ; Test if X-coord of laser is on a boundary and wrap if necessary ######## NEEDS CONFIRM
-  lda     ZP_06                           ; 21C1: A5 06    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 21C1: A5 06    
   bit     MASK_00000001                   ; 21C3: 2C 14 20 
   clc                                     ; 21C6: 18       
   beq     Fire_Pressed_0                  ; 21C7: F0 CC    
@@ -628,7 +632,7 @@ FP1111
 FP2222
   txa                                     ; 21DC: 8A        Restore A
 
-  sta     ZP_06                           ; 21DD: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 21DD: 85 06    
 
 ; Invert the displayed 8-bit byte on-screen
   lda     (ZP_UDG_RAM_X),y                ; 21DF: B1 04    
@@ -640,23 +644,23 @@ FP2222
   and     #$0F                            ; 21E7: 29 0F     Zero top 4 bits
   cmp     #GREEN                          ; 21E9: C9 05     Test if 0101
   beq     FP3333                          ; 21EB: F0 04    
-  lda     ZP_Tile_Color                   ; 21ED: A5 1B     Tile color
+  lda     ZP_Obj_Color_2                  ; 21ED: A5 1B     Tile color
   sta     (ZP_Col_RAM_Ptr_Lo),y           ; 21EF: 91 0C    
 
 ; Some kind of screen wrap?
 ; L_BRS_($21F1)_($21EB) OK
 FP3333
-  lda     ZP_07                           ; 21F1: A5 07    
+  lda     ZP_07_Sprite_Data_Addr_Hi       ; 21F1: A5 07    
   sec                                     ; 21F3: 38       
   sbc     #$08                            ; 21F4: E9 08    
-  sta     ZP_07                           ; 21F6: 85 07    
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 21F6: 85 07    
   and     #$F8                            ; 21F8: 29 F8    
   bne     FP5555                          ; 21FA: D0 06    
 ; L_BRS_($21FC)_($21DA) OK
 FP4444
-  lda     ZP_06                           ; 21FC: A5 06    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 21FC: A5 06    
   and     #$FB                            ; 21FE: 29 FB    
-  sta     ZP_06                           ; 2200: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 2200: 85 06    
 
 ; Loads ZP 14/15/16/17 with seed values, which are something to do with the four lasers
 ; L_BRS_($2202)_($21B9) OK
@@ -678,11 +682,11 @@ FP5555
 FP6666
   iny                                     ; 2211: C8        First time round, Y=3, next time 4 and so on
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2212: B1 00     Get one of the four laser object paramenters
-  eor     ZP_06                           ; 2214: 45 06    
+  eor     ZP_06_Sprite_Data_Addr_Lo       ; 2214: 45 06    
   and     #$F8                            ; 2216: 29 F8     Zero bottom 3 bits, probably testing if laser shot ended
   bne     FP7777                          ; 2218: D0 0F    
   jsr     Laser_ZP17_15_to_ZP16_14        ; 221A: 20 8B 22 
-  dec     ZP_02                           ; 221D: C6 02     Active laser shots counter at zero?
+  dec     ZP_02_Obj_Height_Cntdn_1        ; 221D: C6 02     Active laser shots counter at zero?
   bne     FP6666                          ; 221F: D0 F0     No, process next laser shot
 
 ; All laser shows ended, zero laser shots object type
@@ -698,15 +702,15 @@ FP7777
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2229: B1 00     Get one of the four laser object paramenters
   bit     MASK_00000100                   ; 222B: 2C 16 20 
   bne     FP9999                          ; 222E: D0 27    
-  dec     ZP_07                           ; 2230: C6 07    
-  lda     ZP_07                           ; 2232: A5 07    
+  dec     ZP_07_Sprite_Data_Addr_Hi       ; 2230: C6 07    
+  lda     ZP_07_Sprite_Data_Addr_Hi       ; 2232: A5 07    
   and     #$07                            ; 2234: 29 07    
   bne     FP8888                          ; 2236: D0 10    
   lda     ZP_HW_IRQ_Count3                ; 2238: A5 4C    
   and     #$03                            ; 223A: 29 03     Zero bit top 6 bits
   ora     #$04                            ; 223C: 09 04     Set bit 2, now is 000001xx
-  ora     ZP_07                           ; 223E: 05 07    
-  sta     ZP_07                           ; 2240: 85 07    
+  ora     ZP_07_Sprite_Data_Addr_Hi       ; 223E: 05 07    
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 2240: 85 07    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2242: B1 00    
   ora     #$04                            ; 2244: 09 04     Set bit 2
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2246: 91 00    
@@ -716,11 +720,11 @@ FP7777
 ; L_JMP_($2248)_($2282) OK
 FP8888
   ldy     #$06                            ; 2248: A0 06    
-  lda     ZP_07                           ; 224A: A5 07    
+  lda     ZP_07_Sprite_Data_Addr_Hi       ; 224A: A5 07    
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 224C: 91 00    
 
   ldy     #$02                            ; 224E: A0 02    
-  lda     ZP_06                           ; 2250: A5 06    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 2250: A5 06    
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2252: 91 00    
 
   jmp     GOTO_NEXT_OBJECT                ; 2254: 4C 1A 26 
@@ -747,13 +751,13 @@ FPAAAA
   jsr     Convert_XY_to_UDG_RAM_Addr      ; 226E: 20 1D 35 
   jsr     Laser_ZP17_15_to_ZP16_14        ; 2271: 20 8B 22 
   ldy     #$00                            ; 2274: A0 00    
-  lda     ZP_14_Spr_Width_Pix             ; 2276: A5 14    
+  lda     ZP_Sprite_Width_Pixels          ; 2276: A5 14    
   eor     (ZP_UDG_RAM_X),y                ; 2278: 51 04    
   sta     (ZP_UDG_RAM_X),y                ; 227A: 91 04    
   pla                                     ; 227C: 68       
   tay                                     ; 227D: A8        Restore Y
 
-  dec     ZP_02                           ; 227E: C6 02    
+  dec     ZP_02_Obj_Height_Cntdn_1        ; 227E: C6 02    
   bne     FP6666                          ; 2280: D0 8F     Iterate to next laser shot
   jmp     FP8888                          ; 2282: 4C 48 22  Update object list and exit subroutine
 ; -----------------------
@@ -767,7 +771,7 @@ CLC_ADC_08
 ; L_JSR_($228B)_($2271) OK
 Laser_ZP17_15_to_ZP16_14
   lda     ZP_15                           ; 228B: A5 15    
-  sta     ZP_14_Spr_Width_Pix             ; 228D: 85 14    
+  sta     ZP_Sprite_Width_Pixels          ; 228D: 85 14    
   lda     ZP_16                           ; 228F: A5 16    
   sta     ZP_15                           ; 2291: 85 15    
   lda     ZP_17                           ; 2293: A5 17    
@@ -845,7 +849,7 @@ Reset_Level_Add_Extra_Life
   jsr     Reset_Screen_Disp_Scores        ; 22BA: 20 16 24 
 
 ; Player at level 4, add another life
-  lda     ZP_Level_Current_Plyr           ; 22BD: A5 59    
+  lda     ZP_Level_Current_Player         ; 22BD: A5 59    
   and     #$03                            ; 22BF: 29 03    
   bne     Reset_Lev_Add_Extra_Life_2      ; 22C1: D0 0E    
   jsr     Reset_Some_Objects              ; 22C3: 20 0B 23 
@@ -917,8 +921,8 @@ Reset_Some_Objects
 Reset_S_O_1
   txa                                     ; 231A: 8A       
   pha                                     ; 231B: 48       
-  jsr     Save_Obj_Type_X_Y_Color         ; 231C: 20 E9 35 
-  jsr     Get_Spr_Addr_Rocket_Top_OR_Fuel ; 231F: 20 DA 2F 
+  jsr     Load_Obj_Type_X_Y_Color         ; 231C: 20 E9 35 
+  jsr     Get_Sprite_Addr_Rocket_or_Fuel  ; 231F: 20 DA 2F 
   jsr     Load_Rocket_OR_Fuel_UDGs_2      ; 2322: 20 5A 30 
   lda     ZP_Obj_List_Ptr_Lo              ; 2325: A5 00    
   clc                                     ; 2327: 18       
@@ -993,7 +997,7 @@ Display_P2_Lives
 Display_Number_Lives
   clc                                     ; 238E: 18       
   adc     #$70                            ; 238F: 69 70     $70 = "0" character
-  sta     ZP_06                           ; 2391: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 2391: 85 06    
   jsr     Copy_Char_To_UDG_RAM            ; 2393: 20 95 35 
 
 ; Display Jetman Icon next to number of lives
@@ -1013,10 +1017,10 @@ Zero_Lives_To_UDG_RAM_1
 ; L_JSR_($23A8)_($23A2) OK
 Zero_Lives_To_UDG_RAM
   lda     #$60                            ; 23A8: A9 60     $60 = Space character
-  sta     ZP_06                           ; 23AA: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 23AA: 85 06    
   jsr     Copy_Char_To_UDG_RAM            ; 23AC: 20 95 35 
   lda     #$60                            ; 23AF: A9 60     $60 = Space character
-  sta     ZP_06                           ; 23B1: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 23B1: 85 06    
   jmp     Copy_Char_To_UDG_RAM            ; 23B3: 4C 95 35 
 ; -----------------------
 ; L_JSR_($23B6)_($237A) OK
@@ -1062,7 +1066,7 @@ Setup_Player_Lives
 ; L_BRS_($23D6)_($23E5) OK
 BACK_SPL
   lda     #$00                            ; 23D6: A9 00    
-  sta     ZP_Level_Current_Plyr           ; 23D8: 85 59    
+  sta     ZP_Level_Current_Player         ; 23D8: 85 59    
 
   lda     #$04                            ; 23DA: A9 04    
   sta     ZP_Num_Lives_P1                 ; 23DC: 85 5A    
@@ -1087,12 +1091,12 @@ Swap_Player_And_Objects
   ldx     #$01                            ; 23F5: A2 01    
 ; L_BRS_($23F7)_($2402) OK
 Swap_Player
-  lda     ZP_Level_Current_Plyr,x         ; 23F7: B5 59    
+  lda     ZP_Level_Current_Player,x       ; 23F7: B5 59    
   pha                                     ; 23F9: 48       
-  lda     ZP_Level_Other_Plyr,x           ; 23FA: B5 5B    
-  sta     ZP_Level_Current_Plyr,x         ; 23FC: 95 59    
+  lda     ZP_Level_Other_Player,x         ; 23FA: B5 5B    
+  sta     ZP_Level_Current_Player,x       ; 23FC: 95 59    
   pla                                     ; 23FE: 68       
-  sta     ZP_Level_Other_Plyr,x           ; 23FF: 95 5B    
+  sta     ZP_Level_Other_Player,x         ; 23FF: 95 5B    
   dex                                     ; 2401: CA       
   bpl     Swap_Player                     ; 2402: 10 F3    
 
@@ -1137,10 +1141,10 @@ BACK_D1H2
   sta     ZP_UDG_RAM_Y                    ; 2432: 85 05    
   inx                                     ; 2434: E8       
   lda     STR_1UP_HI_2UP,x                ; 2435: BD 65 24 
-  sta     ZP_Ptr_To_Str_Lo                ; 2438: 85 0E    
+  sta     ZP_Addr_Ptr_Lo                  ; 2438: 85 0E    
   inx                                     ; 243A: E8       
   lda     STR_1UP_HI_2UP,x                ; 243B: BD 65 24 
-  sta     ZP_Ptr_To_Str_Hi                ; 243E: 85 0F    
+  sta     ZP_Addr_Ptr_Hi                  ; 243E: 85 0F    
   inx                                     ; 2440: E8       
 
   txa                                     ; 2441: 8A       
@@ -1293,31 +1297,31 @@ Display_Game_Select
   fcb     $FF                             ; 24EA: FF       
 
   lda     #$00                            ; 24EB: A9 00    
-  sta     ZP_08                           ; 24ED: 85 08    
+  sta     ZP_08_Sprite_Data_Index         ; 24ED: 85 08    
 ; L_BRS_($24EF)_($251C) OK
 DGS1
   lda     #$18                            ; 24EF: A9 18    
   sta     ZP_UDG_RAM_X                    ; 24F1: 85 04    
-  ldx     ZP_08                           ; 24F3: A6 08    
+  ldx     ZP_08_Sprite_Data_Index         ; 24F3: A6 08    
   lda     Fn_Key_SP_Row_Offsets,x         ; 24F5: BD 1F 25 
   sta     ZP_UDG_RAM_Y                    ; 24F8: 85 05    
   jsr     Setup_Color_RAM_Ptr             ; 24FA: 20 F7 34 
   jsr     Convert_XY_to_UDG_RAM_Addr      ; 24FD: 20 1D 35 
 
   ldy     #$00                            ; 2500: A0 00    
-  ldx     ZP_08                           ; 2502: A6 08    
+  ldx     ZP_08_Sprite_Data_Index         ; 2502: A6 08    
   lda     ZP_Game_Sel_F1_Flash,x          ; 2504: B5 45    
   jsr     DSTR1                           ; 2506: 20 D6 34 
   iny                                     ; 2509: C8       
   tya                                     ; 250A: 98       
   clc                                     ; 250B: 18       
-  adc     ZP_Ptr_To_Str_Lo                ; 250C: 65 0E    
-  sta     ZP_Ptr_To_Str_Lo                ; 250E: 85 0E    
-  lda     ZP_Ptr_To_Str_Hi                ; 2510: A5 0F    
+  adc     ZP_Addr_Ptr_Lo                  ; 250C: 65 0E    
+  sta     ZP_Addr_Ptr_Lo                  ; 250E: 85 0E    
+  lda     ZP_Addr_Ptr_Hi                  ; 2510: A5 0F    
   adc     #$00                            ; 2512: 69 00    
-  sta     ZP_Ptr_To_Str_Hi                ; 2514: 85 0F    
-  inc     ZP_08                           ; 2516: E6 08    
-  lda     ZP_08                           ; 2518: A5 08    
+  sta     ZP_Addr_Ptr_Hi                  ; 2514: 85 0F    
+  inc     ZP_08_Sprite_Data_Index         ; 2516: E6 08    
+  lda     ZP_08_Sprite_Data_Index         ; 2518: A5 08    
   cmp     #$05                            ; 251A: C9 05    
   bne     DGS1                            ; 251C: D0 D1    
   rts                                     ; 251E: 60       
@@ -1785,10 +1789,10 @@ Sound_Loop
   asl     a                               ; 26D5: 0A       
   tax                                     ; 26D6: AA       
   lda     Subroutine_List2,x              ; 26D7: BD 43 27 
-  sta     ZP_08                           ; 26DA: 85 08    
+  sta     ZP_08_Sprite_Data_Index         ; 26DA: 85 08    
   lda     Subroutine_List2+1,x            ; 26DC: BD 44 27 
   sta     ZP_09                           ; 26DF: 85 09    
-  jmp     (ZP_08)                         ; 26E1: 6C 08 00 
+  jmp     (ZP_08_Sprite_Data_Index)       ; 26E1: 6C 08 00 
 ; -----------------------
 ; L_JMP_($26E4)_($2719) OK
 Goto_Next_Sound
@@ -1984,7 +1988,7 @@ Test_New_Hi_Score
 ; L_BRS_($2790)_($279D) OK
 Compare_BCD_Byte
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2790: B1 00    
-  cmp     (ZP_08),y                       ; 2792: D1 08    
+  cmp     (ZP_08_Sprite_Data_Index),y     ; 2792: D1 08    
   beq     Move_To_Next_BCD_Byte           ; 2794: F0 03    
   bcc     Copy_Player_To_Hi_Score         ; 2796: 90 08     Branch if SCORE_HI < Player Score
   rts                                     ; 2798: 60        SCORE_HI >= Player Score, so return
@@ -2002,7 +2006,7 @@ Copy_Player_To_Hi_Score
   ldy     #$02                            ; 27A0: A0 02     3 BCD bytes, 02, 01, 00
 ; L_BRS_($27A2)_($27A7) OK
 Copy_Player_To_Hi_Score_1
-  lda     (ZP_08),y                       ; 27A2: B1 08    
+  lda     (ZP_08_Sprite_Data_Index),y     ; 27A2: B1 08    
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 27A4: 91 00    
   dey                                     ; 27A6: 88       
   bpl     Copy_Player_To_Hi_Score_1       ; 27A7: 10 F9     Return when all bytes copied
@@ -2045,17 +2049,17 @@ Display_Rocket_Flame
 Display_Rocket_Flame_1
   inc     ZP_Rocket_Flame_Toggle          ; 27B3: E6 27    
 
-  lda     ZP_Saved_Obj_Y                  ; 27B5: A5 11    
+  lda     ZP_Obj_Y_Position_1             ; 27B5: A5 11    
   pha                                     ; 27B7: 48       
   clc                                     ; 27B8: 18       
   adc     #$15                            ; 27B9: 69 15    
-  sta     ZP_Saved_Obj_Y                  ; 27BB: 85 11    
+  sta     ZP_Obj_Y_Position_1             ; 27BB: 85 11    
 
-  lda     ZP_Save_Obj_Lst_Prms2_Hi        ; 27BD: A5 19    
+  lda     ZP_Obj_Y_Position_2             ; 27BD: A5 19    
   pha                                     ; 27BF: 48       
   clc                                     ; 27C0: 18       
   adc     #$15                            ; 27C1: 69 15    
-  sta     ZP_Save_Obj_Lst_Prms2_Hi        ; 27C3: 85 19     0019 must be height of rocket
+  sta     ZP_Obj_Y_Position_2             ; 27C3: 85 19     0019 must be height of rocket
 
   cmp     #$AF                            ; 27C5: C9 AF     Check rocket height
   beq     Display_Flame                   ; 27C7: F0 50     Display Flame
@@ -2069,7 +2073,7 @@ Display_Rocket_Flame_1
   sec                                     ; 27D5: 38       
   sbc     #$01                            ; 27D6: E9 01    
   jsr     Get_Flame_UDG_Addr              ; 27D8: 20 2E 28 
-  jsr     Set_UDG_RAM_Ptr_Spr_Dimen       ; 27DB: 20 8D 37 
+  jsr     Set_UDG_RAM_Ptr_Sprite_Dimen    ; 27DB: 20 8D 37 
   jsr     DDDDDD                          ; 27DE: 20 10 36 
 ; L_BRS_($27E1)_($27CD) OK
 Display_Rocket_Flame_2
@@ -2081,11 +2085,11 @@ Display_Rocket_Flame_2
   sec                                     ; 27EB: 38       
   sbc     #$01                            ; 27EC: E9 01    
   jsr     Get_Flame_UDG_Addr              ; 27EE: 20 2E 28 
-  jsr     Set_UDG_RAM_Ptr_Spr_Dimen       ; 27F1: 20 8D 37 
+  jsr     Set_UDG_RAM_Ptr_Sprite_Dimen    ; 27F1: 20 8D 37 
   jsr     YYYYYY                          ; 27F4: 20 4C 36 
-  lda     ZP_Save_Obj_Lst_Prms2_Lo        ; 27F7: A5 18    
+  lda     ZP_Obj_X_Position_2             ; 27F7: A5 18    
   sta     ZP_UDG_RAM_X                    ; 27F9: 85 04    
-  lda     ZP_Save_Obj_Lst_Prms2_Hi        ; 27FB: A5 19    
+  lda     ZP_Obj_Y_Position_2             ; 27FB: A5 19    
   sta     ZP_UDG_RAM_Y                    ; 27FD: 85 05    
   jsr     Setup_Color_RAM_Ptr             ; 27FF: 20 F7 34 
   lda     #$02                            ; 2802: A9 02    
@@ -2100,9 +2104,9 @@ Display_Rocket_Flame_2
 ; L_JMP_($280B)_($282B) OK
 Display_Rocket_Flame_3
   pla                                     ; 280B: 68       
-  sta     ZP_Save_Obj_Lst_Prms2_Hi        ; 280C: 85 19    
+  sta     ZP_Obj_Y_Position_2             ; 280C: 85 19    
   pla                                     ; 280E: 68       
-  sta     ZP_Saved_Obj_Y                  ; 280F: 85 11    
+  sta     ZP_Obj_Y_Position_1             ; 280F: 85 11    
   rts                                     ; 2811: 60       
 ; ===========================================================
 ; L_BRS_($2812)_($27C9) OK
@@ -2119,7 +2123,7 @@ Display_Flame
   sec                                     ; 281F: 38       
   sbc     #$01                            ; 2820: E9 01    
   jsr     Get_Flame_UDG_Addr              ; 2822: 20 2E 28 
-  jsr     Set_UDG_RAM_Ptr_Spr_Dimen       ; 2825: 20 8D 37 
+  jsr     Set_UDG_RAM_Ptr_Sprite_Dimen    ; 2825: 20 8D 37 
   jsr     DDDDDD                          ; 2828: 20 10 36 
   jmp     Display_Rocket_Flame_3          ; 282B: 4C 0B 28 
 ; -----------------------
@@ -2169,9 +2173,9 @@ Ptr_Final_Char_Hi
 ; #####################################################################################
 
 FIRE_PRESSED
-  jsr     Save_Obj_Type_X_Y               ; 283E: 20 D7 35 
+  jsr     Load_Obj_Type_X_Y               ; 283E: 20 D7 35 
   jsr     Platform_Collision_Test         ; 2841: 20 B3 30  Remove=Gems all fall through platforms and floor, reentering at top
-  lda     ZP_02                           ; 2844: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 2844: A5 02    
   bmi     FP_1                            ; 2846: 30 09    
   ldy     #$03                            ; 2848: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 284A: B1 00    
@@ -2180,13 +2184,13 @@ FIRE_PRESSED
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 284F: 91 00    
 ; L_BRS_($2851)_($2846) OK
 FP_1
-  jsr     Save_Obj_Type_X_Y_Color         ; 2851: 20 E9 35 
+  jsr     Load_Obj_Type_X_Y_Color         ; 2851: 20 E9 35 
   jsr     Test_Jetman_Obj_Collide         ; 2854: 20 58 2D 
   bpl     Jump_To_Subroutine_List3        ; 2857: 10 1B    
   lda     #$00                            ; 2859: A9 00    
-  jsr     Get_Spr_Addr_Rckt_Top_OR_Fuel_1 ; 285B: 20 DC 2F 
+  jsr     Get_Sprite_Addr_Rocket_or_Fue_1 ; 285B: 20 DC 2F 
   jsr     Get_Object_UDG_Addr_Small       ; 285E: 20 E5 2F 
-  jsr     Set_UDG_RAM_Ptr_Spr_Dimen       ; 2861: 20 8D 37 
+  jsr     Set_UDG_RAM_Ptr_Sprite_Dimen    ; 2861: 20 8D 37 
   jsr     DDDDDD                          ; 2864: 20 10 36 
 
 ; Jetman pickup Gem/Elements/Gold etc = 250 points
@@ -2204,10 +2208,10 @@ Jump_To_Subroutine_List3
   and     #$0E                            ; 2878: 29 0E    
   tax                                     ; 287A: AA       
   lda     Subroutine_List3,x              ; 287B: BD 88 28 
-  sta     ZP_08                           ; 287E: 85 08    
+  sta     ZP_08_Sprite_Data_Index         ; 287E: 85 08    
   lda     Subroutine_List3+1,x            ; 2880: BD 89 28 
   sta     ZP_09                           ; 2883: 85 09    
-  jmp     (ZP_08)                         ; 2885: 6C 08 00 
+  jmp     (ZP_08_Sprite_Data_Index)       ; 2885: 6C 08 00 
 Subroutine_List3
   fdb     Set_Obj_Posn_05_To_07           ; 2888: 92 28    
   fdb     Set_Obj_Posn_05_To_03_Or_00     ; 288A: A4 28    
@@ -2396,7 +2400,7 @@ Store_Object_Type_2
 
 EXPLOSIONS
   inc     ZP_HW_IRQ_Count                 ; 2934: E6 21    
-  jsr     Save_Obj_Type_X_Y_Color         ; 2936: 20 E9 35 
+  jsr     Load_Obj_Type_X_Y_Color         ; 2936: 20 E9 35 
   ldy     #$02                            ; 2939: A0 02    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 293B: B1 00    
   and     ZP_HW_IRQ_Count1                ; 293D: 25 4A    
@@ -2527,11 +2531,11 @@ Display_String_
 ; L_BRS_($2A05)_($2A0B) OK
 ; L_BRS_($2A05)_($2A0F) OK
 Delay_Loop_Game_Over
-  inc     ZP_02                           ; 2A05: E6 02     5 cycles
+  inc     ZP_02_Obj_Height_Cntdn_1        ; 2A05: E6 02     5 cycles
   bne     Delay_Loop_Game_Over            ; 2A07: D0 FC     3 cycles when taken, 2 when not taken
-  inc     ZP_03                           ; 2A09: E6 03    
+  inc     ZP_03_Sprite_Height             ; 2A09: E6 03    
   bne     Delay_Loop_Game_Over            ; 2A0B: D0 F8    
-  inc     ZP_0A                           ; 2A0D: E6 0A    
+  inc     ZP_0A_Obj_Height_Cntdn_1        ; 2A0D: E6 0A    
   bne     Delay_Loop_Game_Over            ; 2A0F: D0 F4    
   rts                                     ; 2A11: 60       
 ; ===========================================================
@@ -2795,7 +2799,7 @@ Level_3_Saucer_a
 ; L_JSR_($2B16)_($2AC4) OK
 Platform_Collision_Aliens
   jsr     Platform_Collision_Test         ; 2B16: 20 B3 30  Remove=(Not triggered on first level, so don't yet know)
-  lda     ZP_02                           ; 2B19: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 2B19: A5 02    
   bpl     PCA_RTS                         ; 2B1B: 10 19    
 
   ldy     #$02                            ; 2B1D: A0 02    
@@ -2926,7 +2930,7 @@ Obj_Jetman_NotEqu_3F2_3
   fcb     $00                             ; 2BCD: 00       
   fdb     $03C0                           ; 2BCE: C0 03     Rocket middle module then Fuel object
   fcb     $FF                             ; 2BD0: FF       
-  jsr     Save_Obj_Type_X_Y_Color         ; 2BD1: 20 E9 35 
+  jsr     Load_Obj_Type_X_Y_Color         ; 2BD1: 20 E9 35 
   ldy     #$06                            ; 2BD4: A0 06    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2BD6: B1 00    
   jsr     Load_Rocket_OR_Fuel_UDGs_2      ; 2BD8: 20 5A 30 
@@ -2964,32 +2968,32 @@ Raster_Line_Table
 ; L_JSR_($2BF8)_($2C64) OK
 Test_Laser_Hits_1
   lda     #$88                            ; 2BF8: A9 88    
-  sta     ZP_08                           ; 2BFA: 85 08    
+  sta     ZP_08_Sprite_Data_Index         ; 2BFA: 85 08    
   lda     #$03                            ; 2BFC: A9 03    
   sta     ZP_09                           ; 2BFE: 85 09    
 
 ; Store number of lasers (4) for processing to ZP_02
   lda     #$04                            ; 2C00: A9 04    
-  sta     ZP_02                           ; 2C02: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2C02: 85 02    
 
 ; Store current object (not the laser) X and Y in ZP_06/07
   ldy     #$03                            ; 2C04: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C06: B1 00     Object Y
-  sta     ZP_06                           ; 2C08: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 2C08: 85 06    
   dey                                     ; 2C0A: 88       
   dey                                     ; 2C0B: 88        Object X
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C0C: B1 00    
-  sta     ZP_07                           ; 2C0E: 85 07    
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 2C0E: 85 07    
 
 ; Test if laser X-coords have bit 2 set, not sure why
 ; L_BRS_($2C10)_($2C5C) OK
 BACK_2C10
   ldy     #$02                            ; 2C10: A0 02    
-  lda     (ZP_08),y                       ; 2C12: B1 08     X-coord of end of laser
+  lda     (ZP_08_Sprite_Data_Index),y     ; 2C12: B1 08     X-coord of end of laser
   bit     MASK_00000100                   ; 2C14: 2C 16 20 
   bne     SKIP_2C21                       ; 2C17: D0 08    
   iny                                     ; 2C19: C8       
-  lda     (ZP_08),y                       ; 2C1A: B1 08     Delayed X-coord of end of laser
+  lda     (ZP_08_Sprite_Data_Index),y     ; 2C1A: B1 08     Delayed X-coord of end of laser
   bit     MASK_00000100                   ; 2C1C: 2C 16 20 
   beq     Goto_Next_Obj                   ; 2C1F: F0 32    
 
@@ -2997,22 +3001,22 @@ BACK_2C10
 ; L_BRS_($2C21)_($2C17) OK
 SKIP_2C21
   ldy     #$00                            ; 2C21: A0 00    
-  lda     (ZP_08),y                       ; 2C23: B1 08    
+  lda     (ZP_08_Sprite_Data_Index),y     ; 2C23: B1 08    
   beq     Goto_Next_Obj                   ; 2C25: F0 2C    
 
   iny                                     ; 2C27: C8       
-  lda     ZP_06                           ; 2C28: A5 06    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 2C28: A5 06    
   sec                                     ; 2C2A: 38       
-  sbc     (ZP_08),y                       ; 2C2B: F1 08    
+  sbc     (ZP_08_Sprite_Data_Index),y     ; 2C2B: F1 08    
   cmp     #$10                            ; 2C2D: C9 10    
   bcs     Goto_Next_Obj                   ; 2C2F: B0 22    
 
   iny                                     ; 2C31: C8       
-  lda     (ZP_08),y                       ; 2C32: B1 08    
+  lda     (ZP_08_Sprite_Data_Index),y     ; 2C32: B1 08    
   and     #$F8                            ; 2C34: 29 F8    
   sbc     #$03                            ; 2C36: E9 03    
   sec                                     ; 2C38: 38       
-  sbc     ZP_07                           ; 2C39: E5 07    
+  sbc     ZP_07_Sprite_Data_Addr_Hi       ; 2C39: E5 07    
   bpl     SKIP_2C42                       ; 2C3B: 10 05    
 
   eor     #$FF                            ; 2C3D: 49 FF    
@@ -3025,13 +3029,13 @@ SKIP_2C42
 
 ; Return $80 in ZP_02
   lda     #$80                            ; 2C46: A9 80    
-  sta     ZP_02                           ; 2C48: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2C48: 85 02    
 
 ; Zero bit 2 i.e. xxxxx0xx
   ldy     #$02                            ; 2C4A: A0 02    
-  lda     (ZP_08),y                       ; 2C4C: B1 08    
+  lda     (ZP_08_Sprite_Data_Index),y     ; 2C4C: B1 08    
   and     #$FB                            ; 2C4E: 29 FB    
-  sta     (ZP_08),y                       ; 2C50: 91 08    
+  sta     (ZP_08_Sprite_Data_Index),y     ; 2C50: 91 08    
   rts                                     ; 2C52: 60       
 ; ===========================================================
 ; Increment current object address and decrement object counter
@@ -3040,13 +3044,13 @@ SKIP_2C42
 ; L_BRS_($2C53)_($2C2F) OK
 ; L_BRS_($2C53)_($2C44) OK
 Goto_Next_Obj
-  lda     ZP_08                           ; 2C53: A5 08    
+  lda     ZP_08_Sprite_Data_Index         ; 2C53: A5 08    
   clc                                     ; 2C55: 18       
   adc     #$08                            ; 2C56: 69 08    
-  sta     ZP_08                           ; 2C58: 85 08    
+  sta     ZP_08_Sprite_Data_Index         ; 2C58: 85 08    
 
 ; Decrement object counter, return when all processed
-  dec     ZP_02                           ; 2C5A: C6 02    
+  dec     ZP_02_Obj_Height_Cntdn_1        ; 2C5A: C6 02    
   bne     BACK_2C10                       ; 2C5C: D0 B2    
   rts                                     ; 2C5E: 60       
 ; ===========================================================
@@ -3056,9 +3060,9 @@ Goto_Next_Obj
 ; L_JSR_($2C5F)_($2C6A) OK
 Test_Laser_Hits
   inc     ZP_HW_IRQ_Count                 ; 2C5F: E6 21    
-  jsr     Save_Obj_Type_X_Y               ; 2C61: 20 D7 35 
+  jsr     Load_Obj_Type_X_Y               ; 2C61: 20 D7 35 
   jsr     Test_Laser_Hits_1               ; 2C64: 20 F8 2B 
-  lda     ZP_02                           ; 2C67: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 2C67: A5 02    
   rts                                     ; 2C69: 60       
 ; ===========================================================
 
@@ -3087,7 +3091,7 @@ LEVEL_0_FUZZBALL
   jsr     Test_Laser_Hits                 ; 2C6A: 20 5F 2C 
   bmi     Alien_Hit_Update_Score          ; 2C6D: 30 09    
   jsr     Platform_Collision_Test         ; 2C6F: 20 B3 30  Remove=1st Level Aliens don't explode on platform/floor impact
-  lda     ZP_02                           ; 2C72: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 2C72: A5 02    
   bpl     Update_Sprite_Posn_Collide      ; 2C74: 10 1C    
   bmi     Object_To_Explosion             ; 2C76: 30 14    
 
@@ -3098,19 +3102,19 @@ LEVEL_0_FUZZBALL
 ; L_BRS_($2C78)_($2C6D) OK
 ; L_JMP_($2C78)_($2C9C) OK
 Alien_Hit_Update_Score
-  lda     ZP_Level_Current_Plyr           ; 2C78: A5 59    
+  lda     ZP_Level_Current_Player         ; 2C78: A5 59    
   and     #$03                            ; 2C7A: 29 03    
   asl     a                               ; 2C7C: 0A       
   tax                                     ; 2C7D: AA       
 
 ; Get score high byte and save
   lda     Alien_Points_Lookup,x           ; 2C7E: BD DB 2C 
-  sta     ZP_02                           ; 2C81: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2C81: 85 02    
   inx                                     ; 2C83: E8       
 
 ; Get score low byte and save
   lda     Alien_Points_Lookup,x           ; 2C84: BD DB 2C 
-  sta     ZP_03                           ; 2C87: 85 03    
+  sta     ZP_03_Sprite_Height             ; 2C87: 85 03    
   jsr     Update_Score                    ; 2C89: 20 63 30 
 
 ; L_BRS_($2C8C)_($2C76) OK
@@ -3129,7 +3133,7 @@ Object_To_Explosion
 ; L_BRS_($2C92)_($2C74) OK
 Update_Sprite_Posn_Collide
   jsr     Test_Jetman_Obj_Collide         ; 2C92: 20 58 2D 
-  lda     ZP_02                           ; 2C95: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 2C95: A5 02    
   bpl     Update_Sprite_Posn              ; 2C97: 10 06    
   jsr     Spr_Ptr_To_Jetman               ; 2C99: 20 45 2A 
   jmp     Alien_Hit_Update_Score          ; 2C9C: 4C 78 2C 
@@ -3216,9 +3220,9 @@ Set_Obj_List_Ptr_To_Alien0
   lda     #$03                            ; 2CF5: A9 03    
   sta     ZP_Obj_List_Ptr_Hi              ; 2CF7: 85 01    
 
-; Setup 6 objects
+; Setup 6 alien objects DEBUG Set 2CFA to 1 to spawn only 1 alien
   lda     #$06                            ; 2CF9: A9 06    
-  sta     ZP_02                           ; 2CFB: 85 02     Counter variable
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2CFB: 85 02     Counter variable
   ldy     #$00                            ; 2CFD: A0 00    
 ; L_BRS_($2CFF)_($2D0C) OK
 Next_Object
@@ -3230,7 +3234,7 @@ Next_Object
   clc                                     ; 2D05: 18       
   adc     #$08                            ; 2D06: 69 08    
   sta     ZP_Obj_List_Ptr_Lo              ; 2D08: 85 00    
-  dec     ZP_02                           ; 2D0A: C6 02     Dec object counter
+  dec     ZP_02_Obj_Height_Cntdn_1        ; 2D0A: C6 02     Dec object counter
   bne     Next_Object                     ; 2D0C: D0 F1    
   rts                                     ; 2D0E: 60       
 ; ===========================================================
@@ -3239,7 +3243,7 @@ Next_Object
 ; Set type depending on current level i.e. 0, 1, 2 or 3
 ; L_BRS_($2D0F)_($2D01) OK
 Init_Alien_Sprite
-  lda     ZP_Level_Current_Plyr           ; 2D0F: A5 59    
+  lda     ZP_Level_Current_Player         ; 2D0F: A5 59    
   and     #$03                            ; 2D11: 29 03     Zero bits 2-7
   tax                                     ; 2D13: AA        Save current level
   lda     Level_Alien_Type_Lookup,x       ; 2D14: BD 4C 2D 
@@ -3275,14 +3279,14 @@ Init_Alien_Sprite
   iny                                     ; 2D35: C8       
   txa                                     ; 2D36: 8A       
   and     #$01                            ; 2D37: 29 01    
-  sta     ZP_02                           ; 2D39: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2D39: 85 02    
 
 ; Set object colour randomly, lookup table has 2 colours per level
-  lda     ZP_Level_Current_Plyr           ; 2D3B: A5 59    
+  lda     ZP_Level_Current_Player         ; 2D3B: A5 59    
   asl     a                               ; 2D3D: 0A       
   and     #%00000110                      ; 2D3E: 29 06    
   clc                                     ; 2D40: 18       
-  adc     ZP_02                           ; 2D41: 65 02    
+  adc     ZP_02_Obj_Height_Cntdn_1        ; 2D41: 65 02    
   tax                                     ; 2D43: AA       
   lda     Level_Alien_Color_Lookup,x      ; 2D44: BD 50 2D 
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2D47: 91 00    
@@ -3309,67 +3313,67 @@ Level_Alien_Color_Lookup
 ; L_JSR_($2D58)_($2FA4) OK
 Test_Jetman_Obj_Collide
   lda     ZP_Flash_Score_Countdown        ; 2D58: A5 5D    
-  bne     TJOC_0                          ; 2D5A: D0 0D    
+  bne     Test_Jetman_Obj_Collide_1       ; 2D5A: D0 0D    
   lda     Obj_Jetman                      ; 2D5C: AD 80 03 
   and     #$3F                            ; 2D5F: 29 3F    
   cmp     #$01                            ; 2D61: C9 01     Jetman flying?
-  beq     TJOC_1                          ; 2D63: F0 09     Yes, branch
+  beq     Test_Jetman_Obj_Collide_2       ; 2D63: F0 09     Yes, branch
   cmp     #$02                            ; 2D65: C9 02     Jetman standing?
-  beq     TJOC_1                          ; 2D67: F0 05     Yes, branch
+  beq     Test_Jetman_Obj_Collide_2       ; 2D67: F0 05     Yes, branch
 
 ; L_BRS_($2D69)_($2D5A) OK
-TJOC_0
+Test_Jetman_Obj_Collide_1
   lda     #$00                            ; 2D69: A9 00     If Flashing Score, no collision
-  sta     ZP_02                           ; 2D6B: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2D6B: 85 02    
   rts                                     ; 2D6D: 60       
 ; ===========================================================
 
 ; L_BRS_($2D6E)_($2D63) OK
 ; L_BRS_($2D6E)_($2D67) OK
-TJOC_1
+Test_Jetman_Obj_Collide_2
   ldy     #$00                            ; 2D6E: A0 00     Default No Collision unless tests work out
-  sty     ZP_02                           ; 2D70: 84 02     Reset variable
+  sty     ZP_02_Obj_Height_Cntdn_1        ; 2D70: 84 02     Reset variable
 
   iny                                     ; 2D72: C8        Y=1
   lda     Obj_Jetman_X                    ; 2D73: AD 81 03 
   sec                                     ; 2D76: 38       
   sbc     (ZP_Obj_List_Ptr_Lo),y          ; 2D77: F1 00     Compare objects X-coord vs Jetman's
-  bpl     TJOC_2                          ; 2D79: 10 05    
+  bpl     Test_Jetman_Obj_Collide_3       ; 2D79: 10 05    
   clc                                     ; 2D7B: 18       
   eor     #$FF                            ; 2D7C: 49 FF    
   adc     #$01                            ; 2D7E: 69 01    
 
 ; L_BRS_($2D80)_($2D79) OK
-TJOC_2
+Test_Jetman_Obj_Collide_3
   cmp     #$0C                            ; 2D80: C9 0C    
-  bcs     TJOC_RTS                        ; 2D82: B0 17     Carry Set? Yes, Return
+  bcs     Test_Jetman_Obj_Collide_RTS     ; 2D82: B0 17     Carry Set? Yes, Return
 
   iny                                     ; 2D84: C8        Y=2
   iny                                     ; 2D85: C8        Y=3
   lda     Obj_Jetman_Y                    ; 2D86: AD 83 03 
   sec                                     ; 2D89: 38       
   sbc     (ZP_Obj_List_Ptr_Lo),y          ; 2D8A: F1 00     Compare objects Y-coord vs Jetman's
-  bpl     TJOC_4                          ; 2D8C: 10 0E    
+  bpl     Test_Jetman_Obj_Collide_5       ; 2D8C: 10 0E    
   clc                                     ; 2D8E: 18       
   eor     #$FF                            ; 2D8F: 49 FF    
   adc     #$01                            ; 2D91: 69 01    
 
   cmp     #$0C                            ; 2D93: C9 0C    
 ; L_JMP_($2D95)_($2D9E) OK
-TJOC_3
-  bcs     TJOC_RTS                        ; 2D95: B0 04     Carry Set? Yes, return
+Test_Jetman_Obj_Collide_4
+  bcs     Test_Jetman_Obj_Collide_RTS     ; 2D95: B0 04     Carry Set? Yes, return
 
   lda     #$80                            ; 2D97: A9 80     Set ZP_01_Lo = $80 and return
-  sta     ZP_02                           ; 2D99: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2D99: 85 02    
 ; L_BRS_($2D9B)_($2D82) OK
 ; L_BRS_($2D9B)_($2D95) OK
-TJOC_RTS
+Test_Jetman_Obj_Collide_RTS
   rts                                     ; 2D9B: 60       
 ; ===========================================================
 ; L_BRS_($2D9C)_($2D8C) OK
-TJOC_4
+Test_Jetman_Obj_Collide_5
   cmp     #$12                            ; 2D9C: C9 12    
-  jmp     TJOC_3                          ; 2D9E: 4C 95 2D 
+  jmp     Test_Jetman_Obj_Collide_4       ; 2D9E: 4C 95 2D 
 ; -----------------------
 
 ; L_JSR_($2DA1)_($22DD) OK
@@ -3404,7 +3408,7 @@ XXXX_3
 ; L_JSR_($2DCB)_($2DBF) OK
 XXXX_4
   jsr     Set_Sprite_UDG_Color            ; 2DCB: 20 DD 2D 
-  jsr     Save_Obj_Type_X_Y_Color         ; 2DCE: 20 E9 35 
+  jsr     Load_Obj_Type_X_Y_Color         ; 2DCE: 20 E9 35 
 ; L_BRS_($2DD1)_($2DDA) OK
 XXXX_5
   jsr     XXXX_6                          ; 2DD1: 20 E8 2D 
@@ -3426,7 +3430,7 @@ Set_Sprite_UDG_Color
 ; L_JSR_($2DE8)_($2DD1) OK
 ; L_JSR_($2DE8)_($2EB5) OK
 XXXX_6
-  lda     ZP_Level_Current_Plyr           ; 2DE8: A5 59    
+  lda     ZP_Level_Current_Player         ; 2DE8: A5 59    
   lsr     a                               ; 2DEA: 4A       
   lsr     a                               ; 2DEB: 4A       
   and     #$03                            ; 2DEC: 29 03     Current level modulus 4
@@ -3439,19 +3443,19 @@ XXXX_6
   pla                                     ; 2DF8: 68       
 
   jsr     Get_Object_UDG_Addr_Small       ; 2DF9: 20 E5 2F 
-  jmp     Set_UDG_RAM_Ptr_Spr_Dimen       ; 2DFC: 4C 8D 37 
+  jmp     Set_UDG_RAM_Ptr_Sprite_Dimen    ; 2DFC: 4C 8D 37 
 ; -----------------------
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
 Dec_Saved_Obj_List_Params_by_10
-  lda     ZP_Save_Obj_Lst_Prms2_Hi        ; 2DFF: A5 19    
+  lda     ZP_Obj_Y_Position_2             ; 2DFF: A5 19    
   sec                                     ; 2E01: 38       
   sbc     #$10                            ; 2E02: E9 10    
-  sta     ZP_Save_Obj_Lst_Prms2_Hi        ; 2E04: 85 19    
-  lda     ZP_Saved_Obj_Y                  ; 2E06: A5 11    
+  sta     ZP_Obj_Y_Position_2             ; 2E04: 85 19    
+  lda     ZP_Obj_Y_Position_1             ; 2E06: A5 11    
   sec                                     ; 2E08: 38       
   sbc     #$10                            ; 2E09: E9 10    
-  sta     ZP_Saved_Obj_Y                  ; 2E0B: 85 11    
+  sta     ZP_Obj_Y_Position_1             ; 2E0B: 85 11    
   lda     ZP_Ship_UDG_Addr_Offset         ; 2E0D: A5 1E    
   clc                                     ; 2E0F: 18       
   adc     #$04                            ; 2E10: 69 04    
@@ -3483,7 +3487,7 @@ Dec_Saved_Obj_List_Params_by_10
 ; #####################################################################################
 
 ROCKET_ASCEND
-  jsr     Save_Obj_Type_X_Y               ; 2E17: 20 D7 35 
+  jsr     Load_Obj_Type_X_Y               ; 2E17: 20 D7 35 
   ldy     #$03                            ; 2E1A: A0 03     Object height offset
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E1C: B1 00     Load object height i.e. Rocket
   cmp     #$30                            ; 2E1E: C9 30     Object hit top yet
@@ -3499,7 +3503,7 @@ ROCKET_ASCEND
 ; -----------------------
 ; L_BRS_($2E34)_($2E20) OK
 Rocket_At_Top
-  inc     ZP_Level_Current_Plyr           ; 2E34: E6 59    
+  inc     ZP_Level_Current_Player         ; 2E34: E6 59    
   jsr     Reset_Objects_1_To_8            ; 2E36: 20 C9 28 
   ldy     #$00                            ; 2E39: A0 00    
   lda     #$0B                            ; 2E3B: A9 0B    
@@ -3536,7 +3540,7 @@ Rocket_At_Top
 ; #####################################################################################
 
 ROCKET_DESCEND
-  jsr     Save_Obj_Type_X_Y               ; 2E4E: 20 D7 35 
+  jsr     Load_Obj_Type_X_Y               ; 2E4E: 20 D7 35 
   lda     #$04                            ; 2E51: A9 04    
   sta     Obj_Flame_3                     ; 2E53: 8D AB 03 
   lda     #$02                            ; 2E56: A9 02    
@@ -3588,9 +3592,9 @@ ROCKET_DESCEND
 ; #####################################################################################
 
 ROCKET_BOTTOM_MODULE
-  jsr     Save_Obj_Type_X_Y               ; 2E74: 20 D7 35 
+  jsr     Load_Obj_Type_X_Y               ; 2E74: 20 D7 35 
   jsr     Test_Jetman_Obj_Collide         ; 2E77: 20 58 2D  Jetman collided with rocket?
-  lda     ZP_02                           ; 2E7A: A5 02     Set by collision test
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 2E7A: A5 02     Set by collision test
   bpl     Rocket_Fuelled_Up               ; 2E7C: 10 2E     Collision? If no, branch
 
 ; Collision occured, handle it
@@ -3611,7 +3615,7 @@ ROCKET_BOTTOM_MODULE
   fdb     Obj_Jetman                      ; 2E93: 80 03    
   fcb     $FF                             ; 2E95: FF       
 
-  jsr     Save_Obj_Type_X_Y_Color         ; 2E96: 20 E9 35 
+  jsr     Load_Obj_Type_X_Y_Color         ; 2E96: 20 E9 35 
   jsr     AAAAAA                          ; 2E99: 20 01 36 
 
   lda     #$00                            ; 2E9C: A9 00    
@@ -3647,7 +3651,7 @@ ROCKET_BOTTOM_MODULE
 ; L_BRS_($2EAC)_($2E7C) OK
 ; L_BRS_($2EAC)_($2E84) OK
 Rocket_Fuelled_Up
-  jsr     Save_Obj_Type_X_Y_Color         ; 2EAC: 20 E9 35 
+  jsr     Load_Obj_Type_X_Y_Color         ; 2EAC: 20 E9 35 
   jsr     Display_Rocket_Flame            ; 2EAF: 20 AA 27 
   jsr     Set_Sprite_UDG_Color            ; 2EB2: 20 DD 2D 
 ; L_BRS_($2EB5)_($2EBE) OK
@@ -3665,10 +3669,10 @@ Rocket_Fuelled_Up_1
   lda     #$01                            ; 2EC8: A9 01    
 ; L_BRS_($2ECA)_($2EC6) OK
 Rocket_Fuelled_Up_2
-  sta     ZP_Tile_Color                   ; 2ECA: 85 1B    
+  sta     ZP_Obj_Color_2                  ; 2ECA: 85 1B    
   ldy     #$04                            ; 2ECC: A0 04    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ECE: B1 00    
-  sta     ZP_02                           ; 2ED0: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2ED0: 85 02    
   cmp     #$03                            ; 2ED2: C9 03    
   bcc     Rocket_Fuelled_Up_3             ; 2ED4: 90 27    
   ldy     #$02                            ; 2ED6: A0 02    
@@ -3678,16 +3682,16 @@ Rocket_Fuelled_Up_2
   beq     Rocket_Fuelled_Up_3             ; 2EDD: F0 1E    
   cmp     #$03                            ; 2EDF: C9 03    
   bcs     Rocket_Fuelled_Up_4             ; 2EE1: B0 1E    
-  sta     ZP_02                           ; 2EE3: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2EE3: 85 02    
   lda     #$04                            ; 2EE5: A9 04    
-  sta     ZP_Tile_Color                   ; 2EE7: 85 1B    
+  sta     ZP_Obj_Color_2                  ; 2EE7: 85 1B    
   jsr     Rocket_Fuelled_Up_5             ; 2EE9: 20 07 2F 
   lda     #$03                            ; 2EEC: A9 03    
   sec                                     ; 2EEE: 38       
   sbc     ZP_13                           ; 2EEF: E5 13    
-  sta     ZP_02                           ; 2EF1: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 2EF1: 85 02    
   lda     #$01                            ; 2EF3: A9 01    
-  sta     ZP_Tile_Color                   ; 2EF5: 85 1B    
+  sta     ZP_Obj_Color_2                  ; 2EF5: 85 1B    
   jsr     Rocket_Fuelled_Up_6             ; 2EF7: 20 16 2F 
   jmp     GOTO_NEXT_OBJECT                ; 2EFA: 4C 1A 26 
 ; -----------------------
@@ -3695,7 +3699,7 @@ Rocket_Fuelled_Up_2
 ; L_BRS_($2EFD)_($2EDD) OK
 Rocket_Fuelled_Up_3
   lda     #$01                            ; 2EFD: A9 01    
-  sta     ZP_Tile_Color                   ; 2EFF: 85 1B    
+  sta     ZP_Obj_Color_2                  ; 2EFF: 85 1B    
 ; L_BRS_($2F01)_($2EE1) OK
 Rocket_Fuelled_Up_4
   jsr     Rocket_Fuelled_Up_5             ; 2F01: 20 07 2F 
@@ -3717,7 +3721,7 @@ Rocket_Fuelled_Up_5
 ; L_BRS_($2F16)_($2F2E) OK
 Rocket_Fuelled_Up_6
   ldy     #$00                            ; 2F16: A0 00    
-  lda     ZP_Tile_Color                   ; 2F18: A5 1B    
+  lda     ZP_Obj_Color_2                  ; 2F18: A5 1B    
   sta     (ZP_Col_RAM_Ptr_Lo),y           ; 2F1A: 91 0C    
   iny                                     ; 2F1C: C8       
   sta     (ZP_Col_RAM_Ptr_Lo),y           ; 2F1D: 91 0C    
@@ -3728,7 +3732,7 @@ Rocket_Fuelled_Up_6
   lda     ZP_Col_RAM_Ptr_Hi               ; 2F26: A5 0D    
   sbc     #$00                            ; 2F28: E9 00    
   sta     ZP_Col_RAM_Ptr_Hi               ; 2F2A: 85 0D    
-  dec     ZP_02                           ; 2F2C: C6 02    
+  dec     ZP_02_Obj_Height_Cntdn_1        ; 2F2C: C6 02    
   bne     Rocket_Fuelled_Up_6             ; 2F2E: D0 E6    
   rts                                     ; 2F30: 60       
 ; ===========================================================
@@ -3755,7 +3759,7 @@ Rocket_Fuelled_Up_6
 ; #####################################################################################
 
 ; L_BRS_($2F31)_($2F98) OK
-Rocket_Part_Or_Fuel_Drop_Dock
+Rocket_Part_Or_Fuel_Dropped
   ldy     #$06                            ; 2F31: A0 06    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F33: B1 00    
   cmp     #$18                            ; 2F35: C9 18    
@@ -3766,7 +3770,7 @@ Rocket_Part_Or_Fuel_Drop_Dock
   clc                                     ; 2F3C: 18       
   adc     (ZP_Obj_List_Ptr_Lo),y          ; 2F3D: 71 00    
   cmp     #$AF                            ; 2F3F: C9 AF    
-  bcc     Stops_All_3                     ; 2F41: 90 6F    
+  bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F41: 90 6F    
 
   lda     Obj_RTS_Status                  ; 2F43: AD BC 03 
   ora     #$01                            ; 2F46: 09 01    
@@ -3783,7 +3787,7 @@ Rocket_Part_Or_Fuel_Drop_Dock
   lda     Obj_Rocket_Y                    ; 2F57: AD B3 03 
   sec                                     ; 2F5A: 38       
   sbc     ZP_13                           ; 2F5B: E5 13    
-  sta     ZP_Save_Obj_Lst_Prms2_Hi        ; 2F5D: 85 19    
+  sta     ZP_Obj_Y_Position_2             ; 2F5D: 85 19    
 
   jsr     Load_Rocket_OR_Fuel_UDGs_1      ; 2F5F: 20 57 30 
   inc     Obj_Rocket_Direction?           ; 2F62: EE B4 03 
@@ -3805,10 +3809,10 @@ Stops_All_2
   ldy     #$03                            ; 2F77: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F79: B1 00    
   cmp     #$A8                            ; 2F7B: C9 A8    
-  bcc     Stops_All_3                     ; 2F7D: 90 33    
+  bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F7D: 90 33    
   inc     Obj_Rocket_Fuel_Lvl             ; 2F7F: EE B2 03  Fuel cell dropped onto rocket ~8 pixels from bottom
-  jsr     Save_Obj_Type_X_Y_Color         ; 2F82: 20 E9 35 
-  jsr     Get_Spr_Addr_Rocket_Top_OR_Fuel ; 2F85: 20 DA 2F 
+  jsr     Load_Obj_Type_X_Y_Color         ; 2F82: 20 E9 35 
+  jsr     Get_Sprite_Addr_Rocket_or_Fuel  ; 2F85: 20 DA 2F 
   jsr     Load_Rocket_OR_Fuel_UDGs_2      ; 2F88: 20 5A 30 
   jmp     Stops_All_1                     ; 2F8B: 4C 65 2F 
 ; -----------------------
@@ -3825,54 +3829,62 @@ Stops_All_2
 ; When fuel picked-up and dropping onto rocket, still 03B8 checked.
 ; When fuel drops into rocket, for a short time, no interrupt until next fuel cell drops 03B8
 ROCKET_PART_OR_FUEL
-  jsr     Save_Obj_Type_X_Y               ; 2F8E: 20 D7 35 
+  jsr     Load_Obj_Type_X_Y               ; 2F8E: 20 D7 35 
 
+; Test status of the rocket part or fuel cell object
 ; 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Docked
   ldy     #LIFECYCLE_STATE                ; 2F91: A0 04    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F93: B1 00    
   bit     MASK_00000100                   ; 2F95: 2C 16 20 
-  bne     Rocket_Part_Or_Fuel_Drop_Dock   ; 2F98: D0 97    
+  bne     Rocket_Part_Or_Fuel_Dropped     ; 2F98: D0 97    
   bit     MASK_00000010                   ; 2F9A: 2C 15 20 
   bne     Copy_Jetman_XY_To_Object        ; 2F9D: D0 7F    
   bit     MASK_00000001                   ; 2F9F: 2C 14 20 
   beq     Setup_Sprite_Addr_Rocket_Fuel   ; 2FA2: F0 19    
 
+; Test if Jetman has collided with a rocket part or fuel cell?
   jsr     Test_Jetman_Obj_Collide         ; 2FA4: 20 58 2D 
-
-  lda     ZP_02                           ; 2FA7: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 2FA7: A5 02    
   bmi     Jetman_Collide_Rocket_Fuel      ; 2FA9: 30 43    
-  jsr     Platform_Collision_Test         ; 2FAB: 20 B3 30  Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
-  lda     ZP_02                           ; 2FAE: A5 02    
+
+; Test if rocket part or fuel cell has landed on a platform
+; Rocket top part only falls when middle part deposited
+; DEBUG NOP the JSR and rocket part or fuel keeps falling
+  jsr     Platform_Collision_Test         ; 2FAB: 20 B3 30 
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 2FAE: A5 02    
   bmi     Setup_Sprite_Addr_Rocket_Fuel   ; 2FB0: 30 0B    
+
+; Move object down by 2 pixels, make Y an odd number
 ; L_BRS_($2FB2)_($2F41) OK
 ; L_BRS_($2FB2)_($2F7D) OK
-Stops_All_3
-  ldy     #$03                            ; 2FB2: A0 03    
+Rocket_Part_Or_Fuel_Move_Down
+  ldy     #OBJECT_Y_POSITION              ; 2FB2: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2FB4: B1 00    
   clc                                     ; 2FB6: 18       
   adc     #$02                            ; 2FB7: 69 02    
   ora     #$01                            ; 2FB9: 09 01    
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2FBB: 91 00    
 
-
-
-
-
+; Load current object attributes into ZP variables and sprite index into A
 ; L_BRS_($2FBD)_($2FA2) OK
 ; L_BRS_($2FBD)_($2FB0) OK
 ; L_JMP_($2FBD)_($301B) OK
 ; L_JMP_($2FBD)_($3051) OK
 Setup_Sprite_Addr_Rocket_Fuel
-  jsr     Save_Obj_Type_X_Y_Color         ; 2FBD: 20 E9 35 
-  jsr     Get_Spr_Addr_Rocket_Top_OR_Fuel ; 2FC0: 20 DA 2F 
+  jsr     Load_Obj_Type_X_Y_Color         ; 2FBD: 20 E9 35 
+  jsr     Get_Sprite_Addr_Rocket_or_Fuel  ; 2FC0: 20 DA 2F 
+
+; Using index into sprite data, get addr of sprite data to A and Y and setup into ZP
 ; L_JMP_($2FC3)_($289C) OK
 Setup_Sprite_Addr
   pha                                     ; 2FC3: 48       
   jsr     Get_Object_UDG_Addr_Small       ; 2FC4: 20 E5 2F 
   jsr     Load_Small_UDG_Addr_Setup_XY    ; 2FC7: 20 3D 37 
   pla                                     ; 2FCA: 68       
+
+; Do it again to setup the sprite dimensions
   jsr     Get_Object_UDG_Addr_Small       ; 2FCB: 20 E5 2F 
-  jsr     Set_UDG_RAM_Ptr_Spr_Dimen       ; 2FCE: 20 8D 37 
+  jsr     Set_UDG_RAM_Ptr_Sprite_Dimen    ; 2FCE: 20 8D 37 
   jsr     YYYYYY                          ; 2FD1: 20 4C 36 
   jsr     Update_Color_RAM                ; 2FD4: 20 1F 38 
   jmp     GOTO_NEXT_OBJECT                ; 2FD7: 4C 1A 26 
@@ -3903,13 +3915,16 @@ Setup_Sprite_Addr
 ; L_JSR_($2FDA)_($2F85) OK
 ; L_JSR_($2FDA)_($2FC0) OK
 ; L_JSR_($2FDA)_($3057) OK
-Get_Spr_Addr_Rocket_Top_OR_Fuel
-  lda     ZP_Level_Current_Plyr           ; 2FDA: A5 59    
+Get_Sprite_Addr_Rocket_or_Fuel
+  lda     ZP_Level_Current_Player         ; 2FDA: A5 59    
+
+; Calculate and return index to object's sprite based on A e.g. player level
+; First ship is for levels 0-3, second ship for levels 4-7 then repeat
 ; L_JSR_($2FDC)_($285B) OK
-Get_Spr_Addr_Rckt_Top_OR_Fuel_1
+Get_Sprite_Addr_Rocket_or_Fue_1
   lsr     a                               ; 2FDC: 4A       
-  and     #$06                            ; 2FDD: 29 06    
-  ldy     #$06                            ; 2FDF: A0 06    
+  and     #%00000110                      ; 2FDD: 29 06    
+  ldy     #OBJECT_SPRITE_INDEX            ; 2FDF: A0 06    
   clc                                     ; 2FE1: 18       
   adc     (ZP_Obj_List_Ptr_Lo),y          ; 2FE2: 71 00    
   rts                                     ; 2FE4: 60       
@@ -3956,7 +3971,7 @@ Get_Object_UDG_Addr_Small
 
 ; L_BRS_($2FEE)_($2FA9) OK
 Jetman_Collide_Rocket_Fuel
-  jsr     Save_Obj_Type_X_Y               ; 2FEE: 20 D7 35 
+  jsr     Load_Obj_Type_X_Y               ; 2FEE: 20 D7 35 
   ldy     #$04                            ; 2FF1: A0 04     Diag attrib? Not sure...
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2FF3: B1 00    
   ora     #$02                            ; 2FF5: 09 02     Zero all bits except bit 1 i.e. 000000x0
@@ -4022,10 +4037,10 @@ Copy_Jetman_XY_To_Sprite_1
 ; -----------------------
 ; L_JSR_($3054)_($2F4B) OK
 Load_Rocket_OR_Fuel_UDGs
-  jsr     Save_Obj_Type_X_Y_Color         ; 3054: 20 E9 35 
+  jsr     Load_Obj_Type_X_Y_Color         ; 3054: 20 E9 35 
 ; L_JSR_($3057)_($2F5F) OK
 Load_Rocket_OR_Fuel_UDGs_1
-  jsr     Get_Spr_Addr_Rocket_Top_OR_Fuel ; 3057: 20 DA 2F 
+  jsr     Get_Sprite_Addr_Rocket_or_Fuel  ; 3057: 20 DA 2F 
 ; L_JSR_($305A)_($2322) OK
 ; L_JSR_($305A)_($2BD8) OK
 ; L_JSR_($305A)_($2F88) OK
@@ -4073,22 +4088,22 @@ Add_3_Digit_BCD_To_Score
 
 ; Add units
   sed                                     ; 3070: F8        Set Decimal Mode
-  lda     (ZP_06),y                       ; 3071: B1 06    
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3071: B1 06    
   clc                                     ; 3073: 18       
-  adc     ZP_02                           ; 3074: 65 02    
-  sta     (ZP_06),y                       ; 3076: 91 06    
+  adc     ZP_02_Obj_Height_Cntdn_1        ; 3074: 65 02    
+  sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3076: 91 06    
 
 ; Add tens
   dey                                     ; 3078: 88       
-  lda     (ZP_06),y                       ; 3079: B1 06    
-  adc     ZP_03                           ; 307B: 65 03    
-  sta     (ZP_06),y                       ; 307D: 91 06    
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3079: B1 06    
+  adc     ZP_03_Sprite_Height             ; 307B: 65 03    
+  sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 307D: 91 06    
 
 ; Add hundreds
   dey                                     ; 307F: 88       
-  lda     (ZP_06),y                       ; 3080: B1 06    
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3080: B1 06    
   adc     #$00                            ; 3082: 69 00    
-  sta     (ZP_06),y                       ; 3084: 91 06    
+  sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3084: 91 06    
   cld                                     ; 3086: D8        Clear Decimal Mode
 
   lda     ZP_P1_Or_P2                     ; 3087: A5 5E     Decide if working with P1 or P2
@@ -4141,7 +4156,7 @@ PCT_0
   iny                                     ; 30A0: C8       
 
   tax                                     ; 30A1: AA        Save A
-  lda     (ZP_08),y                       ; 30A2: B1 08    
+  lda     (ZP_08_Sprite_Data_Index),y     ; 30A2: B1 08    
   asl     a                               ; 30A4: 0A       
   asl     a                               ; 30A5: 0A       
   asl     a                               ; 30A6: 0A       
@@ -4177,19 +4192,19 @@ PCT_0
 Platform_Collision_Test
   ldy     #$01                            ; 30B3: A0 01    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 30B5: B1 00     1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
-  sta     ZP_Ptr_To_Str_Lo                ; 30B7: 85 0E     1st run: Y=50
+  sta     ZP_Addr_Ptr_Lo                  ; 30B7: 85 0E     1st run: Y=50
   iny                                     ; 30B9: C8       
   iny                                     ; 30BA: C8       
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 30BB: B1 00     1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
-  sta     ZP_Ptr_To_Str_Hi                ; 30BD: 85 0F     1st run: X=5f
+  sta     ZP_Addr_Ptr_Hi                  ; 30BD: 85 0F     1st run: X=5f
   jsr     _31B6_To_Tmp4_03_To_Tmp5_Yto00  ; 30BF: 20 43 31  Set Temp4 to address of data table at 31B6
 ; L_BRS_($30C2)_($311D) OK
 PCT_1
   lda     #$00                            ; 30C2: A9 00    
-  sta     ZP_02                           ; 30C4: 85 02     Set Temp1Lo=0
-  lda     (ZP_08),y                       ; 30C6: B1 08     31B6: 10 40 03 50 60 01 88 30
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 30C4: 85 02     Set Temp1Lo=0
+  lda     (ZP_08_Sprite_Data_Index),y     ; 30C6: B1 08     31B6: 10 40 03 50 60 01 88 30
   sec                                     ; 30C8: 38       
-  sbc     ZP_Ptr_To_Str_Lo                ; 30C9: E5 0E     1st run: 10-50=C0 i.e. -40
+  sbc     ZP_Addr_Ptr_Lo                  ; 30C9: E5 0E     1st run: 10-50=C0 i.e. -40
   bcc     PCT_0                           ; 30CB: 90 CE     1st run: Branch taken
 
   tax                                     ; 30CD: AA        Save A
@@ -4219,9 +4234,9 @@ PCT_03
 ; L_BRS_($30EC)_($30E5) OK
 PCT_04
   iny                                     ; 30EC: C8       
-  lda     (ZP_08),y                       ; 30ED: B1 08    
+  lda     (ZP_08_Sprite_Data_Index),y     ; 30ED: B1 08    
   sec                                     ; 30EF: 38       
-  sbc     ZP_Ptr_To_Str_Hi                ; 30F0: E5 0F    
+  sbc     ZP_Addr_Ptr_Hi                  ; 30F0: E5 0F    
   bcc     PCT_05                          ; 30F2: 90 09    
   cmp     #$04                            ; 30F4: C9 04    
   bcs     INY_2                           ; 30F6: B0 21    
@@ -4256,7 +4271,7 @@ INY_3
 INY_2
   iny                                     ; 3119: C8        2 iny's when moving from X check to X check as y already inc'd
   iny                                     ; 311A: C8       
-  dec     ZP_0A                           ; 311B: C6 0A     Temp5 used as 3-2-1 countdown
+  dec     ZP_0A_Obj_Height_Cntdn_1        ; 311B: C6 0A     Temp5 used as 3-2-1 countdown
   bne     PCT_1                           ; 311D: D0 A3    
   ldy     #$03                            ; 311F: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 3121: B1 00    
@@ -4267,7 +4282,7 @@ INY_2
   lda     #$88                            ; 312B: A9 88    
 ; L_BRS_($312D)_($3136) OK
 PCT_07
-  sta     ZP_02                           ; 312D: 85 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 312D: 85 02    
   rts                                     ; 312F: 60       
 ; ===========================================================
 ; L_BRS_($3130)_($3125) OK
@@ -4282,8 +4297,8 @@ PCT_08
 ; L_JMP_($3138)_($30FA) OK
 ; L_JMP_($3138)_($3115) OK
 ORA_Temp1Lo_And_StoreTo_Temp1Lo
-  ora     ZP_02                           ; 3138: 05 02    
-  sta     ZP_02                           ; 313A: 85 02    
+  ora     ZP_02_Obj_Height_Cntdn_1        ; 3138: 05 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 313A: 85 02    
 ; L_BRS_($313C)_($3132) OK
 PCT_09
   rts                                     ; 313C: 60       
@@ -4318,11 +4333,11 @@ PCT_10
 ; L_JSR_($3143)_($3152) OK
 _31B6_To_Tmp4_03_To_Tmp5_Yto00
   lda     #$B6                            ; 3143: A9 B6     Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
-  sta     ZP_08                           ; 3145: 85 08    
+  sta     ZP_08_Sprite_Data_Index         ; 3145: 85 08    
   lda     #$31                            ; 3147: A9 31    
   sta     ZP_09                           ; 3149: 85 09    
   lda     #$03                            ; 314B: A9 03    
-  sta     ZP_0A                           ; 314D: 85 0A    
+  sta     ZP_0A_Obj_Height_Cntdn_1        ; 314D: 85 0A    
   ldy     #$00                            ; 314F: A0 00    
   rts                                     ; 3151: 60       
 ; ===========================================================
@@ -4331,26 +4346,26 @@ Draw_Platforms
   jsr     _31B6_To_Tmp4_03_To_Tmp5_Yto00  ; 3152: 20 43 31 
 ; L_BRS_($3155)_($319F) OK
 DP_1
-  lda     (ZP_08),y                       ; 3155: B1 08     Get X value from lookup table ($10)
+  lda     (ZP_08_Sprite_Data_Index),y     ; 3155: B1 08     Get X value from lookup table ($10)
   sta     ZP_UDG_RAM_X                    ; 3157: 85 04      and store
 
   iny                                     ; 3159: C8       
-  lda     (ZP_08),y                       ; 315A: B1 08     Get Y value from lookup table ($40)
+  lda     (ZP_08_Sprite_Data_Index),y     ; 315A: B1 08     Get Y value from lookup table ($40)
   sta     ZP_UDG_RAM_Y                    ; 315C: 85 05      and store
 
   iny                                     ; 315E: C8       
-  lda     (ZP_08),y                       ; 315F: B1 08     Get ??? value from lookup table ($03)
+  lda     (ZP_08_Sprite_Data_Index),y     ; 315F: B1 08     Get ??? value from lookup table ($03)
   sta     ZP_0B                           ; 3161: 85 0B      and store
 
-  sty     ZP_03                           ; 3163: 84 03    
+  sty     ZP_03_Sprite_Height             ; 3163: 84 03    
   jsr     Setup_Color_RAM_Ptr             ; 3165: 20 F7 34 
   jsr     Convert_XY_to_UDG_RAM_Addr      ; 3168: 20 1D 35 
 
 ; Load Temp_3 with addr of left end platform UDG char
   lda     #$15                            ; 316B: A9 15    
-  sta     ZP_06                           ; 316D: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 316D: 85 06    
   lda     #$3E                            ; 316F: A9 3E    
-  sta     ZP_07                           ; 3171: 85 07    
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 3171: 85 07    
 
 ; Copy left end platform UDG char to RAM, bytes 9 per column
   ldy     #$09                            ; 3173: A0 09    
@@ -4369,8 +4384,8 @@ Loop_Next_Char
   bpl     Loop_Next_Char                  ; 3184: 10 F5    
 
 ; Set the color mapping for the platforms to Green
-  ldy     ZP_03                           ; 3186: A4 03    
-  lda     (ZP_08),y                       ; 3188: B1 08    
+  ldy     ZP_03_Sprite_Height             ; 3186: A4 03    
+  lda     (ZP_08_Sprite_Data_Index),y     ; 3188: B1 08    
   clc                                     ; 318A: 18       
   adc     #$01                            ; 318B: 69 01    
   sta     ZP_0B                           ; 318D: 85 0B    
@@ -4382,9 +4397,9 @@ DP_2
   iny                                     ; 3195: C8       
   dec     ZP_0B                           ; 3196: C6 0B    
   bpl     DP_2                            ; 3198: 10 F9    
-  ldy     ZP_03                           ; 319A: A4 03    
+  ldy     ZP_03_Sprite_Height             ; 319A: A4 03    
   iny                                     ; 319C: C8       
-  dec     ZP_0A                           ; 319D: C6 0A    
+  dec     ZP_0A_Obj_Height_Cntdn_1        ; 319D: C6 0A    
   bne     DP_1                            ; 319F: D0 B4    
   rts                                     ; 31A1: 60       
 ; ===========================================================
@@ -4396,13 +4411,13 @@ Next_UDG_Char_Loop_Next_Char
 ; L_JSR_($31A8)_($3178) OK
 ; L_JSR_($31A8)_($31A2) OK
 Next_UDG_Char
-  lda     ZP_06                           ; 31A8: A5 06    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 31A8: A5 06    
   clc                                     ; 31AA: 18       
   adc     #$0A                            ; 31AB: 69 0A    
-  sta     ZP_06                           ; 31AD: 85 06    
-  lda     ZP_07                           ; 31AF: A5 07    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 31AD: 85 06    
+  lda     ZP_07_Sprite_Data_Addr_Hi       ; 31AF: A5 07    
   adc     #$00                            ; 31B1: 69 00    
-  sta     ZP_07                           ; 31B3: 85 07    
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 31B3: 85 07    
   rts                                     ; 31B5: 60       
 ; ===========================================================
 ; Platform data for 3143_Subroutine, 3 platforms: X Y #Num_middle_chars
@@ -4583,11 +4598,11 @@ TXA_
   jmp     Update_Jetman_3                 ; 3270: 4C A6 32 
 ; -----------------------
 UPDATE_JETMAN
-  jsr     Save_Obj_Type_X_Y               ; 3273: 20 D7 35 
+  jsr     Load_Obj_Type_X_Y               ; 3273: 20 D7 35 
   jsr     Read_Keyboard_Joystick          ; 3276: 20 F7 33  Returns A=%RLDU_F111
   sta     ZP_Jetman_Movement              ; 3279: 85 1C    
   jsr     Platform_Collision_Test         ; 327B: 20 B3 30  Remove=Jetman+fuel/rocket part pick-up fly through platforms
-  lda     ZP_02                           ; 327E: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 327E: A5 02    
   bpl     Update_Jetman_1                 ; 3280: 10 03    
   jmp     JJJJJJJJ                        ; 3282: 4C F2 31 
 ; -----------------------
@@ -4645,7 +4660,7 @@ Update_Jetman_3
 ; L_JMP_($32BA)_($326C) OK
 CSC_ADC_RTN
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 32BA: 91 00    
-  lda     ZP_02                           ; 32BC: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 32BC: A5 02    
   bpl     Flying?                         ; 32BE: 10 07    
   and     #$0C                            ; 32C0: 29 0C    
   bne     Flying?                         ; 32C2: D0 03    
@@ -4801,10 +4816,10 @@ Flash_Display_Score_JMP
 ; -----------------------
 ; L_BRS_($336A)_($334F) OK
 Read_Controls_1
-  jsr     Save_Obj_Type_X_Y               ; 336A: 20 D7 35 
+  jsr     Load_Obj_Type_X_Y               ; 336A: 20 D7 35 
   jsr     Read_Keyboard_Joystick          ; 336D: 20 F7 33 
   jsr     Platform_Collision_Test         ; 3370: 20 B3 30  Remove=Jetman+pickup flies/walks jiggle when standing on a platform
-  lda     ZP_02                           ; 3373: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 3373: A5 02    
   bmi     Read_Controls_2                 ; 3375: 30 06    
   ldy     #$03                            ; 3377: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 3379: B1 00    
@@ -4825,7 +4840,7 @@ Read_Controls_3
 ; L_BRS_($338F)_($338B) OK
 Read_Controls_4
   ldy     #$02                            ; 338F: A0 02    
-  lda     ZP_02                           ; 3391: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 3391: A5 02    
   bpl     Read_Controls_5                 ; 3393: 10 08    
   bit     MASK_00000010                   ; 3395: 2C 15 20 
   php                                     ; 3398: 08       
@@ -5111,31 +5126,31 @@ Load_UDG_RAM_for_P2
 ; L_BRS_($34A4)_($34C9) OK
 Display_BCD_Bytes
   ldy     #$00                            ; 34A4: A0 00     Pointer to raw 12 34 56 in ZP
-  lda     (ZP_Ptr_To_Str_Lo),y            ; 34A6: B1 0E     Load first score byte i.e. 12
+  lda     (ZP_Addr_Ptr_Lo),y              ; 34A6: B1 0E     Load first score byte i.e. 12
   lsr     a                               ; 34A8: 4A        Divide by $10
   lsr     a                               ; 34A9: 4A       
   lsr     a                               ; 34AA: 4A       
   lsr     a                               ; 34AB: 4A        12 has become 01
   clc                                     ; 34AC: 18       
   adc     #$70                            ; 34AD: 69 70     Add $70, $40 gets subtracted later on
-  sta     ZP_06                           ; 34AF: 85 06     and resultant $31st char in Char ROM is "1"
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 34AF: 85 06     and resultant $31st char in Char ROM is "1"
   jsr     Copy_Char_To_UDG_RAM            ; 34B1: 20 95 35 
 
 ; Display 2nd score character
   ldy     #$00                            ; 34B4: A0 00    
-  lda     (ZP_Ptr_To_Str_Lo),y            ; 34B6: B1 0E     Load first score byte again i.e. 12
+  lda     (ZP_Addr_Ptr_Lo),y              ; 34B6: B1 0E     Load first score byte again i.e. 12
   and     #$0F                            ; 34B8: 29 0F     Mask top 4 bits, 12 becomes 02
   adc     #$70                            ; 34BA: 69 70    
-  sta     ZP_06                           ; 34BC: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 34BC: 85 06    
   jsr     Copy_Char_To_UDG_RAM            ; 34BE: 20 95 35 
 
 ; Increment pointer to next score byte
-  inc     ZP_Ptr_To_Str_Lo                ; 34C1: E6 0E    
+  inc     ZP_Addr_Ptr_Lo                  ; 34C1: E6 0E    
   bne     Display_BCD_Bytes_0             ; 34C3: D0 02    
-  inc     ZP_07                           ; 34C5: E6 07     Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
+  inc     ZP_07_Sprite_Data_Addr_Hi       ; 34C5: E6 07     Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
 ; L_BRS_($34C7)_($34C3) OK
 Display_BCD_Bytes_0
-  dec     ZP_02                           ; 34C7: C6 02     Decrement number of bytes to display counter
+  dec     ZP_02_Obj_Height_Cntdn_1        ; 34C7: C6 02     Decrement number of bytes to display counter
   bne     Display_BCD_Bytes               ; 34C9: D0 D9     If <> 0 yet, process another byte
   rts                                     ; 34CB: 60       
 ; ===========================================================
@@ -5161,13 +5176,13 @@ Display_String
   jsr     Setup_Color_RAM_Ptr             ; 34CC: 20 F7 34 
   jsr     Convert_XY_to_UDG_RAM_Addr      ; 34CF: 20 1D 35 
   ldy     #$00                            ; 34D2: A0 00     Y=string character pointer
-  lda     (ZP_Ptr_To_Str_Lo),y            ; 34D4: B1 0E     Get character to display
+  lda     (ZP_Addr_Ptr_Lo),y              ; 34D4: B1 0E     Get character to display
 ; L_JSR_($34D6)_($2506) OK
 ; L_JMP_($34D6)_($34E0) OK
 DSTR1
   tax                                     ; 34D6: AA        Stash character to X
   iny                                     ; 34D7: C8        Inc character pointer
-  lda     (ZP_Ptr_To_Str_Lo),y            ; 34D8: B1 0E    
+  lda     (ZP_Addr_Ptr_Lo),y              ; 34D8: B1 0E    
   asl     a                               ; 34DA: 0A        Test if character top bit is set = string end
   bcs     Display_Character               ; 34DB: B0 06     Display character then exit
   jsr     Display_Character               ; 34DD: 20 E3 34  Display character
@@ -5178,7 +5193,7 @@ DSTR1
 ; L_JSR_($34E3)_($34DD) OK
 Display_Character
   lsr     a                               ; 34E3: 4A       
-  sta     ZP_06                           ; 34E4: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 34E4: 85 06    
   txa                                     ; 34E6: 8A       
   sta     ZP_Invert                       ; 34E7: 85 57    
 
@@ -5368,19 +5383,19 @@ Reset_RAM
 ; L_BRS_($357B)_($358A) OK
 ; L_BRS_($357B)_($3592) OK
 Reset_RAM_1
-  lda     ZP_06                           ; 357B: A5 06    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 357B: A5 06    
   sta     (ZP_UDG_RAM_X),y                ; 357D: 91 04    
   iny                                     ; 357F: C8       
   bne     Reset_RAM_2                     ; 3580: D0 02    
   inc     ZP_UDG_RAM_Y                    ; 3582: E6 05    
 ; L_BRS_($3584)_($3580) OK
 Reset_RAM_2
-  dec     ZP_02                           ; 3584: C6 02    
-  lda     ZP_02                           ; 3586: A5 02    
+  dec     ZP_02_Obj_Height_Cntdn_1        ; 3584: C6 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 3586: A5 02    
   cmp     #$FF                            ; 3588: C9 FF    
   bne     Reset_RAM_1                     ; 358A: D0 EF    
-  dec     ZP_03                           ; 358C: C6 03    
-  lda     ZP_03                           ; 358E: A5 03    
+  dec     ZP_03_Sprite_Height             ; 358C: C6 03    
+  lda     ZP_03_Sprite_Height             ; 358E: A5 03    
   cmp     #$FF                            ; 3590: C9 FF    
   bne     Reset_RAM_1                     ; 3592: D0 E7    
   rts                                     ; 3594: 60       
@@ -5425,26 +5440,26 @@ Reset_RAM_2
 ; L_JSR_($3595)_($34EB) OK
 Copy_Char_To_UDG_RAM
   lda     #$00                            ; 3595: A9 00     Addr_From = 71 xx as example
-  sta     ZP_07                           ; 3597: 85 07     Clear address hi-byte
-  lda     ZP_06                           ; 3599: A5 06     Addr_From = 71 00
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 3597: 85 07     Clear address hi-byte
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 3599: A5 06     Addr_From = 71 00
   sec                                     ; 359B: 38       
   sbc     #$40                            ; 359C: E9 40    
-  sta     ZP_06                           ; 359E: 85 06     Addr_From = 31 00, $31st Character ROM character is "1"
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 359E: 85 06     Addr_From = 31 00, $31st Character ROM character is "1"
 
 ; Multiply Addr_From by 8, as 8 bytes per UDG RAM character definition
   ldx     #$03                            ; 35A0: A2 03    
 ; L_BRS_($35A2)_($35A8) OK
 Copy_Char_To_UDG_RAM_1
   clc                                     ; 35A2: 18       
-  rol     ZP_06                           ; 35A3: 26 06    
-  rol     ZP_07                           ; 35A5: 26 07     Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
+  rol     ZP_06_Sprite_Data_Addr_Lo       ; 35A3: 26 06    
+  rol     ZP_07_Sprite_Data_Addr_Hi       ; 35A5: 26 07     Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
   dex                                     ; 35A7: CA        Left-shifted 3 times? i.e. multiplied by 8
   bne     Copy_Char_To_UDG_RAM_1          ; 35A8: D0 F8     If no, loop back
 
 ; Add $8000 Character ROM offset to address
-  lda     ZP_07                           ; 35AA: A5 07    
+  lda     ZP_07_Sprite_Data_Addr_Hi       ; 35AA: A5 07    
   adc     #$80                            ; 35AC: 69 80    
-  sta     ZP_07                           ; 35AE: 85 07     Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 35AE: 85 07     Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
 
 ; Copy 8 bytes to form a complete character
   ldy     #$07                            ; 35B0: A0 07    
@@ -5455,7 +5470,7 @@ Copy_Char_To_UDG_RAM_1
 ; L_JSR_($35B6)_($317D) OK
 ; L_BRS_($35B6)_($35BB) OK
 Copy_Char_To_UDG_RAM_2
-  lda     (ZP_06),y                       ; 35B6: B1 06     Copy bytes from given address with Y offset
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 35B6: B1 06     Copy bytes from given address with Y offset
   sta     (ZP_UDG_RAM_X),y                ; 35B8: 91 04     Copy bytes to given address with Y offset
   dey                                     ; 35BA: 88        Decrement number of lines counter
   bpl     Copy_Char_To_UDG_RAM_2          ; 35BB: 10 F9     All lines copied? If no, loop back.
@@ -5477,7 +5492,7 @@ Copy_Char_To_UDG_RAM_NEXT
 ; L_BRS_($35CB)_($35B4) OK
 ; L_BRS_($35CB)_($35D2) OK
 Copy_Char_To_UDG_RAM_INV
-  lda     (ZP_06),y                       ; 35CB: B1 06     Copy bytes from given address with Y offset
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 35CB: B1 06     Copy bytes from given address with Y offset
   eor     #$FF                            ; 35CD: 49 FF     Invert the byte (used to make the byte flash)
   sta     (ZP_UDG_RAM_X),y                ; 35CF: 91 04     Move bytes to given address with Y offset
   dey                                     ; 35D1: 88        Decrement number of lines counter
@@ -5513,18 +5528,18 @@ Copy_Char_To_UDG_RAM_INV
 ; L_JSR_($35D7)_($2FEE) OK
 ; L_JSR_($35D7)_($3273) OK
 ; L_JSR_($35D7)_($336A) OK
-Save_Obj_Type_X_Y
-  ldy     #$00                            ; 35D7: A0 00    
+Load_Obj_Type_X_Y
+  ldy     #OBJECT_TYPE                    ; 35D7: A0 00    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 35D9: B1 00    
-  sta     ZP_Saved_Obj_Type               ; 35DB: 85 12    
+  sta     ZP_Obj_Type_1                   ; 35DB: 85 12    
 
   iny                                     ; 35DD: C8       
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 35DE: B1 00    
-  sta     ZP_Saved_Obj_X                  ; 35E0: 85 10    
+  sta     ZP_Obj_X_Position_1             ; 35E0: 85 10    
 
-  ldy     #$03                            ; 35E2: A0 03    
+  ldy     #OBJECT_Y_POSITION              ; 35E2: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 35E4: B1 00    
-  sta     ZP_Saved_Obj_Y                  ; 35E6: 85 11    
+  sta     ZP_Obj_Y_Position_1             ; 35E6: 85 11    
   rts                                     ; 35E8: 60       
 ; ===========================================================
 ; L_JSR_($35E9)_($231C) OK
@@ -5538,22 +5553,22 @@ Save_Obj_Type_X_Y
 ; L_JSR_($35E9)_($2FBD) OK
 ; L_JSR_($35E9)_($3054) OK
 ; L_JSR_($35E9)_($3737) OK
-Save_Obj_Type_X_Y_Color
-  ldy     #$00                            ; 35E9: A0 00    
-  lda     (ZP_Obj_List_Ptr_Lo),y          ; 35EB: B1 00     Object Type
-  sta     ZP_Obj_Type                     ; 35ED: 85 1A    
+Load_Obj_Type_X_Y_Color
+  ldy     #OBJECT_TYPE                    ; 35E9: A0 00    
+  lda     (ZP_Obj_List_Ptr_Lo),y          ; 35EB: B1 00    
+  sta     ZP_Obj_Type_2                   ; 35ED: 85 1A    
 
   iny                                     ; 35EF: C8       
-  lda     (ZP_Obj_List_Ptr_Lo),y          ; 35F0: B1 00     Object X
-  sta     ZP_Save_Obj_Lst_Prms2_Lo        ; 35F2: 85 18    
+  lda     (ZP_Obj_List_Ptr_Lo),y          ; 35F0: B1 00    
+  sta     ZP_Obj_X_Position_2             ; 35F2: 85 18    
 
-  ldy     #$03                            ; 35F4: A0 03    
-  lda     (ZP_Obj_List_Ptr_Lo),y          ; 35F6: B1 00     Object Y
-  sta     ZP_Save_Obj_Lst_Prms2_Hi        ; 35F8: 85 19    
+  ldy     #OBJECT_Y_POSITION              ; 35F4: A0 03    
+  lda     (ZP_Obj_List_Ptr_Lo),y          ; 35F6: B1 00    
+  sta     ZP_Obj_Y_Position_2             ; 35F8: 85 19    
 
-  ldy     #$05                            ; 35FA: A0 05    
-  lda     (ZP_Obj_List_Ptr_Lo),y          ; 35FC: B1 00     Object Color
-  sta     ZP_Tile_Color                   ; 35FE: 85 1B    
+  ldy     #OBJECT_COLOR                   ; 35FA: A0 05    
+  lda     (ZP_Obj_List_Ptr_Lo),y          ; 35FC: B1 00    
+  sta     ZP_Obj_Color_2                  ; 35FE: 85 1B    
   rts                                     ; 3600: 60       
 ; ===========================================================
 
@@ -5582,14 +5597,14 @@ AAAAAA
 ; L_JMP_($3604)_($3060) OK
 BBBBBB
   lda     #$00                            ; 3604: A9 00    
-  sta     ZP_14_Spr_Width_Pix             ; 3606: 85 14    
-  sta     ZP_03                           ; 3608: 85 03    
+  sta     ZP_Sprite_Width_Pixels          ; 3606: 85 14    
+  sta     ZP_03_Sprite_Height             ; 3608: 85 03    
   jmp     YYYYYY                          ; 360A: 4C 4C 36 
 ; -----------------------
 
 ; L_JSR_($360D)_($28F9) OK
 CCCCCC
-  jsr     Set_UDG_RAM_Ptr_Spr_Dimen_      ; 360D: 20 8A 37 
+  jsr     Set_UDG_RAM_Ptr_Sprite_Dimen_   ; 360D: 20 8A 37 
 ; L_JSR_($3610)_($27DE) OK
 ; L_JSR_($3610)_($2828) OK
 ; L_JSR_($3610)_($2864) OK
@@ -5609,16 +5624,16 @@ YYYYYY_1
   tax                                     ; 3622: AA       
 
   pha                                     ; 3623: 48       
-  sta     ZP_0A                           ; 3624: 85 0A    
+  sta     ZP_0A_Obj_Height_Cntdn_1        ; 3624: 85 0A    
   lda     ZP_0B                           ; 3626: A5 0B    
   sec                                     ; 3628: 38       
-  sbc     ZP_0A                           ; 3629: E5 0A    
-  sta     ZP_0A                           ; 362B: 85 0A    
+  sbc     ZP_0A_Obj_Height_Cntdn_1        ; 3629: E5 0A    
+  sta     ZP_0A_Obj_Height_Cntdn_1        ; 362B: 85 0A    
 
   ldy     ZP_09                           ; 362D: A4 09    
 ; L_BRS_($362F)_($3637) OK
 YYYYYY_2
-  lda     (ZP_Ptr_To_Str_Lo),y            ; 362F: B1 0E    
+  lda     (ZP_Addr_Ptr_Lo),y              ; 362F: B1 0E    
   eor     (ZP_Col_RAM_Ptr_Lo),y           ; 3631: 51 0C    
   sta     (ZP_Col_RAM_Ptr_Lo),y           ; 3633: 91 0C    
 
@@ -5640,7 +5655,7 @@ YYYYYY_2
 ; L_JSR_($3646)_($32F9) OK
 YYYYYY_ALT
   jsr     Load_Small_UDG_Addr_Setup_XY_   ; 3646: 20 37 37 
-  jsr     Set_UDG_RAM_Ptr_Spr_Dimen_      ; 3649: 20 8A 37 
+  jsr     Set_UDG_RAM_Ptr_Sprite_Dimen_   ; 3649: 20 8A 37 
 ; L_JSR_($364C)_($27F4) OK
 ; L_JSR_($364C)_($2EB8) OK
 ; L_JSR_($364C)_($2FD1) OK
@@ -5650,33 +5665,36 @@ YYYYYY_ALT
 ; L_JMP_($364C)_($3726) OK
 YYYYYY
   lda     #$FF                            ; 364C: A9 FF    
-  sta     ZP_08                           ; 364E: 85 08    
+  sta     ZP_08_Sprite_Data_Index         ; 364E: 85 08    
   sta     ZP_09                           ; 3650: 85 09    
 
-  lda     ZP_03                           ; 3652: A5 03    
-  sta     ZP_02                           ; 3654: 85 02    
+; Copy $18 from 03 and 0B, is an index into the sprite data?
+  lda     ZP_03_Sprite_Height             ; 3652: A5 03    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 3654: 85 02    
   lda     ZP_0B                           ; 3656: A5 0B    
-  sta     ZP_0A                           ; 3658: 85 0A    
+  sta     ZP_0A_Obj_Height_Cntdn_1        ; 3658: 85 0A    
 
-  lda     ZP_Saved_Obj_Y                  ; 365A: A5 11    
+; Both Pos1 and Pos2 were AF i.e. in this case Jetman on the ground,
+; so branch to ZZZ
+  lda     ZP_Obj_Y_Position_1             ; 365A: A5 11    
   sec                                     ; 365C: 38       
-  sbc     ZP_Save_Obj_Lst_Prms2_Hi        ; 365D: E5 19    
+  sbc     ZP_Obj_Y_Position_2             ; 365D: E5 19    
   beq     ZZZZZZ                          ; 365F: F0 27    
   bmi     YYYYYY_1                        ; 3661: 30 B6    
-  cmp     ZP_03                           ; 3663: C5 03    
+  cmp     ZP_03_Sprite_Height             ; 3663: C5 03    
   bcs     ZZZZZZ                          ; 3665: B0 21    
   tax                                     ; 3667: AA       
 
   pha                                     ; 3668: 48       
-  sta     ZP_02                           ; 3669: 85 02    
-  lda     ZP_03                           ; 366B: A5 03    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 3669: 85 02    
+  lda     ZP_03_Sprite_Height             ; 366B: A5 03    
   sec                                     ; 366D: 38       
-  sbc     ZP_02                           ; 366E: E5 02    
-  sta     ZP_02                           ; 3670: 85 02    
-  ldy     ZP_08                           ; 3672: A4 08    
+  sbc     ZP_02_Obj_Height_Cntdn_1        ; 366E: E5 02    
+  sta     ZP_02_Obj_Height_Cntdn_1        ; 3670: 85 02    
+  ldy     ZP_08_Sprite_Data_Index         ; 3672: A4 08    
 ; L_BRS_($3674)_($367C) OK
 YYYYYY_3
-  lda     (ZP_06),y                       ; 3674: B1 06    
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3674: B1 06    
   eor     (ZP_UDG_RAM_X),y                ; 3676: 51 04    
   sta     (ZP_UDG_RAM_X),y                ; 3678: 91 04    
   dey                                     ; 367A: 88       
@@ -5685,10 +5703,10 @@ YYYYYY_3
   pla                                     ; 367E: 68       
 
   sta     ZP_13                           ; 367F: 85 13    
-  lda     ZP_08                           ; 3681: A5 08    
+  lda     ZP_08_Sprite_Data_Index         ; 3681: A5 08    
   sec                                     ; 3683: 38       
   sbc     ZP_13                           ; 3684: E5 13    
-  sta     ZP_08                           ; 3686: 85 08    
+  sta     ZP_08_Sprite_Data_Index         ; 3686: 85 08    
 ; L_BRS_($3688)_($3620) OK
 ; L_JMP_($3688)_($3643) OK
 ; L_BRS_($3688)_($365F) OK
@@ -5696,21 +5714,21 @@ YYYYYY_3
 ; L_BRS_($3688)_($369A) OK
 ; L_JMP_($3688)_($36A8) OK
 ZZZZZZ
-  lda     ZP_02                           ; 3688: A5 02    
+  lda     ZP_02_Obj_Height_Cntdn_1        ; 3688: A5 02    
   beq     ZZZZZZ_2                        ; 368A: F0 1F    
-  dec     ZP_02                           ; 368C: C6 02    
-  ldy     ZP_08                           ; 368E: A4 08    
-  lda     (ZP_06),y                       ; 3690: B1 06    
+  dec     ZP_02_Obj_Height_Cntdn_1        ; 368C: C6 02    
+  ldy     ZP_08_Sprite_Data_Index         ; 368E: A4 08    
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3690: B1 06    
   eor     (ZP_UDG_RAM_X),y                ; 3692: 51 04    
   sta     (ZP_UDG_RAM_X),y                ; 3694: 91 04    
-  dec     ZP_08                           ; 3696: C6 08    
-  lda     ZP_0A                           ; 3698: A5 0A    
+  dec     ZP_08_Sprite_Data_Index         ; 3696: C6 08    
+  lda     ZP_0A_Obj_Height_Cntdn_1        ; 3698: A5 0A    
   beq     ZZZZZZ                          ; 369A: F0 EC    
 ; L_BRS_($369C)_($36AD) OK
 ZZZZZZ_1
-  dec     ZP_0A                           ; 369C: C6 0A    
+  dec     ZP_0A_Obj_Height_Cntdn_1        ; 369C: C6 0A    
   ldy     ZP_09                           ; 369E: A4 09    
-  lda     (ZP_Ptr_To_Str_Lo),y            ; 36A0: B1 0E    
+  lda     (ZP_Addr_Ptr_Lo),y              ; 36A0: B1 0E    
   eor     (ZP_Col_RAM_Ptr_Lo),y           ; 36A2: 51 0C    
   sta     (ZP_Col_RAM_Ptr_Lo),y           ; 36A4: 91 0C    
   dec     ZP_09                           ; 36A6: C6 09    
@@ -5718,18 +5736,18 @@ ZZZZZZ_1
 ; -----------------------
 ; L_BRS_($36AB)_($368A) OK
 ZZZZZZ_2
-  lda     ZP_0A                           ; 36AB: A5 0A    
+  lda     ZP_0A_Obj_Height_Cntdn_1        ; 36AB: A5 0A    
   bne     ZZZZZZ_1                        ; 36AD: D0 ED    
-  lda     ZP_14_Spr_Width_Pix             ; 36AF: A5 14    
+  lda     ZP_Sprite_Width_Pixels          ; 36AF: A5 14    
   beq     ZZZZZZ_6                        ; 36B1: F0 76    
-  dec     ZP_14_Spr_Width_Pix             ; 36B3: C6 14    
-  lda     ZP_06                           ; 36B5: A5 06    
+  dec     ZP_Sprite_Width_Pixels          ; 36B3: C6 14    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 36B5: A5 06    
   sec                                     ; 36B7: 38       
-  sbc     ZP_03                           ; 36B8: E5 03    
-  sta     ZP_06                           ; 36BA: 85 06    
-  lda     ZP_07                           ; 36BC: A5 07    
+  sbc     ZP_03_Sprite_Height             ; 36B8: E5 03    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 36BA: 85 06    
+  lda     ZP_07_Sprite_Data_Addr_Hi       ; 36BC: A5 07    
   sbc     #$00                            ; 36BE: E9 00    
-  sta     ZP_07                           ; 36C0: 85 07    
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 36C0: 85 07    
   lda     ZP_UDG_RAM_X                    ; 36C2: A5 04    
   clc                                     ; 36C4: 18       
   adc     #$B0                            ; 36C5: 69 B0    
@@ -5756,13 +5774,13 @@ ZZZZZZ_3
   lda     ZP_15                           ; 36E7: A5 15    
   beq     ZZZZZZ_5                        ; 36E9: F0 37    
   dec     ZP_15                           ; 36EB: C6 15    
-  lda     ZP_Ptr_To_Str_Lo                ; 36ED: A5 0E    
+  lda     ZP_Addr_Ptr_Lo                  ; 36ED: A5 0E    
   sec                                     ; 36EF: 38       
   sbc     ZP_0B                           ; 36F0: E5 0B    
-  sta     ZP_Ptr_To_Str_Lo                ; 36F2: 85 0E    
-  lda     ZP_Ptr_To_Str_Hi                ; 36F4: A5 0F    
+  sta     ZP_Addr_Ptr_Lo                  ; 36F2: 85 0E    
+  lda     ZP_Addr_Ptr_Hi                  ; 36F4: A5 0F    
   sbc     #$00                            ; 36F6: E9 00    
-  sta     ZP_Ptr_To_Str_Hi                ; 36F8: 85 0F    
+  sta     ZP_Addr_Ptr_Hi                  ; 36F8: 85 0F    
   lda     ZP_Col_RAM_Ptr_Lo               ; 36FA: A5 0C    
   clc                                     ; 36FC: 18       
   adc     #$B0                            ; 36FD: 69 B0    
@@ -5796,8 +5814,8 @@ ZZZZZZ_5
 ; L_BRS_($3729)_($36B1) OK
 ZZZZZZ_6
   lda     #$00                            ; 3729: A9 00    
-  sta     ZP_03                           ; 372B: 85 03    
-  lda     ZP_14_Spr_Width_Pix             ; 372D: A5 14    
+  sta     ZP_03_Sprite_Height             ; 372B: 85 03    
+  lda     ZP_Sprite_Width_Pixels          ; 372D: A5 14    
   ora     ZP_15                           ; 372F: 05 15    
   bne     ZZZZZZ_7                        ; 3731: D0 01    
   rts                                     ; 3733: 60       
@@ -5830,7 +5848,7 @@ ZZZZZZ_7
 ; L_JSR_($3737)_($3601) OK
 ; L_JSR_($3737)_($3646) OK
 Load_Small_UDG_Addr_Setup_XY_
-  jsr     Save_Obj_Type_X_Y_Color         ; 3737: 20 E9 35 
+  jsr     Load_Obj_Type_X_Y_Color         ; 3737: 20 E9 35 
   jsr     Get_Object_UDG_Addr             ; 373A: 20 15 38 
 
 ; Load Small UDG address from A & Y
@@ -5840,30 +5858,30 @@ Load_Small_UDG_Addr_Setup_XY_
 ; L_JSR_($373D)_($2FC7) OK
 ; L_JSR_($373D)_($305D) OK
 Load_Small_UDG_Addr_Setup_XY
-  sty     ZP_Ptr_To_Str_Lo                ; 373D: 84 0E    
+  sty     ZP_Addr_Ptr_Lo                  ; 373D: 84 0E    
   tay                                     ; 373F: A8       
   dey                                     ; 3740: 88       
-  sty     ZP_Ptr_To_Str_Hi                ; 3741: 84 0F    
+  sty     ZP_Addr_Ptr_Hi                  ; 3741: 84 0F    
 
 ; Load UDG RAM XY coordinates
-  lda     ZP_Save_Obj_Lst_Prms2_Lo        ; 3743: A5 18    
+  lda     ZP_Obj_X_Position_2             ; 3743: A5 18    
   sta     ZP_UDG_RAM_X                    ; 3745: 85 04    
-  lda     ZP_Save_Obj_Lst_Prms2_Hi        ; 3747: A5 19    
+  lda     ZP_Obj_Y_Position_2             ; 3747: A5 19    
   sta     ZP_UDG_RAM_Y                    ; 3749: 85 05    
 
 ; Load and store UDG addr, including X co-ord wrap
   ldy     #$FF                            ; 374B: A0 FF    
-  lda     (ZP_Ptr_To_Str_Lo),y            ; 374D: B1 0E    
+  lda     (ZP_Addr_Ptr_Lo),y              ; 374D: B1 0E    
   clc                                     ; 374F: 18       
   adc     ZP_UDG_RAM_X                    ; 3750: 65 04    
-  cmp     #$B8                            ; 3752: C9 B8     $B8=screen width in pixels
+  cmp     #SCREEN_WIDTH_PIXELS            ; 3752: C9 B8     $B8=screen width in pixels
   bcc     Load_Small_UDG_Addr_Setup_XY_1  ; 3754: 90 03    
   sec                                     ; 3756: 38       
-  sbc     #$B8                            ; 3757: E9 B8     Wrap
+  sbc     #SCREEN_WIDTH_PIXELS            ; 3757: E9 B8     Wrap
 ; L_BRS_($3759)_($3754) OK
 Load_Small_UDG_Addr_Setup_XY_1
   sta     ZP_UDG_RAM_X                    ; 3759: 85 04    
-  sta     ZP_Save_Obj_Lst_Prms2_Lo        ; 375B: 85 18    
+  sta     ZP_Obj_X_Position_2             ; 375B: 85 18    
 
   jsr     Convert_XY_to_UDG_RAM_Addr      ; 375D: 20 1D 35 
   lda     ZP_UDG_RAM_X                    ; 3760: A5 04    
@@ -5876,23 +5894,23 @@ Load_Small_UDG_Addr_Setup_XY_1
   sta     ZP_Col_RAM_Ptr_Hi               ; 376B: 85 0D    
 
   ldy     #$FE                            ; 376D: A0 FE    
-  lda     (ZP_Ptr_To_Str_Lo),y            ; 376F: B1 0E    
+  lda     (ZP_Addr_Ptr_Lo),y              ; 376F: B1 0E    
   sta     ZP_15                           ; 3771: 85 15    
   sta     ZP_16                           ; 3773: 85 16    
 
   dey                                     ; 3775: 88       
-  lda     (ZP_Ptr_To_Str_Lo),y            ; 3776: B1 0E    
+  lda     (ZP_Addr_Ptr_Lo),y              ; 3776: B1 0E    
   sta     ZP_0B                           ; 3778: 85 0B    
   sta     ZP_17                           ; 377A: 85 17    
 
-  lda     ZP_Ptr_To_Str_Lo                ; 377C: A5 0E    
+  lda     ZP_Addr_Ptr_Lo                  ; 377C: A5 0E    
   sec                                     ; 377E: 38       
   sbc     #$03                            ; 377F: E9 03    
-  sta     ZP_Ptr_To_Str_Lo                ; 3781: 85 0E    
+  sta     ZP_Addr_Ptr_Lo                  ; 3781: 85 0E    
 
-  lda     ZP_Ptr_To_Str_Hi                ; 3783: A5 0F    
+  lda     ZP_Addr_Ptr_Hi                  ; 3783: A5 0F    
   sbc     #$00                            ; 3785: E9 00    
-  sta     ZP_Ptr_To_Str_Hi                ; 3787: 85 0F    
+  sta     ZP_Addr_Ptr_Hi                  ; 3787: 85 0F    
   rts                                     ; 3789: 60       
 ; ===========================================================
 
@@ -5917,7 +5935,7 @@ Load_Small_UDG_Addr_Setup_XY_1
 
 ; L_JSR_($378A)_($360D) OK
 ; L_JSR_($378A)_($3649) OK
-Set_UDG_RAM_Ptr_Spr_Dimen_
+Set_UDG_RAM_Ptr_Sprite_Dimen_
   jsr     Get_Obj_UDG_Addr_               ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
 
 ; Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
@@ -5927,21 +5945,21 @@ Set_UDG_RAM_Ptr_Spr_Dimen_
 ; L_JSR_($378D)_($2861) OK
 ; L_JMP_($378D)_($2DFC) OK
 ; L_JSR_($378D)_($2FCE) OK
-Set_UDG_RAM_Ptr_Spr_Dimen
-  sty     ZP_06                           ; 378D: 84 06    
+Set_UDG_RAM_Ptr_Sprite_Dimen
+  sty     ZP_06_Sprite_Data_Addr_Lo       ; 378D: 84 06    
   tay                                     ; 378F: A8       
   dey                                     ; 3790: 88       
-  sty     ZP_07                           ; 3791: 84 07    
+  sty     ZP_07_Sprite_Data_Addr_Hi       ; 3791: 84 07    
 
 ; Setup UDG RAM X & Y
-  lda     ZP_Saved_Obj_X                  ; 3793: A5 10    
+  lda     ZP_Obj_X_Position_1             ; 3793: A5 10    
   sta     ZP_UDG_RAM_X                    ; 3795: 85 04    
-  lda     ZP_Saved_Obj_Y                  ; 3797: A5 11    
+  lda     ZP_Obj_Y_Position_1             ; 3797: A5 11    
   sta     ZP_UDG_RAM_Y                    ; 3799: 85 05    
 
 ; Convert XY pixel coords to address, managing X axis wrap ($B8)
   ldy     #$FF                            ; 379B: A0 FF    
-  lda     (ZP_06),y                       ; 379D: B1 06    
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 379D: B1 06    
   clc                                     ; 379F: 18       
   adc     ZP_UDG_RAM_X                    ; 37A0: 65 04    
   cmp     #SCREEN_WIDTH_PIXELS            ; 37A2: C9 B8    
@@ -5964,24 +5982,24 @@ No_X_Wrap
 
 ; Get/store sprite width in characters (zero-based)
   ldy     #$FE                            ; 37BB: A0 FE    
-  lda     (ZP_06),y                       ; 37BD: B1 06    
-  sta     ZP_14_Spr_Width_Pix             ; 37BF: 85 14    
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 37BD: B1 06    
+  sta     ZP_Sprite_Width_Pixels          ; 37BF: 85 14    
 
 ; Get/store sprite height in pixels
   dey                                     ; 37C1: 88       
-  lda     (ZP_06),y                       ; 37C2: B1 06    
-  sta     ZP_03                           ; 37C4: 85 03    
+  lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 37C2: B1 06    
+  sta     ZP_03_Sprite_Height             ; 37C4: 85 03    
 
-; Subtract $01 from 16-bit sprite UDG addr, i.e. so address
+; Subtract $03 from 16-bit sprite UDG addr, i.e. so address
 ; avoids the sprite dimension bytes
-  lda     ZP_06                           ; 37C6: A5 06    
+  lda     ZP_06_Sprite_Data_Addr_Lo       ; 37C6: A5 06    
   sec                                     ; 37C8: 38       
   sbc     #$03                            ; 37C9: E9 03    
-  sta     ZP_06                           ; 37CB: 85 06    
+  sta     ZP_06_Sprite_Data_Addr_Lo       ; 37CB: 85 06    
 
-  lda     ZP_07                           ; 37CD: A5 07    
+  lda     ZP_07_Sprite_Data_Addr_Hi       ; 37CD: A5 07    
   sbc     #$00                            ; 37CF: E9 00    
-  sta     ZP_07                           ; 37D1: 85 07    
+  sta     ZP_07_Sprite_Data_Addr_Hi       ; 37D1: 85 07    
   rts                                     ; 37D3: 60       
 ; ===========================================================
 
@@ -6024,10 +6042,10 @@ Get_Obj_UDG_Addr_1
 ; -----------------------
 ; L_JSR_($37E6)_($378A) OK
 Get_Obj_UDG_Addr_
-  lda     ZP_Saved_Obj_X                  ; 37E6: A5 10    
+  lda     ZP_Obj_X_Position_1             ; 37E6: A5 10    
   and     #%00000110                      ; 37E8: 29 06     Zero bits
   tax                                     ; 37EA: AA       
-  lda     ZP_Saved_Obj_Type               ; 37EB: A5 12    
+  lda     ZP_Obj_Type_1                   ; 37EB: A5 12    
 
 ; InReg: A=Saved Obj Type, X=Saved Object X AND $06/%110
 ; But if it's the Jetman Object, Obj Type is instead Jetman Looks
@@ -6078,10 +6096,10 @@ Get_Obj_UDG_Addr_4
 ; ===========================================================
 ; L_JSR_($3815)_($373A) OK
 Get_Object_UDG_Addr
-  lda     ZP_Save_Obj_Lst_Prms2_Lo        ; 3815: A5 18     Saved Object X
+  lda     ZP_Obj_X_Position_2             ; 3815: A5 18     Saved Object X
   and     #$06                            ; 3817: 29 06    
   tax                                     ; 3819: AA       
-  lda     ZP_Obj_Type                     ; 381A: A5 1A     Saved Object Type
+  lda     ZP_Obj_Type_2                   ; 381A: A5 1A     Saved Object Type
   jmp     Get_Obj_UDG_Addr_2              ; 381C: 4C ED 37 
 
 
@@ -6110,9 +6128,9 @@ Get_Object_UDG_Addr
 ; L_JSR_($381F)_($32FC) OK
 ; L_JSR_($381F)_($335B) OK
 Update_Color_RAM
-  lda     ZP_Save_Obj_Lst_Prms2_Lo        ; 381F: A5 18    
+  lda     ZP_Obj_X_Position_2             ; 381F: A5 18    
   sta     ZP_UDG_RAM_X                    ; 3821: 85 04    
-  lda     ZP_Save_Obj_Lst_Prms2_Hi        ; 3823: A5 19    
+  lda     ZP_Obj_Y_Position_2             ; 3823: A5 19    
   sta     ZP_UDG_RAM_Y                    ; 3825: 85 05    
 
 ; Setup Color RAM Pointer using UDG RAM X and Y
@@ -6131,11 +6149,11 @@ Update_Color_RAM
 ; Outer loop decrementing ZP_0B
 ; Inner loop decrementing ZP_0A
   lda     ZP_16                           ; 3835: A5 16    
-  sta     ZP_0A                           ; 3837: 85 0A    
-  inc     ZP_0A                           ; 3839: E6 0A    
+  sta     ZP_0A_Obj_Height_Cntdn_1        ; 3837: 85 0A    
+  inc     ZP_0A_Obj_Height_Cntdn_1        ; 3839: E6 0A    
 ; L_BRS_($383B)_($385C) OK
 Update_Color_RAM_1
-  ldx     ZP_0A                           ; 383B: A6 0A    
+  ldx     ZP_0A_Obj_Height_Cntdn_1        ; 383B: A6 0A    
   ldy     #$00                            ; 383D: A0 00    
 
 ; L_BRS_($383F)_($384D) OK
@@ -6145,7 +6163,7 @@ Update_Color_RAM_2
   cmp     #$05                            ; 3843: C9 05    
   beq     Update_Color_RAM_3              ; 3845: F0 04    
 
-  lda     ZP_Tile_Color                   ; 3847: A5 1B    
+  lda     ZP_Obj_Color_2                  ; 3847: A5 1B    
   sta     (ZP_Col_RAM_Ptr_Lo),y           ; 3849: 91 0C    
 
 ; L_BRS_($384B)_($3845) OK

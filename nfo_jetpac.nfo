@@ -994,7 +994,7 @@ deflabel 2CED JETMAN_STANDING
 comment  2CF1 Set Object List Pointer to first alien sprite
 label    2CF1 Set_Obj_List_Ptr_To_Alien0
 comment  2CF9
-comment  2CF9 Setup 6 objects
+comment  2CF9 Setup 6 alien objects DEBUG Set 2CFA to 1 to spawn only 1 alien
 lcomment 2CFB Counter variable
 label    2CFF Next_Object
 lcomment 2CFF Get object type
@@ -1040,29 +1040,29 @@ lcomment 2D63 Yes, branch
 lcomment 2D65 Jetman standing?
 lcomment 2D67 Yes, branch
 comment  2D69
-label    2D69 TJOC_0
+label    2D69 Test_Jetman_Obj_Collide_1
 lcomment 2D69 If Flashing Score, no collision
 comment  2D6E
 lcomment 2D6E Default No Collision unless tests work out
-label    2D6E TJOC_1
+label    2D6E Test_Jetman_Obj_Collide_2
 lcomment 2D70 Reset variable
 comment  2D72
 lcomment 2D72 Y=1
 lcomment 2D77 Compare objects X-coord vs Jetman's
 comment  2D80
-label    2D80 TJOC_2
+label    2D80 Test_Jetman_Obj_Collide_3
 lcomment 2D82 Carry Set? Yes, Return
 comment  2D84
 lcomment 2D84 Y=2
 lcomment 2D85 Y=3
 lcomment 2D8A Compare objects Y-coord vs Jetman's
 comment  2D93
-label    2D95 TJOC_3
+label    2D95 Test_Jetman_Obj_Collide_4
 lcomment 2D95 Carry Set? Yes, return
 comment  2D97
 lcomment 2D97 Set ZP_01_Lo = $80 and return
-label    2D9B TJOC_RTS
-label    2D9C TJOC_4
+label    2D9B Test_Jetman_Obj_Collide_RTS
+label    2D9C Test_Jetman_Obj_Collide_5
 label    2DA1 XXXX
 label    2DA9 XXXX_1
 label    2DB5 XXXX_2
@@ -1123,7 +1123,7 @@ label    2F07 Rocket_Fuelled_Up_5
 comment  2F0D
 comment  2F13
 label    2F16 Rocket_Fuelled_Up_6
-label    2F31 Rocket_Part_Or_Fuel_Drop_Dock
+label    2F31 Rocket_Part_Or_Fuel_Dropped
 comment  2F3A
 comment  2F43
 comment  2F4E
@@ -1132,18 +1132,14 @@ comment  2F5F
 label    2F65 Stops_All_1
 comment  2F6A
 label    2F77 Stops_All_2
-label    2FB2 Stops_All_3
-comment  2FBD
-comment  2FBD
-comment  2FBD
-comment  2FBD
+label    2FB2 Rocket_Part_Or_Fuel_Move_Down
 comment  2FBD
 label    2FBD Setup_Sprite_Addr_Rocket_Fuel
 label    2FC3 Setup_Sprite_Addr
 comment  2FDA
 comment  2FDA Returns UDG sprite data index to Rocket Middle Section/Fuel depending on level
-label    2FDA Get_Spr_Addr_Rocket_Top_OR_Fuel
-label    2FDC Get_Spr_Addr_Rckt_Top_OR_Fuel_1
+label    2FDA Get_Sprite_Addr_Rocket_or_Fuel
+label    2FDC Get_Sprite_Addr_Rocket_or_Fue_1
 lcomment 2F7F Fuel cell dropped onto rocket ~8 pixels from bottom
 comment  2F8E On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
 comment  2F8E On game startup 03B8+04=00, 03C0+4=01
@@ -1159,11 +1155,28 @@ comment  2F8E When fuel picked-up and dropping onto rocket, still 03B8 checked.
 comment  2F8E When fuel drops into rocket, for a short time, no interrupt until next fuel cell drops 03B8
 label    2F8E ROCKET_PART_OR_FUEL
 comment  2F91
+comment  2F91 Test status of the rocket part or fuel cell object
 comment  2F91 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Docked
 deflabel 2F92 LIFECYCLE_STATE
 comment  2FA4
-comment  2FA7
-lcomment 2FAB Remove=Rocket part & fuel keeps falling. Rocket top part only falls when middle part deposited.
+comment  2FA4 Test if Jetman has collided with a rocket part or fuel cell?
+comment  2FAB
+comment  2FAB Test if rocket part or fuel cell has landed on a platform
+comment  2FAB Rocket top part only falls when middle part deposited
+comment  2FAB DEBUG NOP the JSR and rocket part or fuel keeps falling
+comment  2FB2
+comment  2FB2 Move object down by 2 pixels, make Y an odd number
+deflabel 2FB3 OBJECT_Y_POSITION
+comment  2FC3
+comment  2FC3 Using index into sprite data, get addr of sprite data to A and Y and setup into ZP
+comment  2FCB
+comment  2FCB Do it again to setup the sprite dimensions
+comment  2FBD Load current object attributes into ZP variables and sprite index into A
+comment  2FDC
+comment  2FDC Calculate and return index to object's sprite based on A e.g. player level
+comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat
+binary   2FDE
+deflabel 2FE0 OBJECT_SPRITE_INDEX
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
 label    2FE5 Get_Object_UDG_Addr_Small
 label    2FEE Jetman_Collide_Rocket_Fuel
@@ -1630,17 +1643,18 @@ lcomment 35CF Move bytes to given address with Y offset
 lcomment 35D1 Decrement number of lines counter
 lcomment 35D2 All lines copied? If no, loop back.
 lcomment 35D4 If yes, routine ends
-label    35D7 Save_Obj_Type_X_Y
+label    35D7 Load_Obj_Type_X_Y
+deflabel 35D8 OBJECT_TYPE
 comment  35DD
 comment  35E2
-label    35E9 Save_Obj_Type_X_Y_Color
-lcomment 35EB Object Type
+deflabel 35E3 OBJECT_Y_POSITION
+label    35E9 Load_Obj_Type_X_Y_Color
+deflabel 35EA OBJECT_TYPE
 comment  35EF
-lcomment 35F0 Object X
 comment  35F4
-lcomment 35F6 Object Y
+deflabel 35F5 OBJECT_Y_POSITION
 comment  35FA
-lcomment 35FC Object Color
+deflabel 35FB OBJECT_COLOR
 comment  3601
 label    3601 AAAAAA
 label    3604 BBBBBB
@@ -1658,7 +1672,10 @@ label    3646 YYYYYY_ALT
 comment  3643
 label    364C YYYYYY
 comment  3652
+comment  3652 Copy $18 from 03 and 0B, is an index into the sprite data?
 comment  365A
+comment  365A Both Pos1 and Pos2 were AF i.e. in this case Jetman on the ground,
+comment  365A so branch to ZZZ
 label    3674 YYYYYY_3
 comment  3668
 label    3688 ZZZZZZ
@@ -1680,7 +1697,9 @@ comment  3743 Load UDG RAM XY coordinates
 comment  374B
 comment  374B Load and store UDG addr, including X co-ord wrap
 lcomment 3752 $B8=screen width in pixels
+deflabel 3753 SCREEN_WIDTH_PIXELS
 lcomment 3757 Wrap
+deflabel 3758 SCREEN_WIDTH_PIXELS
 label    3759 Load_Small_UDG_Addr_Setup_XY_1
 comment  375D
 comment  3767
@@ -1689,10 +1708,10 @@ comment  3775
 comment  377C
 comment  3783
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
-label    378A Set_UDG_RAM_Ptr_Spr_Dimen_
+label    378A Set_UDG_RAM_Ptr_Sprite_Dimen_
 comment  378D
 comment  378D Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
-label    378D Set_UDG_RAM_Ptr_Spr_Dimen
+label    378D Set_UDG_RAM_Ptr_Sprite_Dimen
 comment  3793
 comment  3793 Setup UDG RAM X & Y
 comment  379B
@@ -1707,7 +1726,7 @@ comment  37BB Get/store sprite width in characters (zero-based)
 comment  37C1
 comment  37C1 Get/store sprite height in pixels
 comment  37C6
-comment  37C6 Subtract $01 from 16-bit sprite UDG addr, i.e. so address
+comment  37C6 Subtract $03 from 16-bit sprite UDG addr, i.e. so address
 comment  37C6 avoids the sprite dimension bytes
 comment  37CD
 comment  37D4
