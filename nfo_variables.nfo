@@ -103,11 +103,11 @@ label    0388 Obj_Laser_0 ;
 ; Byte 00/08= object type:
 ;        03=Explosion->00
 ;        04=Rocket_Part/Fuel
-;        05=fuzzball
+;        05=Fuzzball
 ;        06=Saucer
 ;        07=Ball
 ;        08=Cross
- ;        09=Rocket Bottom Module
+;        09=Rocket Bottom Module
 ;        0A=Rocket Ascend;
 ;        0B=Rocket Descend
 ;        0C=Flame
@@ -116,7 +116,7 @@ label    0388 Obj_Laser_0 ;
 
                           ;            0  1  2  3  4  5  6  7
                           ;     03B0  09 70 00 AF 01 00 00 1C
-label    03A8 Obj_Flame      ; Type = C0 always
+label    03A8 Obj_Flame      ; Type = 0C always
 label    03A9 Obj_Flame_1
 label    03AA Obj_Flame_2
 label    03AB Obj_Flame_3
@@ -135,25 +135,25 @@ label    03B4 Obj_Rocket_Direction?
 ;label    03B6 Obj_Rocket_6
 ;label    03B7 Obj_Rocket_7
 
-; Rocket top section, then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
-label    03B8 Obj_RTS_Fuel_Type ; Type = 04 always
-label    03B9 Obj_rTS_Fuel_X
-;label    03BA Obj_RTS_Fuel_2
-;label    03BB Obj_RTS_Fuel_3
-label    03BC Obj_RTS_Status
-;label    03BD Obj_RTS_Fuel_5
-;label    03BE Obj_RTS_Fuel_6 ; Index into sprite array, calculated together with level number
-;label    03BF Obj_RTS_Fuel_7
+; Rocket Part Top (RPT), then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
+label    03B8 Obj_RPT_Fuel_Type ; Type = 04 always
+label    03B9 Obj_RPT_Fuel_X
+;label    03BA Obj_RPT_Fuel_2
+;label    03BB Obj_Rocket_Y
+label    03BC Obj_RPT_Status
+;label    03BD Obj_RPT_Fuel_5
+;label    03BE Obj_RPT_Fuel_6 ; Index into sprite array, calculated together with level number
+;label    03BF Obj_RPT_Fuel_7
 
-; Rocket middle section, then a Gem e.g. 03C0  0E 58 00 5E 00 03 28 18
-label    03C0 Obj_RMS_Gem_Type ;
-label    03C1 Obj_RMS_Gem_X
-;label    03C2 Obj_RMS_Gem_2
-;label    03C3 Obj_RMS_Gem_3
-label    03C4 Obj_RMS_Status
-;label    03C5 Obj_RMS_Gem_5
-label    03C6 Obj_RMS_Gem_6
-label    03C7 Obj_RMS_Gem_7
+; Rocket Part Middle, then a Gem e.g. 03C0  0E 58 00 5E 00 03 28 18
+label    03C0 Obj_RPM_Gem_Type ;
+label    03C1 Obj_RPM_Gem_X
+;label    03C2 Obj_RPM_Gem_2
+;label    03C3 Obj_RPM_Gem_3
+label    03C4 Obj_RPM_Status
+;label    03C5 Obj_RPM_Gem_5
+label    03C6 Obj_RPM_Gem_6
+label    03C7 Obj_RPM_Gem_7
 
 
 ; Byte 00/08= object type

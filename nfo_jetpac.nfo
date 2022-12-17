@@ -984,11 +984,11 @@ comment  2CD6
 comment  2CD6
 comment  2CD6
 comment  2CD6
-label    2CD6 Spr_Ptr_To_Alien_0_Flsh_Ctr
+label    2CD6 Obj_Ptr_To_Alien_0_Flsh_Ctr
 const    2CDB-2CE2
 label    2CDB Alien_Points_Lookup
 word     2CDB-2CE2
-label    2CE3 Spr_Ptr_To_Alien_0_Jetman
+label    2CE3 Obj_Ptr_To_Alien_0_Jetman
 deflabel 2CE9 JETMAN_FLYING
 deflabel 2CED JETMAN_STANDING
 comment  2CF1 Set Object List Pointer to first alien sprite
@@ -1123,23 +1123,31 @@ label    2F07 Rocket_Fuelled_Up_5
 comment  2F0D
 comment  2F13
 label    2F16 Rocket_Fuelled_Up_6
+comment  2F31
+comment  2F31 Test the object sprite height, $18=Fuel (seems odd), $10=Rocket
 label    2F31 Rocket_Part_Or_Fuel_Dropped
-comment  2F3A
+deflabel 2F32 OBJECT_SPRITE_HEIGHT
+comment  2F39
+comment  2F39 Rocket part dropped, add height of object to current Y postion and
+comment  2F39 test to see if object has hit the ground
+deflabel 2F3B OBJECT_Y_POSITION
 comment  2F43
+comment  2F43 Rocket part docked, set next object status = not dropping and
+comment  2F43 not picked-up by Jetman
+comment  2F43 Note, using direct addressing, not using Y offset
+binary   2F47
 comment  2F4E
+comment  2F4E Multiply rocket direction(?) by $10 and store
 comment  2F57
+comment  2F57 Subtract ZP13 from Rocket Part Bottom Y position and store in Obj_Y_Position_2
 comment  2F5F
-label    2F65 Stops_All_1
+comment  2F5F Direct setting of Rocket Part Bottom to have middle section docked?
+comment  2F65
+comment  2F65 Turn Rocket Middle Section object off in list
+label    2F65 Disable_Object_In_List
 comment  2F6A
-label    2F77 Stops_All_2
-label    2FB2 Rocket_Part_Or_Fuel_Move_Down
-comment  2FBD
-label    2FBD Setup_Sprite_Addr_Rocket_Fuel
-label    2FC3 Setup_Sprite_Addr
-comment  2FDA
-comment  2FDA Returns UDG sprite data index to Rocket Middle Section/Fuel depending on level
-label    2FDA Get_Sprite_Addr_Rocket_or_Fuel
-label    2FDC Get_Sprite_Addr_Rocket_or_Fue_1
+comment  2F6A Store some numbers into Obj_Flame object(?!)
+label    2F77 Fuel_Dropped
 lcomment 2F7F Fuel cell dropped onto rocket ~8 pixels from bottom
 comment  2F8E On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
 comment  2F8E On game startup 03B8+04=00, 03C0+4=01
@@ -1166,12 +1174,20 @@ comment  2FAB Rocket top part only falls when middle part deposited
 comment  2FAB DEBUG NOP the JSR and rocket part or fuel keeps falling
 comment  2FB2
 comment  2FB2 Move object down by 2 pixels, make Y an odd number
+label    2FB2 Rocket_Part_Or_Fuel_Move_Down
 deflabel 2FB3 OBJECT_Y_POSITION
+comment  2FBD
+label    2FBD Setup_Sprite_Addr_Rocket_Fuel
+label    2FC3 Setup_Sprite_Addr
 comment  2FC3
 comment  2FC3 Using index into sprite data, get addr of sprite data to A and Y and setup into ZP
 comment  2FCB
 comment  2FCB Do it again to setup the sprite dimensions
 comment  2FBD Load current object attributes into ZP variables and sprite index into A
+comment  2FDA
+comment  2FDA Returns UDG sprite data index to Rocket Middle Section/Fuel depending on level
+label    2FDA Get_Sprite_Addr_Rocket_or_Fuel
+label    2FDC Get_Sprite_Addr_Rocket_or_Fue_1
 comment  2FDC
 comment  2FDC Calculate and return index to object's sprite based on A e.g. player level
 comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat

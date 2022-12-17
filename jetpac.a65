@@ -91,13 +91,13 @@ Obj_Rocket_X                    equ     $03B1
 Obj_Rocket_Fuel_Lvl             equ     $03B2
 Obj_Rocket_Y                    equ     $03B3
 Obj_Rocket_Direction?           equ     $03B4
-Obj_RTS_Fuel_Type               equ     $03B8
-Obj_rTS_Fuel_X                  equ     $03B9
-Obj_RTS_Status                  equ     $03BC
-Obj_RMS_Gem_Type                equ     $03C0
-Obj_RMS_Gem_X                   equ     $03C1
-Obj_RMS_Status                  equ     $03C4
-Obj_RMS_Gem_6                   equ     $03C6
+Obj_RPT_Fuel_Type               equ     $03B8
+Obj_RPT_Fuel_X                  equ     $03B9
+Obj_RPT_Status                  equ     $03BC
+Obj_RPM_Gem_Type                equ     $03C0
+Obj_RPM_Gem_X                   equ     $03C1
+Obj_RPM_Status                  equ     $03C4
+Obj_RPM_Gem_6                   equ     $03C6
 Obj_Alien_0_0                   equ     $03C8
 UDG_RAM                         equ     $1000
 Display_P1_Score_Posn           equ     $1008
@@ -137,6 +137,7 @@ OBJECT_TYPE                     equ     $00
 GREEN                           equ     $05
 OBJECT_SPRITE_INDEX             equ     $06
 LIFECYCLE_STATE                 equ     $04
+OBJECT_SPRITE_HEIGHT            equ     $06
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
 JETMAN_STANDING                 equ     $02
@@ -879,7 +880,7 @@ Object_RTS_Fuel_Type
   jsr     Save_Obj_List_Ptr               ; 22E3: 20 E7 28 
   jsr     Load_ZP_Parameters              ; 22E6: 20 9D 25 
   fcb     $00                             ; 22E9: 00       
-  fdb     Obj_RTS_Fuel_Type               ; 22EA: B8 03    
+  fdb     Obj_RPT_Fuel_Type               ; 22EA: B8 03    
   fcb     $FF                             ; 22EC: FF       
 ; L_JMP_($22ED)_($22FC) OK
 JMP_Reset_S_O_1
@@ -891,7 +892,7 @@ Object_RMS_Gem_Type
   jsr     Save_Obj_List_Ptr               ; 22F2: 20 E7 28 
   jsr     Load_ZP_Parameters              ; 22F5: 20 9D 25 
   fcb     $00                             ; 22F8: 00       
-  fdb     Obj_RMS_Gem_Type                ; 22F9: C0 03    
+  fdb     Obj_RPM_Gem_Type                ; 22F9: C0 03    
   fcb     $FF                             ; 22FB: FF       
   jmp     JMP_Reset_S_O_1                 ; 22FC: 4C ED 22 
 ; -----------------------
@@ -1545,7 +1546,7 @@ Main_Loop
 ; dP   `" dP   Yb   88   dP   Yb            88Yb88 88__    YbdP    88
 ; Yb  "88 Yb   dP   88   Yb   dP            88 Y88 88""    dPYb    88
 ;  YboodP  YbodP    88    YbodP  oooooooooo 88  Y8 888888 dP  Yb   88   oooooooooo
-; \
+
 ;  dP"Yb  88""Yb  88888 888888  dP""b8 888888
 ; dP   Yb 88__dP     88 88__   dP   `"   88
 ; Yb   dP 88""Yb o.  88 88""   Yb        88
@@ -1622,7 +1623,7 @@ Inc_Sprite_Ptr_Cont
 ; Test if score flash time is zero, if yes, setup sprites
 ; L_BRS_($2652)_($2649) OK
 Inc_Sprite_Ptr_2
-  jsr     Spr_Ptr_To_Alien_0_Flsh_Ctr     ; 2652: 20 D6 2C 
+  jsr     Obj_Ptr_To_Alien_0_Flsh_Ctr     ; 2652: 20 D6 2C 
 ; L_BRS_($2655)_($2650) OK
 Inc_Sprite_Ptr_3
   jsr     Obj_Jetman_Looks?               ; 2655: 20 4B 2B 
@@ -2199,7 +2200,7 @@ FP_1
   fdb     $0250                           ; 286B: 50 02    
   fcb     $FF                             ; 286D: FF       
   jsr     Update_Score                    ; 286E: 20 63 30 
-  jmp     Stops_All_1                     ; 2871: 4C 65 2F 
+  jmp     Disable_Object_In_List          ; 2871: 4C 65 2F 
 ; -----------------------
 ; L_BRS_($2874)_($2857) OK
 Jump_To_Subroutine_List3
@@ -2274,7 +2275,7 @@ Reset_Objects_1_To_8
 
 ; L_BRS_($28CD)_($28D1) OK
 Reset_Objects_1_To_8_1
-  sta     Obj_RTS_Fuel_Type,x             ; 28CD: 9D B8 03 
+  sta     Obj_RPT_Fuel_Type,x             ; 28CD: 9D B8 03 
   dex                                     ; 28D0: CA       
   bpl     Reset_Objects_1_To_8_1          ; 28D1: 10 FA    
   rts                                     ; 28D3: 60       
@@ -2466,13 +2467,13 @@ Sound_Channels_Off_ETC
   sta     VIC_RC_Frq_Osc3                 ; 29A5: 8D 0C 90 
   jsr     Init_Most_Objects               ; 29A8: 20 D4 28 
 
-  lda     Obj_RTS_Status                  ; 29AB: AD BC 03 
+  lda     Obj_RPT_Status                  ; 29AB: AD BC 03 
   and     #$FD                            ; 29AE: 29 FD    
-  sta     Obj_RTS_Status                  ; 29B0: 8D BC 03 
+  sta     Obj_RPT_Status                  ; 29B0: 8D BC 03 
 
-  lda     Obj_RMS_Status                  ; 29B3: AD C4 03 
+  lda     Obj_RPM_Status                  ; 29B3: AD C4 03 
   and     #$FD                            ; 29B6: 29 FD    
-  sta     Obj_RMS_Status                  ; 29B8: 8D C4 03 
+  sta     Obj_RPM_Status                  ; 29B8: 8D C4 03 
 
   lda     Game_Settings                   ; 29BB: AD D3 1F 
   bit     MASK_00000001                   ; 29BE: 2C 14 20 
@@ -2858,7 +2859,7 @@ DO_RTS1
 Obj_Jetman_NotEqu_3F
   cmp     #$03                            ; 2B53: C9 03    
   bcs     DO_RTS1                         ; 2B55: B0 FB    
-  lda     Obj_RTS_Fuel_Type               ; 2B57: AD B8 03 
+  lda     Obj_RPT_Fuel_Type               ; 2B57: AD B8 03 
   bne     DO_RTS1                         ; 2B5A: D0 F6    
   lda     Obj_Rocket_Fuel_Lvl             ; 2B5C: AD B2 03 
   cmp     #$06                            ; 2B5F: C9 06    
@@ -2871,11 +2872,11 @@ Obj_Jetman_NotEqu_3F
 ; L_BRS_($2B6D)_($2B74) OK
 Obj_Jetman_NotEqu_3F_1
   lda     Init_Rocket_Mod_Fuel_Obj_Tbl,x  ; 2B6D: BD 7F 2B 
-  sta     Obj_RTS_Fuel_Type,x             ; 2B70: 9D B8 03 
+  sta     Obj_RPT_Fuel_Type,x             ; 2B70: 9D B8 03 
   dex                                     ; 2B73: CA       
   bpl     Obj_Jetman_NotEqu_3F_1          ; 2B74: 10 F7    
   jsr     Get_Raster_Line_Band            ; 2B76: 20 DE 2B 
-  sta     Obj_rTS_Fuel_X                  ; 2B79: 8D B9 03 
+  sta     Obj_RPT_Fuel_X                  ; 2B79: 8D B9 03 
   jmp     Object_RTS_Fuel_Type            ; 2B7C: 4C E3 22 
 ; -----------------------
 
@@ -2900,7 +2901,7 @@ DO_RTS
 Obj_Jetman_NotEqu_3F2
   cmp     #$03                            ; 2B97: C9 03    
   bcs     DO_RTS                          ; 2B99: B0 FB    
-  lda     Obj_RMS_Gem_Type                ; 2B9B: AD C0 03 
+  lda     Obj_RPM_Gem_Type                ; 2B9B: AD C0 03 
   bne     DO_RTS                          ; 2B9E: D0 F6    
   lda     ZP_HW_IRQ_Count1                ; 2BA0: A5 4A    
   and     #$7F                            ; 2BA2: 29 7F    
@@ -2909,11 +2910,11 @@ Obj_Jetman_NotEqu_3F2
 ; L_BRS_($2BA8)_($2BAF) OK
 Obj_Jetman_NotEqu_3F2_1
   lda     Init_Flashing_Gem_Obj_Table,x   ; 2BA8: BD 87 2B 
-  sta     Obj_RMS_Gem_Type,x              ; 2BAB: 9D C0 03 
+  sta     Obj_RPM_Gem_Type,x              ; 2BAB: 9D C0 03 
   dex                                     ; 2BAE: CA       
   bpl     Obj_Jetman_NotEqu_3F2_1         ; 2BAF: 10 F7    
   jsr     Get_Raster_Line_Band            ; 2BB1: 20 DE 2B 
-  sta     Obj_RMS_Gem_X                   ; 2BB4: 8D C1 03 
+  sta     Obj_RPM_Gem_X                   ; 2BB4: 8D C1 03 
   lda     ZP_HW_IRQ_Count3                ; 2BB7: A5 4C    
   and     #$0E                            ; 2BB9: 29 0E    
   bit     MASK_00001000                   ; 2BBB: 2C 17 20 
@@ -2922,7 +2923,7 @@ Obj_Jetman_NotEqu_3F2_1
 ; L_BRS_($2BC2)_($2BBE) OK
 Obj_Jetman_NotEqu_3F2_2
   ora     #$20                            ; 2BC2: 09 20    
-  sta     Obj_RMS_Gem_6                   ; 2BC4: 8D C6 03 
+  sta     Obj_RPM_Gem_6                   ; 2BC4: 8D C6 03 
 ; L_JSR_($2BC7)_($2DC5) OK
 Obj_Jetman_NotEqu_3F2_3
   jsr     Save_Obj_List_Ptr               ; 2BC7: 20 E7 28 
@@ -3194,15 +3195,15 @@ Upd_Sprite_Posn_Wrap_X_2
 
 
 ; L_JSR_($2CD6)_($2652) OK
-Spr_Ptr_To_Alien_0_Flsh_Ctr
+Obj_Ptr_To_Alien_0_Flsh_Ctr
   lda     ZP_Flash_Score_Countdown        ; 2CD6: A5 5D    
-  beq     Spr_Ptr_To_Alien_0_Jetman       ; 2CD8: F0 09    
+  beq     Obj_Ptr_To_Alien_0_Jetman       ; 2CD8: F0 09    
   rts                                     ; 2CDA: 60       
 ; ===========================================================
 Alien_Points_Lookup
   fdb     $0025,$0035,$0045,$0055         ; 2CDB: 25 00 35 00 45 00 55 00 
 ; L_BRS_($2CE3)_($2CD8) OK
-Spr_Ptr_To_Alien_0_Jetman
+Obj_Ptr_To_Alien_0_Jetman
   lda     Obj_Jetman                      ; 2CE3: AD 80 03 
   and     #$3F                            ; 2CE6: 29 3F    
   cmp     #JETMAN_FLYING                  ; 2CE8: C9 01    
@@ -3378,12 +3379,12 @@ Test_Jetman_Obj_Collide_5
 
 ; L_JSR_($2DA1)_($22DD) OK
 XXXX
-  lda     Obj_RTS_Fuel_Type               ; 2DA1: AD B8 03 
+  lda     Obj_RPT_Fuel_Type               ; 2DA1: AD B8 03 
   beq     XXXX_1                          ; 2DA4: F0 03    
   jsr     Object_RTS_Fuel_Type            ; 2DA6: 20 E3 22 
 ; L_BRS_($2DA9)_($2DA4) OK
 XXXX_1
-  lda     Obj_RMS_Gem_Type                ; 2DA9: AD C0 03 
+  lda     Obj_RPM_Gem_Type                ; 2DA9: AD C0 03 
   beq     XXXX_2                          ; 2DAC: F0 07    
   cmp     #$0E                            ; 2DAE: C9 0E    
   beq     XXXX_3                          ; 2DB0: F0 13    
@@ -3737,6 +3738,8 @@ Rocket_Fuelled_Up_6
   rts                                     ; 2F30: 60       
 ; ===========================================================
 
+; Test the object sprite height, $18=Fuel (seems odd), $10=Rocket
+
 
 
 
@@ -3747,36 +3750,42 @@ Rocket_Fuelled_Up_6
 
 
 ; #####################################################################################
-; .dP"Y8 888888  dP"Yb  88""Yb .dP"Y8
-; `Ybo."   88   dP   Yb 88__dP `Ybo."
-; o.`Y8b   88   Yb   dP 88"""  o.`Y8b
-; 8bodP'   88    YbodP  88     8bodP'
+; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888            88""Yb    db    88""Yb 888888
+; 88__dP dP   Yb dP   `" 88odP  88__     88              88__dP   dPYb   88__dP   88
+; 88"Yb  Yb   dP Yb      88"Yb  88""     88              88"""   dP__Yb  88"Yb    88
+; 88  Yb  YbodP   YboodP 88  Yb 888888   88   oooooooooo 88     dP""""Yb 88  Yb   88
 ; \
-;               db    88     88
-;              dPYb   88     88
-;             dP__Yb  88  .o 88  .o
-; oooooooooo dP""""Yb 88ood8 88ood8
+;             dP"Yb  88""Yb            888888 88   88 888888 88
+;            dP   Yb 88__dP            88__   88   88 88__   88
+;            Yb   dP 88"Yb             88""   Y8   8P 88""   88  .o
+; oooooooooo  YbodP  88  Yb oooooooooo 88     `YbodP' 888888 88ood8
 ; #####################################################################################
 
 ; L_BRS_($2F31)_($2F98) OK
 Rocket_Part_Or_Fuel_Dropped
-  ldy     #$06                            ; 2F31: A0 06    
+  ldy     #OBJECT_SPRITE_HEIGHT           ; 2F31: A0 06    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F33: B1 00    
   cmp     #$18                            ; 2F35: C9 18    
-  beq     Stops_All_2                     ; 2F37: F0 3E    
-  asl     a                               ; 2F39: 0A       
+  beq     Fuel_Dropped                    ; 2F37: F0 3E    
 
-  ldy     #$03                            ; 2F3A: A0 03    
+; Rocket part dropped, add height of object to current Y postion and
+; test to see if object has hit the ground
+  asl     a                               ; 2F39: 0A       
+  ldy     #OBJECT_Y_POSITION              ; 2F3A: A0 03    
   clc                                     ; 2F3C: 18       
   adc     (ZP_Obj_List_Ptr_Lo),y          ; 2F3D: 71 00    
   cmp     #$AF                            ; 2F3F: C9 AF    
   bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F41: 90 6F    
 
-  lda     Obj_RTS_Status                  ; 2F43: AD BC 03 
-  ora     #$01                            ; 2F46: 09 01    
-  sta     Obj_RTS_Status                  ; 2F48: 8D BC 03 
+; Rocket part docked, set next object status = not dropping and
+; not picked-up by Jetman
+; Note, using direct addressing, not using Y offset
+  lda     Obj_RPT_Status                  ; 2F43: AD BC 03 
+  ora     #%00000001                      ; 2F46: 09 01    
+  sta     Obj_RPT_Status                  ; 2F48: 8D BC 03 
   jsr     Load_Rocket_OR_Fuel_UDGs        ; 2F4B: 20 54 30 
 
+; Multiply rocket direction(?) by $10 and store
   lda     Obj_Rocket_Direction?           ; 2F4E: AD B4 03 
   asl     a                               ; 2F51: 0A       
   asl     a                               ; 2F52: 0A       
@@ -3784,20 +3793,25 @@ Rocket_Part_Or_Fuel_Dropped
   asl     a                               ; 2F54: 0A       
   sta     ZP_13                           ; 2F55: 85 13    
 
+; Subtract ZP13 from Rocket Part Bottom Y position and store in Obj_Y_Position_2
   lda     Obj_Rocket_Y                    ; 2F57: AD B3 03 
   sec                                     ; 2F5A: 38       
   sbc     ZP_13                           ; 2F5B: E5 13    
   sta     ZP_Obj_Y_Position_2             ; 2F5D: 85 19    
 
+; Direct setting of Rocket Part Bottom to have middle section docked?
   jsr     Load_Rocket_OR_Fuel_UDGs_1      ; 2F5F: 20 57 30 
   inc     Obj_Rocket_Direction?           ; 2F62: EE B4 03 
+
+; Turn Rocket Middle Section object off in list
 ; L_JMP_($2F65)_($2871) OK
 ; L_JMP_($2F65)_($2F8B) OK
-Stops_All_1
+Disable_Object_In_List
   lda     #$00                            ; 2F65: A9 00    
   tay                                     ; 2F67: A8       
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2F68: 91 00    
 
+; Store some numbers into Obj_Flame object(?!)
   lda     #$02                            ; 2F6A: A9 02    
   sta     Obj_Flame_1                     ; 2F6C: 8D A9 03 
   lda     #$10                            ; 2F6F: A9 10    
@@ -3805,7 +3819,7 @@ Stops_All_1
   jmp     GOTO_NEXT_OBJECT                ; 2F74: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($2F77)_($2F37) OK
-Stops_All_2
+Fuel_Dropped
   ldy     #$03                            ; 2F77: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F79: B1 00    
   cmp     #$A8                            ; 2F7B: C9 A8    
@@ -3814,7 +3828,7 @@ Stops_All_2
   jsr     Load_Obj_Type_X_Y_Color         ; 2F82: 20 E9 35 
   jsr     Get_Sprite_Addr_Rocket_or_Fuel  ; 2F85: 20 DA 2F 
   jsr     Load_Rocket_OR_Fuel_UDGs_2      ; 2F88: 20 5A 30 
-  jmp     Stops_All_1                     ; 2F8B: 4C 65 2F 
+  jmp     Disable_Object_In_List          ; 2F8B: 4C 65 2F 
 ; -----------------------
 ; On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
 ; On game startup 03B8+04=00, 03C0+4=01
@@ -4781,7 +4795,7 @@ Set_Obj_List_Ptr_Lo_To_80
 ; 88__dP 88__     dPYb    8I  Yb
 ; 88"Yb  88""    dP__Yb   8I  dY
 ; 88  Yb 888888 dP""""Yb 8888Y"  oooooooooo
-; \
+
 ;  dP""b8  dP"Yb  88b 88 888888 88""Yb  dP"Yb  88     .dP"Y8
 ; dP   `" dP   Yb 88Yb88   88   88__dP dP   Yb 88     `Ybo."
 ; Yb      Yb   dP 88 Y88   88   88"Yb  Yb   dP 88  .o o.`Y8b
