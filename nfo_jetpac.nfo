@@ -894,10 +894,16 @@ comment  2B42
 label    2B4B Obj_Jetman_Looks?
 label    2B52 DO_RTS1
 label    2B53 Obj_Jetman_NotEqu_3F
+comment  2B5C
+comment  2B5C Test if ship is fuelled up
+comment  2B63
+comment  2B6B
+comment  2B6B Init Rocket Part or Fuel Cell object (8 attributes)
 label    2B6D Obj_Jetman_NotEqu_3F_1
-label    2B7F Init_Rocket_Mod_Fuel_Obj_Tbl
+comment  2B76
+label    2B7F Init_Obj_Rocket_or_Fuel_Table
 comment  2B7F
-label    2B87 Init_Flashing_Gem_Obj_Table
+label    2B87 Init_Obj_Valuable_Table
 const    2B82
 const    2B8A
 comment  2B87
@@ -906,7 +912,10 @@ label    2B8F Obj_Jetman_Looks_2?
 lcomment 2B92 Zero bits 6 & 7 i.e. 00xxxxxx
 label    2B96 DO_RTS
 label    2B97 Obj_Jetman_NotEqu_3F2
+comment  2BA6
+comment  2BA6 Init Flashing Valuable object (8 attributes)
 label    2BA8 Obj_Jetman_NotEqu_3F2_1
+comment  2BB1
 label    2BC2 Obj_Jetman_NotEqu_3F2_2
 label    2BC7 Obj_Jetman_NotEqu_3F2_3
 const    2BCD
@@ -1124,36 +1133,41 @@ comment  2F0D
 comment  2F13
 label    2F16 Rocket_Fuelled_Up_6
 comment  2F31
-comment  2F31 Test the object sprite height, $18=Fuel (seems odd), $10=Rocket
+comment  2F31 Test if rocket part has landed, $08=middle part, $10=top part
+comment  2F31 $18=Fuel (?!)
 label    2F31 Rocket_Part_Or_Fuel_Dropped
-deflabel 2F32 OBJECT_SPRITE_HEIGHT
+deflabel 2F32 OBJECT_Y_WHEN_LANDED_ATTRIB
 comment  2F39
-comment  2F39 Rocket part dropped, add height of object to current Y postion and
-comment  2F39 test to see if object has hit the ground
-deflabel 2F3B OBJECT_Y_POSITION
+comment  2F39 Rocket part dropped, add current Y postion to landed Y position
+comment  2F39 and test to see if object has hit the ground
+deflabel 2F3B OBJECT_Y_POSITION_ATTRIB
+deflabel 2F40 SCREEN_BOTTOM
 comment  2F43
-comment  2F43 Rocket part docked, set next object status = not dropping and
-comment  2F43 not picked-up by Jetman
+comment  2F43 Rocket part landed, activate next object i.e. set
+comment  2F43 status = not dropping and not picked-up by Jetman
 comment  2F43 Note, using direct addressing, not using Y offset
+lcomment 2F46 Set bit 0
 binary   2F47
 comment  2F4E
 comment  2F4E Multiply rocket direction(?) by $10 and store
 comment  2F57
-comment  2F57 Subtract ZP13 from Rocket Part Bottom Y position and store in Obj_Y_Position_2
+comment  2F57 Subtract ZP13 ($10 when rocket middle landed, $20 for top section landed) from Rocket Part Bottom Y position and store in Obj_Y_Position_2
 comment  2F5F
-comment  2F5F Direct setting of Rocket Part Bottom to have middle section docked?
+comment  2F5F Direct setting of Rocket Part Bottom to have middle part landed/top part landed? (Inc's to 1 then 2)
 comment  2F65
 comment  2F65 Turn Rocket Middle Section object off in list
 label    2F65 Disable_Object_In_List
 comment  2F6A
-comment  2F6A Store some numbers into Obj_Flame object(?!)
+comment  2F6A Store some numbers into Obj_Flame object(?! Get disabled for next rocket part)
 label    2F77 Fuel_Dropped
-lcomment 2F7F Fuel cell dropped onto rocket ~8 pixels from bottom
+deflabel 2F78 OBJECT_Y_POSITION_ATTRIB
+deflabel 2F7C FUEL_Y_WHEN_LANDED
+comment  2F7F
 comment  2F8E On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
 comment  2F8E On game startup 03B8+04=00, 03C0+4=01
 comment  2F8E Pickup  middle section 03B8+04=00, 03C0+4=03
 comment  2F8E Falling middle section 03B8+04=00, 03C0+4=07
-comment  2F8E Docked  middle section 03B8+04=01, 03C0+4=07
+comment  2F8E Landed  middle section 03B8+04=01, 03C0+4=07
 comment  2F8E 03C0 turns into a 0E_Valuable, 03B8 goes round the same cycle as 03C0
 comment  2F8E 03B8 becomes a fuel cell
 comment  2F8E When middle rocket section deposited, only 03B8 checked, despite dropped valuable
@@ -1164,7 +1178,7 @@ comment  2F8E When fuel drops into rocket, for a short time, no interrupt until 
 label    2F8E ROCKET_PART_OR_FUEL
 comment  2F91
 comment  2F91 Test status of the rocket part or fuel cell object
-comment  2F91 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Docked
+comment  2F91 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
 deflabel 2F92 LIFECYCLE_STATE
 comment  2FA4
 comment  2FA4 Test if Jetman has collided with a rocket part or fuel cell?
@@ -1215,9 +1229,9 @@ label    303E Copy_Jetman_XY_To_Sprite_0
 comment  3042
 comment  304A
 label    3051 Copy_Jetman_XY_To_Sprite_1
-label    3054 Load_Rocket_OR_Fuel_UDGs
-label    3057 Load_Rocket_OR_Fuel_UDGs_1
-label    305A Load_Rocket_OR_Fuel_UDGs_2
+label    3054 Load_Rocket_or_Fuel_UDGs
+label    3057 Load_Rocket_or_Fuel_UDGs_1
+label    305A Load_Rocket_or_Fuel_UDGs_2
 label    3063 Update_Score
 lcomment 3065 If P2, setup P2 Score instead of P1 and then return after the param setup below
 comment  3067

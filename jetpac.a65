@@ -90,7 +90,7 @@ Obj_Rocket                      equ     $03B0
 Obj_Rocket_X                    equ     $03B1
 Obj_Rocket_Fuel_Lvl             equ     $03B2
 Obj_Rocket_Y                    equ     $03B3
-Obj_Rocket_Direction?           equ     $03B4
+Obj_Rocket_Parts_Fuel_Counter   equ     $03B4
 Obj_RPT_Fuel_Type               equ     $03B8
 Obj_RPT_Fuel_X                  equ     $03B9
 Obj_RPT_Status                  equ     $03BC
@@ -137,7 +137,10 @@ OBJECT_TYPE                     equ     $00
 GREEN                           equ     $05
 OBJECT_SPRITE_INDEX             equ     $06
 LIFECYCLE_STATE                 equ     $04
-OBJECT_SPRITE_HEIGHT            equ     $06
+FUEL_Y_WHEN_LANDED              equ     $A8
+OBJECT_Y_POSITION_ATTRIB        equ     $03
+SCREEN_BOTTOM                   equ     $AF
+OBJECT_Y_WHEN_LANDED_ATTRIB     equ     $06
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
 JETMAN_STANDING                 equ     $02
@@ -924,7 +927,7 @@ Reset_S_O_1
   pha                                     ; 231B: 48       
   jsr     Load_Obj_Type_X_Y_Color         ; 231C: 20 E9 35 
   jsr     Get_Sprite_Addr_Rocket_or_Fuel  ; 231F: 20 DA 2F 
-  jsr     Load_Rocket_OR_Fuel_UDGs_2      ; 2322: 20 5A 30 
+  jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2322: 20 5A 30 
   lda     ZP_Obj_List_Ptr_Lo              ; 2325: A5 00    
   clc                                     ; 2327: 18       
   adc     #$08                            ; 2328: 69 08    
@@ -2861,29 +2864,35 @@ Obj_Jetman_NotEqu_3F
   bcs     DO_RTS1                         ; 2B55: B0 FB    
   lda     Obj_RPT_Fuel_Type               ; 2B57: AD B8 03 
   bne     DO_RTS1                         ; 2B5A: D0 F6    
+
+; Test if ship is fuelled up
   lda     Obj_Rocket_Fuel_Lvl             ; 2B5C: AD B2 03 
   cmp     #$06                            ; 2B5F: C9 06    
   bcs     DO_RTS1                         ; 2B61: B0 EF    
+
   lda     ZP_HW_IRQ_Count1                ; 2B63: A5 4A    
   eor     #$FF                            ; 2B65: 49 FF    
   and     #$0F                            ; 2B67: 29 0F    
   bne     DO_RTS1                         ; 2B69: D0 E7    
+
+; Init Rocket Part or Fuel Cell object (8 attributes)
   ldx     #$07                            ; 2B6B: A2 07    
 ; L_BRS_($2B6D)_($2B74) OK
 Obj_Jetman_NotEqu_3F_1
-  lda     Init_Rocket_Mod_Fuel_Obj_Tbl,x  ; 2B6D: BD 7F 2B 
+  lda     Init_Obj_Rocket_or_Fuel_Table,x ; 2B6D: BD 7F 2B 
   sta     Obj_RPT_Fuel_Type,x             ; 2B70: 9D B8 03 
   dex                                     ; 2B73: CA       
   bpl     Obj_Jetman_NotEqu_3F_1          ; 2B74: 10 F7    
+
   jsr     Get_Raster_Line_Band            ; 2B76: 20 DE 2B 
   sta     Obj_RPT_Fuel_X                  ; 2B79: 8D B9 03 
   jmp     Object_RTS_Fuel_Type            ; 2B7C: 4C E3 22 
 ; -----------------------
 
-Init_Rocket_Mod_Fuel_Obj_Tbl
+Init_Obj_Rocket_or_Fuel_Table
   fcb     $04,$00,$00,$20,$01,$04,$18,$18 ; 2B7F: 04 00 00 20 01 04 18 18 
 
-Init_Flashing_Gem_Obj_Table
+Init_Obj_Valuable_Table
   fcb     $0E,$00,$00,$20,$00,$00,$00,$18 ; 2B87: 0E 00 00 20 00 00 00 18 
 
 ; L_JSR_($2B8F)_($2658) OK
@@ -2906,13 +2915,16 @@ Obj_Jetman_NotEqu_3F2
   lda     ZP_HW_IRQ_Count1                ; 2BA0: A5 4A    
   and     #$7F                            ; 2BA2: 29 7F    
   bne     DO_RTS                          ; 2BA4: D0 F0    
+
+; Init Flashing Valuable object (8 attributes)
   ldx     #$07                            ; 2BA6: A2 07    
 ; L_BRS_($2BA8)_($2BAF) OK
 Obj_Jetman_NotEqu_3F2_1
-  lda     Init_Flashing_Gem_Obj_Table,x   ; 2BA8: BD 87 2B 
+  lda     Init_Obj_Valuable_Table,x       ; 2BA8: BD 87 2B 
   sta     Obj_RPM_Gem_Type,x              ; 2BAB: 9D C0 03 
   dex                                     ; 2BAE: CA       
   bpl     Obj_Jetman_NotEqu_3F2_1         ; 2BAF: 10 F7    
+
   jsr     Get_Raster_Line_Band            ; 2BB1: 20 DE 2B 
   sta     Obj_RPM_Gem_X                   ; 2BB4: 8D C1 03 
   lda     ZP_HW_IRQ_Count3                ; 2BB7: A5 4C    
@@ -2934,7 +2946,7 @@ Obj_Jetman_NotEqu_3F2_3
   jsr     Load_Obj_Type_X_Y_Color         ; 2BD1: 20 E9 35 
   ldy     #$06                            ; 2BD4: A0 06    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2BD6: B1 00    
-  jsr     Load_Rocket_OR_Fuel_UDGs_2      ; 2BD8: 20 5A 30 
+  jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2BD8: 20 5A 30 
   jmp     Restore_Obj_List_Ptr            ; 2BDB: 4C F0 28 
 ; -----------------------
 ; L_JSR_($2BDE)_($2B76) OK
@@ -3738,7 +3750,8 @@ Rocket_Fuelled_Up_6
   rts                                     ; 2F30: 60       
 ; ===========================================================
 
-; Test the object sprite height, $18=Fuel (seems odd), $10=Rocket
+; Test if rocket part has landed, $08=middle part, $10=top part
+; $18=Fuel (?!)
 
 
 
@@ -3763,45 +3776,45 @@ Rocket_Fuelled_Up_6
 
 ; L_BRS_($2F31)_($2F98) OK
 Rocket_Part_Or_Fuel_Dropped
-  ldy     #OBJECT_SPRITE_HEIGHT           ; 2F31: A0 06    
+  ldy     #OBJECT_Y_WHEN_LANDED_ATTRIB    ; 2F31: A0 06    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F33: B1 00    
   cmp     #$18                            ; 2F35: C9 18    
   beq     Fuel_Dropped                    ; 2F37: F0 3E    
 
-; Rocket part dropped, add height of object to current Y postion and
-; test to see if object has hit the ground
+; Rocket part dropped, add current Y postion to landed Y position
+; and test to see if object has hit the ground
   asl     a                               ; 2F39: 0A       
-  ldy     #OBJECT_Y_POSITION              ; 2F3A: A0 03    
+  ldy     #OBJECT_Y_POSITION_ATTRIB       ; 2F3A: A0 03    
   clc                                     ; 2F3C: 18       
   adc     (ZP_Obj_List_Ptr_Lo),y          ; 2F3D: 71 00    
-  cmp     #$AF                            ; 2F3F: C9 AF    
+  cmp     #SCREEN_BOTTOM                  ; 2F3F: C9 AF    
   bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F41: 90 6F    
 
-; Rocket part docked, set next object status = not dropping and
-; not picked-up by Jetman
+; Rocket part landed, activate next object i.e. set
+; status = not dropping and not picked-up by Jetman
 ; Note, using direct addressing, not using Y offset
   lda     Obj_RPT_Status                  ; 2F43: AD BC 03 
-  ora     #%00000001                      ; 2F46: 09 01    
+  ora     #%00000001                      ; 2F46: 09 01     Set bit 0
   sta     Obj_RPT_Status                  ; 2F48: 8D BC 03 
-  jsr     Load_Rocket_OR_Fuel_UDGs        ; 2F4B: 20 54 30 
+  jsr     Load_Rocket_or_Fuel_UDGs        ; 2F4B: 20 54 30 
 
 ; Multiply rocket direction(?) by $10 and store
-  lda     Obj_Rocket_Direction?           ; 2F4E: AD B4 03 
+  lda     Obj_Rocket_Parts_Fuel_Counter   ; 2F4E: AD B4 03 
   asl     a                               ; 2F51: 0A       
   asl     a                               ; 2F52: 0A       
   asl     a                               ; 2F53: 0A       
   asl     a                               ; 2F54: 0A       
   sta     ZP_13                           ; 2F55: 85 13    
 
-; Subtract ZP13 from Rocket Part Bottom Y position and store in Obj_Y_Position_2
+; Subtract ZP13 ($10 when rocket middle landed, $20 for top section landed) from Rocket Part Bottom Y position and store in Obj_Y_Position_2
   lda     Obj_Rocket_Y                    ; 2F57: AD B3 03 
   sec                                     ; 2F5A: 38       
   sbc     ZP_13                           ; 2F5B: E5 13    
   sta     ZP_Obj_Y_Position_2             ; 2F5D: 85 19    
 
-; Direct setting of Rocket Part Bottom to have middle section docked?
-  jsr     Load_Rocket_OR_Fuel_UDGs_1      ; 2F5F: 20 57 30 
-  inc     Obj_Rocket_Direction?           ; 2F62: EE B4 03 
+; Direct setting of Rocket Part Bottom to have middle part landed/top part landed? (Inc's to 1 then 2)
+  jsr     Load_Rocket_or_Fuel_UDGs_1      ; 2F5F: 20 57 30 
+  inc     Obj_Rocket_Parts_Fuel_Counter   ; 2F62: EE B4 03 
 
 ; Turn Rocket Middle Section object off in list
 ; L_JMP_($2F65)_($2871) OK
@@ -3811,7 +3824,7 @@ Disable_Object_In_List
   tay                                     ; 2F67: A8       
   sta     (ZP_Obj_List_Ptr_Lo),y          ; 2F68: 91 00    
 
-; Store some numbers into Obj_Flame object(?!)
+; Store some numbers into Obj_Flame object(?! Get disabled for next rocket part)
   lda     #$02                            ; 2F6A: A9 02    
   sta     Obj_Flame_1                     ; 2F6C: 8D A9 03 
   lda     #$10                            ; 2F6F: A9 10    
@@ -3820,21 +3833,22 @@ Disable_Object_In_List
 ; -----------------------
 ; L_BRS_($2F77)_($2F37) OK
 Fuel_Dropped
-  ldy     #$03                            ; 2F77: A0 03    
+  ldy     #OBJECT_Y_POSITION_ATTRIB       ; 2F77: A0 03    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F79: B1 00    
-  cmp     #$A8                            ; 2F7B: C9 A8    
+  cmp     #FUEL_Y_WHEN_LANDED             ; 2F7B: C9 A8    
   bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F7D: 90 33    
-  inc     Obj_Rocket_Fuel_Lvl             ; 2F7F: EE B2 03  Fuel cell dropped onto rocket ~8 pixels from bottom
+
+  inc     Obj_Rocket_Fuel_Lvl             ; 2F7F: EE B2 03 
   jsr     Load_Obj_Type_X_Y_Color         ; 2F82: 20 E9 35 
   jsr     Get_Sprite_Addr_Rocket_or_Fuel  ; 2F85: 20 DA 2F 
-  jsr     Load_Rocket_OR_Fuel_UDGs_2      ; 2F88: 20 5A 30 
+  jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2F88: 20 5A 30 
   jmp     Disable_Object_In_List          ; 2F8B: 4C 65 2F 
 ; -----------------------
 ; On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
 ; On game startup 03B8+04=00, 03C0+4=01
 ; Pickup  middle section 03B8+04=00, 03C0+4=03
 ; Falling middle section 03B8+04=00, 03C0+4=07
-; Docked  middle section 03B8+04=01, 03C0+4=07
+; Landed  middle section 03B8+04=01, 03C0+4=07
 ; 03C0 turns into a 0E_Valuable, 03B8 goes round the same cycle as 03C0
 ; 03B8 becomes a fuel cell
 ; When middle rocket section deposited, only 03B8 checked, despite dropped valuable
@@ -3846,7 +3860,7 @@ ROCKET_PART_OR_FUEL
   jsr     Load_Obj_Type_X_Y               ; 2F8E: 20 D7 35 
 
 ; Test status of the rocket part or fuel cell object
-; 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Docked
+; 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
   ldy     #LIFECYCLE_STATE                ; 2F91: A0 04    
   lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F93: B1 00    
   bit     MASK_00000100                   ; 2F95: 2C 16 20 
@@ -4050,15 +4064,15 @@ Copy_Jetman_XY_To_Sprite_1
   jmp     Setup_Sprite_Addr_Rocket_Fuel   ; 3051: 4C BD 2F 
 ; -----------------------
 ; L_JSR_($3054)_($2F4B) OK
-Load_Rocket_OR_Fuel_UDGs
+Load_Rocket_or_Fuel_UDGs
   jsr     Load_Obj_Type_X_Y_Color         ; 3054: 20 E9 35 
 ; L_JSR_($3057)_($2F5F) OK
-Load_Rocket_OR_Fuel_UDGs_1
+Load_Rocket_or_Fuel_UDGs_1
   jsr     Get_Sprite_Addr_Rocket_or_Fuel  ; 3057: 20 DA 2F 
 ; L_JSR_($305A)_($2322) OK
 ; L_JSR_($305A)_($2BD8) OK
 ; L_JSR_($305A)_($2F88) OK
-Load_Rocket_OR_Fuel_UDGs_2
+Load_Rocket_or_Fuel_UDGs_2
   jsr     Get_Object_UDG_Addr_Small       ; 305A: 20 E5 2F 
   jsr     Load_Small_UDG_Addr_Setup_XY    ; 305D: 20 3D 37 
   jmp     BBBBBB                          ; 3060: 4C 04 36 

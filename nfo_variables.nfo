@@ -107,7 +107,7 @@ label    0388 Obj_Laser_0 ;
 ;        06=Saucer
 ;        07=Ball
 ;        08=Cross
-;        09=Rocket Bottom Module
+;        09=Rocket Bottom Part
 ;        0A=Rocket Ascend;
 ;        0B=Rocket Descend
 ;        0C=Flame
@@ -130,7 +130,7 @@ label    03B0 Obj_Rocket     ; Type = 09, 0A when ascending, 0B when decending
 label    03B1 Obj_Rocket_X
 label    03B2 Obj_Rocket_Fuel_Lvl ; Number of fuel cells, 6=full
 label    03B3 Obj_Rocket_Y
-label    03B4 Obj_Rocket_Direction?
+label    03B4 Obj_Rocket_Parts_Fuel_Counter
 ;label    03B5 Obj_Rocket_5
 ;label    03B6 Obj_Rocket_6
 ;label    03B7 Obj_Rocket_7
@@ -140,9 +140,9 @@ label    03B8 Obj_RPT_Fuel_Type ; Type = 04 always
 label    03B9 Obj_RPT_Fuel_X
 ;label    03BA Obj_RPT_Fuel_2
 ;label    03BB Obj_Rocket_Y
-label    03BC Obj_RPT_Status
+label    03BC Obj_RPT_Status ; Rocket part Ready for pick-up/picked-up/Dropping
 ;label    03BD Obj_RPT_Fuel_5
-;label    03BE Obj_RPT_Fuel_6 ; Index into sprite array, calculated together with level number
+;label    03BE Obj_RPT_Fuel_6 ; Height when rocket part/fuel cell has landed
 ;label    03BF Obj_RPT_Fuel_7
 
 ; Rocket Part Middle, then a Gem e.g. 03C0  0E 58 00 5E 00 03 28 18
