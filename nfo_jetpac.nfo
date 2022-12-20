@@ -92,8 +92,7 @@ label    2080 RGS_Flash
 comment  2085
 comment  2085 Setup volume and color
 comment  208A
-comment  208A Initialise Flame object
-comment  208F
+comment  208A Disable sound object
 comment  208F ----------------------------------------------------------
 comment  208F Game Select Loop
 comment  208F ----------------------------------------------------------
@@ -139,7 +138,7 @@ lcomment 20E1 No, check for settings again
 comment  20E3
 comment  20E9
 comment  20E9 ----------------------------------------------------------
-comment  20E9 FUNCTION  : Update_Laser_Shots
+comment  20E9 FUNCTION  : Update_Laser_Objects
 comment  20E9 CALLED BY :
 comment  20E9 CALLS     : Nothing
 comment  20E9 ARGUMENTS : sentiseutn
@@ -182,7 +181,7 @@ comment  214B
 comment  2155
 comment  2155 Load a random laser color using the current 6522 timer value
 comment  2160
-comment  2160 Not sure what this is for ??????????????
+comment  2160 Trigger laser sound
 comment  216B
 label    216B Laser_Color_Table
 lcomment 216B Green not used, messes up colors if it's used
@@ -321,12 +320,16 @@ comment  22B6
 comment  22BD
 comment  22BD Player at level 4, add another life
 label    22CB Reset_Lev_Add_Extra_Life_1
+comment  22D1
 label    22D1 Reset_Lev_Add_Extra_Life_2
+comment  22D7
 label    22D7 Reset_Lev_Add_Extra_Life_3
+comment  22E3
 label    22E3 Object_RTS_Fuel_Type
 word     22EA
 label    22ED JMP_Reset_S_O_1
 break    22ED
+comment  22F2
 label    22F2 Object_RMS_Gem_Type
 word     22F9
 label    22FF Init_Objects_1_To_3
@@ -634,32 +637,76 @@ lcomment 26A6 0D
 lcomment 26A8 0E
 lcomment 26AA 0F
 lcomment 26AC 10
-label    26AE Init_Rocket_Object
-label    26B0 Init_Rocket_Object_1
+comment  26AE
+label    26AE Initialize_Sound_Object
+label    26B0 Initialize_Sound_Object_1
 comment  26B9
-comment  26B9 Probably init sound channels
-label    26C5 Init_Rocket_Obj_Table
+comment  26B9 Initialize sound channels
+comment  26C5
+label    26C5 Init_Sound_Object_Table
 break    26C9
-label    26CD SOUND_LOOP_START
+comment  26CD Read and play sound channel data from the Sound object
+label    26CD SOUND_UPDATE
+comment  26D1
+comment  26D1 Uses the Subroutine_Addr_Hi as an index, a bit confusing to read...oh well
+comment  26D1 1st/3rd/5th parameter indicates which sound to play, 2/4/6 is the period
 label    26D1 Sound_Loop
+comment  26D7
+comment  26D7 Jump to Sound player using X as jump table index
+comment  26E4
+comment  26E4 Update index to next 2-byte oscillator/timer pair, stopping when
+comment  26E4 all 3 processed i.e. at 7th parameter. Sound 0 is valid
+comment  26E4 but 'empty' sound call.
 label    26E4 Goto_Next_Sound
-label    2DE8 XXXX_6
-label    26F2 Dec_Obj_Param
-label    26FE Object_Picked_Up
-label    2705 Pre_Output_Sound_1
-label    270A Pre_Output_Sound_2
+comment  26F2
+comment  26F2 Decrements Oscillator channel timer stored in ZP index
+comment  26F2 Index points to Oscillator number, so increment to address timer value
+comment  26F2 Timer value left in A, counts down to zero
+label    26F2 Decrement_Oscillator_Timer
+comment  26F6
+comment  26F6 Read timer, subtract 1 and write back
+comment  26FE
+label    26FE Rocket_Part_or_Fuel_Cell_PickUp
+comment  2703
+comment  2703 Inverts the timer value so $10 countdown becomes $F0, F1, F2 etc. stored
+comment  2703 to the oscillator on subsequent calls, making a pleasent short rising tone
+comment  2705
+comment  2705 Set top bit of oscillator channel to enable
+label    2705 Enable_Oscillator_Channel
+binary   2706
+comment  270A
+comment  270A When oscillator timer expired, delete the oscillator parameter to disable
+label    270A Sound_Done_Reset_Object_Param
 comment  2710
-comment  2710 A probably contains frequency, Y selects channel via X
+comment  2710 Register A contains frequency, Y selects channel via X
 label    2710 Output_Sound
 comment  2716
-label    271C Gem_Fuel_Picked_Up
-label    2727 Laser_Shot_Active
-label    2735 Rocket_Flight_Active
-label    2743 Subroutine_List2
-word     2743-274E
-label    2744 Subroutine_List2+1
+comment  271C
+label    271C Valuable_Pkup_Rocket_Part_Lands
+comment  2721
+comment  2721 Manipulate timer to make a nice sound
+comment  2727
+label    2727 Laser_Beam_Active
+comment  272C
+comment  272C Manipulate timer to make a nice sound
+comment  2735
+label    2735 Rocket_Flight
+comment  273A
+comment  273A Utilise rocket sprite height to manipulate noise sound channel
+label    2743 Subroutine_Sound_Jump_Table
+comment  2743
+word     2743-274D
+lcomment 2743 00
+label    2744 Subroutine_Sound_Jump_Table+1
+lcomment 2745 01
+lcomment 2747 02
+lcomment 2749 03
+lcomment 274B 04
+lcomment 274D 05
 comment  274F
-label    274F Collision
+label    274F Collision_Explosion
+comment  2754
+comment  2754 Manipulate timer to make an explosion sound, though doesn't use noise
 comment  275B Erase $100 bytes zero page
 label    275B Erase_ZP_RAM
 label    275E Erase_ZP_RAM_1
@@ -767,7 +814,7 @@ comment  28F9
 comment  28F9
 comment  28F9
 comment  28F9
-label    28F9 Change_Object_To_Explosion
+label    28F9 Change_Object_To_Explosion_1
 comment  28FC
 comment  28FC Reset Alien? object direction
 comment  2902
@@ -788,7 +835,7 @@ label    2921 Store_Object_Type_1
 label    2927 Store_Object_Type_2
 lcomment 2925 Color code
 comment  292B
-comment  292B Reset Flame object parameters???
+comment  292B Trigger explosion sound (noise + regular oscillator)
 label    2934 EXPLOSIONS
 label    294A Explosions_1
 label    2967 Explosion_UDG_Ptr
@@ -842,7 +889,7 @@ word     2A19
 label    2A1F STR_GAME_OVER_PLAYER_1
 break    2A32
 label    2A32 STR_GAME_OVER_PLAYER_2
-label    2A45 Spr_Ptr_To_Jetman
+label    2A45 Object_Pointer_To_Jetman
 word     2A4C
 comment  2A4F
 comment  2A4F Set Jetman Move Speed to 1
@@ -891,6 +938,16 @@ label    2B36 PCA_RTS
 label    2B37 PCA_2222
 label    2B42 PCA_3333
 comment  2B42
+comment  2B4B
+comment  2B4B
+comment  2B4B
+comment  2B4B
+comment  2B4B
+comment  2B4B
+comment  2B4B
+comment  2B4B
+comment  2B4B
+comment  2B4B
 label    2B4B Obj_Jetman_Looks?
 label    2B52 DO_RTS1
 label    2B53 Obj_Jetman_NotEqu_3F
@@ -960,48 +1017,63 @@ comment  2C5A
 comment  2C5A Decrement object counter, return when all processed
 label    2C5F Test_Laser_Hits
 label    2C6A LEVEL_0_FUZZBALL
-lcomment 2C6F Remove=1st Level Aliens don't explode on platform/floor impact
+comment  2C6F
+comment  2C6F Alien not hit by laser, check to see if hit platform
 comment  2C78
-comment  2C78 Use current player level to create offset into points table
+comment  2C78 Alien has been hit by laser, use current player level to create points table offset
 label    2C78 Alien_Hit_Update_Score
+binary   2C7B
 comment  2C7E
 comment  2C7E Get score high byte and save
 comment  2C84
 comment  2C84 Get score low byte and save
-label    2C8C Object_To_Explosion
+label    2C8C Change_Object_To_Explosion
 comment  2C8C
 comment  2C92
 comment  2C92
 comment  2C92
 comment  2C92
 comment  2C92
-label    2C92 Update_Sprite_Posn_Collide
-lcomment
-label    2C9F Update_Sprite_Posn
+label    2C92 Update_Object_Position_Collide
+comment  2C99
+comment  2C99 Alien has hit Jetman
+label    2C9F Update_Object_Position
 comment  2C9F
 comment  2C9F Get sprite direction/speed and use to create new X value
+deflabel 2CA0 OBJECT_X_DIRECTION_PARAM
 comment  2CAB
-comment  2CAB Take care of X screen wrapping
+comment  2CAB Take care of X screen wrapping (note $f0=-16 decimal)
 label    2CB3 Update_Sprite_Posn_X
 comment  2CB5
 comment  2CB5 Get sprite direction/speed and use to create new Y value
+deflabel 2CB6 OBJECT_Y_DIRECTION_PARAM
 comment  2CC3
-label    2CCC Upd_Sprite_Posn_Wrap_X_1
-label    2CD1 Upd_Sprite_Posn_Wrap_X_2
+label    2CCC Wrap_Object_X_Position_Left
+label    2CD1 Wrap_Object_X_Position_Right
 comment  2CD6
 comment  2CD6
 comment  2CD6
 comment  2CD6
 comment  2CD6
+comment  2CD6
+comment  2CD6
+comment  2CD6
+comment  2CD6
+comment  2CD6 #####################################################################################
+comment  2CD6 #####################################################################################
+comment  2CD6 #####################################################################################
+comment  2CD6 #####################################################################################
+comment  2CD6 #####################################################################################
+comment  2CD6 #####################################################################################
 label    2CD6 Obj_Ptr_To_Alien_0_Flsh_Ctr
 const    2CDB-2CE2
-label    2CDB Alien_Points_Lookup
+label    2CDB Alien_Points_Lookup_Table
 word     2CDB-2CE2
 label    2CE3 Obj_Ptr_To_Alien_0_Jetman
 deflabel 2CE9 JETMAN_FLYING
 deflabel 2CED JETMAN_STANDING
 comment  2CF1 Set Object List Pointer to first alien sprite
-label    2CF1 Set_Obj_List_Ptr_To_Alien0
+label    2CF1 Set_Obj_List_Ptr_To_Alien_0
 comment  2CF9
 comment  2CF9 Setup 6 alien objects DEBUG Set 2CFA to 1 to spawn only 1 alien
 lcomment 2CFB Counter variable
@@ -1043,7 +1115,7 @@ comment  2D58 ENTRY : ZP_Obj_List_Ptr = Current Object
 comment  2D58 \        Obj_Jetman_Looks = Status of Jetman
 comment  2D58 EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
 comment  2D58 ----------------------------------------------------------
-label    2D58 Test_Jetman_Obj_Collide
+label    2D58 Test_Jetman_Object_Collide
 lcomment 2D61 Jetman flying?
 lcomment 2D63 Yes, branch
 lcomment 2D65 Jetman standing?
@@ -1081,6 +1153,7 @@ label    2DD1 XXXX_5
 comment  2DA1
 word     2DBC
 label    2DDD Set_Sprite_UDG_Color
+label    2DE8 XXXX_6
 lcomment 2DEC Current level modulus 4
 comment  2DF1
 comment  2DF9
@@ -1093,9 +1166,14 @@ lcomment 2E1E Object hit top yet
 lcomment 2E20 Yes, branch
 lcomment 2E23 Calculate new height
 lcomment 2E25 Store new height i.e one pixel up
+comment  2E27
+comment  2E27 Trigger rocket flight sound
+comment  2E31
 label    2E34 Rocket_At_Top
 comment  2E4E Flames stop a little way before bottom
 label    2E4E ROCKET_DESCEND
+comment  2E51
+comment  2E51 Trigger rocket flight sound
 comment  2E5B
 comment  2E5B Move object Y position down 1 pixel, stopping at bottom i.e. $AF
 lcomment 2E5B 03 = Height of object
@@ -1136,11 +1214,11 @@ comment  2F31
 comment  2F31 Test if rocket part has landed, $08=middle part, $10=top part
 comment  2F31 $18=Fuel (?!)
 label    2F31 Rocket_Part_Or_Fuel_Dropped
-deflabel 2F32 OBJECT_Y_WHEN_LANDED_ATTRIB
+deflabel 2F32 OBJECT_Y_WHEN_LANDED_PARAM
 comment  2F39
 comment  2F39 Rocket part dropped, add current Y postion to landed Y position
 comment  2F39 and test to see if object has hit the ground
-deflabel 2F3B OBJECT_Y_POSITION_ATTRIB
+deflabel 2F3B OBJECT_Y_POSITION_PARAM
 deflabel 2F40 SCREEN_BOTTOM
 comment  2F43
 comment  2F43 Rocket part landed, activate next object i.e. set
@@ -1149,20 +1227,22 @@ comment  2F43 Note, using direct addressing, not using Y offset
 lcomment 2F46 Set bit 0
 binary   2F47
 comment  2F4E
-comment  2F4E Multiply rocket direction(?) by $10 and store
+comment  2F4E Multiply rocket direction(???) by $10 and store
 comment  2F57
-comment  2F57 Subtract ZP13 ($10 when rocket middle landed, $20 for top section landed) from Rocket Part Bottom Y position and store in Obj_Y_Position_2
-comment  2F5F
-comment  2F5F Direct setting of Rocket Part Bottom to have middle part landed/top part landed? (Inc's to 1 then 2)
+comment  2F57 Subtract ZP13 ($10 when rocket middle landed, $20 for top section landed) from
+comment  2F57 Rocket Part Bottom Y position and store in Obj_Y_Position_2
 comment  2F65
 comment  2F65 Turn Rocket Middle Section object off in list
 label    2F65 Disable_Object_In_List
 comment  2F6A
-comment  2F6A Store some numbers into Obj_Flame object(?! Get disabled for next rocket part)
+comment  2F6A Trigger sound for valuable pickup and rocket part/fuel cell
+comment  2F6A landing on rocket base
+comment  2F74
 label    2F77 Fuel_Dropped
-deflabel 2F78 OBJECT_Y_POSITION_ATTRIB
+deflabel 2F78 OBJECT_Y_POSITION_PARAM
 deflabel 2F7C FUEL_Y_WHEN_LANDED
 comment  2F7F
+comment  2F7F Fuel cell has landed, increment the counter
 comment  2F8E On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
 comment  2F8E On game startup 03B8+04=00, 03C0+4=01
 comment  2F8E Pickup  middle section 03B8+04=00, 03C0+4=03
@@ -1218,8 +1298,10 @@ comment  2FF9 Jetman pickup Rocket Module / Fuel Pod = 100 points
 word     2FFD
 const    2FFD
 comment  3003
+comment  3003 Trigger collision pickup sound
 lcomment 3005 Flame sprite X pos??
 lcomment 300A Flame sprite direction?
+comment  300D
 lcomment 3012 Store current Jetman sprite X pos into current object?
 lcomment 3019 Store current Jetman sprite Y pos into current object?
 label    301E Copy_Jetman_XY_To_Object
@@ -1277,7 +1359,7 @@ comment  30B3 \            satoehsaeuht
 comment  30B3 \            sathoeusanteho
 comment  30B3 ----------------------------------------------------------
 comment  30B3 Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
-label    30B3 Platform_Collision_Test
+label    30B3 Test_Platform_Collision
 lcomment 30B5 1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
 lcomment 30B7 1st run: Y=50
 lcomment 30BB 1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
@@ -1371,7 +1453,7 @@ label    325E CLC_ADC_01
 label    3264 CLC_ADC_B8
 label    326A ADC_48
 label    326F TXA_
-label    3273 UPDATE_JETMAN
+label    3273 JETMAN_UPDATE
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
 label    3285 Update_Jetman_1
@@ -1673,18 +1755,18 @@ lcomment 35CF Move bytes to given address with Y offset
 lcomment 35D1 Decrement number of lines counter
 lcomment 35D2 All lines copied? If no, loop back.
 lcomment 35D4 If yes, routine ends
-label    35D7 Load_Obj_Type_X_Y
-deflabel 35D8 OBJECT_TYPE
+label    35D7 Load_Object_Type_X_Y
+deflabel 35D8 OBJECT_TYPE_PARAM
 comment  35DD
 comment  35E2
-deflabel 35E3 OBJECT_Y_POSITION
-label    35E9 Load_Obj_Type_X_Y_Color
-deflabel 35EA OBJECT_TYPE
+deflabel 35E3 OBJECT_Y_POSITION_PARAM
+label    35E9 Load_Object_Type_X_Y_Color
+deflabel 35EA OBJECT_TYPE_PARAM
 comment  35EF
 comment  35F4
-deflabel 35F5 OBJECT_Y_POSITION
+deflabel 35F5 OBJECT_Y_POSITION_PARAM
 comment  35FA
-deflabel 35FB OBJECT_COLOR
+deflabel 35FB OBJECT_COLOR_PARAM
 comment  3601
 label    3601 AAAAAA
 label    3604 BBBBBB

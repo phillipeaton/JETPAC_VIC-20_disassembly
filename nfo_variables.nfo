@@ -1,13 +1,13 @@
 ; Zero-Page variables ; Usage count
 label      00 ZP_Obj_List_Ptr_Lo ; 182
 label      01 ZP_Obj_List_Ptr_Hi ; 111
-label      02 ZP_02_Obj_Height_Cntdn_1 ; 46
-label      03 ZP_03_Sprite_Height ; 17 Sprite width in bytes
+label      02 ZP_02 ; 46
+label      03 ZP_03 ; 17
 label      04 ZP_UDG_RAM_X ; 56
 label      05 ZP_UDG_RAM_Y ; 35
 label      06 ZP_06_Sprite_Data_Addr_Lo ; 51 06/07 used as addr of sprite data + several other 06 only uses
 label      07 ZP_07_Sprite_Data_Addr_Hi  ; 26 Used with 06
-label      08 ZP_08_Sprite_Data_Index ; 42 Used with 09
+label      08 ZP_08 ; _Sprite_Data_Index ; 42 Used with 09
 label      09 ZP_09 ; 11 Used with 08
 label      0A ZP_0A_Obj_Height_Cntdn_1 ; 15
 label      0B ZP_0B ; 18
@@ -61,8 +61,8 @@ label      5b ZP_Level_Other_Player ;
 label      5c ZP_Num_Lives_P2 ;
 label      5d ZP_Flash_Score_Countdown ; 7f for 1 player, ff for 2 player
 label      5e ZP_P1_Or_P2 ;
-label      5f ZP_Subroutine_Vec_Lo ; NOT WORD ALIGNED
-label      60 ZP_Subroutine_Vec_Hi ; NOT WORD ALIGNED
+label      5f ZP_Subroutine_Addr_Lo ;
+label      60 ZP_Subroutine_Addr_Hi ;
 
 ; Non-Zero-Page Object Variables
 label    0380 Obj_Jetman            ; Bit7=direction 1=left, 0=right; bit 0&1 00 = Not there (hit by alien), 01 = flying, 10 = standing
@@ -116,14 +116,14 @@ label    0388 Obj_Laser_0 ;
 
                           ;            0  1  2  3  4  5  6  7
                           ;     03B0  09 70 00 AF 01 00 00 1C
-label    03A8 Obj_Flame      ; Type = 0C always
-label    03A9 Obj_Flame_1
-label    03AA Obj_Flame_2
-label    03AB Obj_Flame_3
-label    03AC Obj_Flame_4
-label    03AD Obj_Flame_5
-label    03AE Obj_Flame_6
-;label    03AF Obj_Flame_7
+label    03A8 Obj_Sound      ; Type = 0C always
+label    03A9 Obj_Sound_Collision
+label    03AA Obj_Sound_Collision_Timer
+label    03AB Obj_Sound_Noise
+label    03AC Obj_Sound_Noise_Timer
+label    03AD Obj_Sound_Laser
+label    03AE Obj_Sound_Laser_Timer
+;label    03AF Obj_Sound_7 ; Not used
                              ;        0  1  2  3  4  5  6  7
                              ; 03B0  09 70 00 AF 01 00 00 1C
 label    03B0 Obj_Rocket     ; Type = 09, 0A when ascending, 0B when decending
