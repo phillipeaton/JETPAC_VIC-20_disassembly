@@ -897,12 +897,14 @@ comment  2A55
 comment  2A55 Object type
 label    2A5F LEVEL_1_PLUSSES
 label    2A67 Level_1_Plusses_1
+comment  2A67
+comment  2A67 Alien not hit by laser, check to see if hit platform
 label    2A6D LEVEL_2_BALLS
 label    2A75 Level_2_Balls_1
 comment  2A78
 comment  2A78 Read countdown, branch if zero, else decrement
 comment  2A83
-label    2A83 Test_Alien_Direction
+label    2A83 Update_Alien_Direction
 label    2A8B Set_Alien_Direction
 comment  2A8D
 comment  2A8D Test_Alien_Diagonal?
@@ -928,15 +930,16 @@ label    2B03 Level_3_Saucer_8
 label    2B08 Level_3_Saucer_9
 label    2B11 Level_3_Saucer_a
 label    2AF7 Level_3_Saucer_EXIT
-label    2B16 Platform_Collision_Aliens
+comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change
+label    2B16 Test_Platform_Collision_Bounce
 lcomment 2B16 Remove=(Not triggered on first level, so don't yet know)
 comment  2B1D
 comment  2B24
 comment  2B2B
-label    2B2F PCA_1111
-label    2B36 PCA_RTS
-label    2B37 PCA_2222
-label    2B42 PCA_3333
+label    2B2F Test_Platform_Collision_Bounc_1
+label    2B36 Test_Platform_Collision_Bou_RTS
+label    2B37 Test_Platform_Collision_Bounc_2
+label    2B42 Test_Platform_Collision_Bounc_3
 comment  2B42
 comment  2B4B
 comment  2B4B
@@ -1018,7 +1021,7 @@ comment  2C5A Decrement object counter, return when all processed
 label    2C5F Test_Laser_Hits
 label    2C6A LEVEL_0_FUZZBALL
 comment  2C6F
-comment  2C6F Alien not hit by laser, check to see if hit platform
+comment  2C6F Alien not hit by laser, check to see if hit platform, if yes explode
 comment  2C78
 comment  2C78 Alien has been hit by laser, use current player level to create points table offset
 label    2C78 Alien_Hit_Update_Score
@@ -1033,8 +1036,9 @@ comment  2C92
 comment  2C92
 comment  2C92
 comment  2C92
-comment  2C92
-label    2C92 Update_Object_Position_Collide
+comment  2C92 Test if object has collided with Jetman, if not, update position
+label    2C92 Test_Jetman_Collide
+;label    2C92 Update_Object_Position_Collide
 comment  2C99
 comment  2C99 Alien has hit Jetman
 label    2C9F Update_Object_Position
@@ -1043,12 +1047,15 @@ comment  2C9F Get sprite direction/speed and use to create new X value
 deflabel 2CA0 OBJECT_X_DIRECTION_PARAM
 comment  2CAB
 comment  2CAB Take care of X screen wrapping (note $f0=-16 decimal)
-label    2CB3 Update_Sprite_Posn_X
+deflabel 2CB0 SCREEN_WIDTH_PIXELS
+label    2CB3 Update_Sprite_X_Position
 comment  2CB5
 comment  2CB5 Get sprite direction/speed and use to create new Y value
 deflabel 2CB6 OBJECT_Y_DIRECTION_PARAM
 comment  2CC3
+comment  2CCC
 label    2CCC Wrap_Object_X_Position_Left
+comment  2CD1
 label    2CD1 Wrap_Object_X_Position_Right
 comment  2CD6
 comment  2CD6
@@ -1365,7 +1372,7 @@ lcomment 30B7 1st run: Y=50
 lcomment 30BB 1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
 lcomment 30BD 1st run: X=5f
 lcomment 30BF Set Temp4 to address of data table at 31B6
-label    30C2 PCT_1
+label    30C2 Test_Platform_Collision_1
 lcomment 30C4 Set Temp1Lo=0
 lcomment 30C6 31B6: 10 40 03 50 60 01 88 30
 lcomment 30C9 1st run: 10-50=C0 i.e. -40
@@ -1374,26 +1381,26 @@ comment  30CD
 lcomment 30CD Save A
 lcomment 30D3 Restore A
 comment  30D4
-label    30D4 PCT_02
+label    30D4 Test_Platform_Collision_2
 comment  30D8
 lcomment 30D8 Save A
 lcomment 30DE Restore A
 comment  30DF
-label    30DF PCT_03
-label    30EC PCT_04
-label    30FD PCT_05
-label    310F PCT_06
+label    30DF Test_Platform_Collision_3
+label    30EC Test_Platform_Collision_4
+label    30FD Test_Platform_Collision_5
+label    310F Test_Platform_Collision_6
 label    3118 INY_3
 label    3119 INY_2
 comment  3118 y reg is pointer into lookup table, 3 groups of 3
 lcomment 3118 3 iny's when moving from Y check to Y check
 lcomment 3119 2 iny's when moving from X check to X check as y already inc'd
 lcomment 311B Temp5 used as 3-2-1 countdown
-label    312D PCT_07
-label    3130 PCT_08
+label    312D Test_Platform_Collision_7
+label    3130 Test_Platform_Collision_8
 label    3138 ORA_Temp1Lo_And_StoreTo_Temp1Lo
-label    313C PCT_09
-label    313D PCT_10
+label    313C Test_Platform_Collision_9
+label    313D Test_Platform_Collision10
 label    3143 _31B6_To_Tmp4_03_To_Tmp5_Yto00
 lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
 label    3152 Draw_Platforms

@@ -11,7 +11,7 @@ file   jetpac_2000-3fff.bin * Instructs dasmfw to load the given file at the giv
 option asc off        * Show output of the ASCII equivalent to code/data
 *option cref on       * Show cross-referece table
 *option unused on     * Show unused labels
-option labellen  2    * Def=8  Reserve spaces for code labels.
+option labellen  4    * Def=8  Reserve spaces for code labels.
 option eqlbllen 32    * Def=8  Reserve spaces for EQU labels.
 option copndlen 32    * Def=24 Reserve spaces for operand part of disassembled instruction with line comment
 option uopndlen 52    * Def=52 Reserve spaces for operand part of disassembled instruction without line comment
