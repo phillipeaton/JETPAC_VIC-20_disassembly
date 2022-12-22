@@ -18,8 +18,8 @@ ZP_02                           equ     $0002
 ZP_03                           equ     $0003
 ZP_UDG_RAM_X                    equ     $0004
 ZP_UDG_RAM_Y                    equ     $0005
-ZP_06_Sprite_Data_Addr_Lo       equ     $0006
-ZP_07_Sprite_Data_Addr_Hi       equ     $0007
+ZP_06_Obj_Addr_Lo               equ     $0006
+ZP_07_Obj_Addr_Hi               equ     $0007
 ZP_08                           equ     $0008
 ZP_09                           equ     $0009
 ZP_0A_Obj_Height_Cntdn_1        equ     $000A
@@ -147,6 +147,7 @@ JETMAN_STANDING                 equ     $02
 JETMAN_FLYING                   equ     $01
 OBJECT_Y_DIRECTION_PARAM        equ     $04
 OBJECT_X_DIRECTION_PARAM        equ     $02
+LASER_X_POSITION_PARAM          equ     $02
 YELLOW                          equ     $07
 CYAN                            equ     $03
 BLUE                            equ     $06
@@ -445,17 +446,17 @@ Update_Laser_Objects_1
     ldy     #$00                            ; 20F9: A0 00    
 ; L_BRS_($20FB)_($210D) OK
 Update_Laser_Objects_2
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 20FB: B1 06    
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 20FB: B1 06    
     beq     Update_Laser_Object             ; 20FD: F0 11    
 
 ; Move ZP index address to next 8 bytes i.e. next Laser shot
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 20FF: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 20FF: A5 06    
     clc                                     ; 2101: 18       
     adc     #$08                            ; 2102: 69 08    
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 2104: 85 06    
-    lda     ZP_07_Sprite_Data_Addr_Hi       ; 2106: A5 07    
+    sta     ZP_06_Obj_Addr_Lo               ; 2104: 85 06    
+    lda     ZP_07_Obj_Addr_Hi               ; 2106: A5 07    
     adc     #$00                            ; 2108: 69 00    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 210A: 85 07    
+    sta     ZP_07_Obj_Addr_Hi               ; 210A: 85 07    
     dex                                     ; 210C: CA       
     bne     Update_Laser_Objects_2          ; 210D: D0 EC    
     rts                                     ; 210F: 60       
@@ -466,7 +467,7 @@ Update_Laser_Object
     tax                                     ; 2112: AA        Store for later
     and     #$80                            ; 2113: 29 80     Jetman looking left?
     ora     #$10                            ; 2115: 09 10     Set bit 4, DON'T KNOW WHAT IT'S USED FOR??????????
-    sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 2117: 91 06     Store to inactive Laser attrib 00
+    sta     (ZP_06_Obj_Addr_Lo),y           ; 2117: 91 06     Store to inactive Laser attrib 00
 
     iny                                     ; 2119: C8        Move to next Jetman attrib 01
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 211A: B1 00     Get Jetman attrib 01 i.e. X position
@@ -492,17 +493,17 @@ Update_Laser_Object_1
     sbc     #$0D                            ; 2136: E9 0D    
     dey                                     ; 2138: 88       
     dey                                     ; 2139: 88       
-    sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 213A: 91 06    
+    sta     (ZP_06_Obj_Addr_Lo),y           ; 213A: 91 06    
 
     ldx     #$03                            ; 213C: A2 03    
     iny                                     ; 213E: C8       
     lda     ZP_08                           ; 213F: A5 08    
-    sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 2141: 91 06    
+    sta     (ZP_06_Obj_Addr_Lo),y           ; 2141: 91 06    
     and     #$FB                            ; 2143: 29 FB    
 ; L_BRS_($2145)_($2149) OK
 Update_Laser_Object_2
     iny                                     ; 2145: C8       
-    sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 2146: 91 06    
+    sta     (ZP_06_Obj_Addr_Lo),y           ; 2146: 91 06    
     dex                                     ; 2148: CA       
     bne     Update_Laser_Object_2           ; 2149: D0 FA    
 
@@ -511,7 +512,7 @@ Update_Laser_Object_2
     and     #$38                            ; 214E: 29 38    
     clc                                     ; 2150: 18       
     adc     #$40                            ; 2151: 69 40    
-    sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 2153: 91 06    
+    sta     (ZP_06_Obj_Addr_Lo),y           ; 2153: 91 06    
 
 ; Load a random laser color using the current 6522 timer value
     iny                                     ; 2155: C8       
@@ -519,7 +520,7 @@ Update_Laser_Object_2
     and     #$07                            ; 2158: 29 07    
     tax                                     ; 215A: AA       
     lda     Laser_Color_Table,x             ; 215B: BD 6B 21 
-    sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 215E: 91 06    
+    sta     (ZP_06_Obj_Addr_Lo),y           ; 215E: 91 06    
 
 ; Trigger laser sound
     lda     #$03                            ; 2160: A9 03    
@@ -592,7 +593,7 @@ Fire_Pressed_0
 DISPLAY_LASERS
     ldy     #$06                            ; 219A: A0 06     ???????
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 219C: B1 00    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 219E: 85 07    
+    sta     ZP_07_Obj_Addr_Hi               ; 219E: 85 07    
     iny                                     ; 21A0: C8        Y=$07, laser color addr
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 21A1: B1 00     Fetch laser color
     sta     ZP_Obj_Color_2                  ; 21A3: 85 1B     Store to ZP variable
@@ -600,7 +601,7 @@ DISPLAY_LASERS
 ; Get laser X and Y-coord and store to temp vars
     ldy     #$02                            ; 21A5: A0 02     Y=$02, X-coord of laser horizontal end point
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 21A7: B1 00    
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 21A9: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 21A9: 85 06    
     sta     ZP_UDG_RAM_X                    ; 21AB: 85 04    
     dey                                     ; 21AD: 88        Y=$01, Y-coord of laser
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 21AE: B1 00    
@@ -608,14 +609,14 @@ DISPLAY_LASERS
     sta     ZP_13                           ; 21B2: 85 13    
 
 ; Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 21B4: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 21B4: A5 06    
     bit     MASK_00000100                   ; 21B6: 2C 16 20 
     beq     FP5555                          ; 21B9: F0 47    
     jsr     Setup_Color_RAM_Ptr             ; 21BB: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 21BE: 20 1D 35 
 
 ; Test if X-coord of laser is on a boundary and wrap if necessary ######## NEEDS CONFIRM
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 21C1: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 21C1: A5 06    
     bit     MASK_00000001                   ; 21C3: 2C 14 20 
     clc                                     ; 21C6: 18       
     beq     Fire_Pressed_0                  ; 21C7: F0 CC    
@@ -636,7 +637,7 @@ FP1111
 FP2222
     txa                                     ; 21DC: 8A        Restore A
 
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 21DD: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 21DD: 85 06    
 
 ; Invert the displayed 8-bit byte on-screen
     lda     (ZP_UDG_RAM_X),y                ; 21DF: B1 04    
@@ -654,17 +655,17 @@ FP2222
 ; Some kind of screen wrap?
 ; L_BRS_($21F1)_($21EB) OK
 FP3333
-    lda     ZP_07_Sprite_Data_Addr_Hi       ; 21F1: A5 07    
+    lda     ZP_07_Obj_Addr_Hi               ; 21F1: A5 07    
     sec                                     ; 21F3: 38       
     sbc     #$08                            ; 21F4: E9 08    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 21F6: 85 07    
+    sta     ZP_07_Obj_Addr_Hi               ; 21F6: 85 07    
     and     #$F8                            ; 21F8: 29 F8    
     bne     FP5555                          ; 21FA: D0 06    
 ; L_BRS_($21FC)_($21DA) OK
 FP4444
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 21FC: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 21FC: A5 06    
     and     #$FB                            ; 21FE: 29 FB    
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 2200: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 2200: 85 06    
 
 ; Loads ZP 14/15/16/17 with seed values, which are something to do with the four lasers
 ; L_BRS_($2202)_($21B9) OK
@@ -686,7 +687,7 @@ FP5555
 FP6666
     iny                                     ; 2211: C8        First time round, Y=3, next time 4 and so on
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2212: B1 00     Get one of the four laser object paramenters
-    eor     ZP_06_Sprite_Data_Addr_Lo       ; 2214: 45 06    
+    eor     ZP_06_Obj_Addr_Lo               ; 2214: 45 06    
     and     #$F8                            ; 2216: 29 F8     Zero bottom 3 bits, probably testing if laser shot ended
     bne     FP7777                          ; 2218: D0 0F    
     jsr     Laser_ZP17_15_to_ZP16_14        ; 221A: 20 8B 22 
@@ -706,15 +707,15 @@ FP7777
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2229: B1 00     Get one of the four laser object paramenters
     bit     MASK_00000100                   ; 222B: 2C 16 20 
     bne     FP9999                          ; 222E: D0 27    
-    dec     ZP_07_Sprite_Data_Addr_Hi       ; 2230: C6 07    
-    lda     ZP_07_Sprite_Data_Addr_Hi       ; 2232: A5 07    
+    dec     ZP_07_Obj_Addr_Hi               ; 2230: C6 07    
+    lda     ZP_07_Obj_Addr_Hi               ; 2232: A5 07    
     and     #$07                            ; 2234: 29 07    
     bne     FP8888                          ; 2236: D0 10    
     lda     ZP_HW_IRQ_Count3                ; 2238: A5 4C    
     and     #$03                            ; 223A: 29 03     Zero bit top 6 bits
     ora     #$04                            ; 223C: 09 04     Set bit 2, now is 000001xx
-    ora     ZP_07_Sprite_Data_Addr_Hi       ; 223E: 05 07    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 2240: 85 07    
+    ora     ZP_07_Obj_Addr_Hi               ; 223E: 05 07    
+    sta     ZP_07_Obj_Addr_Hi               ; 2240: 85 07    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2242: B1 00    
     ora     #$04                            ; 2244: 09 04     Set bit 2
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2246: 91 00    
@@ -724,11 +725,11 @@ FP7777
 ; L_JMP_($2248)_($2282) OK
 FP8888
     ldy     #$06                            ; 2248: A0 06    
-    lda     ZP_07_Sprite_Data_Addr_Hi       ; 224A: A5 07    
+    lda     ZP_07_Obj_Addr_Hi               ; 224A: A5 07    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 224C: 91 00    
 
     ldy     #$02                            ; 224E: A0 02    
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 2250: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 2250: A5 06    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2252: 91 00    
 
     jmp     GOTO_NEXT_OBJECT                ; 2254: 4C 1A 26 
@@ -1003,7 +1004,7 @@ Display_P2_Lives
 Display_Number_Lives
     clc                                     ; 238E: 18       
     adc     #$70                            ; 238F: 69 70     $70 = "0" character
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 2391: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 2391: 85 06    
     jsr     Copy_Char_To_UDG_RAM            ; 2393: 20 95 35 
 
 ; Display Jetman Icon next to number of lives
@@ -1023,10 +1024,10 @@ Zero_Lives_To_UDG_RAM_1
 ; L_JSR_($23A8)_($23A2) OK
 Zero_Lives_To_UDG_RAM
     lda     #$60                            ; 23A8: A9 60     $60 = Space character
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 23AA: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 23AA: 85 06    
     jsr     Copy_Char_To_UDG_RAM            ; 23AC: 20 95 35 
     lda     #$60                            ; 23AF: A9 60     $60 = Space character
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 23B1: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 23B1: 85 06    
     jmp     Copy_Char_To_UDG_RAM            ; 23B3: 4C 95 35 
 ; -----------------------
 ; L_JSR_($23B6)_($237A) OK
@@ -2636,7 +2637,7 @@ LEVEL_1_PLUSSES
     jmp     Alien_Hit_Update_Score          ; 2A64: 4C 78 2C 
 ; -----------------------
 
-; Alien not hit by laser, check to see if hit platform
+; Alien not hit by laser, check to see if hit platform, plusses bounce off so update direction
 ; L_BRS_($2A67)_($2A62) OK
 Level_1_Plusses_1
     jsr     Test_Platform_Collision_Bounce  ; 2A67: 20 16 2B 
@@ -2718,16 +2719,19 @@ Reset_Countdown_Timer
     adc     #$10                            ; 2AA6: 69 10    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AA8: 91 00    
 
-; Invert diagonal direction up/down, randomly via IRQ
+; Invert Y direction up/down, randomly via IRQ
     ldy     #$04                            ; 2AAA: A0 04    
     and     #$04                            ; 2AAC: 29 04    
     bit     ZP_HW_IRQ_Count3                ; 2AAE: 24 4C    
-    bmi     Set_Alien_Diagonal_2?           ; 2AB0: 30 05    
+    bmi     Reset_Countdown_Timer_1         ; 2AB0: 30 05    
+
+; Do the inversion
     eor     #$FF                            ; 2AB2: 49 FF    
     clc                                     ; 2AB4: 18       
     adc     #$01                            ; 2AB5: 69 01    
+
 ; L_BRS_($2AB7)_($2AB0) OK
-Set_Alien_Diagonal_2?
+Reset_Countdown_Timer_1
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AB7: 91 00    
     jmp     Test_Jetman_Collide             ; 2AB9: 4C 92 2C 
 ; -----------------------
@@ -3042,6 +3046,26 @@ Raster_Line_Table
     fcb     $18                             ; 2BF6: 18       
     fcb     $20                             ; 2BF7: 20       
 
+
+
+
+
+
+
+
+
+
+; 888888 888888 .dP"Y8 888888     88        db    .dP"Y8 888888 88""Yb
+;   88   88__   `Ybo."   88       88       dPYb   `Ybo." 88__   88__dP
+;   88   88""   o.`Y8b   88       88  .o  dP__Yb  o.`Y8b 88""   88"Yb
+;   88   888888 8bodP'   88       88ood8 dP""""Yb 8bodP' 888888 88  Yb
+; \
+; 88  88 88 888888 .dP"Y8
+; 88  88 88   88   `Ybo."
+; 888888 88   88   o.`Y8b
+; 88  88 88   88   8bodP'
+
+
 ; Store Obj_Laser_0 address in ZP_08/09 ($0388)
 ; Replace call with RTS at 2C64 and you can't shoot any aliens
 ; L_JSR_($2BF8)_($2C64) OK
@@ -3056,18 +3080,18 @@ Test_Laser_Hits_1
     sta     ZP_02                           ; 2C02: 85 02    
 
 ; Store current object (not the laser) X and Y in ZP_06/07
-    ldy     #$03                            ; 2C04: A0 03    
+    ldy     #OBJECT_Y_POSITION_PARAM        ; 2C04: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C06: B1 00     Object Y
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 2C08: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 2C08: 85 06    
     dey                                     ; 2C0A: 88       
     dey                                     ; 2C0B: 88        Object X
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C0C: B1 00    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 2C0E: 85 07    
+    sta     ZP_07_Obj_Addr_Hi               ; 2C0E: 85 07    
 
 ; Test if laser X-coords have bit 2 set, not sure why
 ; L_BRS_($2C10)_($2C5C) OK
 BACK_2C10
-    ldy     #$02                            ; 2C10: A0 02    
+    ldy     #LASER_X_POSITION_PARAM         ; 2C10: A0 02    
     lda     (ZP_08),y                       ; 2C12: B1 08     X-coord of end of laser
     bit     MASK_00000100                   ; 2C14: 2C 16 20 
     bne     SKIP_2C21                       ; 2C17: D0 08    
@@ -3083,8 +3107,9 @@ SKIP_2C21
     lda     (ZP_08),y                       ; 2C23: B1 08    
     beq     Goto_Next_Obj                   ; 2C25: F0 2C    
 
+; Test Y position???
     iny                                     ; 2C27: C8       
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 2C28: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 2C28: A5 06    
     sec                                     ; 2C2A: 38       
     sbc     (ZP_08),y                       ; 2C2B: F1 08    
     cmp     #$10                            ; 2C2D: C9 10    
@@ -3092,10 +3117,10 @@ SKIP_2C21
 
     iny                                     ; 2C31: C8       
     lda     (ZP_08),y                       ; 2C32: B1 08    
-    and     #$F8                            ; 2C34: 29 F8    
+    and     #%11111000                      ; 2C34: 29 F8     Zero bits 0-2
     sbc     #$03                            ; 2C36: E9 03    
     sec                                     ; 2C38: 38       
-    sbc     ZP_07_Sprite_Data_Addr_Hi       ; 2C39: E5 07    
+    sbc     ZP_07_Obj_Addr_Hi               ; 2C39: E5 07    
     bpl     SKIP_2C42                       ; 2C3B: 10 05    
 
     eor     #$FF                            ; 2C3D: 49 FF    
@@ -3170,7 +3195,8 @@ LEVEL_0_FUZZBALL
     jsr     Test_Laser_Hits                 ; 2C6A: 20 5F 2C 
     bmi     Alien_Hit_Update_Score          ; 2C6D: 30 09    
 
-; Alien not hit by laser, check to see if hit platform, if yes explode
+; Alien not hit by laser, test if alien hit platform, if yes explode,
+; else test if alien hit Jetman
     jsr     Test_Platform_Collision         ; 2C6F: 20 B3 30 
     lda     ZP_02                           ; 2C72: A5 02    
     bpl     Test_Jetman_Collide             ; 2C74: 10 1C    
@@ -4206,22 +4232,22 @@ Add_3_Digit_BCD_To_Score
 
 ; Add units
     sed                                     ; 3070: F8        Set Decimal Mode
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3071: B1 06    
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 3071: B1 06    
     clc                                     ; 3073: 18       
     adc     ZP_02                           ; 3074: 65 02    
-    sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3076: 91 06    
+    sta     (ZP_06_Obj_Addr_Lo),y           ; 3076: 91 06    
 
 ; Add tens
     dey                                     ; 3078: 88       
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3079: B1 06    
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 3079: B1 06    
     adc     ZP_03                           ; 307B: 65 03    
-    sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 307D: 91 06    
+    sta     (ZP_06_Obj_Addr_Lo),y           ; 307D: 91 06    
 
 ; Add hundreds
     dey                                     ; 307F: 88       
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3080: B1 06    
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 3080: B1 06    
     adc     #$00                            ; 3082: 69 00    
-    sta     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3084: 91 06    
+    sta     (ZP_06_Obj_Addr_Lo),y           ; 3084: 91 06    
     cld                                     ; 3086: D8        Clear Decimal Mode
 
     lda     ZP_P1_Or_P2                     ; 3087: A5 5E     Decide if working with P1 or P2
@@ -4480,9 +4506,9 @@ DP_1 lda    (ZP_08),y                       ; 3155: B1 08     Get X value from l
 
 ; Load Temp_3 with addr of left end platform UDG char
     lda     #$15                            ; 316B: A9 15    
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 316D: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 316D: 85 06    
     lda     #$3E                            ; 316F: A9 3E    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 3171: 85 07    
+    sta     ZP_07_Obj_Addr_Hi               ; 3171: 85 07    
 
 ; Copy left end platform UDG char to RAM, bytes 9 per column
     ldy     #$09                            ; 3173: A0 09    
@@ -4527,13 +4553,13 @@ Next_UDG_Char_Loop_Next_Char
 ; L_JSR_($31A8)_($3178) OK
 ; L_JSR_($31A8)_($31A2) OK
 Next_UDG_Char
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 31A8: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 31A8: A5 06    
     clc                                     ; 31AA: 18       
     adc     #$0A                            ; 31AB: 69 0A    
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 31AD: 85 06    
-    lda     ZP_07_Sprite_Data_Addr_Hi       ; 31AF: A5 07    
+    sta     ZP_06_Obj_Addr_Lo               ; 31AD: 85 06    
+    lda     ZP_07_Obj_Addr_Hi               ; 31AF: A5 07    
     adc     #$00                            ; 31B1: 69 00    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 31B3: 85 07    
+    sta     ZP_07_Obj_Addr_Hi               ; 31B3: 85 07    
     rts                                     ; 31B5: 60       
 ; ===========================================================
 ; Platform data for 3143_Subroutine, 3 platforms: X Y #Num_middle_chars
@@ -5247,7 +5273,7 @@ Display_BCD_Bytes
     lsr     a                               ; 34AB: 4A        12 has become 01
     clc                                     ; 34AC: 18       
     adc     #$70                            ; 34AD: 69 70     Add $70, $40 gets subtracted later on
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 34AF: 85 06     and resultant $31st char in Char ROM is "1"
+    sta     ZP_06_Obj_Addr_Lo               ; 34AF: 85 06     and resultant $31st char in Char ROM is "1"
     jsr     Copy_Char_To_UDG_RAM            ; 34B1: 20 95 35 
 
 ; Display 2nd score character
@@ -5255,13 +5281,13 @@ Display_BCD_Bytes
     lda     (ZP_Addr_Ptr_Lo),y              ; 34B6: B1 0E     Load first score byte again i.e. 12
     and     #$0F                            ; 34B8: 29 0F     Mask top 4 bits, 12 becomes 02
     adc     #$70                            ; 34BA: 69 70    
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 34BC: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 34BC: 85 06    
     jsr     Copy_Char_To_UDG_RAM            ; 34BE: 20 95 35 
 
 ; Increment pointer to next score byte
     inc     ZP_Addr_Ptr_Lo                  ; 34C1: E6 0E    
     bne     Display_BCD_Bytes_0             ; 34C3: D0 02    
-    inc     ZP_07_Sprite_Data_Addr_Hi       ; 34C5: E6 07     Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
+    inc     ZP_07_Obj_Addr_Hi               ; 34C5: E6 07     Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
 ; L_BRS_($34C7)_($34C3) OK
 Display_BCD_Bytes_0
     dec     ZP_02                           ; 34C7: C6 02     Decrement number of bytes to display counter
@@ -5307,7 +5333,7 @@ DSTR1
 ; L_JSR_($34E3)_($34DD) OK
 Display_Character
     lsr     a                               ; 34E3: 4A       
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 34E4: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 34E4: 85 06    
     txa                                     ; 34E6: 8A       
     sta     ZP_Invert                       ; 34E7: 85 57    
 
@@ -5497,7 +5523,7 @@ Reset_RAM
 ; L_BRS_($357B)_($358A) OK
 ; L_BRS_($357B)_($3592) OK
 Reset_RAM_1
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 357B: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 357B: A5 06    
     sta     (ZP_UDG_RAM_X),y                ; 357D: 91 04    
     iny                                     ; 357F: C8       
     bne     Reset_RAM_2                     ; 3580: D0 02    
@@ -5554,26 +5580,26 @@ Reset_RAM_2
 ; L_JSR_($3595)_($34EB) OK
 Copy_Char_To_UDG_RAM
     lda     #$00                            ; 3595: A9 00     Addr_From = 71 xx as example
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 3597: 85 07     Clear address hi-byte
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 3599: A5 06     Addr_From = 71 00
+    sta     ZP_07_Obj_Addr_Hi               ; 3597: 85 07     Clear address hi-byte
+    lda     ZP_06_Obj_Addr_Lo               ; 3599: A5 06     Addr_From = 71 00
     sec                                     ; 359B: 38       
     sbc     #$40                            ; 359C: E9 40    
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 359E: 85 06     Addr_From = 31 00, $31st Character ROM character is "1"
+    sta     ZP_06_Obj_Addr_Lo               ; 359E: 85 06     Addr_From = 31 00, $31st Character ROM character is "1"
 
 ; Multiply Addr_From by 8, as 8 bytes per UDG RAM character definition
     ldx     #$03                            ; 35A0: A2 03    
 ; L_BRS_($35A2)_($35A8) OK
 Copy_Char_To_UDG_RAM_1
     clc                                     ; 35A2: 18       
-    rol     ZP_06_Sprite_Data_Addr_Lo       ; 35A3: 26 06    
-    rol     ZP_07_Sprite_Data_Addr_Hi       ; 35A5: 26 07     Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
+    rol     ZP_06_Obj_Addr_Lo               ; 35A3: 26 06    
+    rol     ZP_07_Obj_Addr_Hi               ; 35A5: 26 07     Addr_From = 31 00 > 62 00 > c4 00 > 88 01 i.e. $0188
     dex                                     ; 35A7: CA        Left-shifted 3 times? i.e. multiplied by 8
     bne     Copy_Char_To_UDG_RAM_1          ; 35A8: D0 F8     If no, loop back
 
 ; Add $8000 Character ROM offset to address
-    lda     ZP_07_Sprite_Data_Addr_Hi       ; 35AA: A5 07    
+    lda     ZP_07_Obj_Addr_Hi               ; 35AA: A5 07    
     adc     #$80                            ; 35AC: 69 80    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 35AE: 85 07     Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
+    sta     ZP_07_Obj_Addr_Hi               ; 35AE: 85 07     Addr_From = 88 81 i.e. $8188 is Character ROM character "1"
 
 ; Copy 8 bytes to form a complete character
     ldy     #$07                            ; 35B0: A0 07    
@@ -5584,7 +5610,7 @@ Copy_Char_To_UDG_RAM_1
 ; L_JSR_($35B6)_($317D) OK
 ; L_BRS_($35B6)_($35BB) OK
 Copy_Char_To_UDG_RAM_2
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 35B6: B1 06     Copy bytes from given address with Y offset
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 35B6: B1 06     Copy bytes from given address with Y offset
     sta     (ZP_UDG_RAM_X),y                ; 35B8: 91 04     Copy bytes to given address with Y offset
     dey                                     ; 35BA: 88        Decrement number of lines counter
     bpl     Copy_Char_To_UDG_RAM_2          ; 35BB: 10 F9     All lines copied? If no, loop back.
@@ -5606,7 +5632,7 @@ Copy_Char_To_UDG_RAM_NEXT
 ; L_BRS_($35CB)_($35B4) OK
 ; L_BRS_($35CB)_($35D2) OK
 Copy_Char_To_UDG_RAM_INV
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 35CB: B1 06     Copy bytes from given address with Y offset
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 35CB: B1 06     Copy bytes from given address with Y offset
     eor     #$FF                            ; 35CD: 49 FF     Invert the byte (used to make the byte flash)
     sta     (ZP_UDG_RAM_X),y                ; 35CF: 91 04     Move bytes to given address with Y offset
     dey                                     ; 35D1: 88        Decrement number of lines counter
@@ -5808,7 +5834,7 @@ YYYYYY
     ldy     ZP_08                           ; 3672: A4 08    
 ; L_BRS_($3674)_($367C) OK
 YYYYYY_3
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3674: B1 06    
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 3674: B1 06    
     eor     (ZP_UDG_RAM_X),y                ; 3676: 51 04    
     sta     (ZP_UDG_RAM_X),y                ; 3678: 91 04    
     dey                                     ; 367A: 88       
@@ -5832,7 +5858,7 @@ ZZZZZZ
     beq     ZZZZZZ_2                        ; 368A: F0 1F    
     dec     ZP_02                           ; 368C: C6 02    
     ldy     ZP_08                           ; 368E: A4 08    
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 3690: B1 06    
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 3690: B1 06    
     eor     (ZP_UDG_RAM_X),y                ; 3692: 51 04    
     sta     (ZP_UDG_RAM_X),y                ; 3694: 91 04    
     dec     ZP_08                           ; 3696: C6 08    
@@ -5855,13 +5881,13 @@ ZZZZZZ_2
     lda     ZP_Sprite_Width_Pixels          ; 36AF: A5 14    
     beq     ZZZZZZ_6                        ; 36B1: F0 76    
     dec     ZP_Sprite_Width_Pixels          ; 36B3: C6 14    
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 36B5: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 36B5: A5 06    
     sec                                     ; 36B7: 38       
     sbc     ZP_03                           ; 36B8: E5 03    
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 36BA: 85 06    
-    lda     ZP_07_Sprite_Data_Addr_Hi       ; 36BC: A5 07    
+    sta     ZP_06_Obj_Addr_Lo               ; 36BA: 85 06    
+    lda     ZP_07_Obj_Addr_Hi               ; 36BC: A5 07    
     sbc     #$00                            ; 36BE: E9 00    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 36C0: 85 07    
+    sta     ZP_07_Obj_Addr_Hi               ; 36C0: 85 07    
     lda     ZP_UDG_RAM_X                    ; 36C2: A5 04    
     clc                                     ; 36C4: 18       
     adc     #$B0                            ; 36C5: 69 B0    
@@ -6060,10 +6086,10 @@ Set_UDG_RAM_Ptr_Sprite_Dimen_
 ; L_JMP_($378D)_($2DFC) OK
 ; L_JSR_($378D)_($2FCE) OK
 Set_UDG_RAM_Ptr_Sprite_Dimen
-    sty     ZP_06_Sprite_Data_Addr_Lo       ; 378D: 84 06    
+    sty     ZP_06_Obj_Addr_Lo               ; 378D: 84 06    
     tay                                     ; 378F: A8       
     dey                                     ; 3790: 88       
-    sty     ZP_07_Sprite_Data_Addr_Hi       ; 3791: 84 07    
+    sty     ZP_07_Obj_Addr_Hi               ; 3791: 84 07    
 
 ; Setup UDG RAM X & Y
     lda     ZP_Obj_X_Position_1             ; 3793: A5 10    
@@ -6073,7 +6099,7 @@ Set_UDG_RAM_Ptr_Sprite_Dimen
 
 ; Convert XY pixel coords to address, managing X axis wrap ($B8)
     ldy     #$FF                            ; 379B: A0 FF    
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 379D: B1 06    
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 379D: B1 06    
     clc                                     ; 379F: 18       
     adc     ZP_UDG_RAM_X                    ; 37A0: 65 04    
     cmp     #SCREEN_WIDTH_PIXELS            ; 37A2: C9 B8    
@@ -6096,24 +6122,24 @@ No_X_Wrap
 
 ; Get/store sprite width in characters (zero-based)
     ldy     #$FE                            ; 37BB: A0 FE    
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 37BD: B1 06    
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 37BD: B1 06    
     sta     ZP_Sprite_Width_Pixels          ; 37BF: 85 14    
 
 ; Get/store sprite height in pixels
     dey                                     ; 37C1: 88       
-    lda     (ZP_06_Sprite_Data_Addr_Lo),y   ; 37C2: B1 06    
+    lda     (ZP_06_Obj_Addr_Lo),y           ; 37C2: B1 06    
     sta     ZP_03                           ; 37C4: 85 03    
 
 ; Subtract $03 from 16-bit sprite UDG addr, i.e. so address
 ; avoids the sprite dimension bytes
-    lda     ZP_06_Sprite_Data_Addr_Lo       ; 37C6: A5 06    
+    lda     ZP_06_Obj_Addr_Lo               ; 37C6: A5 06    
     sec                                     ; 37C8: 38       
     sbc     #$03                            ; 37C9: E9 03    
-    sta     ZP_06_Sprite_Data_Addr_Lo       ; 37CB: 85 06    
+    sta     ZP_06_Obj_Addr_Lo               ; 37CB: 85 06    
 
-    lda     ZP_07_Sprite_Data_Addr_Hi       ; 37CD: A5 07    
+    lda     ZP_07_Obj_Addr_Hi               ; 37CD: A5 07    
     sbc     #$00                            ; 37CF: E9 00    
-    sta     ZP_07_Sprite_Data_Addr_Hi       ; 37D1: 85 07    
+    sta     ZP_07_Obj_Addr_Hi               ; 37D1: 85 07    
     rts                                     ; 37D3: 60       
 ; ===========================================================
 

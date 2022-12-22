@@ -898,7 +898,7 @@ comment  2A55 Object type
 label    2A5F LEVEL_1_PLUSSES
 label    2A67 Level_1_Plusses_1
 comment  2A67
-comment  2A67 Alien not hit by laser, check to see if hit platform
+comment  2A67 Alien not hit by laser, check to see if hit platform, plusses bounce off so update direction
 label    2A6D LEVEL_2_BALLS
 label    2A75 Level_2_Balls_1
 comment  2A78
@@ -915,8 +915,11 @@ comment  2AA2
 comment  2AA2 Use IRQ counter for randomness, range $10-$1F
 label    2AA2 Reset_Countdown_Timer
 comment  2AAA
-comment  2AAA Invert diagonal direction up/down, randomly via IRQ
-label    2AB7 Set_Alien_Diagonal_2?
+comment  2AAA Invert Y direction up/down, randomly via IRQ
+label    2AB7 Reset_Countdown_Timer_1
+comment  2AB7
+comment  2AB2
+comment  2AB2 Do the inversion
 label    2ABC LEVEL_3_SAUCER
 label    2AC4 Level_3_Saucer_1
 comment  2AC7
@@ -995,11 +998,13 @@ comment  2C00
 comment  2C00 Store number of lasers (4) for processing to ZP_02
 comment  2C04
 comment  2C04 Store current object (not the laser) X and Y in ZP_06/07
+deflabel 2C05 OBJECT_Y_POSITION_PARAM
 lcomment 2C06 Object Y
 lcomment 2C0B Object X
 comment  2C10
 comment  2C10 Test if laser X-coords have bit 2 set, not sure why
 label    2C10 BACK_2C10
+deflabel 2C11 LASER_X_POSITION_PARAM
 lcomment 2C12 X-coord of end of laser
 lcomment 2C1A Delayed X-coord of end of laser
 comment  2C21
@@ -1007,7 +1012,10 @@ comment  2C21 Test if next object is in use
 label    2C21 SKIP_2C21
 label    2C42 SKIP_2C42
 comment  2C27
+comment  2C27 Test Y position???
 comment  2C31
+lcomment 2C34 Zero bits 0-2
+binary   2C35
 comment  2C3D
 comment  2C46
 comment  2C46 Return $80 in ZP_02
@@ -1021,7 +1029,8 @@ comment  2C5A Decrement object counter, return when all processed
 label    2C5F Test_Laser_Hits
 label    2C6A LEVEL_0_FUZZBALL
 comment  2C6F
-comment  2C6F Alien not hit by laser, check to see if hit platform, if yes explode
+comment  2C6F Alien not hit by laser, test if alien hit platform, if yes explode,
+comment  2C6F else test if alien hit Jetman
 comment  2C78
 comment  2C78 Alien has been hit by laser, use current player level to create points table offset
 label    2C78 Alien_Hit_Update_Score
