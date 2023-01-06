@@ -898,36 +898,54 @@ comment  2A55 Object type
 label    2A5F LEVEL_1_PLUSSES
 label    2A67 Level_1_Plusses_1
 comment  2A67
-comment  2A67 Alien not hit by laser, check to see if hit platform, plusses bounce off so update direction
+comment  2A67 Alien not hit by laser, check to see if hit platform, aliens bounce off after Level 0 so update direction
 label    2A6D LEVEL_2_BALLS
+comment  2A75
+comment  2A75 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so update direction
 label    2A75 Level_2_Balls_1
 comment  2A78
-comment  2A78 Read countdown, branch if zero, else decrement
+comment  2A78 Read Y direction reversal countdown, branch if zero, else decrement countdown
+deflabel 2A79 OBJECT_Y_DIR_COUNTDOWN_PARAM
 comment  2A83
-label    2A83 Update_Alien_Direction
-label    2A8B Set_Alien_Direction
+comment  2A83 Below routine common to Level 1 and 2
+label    2A83 Update_Alien_X_Y_Direction
+deflabel 2A84 OBJECT_X_DIRECTION_PARAM
+label    2A8B Update_Alien_X_Direction
 comment  2A8D
-comment  2A8D Test_Alien_Diagonal?
-label    2A95 Set_Alien_Diagonal?
-label    2A9A Alien_Diagonal_Set_F8
+comment  2A8D Update_Alien_Y_Direction
+deflabel 2A8E OBJECT_Y_DIRECTION_PARAM
+label    2A95 Update_Alien_Y_Direction
+label    2A9A Alien_Direction_Up
 label    2A9E Alien_Direction_Left
+comment  2A9A
 comment  2AA2
-comment  2AA2 Use IRQ counter for randomness, range $10-$1F
-label    2AA2 Reset_Countdown_Timer
+comment  2AA2 Countdown timer at zero, randomly change Y direction using IRQ counter, range $10-$1F
+label    2AA2 Update_Y_Direction_Random
+binary   2AA5
 comment  2AAA
 comment  2AAA Invert Y direction up/down, randomly via IRQ
-label    2AB7 Reset_Countdown_Timer_1
+deflabel 2AAB OBJECT_Y_DIRECTION_PARAM
+binary   2AAD
+binary   2AB3
+label    2AB7 Update_Y_Direction_Random_1
 comment  2AB7
 comment  2AB2
-comment  2AB2 Do the inversion
+comment  2AB2 Do the inversion on the direction byte
 label    2ABC LEVEL_3_SAUCER
+comment  2AC4
+comment  2AC4 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so update direction
 label    2AC4 Level_3_Saucer_1
 comment  2AC7
+deflabel 2AC8 OBJECT_X_POSITION_PARAM
+comment  2ACB
+comment  2ACB Update Y register to index OBJECT_X_DIRECTION_PARAM
 label    2ADB Level_3_Saucer_2
 label    2ADD Level_3_Saucer_3
 label    2ADF Level_3_Saucer_4
+deflabel 2AE0 OBJECT_Y_DIRECTION_PARAM
 label    2AF3 Level_3_Saucer_5
 label    2AF5 Level_3_Saucer_6
+comment  2AFA
 label    2AFA Level_3_Saucer_7
 label    2B03 Level_3_Saucer_8
 label    2B08 Level_3_Saucer_9
@@ -943,16 +961,6 @@ label    2B2F Test_Platform_Collision_Bounc_1
 label    2B36 Test_Platform_Collision_Bou_RTS
 label    2B37 Test_Platform_Collision_Bounc_2
 label    2B42 Test_Platform_Collision_Bounc_3
-comment  2B42
-comment  2B4B
-comment  2B4B
-comment  2B4B
-comment  2B4B
-comment  2B4B
-comment  2B4B
-comment  2B4B
-comment  2B4B
-comment  2B4B
 comment  2B4B
 label    2B4B Obj_Jetman_Looks?
 label    2B52 DO_RTS1

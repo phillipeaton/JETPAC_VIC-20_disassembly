@@ -148,6 +148,8 @@ JETMAN_FLYING                   equ     $01
 OBJECT_Y_DIRECTION_PARAM        equ     $04
 OBJECT_X_DIRECTION_PARAM        equ     $02
 LASER_X_POSITION_PARAM          equ     $02
+OBJECT_X_POSITION_PARAM         equ     $01
+OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
 YELLOW                          equ     $07
 CYAN                            equ     $03
 BLUE                            equ     $06
@@ -1502,10 +1504,10 @@ HIH_1
 
 
 
-; 8b    d8    db    88 88b 88            88      dP"Yb   dP"Yb  88""Yb
-; 88b  d88   dPYb   88 88Yb88            88     dP   Yb dP   Yb 88__dP
-; 88YbdP88  dP__Yb  88 88 Y88            88  .o Yb   dP Yb   dP 88"""
-; 88 YY 88 dP""""Yb 88 88  Y8 oooooooooo 88ood8  YbodP   YbodP  88
+; 8b    d8    db    88 88b 88     88      dP"Yb   dP"Yb  88""Yb
+; 88b  d88   dPYb   88 88Yb88     88     dP   Yb dP   Yb 88__dP
+; 88YbdP88  dP__Yb  88 88 Y88     88  .o Yb   dP Yb   dP 88"""
+; 88 YY 88 dP""""Yb 88 88  Y8     88ood8  YbodP   YbodP  88
 
 
 ; ----------------------------------------------------------
@@ -2637,11 +2639,11 @@ LEVEL_1_PLUSSES
     jmp     Alien_Hit_Update_Score          ; 2A64: 4C 78 2C 
 ; -----------------------
 
-; Alien not hit by laser, check to see if hit platform, plusses bounce off so update direction
+; Alien not hit by laser, check to see if hit platform, aliens bounce off after Level 0 so update direction
 ; L_BRS_($2A67)_($2A62) OK
 Level_1_Plusses_1
     jsr     Test_Platform_Collision_Bounce  ; 2A67: 20 16 2B 
-    jmp     Update_Alien_Direction          ; 2A6A: 4C 83 2A 
+    jmp     Update_Alien_X_Y_Direction      ; 2A6A: 4C 83 2A 
 ; -----------------------
 
 
@@ -2670,68 +2672,72 @@ LEVEL_2_BALLS
     beq     Level_2_Balls_1                 ; 2A70: F0 03    
     jmp     Alien_Hit_Update_Score          ; 2A72: 4C 78 2C 
 ; -----------------------
+
+; Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so update direction
 ; L_BRS_($2A75)_($2A70) OK
 Level_2_Balls_1
     jsr     Test_Platform_Collision_Bounce  ; 2A75: 20 16 2B 
 
-; Read countdown, branch if zero, else decrement
-    ldy     #$06                            ; 2A78: A0 06    
+; Read Y direction reversal countdown, branch if zero, else decrement countdown
+    ldy     #OBJECT_Y_DIR_COUNTDOWN_PARAM   ; 2A78: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A7A: B1 00    
-    beq     Reset_Countdown_Timer           ; 2A7C: F0 24    
+    beq     Update_Y_Direction_Random       ; 2A7C: F0 24    
     sec                                     ; 2A7E: 38       
     sbc     #$01                            ; 2A7F: E9 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2A81: 91 00    
 
+; Below routine common to Level 1 and 2
 ; L_JMP_($2A83)_($2A6A) OK
-Update_Alien_Direction
-    ldy     #$02                            ; 2A83: A0 02    
+Update_Alien_X_Y_Direction
+    ldy     #OBJECT_X_DIRECTION_PARAM       ; 2A83: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A85: B1 00    
     bmi     Alien_Direction_Left            ; 2A87: 30 15    
     lda     #$08                            ; 2A89: A9 08    
 ; L_BRS_($2A8B)_($2AA0) OK
-Set_Alien_Direction
+Update_Alien_X_Direction
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2A8B: 91 00    
 
-; Test_Alien_Diagonal?
-    ldy     #$04                            ; 2A8D: A0 04    
+; Update_Alien_Y_Direction
+    ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2A8D: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A8F: B1 00    
-    bmi     Alien_Diagonal_Set_F8           ; 2A91: 30 07    
+    bmi     Alien_Direction_Up              ; 2A91: 30 07    
     lda     #$08                            ; 2A93: A9 08    
 ; L_BRS_($2A95)_($2A9C) OK
-Set_Alien_Diagonal?
+Update_Alien_Y_Direction
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2A95: 91 00    
     jmp     Test_Jetman_Collide             ; 2A97: 4C 92 2C 
 ; -----------------------
+
 ; L_BRS_($2A9A)_($2A91) OK
-Alien_Diagonal_Set_F8
+Alien_Direction_Up
     lda     #$F8                            ; 2A9A: A9 F8    
-    bmi     Set_Alien_Diagonal?             ; 2A9C: 30 F7    
+    bmi     Update_Alien_Y_Direction        ; 2A9C: 30 F7    
 ; L_BRS_($2A9E)_($2A87) OK
 Alien_Direction_Left
     lda     #$F8                            ; 2A9E: A9 F8    
-    bmi     Set_Alien_Direction             ; 2AA0: 30 E9    
+    bmi     Update_Alien_X_Direction        ; 2AA0: 30 E9    
 
-; Use IRQ counter for randomness, range $10-$1F
+; Countdown timer at zero, randomly change Y direction using IRQ counter, range $10-$1F
 ; L_BRS_($2AA2)_($2A7C) OK
-Reset_Countdown_Timer
+Update_Y_Direction_Random
     lda     ZP_HW_IRQ_Count3                ; 2AA2: A5 4C    
-    and     #$0F                            ; 2AA4: 29 0F    
+    and     #%00001111                      ; 2AA4: 29 0F    
     adc     #$10                            ; 2AA6: 69 10    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AA8: 91 00    
 
 ; Invert Y direction up/down, randomly via IRQ
-    ldy     #$04                            ; 2AAA: A0 04    
-    and     #$04                            ; 2AAC: 29 04    
+    ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2AAA: A0 04    
+    and     #%00000100                      ; 2AAC: 29 04    
     bit     ZP_HW_IRQ_Count3                ; 2AAE: 24 4C    
-    bmi     Reset_Countdown_Timer_1         ; 2AB0: 30 05    
+    bmi     Update_Y_Direction_Random_1     ; 2AB0: 30 05    
 
-; Do the inversion
-    eor     #$FF                            ; 2AB2: 49 FF    
+; Do the inversion on the direction byte
+    eor     #%11111111                      ; 2AB2: 49 FF    
     clc                                     ; 2AB4: 18       
     adc     #$01                            ; 2AB5: 69 01    
 
 ; L_BRS_($2AB7)_($2AB0) OK
-Reset_Countdown_Timer_1
+Update_Y_Direction_Random_1
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AB7: 91 00    
     jmp     Test_Jetman_Collide             ; 2AB9: 4C 92 2C 
 ; -----------------------
@@ -2762,12 +2768,16 @@ LEVEL_3_SAUCER
     bpl     Level_3_Saucer_1                ; 2ABF: 10 03    
     jmp     Alien_Hit_Update_Score          ; 2AC1: 4C 78 2C 
 ; -----------------------
+
+; Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so update direction
 ; L_BRS_($2AC4)_($2ABF) OK
 Level_3_Saucer_1
     jsr     Test_Platform_Collision_Bounce  ; 2AC4: 20 16 2B 
 
-    ldy     #$01                            ; 2AC7: A0 01    
+    ldy     #OBJECT_X_POSITION_PARAM        ; 2AC7: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AC9: B1 00    
+
+; Update Y register to index OBJECT_X_DIRECTION_PARAM
     iny                                     ; 2ACB: C8       
     sec                                     ; 2ACC: 38       
     sbc     Obj_Jetman_X                    ; 2ACD: ED 81 03 
@@ -2786,7 +2796,7 @@ Level_3_Saucer_3
 ; L_BRS_($2ADF)_($2AD9) OK
 ; L_BRS_($2ADF)_($2B01) OK
 Level_3_Saucer_4
-    ldy     #$03                            ; 2ADF: A0 03    
+    ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2ADF: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AE1: B1 00    
     iny                                     ; 2AE3: C8       
     sec                                     ; 2AE4: 38       
@@ -2808,6 +2818,7 @@ Level_3_Saucer_6
 Level_3_Saucer_EXIT
     jmp     Test_Jetman_Collide             ; 2AF7: 4C 92 2C 
 ; -----------------------
+
 ; L_BRS_($2AFA)_($2AD0) OK
 Level_3_Saucer_7
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AFA: B1 00    
@@ -2896,7 +2907,6 @@ Test_Platform_Collision_Bounc_2
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B3C: B1 00    
     bpl     Test_Platform_Collision_Bou_RTS ; 2B3E: 10 F6    
     bmi     Test_Platform_Collision_Bounc_1 ; 2B40: 30 ED    
-
 ; L_BRS_($2B42)_($2B29) OK
 ; L_BRS_($2B42)_($2B3A) OK
 Test_Platform_Collision_Bounc_3
@@ -2914,6 +2924,17 @@ Test_Platform_Collision_Bounc_3
 
 
 
+
+
+;  dP"Yb  88""Yb  88888      88888 888888 888888 8b    d8    db    88b 88
+; dP   Yb 88__dP     88         88 88__     88   88b  d88   dPYb   88Yb88
+; Yb   dP 88""Yb o.  88     o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
+;  YbodP  88oodP "bodP'     "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
+; \
+; 88      dP"Yb   dP"Yb  88  dP .dP"Y8
+; 88     dP   Yb dP   Yb 88odP  `Ybo."
+; 88  .o Yb   dP Yb   dP 88"Yb  o.`Y8b
+; 88ood8  YbodP   YbodP  88  Yb 8bodP'
 
 
 ; L_JSR_($2B4B)_($2655) OK
