@@ -934,22 +934,45 @@ comment  2AB2 Do the inversion on the direction byte
 label    2ABC LEVEL_3_SAUCER
 comment  2AC4
 comment  2AC4 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so update direction
-label    2AC4 Level_3_Saucer_1
+label    2AC4 Level_3_Saucer_X_Update
 comment  2AC7
 deflabel 2AC8 OBJECT_X_POSITION_PARAM
 comment  2ACB
-comment  2ACB Update Y register to index OBJECT_X_DIRECTION_PARAM
-label    2ADB Level_3_Saucer_2
-label    2ADD Level_3_Saucer_3
-label    2ADF Level_3_Saucer_4
+comment  2ACB Update Y register to index X Direction
+comment  2ACC
+comment  2ACC Compare alien and jetman positions, jump if alien to left of Jetman
+comment  2AD2
+comment  2AD2 Load X Direction, jump if alien is moving right
+comment  2AD7
+comment  2AD7 Test X Direction, when FC reached, Direction resets to $03
+comment  2ADB
+comment  2ADB Alien and Jetman X position is now equal, decrement direction
+label    2ADB Level_3_Saucer_X_Dec_Direction
+comment  2ADD
+label    2ADD Level_3_Saucer_X_Store_Dir
+comment  2ADF
+label    2ADF Level_3_Saucer_Y_Update
 deflabel 2AE0 OBJECT_Y_DIRECTION_PARAM
-label    2AF3 Level_3_Saucer_5
-label    2AF5 Level_3_Saucer_6
+comment  2AE3
+comment  2AE3 Update Y register to index Y Direction
+comment  2AE4
+comment  2AE4 Compare alien and jetman positions, jump if alien below Jetman
+comment  2AEA
+comment  2AEA Load Y Direction, jump if alien is moving down
+comment  2AEF Test Y Direction, when $FC reached, Direction resets to $03
+comment  2AF3
+label    2AF3 Level_3_Saucer_Y_Dec_Direction
+comment  2AF5
+label    2AF5 Level_3_Saucer_Y_Store_Dir
+comment  2AF7
 comment  2AFA
-label    2AFA Level_3_Saucer_7
-label    2B03 Level_3_Saucer_8
-label    2B08 Level_3_Saucer_9
-label    2B11 Level_3_Saucer_a
+comment  2AFA Alien is to the left of Jetman
+label    2AFA Level_3_Saucer_X_Alien_Left
+label    2B03 Level_3_Saucer_X_Inc_Direction
+comment  2B08
+comment  2B08 Alien is to the below Jetman
+label    2B08 Level_3_Saucer_Y_Alien_Below
+label    2B11 Level_3_Saucer_Y_Inc_Direction
 label    2AF7 Level_3_Saucer_EXIT
 comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change
 label    2B16 Test_Platform_Collision_Bounce

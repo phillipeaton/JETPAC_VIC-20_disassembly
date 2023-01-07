@@ -2765,83 +2765,106 @@ Update_Y_Direction_Random_1
 
 LEVEL_3_SAUCER
     jsr     Test_Laser_Hits                 ; 2ABC: 20 5F 2C 
-    bpl     Level_3_Saucer_1                ; 2ABF: 10 03    
+    bpl     Level_3_Saucer_X_Update         ; 2ABF: 10 03    
     jmp     Alien_Hit_Update_Score          ; 2AC1: 4C 78 2C 
 ; -----------------------
 
 ; Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so update direction
 ; L_BRS_($2AC4)_($2ABF) OK
-Level_3_Saucer_1
+Level_3_Saucer_X_Update
     jsr     Test_Platform_Collision_Bounce  ; 2AC4: 20 16 2B 
 
     ldy     #OBJECT_X_POSITION_PARAM        ; 2AC7: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AC9: B1 00    
 
-; Update Y register to index OBJECT_X_DIRECTION_PARAM
+; Update Y register to index X Direction
     iny                                     ; 2ACB: C8       
+
+; Compare alien and jetman positions, jump if alien to left of Jetman
     sec                                     ; 2ACC: 38       
     sbc     Obj_Jetman_X                    ; 2ACD: ED 81 03 
-    bmi     Level_3_Saucer_7                ; 2AD0: 30 28    
+    bmi     Level_3_Saucer_X_Alien_Left     ; 2AD0: 30 28    
+
+; Load X Direction, jump if alien is moving right
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AD2: B1 00    
     sec                                     ; 2AD4: 38       
-    bpl     Level_3_Saucer_2                ; 2AD5: 10 04    
+    bpl     Level_3_Saucer_X_Dec_Direction  ; 2AD5: 10 04    
+
+; Test X Direction, when FC reached, Direction resets to $03
     cmp     #$FC                            ; 2AD7: C9 FC    
-    bcc     Level_3_Saucer_4                ; 2AD9: 90 04    
+    bcc     Level_3_Saucer_Y_Update         ; 2AD9: 90 04    
+
+; Alien and Jetman X position is now equal, decrement direction
 ; L_BRS_($2ADB)_($2AD5) OK
-Level_3_Saucer_2
+Level_3_Saucer_X_Dec_Direction
     sbc     #$01                            ; 2ADB: E9 01    
+
 ; L_JMP_($2ADD)_($2B05) OK
-Level_3_Saucer_3
+Level_3_Saucer_X_Store_Dir
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2ADD: 91 00    
+
 ; L_BRS_($2ADF)_($2AD9) OK
 ; L_BRS_($2ADF)_($2B01) OK
-Level_3_Saucer_4
+Level_3_Saucer_Y_Update
     ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2ADF: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AE1: B1 00    
+
+; Update Y register to index Y Direction
     iny                                     ; 2AE3: C8       
+
+; Compare alien and jetman positions, jump if alien below Jetman
     sec                                     ; 2AE4: 38       
     sbc     Obj_Jetman_Y                    ; 2AE5: ED 83 03 
-    bmi     Level_3_Saucer_9                ; 2AE8: 30 1E    
+    bmi     Level_3_Saucer_Y_Alien_Below    ; 2AE8: 30 1E    
+
+; Load Y Direction, jump if alien is moving down
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AEA: B1 00    
     sec                                     ; 2AEC: 38       
-    bpl     Level_3_Saucer_5                ; 2AED: 10 04    
+    bpl     Level_3_Saucer_Y_Dec_Direction  ; 2AED: 10 04    
+; Test Y Direction, when $FC reached, Direction resets to $03
     cmp     #$FC                            ; 2AEF: C9 FC    
     bcc     Level_3_Saucer_EXIT             ; 2AF1: 90 04    
+
 ; L_BRS_($2AF3)_($2AED) OK
-Level_3_Saucer_5
+Level_3_Saucer_Y_Dec_Direction
     sbc     #$01                            ; 2AF3: E9 01    
+
 ; L_JMP_($2AF5)_($2B13) OK
-Level_3_Saucer_6
+Level_3_Saucer_Y_Store_Dir
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AF5: 91 00    
+
 ; L_BRS_($2AF7)_($2AF1) OK
 ; L_BRS_($2AF7)_($2B0F) OK
 Level_3_Saucer_EXIT
     jmp     Test_Jetman_Collide             ; 2AF7: 4C 92 2C 
 ; -----------------------
 
+; Alien is to the left of Jetman
 ; L_BRS_($2AFA)_($2AD0) OK
-Level_3_Saucer_7
+Level_3_Saucer_X_Alien_Left
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AFA: B1 00    
     clc                                     ; 2AFC: 18       
-    bmi     Level_3_Saucer_8                ; 2AFD: 30 04    
+    bmi     Level_3_Saucer_X_Inc_Direction  ; 2AFD: 30 04    
     cmp     #$04                            ; 2AFF: C9 04    
-    bcs     Level_3_Saucer_4                ; 2B01: B0 DC    
+    bcs     Level_3_Saucer_Y_Update         ; 2B01: B0 DC    
 ; L_BRS_($2B03)_($2AFD) OK
-Level_3_Saucer_8
+Level_3_Saucer_X_Inc_Direction
     adc     #$01                            ; 2B03: 69 01    
-    jmp     Level_3_Saucer_3                ; 2B05: 4C DD 2A 
+    jmp     Level_3_Saucer_X_Store_Dir      ; 2B05: 4C DD 2A 
 ; -----------------------
+
+; Alien is to the below Jetman
 ; L_BRS_($2B08)_($2AE8) OK
-Level_3_Saucer_9
+Level_3_Saucer_Y_Alien_Below
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B08: B1 00    
     clc                                     ; 2B0A: 18       
-    bmi     Level_3_Saucer_a                ; 2B0B: 30 04    
+    bmi     Level_3_Saucer_Y_Inc_Direction  ; 2B0B: 30 04    
     cmp     #$04                            ; 2B0D: C9 04    
     bcs     Level_3_Saucer_EXIT             ; 2B0F: B0 E6    
 ; L_BRS_($2B11)_($2B0B) OK
-Level_3_Saucer_a
+Level_3_Saucer_Y_Inc_Direction
     adc     #$01                            ; 2B11: 69 01    
-    jmp     Level_3_Saucer_6                ; 2B13: 4C F5 2A 
+    jmp     Level_3_Saucer_Y_Store_Dir      ; 2B13: 4C F5 2A 
 ; -----------------------
 
 
