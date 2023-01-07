@@ -951,16 +951,15 @@ label    2ADB Level_3_Saucer_X_Dec_Direction
 comment  2ADD
 label    2ADD Level_3_Saucer_X_Store_Dir
 comment  2ADF
+comment  2ADF Update Alien Y Direction, same as Update X Direction, so deliberately fewer comments
 label    2ADF Level_3_Saucer_Y_Update
-deflabel 2AE0 OBJECT_Y_DIRECTION_PARAM
+deflabel 2AE0 OBJECT_Y_POSITION_PARAM
 comment  2AE3
 comment  2AE3 Update Y register to index Y Direction
 comment  2AE4
 comment  2AE4 Compare alien and jetman positions, jump if alien below Jetman
 comment  2AEA
 comment  2AEA Load Y Direction, jump if alien is moving down
-comment  2AEF Test Y Direction, when $FC reached, Direction resets to $03
-comment  2AF3
 label    2AF3 Level_3_Saucer_Y_Dec_Direction
 comment  2AF5
 label    2AF5 Level_3_Saucer_Y_Store_Dir

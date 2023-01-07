@@ -2803,10 +2803,11 @@ Level_3_Saucer_X_Dec_Direction
 Level_3_Saucer_X_Store_Dir
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2ADD: 91 00    
 
+; Update Alien Y Direction, same as Update X Direction, so deliberately fewer comments
 ; L_BRS_($2ADF)_($2AD9) OK
 ; L_BRS_($2ADF)_($2B01) OK
 Level_3_Saucer_Y_Update
-    ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2ADF: A0 03    
+    ldy     #OBJECT_Y_POSITION_PARAM        ; 2ADF: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AE1: B1 00    
 
 ; Update Y register to index Y Direction
@@ -2821,10 +2822,8 @@ Level_3_Saucer_Y_Update
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AEA: B1 00    
     sec                                     ; 2AEC: 38       
     bpl     Level_3_Saucer_Y_Dec_Direction  ; 2AED: 10 04    
-; Test Y Direction, when $FC reached, Direction resets to $03
     cmp     #$FC                            ; 2AEF: C9 FC    
     bcc     Level_3_Saucer_EXIT             ; 2AF1: 90 04    
-
 ; L_BRS_($2AF3)_($2AED) OK
 Level_3_Saucer_Y_Dec_Direction
     sbc     #$01                            ; 2AF3: E9 01    
