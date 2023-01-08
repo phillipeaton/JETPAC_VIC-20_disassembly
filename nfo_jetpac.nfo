@@ -560,7 +560,7 @@ comment  25FA
 comment  25FA ----------------------------------------------------------
 comment  25FA Game Main Loop
 comment  25FA ----------------------------------------------------------
-label    25FA Main_Loop_Sprite_0
+label    25FA Main_Loop_Object_0
 lcomment 25FE $03B0 = "Object_0"
 lcomment 2606 Enable interrupts
 label    2607 Main_Loop
@@ -583,20 +583,20 @@ comment  2626 $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Sec
 label    262A Delay_Loop_0A00
 comment  2630
 comment  2630 Increment Object Pointer to next Obj i.e. by adding 8
-label    2630 Inc_Sprite_Ptr_1
+label    2630 Inc_Object_List_Ptr
 comment  2637
 comment  2637 If interrupt happened, update Jetman, it has higher priority
 lcomment 2637 H/W interrupt happened?
 lcomment 2639 If yes, jump
-label    263B Inc_Sprite_Ptr_Cont
+label    263B Main_Loop_Continue
 comment  263B
 lcomment 263D Is Object address a rocket module?
 comment  2645
 comment  264B
 comment  2652
 comment  2652 Test if score flash time is zero, if yes, setup sprites
-label    2652 Inc_Sprite_Ptr_2
-label    2655 Inc_Sprite_Ptr_3
+label    2652 Test_Score_Flash_Time_At_Zero
+label    2655 What_Is_This???
 comment  265E
 comment  265E ----------------------------------------------------------
 comment  265E VIA2 timer interrupts used to update Jetman movement
@@ -809,11 +809,6 @@ comment  28DE Init all Alien objects
 label    28E0 Loop_28E0
 label    28E7 Save_Obj_List_Ptr
 label    28F0 Restore_Obj_List_Ptr
-comment  28F9
-comment  28F9
-comment  28F9
-comment  28F9
-comment  28F9
 label    28F9 Change_Object_To_Explosion_1
 comment  28FC
 comment  28FC Reset Alien? object direction
@@ -898,14 +893,18 @@ comment  2A55 Object type
 label    2A5F LEVEL_1_PLUSSES
 label    2A67 Level_1_Plusses_1
 comment  2A67
-comment  2A67 Alien not hit by laser, check to see if hit platform, aliens bounce off after Level 0 so update direction
+comment  2A67 Alien not hit by laser, check to see if hit platform, aliens bounce off after Level 0 so
+comment  2A67 update direction
 label    2A6D LEVEL_2_BALLS
 comment  2A75
-comment  2A75 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so update direction
+comment  2A75 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0
+comment  2A75 so update direction
 label    2A75 Level_2_Balls_1
 comment  2A78
 comment  2A78 Read Y direction reversal countdown, branch if zero, else decrement countdown
 deflabel 2A79 OBJECT_Y_DIR_COUNTDOWN_PARAM
+comment  2A83
+comment  2A83
 comment  2A83
 comment  2A83 Below routine common to Level 1 and 2
 label    2A83 Update_Alien_X_Y_Direction
@@ -933,46 +932,49 @@ comment  2AB2
 comment  2AB2 Do the inversion on the direction byte
 label    2ABC LEVEL_3_SAUCER
 comment  2AC4
-comment  2AC4 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so update direction
-label    2AC4 Level_3_Saucer_X_Update
+comment  2AC4 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so
+comment  2AC4 update direction
+label    2AC4 Level_3_Saucer_Update_X
 comment  2AC7
+comment  2AC7 Saucers home-in on Jetman, thus below code is in four sections:
+comment  2AC7 - Two sections update X depending on whether alien is left or right of Jetman
+comment  2AC7 - Two sections update Y depending on whether alien is above or below Jetman
+comment  2AC7
+comment  2AC7 Update Alien Direction X
 deflabel 2AC8 OBJECT_X_POSITION_PARAM
 comment  2ACB
-comment  2ACB Update Y register to index X Direction
+comment  2ACB Update Y register to index Direction X
 comment  2ACC
 comment  2ACC Compare alien and jetman positions, jump if alien to left of Jetman
 comment  2AD2
-comment  2AD2 Load X Direction, jump if alien is moving right
+comment  2AD2 Load Direction X, jump if alien is moving right
 comment  2AD7
-comment  2AD7 Test X Direction, when FC reached, Direction resets to $03
+comment  2AD7 Test Direction X, when FC reached, Direction resets to $03
 comment  2ADB
-comment  2ADB Alien and Jetman X position is now equal, decrement direction
-label    2ADB Level_3_Saucer_X_Dec_Direction
+comment  2ADB Alien and Jetman Position X is now equal, decrement direction
+label    2ADB Level_3_Saucer_Dec_Direction_X
 comment  2ADD
-label    2ADD Level_3_Saucer_X_Store_Dir
+label    2ADD Level_3_Saucer_Store_Directn_X
 comment  2ADF
-comment  2ADF Update Alien Y Direction, same as Update X Direction, so deliberately fewer comments
-label    2ADF Level_3_Saucer_Y_Update
+comment  2ADF
+comment  2ADF Update Alien Direction Y, same as Update Direction X, so deliberately fewer comments
+label    2ADF Level_3_Saucer_Update_Y
 deflabel 2AE0 OBJECT_Y_POSITION_PARAM
-comment  2AE3
-comment  2AE3 Update Y register to index Y Direction
-comment  2AE4
-comment  2AE4 Compare alien and jetman positions, jump if alien below Jetman
 comment  2AEA
-comment  2AEA Load Y Direction, jump if alien is moving down
-label    2AF3 Level_3_Saucer_Y_Dec_Direction
+comment  2AEA Load Direction Y, jump if alien is moving down
+label    2AF3 Level_3_Saucer_Dec_Direction_Y
 comment  2AF5
-label    2AF5 Level_3_Saucer_Y_Store_Dir
+label    2AF5 Level_3_Saucer_Store_Directn_Y
 comment  2AF7
+label    2AF7 Level_3_Saucer_EXIT
 comment  2AFA
 comment  2AFA Alien is to the left of Jetman
-label    2AFA Level_3_Saucer_X_Alien_Left
-label    2B03 Level_3_Saucer_X_Inc_Direction
+label    2AFA Level_3_Saucer_Alien_Left_X
+label    2B03 Level_3_Saucer_Inc_Direction_X
 comment  2B08
 comment  2B08 Alien is to the below Jetman
-label    2B08 Level_3_Saucer_Y_Alien_Below
-label    2B11 Level_3_Saucer_Y_Inc_Direction
-label    2AF7 Level_3_Saucer_EXIT
+label    2B08 Level_3_Saucer_Alien_Below_Y
+label    2B11 Level_3_Saucer_Inc_Direction_Y
 comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change
 label    2B16 Test_Platform_Collision_Bounce
 lcomment 2B16 Remove=(Not triggered on first level, so don't yet know)
@@ -984,15 +986,21 @@ label    2B36 Test_Platform_Collision_Bou_RTS
 label    2B37 Test_Platform_Collision_Bounc_2
 label    2B42 Test_Platform_Collision_Bounc_3
 comment  2B4B
-label    2B4B Obj_Jetman_Looks?
+comment  2B4B Test if Jetman is onscreen
+label    2B4B Spawn_Rocket_Modules_Fuel_Cell
+lcomment 2B4E Zero bits 6 & 7
+binary   2B4F
 label    2B52 DO_RTS1
-label    2B53 Obj_Jetman_NotEqu_3F
+comment  2B53
+comment  2B53 Return if Jetman not only flying or standing(?) or no rocket module/fuel onscreen
+label    2B53 Test_Jetman_Status_Fuel_Pod
 comment  2B5C
-comment  2B5C Test if ship is fuelled up
+comment  2B5C Test if ship is built and fuelled up
 comment  2B63
+comment  2B63 Use counter to randomly spawn another Fuel Cell
 comment  2B6B
 comment  2B6B Init Rocket Part or Fuel Cell object (8 attributes)
-label    2B6D Obj_Jetman_NotEqu_3F_1
+label    2B6D Loop_2B6D
 comment  2B76
 label    2B7F Init_Obj_Rocket_or_Fuel_Table
 comment  2B7F
@@ -1001,7 +1009,7 @@ const    2B82
 const    2B8A
 comment  2B87
 comment  2B8F
-label    2B8F Obj_Jetman_Looks_2?
+label    2B8F Spawn_Valuables
 lcomment 2B92 Zero bits 6 & 7 i.e. 00xxxxxx
 label    2B96 DO_RTS
 label    2B97 Obj_Jetman_NotEqu_3F2
@@ -1061,7 +1069,6 @@ label    2C6A LEVEL_0_FUZZBALL
 comment  2C6F
 comment  2C6F Alien not hit by laser, test if alien hit platform, if yes explode,
 comment  2C6F else test if alien hit Jetman
-comment  2C78
 comment  2C78 Alien has been hit by laser, use current player level to create points table offset
 label    2C78 Alien_Hit_Update_Score
 binary   2C7B

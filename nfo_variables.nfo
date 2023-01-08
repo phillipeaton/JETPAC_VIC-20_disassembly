@@ -112,7 +112,7 @@ label    0388 Obj_Laser_0 ;
 ;        0B=Rocket Descend
 ;        0C=Flame
 ;        0D=???
-;        0E=flashing gem
+;        0E=flashing valuable
 
                           ;            0  1  2  3  4  5  6  7
                           ;     03B0  09 70 00 AF 01 00 00 1C
@@ -136,7 +136,7 @@ label    03B4 Obj_Rocket_Parts_Fuel_Counter
 ;label    03B7 Obj_Rocket_7
 
 ; Rocket Part Top (RPT), then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
-label    03B8 Obj_RPT_Fuel_Type ; Type = 04 always
+label    03B8 Obj_RPT_Fuel_Type ; Type = 04 when active, else 00
 label    03B9 Obj_RPT_Fuel_X
 ;label    03BA Obj_RPT_Fuel_2
 ;label    03BB Obj_Rocket_Y
@@ -145,15 +145,15 @@ label    03BC Obj_RPT_Status ; Rocket part Ready for pick-up/picked-up/Dropping
 ;label    03BE Obj_RPT_Fuel_6 ; Height when rocket part/fuel cell has landed
 ;label    03BF Obj_RPT_Fuel_7
 
-; Rocket Part Middle, then a Gem e.g. 03C0  0E 58 00 5E 00 03 28 18
-label    03C0 Obj_RPM_Gem_Type ;
-label    03C1 Obj_RPM_Gem_X
-;label    03C2 Obj_RPM_Gem_2
-;label    03C3 Obj_RPM_Gem_3
+; Rocket Part Middle, then a valuable e.g. 03C0  0E 58 00 5E 00 03 28 18
+label    03C0 Obj_RPM_Valuable_Type ;
+label    03C1 Obj_RPM_Valuable_X
+;label    03C2 Obj_RPM_Valuable_2
+;label    03C3 Obj_RPM_Valuable_3
 label    03C4 Obj_RPM_Status
-;label    03C5 Obj_RPM_Gem_5
-label    03C6 Obj_RPM_Gem_6
-label    03C7 Obj_RPM_Gem_7
+;label    03C5 Obj_RPM_Valuable_5
+label    03C6 Obj_RPM_Valuable_6
+label    03C7 Obj_RPM_Valuable_7
 
 
 ; Byte 00/08= object type
