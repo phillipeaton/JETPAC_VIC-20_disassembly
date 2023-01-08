@@ -91,13 +91,13 @@ Obj_Rocket_X                    equ     $03B1
 Obj_Rocket_Fuel_Lvl             equ     $03B2
 Obj_Rocket_Y                    equ     $03B3
 Obj_Rocket_Parts_Fuel_Counter   equ     $03B4
-Obj_RPT_Fuel_Type               equ     $03B8
-Obj_RPT_Fuel_X                  equ     $03B9
-Obj_RPT_Status                  equ     $03BC
-Obj_RPM_Valuable_Type           equ     $03C0
-Obj_RPM_Valuable_X              equ     $03C1
-Obj_RPM_Status                  equ     $03C4
-Obj_RPM_Valuable_6              equ     $03C6
+Obj_Rock_Mod_Top_Fuel_Type      equ     $03B8
+Obj_Rock_Mod_Top_Fuel_X         equ     $03B9
+Obj_Rock_Mod_Top_Fuel_Status    equ     $03BC
+Obj_Rock_Mod_Mid_Valuable_Type  equ     $03C0
+Obj_Rock_Mod_Mid_Valuable_X     equ     $03C1
+Obj_Rock_Mod_Mid_Valuab_Status  equ     $03C4
+Obj_Rock_Mod_Mid_Valuable_Type  equ     $03C6
 Obj_Alien_0_0                   equ     $03C8
 UDG_RAM                         equ     $1000
 Display_P1_Score_Posn           equ     $1008
@@ -883,11 +883,11 @@ Reset_Lev_Add_Extra_Life_3
 
 ; L_JMP_($22E3)_($2B7C) OK
 ; L_JSR_($22E3)_($2DA6) OK
-Object_RTS_Fuel_Type
+Set_Obj_List_Type_Rocket_Fuel
     jsr     Save_Obj_List_Ptr               ; 22E3: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22E6: 20 9D 25 
     fcb     $00                             ; 22E9: 00       
-    fdb     Obj_RPT_Fuel_Type               ; 22EA: B8 03    
+    fdb     Obj_Rock_Mod_Top_Fuel_Type      ; 22EA: B8 03    
     fcb     $FF                             ; 22EC: FF       
 ; L_JMP_($22ED)_($22FC) OK
 JMP_Reset_S_O_1
@@ -900,7 +900,7 @@ Object_RMS_Gem_Type
     jsr     Save_Obj_List_Ptr               ; 22F2: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22F5: 20 9D 25 
     fcb     $00                             ; 22F8: 00       
-    fdb     Obj_RPM_Valuable_Type           ; 22F9: C0 03    
+    fdb     Obj_Rock_Mod_Mid_Valuable_Type  ; 22F9: C0 03    
     fcb     $FF                             ; 22FB: FF       
     jmp     JMP_Reset_S_O_1                 ; 22FC: 4C ED 22 
 ; -----------------------
@@ -1624,14 +1624,15 @@ Main_Loop_Continue
 
     lda     VIC_R4_TV_Raster                ; 264B: AD 04 90 
     and     #$07                            ; 264E: 29 07    
-    bne     What_Is_This???                 ; 2650: D0 03    
+    bne     Spawn_Objects                   ; 2650: D0 03    
 
 ; Test if score flash time is zero, if yes, setup sprites
 ; L_BRS_($2652)_($2649) OK
 Test_Score_Flash_Time_At_Zero
     jsr     Obj_Ptr_To_Alien_0_Flsh_Ctr     ; 2652: 20 D6 2C 
+
 ; L_BRS_($2655)_($2650) OK
-What_Is_This???
+Spawn_Objects
     jsr     Spawn_Rocket_Modules_Fuel_Cell  ; 2655: 20 4B 2B 
     jsr     Spawn_Valuables                 ; 2658: 20 8F 2B 
     jmp     Main_Loop_Object_0              ; 265B: 4C FA 25 
@@ -2309,7 +2310,7 @@ Reset_Objects_1_To_8
 
 ; L_BRS_($28CD)_($28D1) OK
 Reset_Objects_1_To_8_1
-    sta     Obj_RPT_Fuel_Type,x             ; 28CD: 9D B8 03 
+    sta     Obj_Rock_Mod_Top_Fuel_Type,x    ; 28CD: 9D B8 03 
     dex                                     ; 28D0: CA       
     bpl     Reset_Objects_1_To_8_1          ; 28D1: 10 FA    
     rts                                     ; 28D3: 60       
@@ -2496,13 +2497,13 @@ Sound_Channels_Off_ETC
     sta     VIC_RC_Frq_Osc3                 ; 29A5: 8D 0C 90 
     jsr     Init_Most_Objects               ; 29A8: 20 D4 28 
 
-    lda     Obj_RPT_Status                  ; 29AB: AD BC 03 
+    lda     Obj_Rock_Mod_Top_Fuel_Status    ; 29AB: AD BC 03 
     and     #$FD                            ; 29AE: 29 FD    
-    sta     Obj_RPT_Status                  ; 29B0: 8D BC 03 
+    sta     Obj_Rock_Mod_Top_Fuel_Status    ; 29B0: 8D BC 03 
 
-    lda     Obj_RPM_Status                  ; 29B3: AD C4 03 
+    lda     Obj_Rock_Mod_Mid_Valuab_Status  ; 29B3: AD C4 03 
     and     #$FD                            ; 29B6: 29 FD    
-    sta     Obj_RPM_Status                  ; 29B8: 8D C4 03 
+    sta     Obj_Rock_Mod_Mid_Valuab_Status  ; 29B8: 8D C4 03 
 
     lda     Game_Settings                   ; 29BB: AD D3 1F 
     bit     MASK_00000001                   ; 29BE: 2C 14 20 
@@ -2951,62 +2952,62 @@ Test_Platform_Collision_Bounc_3
 
 
 
-;  dP"Yb  88""Yb  88888      88888 888888 888888 8b    d8    db    88b 88
-; dP   Yb 88__dP     88         88 88__     88   88b  d88   dPYb   88Yb88
-; Yb   dP 88""Yb o.  88     o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
-;  YbodP  88oodP "bodP'     "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
+; .dP"Y8 88""Yb    db    Yb        dP 88b 88
+; `Ybo." 88__dP   dPYb    Yb  db  dP  88Yb88
+; o.`Y8b 88"""   dP__Yb    YbdPYbdP   88 Y88
+; 8bodP' 88     dP""""Yb    YP  YP    88  Y8
 ; \
-; 88      dP"Yb   dP"Yb  88  dP .dP"Y8
-; 88     dP   Yb dP   Yb 88odP  `Ybo."
-; 88  .o Yb   dP Yb   dP 88"Yb  o.`Y8b
-; 88ood8  YbodP   YbodP  88  Yb 8bodP'
-
+;  dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
+; dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
+; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
+;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
 ; Test if Jetman is onscreen
 ; L_JSR_($2B4B)_($2655) OK
 Spawn_Rocket_Modules_Fuel_Cell
     lda     Obj_Jetman                      ; 2B4B: AD 80 03 
     and     #%00111111                      ; 2B4E: 29 3F     Zero bits 6 & 7
-    bne     Test_Jetman_Status_Fuel_Pod     ; 2B50: D0 01    
+    bne     Spawn_Rocket_Modules_Fuel_Ce_1  ; 2B50: D0 01    
 ; L_BRS_($2B52)_($2B55) OK
 ; L_BRS_($2B52)_($2B5A) OK
 ; L_BRS_($2B52)_($2B61) OK
 ; L_BRS_($2B52)_($2B69) OK
-DO_RTS1
+RTS_2B52
     rts                                     ; 2B52: 60       
 ; ===========================================================
 
-; Return if Jetman not only flying or standing(?) or no rocket module/fuel onscreen
+; Return if Jetman not only flying or standing or no rocket module/fuel onscreen
 ; L_BRS_($2B53)_($2B50) OK
-Test_Jetman_Status_Fuel_Pod
+Spawn_Rocket_Modules_Fuel_Ce_1
     cmp     #$03                            ; 2B53: C9 03    
-    bcs     DO_RTS1                         ; 2B55: B0 FB    
-    lda     Obj_RPT_Fuel_Type               ; 2B57: AD B8 03 
-    bne     DO_RTS1                         ; 2B5A: D0 F6    
+    bcs     RTS_2B52                        ; 2B55: B0 FB    
+    lda     Obj_Rock_Mod_Top_Fuel_Type      ; 2B57: AD B8 03 
+    bne     RTS_2B52                        ; 2B5A: D0 F6    
 
-; Test if ship is built and fuelled up
+; Return if ship is built and fuelled up
     lda     Obj_Rocket_Fuel_Lvl             ; 2B5C: AD B2 03 
     cmp     #$06                            ; 2B5F: C9 06    
-    bcs     DO_RTS1                         ; 2B61: B0 EF    
+    bcs     RTS_2B52                        ; 2B61: B0 EF    
 
 ; Use counter to randomly spawn another Fuel Cell
     lda     ZP_HW_IRQ_Count1                ; 2B63: A5 4A    
-    eor     #$FF                            ; 2B65: 49 FF    
-    and     #$0F                            ; 2B67: 29 0F    
-    bne     DO_RTS1                         ; 2B69: D0 E7    
+    eor     #%11111111                      ; 2B65: 49 FF    
+    and     #%00001111                      ; 2B67: 29 0F    
+    bne     RTS_2B52                        ; 2B69: D0 E7    
 
 ; Init Rocket Part or Fuel Cell object (8 attributes)
     ldx     #$07                            ; 2B6B: A2 07    
 ; L_BRS_($2B6D)_($2B74) OK
 Loop_2B6D
     lda     Init_Obj_Rocket_or_Fuel_Table,x ; 2B6D: BD 7F 2B 
-    sta     Obj_RPT_Fuel_Type,x             ; 2B70: 9D B8 03 
+    sta     Obj_Rock_Mod_Top_Fuel_Type,x    ; 2B70: 9D B8 03 
     dex                                     ; 2B73: CA       
     bpl     Loop_2B6D                       ; 2B74: 10 F7    
 
-    jsr     Get_Raster_Line_Band            ; 2B76: 20 DE 2B 
-    sta     Obj_RPT_Fuel_X                  ; 2B79: 8D B9 03 
-    jmp     Object_RTS_Fuel_Type            ; 2B7C: 4C E3 22 
+; Spawn object at a random X position
+    jsr     Get_Random_X                    ; 2B76: 20 DE 2B 
+    sta     Obj_Rock_Mod_Top_Fuel_X         ; 2B79: 8D B9 03 
+    jmp     Set_Obj_List_Type_Rocket_Fuel   ; 2B7C: 4C E3 22 
 ; -----------------------
 
 Init_Obj_Rocket_or_Fuel_Table
@@ -3015,70 +3016,90 @@ Init_Obj_Rocket_or_Fuel_Table
 Init_Obj_Valuable_Table
     fcb     $0E,$00,$00,$20,$00,$00,$00,$18 ; 2B87: 0E 00 00 20 00 00 00 18 
 
+
 ; L_JSR_($2B8F)_($2658) OK
 Spawn_Valuables
     lda     Obj_Jetman                      ; 2B8F: AD 80 03 
     and     #$3F                            ; 2B92: 29 3F     Zero bits 6 & 7 i.e. 00xxxxxx
-    bne     Obj_Jetman_NotEqu_3F2           ; 2B94: D0 01    
+    bne     Spawn_Valuables_1               ; 2B94: D0 01    
 ; L_BRS_($2B96)_($2B99) OK
 ; L_BRS_($2B96)_($2B9E) OK
 ; L_BRS_($2B96)_($2BA4) OK
-DO_RTS
+RTS_2B96
     rts                                     ; 2B96: 60       
 ; ===========================================================
+
+; Return if Jetman not only flying or standing or valuable onscreen
 ; L_BRS_($2B97)_($2B94) OK
-Obj_Jetman_NotEqu_3F2
+Spawn_Valuables_1
     cmp     #$03                            ; 2B97: C9 03    
-    bcs     DO_RTS                          ; 2B99: B0 FB    
-    lda     Obj_RPM_Valuable_Type           ; 2B9B: AD C0 03 
-    bne     DO_RTS                          ; 2B9E: D0 F6    
+    bcs     RTS_2B96                        ; 2B99: B0 FB    
+    lda     Obj_Rock_Mod_Mid_Valuable_Type  ; 2B9B: AD C0 03 
+    bne     RTS_2B96                        ; 2B9E: D0 F6    
+
+; Use counter to randomly spawn another valuable
     lda     ZP_HW_IRQ_Count1                ; 2BA0: A5 4A    
-    and     #$7F                            ; 2BA2: 29 7F    
-    bne     DO_RTS                          ; 2BA4: D0 F0    
+    and     #%01111111                      ; 2BA2: 29 7F    
+    bne     RTS_2B96                        ; 2BA4: D0 F0    
 
 ; Init Flashing Valuable object (8 attributes)
     ldx     #$07                            ; 2BA6: A2 07    
 ; L_BRS_($2BA8)_($2BAF) OK
-Obj_Jetman_NotEqu_3F2_1
+Loop_2BA8
     lda     Init_Obj_Valuable_Table,x       ; 2BA8: BD 87 2B 
-    sta     Obj_RPM_Valuable_Type,x         ; 2BAB: 9D C0 03 
+    sta     Obj_Rock_Mod_Mid_Valuable_Type,x ; 2BAB: 9D C0 03 
     dex                                     ; 2BAE: CA       
-    bpl     Obj_Jetman_NotEqu_3F2_1         ; 2BAF: 10 F7    
+    bpl     Loop_2BA8                       ; 2BAF: 10 F7    
 
-    jsr     Get_Raster_Line_Band            ; 2BB1: 20 DE 2B 
-    sta     Obj_RPM_Valuable_X              ; 2BB4: 8D C1 03 
+; Spawn object at a random X position
+    jsr     Get_Random_X                    ; 2BB1: 20 DE 2B 
+    sta     Obj_Rock_Mod_Mid_Valuable_X     ; 2BB4: 8D C1 03 
+
+; Use counter to setup next object type
     lda     ZP_HW_IRQ_Count3                ; 2BB7: A5 4C    
-    and     #$0E                            ; 2BB9: 29 0E    
+    and     #%00001110                      ; 2BB9: 29 0E    
     bit     MASK_00001000                   ; 2BBB: 2C 17 20 
-    beq     Obj_Jetman_NotEqu_3F2_2         ; 2BBE: F0 02    
-    and     #$08                            ; 2BC0: 29 08    
+    beq     SKIP_2BC2                       ; 2BBE: F0 02    
+
+; Bit 3 wasn't set, so zero all bits apart from bit 3
+; Bit 3 will make the object the diamond which cycles through all colors
+    and     #%00001000                      ; 2BC0: 29 08    
+
+; Make the valuble type $2x, maybe used as an offset later?
 ; L_BRS_($2BC2)_($2BBE) OK
-Obj_Jetman_NotEqu_3F2_2
-    ora     #$20                            ; 2BC2: 09 20    
-    sta     Obj_RPM_Valuable_6              ; 2BC4: 8D C6 03 
+SKIP_2BC2
+    ora     #%00100000                      ; 2BC2: 09 20    
+    sta     Obj_Rock_Mod_Mid_Valuable_Type  ; 2BC4: 8D C6 03 
+
+; 03C0 object starts as Rocket Module Middle, then Fuel Cell
 ; L_JSR_($2BC7)_($2DC5) OK
-Obj_Jetman_NotEqu_3F2_3
+Load_ZP_Params_For_Object_03C0
     jsr     Save_Obj_List_Ptr               ; 2BC7: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2BCA: 20 9D 25 
     fcb     $00                             ; 2BCD: 00       
-    fdb     $03C0                           ; 2BCE: C0 03     Rocket middle module then Fuel object
+    fdb     $03C0                           ; 2BCE: C0 03    
     fcb     $FF                             ; 2BD0: FF       
     jsr     Load_Object_Type_X_Y_Color      ; 2BD1: 20 E9 35 
-    ldy     #$06                            ; 2BD4: A0 06    
+
+    ldy     #OBJECT_COLOR_PARAM             ; 2BD4: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2BD6: B1 00    
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2BD8: 20 5A 30 
     jmp     Restore_Obj_List_Ptr            ; 2BDB: 4C F0 28 
 ; -----------------------
+
+; Use VIC raster value to create a random X parameter for new object
 ; L_JSR_($2BDE)_($2B76) OK
 ; L_JSR_($2BDE)_($2BB1) OK
-Get_Raster_Line_Band
+Get_Random_X
     lda     VIC_R4_TV_Raster                ; 2BDE: AD 04 90 
     and     #$0F                            ; 2BE1: 29 0F    
     tax                                     ; 2BE3: AA       
-    lda     Raster_Line_Table,x             ; 2BE4: BD E8 2B 
+    lda     Object_X_Table,x                ; 2BE4: BD E8 2B 
     rts                                     ; 2BE7: 60       
 ; ===========================================================
-Raster_Line_Table
+
+; Table of possible X positions for spawned new object
+Object_X_Table
     fcb     $00                             ; 2BE8: 00       
     fcb     $10                             ; 2BE9: 10       
     fcb     $18                             ; 2BEA: 18       
@@ -3562,12 +3583,12 @@ Test_Jetman_Obj_Collide_5
 ; -----------------------
 
 ; L_JSR_($2DA1)_($22DD) OK
-XXXX lda    Obj_RPT_Fuel_Type               ; 2DA1: AD B8 03 
+XXXX lda    Obj_Rock_Mod_Top_Fuel_Type      ; 2DA1: AD B8 03 
     beq     XXXX_1                          ; 2DA4: F0 03    
-    jsr     Object_RTS_Fuel_Type            ; 2DA6: 20 E3 22 
+    jsr     Set_Obj_List_Type_Rocket_Fuel   ; 2DA6: 20 E3 22 
 ; L_BRS_($2DA9)_($2DA4) OK
 XXXX_1
-    lda     Obj_RPM_Valuable_Type           ; 2DA9: AD C0 03 
+    lda     Obj_Rock_Mod_Mid_Valuable_Type  ; 2DA9: AD C0 03 
     beq     XXXX_2                          ; 2DAC: F0 07    
     cmp     #$0E                            ; 2DAE: C9 0E    
     beq     XXXX_3                          ; 2DB0: F0 13    
@@ -3585,7 +3606,7 @@ XXXX_2
 ; -----------------------
 ; L_BRS_($2DC5)_($2DB0) OK
 XXXX_3
-    jsr     Obj_Jetman_NotEqu_3F2_3         ; 2DC5: 20 C7 2B 
+    jsr     Load_ZP_Params_For_Object_03C0  ; 2DC5: 20 C7 2B 
     jmp     XXXX_2                          ; 2DC8: 4C B5 2D 
 ; -----------------------
 ; L_JSR_($2DCB)_($22D1) OK
@@ -3969,9 +3990,9 @@ Rocket_Part_Or_Fuel_Dropped
 ; Rocket part landed, activate next object i.e. set
 ; status = not dropping and not picked-up by Jetman
 ; Note, using direct addressing, not using Y offset
-    lda     Obj_RPT_Status                  ; 2F43: AD BC 03 
+    lda     Obj_Rock_Mod_Top_Fuel_Status    ; 2F43: AD BC 03 
     ora     #%00000001                      ; 2F46: 09 01     Set bit 0
-    sta     Obj_RPT_Status                  ; 2F48: 8D BC 03 
+    sta     Obj_Rock_Mod_Top_Fuel_Status    ; 2F48: 8D BC 03 
     jsr     Load_Rocket_or_Fuel_UDGs        ; 2F4B: 20 54 30 
 
 ; Multiply rocket direction(???) by $10 and store
@@ -4626,6 +4647,7 @@ Next_UDG_Char
     sta     ZP_07_Obj_Addr_Hi               ; 31B3: 85 07    
     rts                                     ; 31B5: 60       
 ; ===========================================================
+
 ; Platform data for 3143_Subroutine, 3 platforms: X Y #Num_middle_chars
     fcb     $10,$40,$03                     ; 31B6: 10 40 03 
     fcb     $50,$60,$01                     ; 31B9: 50 60 01 
@@ -7484,7 +7506,7 @@ UDG_Sprite_Lookup_Hi
     fdb     Gold_Bar                        ; 3CA7: AF 3D    
     fdb     Plutonium                       ; 3CA9: E3 3D    
     fdb     Isotope                         ; 3CAB: 00 3E    
-    fdb     Platform                        ; 3CAD: 15 3E    
+    fdb     Mineral                         ; 3CAD: 15 3E    
     fdb     Diamond                         ; 3CAF: CA 3D    
     fcb     %11110111                       ; 3CB1: F7       
     fcb     %11110111                       ; 3CB2: F7       
@@ -7852,7 +7874,7 @@ Isotope
     fcb     %00001001                       ; 3E12: 09       
     fcb     %00000001                       ; 3E13: 01       
     fcb     %00000000                       ; 3E14: 00       
-Platform
+Mineral
     fcb     %00110111                       ; 3E15: 37       
     fcb     %01111111                       ; 3E16: 7F       
     fcb     %11111111                       ; 3E17: FF       

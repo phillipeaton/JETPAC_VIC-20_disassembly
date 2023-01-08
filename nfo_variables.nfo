@@ -70,9 +70,9 @@ label    0381 Obj_Jetman_X          ; Pixel Left=00 Right=B6 or B7
 label    0382 Obj_Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
 label    0383 Obj_Jetman_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
 label    0384 Obj_Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accelerating?
-;label    0385 Obj_Jetman_0385
-;label    0386 Obj_Jetman_0386
-;label    0387 Obj_Jetman_0387
+;label   0385 Obj_Jetman_0385
+;label   0386 Obj_Jetman_0386
+;label   0387 Obj_Jetman_0387
 
 
 ; Byte 00/08= object type: 10/90=Laser Shot Left/Right
@@ -94,11 +94,11 @@ label    0384 Obj_Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accele
 
 label    0388 Obj_Laser_0 ;
 
-;label    0390 Obj_Laser_1
+;label   0390 Obj_Laser_1
 
-;label    0398 Obj_Laser_2
+;label   0398 Obj_Laser_2
 
-;label    03A0 Obj_Laser_3
+;label   03A0 Obj_Laser_3
 
 ; Byte 00/08= object type:
 ;        03=Explosion->00
@@ -123,7 +123,7 @@ label    03AB Obj_Sound_Noise
 label    03AC Obj_Sound_Noise_Timer
 label    03AD Obj_Sound_Laser
 label    03AE Obj_Sound_Laser_Timer
-;label    03AF Obj_Sound_7 ; Not used
+;label   03AF Obj_Sound_7 ; Not used
                              ;        0  1  2  3  4  5  6  7
                              ; 03B0  09 70 00 AF 01 00 00 1C
 label    03B0 Obj_Rocket     ; Type = 09, 0A when ascending, 0B when decending
@@ -131,29 +131,29 @@ label    03B1 Obj_Rocket_X
 label    03B2 Obj_Rocket_Fuel_Lvl ; Number of fuel cells, 6=full
 label    03B3 Obj_Rocket_Y
 label    03B4 Obj_Rocket_Parts_Fuel_Counter
-;label    03B5 Obj_Rocket_5
-;label    03B6 Obj_Rocket_6
-;label    03B7 Obj_Rocket_7
+;label   03B5 Obj_Rocket_5
+;label   03B6 Obj_Rocket_6
+;label   03B7 Obj_Rocket_7
 
 ; Rocket Part Top (RPT), then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
-label    03B8 Obj_RPT_Fuel_Type ; Type = 04 when active, else 00
-label    03B9 Obj_RPT_Fuel_X
-;label    03BA Obj_RPT_Fuel_2
-;label    03BB Obj_Rocket_Y
-label    03BC Obj_RPT_Status ; Rocket part Ready for pick-up/picked-up/Dropping
-;label    03BD Obj_RPT_Fuel_5
-;label    03BE Obj_RPT_Fuel_6 ; Height when rocket part/fuel cell has landed
-;label    03BF Obj_RPT_Fuel_7
+label    03B8 Obj_Rock_Mod_Top_Fuel_Type ; Type = 04 when active, else 00
+label    03B9 Obj_Rock_Mod_Top_Fuel_X
+;label   03BA Obj_Rock_Mod_Top_Fuel_2
+;label   03BB Obj_Rock_Mod_Top_Fuel_Y
+label    03BC Obj_Rock_Mod_Top_Fuel_Status ; Rocket part Ready for pick-up/picked-up/Dropping
+;label   03BD Obj_Rock_Mod_Top_Fuel_5
+;label   03BE Obj_Rock_Mod_Top_Fuel_6 ; Height when rocket part/fuel cell has landed
+;label   03BF Obj_Rock_Mod_Top_Fuel_7
 
 ; Rocket Part Middle, then a valuable e.g. 03C0  0E 58 00 5E 00 03 28 18
-label    03C0 Obj_RPM_Valuable_Type ;
-label    03C1 Obj_RPM_Valuable_X
-;label    03C2 Obj_RPM_Valuable_2
-;label    03C3 Obj_RPM_Valuable_3
-label    03C4 Obj_RPM_Status
-;label    03C5 Obj_RPM_Valuable_5
-label    03C6 Obj_RPM_Valuable_6
-label    03C7 Obj_RPM_Valuable_7
+label    03C0 Obj_Rock_Mod_Mid_Valuable_Type ;
+label    03C1 Obj_Rock_Mod_Mid_Valuable_X
+;label   03C2 Obj_Rock_Mod_Mid_Valuable_2
+;label   03C3 Obj_Rock_Mod_Mid_Valuable_3
+label    03C4 Obj_Rock_Mod_Mid_Valuab_Status
+;label   03C5 Obj_Rock_Mod_Mid_Valuable_Color
+label    03C6 Obj_Rock_Mod_Mid_Valuable_Type
+label    03C7 Obj_Rock_Mod_Mid_Valuable_7
 
 
 ; Byte 00/08= object type
@@ -169,23 +169,23 @@ label    03C7 Obj_RPM_Valuable_7
 
 ; Aliens 1-6
 label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00
-;label    03C9 Obj_Alien_0_1 ;
-;label    03CA Obj_Alien_0_2 ;
-;label    03CB Obj_Alien_0_3 ;
-;label    03CC Obj_Alien_0_4 ;
-;label    03CD Obj_Alien_0_5 ;
-;label    03CE Obj_Alien_0_6 ;
-;label    03CF Obj_Alien_0_7 ;
+;label   03C9 Obj_Alien_0_1 ;
+;label   03CA Obj_Alien_0_2 ;
+;label   03CB Obj_Alien_0_3 ;
+;label   03CC Obj_Alien_0_4 ;
+;label   03CD Obj_Alien_0_5 ;
+;label   03CE Obj_Alien_0_6 ;
+;label   03CF Obj_Alien_0_7 ;
 
-;label    03D0 Obj_Alien_1_0 ;     03D0  05 91 08 7C 00 06 03 00
+;label   03D0 Obj_Alien_1_0 ;     03D0  05 91 08 7C 00 06 03 00
 
-;label    03D8 Obj_Alien_2_0 ;     03D8  05 47 08 85 00 02 00 00
+;label   03D8 Obj_Alien_2_0 ;     03D8  05 47 08 85 00 02 00 00
 
-;label    03E0 Obj_Alien_3_0 ;     03E0  05 8B 08 81 00 02 03 00
+;label   03E0 Obj_Alien_3_0 ;     03E0  05 8B 08 81 00 02 03 00
 
-;label    03E8 Obj_Alien_4_0 ;     03E8  05 A6 08 7D 00 02 03 00
+;label   03E8 Obj_Alien_4_0 ;     03E8  05 A6 08 7D 00 02 03 00
 
-;label    03F0 Obj_Alien_5_0 ;     03F0  05 19 F8 8D 00 06 00 00
+;label   03F0 Obj_Alien_5_0 ;     03F0  05 19 F8 8D 00 06 00 00
 
 ; UDG RAM positions of score data
 label    1008 Display_P1_Score_Posn
