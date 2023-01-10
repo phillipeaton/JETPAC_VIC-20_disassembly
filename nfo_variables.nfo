@@ -27,7 +27,20 @@ label      18 ZP_Obj_X_Position_2 ; 07
 label      19 ZP_Obj_Y_Position_2 ; 12
 label      1A ZP_Obj_Type_2 ; 03 Save_Obj_List_Params 2
 label      1B ZP_Obj_Color_2 ; 10 Save_Obj_List_Params 2
-label      1C ZP_Jetman_Movement ; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
+label      1C ZP_Jetman_Action ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
+;                               1111 1111 = No action
+;                               1xxx xxxx = Not moving right
+;                               x1xx xxxx = Not moving left
+;                               xxx1 xxxx = On ground/not flying
+;                               xxxx 1xxx = Not Firing
+;
+;                               Examples:
+;                               1110 xxxx = Flying Hover
+;                               1010 xxxx = Flying Left
+;                               0110 xxxx = Flying Right
+;                               1011 xxxx = Walk Left
+;                               0111 xxxx = Walk right
+
 label      1E ZP_Ship_UDG_Addr_Offset ;
 label      1F ZP_Ship_UDG_Addr_Color? ;
 label      20 ZP_HW_IRQ_1_OR_0 ;
@@ -152,7 +165,7 @@ label    03C1 Obj_Rock_Mod_Mid_Valuable_X
 ;label   03C3 Obj_Rock_Mod_Mid_Valuable_3
 label    03C4 Obj_Rock_Mod_Mid_Valuab_Status
 ;label   03C5 Obj_Rock_Mod_Mid_Valuable_Color
-label    03C6 Obj_Rock_Mod_Mid_Valuable_Type
+label    03C6 Obj_Rock_Mod_Mid_Valuable_Type_
 label    03C7 Obj_Rock_Mod_Mid_Valuable_7
 
 

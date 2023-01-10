@@ -93,6 +93,7 @@ comment  2085
 comment  2085 Setup volume and color
 comment  208A
 comment  208A Disable sound object
+comment  208F
 comment  208F ----------------------------------------------------------
 comment  208F Game Select Loop
 comment  208F ----------------------------------------------------------
@@ -315,6 +316,7 @@ label    22B4 Laser_JFL_2
 comment  22B4 Towards right
 lcomment 22B4 Restore Y from Stack
 lcomment 22B7 Zero the top 5 bits
+comment  22BA
 label    22BA Reset_Level_Add_Extra_Life
 comment  22B6
 comment  22BD
@@ -490,6 +492,7 @@ lcomment 24A5 Test settings bit 1, if not set, skip counter logic
 lcomment 24A9 Counter for flash period
 lcomment 24AB remove the lasers? and flashes get faster
 label    24B2 GSFP2
+comment  24B9
 label    24B9 Display_Game_Select
 comment  24CA
 break    24CE
@@ -550,6 +553,7 @@ lcomment 25C7 Go back and read the next parameter
 label    25CA Inc_Param_Addr
 lcomment 25CA Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
 label    25D0 IPA1
+comment  25D1
 label    25D1 Game_Start
 comment  25E0
 comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -618,6 +622,7 @@ word     267A
 comment  2680
 label    2680 Restore_Obj_Ptr_CLI
 lcomment 2688 Clear Disable Interrupts flag
+comment  268C
 label    268C Subroutine_List
 word     268C-26AD
 lcomment 268C 00
@@ -646,6 +651,7 @@ comment  26B9 Initialize sound channels
 comment  26C5
 label    26C5 Init_Sound_Object_Table
 break    26C9
+comment  26CD
 comment  26CD Read and play sound channel data from the Sound object
 label    26CD SOUND_UPDATE
 comment  26D1
@@ -708,6 +714,7 @@ comment  274F
 label    274F Collision_Explosion
 comment  2754
 comment  2754 Manipulate timer to make an explosion sound, though doesn't use noise
+comment  275B
 comment  275B Erase $100 bytes zero page
 label    275B Erase_ZP_RAM
 label    275E Erase_ZP_RAM_1
@@ -716,6 +723,7 @@ label    2768 Erase_Object_RAM_1
 comment  276F Erase $30 bytes at end of UDGs $1fd0-$2000
 label    276F Erase_HiScore_Setts_Etc
 label    2773 Erase_HiScore_Setts_Etc_1
+comment  277A
 label    277A Check_New_Hi_Score
 const    277D
 lcomment 277D ZP_00
@@ -746,6 +754,7 @@ label    27A0 Copy_Player_To_Hi_Score
 lcomment 27A0 3 BCD bytes, 02, 01, 00
 label    27A2 Copy_Player_To_Hi_Score_1
 lcomment 27A7 Return when all bytes copied
+comment  27AA
 label    27AA Display_Rocket_Flame
 lcomment 27AE Object $0A = Flame (or maybe Rocket?)
 label    27B3 Display_Rocket_Flame_1
@@ -810,6 +819,7 @@ comment  28DE Init all Alien objects
 label    28E0 Loop_28E0
 label    28E7 Save_Obj_List_Ptr
 label    28F0 Restore_Obj_List_Ptr
+comment  28F9
 label    28F9 Change_Object_To_Explosion_1
 comment  28FC
 comment  28FC Reset Alien? object direction
@@ -891,11 +901,13 @@ comment  2A4F
 comment  2A4F Set Jetman Move Speed to 1
 comment  2A55
 comment  2A55 Object type
+comment  2A5F
 label    2A5F LEVEL_1_PLUSSES
 label    2A67 Level_1_Plusses_1
 comment  2A67
 comment  2A67 Alien not hit by laser, check to see if hit platform, aliens bounce off after Level 0 so
 comment  2A67 update direction
+comment  2A6D
 label    2A6D LEVEL_2_BALLS
 comment  2A75
 comment  2A75 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0
@@ -931,6 +943,7 @@ label    2AB7 Update_Y_Direction_Random_1
 comment  2AB7
 comment  2AB2
 comment  2AB2 Do the inversion on the direction byte
+comment  2ABC
 label    2ABC LEVEL_3_SAUCER
 comment  2AC4
 comment  2AC4 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so
@@ -976,6 +989,7 @@ comment  2B08
 comment  2B08 Alien is to the below Jetman
 label    2B08 Level_3_Saucer_Alien_Below_Y
 label    2B11 Level_3_Saucer_Inc_Direction_Y
+comment  2B16
 comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change
 label    2B16 Test_Platform_Collision_Bounce
 lcomment 2B16 Remove=(Not triggered on first level, so don't yet know)
@@ -986,6 +1000,7 @@ label    2B2F Test_Platform_Collision_Bounc_1
 label    2B36 Test_Platform_Collision_Bou_RTS
 label    2B37 Test_Platform_Collision_Bounc_2
 label    2B42 Test_Platform_Collision_Bounc_3
+comment  2B4B
 comment  2B4B Test if Jetman is onscreen
 label    2B4B Spawn_Rocket_Modules_Fuel_Cell
 lcomment 2B4E Zero bits 6 & 7
@@ -1047,7 +1062,7 @@ lcomment 2BCD
 const    2BCE
 word     2BCE
 comment  2BD4
-deflabel 2BD5 OBJECT_COLOR_PARAM
+deflabel 2BD5 OBJECT_VALUABLE_TYPE
 comment  2BDE
 comment  2BDE Use VIC raster value to create a random X parameter for new object
 label    2BDE Get_Random_X
@@ -1056,6 +1071,7 @@ comment  2BE8 Table of possible X positions for spawned new object
 break    2BE8-2BF7
 const    2BE8-2BF7
 label    2BE8 Object_X_Table
+comment  2BF8
 label    2BF8 Test_Laser_Hits_1
 comment  2BF8
 comment  2BF8 Store Obj_Laser_0 address in ZP_08/09 ($0388)
@@ -1093,10 +1109,12 @@ label    2C53 Goto_Next_Obj
 comment  2C5A
 comment  2C5A Decrement object counter, return when all processed
 label    2C5F Test_Laser_Hits
+comment  2C6A
 label    2C6A LEVEL_0_FUZZBALL
 comment  2C6F
 comment  2C6F Alien not hit by laser, test if alien hit platform, if yes explode,
 comment  2C6F else test if alien hit Jetman
+comment  2C78
 comment  2C78 Alien has been hit by laser, use current player level to create points table offset
 label    2C78 Alien_Hit_Update_Score
 binary   2C7B
@@ -1239,6 +1257,7 @@ lcomment 2DEC Current level modulus 4
 comment  2DF1
 comment  2DF9
 label    2DFF Dec_Saved_Obj_List_Params_by_10
+comment  2E17
 comment  2E17 Aliens keep moving also
 label    2E17 ROCKET_ASCEND
 lcomment 2E1A Object height offset
@@ -1251,6 +1270,7 @@ comment  2E27
 comment  2E27 Trigger rocket flight sound
 comment  2E31
 label    2E34 Rocket_At_Top
+comment  2E4E
 comment  2E4E Flames stop a little way before bottom
 label    2E4E ROCKET_DESCEND
 comment  2E51
@@ -1281,6 +1301,7 @@ comment  2E8F Don't display Jetman next time? Also zeroes Jetman X coord.
 word     2E93
 comment  2E96
 comment  2E9C
+comment  2EAC
 label    2EAC Rocket_Fuelled_Up
 label    2EB5 Rocket_Fuelled_Up_1
 comment  2EC0
@@ -1350,7 +1371,7 @@ comment  2FAB DEBUG NOP the JSR and rocket part or fuel keeps falling
 comment  2FB2
 comment  2FB2 Move object down by 2 pixels, make Y an odd number
 label    2FB2 Rocket_Part_Or_Fuel_Move_Down
-deflabel 2FB3 OBJECT_Y_POSITION
+deflabel 2FB3 OBJECT_Y_POSITION_PARAM
 comment  2FBD
 label    2FBD Setup_Sprite_Addr_Rocket_Fuel
 label    2FC3 Setup_Sprite_Addr
@@ -1367,9 +1388,10 @@ comment  2FDC
 comment  2FDC Calculate and return index to object's sprite based on A e.g. player level
 comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat
 binary   2FDE
-deflabel 2FE0 OBJECT_SPRITE_INDEX
+deflabel 2FE0 OBJECT_PARAM
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
 label    2FE5 Get_Object_UDG_Addr_Small
+comment  2FEE
 label    2FEE Jetman_Collide_Rocket_Fuel
 comment  2FEE At point when Jetman picks up Rocket or Fuel module
 lcomment 2FF1 Diag attrib? Not sure...
@@ -1395,6 +1417,7 @@ label    3051 Copy_Jetman_XY_To_Sprite_1
 label    3054 Load_Rocket_or_Fuel_UDGs
 label    3057 Load_Rocket_or_Fuel_UDGs_1
 label    305A Load_Rocket_or_Fuel_UDGs_2
+comment  3063
 label    3063 Update_Score
 lcomment 3065 If P2, setup P2 Score instead of P1 and then return after the param setup below
 comment  3067
@@ -1475,6 +1498,7 @@ label    3130 Test_Platform_Collision_8
 label    3138 ORA_Temp1Lo_And_StoreTo_Temp1Lo
 label    313C Test_Platform_Collision_9
 label    313D Test_Platform_Collision10
+comment  3143
 label    3143 _31B6_To_Tmp4_03_To_Tmp5_Yto00
 lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
 label    3152 Draw_Platforms
@@ -1509,58 +1533,77 @@ break    31B9
 break    31BC
 comment  31BF
 label    31BF AAAAAAAA
-label    31DF BBBBBBBB
+deflabel 31C0 JETMAN_X_DIRECTION_PARAM
+comment  31C7
+comment  31C7 Load and test Jetman X Direction/Velocity
 label    31CE CCCCCCCC
+comment  31CB
 label    31CB EEEEEEEE
 label    31D7 FFFFFFFF
-label    31D4 GGGGGGGG
+label    31D4 BACK_31D4
+label    31DF BBBBBBBB
 label    31EA HHHHHHHH
 label    31E7 IIIIIIII
 label    31F2 JJJJJJJJ
+comment  31F7
+comment  31F7 Test Obj_Jetman_At_Rest???
 label    3200 KKKKKKKK
+comment  3208
+comment  3208 Test Obj_Jetman_At_Rest???
 label    3208 LLLLLLLL
-label    3212 MMMMMMMM
+label    3212 Jetman_flys_up_hits_platform_1
 label    3215 JMP_FLYING
-label    3218 NNNNNNNN
+label    3218 Jetman_flys_up_hits_platform
 lcomment 3218 Save A
-lcomment 321B Test for direction Up
+lcomment 321B Test if on ground
 lcomment 321E No, branch
 lcomment 3224 Restore A
 label    3228 OOOOOOOO
-label    3224 PPPPPPPP
+label    3224 Jetman_head_on_pltfrm_up_relsd
+comment  3230
 label    323E QQQQQQQQ
 label    3254 LDA_08
 comment  3259 HOW DO YOU EVER GET HERE?
-label    325E CLC_ADC_01
-label    3264 CLC_ADC_B8
+label    325E ADC_01
+label    3264 ADC_B8
+deflabel 3266 SCREEN_WIDTH_PIXELS
 label    326A ADC_48
-label    326F TXA_
+label    326F TXA_JM_UPD_3
 label    3273 JETMAN_UPDATE
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
-label    3285 Update_Jetman_1
-label    32A2 Update_Jetman_2
-label    32A6 Update_Jetman_3
-label    32BA CSC_ADC_RTN
-label    32C7 Flying?
+label    3285 Triggers_every_frame_when_Fly
+deflabel 3286 JETMAN_X_DIRECTION_PARAM
+label    32A2 Jetman_Update_2
+deflabel 32A3 JETMAN_X_DIRECTION_PARAM
+label    32A6 Jetman_Update_3
+deflabel 32A7 JETMAN_X
+deflabel 32B7 SCREEN_WIDTH_PIXELS
+label    32BA ADC_RTN
+label    32C7 Flying
+deflabel 32C8 JETMAN_Y_DIRECTION_PARAM
 lcomment 32CB Test for direction Down
 lcomment 32CE Yes, branch
 lcomment 32D0 Test for direction Up
 lcomment 32D3 Yes, branch
-label    32DE Flying_1?
-label    32E0 Flying_2?
+label    32DE Flying_1
+label    32E0 Flying_2
 lcomment 32E8 AF=Bottom of screen
-label    32F7 Flying_3?
-label    32F9 Flying_4?
+label    32F7 Flying_3
+label    32F9 Flying_4
 lcomment 3301 Test for direction Right
 lcomment 3304 No, branch
-label    3309 SKIP_Flying_5?
-label    330C Not_sure_330c
+label    3309 SKIP_3309
+label    330C Triggers_on_flight
 label    3318 LDA00
 label    331D Bottom?
 label    3321 Bottom_After?
+comment  332C
 label    332C Set_Obj_List_Ptr_Lo_To_7F
+binary   332F
 label    3337 Set_Obj_List_Ptr_Lo_To_80
+binary   333A
+comment  3342
 label    3342 Add_B8
 label    3348 Add_48
 label    334D READ_CONTROLS
@@ -1625,6 +1668,7 @@ lcomment 3459 Restore A
 comment  345A
 label    345C Read_Keyboard_1
 lcomment 345E Set bits 0-4 and 6-7 i.e. 11x11111
+comment  3465
 label    3465 Flash_Score
 lcomment 3467 P1 or P2? Branch if P2
 const    346C
@@ -1712,6 +1756,7 @@ comment  34E3
 label    34E3 Display_Character
 comment  34E9
 comment  34F0
+comment  34F7
 label    34F7 Setup_Color_RAM_Ptr
 lcomment 34F7 Get Addr_To lo-byte and divide by 8
 lcomment 34F9 and store to Color RAM Ptr lo-byte.
@@ -1837,6 +1882,7 @@ lcomment 35CF Move bytes to given address with Y offset
 lcomment 35D1 Decrement number of lines counter
 lcomment 35D2 All lines copied? If no, loop back.
 lcomment 35D4 If yes, routine ends
+comment  35D7
 label    35D7 Load_Object_Type_X_Y
 deflabel 35D8 OBJECT_TYPE_PARAM
 comment  35DD
@@ -1901,6 +1947,7 @@ comment  376D
 comment  3775
 comment  377C
 comment  3783
+comment  378A
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
 label    378A Set_UDG_RAM_Ptr_Sprite_Dimen_
 comment  378D
@@ -1959,6 +2006,7 @@ lcomment 3811 Address hi byte into A
 label    3815 Get_Object_UDG_Addr
 lcomment 3815 Saved Object X
 lcomment 381A Saved Object Type
+comment  381F
 label    381F Update_Color_RAM
 comment  381F
 comment  3827
@@ -1981,6 +2029,7 @@ label    385E Update_Color_RAM_RTS
 ; End of file contains graphics data
 ;
 ;unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
+comment  385F
 label    385F UDG_Lookup
 label    3860 UDG_Lookup+1
 break    385F-3FFF ; Output one byte per line

@@ -1,8 +1,4 @@
-comment  261A
-comment  261A
-comment  261A
-comment  261A
-comment  261A
+; GOTO_NEXT_OBJECT
 comment  261A
 comment  261A
 comment  261A
@@ -19,13 +15,7 @@ comment  261A \dP   Yb 88__dP     88 88__   dP   `"   88
 comment  261A \Yb   dP 88""Yb o.  88 88""   Yb        88
 comment  261A \ YbodP  88oodP "bodP' 888888  YboodP   88
 comment  261A #########################################################################################
-comment  261A
-
-comment  31BF
-comment  31BF
-comment  31BF
-comment  31BF
-comment  31BF
+; UPDATE_JETMAN
 comment  31BF
 comment  31BF
 comment  31BF
@@ -42,36 +32,24 @@ comment  31BF \    88 88__     88   88b  d88   dPYb   88Yb88
 comment  31BF \o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
 comment  31BF \"bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
 comment  31BF #########################################################################################
-comment  31BF
-
-comment  3342
-comment  3342
-comment  3342
-comment  3342
-comment  3342
-comment  3342
-comment  3342
-comment  3342
-comment  3342
-comment  3342
-comment  3342 #########################################################################################
-comment  3342 \88""Yb 888888    db    8888b.
-comment  3342 \88__dP 88__     dPYb    8I  Yb
-comment  3342 \88"Yb  88""    dP__Yb   8I  dY
-comment  3342 \88  Yb 888888 dP""""Yb 8888Y"
-comment  3342
-comment  3342 \ dP""b8  dP"Yb  88b 88 888888 88""Yb  dP"Yb  88     .dP"Y8
-comment  3342 \dP   `" dP   Yb 88Yb88   88   88__dP dP   Yb 88     `Ybo."
-comment  3342 \Yb      Yb   dP 88 Y88   88   88"Yb  Yb   dP 88  .o o.`Y8b
-comment  3342 \ YboodP  YbodP  88  Y8   88   88  Yb  YbodP  88ood8 8bodP'
-comment  3342 #########################################################################################
-comment  3342
-
-comment  28F9
-comment  28F9
-comment  28F9
-comment  28F9
-comment  28F9
+; READ_CONTROLS
+comment  332C
+comment  332C
+comment  332C
+comment  332C
+comment  332C
+comment  332C #########################################################################################
+comment  332C \88""Yb 888888    db    8888b.
+comment  332C \88__dP 88__     dPYb    8I  Yb
+comment  332C \88"Yb  88""    dP__Yb   8I  dY
+comment  332C \88  Yb 888888 dP""""Yb 8888Y"
+comment  332C
+comment  332C \ dP""b8  dP"Yb  88b 88 888888 88""Yb  dP"Yb  88     .dP"Y8
+comment  332C \dP   `" dP   Yb 88Yb88   88   88__dP dP   Yb 88     `Ybo."
+comment  332C \Yb      Yb   dP 88 Y88   88   88"Yb  Yb   dP 88  .o o.`Y8b
+comment  332C \ YboodP  YbodP  88  Y8   88   88  Yb  YbodP  88ood8 8bodP'
+comment  332C #########################################################################################
+; EXPLOSIONS
 comment  28F9
 comment  28F9
 comment  28F9
@@ -83,13 +61,7 @@ comment  28F9 \88__    YbdP  88__dP 88     dP   Yb `Ybo." 88 dP   Yb 88Yb88 `Ybo
 comment  28F9 \88""    dPYb  88"""  88  .o Yb   dP o.`Y8b 88 Yb   dP 88 Y88 o.`Y8b
 comment  28F9 \888888 dP  Yb 88     88ood8  YbodP  8bodP' 88  YbodP  88  Y8 8bodP'
 comment  28F9 #########################################################################################
-comment  28F9
-
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
-comment  2F31
+; ROCKET_PART_OR_FUEL
 comment  2F31
 comment  2F31
 comment  2F31
@@ -106,13 +78,7 @@ comment  2F31 \dP   Yb 88__dP     88__   88   88 88__   88
 comment  2F31 \Yb   dP 88"Yb      88""   Y8   8P 88""   88  .o
 comment  2F31 \ YbodP  88  Yb     88     `YbodP' 888888 88ood8
 comment  2F31 #########################################################################################
-comment  2F31
-
-comment  2C6A
-comment  2C6A
-comment  2C6A
-comment  2C6A
-comment  2C6A
+; LEVEL_0_FUZZBALL
 comment  2C6A
 comment  2C6A
 comment  2C6A
@@ -129,13 +95,7 @@ comment  2C6A \88__   88   88   dP    dP  88__dP   dPYb   88     88
 comment  2C6A \88""   Y8   8P  dP    dP   88""Yb  dP__Yb  88  .o 88  .o
 comment  2C6A \88     `YbodP' d8888 d8888 88oodP dP""""Yb 88ood8 88ood8
 comment  2C6A #########################################################################################
-comment  2C6A
-
-comment  2ABC
-comment  2ABC
-comment  2ABC
-comment  2ABC
-comment  2ABC
+; LEVEL_3_SAUCER
 comment  2ABC
 comment  2ABC
 comment  2ABC
@@ -152,13 +112,7 @@ comment  2ABC \`Ybo."   dPYb   88   88 dP   `" 88__   88__dP
 comment  2ABC \o.`Y8b  dP__Yb  Y8   8P Yb      88""   88"Yb
 comment  2ABC \8bodP' dP""""Yb `YbodP'  YboodP 888888 88  Yb
 comment  2ABC #########################################################################################
-comment  2ABC
-
-comment  2A6D
-comment  2A6D
-comment  2A6D
-comment  2A6D
-comment  2A6D
+; LEVEL_2_BALLS
 comment  2A6D
 comment  2A6D
 comment  2A6D
@@ -175,13 +129,7 @@ comment  2A6D \88__dP   dPYb   88     88     `Ybo."
 comment  2A6D \88""Yb  dP__Yb  88  .o 88  .o o.`Y8b
 comment  2A6D \88oodP dP""""Yb 88ood8 88ood8 8bodP'
 comment  2A6D #########################################################################################
-comment  2A6D
-
-comment  2A5F
-comment  2A5F
-comment  2A5F
-comment  2A5F
-comment  2A5F
+; LEVEL_1_PLUSSES
 comment  2A5F
 comment  2A5F
 comment  2A5F
@@ -198,29 +146,7 @@ comment  2A5F \88__dP 88     88   88 `Ybo." `Ybo." 88__   `Ybo."
 comment  2A5F \88"""  88  .o Y8   8P o.`Y8b o.`Y8b 88""   o.`Y8b
 comment  2A5F \88     88ood8 `YbodP' 8bodP' 8bodP' 888888 8bodP'
 comment  2A5F #########################################################################################
-comment  2A5F
-
-comment  2C78
-comment  2C78
-comment  2C78
-comment  2C78
-comment  2C78
-comment  2C78
-comment  2C78
-comment  2C78
-comment  2C78
-comment  2C78
-comment  2C78 \88     888888 Yb    dP 888888 88          dP""b8  dP"Yb  8b    d8 8b    d8  dP"Yb  88b 88
-comment  2C78 \88     88__    Yb  dP  88__   88         dP   `" dP   Yb 88b  d88 88b  d88 dP   Yb 88Yb88
-comment  2C78 \88  .o 88""     YbdP   88""   88  .o     Yb      Yb   dP 88YbdP88 88YbdP88 Yb   dP 88 Y88
-comment  2C78 \88ood8 888888    YP    888888 88ood8      YboodP  YbodP  88 YY 88 88 YY 88  YbodP  88  Y8
-comment  2C78
-
-comment  2E74
-comment  2E74
-comment  2E74
-comment  2E74
-comment  2E74
+; ROCKET_BOTTOM_MODULE
 comment  2E74
 comment  2E74
 comment  2E74
@@ -242,13 +168,7 @@ comment  2E74 \88b  d88 dP   Yb  8I  Yb 88   88 88     88__
 comment  2E74 \88YbdP88 Yb   dP  8I  dY Y8   8P 88  .o 88""
 comment  2E74 \88 YY 88  YbodP  8888Y"  `YbodP' 88ood8 888888
 comment  2E74 #########################################################################################
-comment  2E74
-
-comment  2E17
-comment  2E17
-comment  2E17
-comment  2E17
-comment  2E17
+; ROCKET_ASCEND
 comment  2E17
 comment  2E17
 comment  2E17
@@ -265,13 +185,7 @@ comment  2E17 \  dPYb   `Ybo." dP   `" 88__   88Yb88  8I  Yb
 comment  2E17 \ dP__Yb  o.`Y8b Yb      88""   88 Y88  8I  dY
 comment  2E17 \dP""""Yb 8bodP'  YboodP 888888 88  Y8 8888Y"
 comment  2E17 #########################################################################################
-comment  2E17
-
-comment  2E4E
-comment  2E4E
-comment  2E4E
-comment  2E4E
-comment  2E4E
+; ROCKET_DESCEND
 comment  2E4E
 comment  2E4E
 comment  2E4E
@@ -288,13 +202,7 @@ comment  2E4E \ 8I  Yb 88__   `Ybo." dP   `" 88__   88Yb88  8I  Yb
 comment  2E4E \ 8I  dY 88""   o.`Y8b Yb      88""   88 Y88  8I  dY
 comment  2E4E \8888Y"  888888 8bodP'  YboodP 888888 88  Y8 8888Y"
 comment  2E4E #########################################################################################
-comment  2E4E
-
-comment  26CD
-comment  26CD
-comment  26CD
-comment  26CD
-comment  26CD
+; SOUND_UPDATE
 comment  26CD
 comment  26CD
 comment  26CD
@@ -306,13 +214,7 @@ comment  26CD \ `Ybo." dP   Yb 88   88 88Yb88  8I  Yb     88   88 88__dP  8I  Yb
 comment  26CD \ o.`Y8b Yb   dP Y8   8P 88 Y88  8I  dY     Y8   8P 88"""   8I  dY  dP__Yb    88   88""
 comment  26CD \ 8bodP'  YbodP  `YbodP' 88  Y8 8888Y"      `YbodP' 88     8888Y"  dP""""Yb   88   888888
 comment  26CD #########################################################################################
-comment  26CD
-
-comment  283E
-comment  283E
-comment  283E
-comment  283E
-comment  283E
+; FIRE_PRESSED
 comment  283E
 comment  283E
 comment  283E
@@ -329,13 +231,7 @@ comment  283E \88__dP 88__dP 88__   `Ybo." `Ybo." 88__    8I  Yb
 comment  283E \88"""  88"Yb  88""   o.`Y8b o.`Y8b 88""    8I  dY
 comment  283E \88     88  Yb 888888 8bodP' 8bodP' 888888 8888Y"
 comment  283E #########################################################################################
-comment  283E
-
-comment  2195
-comment  2195
-comment  2195
-comment  2195
-comment  2195
+; DISPLAY_LASERS
 comment  2195
 comment  2195
 comment  2195
@@ -352,13 +248,7 @@ comment  2195 \88       dPYb   `Ybo." 88__   88__dP `Ybo."
 comment  2195 \88  .o  dP__Yb  o.`Y8b 88""   88"Yb  o.`Y8b
 comment  2195 \88ood8 dP""""Yb 8bodP' 888888 88  Yb 8bodP'
 comment  2195 #########################################################################################
-comment  2195
-
-comment  3601
-comment  3601
-comment  3601
-comment  3601
-comment  3601
+; ABCD_XYZ
 comment  3601
 comment  3601
 comment  3601
@@ -368,13 +258,7 @@ comment  3601 \   db    88""Yb  dP""b8 8888b.      Yb  dP Yb  dP 8888P
 comment  3601 \  dPYb   88__dP dP   `"  8I  Yb      YbdP   YbdP    dP
 comment  3601 \ dP__Yb  88""Yb Yb       8I  dY      dPYb    8P    dP
 comment  3601 \dP""""Yb 88oodP  YboodP 8888Y"      dP  Yb  dP    d8888
-comment  3601
-
-comment  277A
-comment  277A
-comment  277A
-comment  277A
-comment  277A
+; Check_New_High_Score
 comment  277A
 comment  277A
 comment  277A
@@ -388,13 +272,7 @@ comment  277A \88  88 88     .dP"Y8  dP""b8  dP"Yb  88""Yb 888888
 comment  277A \88  88 88     `Ybo." dP   `" dP   Yb 88__dP 88__
 comment  277A \888888 88     o.`Y8b Yb      Yb   dP 88"Yb  88""
 comment  277A \88  88 88     8bodP'  YboodP  YbodP  88  Yb 888888
-comment  277A
-
-comment  351D
-comment  351D
-comment  351D
-comment  351D
-comment  351D
+; Convert_XY_To_UDG_RAM_Addr
 comment  351D
 comment  351D
 comment  351D
@@ -414,13 +292,7 @@ comment  351D \   db    8888b.  8888b.  88""Yb
 comment  351D \  dPYb    8I  Yb  8I  Yb 88__dP
 comment  351D \ dP__Yb   8I  dY  8I  dY 88"Yb
 comment  351D \dP""""Yb 8888Y"  8888Y"  88  Yb
-comment  351D
-
-comment  3595
-comment  3595
-comment  3595
-comment  3595
-comment  3595
+; Copy_Char_To_UDG_RAM
 comment  3595
 comment  3595
 comment  3595
@@ -435,13 +307,7 @@ comment  3595 \888888  dP"Yb      88   88 8888b.   dP""b8     88""Yb    db    8b
 comment  3595 \  88   dP   Yb     88   88  8I  Yb dP   `"     88__dP   dPYb   88b  d88
 comment  3595 \  88   Yb   dP     Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88
 comment  3595 \  88    YbodP      `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88
-comment  3595
-
-comment  34A4
-comment  34A4
-comment  34A4
-comment  34A4
-comment  34A4
+; Display_BCD_Str_Char
 comment  34A4
 comment  34A4
 comment  34A4
@@ -456,13 +322,7 @@ comment  34A4 \.dP"Y8 888888 88""Yb      dP""b8 88  88    db    88""Yb
 comment  34A4 \`Ybo."   88   88__dP     dP   `" 88  88   dPYb   88__dP
 comment  34A4 \o.`Y8b   88   88"Yb      Yb      888888  dP__Yb  88"Yb
 comment  34A4 \8bodP'   88   88  Yb      YboodP 88  88 dP""""Yb 88  Yb
-comment  34A4
-
-comment  24B9
-comment  24B9
-comment  24B9
-comment  24B9
-comment  24B9
+; Display_Game_Select
 comment  24B9
 comment  24B9
 comment  24B9
@@ -477,13 +337,7 @@ comment  24B9 \ dP""b8    db    8b    d8 888888     .dP"Y8 888888 88     888888 
 comment  24B9 \dP   `"   dPYb   88b  d88 88__       `Ybo." 88__   88     88__   dP   `"   88
 comment  24B9 \Yb  "88  dP__Yb  88YbdP88 88""       o.`Y8b 88""   88  .o 88""   Yb        88
 comment  24B9 \ YboodP dP""""Yb 88 YY 88 888888     8bodP' 888888 88ood8 888888  YboodP   88
-comment  24B9
-
-comment  27AA
-comment  27AA
-comment  27AA
-comment  27AA
-comment  27AA
+; Display_Rocket_Flame
 comment  27AA
 comment  27AA
 comment  27AA
@@ -503,13 +357,7 @@ comment  27AA \888888 88        db    8b    d8 888888
 comment  27AA \88__   88       dPYb   88b  d88 88__
 comment  27AA \88""   88  .o  dP__Yb  88YbdP88 88""
 comment  27AA \88     88ood8 dP""""Yb 88 YY 88 888888
-comment  27AA
-
-comment  3143
-comment  3143
-comment  3143
-comment  3143
-comment  3143
+; Draw_Platforms
 comment  3143
 comment  3143
 comment  3143
@@ -524,13 +372,7 @@ comment  3143 \88""Yb 88        db    888888 888888  dP"Yb  88""Yb 8b    d8 .dP"
 comment  3143 \88__dP 88       dPYb     88   88__   dP   Yb 88__dP 88b  d88 `Ybo."
 comment  3143 \88"""  88  .o  dP__Yb    88   88""   Yb   dP 88"Yb  88YbdP88 o.`Y8b
 comment  3143 \88     88ood8 dP""""Yb   88   88      YbodP  88  Yb 88 YY 88 8bodP'
-comment  3143
-
-comment  275B
-comment  275B
-comment  275B
-comment  275B
-comment  275B
+; Erase_RAM
 comment  275B
 comment  275B
 comment  275B
@@ -540,13 +382,7 @@ comment  275B \888888 88""Yb    db    .dP"Y8 888888     88""Yb    db    8b    d8
 comment  275B \88__   88__dP   dPYb   `Ybo." 88__       88__dP   dPYb   88b  d88
 comment  275B \88""   88"Yb   dP__Yb  o.`Y8b 88""       88"Yb   dP__Yb  88YbdP88
 comment  275B \888888 88  Yb dP""""Yb 8bodP' 888888     88  Yb dP""""Yb 88 YY 88
-comment  275B
-
-comment  3465
-comment  3465
-comment  3465
-comment  3465
-comment  3465
+; Flash_Score
 comment  3465
 comment  3465
 comment  3465
@@ -556,13 +392,7 @@ comment  3465 \888888 88        db    .dP"Y8 88  88     .dP"Y8  dP""b8  dP"Yb  8
 comment  3465 \88__   88       dPYb   `Ybo." 88  88     `Ybo." dP   `" dP   Yb 88__dP 88__
 comment  3465 \88""   88  .o  dP__Yb  o.`Y8b 888888     o.`Y8b Yb      Yb   dP 88"Yb  88""
 comment  3465 \88     88ood8 dP""""Yb 8bodP' 88  88     8bodP'  YboodP  YbodP  88  Yb 888888
-comment  3465
-
-comment  208F
-comment  208F
-comment  208F
-comment  208F
-comment  208F
+; Game_Select
 comment  208F
 comment  208F
 comment  208F
@@ -572,13 +402,7 @@ comment  208F \ dP""b8    db    8b    d8 888888     .dP"Y8 888888 88     888888 
 comment  208F \dP   `"   dPYb   88b  d88 88__       `Ybo." 88__   88     88__   dP   `"   88
 comment  208F \Yb  "88  dP__Yb  88YbdP88 88""       o.`Y8b 88""   88  .o 88""   Yb        88
 comment  208F \ YboodP dP""""Yb 88 YY 88 888888     8bodP' 888888 88ood8 888888  YboodP   88
-comment  208F
-
-comment  25D1
-comment  25D1
-comment  25D1
-comment  25D1
-comment  25D1
+; Game_Start
 comment  25D1
 comment  25D1
 comment  25D1
@@ -588,13 +412,7 @@ comment  25D1 \ dP""b8    db    8b    d8 888888     .dP"Y8 888888    db    88""Y
 comment  25D1 \dP   `"   dPYb   88b  d88 88__       `Ybo."   88     dPYb   88__dP   88
 comment  25D1 \Yb  "88  dP__Yb  88YbdP88 88""       o.`Y8b   88    dP__Yb  88"Yb    88
 comment  25D1 \ YboodP dP""""Yb 88 YY 88 888888     8bodP'   88   dP""""Yb 88  Yb   88
-comment  25D1
-
-comment  37D4
-comment  37D4
-comment  37D4
-comment  37D4
-comment  37D4
+; Get_Object_UDG_Addr
 comment  37D4
 comment  37D4
 comment  37D4
@@ -609,13 +427,7 @@ comment  37D4 \88   88 8888b.   dP""b8        db    8888b.  8888b.  88""Yb
 comment  37D4 \88   88  8I  Yb dP   `"       dPYb    8I  Yb  8I  Yb 88__dP
 comment  37D4 \Y8   8P  8I  dY Yb  "88      dP__Yb   8I  dY  8I  dY 88"Yb
 comment  37D4 \`YbodP' 8888Y"   YboodP     dP""""Yb 8888Y"  8888Y"  88  Yb
-comment  37D4
-
-comment  2FEE
-comment  2FEE
-comment  2FEE
-comment  2FEE
-comment  2FEE
+; Jetman_Collide_Rocket_Fuel
 comment  2FEE
 comment  2FEE
 comment  2FEE
@@ -635,13 +447,17 @@ comment  2FEE \88""Yb  dP"Yb   dP""b8 88  dP 888888 888888     888888 88   88 88
 comment  2FEE \88__dP dP   Yb dP   `" 88odP  88__     88       88__   88   88 88__   88
 comment  2FEE \88"Yb  Yb   dP Yb      88"Yb  88""     88       88""   Y8   8P 88""   88  .o
 comment  2FEE \88  Yb  YbodP   YboodP 88  Yb 888888   88       88     `YbodP' 888888 88ood8
-comment  2FEE
-
-comment  3737
-comment  3737
-comment  3737
-comment  3737
-comment  3737
+; Level_Common
+comment  2C78
+comment  2C78
+comment  2C78
+comment  2C78
+comment  2C78
+comment  2C78 \88     888888 Yb    dP 888888 88          dP""b8  dP"Yb  8b    d8 8b    d8  dP"Yb  88b 88
+comment  2C78 \88     88__    Yb  dP  88__   88         dP   `" dP   Yb 88b  d88 88b  d88 dP   Yb 88Yb88
+comment  2C78 \88  .o 88""     YbdP   88""   88  .o     Yb      Yb   dP 88YbdP88 88YbdP88 Yb   dP 88 Y88
+comment  2C78 \88ood8 888888    YP    888888 88ood8      YboodP  YbodP  88 YY 88 88 YY 88  YbodP  88  Y8
+; Load_Small_UDG_Addr
 comment  3737
 comment  3737
 comment  3737
@@ -656,15 +472,7 @@ comment  3737 \88   88 8888b.   dP""b8        db    8888b.  8888b.  88""Yb
 comment  3737 \88   88  8I  Yb dP   `"       dPYb    8I  Yb  8I  Yb 88__dP
 comment  3737 \Y8   8P  8I  dY Yb  "88      dP__Yb   8I  dY  8I  dY 88"Yb
 comment  3737 \`YbodP' 8888Y"   YboodP     dP""""Yb 8888Y"  8888Y"  88  Yb
-comment  3737
-
-comment  25FA
-comment  25FA
-comment  25FA
-comment  25FA
-comment  25FA
-comment  25FA
-comment  25FA
+; Main_Loop
 comment  25FA
 comment  25FA
 comment  25FA
@@ -674,13 +482,7 @@ comment  25FA \8b    d8    db    88 88b 88     88      dP"Yb   dP"Yb  88""Yb
 comment  25FA \88b  d88   dPYb   88 88Yb88     88     dP   Yb dP   Yb 88__dP
 comment  25FA \88YbdP88  dP__Yb  88 88 Y88     88  .o Yb   dP Yb   dP 88"""
 comment  25FA \88 YY 88 dP""""Yb 88 88  Y8     88ood8  YbodP   YbodP  88
-comment  25FA
-
-comment  2B4B
-comment  2B4B
-comment  2B4B
-comment  2B4B
-comment  2B4B
+; Spawn_Objects
 comment  2B4B
 comment  2B4B
 comment  2B4B
@@ -695,13 +497,7 @@ comment  2B4B \ dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
 comment  2B4B \dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
 comment  2B4B \Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 comment  2B4B \ YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
-comment  2B4B
-
-comment  2B16
-comment  2B16
-comment  2B16
-comment  2B16
-comment  2B16
+; Platform_Collision_Aliens
 comment  2B16
 comment  2B16
 comment  2B16
@@ -721,13 +517,7 @@ comment  2B16 \   db    88     88 888888 88b 88 .dP"Y8
 comment  2B16 \  dPYb   88     88 88__   88Yb88 `Ybo."
 comment  2B16 \ dP__Yb  88  .o 88 88""   88 Y88 o.`Y8b
 comment  2B16 \dP""""Yb 88ood8 88 888888 88  Y8 8bodP'
-comment  2B16
-
-comment  309B
-comment  309B
-comment  309B
-comment  309B
-comment  309B
+; Platform_Collision_Test
 comment  309B
 comment  309B
 comment  309B
@@ -736,23 +526,18 @@ comment  309B
 comment  309B \88""Yb 88        db    888888 888888  dP"Yb  88""Yb 8b    d8
 comment  309B \88__dP 88       dPYb     88   88__   dP   Yb 88__dP 88b  d88
 comment  309B \88"""  88  .o  dP__Yb    88   88""   Yb   dP 88"Yb  88YbdP88
-comment  309B \88     88ood8 dP""""Yb   88   88      YbodP  88  Yb 88 YY 88 oooooooooo
+comment  309B \88     88ood8 dP""""Yb   88   88      YbodP  88  Yb 88 YY 88
 comment  309B \
 comment  309B \ dP""b8  dP"Yb  88     88     88 .dP"Y8 88  dP"Yb  88b 88
 comment  309B \dP   `" dP   Yb 88     88     88 `Ybo." 88 dP   Yb 88Yb88
 comment  309B \Yb      Yb   dP 88  .o 88  .o 88 o.`Y8b 88 Yb   dP 88 Y88
-comment  309B \ YboodP  YbodP  88ood8 88ood8 88 8bodP' 88  YbodP  88  Y8 oooooooooo
+comment  309B \ YboodP  YbodP  88ood8 88ood8 88 8bodP' 88  YbodP  88  Y8
 comment  309B \
 comment  309B \888888 888888 .dP"Y8 888888
 comment  309B \  88   88__   `Ybo."   88
 comment  309B \  88   88""   o.`Y8b   88
 comment  309B \  88   888888 8bodP'   88
-comment  309B
-
-comment  33D4
-comment  33D4
-comment  33D4
-comment  33D4
+; Read_Keyboard_Joystick
 comment  33D4
 comment  33D4
 comment  33D4
@@ -772,13 +557,7 @@ comment  33D4 \ 88888  dP"Yb  Yb  dP .dP"Y8 888888 88  dP""b8 88  dP
 comment  33D4 \    88 dP   Yb  YbdP  `Ybo."   88   88 dP   `" 88odP
 comment  33D4 \o.  88 Yb   dP   8P   o.`Y8b   88   88 Yb      88"Yb
 comment  33D4 \"bodP'  YbodP   dP    8bodP'   88   88  YboodP 88  Yb
-comment  33D4
-
-comment  22BA
-comment  22BA
-comment  22BA
-comment  22BA
-comment  22BA
+; Reset_Level_Add_Extra_Life
 comment  22BA
 comment  22BA
 comment  22BA
@@ -798,13 +577,7 @@ comment  22BA \88     88 888888 888888
 comment  22BA \88     88 88__   88__
 comment  22BA \88  .o 88 88""   88""
 comment  22BA \88ood8 88 88     888888
-comment  22BA
-
-comment  355C
-comment  355C
-comment  355C
-comment  355C
-comment  355C
+; Reset_RAM
 comment  355C
 comment  355C
 comment  355C
@@ -814,13 +587,7 @@ comment  355C \88""Yb 888888 .dP"Y8 888888 888888     88""Yb    db    8b    d8
 comment  355C \88__dP 88__   `Ybo." 88__     88       88__dP   dPYb   88b  d88
 comment  355C \88"Yb  88""   o.`Y8b 88""     88       88"Yb   dP__Yb  88YbdP88
 comment  355C \88  Yb 888888 8bodP' 888888   88       88  Yb dP""""Yb 88 YY 88
-comment  355C
-
-comment  2EAC
-comment  2EAC
-comment  2EAC
-comment  2EAC
-comment  2EAC
+; Rocket_Fuelled_Up
 comment  2EAC
 comment  2EAC
 comment  2EAC
@@ -835,13 +602,7 @@ comment  2EAC \888888 88   88 888888 88     88     888888 8888b.      88   88 88
 comment  2EAC \88__   88   88 88__   88     88     88__    8I  Yb     88   88 88__dP
 comment  2EAC \88""   Y8   8P 88""   88  .o 88  .o 88""    8I  dY     Y8   8P 88"""
 comment  2EAC \88     `YbodP' 888888 88ood8 88ood8 888888 8888Y"      `YbodP' 88
-comment  2EAC
-
-comment  378A
-comment  378A
-comment  378A
-comment  378A
-comment  378A
+; Set_UDG_RAM_Ptr
 comment  378A
 comment  378A
 comment  378A
@@ -856,13 +617,7 @@ comment  378A \88""Yb    db    8b    d8     88""Yb 888888 88""Yb
 comment  378A \88__dP   dPYb   88b  d88     88__dP   88   88__dP
 comment  378A \88"Yb   dP__Yb  88YbdP88     88"""    88   88"Yb
 comment  378A \88  Yb dP""""Yb 88 YY 88     88       88   88  Yb
-comment  378A
-
-comment  34F7
-comment  34F7
-comment  34F7
-comment  34F7
-comment  34F7
+; Setup_Color_RAM_Ptr
 comment  34F7
 comment  34F7
 comment  34F7
@@ -877,13 +632,7 @@ comment  34F7 \88""Yb    db    8b    d8     88""Yb 888888 88""Yb
 comment  34F7 \88__dP   dPYb   88b  d88     88__dP   88   88__dP
 comment  34F7 \88"Yb   dP__Yb  88YbdP88     88"""    88   88"Yb
 comment  34F7 \88  Yb dP""""Yb 88 YY 88     88       88   88  Yb
-comment  34F7
-
-comment  268C
-comment  268C
-comment  268C
-comment  268C
-comment  268C
+; Subroutine_List
 comment  268C
 comment  268C
 comment  268C
@@ -898,13 +647,7 @@ comment  268C \88     88 .dP"Y8 888888
 comment  268C \88     88 `Ybo."   88
 comment  268C \88  .o 88 o.`Y8b   88
 comment  268C \88ood8 88 8bodP'   88
-comment  268C
-
-comment  2BF8
-comment  2BF8
-comment  2BF8
-comment  2BF8
-comment  2BF8
+; Test_Laser_Hits
 comment  2BF8
 comment  2BF8
 comment  2BF8
@@ -919,13 +662,7 @@ comment  2BF8 \88  88 88 888888 .dP"Y8
 comment  2BF8 \88  88 88   88   `Ybo."
 comment  2BF8 \888888 88   88   o.`Y8b
 comment  2BF8 \88  88 88   88   8bodP'
-comment  2BF8
-
-comment  381F
-comment  381F
-comment  381F
-comment  381F
-comment  381F
+; Update_Color_RAM
 comment  381F
 comment  381F
 comment  381F
@@ -934,18 +671,13 @@ comment  381F
 comment  381F \88   88 88""Yb 8888b.     db    888888 888888
 comment  381F \88   88 88__dP  8I  Yb   dPYb     88   88__
 comment  381F \Y8   8P 88"""   8I  dY  dP__Yb    88   88""
-comment  381F \`YbodP' 88     8888Y"  dP""""Yb   88   888888 oooooooooo
+comment  381F \`YbodP' 88     8888Y"  dP""""Yb   88   888888
 comment  381F \
-comment  381F \ dP""b8  dP"Yb  88      dP"Yb  88""Yb            88""Yb    db    8b    d8
-comment  381F \dP   `" dP   Yb 88     dP   Yb 88__dP            88__dP   dPYb   88b  d88
-comment  381F \Yb      Yb   dP 88  .o Yb   dP 88"Yb             88"Yb   dP__Yb  88YbdP88
-comment  381F \ YboodP  YbodP  88ood8  YbodP  88  Yb oooooooooo 88  Yb dP""""Yb 88 YY 88
-comment  381F
-
-comment  20E9
-comment  20E9
-comment  20E9
-comment  20E9
+comment  381F \ dP""b8  dP"Yb  88      dP"Yb  88""Yb     88""Yb    db    8b    d8
+comment  381F \dP   `" dP   Yb 88     dP   Yb 88__dP     88__dP   dPYb   88b  d88
+comment  381F \Yb      Yb   dP 88  .o Yb   dP 88"Yb      88"Yb   dP__Yb  88YbdP88
+comment  381F \ YboodP  YbodP  88ood8  YbodP  88  Yb     88  Yb dP""""Yb 88 YY 88
+; Update_Laser_Objects
 comment  20E9
 comment  20E9
 comment  20E9
@@ -965,13 +697,7 @@ comment  20E9 \ dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
 comment  20E9 \dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
 comment  20E9 \Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 comment  20E9 \ YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
-comment  20E9
-
-comment  3063
-comment  3063
-comment  3063
-comment  3063
-comment  3063
+; Update_Score
 comment  3063
 comment  3063
 comment  3063
@@ -986,13 +712,7 @@ comment  3063 \.dP"Y8  dP""b8  dP"Yb  88""Yb 888888
 comment  3063 \`Ybo." dP   `" dP   Yb 88__dP 88__
 comment  3063 \o.`Y8b Yb      Yb   dP 88"Yb  88""
 comment  3063 \8bodP'  YboodP  YbodP  88  Yb 888888
-comment  3063
-
-comment  385F
-comment  385F
-comment  385F
-comment  385F
-comment  385F
+; User_Def_Graphics
 comment  385F
 comment  385F
 comment  385F
@@ -1007,13 +727,7 @@ comment  385F \ dP""b8 88""Yb    db    88""Yb 88  88 88  dP""b8 .dP"Y8
 comment  385F \dP   `" 88__dP   dPYb   88__dP 88  88 88 dP   `" `Ybo."
 comment  385F \Yb  "88 88"Yb   dP__Yb  88"""  888888 88 Yb      o.`Y8b
 comment  385F \ YboodP 88  Yb dP""""Yb 88     88  88 88  YboodP 8bodP'
-comment  385F
-
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
+; ( Get_Obj_Or_UDG_Addr )
 comment  2FDA
 comment  2FDA
 comment  2FDA
@@ -1028,13 +742,7 @@ comment  2FDA \88   88 8888b.   dP""b8        db    8888b.  8888b.  88""Yb     Y
 comment  2FDA \88   88  8I  Yb dP   `"       dPYb    8I  Yb  8I  Yb 88__dP      Yb
 comment  2FDA \Y8   8P  8I  dY Yb  "88      dP__Yb   8I  dY  8I  dY 88"Yb       dP
 comment  2FDA \`YbodP' 8888Y"   YboodP     dP""""Yb 8888Y"  8888Y"  88  Yb     dP
-comment  2FDA
-
-comment  265E
-comment  265E
-comment  265E
-comment  265E
-comment  265E
+; ( Interrupt_Related )
 comment  265E
 comment  265E
 comment  265E
@@ -1049,13 +757,7 @@ comment  265E \88""Yb 888888 88        db    888888 888888 8888b.      Yb
 comment  265E \88__dP 88__   88       dPYb     88   88__    8I  Yb      Yb
 comment  265E \88"Yb  88""   88  .o  dP__Yb    88   88""    8I  dY      dP
 comment  265E \88  Yb 888888 88ood8 dP""""Yb   88   888888 8888Y"      dP
-comment  265E
-
-comment  35D7
-comment  35D7
-comment  35D7
-comment  35D7
-comment  35D7
+; ( Load_Obj_Attribs )
 comment  35D7
 comment  35D7
 comment  35D7
@@ -1070,4 +772,3 @@ comment  35D7 \   db    888888 888888 88""Yb 88 88""Yb .dP"Y8     Yb
 comment  35D7 \  dPYb     88     88   88__dP 88 88__dP `Ybo."      Yb
 comment  35D7 \ dP__Yb    88     88   88"Yb  88 88""Yb o.`Y8b      dP
 comment  35D7 \dP""""Yb   88     88   88  Yb 88 88oodP 8bodP'     dP
-comment  35D7
