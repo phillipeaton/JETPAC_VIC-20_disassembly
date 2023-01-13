@@ -31,7 +31,8 @@ label      1C ZP_Jetman_Action ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly,
 ;                               1111 1111 = No action
 ;                               1xxx xxxx = Not moving right
 ;                               x1xx xxxx = Not moving left
-;                               xxx1 xxxx = On ground/not flying
+;                               xx1x xxxx = Not down (i.e. hover)
+;                               xxx1 xxxx = Not up
 ;                               xxxx 1xxx = Not Firing
 ;
 ;                               Examples:
@@ -79,10 +80,10 @@ label      60 ZP_Subroutine_Addr_Hi ;
 
 ; Non-Zero-Page Object Variables
 label    0380 Obj_Jetman            ; Bit7=direction 1=left, 0=right; bit 0&1 00 = Not there (hit by alien), 01 = flying, 10 = standing
-label    0381 Obj_Jetman_X          ; Pixel Left=00 Right=B6 or B7
-label    0382 Obj_Jetman_Move_Speed ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
-label    0383 Obj_Jetman_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
-label    0384 Obj_Jetman_At_Rest??? ; 04 when at rest, higher numbers wen accelerating?
+label    0381 Obj_Jetman_Position_X          ; Pixel Left=00 Right=B6 or B7
+label    0382 Obj_Jetman_Direction_X  ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
+label    0383 Obj_Jetman_Position_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
+label    0384 Obj_Jetman_Direction_Y  ; Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
 ;label   0385 Obj_Jetman_0385
 ;label   0386 Obj_Jetman_0386
 ;label   0387 Obj_Jetman_0387

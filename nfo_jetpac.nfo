@@ -1544,7 +1544,7 @@ label    31D4 BACK_31D4
 label    31DF E_tman_Flies_Left_Into_Platf_1
 label    31EA F_tman_Flies_Left_Into_Platfrm
 label    31E7 G_tman_Flies_Left_Into_Platf_2
-label    31F2 H_tman_Flis_LtRtUpDn_Pltfm_Flr
+label    31F2 H_Jetman_Hits_Surface
 comment  31F7
 comment  31F7 Test Obj_Jetman_At_Rest???
 label    3200 I_tman_Flies_LtRtUp_into_Platf
@@ -1565,42 +1565,48 @@ comment  3230
 label    323E S_Flying_Right
 label    3254 SKIP_3254
 comment  3259 HOW DO YOU EVER GET HERE?
-label    325E ADC_01_JM_UPD_2
-label    3264 ADC_B8_RTN
+label    325E P_INC_A_Then_Q
+label    3264 R_Wrap_Left_To_Right
 deflabel 3266 SCREEN_WIDTH_PIXELS
-label    326A ADC_48_RTN
-label    326F TXA_JM_UPD_3
-label    3273 JETMAN_UPDATE
+label    326A R_Wrap_Right_To_Left
+label    326F P_TXA_Then_R
+label    3273 JETMAN_FLYING_
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
-label    3285 P_iggers_every_frame_when_Fly
+label    3285 P_Update_Jetman_Position_X
 deflabel 3286 JETMAN_X_DIRECTION_PARAM
+comment  3291
 binary   3295
-label    32A2 Q_tman_Update_2
-deflabel 32A3 JETMAN_X_DIRECTION_PARAM
-label    32A6 R_tman_Update_3
-deflabel 32A7 JETMAN_X
+label    32A2 Q_Store_Jetman_Direction_X
+deflabel 32A3 JETMAN_DIRECTION_X_PARAM
+label    32A6 R_Update_Jetman_Position_X
+deflabel 32A7 JETMAN_POSITION_X_PARAM
 comment  32A8
 comment  32AB
 comment  32AE
 deflabel 32B7 SCREEN_WIDTH_PIXELS
-label    32BA ADC_RTN
-label    32C7 Flying
+label    32BA R_Store_Jetman_Position_X
+comment  32BC
+label    32C7 T_Update_Jetman_Position_Y
 deflabel 32C8 JETMAN_Y_DIRECTION_PARAM
 lcomment 32CB Test for direction Down
 lcomment 32CE Yes, branch
 lcomment 32D0 Test for direction Up
 lcomment 32D3 Yes, branch
-label    32DE Flying_1
-label    32E0 Flying_2
+label    32DE U_Store_Jetman_Direction_Y
+label    32E0 V_Update_Jetman_Position_Y
+comment  32E1
+comment  32E4
 lcomment 32E8 AF=Bottom of screen
-label    32F7 Flying_3
-label    32F9 Flying_4
-lcomment 3301 Test for direction Right
+label    32F7 W_Store_Jetman_Position_Y
+label    32F9 X_Jetman_Screen_Update
+comment  32FF
+comment  32FF Test for fire pressed
 lcomment 3304 No, branch
 label    3309 SKIP_3309
-label    330C Triggers_on_flight
-label    3318 LDA00_Flying_1
+comment  330C
+label    330C Y_Update_Jetman_Direction_Y
+label    3318 T_Set_A_Zero_Then_U
 label    331D Bottom?
 label    3321 Bottom_After?
 comment  332C
