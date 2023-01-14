@@ -1536,25 +1536,36 @@ label    31BF A_tman_Flies_LorR_into_Platfrm
 deflabel 31C0 JETMAN_X_DIRECTION_PARAM
 comment  31C7
 comment  31C7 Load and test Jetman X Direction/Velocity
+comment  31CE
 label    31CE B_tman_Flies_Rght_Into_Platfrm
 comment  31CB
 label    31CB C_tman_Flies_LorR_into_Platf_1
-label    31D7 D_Doesnt_Trigger?
 label    31D4 BACK_31D4
+comment  31D7
+label    31D7 D_Doesnt_Trigger?
+comment  31DF
 label    31DF E_tman_Flies_Left_Into_Platf_1
+comment  31EA
 label    31EA F_tman_Flies_Left_Into_Platfrm
+comment  31E7
 label    31E7 G_tman_Flies_Left_Into_Platf_2
+comment  31F2
 label    31F2 H_Jetman_Hits_Surface
 comment  31F7
 comment  31F7 Test Obj_Jetman_At_Rest???
+comment  3200
 label    3200 I_tman_Flies_LtRtUp_into_Platf
 comment  3208
 comment  3208 Test Obj_Jetman_At_Rest???
 label    3208 J_tman_flys_up_hits_platform_0
 binary   3211
-label    3212 K_tman_flys_up_hits_platform_1
-label    3215 L_JMP_FLYING
+comment  3212
+comment  3212 K_tman_flys_up_hits_platform_1
+label    3212 K_Store_Jetman_Direction_Y
+comment  3215
+label    3215 L_Update_Jetman_Position_Y
 label    3218 M_tman_flys_up_hits_platform
+comment  3218
 lcomment 3218 Save A
 lcomment 321B Test if on ground
 lcomment 321E No, branch
@@ -1562,7 +1573,15 @@ lcomment 3224 Restore A
 label    3228 N_Flying_Left
 label    3224 SKIP_3224
 comment  3230
+comment  3321
+deflabel 3322 JETMAN_PARAM
+comment  3325
+comment  3325 ROL saves bit 7 (facing direction), LDA #$04 sets bit 2, ROR restores bit 7 and moves
+comment  3325 bit 2 to bit 1 i.e. Jetman action is now Standing
+comment  3228
+comment  323E
 label    323E S_Flying_Right
+comment  3246
 label    3254 SKIP_3254
 comment  3259 HOW DO YOU EVER GET HERE?
 label    325E P_INC_A_Then_Q
@@ -1589,26 +1608,39 @@ label    32BA R_Store_Jetman_Position_X
 comment  32BC
 label    32C7 T_Update_Jetman_Position_Y
 deflabel 32C8 JETMAN_Y_DIRECTION_PARAM
+comment  32C9
 lcomment 32CB Test for direction Down
 lcomment 32CE Yes, branch
 lcomment 32D0 Test for direction Up
 lcomment 32D3 Yes, branch
+comment  32D5
+comment  32DE
 label    32DE U_Store_Jetman_Direction_Y
+comment  32E0
 label    32E0 V_Update_Jetman_Position_Y
 comment  32E1
 comment  32E4
-lcomment 32E8 AF=Bottom of screen
-label    32F7 W_Store_Jetman_Position_Y
+deflabel 32E9 SCREEN_BOTTOM
+deflabel 32ED SCREEN_TOP
+comment  32F0
+comment  32F0 Y becomes index to Direction Y
+comment  32F5
+comment  32F5 Reverse the direction parameter
+comment  32F7
+comment  32F7 Gets called with either Jetman Type (index 0) or Jetman_Position_Y (index 3)
+label    32F7 W_Store_Jetman_Parameter
+comment  32F9
 label    32F9 X_Jetman_Screen_Update
 comment  32FF
 comment  32FF Test for fire pressed
-lcomment 3304 No, branch
 label    3309 SKIP_3309
 comment  330C
 label    330C Y_Update_Jetman_Direction_Y
-label    3318 T_Set_A_Zero_Then_U
-label    331D Bottom?
-label    3321 Bottom_After?
+comment  3318
+label    3318 T_Set_Jetman_Direction_Y_Zero
+comment  331D
+label    331D Set_Jetman_Position_Y_Bottom
+label    3321 Set_Jetman_Standing
 comment  332C
 label    332C Set_Obj_List_Ptr_Lo_To_7F
 binary   332F

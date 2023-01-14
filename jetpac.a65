@@ -134,6 +134,9 @@ SCREEN_WIDTH_PIXELS             equ     $B8
 OBJECT_COLOR_PARAM              equ     $05
 OBJECT_Y_POSITION_PARAM         equ     $03
 OBJECT_TYPE_PARAM               equ     $00
+JETMAN_PARAM                    equ     $00
+SCREEN_TOP                      equ     $28
+SCREEN_BOTTOM                   equ     $AF
 JETMAN_Y_DIRECTION_PARAM        equ     $04
 JETMAN_POSITION_X_PARAM         equ     $01
 JETMAN_DIRECTION_X_PARAM        equ     $02
@@ -142,7 +145,6 @@ GREEN                           equ     $05
 OBJECT_PARAM                    equ     $06
 LIFECYCLE_STATE                 equ     $04
 FUEL_Y_WHEN_LANDED              equ     $A8
-SCREEN_BOTTOM                   equ     $AF
 OBJECT_Y_WHEN_LANDED_PARAM      equ     $06
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
@@ -4508,6 +4510,7 @@ A_tman_Flies_LorR_into_Platfrm
 C_tman_Flies_LorR_into_Platf_1
     jmp     P_Update_Jetman_Position_X      ; 31CB: 4C 85 32 
 ; -----------------------
+
 ; L_BRS_($31CE)_($31C9) OK
 B_tman_Flies_Rght_Into_Platfrm
     beq     D_Doesnt_Trigger?               ; 31CE: F0 07    
@@ -4517,28 +4520,33 @@ B_tman_Flies_Rght_Into_Platfrm
 BACK_31D4
     jmp     Q_Store_Jetman_Direction_X      ; 31D4: 4C A2 32 
 ; -----------------------
+
 ; L_BRS_($31D7)_($31CE) OK
 D_Doesnt_Trigger?
     ldy     #$00                            ; 31D7: A0 00    
     bit     ZP_Jetman_Action                ; 31D9: 24 1C    
     bvc     N_Flying_Left                   ; 31DB: 50 4B    
     bvs     BACK_31D4                       ; 31DD: 70 F5    
+
 ; L_BRS_($31DF)_($31C5) OK
 E_tman_Flies_Left_Into_Platf_1
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31DF: B1 00    
     beq     F_tman_Flies_Left_Into_Platfrm  ; 31E1: F0 07    
     bpl     C_tman_Flies_LorR_into_Platf_1  ; 31E3: 10 E6    
     eor     #$FF                            ; 31E5: 49 FF    
+
 ; L_BRS_($31E7)_($31F0) OK
 G_tman_Flies_Left_Into_Platf_2
     jmp     Q_Store_Jetman_Direction_X      ; 31E7: 4C A2 32 
 ; -----------------------
+
 ; L_BRS_($31EA)_($31E1) OK
 F_tman_Flies_Left_Into_Platfrm
     ldy     #$00                            ; 31EA: A0 00    
     bit     ZP_Jetman_Action                ; 31EC: 24 1C    
     bpl     S_Flying_Right                  ; 31EE: 10 4E    
     bmi     G_tman_Flies_Left_Into_Platf_2  ; 31F0: 30 F5    
+
 ; L_JMP_($31F2)_($3282) OK
 H_Jetman_Hits_Surface
     bit     MASK_00001000                   ; 31F2: 2C 17 20 
@@ -4548,8 +4556,9 @@ H_Jetman_Hits_Surface
     ldy     #$04                            ; 31F7: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31F9: B1 00    
     bmi     C_tman_Flies_LorR_into_Platf_1  ; 31FB: 30 CE    
-    jmp     Bottom_After?                   ; 31FD: 4C 21 33 
+    jmp     Set_Jetman_Standing             ; 31FD: 4C 21 33 
 ; -----------------------
+
 ; L_BRS_($3200)_($31F5) OK
 I_tman_Flies_LtRtUp_into_Platf
     bit     MASK_00000100                   ; 3200: 2C 16 20 
@@ -4563,16 +4572,20 @@ J_tman_flys_up_hits_platform_0
     ldy     #$04                            ; 3208: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 320A: B1 00    
     beq     M_tman_flys_up_hits_platform    ; 320C: F0 0A    
-    bpl     L_JMP_FLYING                    ; 320E: 10 05    
+    bpl     L_Update_Jetman_Position_Y      ; 320E: 10 05    
     eor     #%11111111                      ; 3210: 49 FF    
+
+; K_tman_flys_up_hits_platform_1
 ; L_BRS_($3212)_($3222) OK
-K_tman_flys_up_hits_platform_1
+K_Store_Jetman_Direction_Y
     jmp     U_Store_Jetman_Direction_Y      ; 3212: 4C DE 32 
 ; -----------------------
+
 ; L_BRS_($3215)_($320E) OK
-L_JMP_FLYING
+L_Update_Jetman_Position_Y
     jmp     T_Update_Jetman_Position_Y      ; 3215: 4C C7 32 
 ; -----------------------
+
 ; L_BRS_($3218)_($320C) OK
 M_tman_flys_up_hits_platform
     tax                                     ; 3218: AA        Save A
@@ -4580,12 +4593,13 @@ M_tman_flys_up_hits_platform
     bit     MASK_00010000                   ; 321B: 2C 18 20  Test if on ground
     bne     SKIP_3224                       ; 321E: D0 04     No, branch
     lda     #$00                            ; 3220: A9 00    
-    beq     K_tman_flys_up_hits_platform_1  ; 3222: F0 EE    
+    beq     K_Store_Jetman_Direction_Y      ; 3222: F0 EE    
 ; L_BRS_($3224)_($321E) OK
 SKIP_3224
     txa                                     ; 3224: 8A        Restore A
     jmp     T_Update_Jetman_Position_Y      ; 3225: 4C C7 32 
 ; -----------------------
+
 ; L_BRS_($3228)_($31DB) OK
 ; L_BRS_($3228)_($328F) OK
 N_Flying_Left
@@ -4603,6 +4617,7 @@ N_Flying_Left
     sbc     #$01                            ; 3239: E9 01    
     jmp     Q_Store_Jetman_Direction_X      ; 323B: 4C A2 32 
 ; -----------------------
+
 ; L_BRS_($323E)_($31EE) OK
 ; L_BRS_($323E)_($328D) OK
 S_Flying_Right
@@ -4611,6 +4626,7 @@ S_Flying_Right
     and     #$7F                            ; 3241: 29 7F    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 3243: 91 00    
     pla                                     ; 3245: 68       
+
     cmp     #$08                            ; 3246: C9 08    
     beq     R_Update_Jetman_Position_X      ; 3248: F0 5C    
     cmp     #$09                            ; 324A: C9 09    
@@ -4730,21 +4746,25 @@ R_Store_Jetman_Position_X
 ; L_BRS_($32C7)_($32C2) OK
 T_Update_Jetman_Position_Y
     ldy     #JETMAN_Y_DIRECTION_PARAM       ; 32C7: A0 04    
+
     lda     ZP_Jetman_Action                ; 32C9: A5 1C    
     bit     MASK_00100000                   ; 32CB: 2C 19 20  Test for direction Down
-    beq     T_Set_A_Zero_Then_U             ; 32CE: F0 48     Yes, branch
+    beq     T_Set_Jetman_Direction_Y_Zero   ; 32CE: F0 48     Yes, branch
     bit     MASK_00010000                   ; 32D0: 2C 18 20  Test for direction Up
     beq     Y_Update_Jetman_Direction_Y     ; 32D3: F0 37     Yes, branch
+
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 32D5: B1 00    
     cmp     #$04                            ; 32D7: C9 04    
     beq     V_Update_Jetman_Position_Y      ; 32D9: F0 05    
     clc                                     ; 32DB: 18       
     adc     #$01                            ; 32DC: 69 01    
+
 ; L_JMP_($32DE)_($3212) OK
 ; L_JMP_($32DE)_($3315) OK
 ; L_JMP_($32DE)_($331A) OK
 U_Store_Jetman_Direction_Y
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 32DE: 91 00    
+
 ; L_BRS_($32E0)_($32D9) OK
 ; L_BRS_($32E0)_($3310) OK
 V_Update_Jetman_Position_Y
@@ -4757,20 +4777,27 @@ V_Update_Jetman_Position_Y
     ror     a                               ; 32E4: 6A       
     clc                                     ; 32E5: 18       
     adc     (ZP_Obj_List_Ptr_Lo),y          ; 32E6: 71 00    
-    cmp     #$AF                            ; 32E8: C9 AF     AF=Bottom of screen
-    bcs     Bottom?                         ; 32EA: B0 31    
-    cmp     #$28                            ; 32EC: C9 28    
-    bcs     W_Store_Jetman_Position_Y       ; 32EE: B0 07    
+    cmp     #SCREEN_BOTTOM                  ; 32E8: C9 AF    
+    bcs     Set_Jetman_Position_Y_Bottom    ; 32EA: B0 31    
+    cmp     #SCREEN_TOP                     ; 32EC: C9 28    
+    bcs     W_Store_Jetman_Parameter        ; 32EE: B0 07    
+
+; Y becomes index to Direction Y
     iny                                     ; 32F0: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 32F1: B1 00    
-    beq     W_Store_Jetman_Position_Y       ; 32F3: F0 02    
+    beq     W_Store_Jetman_Parameter        ; 32F3: F0 02    
+
+; Reverse the direction parameter
     eor     #$FF                            ; 32F5: 49 FF    
+
+; Gets called with either Jetman Type (index 0) or Jetman_Position_Y (index 3)
 ; L_BRS_($32F7)_($32EE) OK
 ; L_BRS_($32F7)_($32F3) OK
 ; L_JMP_($32F7)_($3329) OK
 ; L_JMP_($32F7)_($33D1) OK
-W_Store_Jetman_Position_Y
+W_Store_Jetman_Parameter
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 32F7: 91 00    
+
 ; L_JMP_($32F9)_($33B7) OK
 X_Jetman_Screen_Update
     jsr     YYYYYY_ALT                      ; 32F9: 20 46 36 
@@ -4779,7 +4806,7 @@ X_Jetman_Screen_Update
 ; Test for fire pressed
     lda     ZP_Jetman_Action                ; 32FF: A5 1C    
     bit     MASK_00001000                   ; 3301: 2C 17 20 
-    bne     SKIP_3309                       ; 3304: D0 03     No, branch
+    bne     SKIP_3309                       ; 3304: D0 03    
     jsr     Update_Laser_Objects            ; 3306: 20 E9 20 
 ; L_BRS_($3309)_($3304) OK
 SKIP_3309
@@ -4795,23 +4822,29 @@ Y_Update_Jetman_Direction_Y
     sbc     #$01                            ; 3313: E9 01    
     jmp     U_Store_Jetman_Direction_Y      ; 3315: 4C DE 32 
 ; -----------------------
+
 ; L_BRS_($3318)_($32CE) OK
-T_Set_A_Zero_Then_U
+T_Set_Jetman_Direction_Y_Zero
     lda     #$00                            ; 3318: A9 00    
     jmp     U_Store_Jetman_Direction_Y      ; 331A: 4C DE 32 
 ; -----------------------
+
 ; L_BRS_($331D)_($32EA) OK
-Bottom?
+Set_Jetman_Position_Y_Bottom
     lda     #$AF                            ; 331D: A9 AF    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 331F: 91 00    
+
 ; L_JMP_($3321)_($31FD) OK
-Bottom_After?
-    ldy     #$00                            ; 3321: A0 00    
+Set_Jetman_Standing
+    ldy     #JETMAN_PARAM                   ; 3321: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3323: B1 00    
+
+; ROL saves bit 7 (facing direction), LDA #$04 sets bit 2, ROR restores bit 7 and moves
+; bit 2 to bit 1 i.e. Jetman action is now Standing
     rol     a                               ; 3325: 2A       
     lda     #$04                            ; 3326: A9 04    
     ror     a                               ; 3328: 6A       
-    jmp     W_Store_Jetman_Position_Y       ; 3329: 4C F7 32 
+    jmp     W_Store_Jetman_Parameter        ; 3329: 4C F7 32 
 ; -----------------------
 
 
@@ -4948,7 +4981,7 @@ Jetman_Movement_4
     rol     a                               ; 33CD: 2A       
     lda     #$02                            ; 33CE: A9 02    
     ror     a                               ; 33D0: 6A       
-    jmp     W_Store_Jetman_Position_Y       ; 33D1: 4C F7 32 
+    jmp     W_Store_Jetman_Parameter        ; 33D1: 4C F7 32 
 ; -----------------------
 
 
