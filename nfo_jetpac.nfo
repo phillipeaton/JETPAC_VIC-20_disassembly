@@ -1532,29 +1532,39 @@ const    31B6-31BE
 break    31B9
 break    31BC
 comment  31BF
-label    31BF A_tman_Flies_LorR_into_Platfrm
+label    31BF A_Left_Right_Impact
 deflabel 31C0 JETMAN_X_DIRECTION_PARAM
 comment  31C7
 comment  31C7 Load and test Jetman X Direction/Velocity
 comment  31CE
-label    31CE B_tman_Flies_Rght_Into_Platfrm
+label    31CE B_Fly_Right_Impact
 comment  31CB
-label    31CB C_tman_Flies_LorR_into_Platf_1
-label    31D4 BACK_31D4
+label    31CB C_Left_Right_Impact
+label    31D4 B__Store_Jetman_Direction_X
 comment  31D7
-label    31D7 D_Doesnt_Trigger?
+label    31D7 SKIP_31D7
 comment  31DF
-label    31DF E_tman_Flies_Left_Into_Platf_1
-comment  31EA
-label    31EA F_tman_Flies_Left_Into_Platfrm
+comment  31DF BVS/BVC above means below code can only be jumped/branched to
+label    31DF E_Fly_Left_Impact
 comment  31E7
-label    31E7 G_tman_Flies_Left_Into_Platf_2
+label    31E7 E__Store_Jetman_Direction_X
+comment  31EA
+label    31EA SKIP_31EA
+comment  31F2
+comment  31F2 BVS/BVC above means below code can only be jumped/branched to
+comment  31F2 10000000 = Upward impact
+comment  31F2 10000001 = Upward impact (As above)
+comment  31F2 10001000 = Downward impact
+comment  31F2 10001110 = Top Right Corner impact
+comment  31F2 10000110 = Right impact
+comment  31F2 10000111 = Top Left impact
+comment  31F2 10000111 = Left impact
 comment  31F2
 label    31F2 H_Jetman_Hits_Surface
 comment  31F7
 comment  31F7 Test Obj_Jetman_At_Rest???
 comment  3200
-label    3200 I_tman_Flies_LtRtUp_into_Platf
+label    3200 I_Left_Right_Up_Impact
 comment  3208
 comment  3208 Test Obj_Jetman_At_Rest???
 label    3208 J_tman_flys_up_hits_platform_0
@@ -1563,7 +1573,7 @@ comment  3212
 comment  3212 K_tman_flys_up_hits_platform_1
 label    3212 K_Store_Jetman_Direction_Y
 comment  3215
-label    3215 L_Update_Jetman_Position_Y
+label    3215 J__Update_Jetman_Position_Y
 label    3218 M_tman_flys_up_hits_platform
 comment  3218
 lcomment 3218 Save A
@@ -1584,11 +1594,11 @@ label    323E S_Flying_Right
 comment  3246
 label    3254 SKIP_3254
 comment  3259 HOW DO YOU EVER GET HERE?
-label    325E P_INC_A_Then_Q
-label    3264 R_Wrap_Left_To_Right
+label    325E P__INC_A_Then_Q
+label    3264 R__Wrap_Left_To_Right
 deflabel 3266 SCREEN_WIDTH_PIXELS
-label    326A R_Wrap_Right_To_Left
-label    326F P_TXA_Then_R
+label    326A R__Wrap_Right_To_Left
+label    326F P__TXA_Then_R
 label    3273 JETMAN_FLYING_
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
@@ -1604,7 +1614,7 @@ comment  32A8
 comment  32AB
 comment  32AE
 deflabel 32B7 SCREEN_WIDTH_PIXELS
-label    32BA R_Store_Jetman_Position_X
+label    32BA R__Store_Jetman_Position_X
 comment  32BC
 label    32C7 T_Update_Jetman_Position_Y
 deflabel 32C8 JETMAN_Y_DIRECTION_PARAM
@@ -1639,8 +1649,8 @@ label    330C Y_Update_Jetman_Direction_Y
 comment  3318
 label    3318 T_Set_Jetman_Direction_Y_Zero
 comment  331D
-label    331D Set_Jetman_Position_Y_Bottom
-label    3321 Set_Jetman_Standing
+label    331D V__Set_Jetman_Position_Y_Bottom
+label    3321 D_Set_Jetman_Standing
 comment  332C
 label    332C Set_Obj_List_Ptr_Lo_To_7F
 binary   332F
