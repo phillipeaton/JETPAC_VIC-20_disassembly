@@ -4517,7 +4517,7 @@ B_Fly_Right_Impact
     eor     #$FF                            ; 31D0: 49 FF    
     adc     #$03                            ; 31D2: 69 03    
 ; L_BRS_($31D4)_($31DD) OK
-B__Store_Jetman_Direction_X
+B_Q_Store_Jetman_Direction_X
     jmp     Q_Store_Jetman_Direction_X      ; 31D4: 4C A2 32 
 ; -----------------------
 
@@ -4526,7 +4526,7 @@ SKIP_31D7
     ldy     #$00                            ; 31D7: A0 00    
     bit     ZP_Jetman_Action                ; 31D9: 24 1C    
     bvc     N_Flying_Left                   ; 31DB: 50 4B    
-    bvs     B__Store_Jetman_Direction_X     ; 31DD: 70 F5    
+    bvs     B_Q_Store_Jetman_Direction_X    ; 31DD: 70 F5    
 
 ; BVS/BVC above means below code can only be jumped/branched to
 ; L_BRS_($31DF)_($31C5) OK
@@ -4537,7 +4537,7 @@ E_Fly_Left_Impact
     eor     #$FF                            ; 31E5: 49 FF    
 
 ; L_BRS_($31E7)_($31F0) OK
-E__Store_Jetman_Direction_X
+E_Q_Store_Jetman_Direction_X
     jmp     Q_Store_Jetman_Direction_X      ; 31E7: 4C A2 32 
 ; -----------------------
 
@@ -4546,16 +4546,16 @@ SKIP_31EA
     ldy     #$00                            ; 31EA: A0 00    
     bit     ZP_Jetman_Action                ; 31EC: 24 1C    
     bpl     S_Flying_Right                  ; 31EE: 10 4E    
-    bmi     E__Store_Jetman_Direction_X     ; 31F0: 30 F5    
+    bmi     E_Q_Store_Jetman_Direction_X    ; 31F0: 30 F5    
 
 ; BVS/BVC above means below code can only be jumped/branched to
-; 10000000 = Upward impact
-; 10000001 = Upward impact (As above)
-; 10001000 = Downward impact
-; 10001110 = Top Right Corner impact
-; 10000110 = Right impact
-; 10000111 = Top Left impact
-; 10000111 = Left impact
+; 1xxx0001 = Upward impact
+; 1xxx1000 = Downward impact
+; 1xxxx1xx = Left or Right impact
+; 1xxx1110 = Top Right Corner impact
+; 1xxx0110 = Right impact
+; 1xxx0111 = Top Left impact
+; 1xxx0111 = Left impact
 
 ; L_JMP_($31F2)_($3282) OK
 H_Jetman_Hits_Surface
@@ -4563,7 +4563,7 @@ H_Jetman_Hits_Surface
     beq     I_Left_Right_Up_Impact          ; 31F5: F0 09    
 
 ; Test Obj_Jetman_At_Rest???
-    ldy     #$04                            ; 31F7: A0 04    
+    ldy     #JETMAN_Y_DIRECTION_PARAM       ; 31F7: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31F9: B1 00    
     bmi     C_Left_Right_Impact             ; 31FB: 30 CE    
     jmp     D_Set_Jetman_Standing           ; 31FD: 4C 21 33 
@@ -4579,10 +4579,10 @@ I_Left_Right_Up_Impact
 ; Test Obj_Jetman_At_Rest???
 ; L_JMP_($3208)_($32C4) OK
 J_tman_flys_up_hits_platform_0
-    ldy     #$04                            ; 3208: A0 04    
+    ldy     #JETMAN_Y_DIRECTION_PARAM       ; 3208: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 320A: B1 00    
     beq     M_tman_flys_up_hits_platform    ; 320C: F0 0A    
-    bpl     J__Update_Jetman_Position_Y     ; 320E: 10 05    
+    bpl     J_T_Update_Jetman_Position_Y    ; 320E: 10 05    
     eor     #%11111111                      ; 3210: 49 FF    
 
 ; K_tman_flys_up_hits_platform_1
@@ -4592,21 +4592,21 @@ K_Store_Jetman_Direction_Y
 ; -----------------------
 
 ; L_BRS_($3215)_($320E) OK
-J__Update_Jetman_Position_Y
+J_T_Update_Jetman_Position_Y
     jmp     T_Update_Jetman_Position_Y      ; 3215: 4C C7 32 
 ; -----------------------
 
 ; L_BRS_($3218)_($320C) OK
 M_tman_flys_up_hits_platform
-    tax                                     ; 3218: AA        Save A
+    tax                                     ; 3218: AA       
     lda     ZP_Jetman_Action                ; 3219: A5 1C    
-    bit     MASK_00010000                   ; 321B: 2C 18 20  Test if on ground
-    bne     SKIP_3224                       ; 321E: D0 04     No, branch
+    bit     MASK_00010000                   ; 321B: 2C 18 20 
+    bne     SKIP_3224                       ; 321E: D0 04    
     lda     #$00                            ; 3220: A9 00    
     beq     K_Store_Jetman_Direction_Y      ; 3222: F0 EE    
 ; L_BRS_($3224)_($321E) OK
 SKIP_3224
-    txa                                     ; 3224: 8A        Restore A
+    txa                                     ; 3224: 8A       
     jmp     T_Update_Jetman_Position_Y      ; 3225: 4C C7 32 
 ; -----------------------
 
@@ -4655,7 +4655,7 @@ SKIP_3254
     jmp     Q_Store_Jetman_Direction_X      ; 325B: 4C A2 32 
 ; -----------------------
 ; L_BRS_($325E)_($329D) OK
-P__INC_A_Then_Q
+P_Q_INC_A
     clc                                     ; 325E: 18       
     adc     #$01                            ; 325F: 69 01    
     jmp     Q_Store_Jetman_Direction_X      ; 3261: 4C A2 32 
@@ -4672,7 +4672,7 @@ R__Wrap_Right_To_Left
     jmp     R__Store_Jetman_Position_X      ; 326C: 4C BA 32 
 ; -----------------------
 ; L_BRS_($326F)_($3296) OK
-P__TXA_Then_R
+P_R_TXA
     txa                                     ; 326F: 8A       
     jmp     R_Update_Jetman_Position_X      ; 3270: 4C A6 32 
 ; -----------------------
@@ -4699,11 +4699,11 @@ P_Update_Jetman_Position_X
     tax                                     ; 3291: AA       
     lda     ZP_HW_IRQ_Count1                ; 3292: A5 4A    
     and     #%00000001                      ; 3294: 29 01    
-    beq     P__TXA_Then_R                   ; 3296: F0 D7    
+    beq     P_R_TXA                         ; 3296: F0 D7    
     txa                                     ; 3298: 8A       
     cmp     #$00                            ; 3299: C9 00    
     beq     R_Update_Jetman_Position_X      ; 329B: F0 09    
-    bmi     P__INC_A_Then_Q                 ; 329D: 30 BF    
+    bmi     P_Q_INC_A                       ; 329D: 30 BF    
     sec                                     ; 329F: 38       
     sbc     #$01                            ; 32A0: E9 01    
 ; L_JMP_($32A2)_($31D4) OK
@@ -4759,7 +4759,7 @@ T_Update_Jetman_Position_Y
 
     lda     ZP_Jetman_Action                ; 32C9: A5 1C    
     bit     MASK_00100000                   ; 32CB: 2C 19 20  Test for direction Down
-    beq     T_Set_Jetman_Direction_Y_Zero   ; 32CE: F0 48     Yes, branch
+    beq     T_U_Set_Jetman_Direction_Y_Zro  ; 32CE: F0 48     Yes, branch
     bit     MASK_00010000                   ; 32D0: 2C 18 20  Test for direction Up
     beq     Y_Update_Jetman_Direction_Y     ; 32D3: F0 37     Yes, branch
 
@@ -4788,7 +4788,7 @@ V_Update_Jetman_Position_Y
     clc                                     ; 32E5: 18       
     adc     (ZP_Obj_List_Ptr_Lo),y          ; 32E6: 71 00    
     cmp     #SCREEN_BOTTOM                  ; 32E8: C9 AF    
-    bcs     V__Set_Jetman_Position_Y_Bottom ; 32EA: B0 31    
+    bcs     V_D_Set_Jetman_Position_Y_Bott  ; 32EA: B0 31    
     cmp     #SCREEN_TOP                     ; 32EC: C9 28    
     bcs     W_Store_Jetman_Parameter        ; 32EE: B0 07    
 
@@ -4823,6 +4823,7 @@ SKIP_3309
     jmp     GOTO_NEXT_OBJECT                ; 3309: 4C 1A 26 
 ; -----------------------
 
+; Load and test Jetman Y Direction
 ; L_BRS_($330C)_($32D3) OK
 Y_Update_Jetman_Direction_Y
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 330C: B1 00    
@@ -4834,13 +4835,13 @@ Y_Update_Jetman_Direction_Y
 ; -----------------------
 
 ; L_BRS_($3318)_($32CE) OK
-T_Set_Jetman_Direction_Y_Zero
+T_U_Set_Jetman_Direction_Y_Zro
     lda     #$00                            ; 3318: A9 00    
     jmp     U_Store_Jetman_Direction_Y      ; 331A: 4C DE 32 
 ; -----------------------
 
 ; L_BRS_($331D)_($32EA) OK
-V__Set_Jetman_Position_Y_Bottom
+V_D_Set_Jetman_Position_Y_Bott
     lda     #$AF                            ; 331D: A9 AF    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 331F: 91 00    
 

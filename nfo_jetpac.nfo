@@ -1540,65 +1540,58 @@ comment  31CE
 label    31CE B_Fly_Right_Impact
 comment  31CB
 label    31CB C_Left_Right_Impact
-label    31D4 B__Store_Jetman_Direction_X
+label    31D4 B_Q_Store_Jetman_Direction_X
 comment  31D7
 label    31D7 SKIP_31D7
 comment  31DF
 comment  31DF BVS/BVC above means below code can only be jumped/branched to
 label    31DF E_Fly_Left_Impact
 comment  31E7
-label    31E7 E__Store_Jetman_Direction_X
+label    31E7 E_Q_Store_Jetman_Direction_X
 comment  31EA
 label    31EA SKIP_31EA
 comment  31F2
 comment  31F2 BVS/BVC above means below code can only be jumped/branched to
-comment  31F2 10000000 = Upward impact
-comment  31F2 10000001 = Upward impact (As above)
-comment  31F2 10001000 = Downward impact
-comment  31F2 10001110 = Top Right Corner impact
-comment  31F2 10000110 = Right impact
-comment  31F2 10000111 = Top Left impact
-comment  31F2 10000111 = Left impact
+comment  31F2 1xxx0001 = Upward impact
+comment  31F2 1xxx1000 = Downward impact
+comment  31F2 1xxxx1xx = Left or Right impact
+comment  31F2 1xxx1110 = Top Right Corner impact
+comment  31F2 1xxx0110 = Right impact
+comment  31F2 1xxx0111 = Top Left impact
+comment  31F2 1xxx0111 = Left impact
 comment  31F2
 label    31F2 H_Jetman_Hits_Surface
 comment  31F7
 comment  31F7 Test Obj_Jetman_At_Rest???
+deflabel 31F8 JETMAN_Y_DIRECTION_PARAM
 comment  3200
 label    3200 I_Left_Right_Up_Impact
 comment  3208
 comment  3208 Test Obj_Jetman_At_Rest???
 label    3208 J_tman_flys_up_hits_platform_0
+deflabel 3209 JETMAN_Y_DIRECTION_PARAM
 binary   3211
 comment  3212
 comment  3212 K_tman_flys_up_hits_platform_1
 label    3212 K_Store_Jetman_Direction_Y
 comment  3215
-label    3215 J__Update_Jetman_Position_Y
+label    3215 J_T_Update_Jetman_Position_Y
 label    3218 M_tman_flys_up_hits_platform
 comment  3218
-lcomment 3218 Save A
-lcomment 321B Test if on ground
-lcomment 321E No, branch
-lcomment 3224 Restore A
 label    3228 N_Flying_Left
 label    3224 SKIP_3224
 comment  3230
-comment  3321
-deflabel 3322 JETMAN_PARAM
-comment  3325
-comment  3325 ROL saves bit 7 (facing direction), LDA #$04 sets bit 2, ROR restores bit 7 and moves
-comment  3325 bit 2 to bit 1 i.e. Jetman action is now Standing
 comment  3228
 comment  323E
 label    323E S_Flying_Right
 comment  3246
 label    3254 SKIP_3254
 comment  3259 HOW DO YOU EVER GET HERE?
-label    325E P__INC_A_Then_Q
+label    325E P_Q_INC_A
 label    3264 R__Wrap_Left_To_Right
 deflabel 3266 SCREEN_WIDTH_PIXELS
 label    326A R__Wrap_Right_To_Left
-label    326F P__TXA_Then_R
+label    326F P_R_TXA
 label    3273 JETMAN_FLYING_
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
@@ -1645,12 +1638,18 @@ comment  32FF
 comment  32FF Test for fire pressed
 label    3309 SKIP_3309
 comment  330C
+comment  330C Load and test Jetman Y Direction
 label    330C Y_Update_Jetman_Direction_Y
 comment  3318
-label    3318 T_Set_Jetman_Direction_Y_Zero
+label    3318 T_U_Set_Jetman_Direction_Y_Zro
 comment  331D
-label    331D V__Set_Jetman_Position_Y_Bottom
+label    331D V_D_Set_Jetman_Position_Y_Bott
 label    3321 D_Set_Jetman_Standing
+comment  3321
+deflabel 3322 JETMAN_PARAM
+comment  3325
+comment  3325 ROL saves bit 7 (facing direction), LDA #$04 sets bit 2, ROR restores bit 7 and moves
+comment  3325 bit 2 to bit 1 i.e. Jetman action is now Standing
 comment  332C
 label    332C Set_Obj_List_Ptr_Lo_To_7F
 binary   332F
