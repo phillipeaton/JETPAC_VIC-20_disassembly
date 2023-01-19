@@ -1150,20 +1150,6 @@ label    2CCC Wrap_Object_X_Position_Left
 comment  2CD1
 label    2CD1 Wrap_Object_X_Position_Right
 comment  2CD6
-comment  2CD6
-comment  2CD6
-comment  2CD6
-comment  2CD6
-comment  2CD6
-comment  2CD6
-comment  2CD6
-comment  2CD6
-comment  2CD6 #####################################################################################
-comment  2CD6 #####################################################################################
-comment  2CD6 #####################################################################################
-comment  2CD6 #####################################################################################
-comment  2CD6 #####################################################################################
-comment  2CD6 #####################################################################################
 label    2CD6 Obj_Ptr_To_Alien_0_Flsh_Ctr
 const    2CDB-2CE2
 label    2CDB Alien_Points_Lookup_Table
@@ -1243,16 +1229,16 @@ comment  2D97
 lcomment 2D97 Set ZP_01_Lo = $80 and return
 label    2D9B Test_Jetman_Obj_Collide_RTS
 label    2D9C Test_Jetman_Obj_Collide_5
-label    2DA1 XXXX
-label    2DA9 XXXX_1
-label    2DB5 XXXX_2
-label    2DC5 XXXX_3
-label    2DCB XXXX_4
-label    2DD1 XXXX_5
+label    2DA1 Restore_Player_Objects
+label    2DA9 Restore_Player_Objects_1
+label    2DB5 Restore_Player_Objects_2
+label    2DC5 Restore_Player_Objects_3
+label    2DCB Restore_Player_Objects_4
+label    2DD1 Restore_Player_Objects_5
 comment  2DA1
 word     2DBC
 label    2DDD Set_Sprite_UDG_Color
-label    2DE8 XXXX_6
+label    2DE8 Restore_Player_Objects_6
 lcomment 2DEC Current level modulus 4
 comment  2DF1
 comment  2DF9
@@ -1539,15 +1525,15 @@ comment  31C7 Load and test Jetman X Direction/Velocity
 comment  31CE
 label    31CE B_Fly_Right_Impact
 comment  31CB
-label    31CB C_Left_Right_Impact
-label    31D4 B_Q_Store_Jetman_Direction_X
+label    31CB C_Jump_P
+label    31D4 B_Jump_Q
 comment  31D7
 label    31D7 SKIP_31D7
 comment  31DF
 comment  31DF BVS/BVC above means below code can only be jumped/branched to
 label    31DF E_Fly_Left_Impact
 comment  31E7
-label    31E7 E_Q_Store_Jetman_Direction_X
+label    31E7 E_Jump_Q
 comment  31EA
 label    31EA SKIP_31EA
 comment  31F2
@@ -1568,15 +1554,14 @@ comment  3200
 label    3200 I_Left_Right_Up_Impact
 comment  3208
 comment  3208 Test Obj_Jetman_At_Rest???
-label    3208 J_tman_flys_up_hits_platform_0
+label    3208 J_Flying_Up_Impact
 deflabel 3209 JETMAN_Y_DIRECTION_PARAM
 binary   3211
 comment  3212
-comment  3212 K_tman_flys_up_hits_platform_1
-label    3212 K_Store_Jetman_Direction_Y
+label    3212 K_Jump_U
 comment  3215
-label    3215 J_T_Update_Jetman_Position_Y
-label    3218 M_tman_flys_up_hits_platform
+label    3215 J_Jump_T
+label    3218 M_Flying_Up_Impact_Bounce
 comment  3218
 label    3228 N_Flying_Left
 label    3224 SKIP_3224
@@ -1587,11 +1572,11 @@ label    323E S_Flying_Right
 comment  3246
 label    3254 SKIP_3254
 comment  3259 HOW DO YOU EVER GET HERE?
-label    325E P_Q_INC_A
+label    325E P_INC_A_Jump_Q
 label    3264 R__Wrap_Left_To_Right
 deflabel 3266 SCREEN_WIDTH_PIXELS
 label    326A R__Wrap_Right_To_Left
-label    326F P_R_TXA
+label    326F P_TXA_Jump_R
 label    3273 JETMAN_FLYING_
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms

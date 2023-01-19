@@ -854,7 +854,7 @@ Reset_Lev_Add_Extra_Life_1
 
 ; L_BRS_($22D1)_($22C1) OK
 Reset_Lev_Add_Extra_Life_2
-    jsr     XXXX_4                          ; 22D1: 20 CB 2D 
+    jsr     Restore_Player_Objects_4        ; 22D1: 20 CB 2D 
     jmp     Reset_Lev_Add_Extra_Life_1      ; 22D4: 4C CB 22 
 ; -----------------------
 
@@ -862,7 +862,7 @@ Reset_Lev_Add_Extra_Life_2
 Reset_Lev_Add_Extra_Life_3
     jsr     Reset_Screen_Disp_Scores        ; 22D7: 20 16 24 
     jsr     Display_P1_Lives                ; 22DA: 20 73 23 
-    jsr     XXXX                            ; 22DD: 20 A1 2D 
+    jsr     Restore_Player_Objects          ; 22DD: 20 A1 2D 
     jmp     Reset_Lev_Add_Extra_Life_1      ; 22E0: 4C CB 22 
 ; -----------------------
 
@@ -1346,6 +1346,20 @@ STR_SP_START_GAME
     fcb     $00                             ; 258E: 00       
     fcc     "SP``START`GAM"                 ; 258F: 53 50 60 60 53 54 41 52 54 60 47 41 4D 
     fcb     $C5                             ; 259C: C5       
+
+
+
+
+
+; 88      dP"Yb     db    8888b.      8888P 88""Yb
+; 88     dP   Yb   dPYb    8I  Yb       dP  88__dP
+; 88  .o Yb   dP  dP__Yb   8I  dY      dP   88"""
+; 88ood8  YbodP  dP""""Yb 8888Y"      d8888 88
+; \
+; 88""Yb    db    88""Yb    db    8b    d8 888888 888888 888888 88""Yb .dP"Y8
+; 88__dP   dPYb   88__dP   dPYb   88b  d88 88__     88   88__   88__dP `Ybo."
+; 88"""   dP__Yb  88"Yb   dP__Yb  88YbdP88 88""     88   88""   88"Yb  o.`Y8b
+; 88     dP""""Yb 88  Yb dP""""Yb 88 YY 88 888888   88   888888 88  Yb 8bodP'
 
 ; L_JSR_($259D)_($20F0) OK
 ; L_JSR_($259D)_($2202) OK
@@ -3268,16 +3282,16 @@ Wrap_Object_X_Position_Right
 
 
 
+; 88 88b 88 88 888888 88    db    88     88 .dP"Y8 888888
+; 88 88Yb88 88   88   88   dPYb   88     88 `Ybo." 88__
+; 88 88 Y88 88   88   88  dP__Yb  88  .o 88 o.`Y8b 88""
+; 88 88  Y8 88   88   88 dP""""Yb 88ood8 88 8bodP' 888888
+; \
+;  dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
+; dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
+; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
+;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
-
-
-
-; #####################################################################################
-; #####################################################################################
-; #####################################################################################
-; #####################################################################################
-; #####################################################################################
-; #####################################################################################
 ; L_JSR_($2CD6)_($2652) OK
 Obj_Ptr_To_Alien_0_Flsh_Ctr
     lda     ZP_Flash_Score_Countdown        ; 2CD6: A5 5D    
@@ -3384,6 +3398,25 @@ Level_Alien_Color_Lookup
     fcb     $02,$06,$03,$07                 ; 2D50: 02 06 03 07 
     fcb     $06,$07,$02,$04                 ; 2D54: 06 07 02 04 
 
+
+
+
+
+; 888888 888888 .dP"Y8 888888      88888 888888 888888 8b    d8    db    88b 88
+;   88   88__   `Ybo."   88           88 88__     88   88b  d88   dPYb   88Yb88
+;   88   88""   o.`Y8b   88       o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
+;   88   888888 8bodP'   88       "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
+; \
+;  dP"Yb  88""Yb  88888 888888  dP""b8 888888
+; dP   Yb 88__dP     88 88__   dP   `"   88
+; Yb   dP 88""Yb o.  88 88""   Yb        88
+;  YbodP  88oodP "bodP' 888888  YboodP   88
+; \
+;  dP""b8  dP"Yb  88     88     88 8888b.  888888
+; dP   `" dP   Yb 88     88     88  8I  Yb 88__
+; Yb      Yb   dP 88  .o 88  .o 88  8I  dY 88""
+;  YboodP  YbodP  88ood8 88ood8 88 8888Y"  888888
+
 ; ----------------------------------------------------------
 ; FUNCTION : Tests if Jetman and the current object have
 ;            overlapped i.e. collided. Object can be rocket
@@ -3461,44 +3494,64 @@ Test_Jetman_Obj_Collide_5
     jmp     Test_Jetman_Obj_Collide_4       ; 2D9E: 4C 95 2D 
 ; -----------------------
 
+
+
+
+
+; 88""Yb 888888 .dP"Y8 888888  dP"Yb  88""Yb 888888
+; 88__dP 88__   `Ybo."   88   dP   Yb 88__dP 88__
+; 88"Yb  88""   o.`Y8b   88   Yb   dP 88"Yb  88""
+; 88  Yb 888888 8bodP'   88    YbodP  88  Yb 888888
+; \
+; 88""Yb 88        db    Yb  dP 888888 88""Yb
+; 88__dP 88       dPYb    YbdP  88__   88__dP
+; 88"""  88  .o  dP__Yb    8P   88""   88"Yb
+; 88     88ood8 dP""""Yb  dP    888888 88  Yb
+; \
+;  dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
+; dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
+; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
+;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
+
 ; L_JSR_($2DA1)_($22DD) OK
-XXXX lda    Obj_Rock_Mod_Top_Fuel_Type      ; 2DA1: AD B8 03 
-    beq     XXXX_1                          ; 2DA4: F0 03    
+Restore_Player_Objects
+    lda     Obj_Rock_Mod_Top_Fuel_Type      ; 2DA1: AD B8 03 
+    beq     Restore_Player_Objects_1        ; 2DA4: F0 03    
     jsr     Set_Obj_List_Type_Rocket_Fuel   ; 2DA6: 20 E3 22 
 ; L_BRS_($2DA9)_($2DA4) OK
-XXXX_1
+Restore_Player_Objects_1
     lda     Obj_Rock_Mod_Mid_Valuable_Type  ; 2DA9: AD C0 03 
-    beq     XXXX_2                          ; 2DAC: F0 07    
+    beq     Restore_Player_Objects_2        ; 2DAC: F0 07    
     cmp     #$0E                            ; 2DAE: C9 0E    
-    beq     XXXX_3                          ; 2DB0: F0 13    
+    beq     Restore_Player_Objects_3        ; 2DB0: F0 13    
     jsr     Object_RMS_Gem_Type             ; 2DB2: 20 F2 22 
 ; L_BRS_($2DB5)_($2DAC) OK
 ; L_JMP_($2DB5)_($2DC8) OK
-XXXX_2
+Restore_Player_Objects_2
     jsr     Save_Obj_List_Ptr               ; 2DB5: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2DB8: 20 9D 25 
     fcb     $00                             ; 2DBB: 00       
     fdb     Obj_Rocket                      ; 2DBC: B0 03    
     fcb     $FF                             ; 2DBE: FF       
-    jsr     XXXX_4                          ; 2DBF: 20 CB 2D 
+    jsr     Restore_Player_Objects_4        ; 2DBF: 20 CB 2D 
     jmp     Restore_Obj_List_Ptr            ; 2DC2: 4C F0 28 
 ; -----------------------
 ; L_BRS_($2DC5)_($2DB0) OK
-XXXX_3
+Restore_Player_Objects_3
     jsr     Load_ZP_Params_For_Object_03C0  ; 2DC5: 20 C7 2B 
-    jmp     XXXX_2                          ; 2DC8: 4C B5 2D 
+    jmp     Restore_Player_Objects_2        ; 2DC8: 4C B5 2D 
 ; -----------------------
 ; L_JSR_($2DCB)_($22D1) OK
 ; L_JSR_($2DCB)_($2DBF) OK
-XXXX_4
+Restore_Player_Objects_4
     jsr     Set_Sprite_UDG_Color            ; 2DCB: 20 DD 2D 
     jsr     Load_Object_Type_X_Y_Color      ; 2DCE: 20 E9 35 
 ; L_BRS_($2DD1)_($2DDA) OK
-XXXX_5
-    jsr     XXXX_6                          ; 2DD1: 20 E8 2D 
+Restore_Player_Objects_5
+    jsr     Restore_Player_Objects_6        ; 2DD1: 20 E8 2D 
     jsr     BBBBBB                          ; 2DD4: 20 04 36 
     jsr     Dec_Saved_Obj_List_Params_by_10 ; 2DD7: 20 FF 2D 
-    bne     XXXX_5                          ; 2DDA: D0 F5    
+    bne     Restore_Player_Objects_5        ; 2DDA: D0 F5    
     rts                                     ; 2DDC: 60       
 ; ===========================================================
 ; L_JSR_($2DDD)_($2DCB) OK
@@ -3513,7 +3566,7 @@ Set_Sprite_UDG_Color
 ; ===========================================================
 ; L_JSR_($2DE8)_($2DD1) OK
 ; L_JSR_($2DE8)_($2EB5) OK
-XXXX_6
+Restore_Player_Objects_6
     lda     ZP_Level_Current_Player         ; 2DE8: A5 59    
     lsr     a                               ; 2DEA: 4A       
     lsr     a                               ; 2DEB: 4A       
@@ -3724,7 +3777,7 @@ Rocket_Fuelled_Up
     jsr     Set_Sprite_UDG_Color            ; 2EB2: 20 DD 2D 
 ; L_BRS_($2EB5)_($2EBE) OK
 Rocket_Fuelled_Up_1
-    jsr     XXXX_6                          ; 2EB5: 20 E8 2D 
+    jsr     Restore_Player_Objects_6        ; 2EB5: 20 E8 2D 
     jsr     YYYYYY                          ; 2EB8: 20 4C 36 
     jsr     Dec_Saved_Obj_List_Params_by_10 ; 2EBB: 20 FF 2D 
     bne     Rocket_Fuelled_Up_1             ; 2EBE: D0 F5    
@@ -4507,7 +4560,7 @@ A_Left_Right_Impact
 
 ; L_BRS_($31CB)_($31E3) OK
 ; L_BRS_($31CB)_($31FB) OK
-C_Left_Right_Impact
+C_Jump_P
     jmp     P_Update_Jetman_Position_X      ; 31CB: 4C 85 32 
 ; -----------------------
 
@@ -4517,7 +4570,7 @@ B_Fly_Right_Impact
     eor     #$FF                            ; 31D0: 49 FF    
     adc     #$03                            ; 31D2: 69 03    
 ; L_BRS_($31D4)_($31DD) OK
-B_Q_Store_Jetman_Direction_X
+B_Jump_Q
     jmp     Q_Store_Jetman_Direction_X      ; 31D4: 4C A2 32 
 ; -----------------------
 
@@ -4526,18 +4579,18 @@ SKIP_31D7
     ldy     #$00                            ; 31D7: A0 00    
     bit     ZP_Jetman_Action                ; 31D9: 24 1C    
     bvc     N_Flying_Left                   ; 31DB: 50 4B    
-    bvs     B_Q_Store_Jetman_Direction_X    ; 31DD: 70 F5    
+    bvs     B_Jump_Q                        ; 31DD: 70 F5    
 
 ; BVS/BVC above means below code can only be jumped/branched to
 ; L_BRS_($31DF)_($31C5) OK
 E_Fly_Left_Impact
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31DF: B1 00    
     beq     SKIP_31EA                       ; 31E1: F0 07    
-    bpl     C_Left_Right_Impact             ; 31E3: 10 E6    
+    bpl     C_Jump_P                        ; 31E3: 10 E6    
     eor     #$FF                            ; 31E5: 49 FF    
 
 ; L_BRS_($31E7)_($31F0) OK
-E_Q_Store_Jetman_Direction_X
+E_Jump_Q
     jmp     Q_Store_Jetman_Direction_X      ; 31E7: 4C A2 32 
 ; -----------------------
 
@@ -4546,7 +4599,7 @@ SKIP_31EA
     ldy     #$00                            ; 31EA: A0 00    
     bit     ZP_Jetman_Action                ; 31EC: 24 1C    
     bpl     S_Flying_Right                  ; 31EE: 10 4E    
-    bmi     E_Q_Store_Jetman_Direction_X    ; 31F0: 30 F5    
+    bmi     E_Jump_Q                        ; 31F0: 30 F5    
 
 ; BVS/BVC above means below code can only be jumped/branched to
 ; 1xxx0001 = Upward impact
@@ -4565,7 +4618,7 @@ H_Jetman_Hits_Surface
 ; Test Obj_Jetman_At_Rest???
     ldy     #JETMAN_Y_DIRECTION_PARAM       ; 31F7: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31F9: B1 00    
-    bmi     C_Left_Right_Impact             ; 31FB: 30 CE    
+    bmi     C_Jump_P                        ; 31FB: 30 CE    
     jmp     D_Set_Jetman_Standing           ; 31FD: 4C 21 33 
 ; -----------------------
 
@@ -4578,32 +4631,31 @@ I_Left_Right_Up_Impact
 
 ; Test Obj_Jetman_At_Rest???
 ; L_JMP_($3208)_($32C4) OK
-J_tman_flys_up_hits_platform_0
+J_Flying_Up_Impact
     ldy     #JETMAN_Y_DIRECTION_PARAM       ; 3208: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 320A: B1 00    
-    beq     M_tman_flys_up_hits_platform    ; 320C: F0 0A    
-    bpl     J_T_Update_Jetman_Position_Y    ; 320E: 10 05    
+    beq     M_Flying_Up_Impact_Bounce       ; 320C: F0 0A    
+    bpl     J_Jump_T                        ; 320E: 10 05    
     eor     #%11111111                      ; 3210: 49 FF    
 
-; K_tman_flys_up_hits_platform_1
 ; L_BRS_($3212)_($3222) OK
-K_Store_Jetman_Direction_Y
+K_Jump_U
     jmp     U_Store_Jetman_Direction_Y      ; 3212: 4C DE 32 
 ; -----------------------
 
 ; L_BRS_($3215)_($320E) OK
-J_T_Update_Jetman_Position_Y
+J_Jump_T
     jmp     T_Update_Jetman_Position_Y      ; 3215: 4C C7 32 
 ; -----------------------
 
 ; L_BRS_($3218)_($320C) OK
-M_tman_flys_up_hits_platform
+M_Flying_Up_Impact_Bounce
     tax                                     ; 3218: AA       
     lda     ZP_Jetman_Action                ; 3219: A5 1C    
     bit     MASK_00010000                   ; 321B: 2C 18 20 
     bne     SKIP_3224                       ; 321E: D0 04    
     lda     #$00                            ; 3220: A9 00    
-    beq     K_Store_Jetman_Direction_Y      ; 3222: F0 EE    
+    beq     K_Jump_U                        ; 3222: F0 EE    
 ; L_BRS_($3224)_($321E) OK
 SKIP_3224
     txa                                     ; 3224: 8A       
@@ -4655,7 +4707,7 @@ SKIP_3254
     jmp     Q_Store_Jetman_Direction_X      ; 325B: 4C A2 32 
 ; -----------------------
 ; L_BRS_($325E)_($329D) OK
-P_Q_INC_A
+P_INC_A_Jump_Q
     clc                                     ; 325E: 18       
     adc     #$01                            ; 325F: 69 01    
     jmp     Q_Store_Jetman_Direction_X      ; 3261: 4C A2 32 
@@ -4672,7 +4724,7 @@ R__Wrap_Right_To_Left
     jmp     R__Store_Jetman_Position_X      ; 326C: 4C BA 32 
 ; -----------------------
 ; L_BRS_($326F)_($3296) OK
-P_R_TXA
+P_TXA_Jump_R
     txa                                     ; 326F: 8A       
     jmp     R_Update_Jetman_Position_X      ; 3270: 4C A6 32 
 ; -----------------------
@@ -4699,11 +4751,11 @@ P_Update_Jetman_Position_X
     tax                                     ; 3291: AA       
     lda     ZP_HW_IRQ_Count1                ; 3292: A5 4A    
     and     #%00000001                      ; 3294: 29 01    
-    beq     P_R_TXA                         ; 3296: F0 D7    
+    beq     P_TXA_Jump_R                    ; 3296: F0 D7    
     txa                                     ; 3298: 8A       
     cmp     #$00                            ; 3299: C9 00    
     beq     R_Update_Jetman_Position_X      ; 329B: F0 09    
-    bmi     P_Q_INC_A                       ; 329D: 30 BF    
+    bmi     P_INC_A_Jump_Q                  ; 329D: 30 BF    
     sec                                     ; 329F: 38       
     sbc     #$01                            ; 32A0: E9 01    
 ; L_JMP_($32A2)_($31D4) OK
@@ -4748,7 +4800,7 @@ R__Store_Jetman_Position_X
     bpl     T_Update_Jetman_Position_Y      ; 32BE: 10 07    
     and     #$0C                            ; 32C0: 29 0C    
     bne     T_Update_Jetman_Position_Y      ; 32C2: D0 03    
-    jmp     J_tman_flys_up_hits_platform_0  ; 32C4: 4C 08 32 
+    jmp     J_Flying_Up_Impact              ; 32C4: 4C 08 32 
 ; -----------------------
 ; L_JMP_($32C7)_($3215) OK
 ; L_JMP_($32C7)_($3225) OK
