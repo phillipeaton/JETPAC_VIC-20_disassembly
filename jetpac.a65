@@ -5696,6 +5696,7 @@ Load_Object_Type_X_Y_Color
 ; L_JSR_($3601)_($3358) OK
 AAAAAA
     jsr     Load_Small_UDG_Addr_Setup_XY_   ; 3601: 20 37 37 
+
 ; L_JSR_($3604)_($295E) OK
 ; L_JSR_($3604)_($2DD4) OK
 ; L_JMP_($3604)_($3060) OK
@@ -5709,6 +5710,7 @@ BBBBBB
 ; L_JSR_($360D)_($28F9) OK
 CCCCCC
     jsr     Set_UDG_RAM_Ptr_Sprite_Dimen_   ; 360D: 20 8A 37 
+
 ; L_JSR_($3610)_($27DE) OK
 ; L_JSR_($3610)_($2828) OK
 ; L_JSR_($3610)_($2864) OK
@@ -5718,8 +5720,9 @@ DDDDDD
     sta     ZP_0B                           ; 3614: 85 0B    
     jmp     YYYYYY                          ; 3616: 4C 4C 36 
 ; -----------------------
+
 ; L_BRS_($3619)_($3661) OK
-YYYYYY_1
+BACK_3619
     eor     #$FF                            ; 3619: 49 FF    
     clc                                     ; 361B: 18       
     adc     #$01                            ; 361C: 69 01    
@@ -5729,21 +5732,23 @@ YYYYYY_1
 
     pha                                     ; 3623: 48       
     sta     ZP_0A_Obj_Height_Cntdn_1        ; 3624: 85 0A    
+
     lda     ZP_0B                           ; 3626: A5 0B    
     sec                                     ; 3628: 38       
     sbc     ZP_0A_Obj_Height_Cntdn_1        ; 3629: E5 0A    
     sta     ZP_0A_Obj_Height_Cntdn_1        ; 362B: 85 0A    
 
     ldy     ZP_09                           ; 362D: A4 09    
+
 ; L_BRS_($362F)_($3637) OK
-YYYYYY_2
+BACK_362F
     lda     (ZP_Addr_Ptr_Lo),y              ; 362F: B1 0E    
     eor     (ZP_Col_RAM_Ptr_Lo),y           ; 3631: 51 0C    
     sta     (ZP_Col_RAM_Ptr_Lo),y           ; 3633: 91 0C    
 
     dey                                     ; 3635: 88       
     dex                                     ; 3636: CA       
-    bne     YYYYYY_2                        ; 3637: D0 F6    
+    bne     BACK_362F                       ; 3637: D0 F6    
     pla                                     ; 3639: 68       
 
     sta     ZP_13                           ; 363A: 85 13    
@@ -5755,11 +5760,13 @@ YYYYYY_2
 
     jmp     ZZZZZZ                          ; 3643: 4C 88 36 
 ; -----------------------
+
 ; L_JSR_($3646)_($2CC3) OK
 ; L_JSR_($3646)_($32F9) OK
 YYYYYY_ALT
     jsr     Load_Small_UDG_Addr_Setup_XY_   ; 3646: 20 37 37 
     jsr     Set_UDG_RAM_Ptr_Sprite_Dimen_   ; 3649: 20 8A 37 
+
 ; L_JSR_($364C)_($27F4) OK
 ; L_JSR_($364C)_($2EB8) OK
 ; L_JSR_($364C)_($2FD1) OK
@@ -5775,6 +5782,7 @@ YYYYYY
 ; Copy $18 from 03 and 0B, is an index into the sprite data?
     lda     ZP_03                           ; 3652: A5 03    
     sta     ZP_02                           ; 3654: 85 02    
+
     lda     ZP_0B                           ; 3656: A5 0B    
     sta     ZP_0A_Obj_Height_Cntdn_1        ; 3658: 85 0A    
 
@@ -5784,33 +5792,38 @@ YYYYYY
     sec                                     ; 365C: 38       
     sbc     ZP_Obj_Y_Position_2             ; 365D: E5 19    
     beq     ZZZZZZ                          ; 365F: F0 27    
-    bmi     YYYYYY_1                        ; 3661: 30 B6    
+    bmi     BACK_3619                       ; 3661: 30 B6    
     cmp     ZP_03                           ; 3663: C5 03    
     bcs     ZZZZZZ                          ; 3665: B0 21    
     tax                                     ; 3667: AA       
 
     pha                                     ; 3668: 48       
     sta     ZP_02                           ; 3669: 85 02    
+
     lda     ZP_03                           ; 366B: A5 03    
     sec                                     ; 366D: 38       
     sbc     ZP_02                           ; 366E: E5 02    
     sta     ZP_02                           ; 3670: 85 02    
+
     ldy     ZP_08                           ; 3672: A4 08    
 ; L_BRS_($3674)_($367C) OK
-YYYYYY_3
+BACK_3674
     lda     (ZP_06_Obj_Addr_Lo),y           ; 3674: B1 06    
     eor     (ZP_UDG_RAM_X),y                ; 3676: 51 04    
     sta     (ZP_UDG_RAM_X),y                ; 3678: 91 04    
+
     dey                                     ; 367A: 88       
     dex                                     ; 367B: CA       
-    bne     YYYYYY_3                        ; 367C: D0 F6    
+    bne     BACK_3674                       ; 367C: D0 F6    
     pla                                     ; 367E: 68       
 
     sta     ZP_13                           ; 367F: 85 13    
+
     lda     ZP_08                           ; 3681: A5 08    
     sec                                     ; 3683: 38       
     sbc     ZP_13                           ; 3684: E5 13    
     sta     ZP_08                           ; 3686: 85 08    
+
 ; L_BRS_($3688)_($3620) OK
 ; L_JMP_($3688)_($3643) OK
 ; L_BRS_($3688)_($365F) OK
@@ -5819,114 +5832,140 @@ YYYYYY_3
 ; L_JMP_($3688)_($36A8) OK
 ZZZZZZ
     lda     ZP_02                           ; 3688: A5 02    
-    beq     ZZZZZZ_2                        ; 368A: F0 1F    
+    beq     SKIP_36AB                       ; 368A: F0 1F    
     dec     ZP_02                           ; 368C: C6 02    
+
     ldy     ZP_08                           ; 368E: A4 08    
     lda     (ZP_06_Obj_Addr_Lo),y           ; 3690: B1 06    
     eor     (ZP_UDG_RAM_X),y                ; 3692: 51 04    
     sta     (ZP_UDG_RAM_X),y                ; 3694: 91 04    
+
     dec     ZP_08                           ; 3696: C6 08    
     lda     ZP_0A_Obj_Height_Cntdn_1        ; 3698: A5 0A    
     beq     ZZZZZZ                          ; 369A: F0 EC    
+
 ; L_BRS_($369C)_($36AD) OK
-ZZZZZZ_1
+BACK_369C
     dec     ZP_0A_Obj_Height_Cntdn_1        ; 369C: C6 0A    
     ldy     ZP_09                           ; 369E: A4 09    
     lda     (ZP_Addr_Ptr_Lo),y              ; 36A0: B1 0E    
     eor     (ZP_Col_RAM_Ptr_Lo),y           ; 36A2: 51 0C    
     sta     (ZP_Col_RAM_Ptr_Lo),y           ; 36A4: 91 0C    
+
     dec     ZP_09                           ; 36A6: C6 09    
     jmp     ZZZZZZ                          ; 36A8: 4C 88 36 
 ; -----------------------
+
 ; L_BRS_($36AB)_($368A) OK
-ZZZZZZ_2
+SKIP_36AB
     lda     ZP_0A_Obj_Height_Cntdn_1        ; 36AB: A5 0A    
-    bne     ZZZZZZ_1                        ; 36AD: D0 ED    
+    bne     BACK_369C                       ; 36AD: D0 ED    
+
     lda     ZP_Sprite_Width_Pixels          ; 36AF: A5 14    
-    beq     ZZZZZZ_6                        ; 36B1: F0 76    
+    beq     SKIP_3729                       ; 36B1: F0 76    
+
     dec     ZP_Sprite_Width_Pixels          ; 36B3: C6 14    
     lda     ZP_06_Obj_Addr_Lo               ; 36B5: A5 06    
     sec                                     ; 36B7: 38       
     sbc     ZP_03                           ; 36B8: E5 03    
     sta     ZP_06_Obj_Addr_Lo               ; 36BA: 85 06    
+
     lda     ZP_07_Obj_Addr_Hi               ; 36BC: A5 07    
     sbc     #$00                            ; 36BE: E9 00    
     sta     ZP_07_Obj_Addr_Hi               ; 36C0: 85 07    
+
     lda     ZP_UDG_RAM_X                    ; 36C2: A5 04    
     clc                                     ; 36C4: 18       
     adc     #$B0                            ; 36C5: 69 B0    
     sta     ZP_UDG_RAM_X                    ; 36C7: 85 04    
+
     lda     ZP_UDG_RAM_Y                    ; 36C9: A5 05    
     adc     #$00                            ; 36CB: 69 00    
     sta     ZP_UDG_RAM_Y                    ; 36CD: 85 05    
+
     lda     ZP_UDG_RAM_X                    ; 36CF: A5 04    
     sec                                     ; 36D1: 38       
     sbc     #$D1                            ; 36D2: E9 D1    
     lda     ZP_UDG_RAM_Y                    ; 36D4: A5 05    
     sbc     #$1E                            ; 36D6: E9 1E    
-    bcc     ZZZZZZ_3                        ; 36D8: 90 0D    
+    bcc     ZZZZZZ_1                        ; 36D8: 90 0D    
+
     lda     ZP_UDG_RAM_X                    ; 36DA: A5 04    
     sec                                     ; 36DC: 38       
     sbc     #$D0                            ; 36DD: E9 D0    
     sta     ZP_UDG_RAM_X                    ; 36DF: 85 04    
+
     lda     ZP_UDG_RAM_Y                    ; 36E1: A5 05    
     sbc     #$0F                            ; 36E3: E9 0F    
     sta     ZP_UDG_RAM_Y                    ; 36E5: 85 05    
+
 ; L_BRS_($36E7)_($36D8) OK
 ; L_JMP_($36E7)_($3734) OK
-ZZZZZZ_3
+ZZZZZZ_1
     lda     ZP_15                           ; 36E7: A5 15    
-    beq     ZZZZZZ_5                        ; 36E9: F0 37    
+    beq     SKIP_3722                       ; 36E9: F0 37    
+
     dec     ZP_15                           ; 36EB: C6 15    
     lda     ZP_Addr_Ptr_Lo                  ; 36ED: A5 0E    
     sec                                     ; 36EF: 38       
     sbc     ZP_0B                           ; 36F0: E5 0B    
     sta     ZP_Addr_Ptr_Lo                  ; 36F2: 85 0E    
+
     lda     ZP_Addr_Ptr_Hi                  ; 36F4: A5 0F    
     sbc     #$00                            ; 36F6: E9 00    
     sta     ZP_Addr_Ptr_Hi                  ; 36F8: 85 0F    
+
     lda     ZP_Col_RAM_Ptr_Lo               ; 36FA: A5 0C    
     clc                                     ; 36FC: 18       
     adc     #$B0                            ; 36FD: 69 B0    
     sta     ZP_Col_RAM_Ptr_Lo               ; 36FF: 85 0C    
+
     lda     ZP_Col_RAM_Ptr_Hi               ; 3701: A5 0D    
     adc     #$00                            ; 3703: 69 00    
     sta     ZP_Col_RAM_Ptr_Hi               ; 3705: 85 0D    
+
     lda     ZP_Col_RAM_Ptr_Lo               ; 3707: A5 0C    
     sec                                     ; 3709: 38       
     sbc     #$D1                            ; 370A: E9 D1    
     lda     ZP_Col_RAM_Ptr_Hi               ; 370C: A5 0D    
     sbc     #$1E                            ; 370E: E9 1E    
-    bcc     ZZZZZZ_4                        ; 3710: 90 0D    
+    bcc     SKIP_371F                       ; 3710: 90 0D    
+
     lda     ZP_Col_RAM_Ptr_Lo               ; 3712: A5 0C    
     sec                                     ; 3714: 38       
     sbc     #$D0                            ; 3715: E9 D0    
     sta     ZP_Col_RAM_Ptr_Lo               ; 3717: 85 0C    
+
     lda     ZP_Col_RAM_Ptr_Hi               ; 3719: A5 0D    
     sbc     #$0F                            ; 371B: E9 0F    
     sta     ZP_Col_RAM_Ptr_Hi               ; 371D: 85 0D    
+
 ; L_BRS_($371F)_($3710) OK
-ZZZZZZ_4
+SKIP_371F
     jmp     YYYYYY                          ; 371F: 4C 4C 36 
 ; -----------------------
+
 ; L_BRS_($3722)_($36E9) OK
-ZZZZZZ_5
+SKIP_3722
     lda     #$00                            ; 3722: A9 00    
     sta     ZP_0B                           ; 3724: 85 0B    
     jmp     YYYYYY                          ; 3726: 4C 4C 36 
 ; -----------------------
+
 ; L_BRS_($3729)_($36B1) OK
-ZZZZZZ_6
+SKIP_3729
     lda     #$00                            ; 3729: A9 00    
     sta     ZP_03                           ; 372B: 85 03    
+
     lda     ZP_Sprite_Width_Pixels          ; 372D: A5 14    
     ora     ZP_15                           ; 372F: 05 15    
-    bne     ZZZZZZ_7                        ; 3731: D0 01    
+    bne     SKIP_3734                       ; 3731: D0 01    
     rts                                     ; 3733: 60       
 ; ===========================================================
+
 ; L_BRS_($3734)_($3731) OK
-ZZZZZZ_7
-    jmp     ZZZZZZ_3                        ; 3734: 4C E7 36 
+SKIP_3734
+    jmp     ZZZZZZ_1                        ; 3734: 4C E7 36 
 ; -----------------------
 
 

@@ -1934,36 +1934,75 @@ comment  35FA
 deflabel 35FB OBJECT_COLOR_PARAM
 comment  3601
 label    3601 AAAAAA
+comment  3604
 label    3604 BBBBBB
 comment  360D
 label    360D CCCCCC
+comment  3610
 label    3610 DDDDDD
-label    3619 YYYYYY_1
-label    362F YYYYYY_2
+comment  3619
+label    3619 BACK_3619
+label    362F BACK_362F
 comment  3623
+comment  3626
 comment  362D
+comment  362F
 comment  3635
 comment  363A
 comment  363C
 label    3646 YYYYYY_ALT
 comment  3643
+comment  3646
+comment  364C
 label    364C YYYYYY
 comment  3652
 comment  3652 Copy $18 from 03 and 0B, is an index into the sprite data?
+comment  3656
 comment  365A
 comment  365A Both Pos1 and Pos2 were AF i.e. in this case Jetman on the ground,
 comment  365A so branch to ZZZ
-label    3674 YYYYYY_3
 comment  3668
-label    3688 ZZZZZZ
+comment  366B
+comment  3672
+label    3674 BACK_3674
+comment  367A
 comment  367F
-label    369C ZZZZZZ_1
-label    36AB ZZZZZZ_2
-label    36E7 ZZZZZZ_3
-label    371F ZZZZZZ_4
-label    3722 ZZZZZZ_5
-label    3729 ZZZZZZ_6
-label    3734 ZZZZZZ_7
+comment  3681
+comment  3688
+label    3688 ZZZZZZ
+comment  368E
+comment  3696
+comment  369C
+comment  36A6
+comment  36AB
+comment  36AF
+comment  36B3
+comment  36BC
+comment  36C2
+comment  36C9
+comment  36CF
+comment  36DA
+comment  36E1
+comment  36E7
+comment  36EB
+comment  36F4
+comment  36FA
+comment  3701
+comment  3707
+comment  3712
+comment  3719
+comment  371F
+comment  3722
+comment  3729
+comment  372D
+comment  3734
+label    369C BACK_369C
+label    36AB SKIP_36AB
+label    36E7 ZZZZZZ_1
+label    371F SKIP_371F
+label    3722 SKIP_3722
+label    3729 SKIP_3729
+label    3734 SKIP_3734
 comment  3737
 label    3737 Load_Small_UDG_Addr_Setup_XY_
 comment  373D
