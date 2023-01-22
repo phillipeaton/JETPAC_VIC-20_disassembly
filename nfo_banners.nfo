@@ -254,10 +254,15 @@ comment  3601
 comment  3601
 comment  3601
 comment  3601
-comment  3601 \   db    88""Yb  dP""b8 8888b.      Yb  dP Yb  dP 8888P
-comment  3601 \  dPYb   88__dP dP   `"  8I  Yb      YbdP   YbdP    dP
-comment  3601 \ dP__Yb  88""Yb Yb       8I  dY      dPYb    8P    dP
-comment  3601 \dP""""Yb 88oodP  YboodP 8888Y"      dP  Yb  dP    d8888
+comment  3601 \8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
+comment  3601 \ 8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
+comment  3601 \ 8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
+comment  3601 \8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
+comment  3601 \
+comment  3601 \.dP"Y8 88""Yb 88""Yb 88 888888 888888
+comment  3601 \`Ybo." 88__dP 88__dP 88   88   88__
+comment  3601 \o.`Y8b 88"""  88"Yb  88   88   88""
+comment  3601 \8bodP' 88     88  Yb 88   88   888888
 ; Check_New_High_Score
 comment  277A
 comment  277A

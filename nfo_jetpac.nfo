@@ -1933,44 +1933,55 @@ deflabel 35F5 OBJECT_Y_POSITION_PARAM
 comment  35FA
 deflabel 35FB OBJECT_COLOR_PARAM
 comment  3601
-label    3601 AAAAAA
+label    3601 Display_Sprite_With_Setup_AB
 comment  3604
-label    3604 BBBBBB
+label    3604 Display_Sprite_With_Setup_B
 comment  360D
-label    360D CCCCCC
+label    360D Display_Sprite_With_Setup_CD
 comment  3610
-label    3610 DDDDDD
+label    3610 Display_Sprite_With_Setup_D
 comment  3619
 label    3619 BACK_3619
+comment  361E CODE 361E/3663 IS THE SAME BUT WITH DIFF ZP VARS THROUGH TO ZZZZZZ ##########
 label    362F BACK_362F
 comment  3623
 comment  3626
 comment  362D
+comment  362D EXOR sprite data bytes from ###COLOR RAM???### static data to screen RAM, ZP08 offset decrements from $FF
 comment  362F
 comment  3635
 comment  363A
 comment  363C
-label    3646 YYYYYY_ALT
+label    3646 Display_Sprite_With_Setup
 comment  3643
 comment  3646
 comment  364C
-label    364C YYYYYY
+label    364C Display_Sprite
+comment  364E ZP08 and ZP09 used as index into UDG RAM and Color RAM respectively
 comment  3652
-comment  3652 Copy $18 from 03 and 0B, is an index into the sprite data?
+comment  3652 ZP03 contains the height of a sprite tile, from the UDG graphics static data
+comment  3652 Rocket is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
 comment  3656
+comment  3656 ZP0B contains the same as ZP03?????
 comment  365A
-comment  365A Both Pos1 and Pos2 were AF i.e. in this case Jetman on the ground,
-comment  365A so branch to ZZZ
+comment  365A Example for Jetman in initial postion, both Pos1 and Pos2 were AF
+comment  365A Subtract ZP19 from ZP11 and jump to ZZZZZZ if different
+comment  3663
+comment  3663 CODE 361E/3663 IS THE SAME BUT WITH DIFF ZP VARS THROUGH TO ZZZZZZ ##########
 comment  3668
 comment  366B
 comment  3672
-label    3674 BACK_3674
+comment  3672 EXOR sprite data bytes from UDG static data to screen RAM, ZP08 offset decrements from $FF
+comment  3674
+label    3674 LOOP_3674
 comment  367A
+comment  367A Dec Y register offset, decrement X register used as loop index
 comment  367F
 comment  3681
 comment  3688
 label    3688 ZZZZZZ
 comment  368E
+comment  368E EXOR sprite data bytes from UDG static data to screen RAM
 comment  3696
 comment  369C
 comment  36A6
@@ -1996,13 +2007,13 @@ comment  3722
 comment  3729
 comment  372D
 comment  3734
-label    369C BACK_369C
+label    369C LOOP_369C
 label    36AB SKIP_36AB
 label    36E7 ZZZZZZ_1
-label    371F SKIP_371F
-label    3722 SKIP_3722
-label    3729 SKIP_3729
-label    3734 SKIP_3734
+label    371F JMP_Display_Sprite
+label    3722 Zero_ZP0B__JMP_Display_Sprite
+label    3729 Sprite_Width_Complete
+label    3734 JMP_ZZZZZZ_1
 comment  3737
 label    3737 Load_Small_UDG_Addr_Setup_XY_
 comment  373D
