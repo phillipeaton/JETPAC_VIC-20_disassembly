@@ -3,10 +3,10 @@ label      00 ZP00_Obj_List_Ptr_Lo      ; 182
 label      01 ZP01_Obj_List_Ptr_Hi      ; 111
 label      02 ZP02                      ; 46
 label      03 ZP03                      ; 17
-label      04 ZP04_UDG_RAM_X            ; 56
-label      05 ZP05_UDG_RAM_Y            ; 35
-label      06 ZP06_Obj_Addr_Lo          ; 51 06/07 used as addr of sprite data + several other 06 only uses
-label      07 ZP07_Obj_Addr_Hi          ; 26 Used with 06
+label      04 ZP04_UDG_RAM_XY_Lo        ; 56
+label      05 ZP05_UDG_RAM_XY_Hi        ; 35
+label      06 ZP06_Sprite_Addr_Lo       ; 51 06/07 used as addr of sprite data + several other 06 only uses
+label      07 ZP07_Sprite_Addr_Hi       ; 26 Used with 06
 label      08 ZP08                      ; 42 Sprite Data Index ; Used with 09
 label      09 ZP09                      ; 11 Used with 08
 label      0A ZP0A_Obj_Height_Countdown ; 15

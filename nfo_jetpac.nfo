@@ -1941,9 +1941,11 @@ label    360D Display_Sprite_With_Setup_CD
 comment  3610
 label    3610 Display_Sprite_With_Setup_D
 comment  3619
-label    3619 BACK_3619
+comment  3619 When sprite is moving down the screen, the number of pixels it has moved down by will result
+comment  3619 in a number of pixel lines at the top of the sprite that need to be EXOR'd to erase them
+label    3619 Erase_Sprite_Moving_Downward
 comment  361E CODE 361E/3663 IS THE SAME BUT WITH DIFF ZP VARS THROUGH TO ZZZZZZ ##########
-label    362F BACK_362F
+label    362F LOOP_362F
 comment  3623
 comment  3626
 comment  362D
@@ -1967,6 +1969,7 @@ comment  365A
 comment  365A Example for Jetman in initial postion, both Pos1 and Pos2 were AF
 comment  365A Subtract ZP19 from ZP11 and jump to ZZZZZZ if different
 comment  3663
+comment  3663 Erase_Sprite_Moving_Upward, see comments for Erase_Sprite_Moving_Downward
 comment  3663 CODE 361E/3663 IS THE SAME BUT WITH DIFF ZP VARS THROUGH TO ZZZZZZ ##########
 comment  3668
 comment  366B
@@ -1979,7 +1982,7 @@ comment  367A Dec Y register offset, decrement X register used as loop index
 comment  367F
 comment  3681
 comment  3688
-label    3688 ZZZZZZ
+label    3688 Erase_Draw_Sprite
 comment  368E
 comment  368E EXOR sprite data bytes from UDG static data to screen RAM
 comment  3696
@@ -2007,13 +2010,13 @@ comment  3722
 comment  3729
 comment  372D
 comment  3734
-label    369C LOOP_369C
-label    36AB SKIP_36AB
-label    36E7 ZZZZZZ_1
+label    369C Erase_Draw_Sprite_Draw
+label    36AB Update_Sprite_Params_1
+label    36E7 Update_Sprite_Params_2
 label    371F JMP_Display_Sprite
-label    3722 Zero_ZP0B__JMP_Display_Sprite
+label    3722 Zero_ZP0B_JMP_Display_Sprite
 label    3729 Sprite_Width_Complete
-label    3734 JMP_ZZZZZZ_1
+label    3734 JMP_Update_Sprite_Params_2
 comment  3737
 label    3737 Load_Small_UDG_Addr_Setup_XY_
 comment  373D
