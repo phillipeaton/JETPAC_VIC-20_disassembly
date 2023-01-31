@@ -3,10 +3,10 @@ label      00 ZP00_Obj_List_Ptr_Lo      ; 182
 label      01 ZP01_Obj_List_Ptr_Hi      ; 111
 label      02 ZP02                      ; 46
 label      03 ZP03                      ; 17
-label      04 ZP04_UDG_RAM_XY_Lo        ; 56
-label      05 ZP05_UDG_RAM_XY_Hi        ; 35
-label      06 ZP06_Sprite_Addr_Lo       ; 51 06/07 used as addr of sprite data + several other 06 only uses
-label      07 ZP07_Sprite_Addr_Hi       ; 26 Used with 06
+label      04 ZP04_UDG_RAM_X            ; 56
+label      05 ZP05_UDG_RAM_Y            ; 35
+label      06 ZP06_Obj_Addr_Lo          ; 51 06/07 used as addr of sprite data + several other 06 only uses
+label      07 ZP07_Obj_Addr_Hi          ; 26 Used with 06
 label      08 ZP08                      ; 42 Sprite Data Index ; Used with 09
 label      09 ZP09                      ; 11 Used with 08
 label      0A ZP0A_Obj_Height_Countdown ; 15
@@ -19,7 +19,7 @@ label      10 ZP10_Obj_X_Position_1     ; 04
 label      11 ZP11_Obj_Y_Position_1     ; 09
 label      12 ZP12_Obj_Type_1           ; 03
 label      13 ZP13                      ; 18
-label      14 ZP14_Sprite_Width_Bytes   ; 08 Connected somehow. Shuffled in a subroutine.
+label      14 ZP14_Sprite_Width_Pixels  ; 08 Connected somehow. Shuffled in a subroutine.
 label      15 ZP15                      ; 08 Connected somehow. Shuffled in a subroutine.
 label      16 ZP16                      ; 05 Connected somehow. Shuffled in a subroutine.
 label      17 ZP17                      ; 04 Connected somehow. Shuffled in a subroutine.
@@ -205,11 +205,11 @@ label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00
 ;label   03F0 Obj_Alien_5_0 ;     03F0  05 19 F8 8D 00 06 00 00
 
 ; UDG RAM positions of score data
-;label    1008 Display_P1_Score_Posn
-;label    1420 Display_P1_Lives_Posn
-;label    1588 Display_Hi_Score_Posn
-;label    19a0 Display_P2_Lives_Posn
-;label    1b08 Display_P2_Score_Posn
+label    1008 Display_P1_Score_Posn
+label    1420 Display_P1_Lives_Posn
+label    1588 Display_Hi_Score_Posn
+label    19a0 Display_P2_Lives_Posn
+label    1b08 Display_P2_Score_Posn
 
 ; Other variables that are somewhat persistent i.e. not reset at game restart
 label    1fd0 Score_Hi

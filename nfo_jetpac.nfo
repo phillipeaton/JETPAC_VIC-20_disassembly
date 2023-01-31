@@ -1943,46 +1943,67 @@ label    3610 Display_Sprite_With_Setup_D
 comment  3619
 comment  3619 When sprite is moving down the screen, the number of pixels it has moved down by will result
 comment  3619 in a number of pixel lines at the top of the sprite that need to be EXOR'd to erase them
+comment  3619 Initial EOR/CLC/ADC performs an ABS on old/new sprite Y position delta for use as loop index
 label    3619 Erase_Sprite_Moving_Downward
-comment  361E CODE 361E/3663 IS THE SAME BUT WITH DIFF ZP VARS THROUGH TO ZZZZZZ ##########
-label    362F LOOP_362F
+comment  361E Note code from 361E & 3663 is basically the same until Erase_Draw, but
+comment  361E using old and new sprite parameters
+comment  3622
+comment  3622 Set X as number of Y pixel-lines to erase only i.e. no following draw for this sprite
 comment  3623
+comment  3623 Subtract number of Y erase-only pixels from total sprite tile height and store to loop
+comment  3623 index for later
 comment  3626
 comment  362D
-comment  362D EXOR sprite data bytes from ###COLOR RAM???### static data to screen RAM, ZP08 offset decrements from $FF
-comment  362F
+comment  362D Erase old sprite data bytes from UDG static data to screen RAM by EXORing
+comment  362D ZP09 offset decrements from $FF, ZP0E holds address of old UDG sprite data,
+comment  362D ZP0C holds address of sprite data on screen to be written to
+label    362F LOOP_362F
 comment  3635
-comment  363A
+comment  3635 Decrement pointer into UDG static data and the loop index
+comment  3639
+comment  3639 Restore the number of pixel lines to erased and store to ZP13, then subtract it from
+comment  3639 ZP09, the updated address offset for erase/draw the first/next part of the new sprite
 comment  363C
 label    3646 Display_Sprite_With_Setup
 comment  3643
 comment  3646
 comment  364C
 label    364C Display_Sprite
-comment  364E ZP08 and ZP09 used as index into UDG RAM and Color RAM respectively
+comment  364E ZP08 and ZP09 used as index into UDG RAM for old sprite and new sprite data
 comment  3652
 comment  3652 ZP03 contains the height of a sprite tile, from the UDG graphics static data
+comment  3652 e.g. Alien cross sprite height is $0A pixels/lines
 comment  3652 Rocket is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
 comment  3656
-comment  3656 ZP0B contains the same as ZP03?????
+comment  3656 ZP0B contains what...needs more analysis, but appears to hold the same as ZP03
 comment  365A
-comment  365A Example for Jetman in initial postion, both Pos1 and Pos2 were AF
-comment  365A Subtract ZP19 from ZP11 and jump to ZZZZZZ if different
+comment  365A Test if updated sprite Y position has changed, if yes, horizontal pixels can be erased
+comment  365A from top or bottom of old sprite that are outside new sprite position, else jump
+comment  365A directly to erase/draw routine
 comment  3663
-comment  3663 Erase_Sprite_Moving_Upward, see comments for Erase_Sprite_Moving_Downward
-comment  3663 CODE 361E/3663 IS THE SAME BUT WITH DIFF ZP VARS THROUGH TO ZZZZZZ ##########
+comment  3663 Erase_Sprite_Moving_Upward, see also comments for Erase_Sprite_Moving_Downward
+comment  3663 Note code from 361E & 3663 is basically the same until Erase_Draw, but
+comment  3663 using old and new sprite parameters
+comment  3667
+comment  3667 Set X as number of Y pixel-lines to erase only i.e. no following draw for this sprite
 comment  3668
+comment  3668 Subtract number of Y erase-only pixels from total sprite tile height and store to loop
+comment  3668 index for later
 comment  366B
 comment  3672
-comment  3672 EXOR sprite data bytes from UDG static data to screen RAM, ZP08 offset decrements from $FF
-comment  3674
+comment  3672 Erase old sprite data bytes from UDG static data to screen RAM by EXORing
+comment  3672 ZP08 offset decrements from $FF, ZP06 holds address of old UDG sprite data,
+comment  3672 ZP04 holds address of sprite data on screen to be written to
 label    3674 LOOP_3674
 comment  367A
-comment  367A Dec Y register offset, decrement X register used as loop index
+comment  367A Decrement pointer into UDG static data and the loop index
+comment  367E
+comment  367E Restore the number of pixel lines to erased and store to ZP13, then subtract it from
+comment  367E ZP08, the updated address offset for erase/draw the first/next part of the new sprite
 comment  367F
 comment  3681
 comment  3688
-label    3688 Erase_Draw_Sprite
+label    3688 Erase_Sprite
 comment  368E
 comment  368E EXOR sprite data bytes from UDG static data to screen RAM
 comment  3696
@@ -2001,6 +2022,9 @@ comment  36E7
 comment  36EB
 comment  36F4
 comment  36FA
+label    369C Draw_Sprite
+label    36AB Update_Sprite_Params_1
+label    36E7 Update_Sprite_Params_2
 comment  3701
 comment  3707
 comment  3712
@@ -2010,9 +2034,6 @@ comment  3722
 comment  3729
 comment  372D
 comment  3734
-label    369C Erase_Draw_Sprite_Draw
-label    36AB Update_Sprite_Params_1
-label    36E7 Update_Sprite_Params_2
 label    371F JMP_Display_Sprite
 label    3722 Zero_ZP0B_JMP_Display_Sprite
 label    3729 Sprite_Width_Complete
