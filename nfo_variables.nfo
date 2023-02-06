@@ -19,7 +19,7 @@ label      10 ZP10_Obj_X_Position_1     ; 04
 label      11 ZP11_Obj_Y_Position_1     ; 09
 label      12 ZP12_Obj_Type_1           ; 03
 label      13 ZP13                      ; 18
-label      14 ZP14_Sprite_Width_Pixels  ; 08 Connected somehow. Shuffled in a subroutine.
+label      14 ZP14_Sprite_Width_Bytes   ; 08 Connected somehow. Shuffled in a subroutine.
 label      15 ZP15                      ; 08 Connected somehow. Shuffled in a subroutine.
 label      16 ZP16                      ; 05 Connected somehow. Shuffled in a subroutine.
 label      17 ZP17                      ; 04 Connected somehow. Shuffled in a subroutine.
