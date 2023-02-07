@@ -9,7 +9,7 @@ label      06 ZP06_Obj_Addr_Lo          ; 51 06/07 used as addr of sprite data +
 label      07 ZP07_Obj_Addr_Hi          ; 26 Used with 06
 label      08 ZP08                      ; 42 Sprite Data Index ; Used with 09
 label      09 ZP09                      ; 11 Used with 08
-label      0A ZP0A_Obj_Height_Countdown ; 15
+label      0A ZP0A                      ; 15
 label      0B ZP0B                      ; 18
 label      0C ZP0C_Col_RAM_Ptr_Lo       ; 28
 label      0D ZP0D_Col_RAM_Ptr_Hi       ; 10

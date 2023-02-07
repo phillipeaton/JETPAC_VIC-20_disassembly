@@ -2007,7 +2007,8 @@ label    3688 Erase_Old_Sprite
 comment  368E
 comment  368E EXOR sprite data bytes from UDG static data to screen RAM to erase
 comment  3696
-comment  3696 Test if all sprite lines erased yet
+comment  3698
+comment  3698 Test if all sprite lines erased yet
 comment  369C
 comment  369E
 comment  369E EXOR sprite data bytes from UDG static data to screen RAM to draw
@@ -2020,7 +2021,7 @@ comment  36B5 Update 16-bit address to point to the old??? sprite data block ???
 comment  36BC
 comment  36C2
 comment  36C2 Update 16-bit address to point to the new??? sprite data block ????
-deflabel 36C6 SCREEN_HEIGHT_PIXELS
+;deflabel 36C6 SCREEN_HEIGHT_PIXELS - B0, not B8
 comment  36C9
 comment  36CF
 comment  36CF WHAT'S THIS FOR?
@@ -2034,6 +2035,7 @@ comment  36ED Update 16-bit address to point to the old??? sprite data block ???
 comment  36F4
 comment  36FA
 comment  36FA Update 16-bit address to point to the new??? sprite data block ????
+;deflabel 36FE SCREEN_HEIGHT_PIXELS - B0, not B8
 label    369C Draw_New_Sprite
 label    36AB Update_Sprite_Params_1
 label    36E7 Update_Sprite_Params_2
