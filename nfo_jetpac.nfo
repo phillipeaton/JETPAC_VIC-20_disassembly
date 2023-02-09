@@ -246,10 +246,12 @@ comment  21DF
 comment  21DF Invert the displayed 8-bit byte on-screen
 comment  21E5
 comment  21E5 Load current tile color, check it's not green, if not update tile color
+lcomment 21E5 ZP0C_Col_RAM_Ptr_Lo
 lcomment 21E7 Zero top 4 bits
 lcomment 21E9 Test if 0101
 deflabel 21EA GREEN
 lcomment 21ED Tile color
+lcomment 21EF ZP0C_Col_RAM_Ptr_Lo
 label    21F1 FP3333
 comment  21F1
 comment  21F1 Some kind of screen wrap?
@@ -578,7 +580,7 @@ label    261A GOTO_NEXT_OBJECT
 lcomment 261C Test Object Type value
 lcomment 261E If <>00, skip
 comment  2620
-comment  2620 Test if sprite is a rocket module
+comment  2620 Test if object is a rocket module
 lcomment 2622 Is Object address $B0?
 lcomment 2624 If not, skip
 comment  2626
@@ -598,7 +600,7 @@ lcomment 263D Is Object address a rocket module?
 comment  2645
 comment  264B
 comment  2652
-comment  2652 Test if score flash time is zero, if yes, setup sprites
+comment  2652 Test if score flash time is zero, if yes, setup objects
 label    2652 Test_Score_Flash_Time_At_Zero
 comment  2655
 label    2655 Spawn_Objects
@@ -699,7 +701,7 @@ comment  272C Manipulate timer to make a nice sound
 comment  2735
 label    2735 Rocket_Flight
 comment  273A
-comment  273A Utilise rocket sprite height to manipulate noise sound channel
+comment  273A Utilise rocket object height to manipulate noise sound channel
 label    2743 Subroutine_Sound_Jump_Table
 comment  2743
 word     2743-274D
@@ -767,6 +769,8 @@ lcomment 27C7 Display Flame
 lcomment 27C9 Don't display Flame
 comment  27CB
 label    27E1 Display_Rocket_Flame_2
+lcomment 2806 ZP0C_Col_RAM_Ptr_Lo
+lcomment 2809 ZP0C_Col_RAM_Ptr_Lo
 comment  280B
 comment  280B Restore 11 and 19 and return
 label    280B Display_Rocket_Flame_3
@@ -830,7 +834,7 @@ lcomment 2908 Set bits 0-1 i.e. xxxxxx11
 comment  290A
 label    290A Store_Object_Type
 comment  290E
-comment  290E Change sprite type to an Explosion
+comment  290E Change object type to an Explosion
 comment  2914
 comment  2914 Reset diagonal jiggles
 comment  2919
@@ -1135,14 +1139,14 @@ comment  2C99
 comment  2C99 Alien has hit Jetman
 label    2C9F Update_Object_Position
 comment  2C9F
-comment  2C9F Get sprite direction/speed and use to create new X value
+comment  2C9F Get object direction/speed and use to create new X value
 deflabel 2CA0 OBJECT_X_DIRECTION_PARAM
 comment  2CAB
 comment  2CAB Take care of X screen wrapping (note $f0=-16 decimal)
 deflabel 2CB0 SCREEN_WIDTH_PIXELS
-label    2CB3 Update_Sprite_X_Position
+label    2CB3 Update_Object_X_Position
 comment  2CB5
-comment  2CB5 Get sprite direction/speed and use to create new Y value
+comment  2CB5 Get object direction/speed and use to create new Y value
 deflabel 2CB6 OBJECT_Y_DIRECTION_PARAM
 comment  2CC3
 comment  2CCC
@@ -1157,7 +1161,7 @@ word     2CDB-2CE2
 label    2CE3 Obj_Ptr_To_Alien_0_Jetman
 deflabel 2CE9 JETMAN_FLYING
 deflabel 2CED JETMAN_STANDING
-comment  2CF1 Set Object List Pointer to first alien sprite
+comment  2CF1 Set Object List Pointer to first alien object
 label    2CF1 Set_Obj_List_Ptr_To_Alien_0
 comment  2CF9
 comment  2CF9 Setup 6 alien objects DEBUG Set 2CFA to 1 to spawn only 1 alien
@@ -1168,10 +1172,10 @@ lcomment 2D01 Object not currently used
 comment  2D03
 comment  2D03 Move pointer to next object
 lcomment 2D0A Dec object counter
-comment  2D0F Initiate new alien sprite
+comment  2D0F Initiate new alien object
 comment  2D0F InReg Y always 0
 comment  2D0F Set type depending on current level i.e. 0, 1, 2 or 3
-label    2D0F Init_Alien_Sprite
+label    2D0F Init_Alien_Object
 lcomment 2D11 Zero bits 2-7
 lcomment 2D13 Save current level
 comment  2D19
@@ -1237,7 +1241,7 @@ label    2DCB Restore_Player_Objects_4
 label    2DD1 Restore_Player_Objects_5
 comment  2DA1
 word     2DBC
-label    2DDD Set_Sprite_UDG_Color
+label    2DDD Set_Object_UDG_Color
 label    2DE8 Restore_Player_Objects_6
 lcomment 2DEC Current level modulus 4
 comment  2DF1
@@ -1298,6 +1302,12 @@ label    2F07 Rocket_Fuelled_Up_5
 comment  2F0D
 comment  2F13
 label    2F16 Rocket_Fuelled_Up_6
+lcomment 2F1A ZP0C_Col_RAM_Ptr_Lo
+lcomment 2F1D ZP0C_Col_RAM_Ptr_Lo
+lcomment 2F1F ZP0C_Col_RAM_Ptr_Lo
+lcomment 2F24 ZP0C_Col_RAM_Ptr_Lo
+lcomment 2F26 ZP0D_Col_RAM_Ptr_Hi
+lcomment 2F2A ZP0D_Col_RAM_Ptr_Hi
 comment  2F31
 comment  2F31 Test if rocket part has landed, $08=middle part, $10=top part
 comment  2F31 $18=Fuel (?!)
@@ -1359,19 +1369,19 @@ comment  2FB2 Move object down by 2 pixels, make Y an odd number
 label    2FB2 Rocket_Part_Or_Fuel_Move_Down
 deflabel 2FB3 OBJECT_Y_POSITION_PARAM
 comment  2FBD
-label    2FBD Setup_Sprite_Addr_Rocket_Fuel
-label    2FC3 Setup_Sprite_Addr
+label    2FBD Setup_Object_Addr_Rocket_Fuel
+label    2FC3 Setup_Object_Addr
 comment  2FC3
-comment  2FC3 Using index into sprite data, get addr of sprite data to A and Y and setup into ZP
+comment  2FC3 Using index into object data, get addr of object data to A and Y and setup into ZP
 comment  2FCB
-comment  2FCB Do it again to setup the sprite dimensions
-comment  2FBD Load current object attributes into ZP variables and sprite index into A
+comment  2FCB Do it again to setup the object dimensions
+comment  2FBD Load current object attributes into ZP variables and object index into A
 comment  2FDA
-comment  2FDA Returns UDG sprite data index to Rocket Middle Section/Fuel depending on level
-label    2FDA Get_Sprite_Addr_Rocket_or_Fuel
-label    2FDC Get_Sprite_Addr_Rocket_or_Fue_1
+comment  2FDA Returns UDG object data index to Rocket Middle Section/Fuel depending on level
+label    2FDA Get_Object_Addr_Rocket_or_Fuel
+label    2FDC Get_Object_Addr_Rocket_or_Fue_1
 comment  2FDC
-comment  2FDC Calculate and return index to object's sprite based on A e.g. player level
+comment  2FDC Calculate and return index to object's object based on A e.g. player level
 comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat
 binary   2FDE
 deflabel 2FE0 OBJECT_PARAM
@@ -1388,18 +1398,18 @@ word     2FFD
 const    2FFD
 comment  3003
 comment  3003 Trigger collision pickup sound
-lcomment 3005 Flame sprite X pos??
-lcomment 300A Flame sprite direction?
+lcomment 3005 Flame object X pos??
+lcomment 300A Flame object direction?
 comment  300D
-lcomment 3012 Store current Jetman sprite X pos into current object?
-lcomment 3019 Store current Jetman sprite Y pos into current object?
+lcomment 3012 Store current Jetman object X pos into current object?
+lcomment 3019 Store current Jetman object Y pos into current object?
 label    301E Copy_Jetman_XY_To_Object
 comment  3028
 comment  302F
-label    303E Copy_Jetman_XY_To_Sprite_0
+label    303E Copy_Jetman_XY_To_Object_0
 comment  3042
 comment  304A
-label    3051 Copy_Jetman_XY_To_Sprite_1
+label    3051 Copy_Jetman_XY_To_Object_1
 label    3054 Load_Rocket_or_Fuel_UDGs
 label    3057 Load_Rocket_or_Fuel_UDGs_1
 label    305A Load_Rocket_or_Fuel_UDGs_2
@@ -1509,6 +1519,7 @@ comment  3180
 comment  3186
 comment  3186 Set the color mapping for the platforms to Green
 deflabel 3192 GREEN
+lcomment 3193 ZP0C_Col_RAM_Ptr_Lo
 label    3193 DP_2
 label    31A2 Next_UDG_Char_Loop_Next_Char
 label    31A8 Next_UDG_Char
@@ -1793,6 +1804,8 @@ comment  34E3
 label    34E3 Display_Character
 comment  34E9
 comment  34F0
+lcomment 34F3 ZP0C_Col_RAM_Ptr_Lo
+lcomment 34FC ZP0C_Col_RAM_Ptr_Lo
 comment  34F7
 label    34F7 Setup_Color_RAM_Ptr
 lcomment 34F7 Get Addr_To lo-byte and divide by 8
@@ -1804,9 +1817,12 @@ lcomment 3500 and use as index into Color RAM
 lcomment 3501 Row Offsets i.e. 9600, 9617, 962e etc.
 lcomment 3502 Divided by #16 because 16 y-pixels per
 lcomment 3503 Color RAM tile.
+lcomment 3509 ZP0C_Col_RAM_Ptr_Lo
+lcomment 350B ZP0C_Col_RAM_Ptr_Lo
 comment  350D
 lcomment 350D Store hi-byte of Color RAM
 lcomment 350F to pointer hi-byte.
+lcomment 350F ZP0D_Col_RAM_Ptr_Hi
 const    3512-351C
 label    3512 Color_RAM_Row_Offsets
 comment  351D
@@ -1933,94 +1949,94 @@ deflabel 35F5 OBJECT_Y_POSITION_PARAM
 comment  35FA
 deflabel 35FB OBJECT_COLOR_PARAM
 comment  3601
-label    3601 Display_Sprite_With_Setup_AB
+label    3601 Display_Object_With_Setup_AB
 comment  3604
-label    3604 Display_Sprite_With_Setup_B
+label    3604 Display_Object_With_Setup_B
 comment  360D
-label    360D Display_Sprite_With_Setup_CD
+label    360D Display_Object_With_Setup_CD
 comment  3610
-label    3610 Display_Sprite_With_Setup_D
+label    3610 Display_Object_With_Setup_D
 comment  3619
-comment  3619 When sprite is moving down the screen, the number of pixels it has moved down by will result
-comment  3619 in a number of pixel lines at the top of the sprite that need to be EXOR'd to erase them
-comment  3619 Initial EOR/CLC/ADC performs an ABS on old/new sprite Y position delta for use as loop index
-label    3619 Erase_Sprite_Moving_Downward
+comment  3619 When object is moving down the screen, the number of pixels it has moved down by will result
+comment  3619 in a number of pixel lines at the top of the object that need to be EXOR'd to erase them
+comment  3619 Initial EOR/CLC/ADC performs an ABS on old/new object Y position delta for use as loop index
+label    3619 Erase_Object_Moving_Downward
 comment  361E Note code from 361E & 3663 is basically the same until Erase_Draw, but
-comment  361E using old and new sprite parameters
+comment  361E using old and new object parameters
 comment  3622
-comment  3622 Set X as number of Y pixel-lines to erase only i.e. no following draw for this sprite
+comment  3622 Set X as number of Y pixel-lines to erase only i.e. no following draw for this object
 comment  3623
-comment  3623 Subtract number of Y erase-only pixels from total sprite tile height and store to loop
+comment  3623 Subtract number of Y erase-only pixels from total object tile height and store to loop
 comment  3623 index for later
 comment  3626
 comment  362D
-comment  362D Erase old sprite data bytes from UDG static data to screen RAM by EXORing
-comment  362D ZP09 offset decrements from $FF, ZP0E holds address of old UDG sprite data,
-comment  362D ZP0C holds address of sprite data on screen to be written to
+comment  362D Erase old object data bytes from UDG static data to screen RAM by EXORing
+comment  362D ZP09 offset decrements from $FF, ZP0E holds address of old UDG object data,
+comment  362D ZP0C holds address of object data on screen to be written to
 label    362F LOOP_362F
 comment  3635
 comment  3635 Decrement pointer into UDG static data and the loop index
 comment  3639
 comment  3639 Restore the number of pixel lines to erased and store to ZP13, then subtract it from
-comment  3639 ZP09, the updated address offset for erase/draw the first/next part of the new sprite
+comment  3639 ZP09, the updated address offset for erase/draw the first/next part of the new object
 comment  363C
-label    3646 Display_Sprite_With_Setup
+label    3646 Display_Object_With_Setup
 comment  3643
 comment  3646
 comment  364C
-label    364C Display_Sprite
-comment  364E ZP08 and ZP09 used as index into UDG RAM for old sprite and new sprite data
+label    364C Display_Object
+comment  364E ZP08 and ZP09 used as index into UDG RAM for old object and new object data
 comment  3652
-comment  3652 ZP03 contains the height of a sprite tile, from the UDG graphics static data
-comment  3652 e.g. Alien cross sprite height is $0A pixels/lines
+comment  3652 ZP03 contains the height of a object tile, from the UDG graphics static data
+comment  3652 e.g. Alien cross object height is $0A pixels/lines
 comment  3652 Rocket is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
 comment  3656
 comment  3656 ZP0B contains what...needs more analysis, but appears to hold the same as ZP03
 comment  365A
-comment  365A Test if updated sprite Y position has changed, if yes, horizontal pixels can be erased
-comment  365A from top or bottom of old sprite that are outside new sprite position, else jump
+comment  365A Test if updated object Y position has changed, if yes, horizontal pixels can be erased
+comment  365A from top or bottom of old object that are outside new object position, else jump
 comment  365A directly to erase/draw routine
 comment  3663
-comment  3663 Erase_Sprite_Moving_Upward, see also comments for Erase_Sprite_Moving_Downward
+comment  3663 Erase_Object_Moving_Upward, see also comments for Erase_Object_Moving_Downward
 comment  3663 Note code from 361E & 3663 is basically the same until Erase_Draw, but
-comment  3663 using old and new sprite parameters
+comment  3663 using old and new object parameters
 comment  3667
-comment  3667 Set X as number of Y pixel-lines to erase only i.e. no following draw for this sprite
+comment  3667 Set X as number of Y pixel-lines to erase only i.e. no following draw for this object
 comment  3668
-comment  3668 Subtract number of Y erase-only pixels from total sprite tile height and store to loop
+comment  3668 Subtract number of Y erase-only pixels from total object tile height and store to loop
 comment  3668 index for later
 comment  366B
 comment  3672
-comment  3672 Erase old sprite data bytes from UDG static data to screen RAM by EXORing
-comment  3672 ZP08 offset decrements from $FF, ZP06 holds address of old UDG sprite data,
-comment  3672 ZP04 holds address of sprite data on screen to be written to
+comment  3672 Erase old object data bytes from UDG static data to screen RAM by EXORing
+comment  3672 ZP08 offset decrements from $FF, ZP06 holds address of old UDG object data,
+comment  3672 ZP04 holds address of object data on screen to be written to
 label    3674 LOOP_3674
 comment  367A
 comment  367A Decrement pointer into UDG static data and the loop index
 comment  367E
 comment  367E Restore the number of pixel lines to erased and store to ZP13, then subtract it from
-comment  367E ZP08, the updated address offset for erase/draw the first/next part of the new sprite
+comment  367E ZP08, the updated address offset for erase/draw the first/next part of the new object
 comment  367F
 comment  3681
 comment  3688
-label    3688 Erase_Old_Sprite
+label    3688 Erase_Old_Object
 comment  368E
-comment  368E EXOR sprite data bytes from UDG static data to screen RAM to erase
+comment  368E EXOR object data bytes from UDG static data to screen RAM to erase
 comment  3696
 comment  3698
-comment  3698 Test if all sprite lines erased yet
+comment  3698 Test if all object lines erased yet
 comment  369C
 comment  369E
-comment  369E EXOR sprite data bytes from UDG static data to screen RAM to draw
+comment  369E EXOR object data bytes from UDG static data to screen RAM to draw
 comment  36A6
 comment  36AB
 comment  36AF
 comment  36B3
 comment  36B5
-comment  36B5 Update 16-bit address to point to the old??? sprite data block ????
+comment  36B5 Update 16-bit address to point to the old??? object data block ????
 comment  36BC
 comment  36C2
-comment  36C2 Update 16-bit address to point to the new??? sprite data block ????
+comment  36C2 Update 16-bit address to point to the new??? object data block ????
 ;deflabel 36C6 SCREEN_HEIGHT_PIXELS - B0, not B8
 comment  36C9
 comment  36CF
@@ -2031,14 +2047,14 @@ comment  36E1
 comment  36E7
 comment  36EB
 comment  36ED
-comment  36ED Update 16-bit address to point to the old??? sprite data block ????
+comment  36ED Update 16-bit address to point to the old??? object data block ????
 comment  36F4
 comment  36FA
-comment  36FA Update 16-bit address to point to the new??? sprite data block ????
+comment  36FA Update 16-bit address to point to the new??? object data block ????
 ;deflabel 36FE SCREEN_HEIGHT_PIXELS - B0, not B8
-label    369C Draw_New_Sprite
-label    36AB Update_Sprite_Params_1
-label    36E7 Update_Sprite_Params_2
+label    369C Draw_New_Object
+label    36AB Update_Object_Params_1
+label    36E7 Update_Object_Params_2
 comment  3701
 comment  3707
 comment  3707 WHAT'S THIS FOR?
@@ -2050,10 +2066,10 @@ comment  3722
 comment  3729
 comment  372D
 comment  3734
-label    371F JMP_Display_Sprite
-label    3722 Zero_ZP0B_JMP_Display_Sprite
-label    3729 Sprite_Width_Complete
-label    3734 JMP_Update_Sprite_Params_2
+label    371F JMP_Display_Object
+label    3722 Zero_ZP0B_JMP_Display_Object
+label    3729 Object_Width_Complete
+label    3734 JMP_Update_Object_Params_2
 comment  3737
 label    3737 Load_Small_UDG_Addr_Setup_XY_
 comment  373D
@@ -2069,17 +2085,19 @@ lcomment 3757 Wrap
 deflabel 3758 SCREEN_WIDTH_PIXELS
 label    3759 Load_Small_UDG_Addr_Setup_XY_1
 comment  375D
+lcomment 3765 ZP0C_Col_RAM_Ptr_Lo
 comment  3767
+lcomment 376B ZP0D_Col_RAM_Ptr_Hi
 comment  376D
 comment  3775
 comment  377C
 comment  3783
 comment  378A
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
-label    378A Set_UDG_RAM_Ptr_Sprite_Dimen_
+label    378A Set_UDG_RAM_Ptr_Object_Dimen_
 comment  378D
 comment  378D Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
-label    378D Set_UDG_RAM_Ptr_Sprite_Dimen
+label    378D Set_UDG_RAM_Ptr_Object_Dimen
 comment  3793
 comment  3793 Setup UDG RAM X & Y
 comment  379B
@@ -2090,12 +2108,12 @@ label    37A9 No_X_Wrap
 comment  37AE
 comment  37AE Subtract $FF from 16-bit UDG_RAM addr?
 comment  37BB
-comment  37BB Get/store sprite width in characters (zero-based)
+comment  37BB Get/store object width in characters (zero-based)
 comment  37C1
-comment  37C1 Get/store sprite height in pixels
+comment  37C1 Get/store object height in pixels
 comment  37C6
-comment  37C6 Subtract $03 from 16-bit sprite UDG addr, i.e. so address
-comment  37C6 avoids the sprite dimension bytes
+comment  37C6 Subtract $03 from 16-bit object UDG addr, i.e. so address
+comment  37C6 avoids the object dimension bytes
 comment  37CD
 comment  37D4
 label    37D4 Get_Obj_UDG_Addr_1
@@ -2145,11 +2163,15 @@ comment  3835 Outer loop decrementing ZP_0B
 comment  3835 Inner loop decrementing ZP_0A
 label    383B Update_Color_RAM_1
 label    383F Update_Color_RAM_2
+lcomment 383F ZP0C_Col_RAM_Ptr_Lo
 comment  383F
 comment  3847
+lcomment 3849 ZP0C_Col_RAM_Ptr_Lo
 comment  384B
 label    384B Update_Color_RAM_3
+lcomment 384F ZP0C_Col_RAM_Ptr_Lo
 comment  384F
+lcomment 3858 ZP0C_Col_RAM_Ptr_Lo
 comment  385A
 label    385E Update_Color_RAM_RTS
 ;
@@ -2162,7 +2184,7 @@ label    3860 UDG_Lookup+1
 break    385F-3FFF ; Output one byte per line
 word     385F-3896
 ;
-; Sprites and UDG start here
+; Objects and UDG start here
 ;
 comment  3897
 binary   3897-3C86
@@ -2187,9 +2209,9 @@ label    3BBE Jetman_Fly_Right_2
 label    3BF1 Jetman_Fly_Right_3
 label    3C3C Jetman_Fly_Right_4
 lcomment 3C87 $3CD4 = Ship_1_Bott
-label    3C87 UDG_Sprite_Lookup_Lo
-label    3C88 UDG_Sprite_Lookup_Hi
-lcomment 3C9F Multiple entries for simple UDG sprite indexing based on player level
+label    3C87 UDG_Object_Lookup_Lo
+label    3C88 UDG_Object_Lookup_Hi
+lcomment 3C9F Multiple entries for simple UDG object indexing based on player level
 label    3E46 Alien_Ship_1
 label    3E61 Alien_Ship_2
 label    3E78 Alien_Fuzz_1

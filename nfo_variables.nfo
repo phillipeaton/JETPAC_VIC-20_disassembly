@@ -1,32 +1,32 @@
-; Zero-Page variables ; Usage count
-label      00 ZP00_Obj_List_Ptr_Lo      ; 182
-label      01 ZP01_Obj_List_Ptr_Hi      ; 111
-label      02 ZP02                      ; 46
-label      03 ZP03                      ; 17
-label      04 ZP04_UDG_RAM_X            ; 56
-label      05 ZP05_UDG_RAM_Y            ; 35
-label      06 ZP06_Obj_Addr_Lo          ; 51 06/07 used as addr of sprite data + several other 06 only uses
-label      07 ZP07_Obj_Addr_Hi          ; 26 Used with 06
-label      08 ZP08                      ; 42 Sprite Data Index ; Used with 09
-label      09 ZP09                      ; 11 Used with 08
-label      0A ZP0A                      ; 15
-label      0B ZP0B                      ; 18
-label      0C ZP0C_Col_RAM_Ptr_Lo       ; 28
-label      0D ZP0D_Col_RAM_Ptr_Hi       ; 10
-label      0E ZP0E_Addr_Ptr_Lo          ; 21
-label      0F ZP0F_Addr_Ptr_Hi          ; 12
-label      10 ZP10_Obj_X_Position_1     ; 04
-label      11 ZP11_Obj_Y_Position_1     ; 09
-label      12 ZP12_Obj_Type_1           ; 03
-label      13 ZP13                      ; 18
-label      14 ZP14_Sprite_Width_Bytes   ; 08 Connected somehow. Shuffled in a subroutine.
-label      15 ZP15                      ; 08 Connected somehow. Shuffled in a subroutine.
-label      16 ZP16                      ; 05 Connected somehow. Shuffled in a subroutine.
-label      17 ZP17                      ; 04 Connected somehow. Shuffled in a subroutine.
-label      18 ZP18_Obj_X_Position_2     ; 07
-label      19 ZP19_Obj_Y_Position_2     ; 12
-label      1A ZP1A_Obj_Type_2           ; 03 Save_Obj_List_Params 2
-label      1B ZP1B_Obj_Color_2          ; 10 Save_Obj_List_Params 2
+; Zero-Page variables                             ; Usage count
+label      00 ZP00_Obj_List_Ptr_Lo                ; 182
+label      01 ZP01_Obj_List_Ptr_Hi                ; 111
+label      02 ZP02                                ; 46
+label      03 ZP03                                ; 17
+label      04 ZP04_UDG_RAM_X                      ; 56
+label      05 ZP05_UDG_RAM_Y                      ; 35
+label      06 ZP06                                ; 51 06/07 used as addr of sprite data + several other 06 only uses
+label      07 ZP07                                ; 26 06/07 used as addr of sprite data + several other 06 only uses
+label      08 ZP08                                ; 42 Sprite Data Index ; Used with 09
+label      09 ZP09                                ; 11 Used with 08
+label      0A ZP0A                                ; 15
+label      0B ZP0B                                ; 18
+label      0C ZP0C                                ; 28
+label      0D ZP0D                                ; 10
+label      0E ZP0E_Addr_Ptr_Lo                    ; 21
+label      0F ZP0F_Addr_Ptr_Hi                    ; 12
+label      10 ZP10_Object_Old_Position_X          ; 04
+label      11 ZP11_Object_Old_Position_Y          ; 09
+label      12 ZP12_Object_Old_Type                ; 03
+label      13 ZP13                                ; 18
+label      14 ZP14_Object_Width_Bytes             ; 08 Connected somehow. Shuffled in a subroutine.
+label      15 ZP15                                ; 08 Connected somehow. Shuffled in a subroutine.
+label      16 ZP16                                ; 05 Connected somehow. Shuffled in a subroutine.
+label      17 ZP17                                ; 04 Connected somehow. Shuffled in a subroutine.
+label      18 ZP18_Object_New_Position_X          ; 07
+label      19 ZP19_Object_New_Position_Y          ; 12
+label      1A ZP1A_Object_Type_New                ; 03 Save_Obj_List_Params 2
+label      1B ZP1B_Object_Color_New               ; 10 Save_Obj_List_Params 2
 label      1C ZP1C_Jetman_Action ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 ;                               1111 1111 = No action
 ;                               1xxx xxxx = Not moving right
