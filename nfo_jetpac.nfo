@@ -2033,33 +2033,33 @@ comment  36AB
 comment  36AF
 comment  36B3
 comment  36B5
-comment  36B5 Update 16-bit address to point to the old??? object data block ????
+comment  36B5 Move UDG Static data 16-bit address pointer to the next UDG column
 comment  36BC
 comment  36C2
-comment  36C2 Update 16-bit address to point to the new??? object data block ????
+comment  36C2 WHAT'S THIS FOR?????????????????????????????????????????????????
 ;deflabel 36C6 SCREEN_HEIGHT_PIXELS - B0, not B8
 comment  36C9
 comment  36CF
-comment  36CF WHAT'S THIS FOR?
+comment  36CF Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
 comment  36DA
-comment  36DA AND THIS ONE?
+comment  36DA Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16*$17*8=$FD0
 comment  36E1
 comment  36E7
 comment  36EB
 comment  36ED
-comment  36ED Update 16-bit address to point to the old??? object data block ????
+comment  36ED Move UDG Static data 16-bit address pointer to the next UDG column
 comment  36F4
 comment  36FA
-comment  36FA Update 16-bit address to point to the new??? object data block ????
+comment  36FA WHAT'S THIS FOR?????????????????????????????????????????????????
 ;deflabel 36FE SCREEN_HEIGHT_PIXELS - B0, not B8
 label    369C Draw_New_Object
-label    36AB Update_Object_Params_1
-label    36E7 Update_Object_Params_2
+label    36AB Next_Object_Old_Update_Params
+label    36E7 Next_Object_New_Update_Params
 comment  3701
 comment  3707
-comment  3707 WHAT'S THIS FOR?
+comment  3707 Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
 comment  3712
-comment  3712 AND THIS ONE?
+comment  3712 Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16*$17*8=$FD0
 comment  3719
 comment  371F
 comment  3722
@@ -2069,7 +2069,7 @@ comment  3734
 label    371F JMP_Display_Object
 label    3722 Zero_ZP0B_JMP_Display_Object
 label    3729 Object_Width_Complete
-label    3734 JMP_Update_Object_Params_2
+label    3734 JMP_Next_Obj_New_Update_Params
 comment  3737
 label    3737 Load_Small_UDG_Addr_Setup_XY_
 comment  373D
