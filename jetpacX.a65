@@ -25,9 +25,9 @@ ZP06_Object_Old_UDG_Stat_Lo     equ     $0006
 ZP07                            equ     $0007
 ZP07_Object_Old_UDG_Stat_Hi     equ     $0007
 ZP08                            equ     $0008
-ZP08_Object_Y_Index_Old         equ     $0008
+ZP08_Object_Old_Y_Index         equ     $0008
 ZP09                            equ     $0009
-ZP09_Object_Y_Index_New         equ     $0009
+ZP09_Object_New_Y_Index         equ     $0009
 ZP0A                            equ     $000A
 ZP0A_Object_New_Height_Index    equ     $000A
 ZP0B                            equ     $000B
@@ -143,6 +143,7 @@ Color_RAM                       equ     $9600
 ;****************************************************
 
 SCREEN_WIDTH_PIXELS             equ     $B8
+SCREEN_HEIGHT_PIXELS            equ     $B0
 OBJECT_COLOR_PARAM              equ     $05
 OBJECT_Y_POSITION_PARAM         equ     $03
 OBJECT_TYPE_PARAM               equ     $00
@@ -2706,10 +2707,10 @@ LEVEL_3_SAUCER
 Level_3_Saucer_Update_X
     jsr     Test_Platform_Collision_Bounce  ; 2AC4: 20 16 2B 
 
+
 ; Saucers home-in on Jetman, thus below code is in four sections:
 ; - Two sections update X depending on whether alien is left or right of Jetman
 ; - Two sections update Y depending on whether alien is above or below Jetman
-
 ; Update Alien Direction X
     ldy     #OBJECT_X_POSITION_PARAM        ; 2AC7: A0 01    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2AC9: B1 00    
@@ -4613,6 +4614,7 @@ SKIP_31EA
     bpl     S_Flying_Right                  ; 31EE: 10 4E    
     bmi     E_Jump_Q                        ; 31F0: 30 F5    
 
+
 ; BVS/BVC above means below code can only be jumped/branched to
 ; 1xxx0001 = Upward impact
 ; 1xxx1000 = Downward impact
@@ -4621,7 +4623,6 @@ SKIP_31EA
 ; 1xxx0110 = Right impact
 ; 1xxx0111 = Top Left impact
 ; 1xxx0111 = Left impact
-
 ; L_JMP_($31F2)_($3282) OK
 H_Jetman_Hits_Surface
     bit     MASK_00001000                   ; 31F2: 2C 17 20 
@@ -5752,7 +5753,7 @@ Erase_Object_Moving_Downward
     cmp     ZP0B_Object_New_Height          ; 361E: C5 0B    
     bcs     Erase_Old_Object                ; 3620: B0 66    
 
-; Set X as number of Y pixel-lines to erase only i.e. no following draw for this object
+; Set X to number of Y pixel-lines to erase only i.e. don't draw over the erase for this object
     tax                                     ; 3622: AA       
 
 ; Subtract number of Y erase-only pixels from total object tile height and store to loop
@@ -5768,7 +5769,7 @@ Erase_Object_Moving_Downward
 ; Erase old object data bytes from UDG static data to screen RAM by EXORing
 ; ZP09 offset decrements from $FF, ZP0E holds address of old UDG object data,
 ; ZP0C holds address of object data on screen to be written to
-    ldy     ZP09_Object_Y_Index_New         ; 362D: A4 09    
+    ldy     ZP09_Object_New_Y_Index         ; 362D: A4 09    
 ; L_BRS_($362F)_($3637) OK
 LOOP_362F
     lda     (ZP0E_Object_New_UDG_Stat_Lo),y ; 362F: B1 0E    
@@ -5785,10 +5786,10 @@ LOOP_362F
     pla                                     ; 3639: 68       
     sta     ZP13_Object_Lines_To_Erase      ; 363A: 85 13    
 
-    lda     ZP09_Object_Y_Index_New         ; 363C: A5 09    
+    lda     ZP09_Object_New_Y_Index         ; 363C: A5 09    
     sec                                     ; 363E: 38       
     sbc     ZP13_Object_Lines_To_Erase      ; 363F: E5 13    
-    sta     ZP09_Object_Y_Index_New         ; 3641: 85 09    
+    sta     ZP09_Object_New_Y_Index         ; 3641: 85 09    
 
     jmp     Erase_Old_Object                ; 3643: 4C 88 36 
 ; -----------------------
@@ -5809,8 +5810,8 @@ Display_Object_With_Setup
 Display_Object
     lda     #$FF                            ; 364C: A9 FF    
 ; ZP08 and ZP09 used as index into UDG RAM for old object and new object data
-    sta     ZP08_Object_Y_Index_Old         ; 364E: 85 08    
-    sta     ZP09_Object_Y_Index_New         ; 3650: 85 09    
+    sta     ZP08_Object_Old_Y_Index         ; 364E: 85 08    
+    sta     ZP09_Object_New_Y_Index         ; 3650: 85 09    
 
 ; ZP03 contains the height of a object tile, from the UDG graphics static data
 ; e.g. Alien cross object height is $0A pixels/lines
@@ -5853,7 +5854,7 @@ Display_Object
 ; Erase old object data bytes from UDG static data to screen RAM by EXORing
 ; ZP08 offset decrements from $FF, ZP06 holds address of old UDG object data,
 ; ZP04 holds address of object data on screen to be written to
-    ldy     ZP08_Object_Y_Index_Old         ; 3672: A4 08    
+    ldy     ZP08_Object_Old_Y_Index         ; 3672: A4 08    
 ; L_BRS_($3674)_($367C) OK
 LOOP_3674
     lda     (ZP06_Object_Old_UDG_Stat_Lo),y ; 3674: B1 06    
@@ -5871,11 +5872,15 @@ LOOP_3674
 
     sta     ZP13_Object_Lines_To_Erase      ; 367F: 85 13    
 
-    lda     ZP08_Object_Y_Index_Old         ; 3681: A5 08    
+    lda     ZP08_Object_Old_Y_Index         ; 3681: A5 08    
     sec                                     ; 3683: 38       
     sbc     ZP13_Object_Lines_To_Erase      ; 3684: E5 13    
-    sta     ZP08_Object_Y_Index_Old         ; 3686: 85 08    
+    sta     ZP08_Object_Old_Y_Index         ; 3686: 85 08    
 
+; Erasure of old object and drawing of new object is done in the same code loop,
+; first you erase the old line from screen memory using EXOR, then you write back
+; to the same line with the new object data
+; First test to see if old object fully erased, if yes jump to draw updated params
 ; L_BRS_($3688)_($3620) OK
 ; L_JMP_($3688)_($3643) OK
 ; L_BRS_($3688)_($365F) OK
@@ -5888,14 +5893,14 @@ Erase_Old_Object
     dec     ZP02_Object_Old_Height_Index    ; 368C: C6 02    
 
 ; EXOR object data bytes from UDG static data to screen RAM to erase
-    ldy     ZP08_Object_Y_Index_Old         ; 368E: A4 08    
+    ldy     ZP08_Object_Old_Y_Index         ; 368E: A4 08    
     lda     (ZP06_Object_Old_UDG_Stat_Lo),y ; 3690: B1 06    
     eor     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3692: 51 04    
     sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3694: 91 04    
 
-    dec     ZP08_Object_Y_Index_Old         ; 3696: C6 08    
+    dec     ZP08_Object_Old_Y_Index         ; 3696: C6 08    
 
-; Test if all object lines erased yet
+; If new object fully drawn, don't try drawing more, erase next old object line
     lda     ZP0A_Object_New_Height_Index    ; 3698: A5 0A    
     beq     Erase_Old_Object                ; 369A: F0 EC    
 
@@ -5904,26 +5909,28 @@ Draw_New_Object
     dec     ZP0A_Object_New_Height_Index    ; 369C: C6 0A    
 
 ; EXOR object data bytes from UDG static data to screen RAM to draw
-    ldy     ZP09_Object_Y_Index_New         ; 369E: A4 09    
+    ldy     ZP09_Object_New_Y_Index         ; 369E: A4 09    
     lda     (ZP0E_Object_New_UDG_Stat_Lo),y ; 36A0: B1 0E    
     eor     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 36A2: 51 0C    
     sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 36A4: 91 0C    
 
-    dec     ZP09_Object_Y_Index_New         ; 36A6: C6 09    
+    dec     ZP09_Object_New_Y_Index         ; 36A6: C6 09    
     jmp     Erase_Old_Object                ; 36A8: 4C 88 36 
 ; -----------------------
 
+; Test if more lines to be drawn for new object, if yes, branch
 ; L_BRS_($36AB)_($368A) OK
 Next_Object_Old_Update_Params
     lda     ZP0A_Object_New_Height_Index    ; 36AB: A5 0A    
     bne     Draw_New_Object                 ; 36AD: D0 ED    
 
+; Test if old object fully erased, if not, move to the next vertical column to erase
     lda     ZP14_Object_Old_Width_Bytes     ; 36AF: A5 14    
     beq     Object_Width_Complete           ; 36B1: F0 76    
 
     dec     ZP14_Object_Old_Width_Bytes     ; 36B3: C6 14    
 
-; Move UDG Static data 16-bit address pointer to the next UDG column
+; Move UDG static data 16-bit address pointer to the object data for the next column
     lda     ZP06_Object_Old_UDG_Stat_Lo     ; 36B5: A5 06    
     sec                                     ; 36B7: 38       
     sbc     ZP03_Object_Old_Height          ; 36B8: E5 03    
@@ -5933,10 +5940,10 @@ Next_Object_Old_Update_Params
     sbc     #$00                            ; 36BE: E9 00    
     sta     ZP07_Object_Old_UDG_Stat_Hi     ; 36C0: 85 07    
 
-; WHAT'S THIS FOR?????????????????????????????????????????????????
+; Move UDG RAM pointer to next vertical column
     lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36C2: A5 04    
     clc                                     ; 36C4: 18       
-    adc     #$B0                            ; 36C5: 69 B0    
+    adc     #SCREEN_HEIGHT_PIXELS           ; 36C5: 69 B0    
     sta     ZP04_Object_Old_UDG_RAM_Lo      ; 36C7: 85 04    
 
     lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36C9: A5 05    
@@ -5951,7 +5958,7 @@ Next_Object_Old_Update_Params
     sbc     #$1E                            ; 36D6: E9 1E    
     bcc     Next_Object_New_Update_Params   ; 36D8: 90 0D    
 
-; Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16
+; Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16 x $17 x 8=$FD0
     lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36DA: A5 04    
     sec                                     ; 36DC: 38       
     sbc     #$D0                            ; 36DD: E9 D0    
@@ -5961,15 +5968,16 @@ Next_Object_Old_Update_Params
     sbc     #$0F                            ; 36E3: E9 0F    
     sta     ZP05_Object_Old_UDG_RAM_Hi      ; 36E5: 85 05    
 
+; Test if new object fully drawn, if not, move to the next vertical column to draw
 ; L_BRS_($36E7)_($36D8) OK
 ; L_JMP_($36E7)_($3734) OK
 Next_Object_New_Update_Params
     lda     ZP15_Object_New_Width_Bytes     ; 36E7: A5 15    
-    beq     Zero_ZP0B_JMP_Display_Object    ; 36E9: F0 37    
+    beq     JMP_Display_Object_Zero_ZP0B    ; 36E9: F0 37    
 
     dec     ZP15_Object_New_Width_Bytes     ; 36EB: C6 15    
 
-; Move UDG Static data 16-bit address pointer to the next UDG column
+; Move UDG static data 16-bit address pointer to the object data for the next column
     lda     ZP0E_Object_New_UDG_Stat_Lo     ; 36ED: A5 0E    
     sec                                     ; 36EF: 38       
     sbc     ZP0B_Object_New_Height          ; 36F0: E5 0B    
@@ -5979,7 +5987,7 @@ Next_Object_New_Update_Params
     sbc     #$00                            ; 36F6: E9 00    
     sta     ZP0F_Object_New_UDG_Stat_Hi     ; 36F8: 85 0F    
 
-; WHAT'S THIS FOR?????????????????????????????????????????????????
+; Move UDG RAM pointer to next vertical column
     lda     ZP0C_Object_New_UDG_RAM_Lo      ; 36FA: A5 0C    
     clc                                     ; 36FC: 18       
     adc     #$B0                            ; 36FD: 69 B0    
@@ -5997,7 +6005,7 @@ Next_Object_New_Update_Params
     sbc     #$1E                            ; 370E: E9 1E    
     bcc     JMP_Display_Object              ; 3710: 90 0D    
 
-; Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16
+; Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16 x $17 x 8=$FD0
     lda     ZP0C_Object_New_UDG_RAM_Lo      ; 3712: A5 0C    
     sec                                     ; 3714: 38       
     sbc     #$D0                            ; 3715: E9 D0    
@@ -6013,7 +6021,7 @@ JMP_Display_Object
 ; -----------------------
 
 ; L_BRS_($3722)_($36E9) OK
-Zero_ZP0B_JMP_Display_Object
+JMP_Display_Object_Zero_ZP0B
     lda     #$00                            ; 3722: A9 00    
     sta     ZP0B_Object_New_Height          ; 3724: 85 0B    
     jmp     Display_Object                  ; 3726: 4C 4C 36 
@@ -6024,6 +6032,7 @@ Object_Width_Complete
     lda     #$00                            ; 3729: A9 00    
     sta     ZP03_Object_Old_Height          ; 372B: 85 03    
 
+; Test if both old and new object heights are the same, if yes, return
     lda     ZP14_Object_Old_Width_Bytes     ; 372D: A5 14    
     ora     ZP15_Object_New_Width_Bytes     ; 372F: 05 15    
     bne     JMP_Next_Obj_New_Update_Params  ; 3731: D0 01    
