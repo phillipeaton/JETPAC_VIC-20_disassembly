@@ -1364,15 +1364,15 @@ comment  2FCB
 comment  2FCB Do it again to setup the object dimensions
 comment  2FDA
 comment  2FDA Returns UDG object data index to Rocket Middle Section/Fuel depending on level
-label    2FDA Get_Object_Addr_Rocket_or_Fuel
+label    2FDA Get_Object_UDG_Stat_Addr_Lvl_A
 comment  2FDC
 comment  2FDC Calculate and return index to object's object based on A e.g. player level
 comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat
-label    2FDC Get_Object_Addr_Rocket_or_Fue_1
+label    2FDC Get_Object_UDG_Stat_Addr_Level
 binary   2FDE
 deflabel 2FE0 OBJECT_PARAM
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
-label    2FE5 Get_Object_UDG_Addr_Small
+label    2FE5 Get_Object_UDG_Stat_Addr
 comment  2FEE
 comment  2FEE At point when Jetman picks up Rocket or Fuel module
 label    2FEE Jetman_Collide_Rocket_Fuel
@@ -2172,8 +2172,8 @@ label    385E Update_Color_RAM_RTS
 ;
 ;unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
 comment  385F
-label    385F UDG_Lookup
-label    3860 UDG_Lookup+1
+label    385F UDG_Lookup_Jetman_Aliens
+label    3860 UDG_Lookup_Jetman_Aliens+1
 break    385F-3FFF ; Output one byte per line
 word     385F-3896
 ;
@@ -2202,9 +2202,9 @@ label    3BBE Jetman_Fly_Right_2
 label    3BF1 Jetman_Fly_Right_3
 label    3C3C Jetman_Fly_Right_4
 lcomment 3C87 $3CD4 = Ship_1_Bott
-label    3C87 UDG_Object_Lookup_Lo
-label    3C88 UDG_Object_Lookup_Hi
-lcomment 3C9F Multiple entries for simple UDG object indexing based on player level
+label    3C87 UDG_Lookup_Ship_Fuel_Vals
+label    3C88 UDG_Lookup_Ship_Fuel_Vals+1
+lcomment 3C9F Multiple entries for UDG objects indexing based on player level
 label    3E46 Alien_Ship_1
 label    3E61 Alien_Ship_2
 label    3E78 Alien_Fuzz_1

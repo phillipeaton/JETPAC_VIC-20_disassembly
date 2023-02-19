@@ -1,4 +1,4 @@
 @echo off
 REM -v = Verbose
-as65.exe jetpac.a65
+as65.exe -v -ojetpac.bin jetpacX.a65
 pause

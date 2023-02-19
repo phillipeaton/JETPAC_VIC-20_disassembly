@@ -917,7 +917,7 @@ Reset_S_O_1
     txa                                     ; 231A: 8A       
     pha                                     ; 231B: 48       
     jsr     Load_Object_Type_X_Y_Color      ; 231C: 20 E9 35 
-    jsr     Get_Object_Addr_Rocket_or_Fuel  ; 231F: 20 DA 2F 
+    jsr     Get_Object_UDG_Stat_Addr_Lvl_A  ; 231F: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2322: 20 5A 30 
     lda     ZP00_Obj_List_Ptr_Lo            ; 2325: A5 00    
     clc                                     ; 2327: 18       
@@ -2163,8 +2163,8 @@ FP_1 jsr    Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35
     jsr     Test_Jetman_Object_Collide      ; 2854: 20 58 2D 
     bpl     Jump_To_Subroutine_List3        ; 2857: 10 1B    
     lda     #$00                            ; 2859: A9 00    
-    jsr     Get_Object_Addr_Rocket_or_Fue_1 ; 285B: 20 DC 2F 
-    jsr     Get_Object_UDG_Addr_Small       ; 285E: 20 E5 2F 
+    jsr     Get_Object_UDG_Stat_Addr_Level  ; 285B: 20 DC 2F 
+    jsr     Get_Object_UDG_Stat_Addr        ; 285E: 20 E5 2F 
     jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 2861: 20 8D 37 
     jsr     Display_Object_With_Setup_D     ; 2864: 20 10 36 
 
@@ -3576,11 +3576,11 @@ Restore_Player_Objects_6
     asl     a                               ; 2DF0: 0A       
 
     pha                                     ; 2DF1: 48       
-    jsr     Get_Object_UDG_Addr_Small       ; 2DF2: 20 E5 2F 
+    jsr     Get_Object_UDG_Stat_Addr        ; 2DF2: 20 E5 2F 
     jsr     Load_Small_UDG_Addr_Setup_XY    ; 2DF5: 20 3D 37 
     pla                                     ; 2DF8: 68       
 
-    jsr     Get_Object_UDG_Addr_Small       ; 2DF9: 20 E5 2F 
+    jsr     Get_Object_UDG_Stat_Addr        ; 2DF9: 20 E5 2F 
     jmp     Set_UDG_RAM_Ptr_Object_Dimen    ; 2DFC: 4C 8D 37 
 ; -----------------------
 ; L_JSR_($2DFF)_($2DD7) OK
@@ -3945,7 +3945,7 @@ Fuel_Dropped
 ; Fuel cell has landed, increment the counter
     inc     Obj_Rocket_Fuel_Lvl             ; 2F7F: EE B2 03 
     jsr     Load_Object_Type_X_Y_Color      ; 2F82: 20 E9 35 
-    jsr     Get_Object_Addr_Rocket_or_Fuel  ; 2F85: 20 DA 2F 
+    jsr     Get_Object_UDG_Stat_Addr_Lvl_A  ; 2F85: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2F88: 20 5A 30 
     jmp     Disable_Object_In_List          ; 2F8B: 4C 65 2F 
 ; -----------------------
@@ -4005,18 +4005,18 @@ Rocket_Part_Or_Fuel_Move_Down
 ; L_JMP_($2FBD)_($3051) OK
 Setup_Object_Addr_Rocket_Fuel
     jsr     Load_Object_Type_X_Y_Color      ; 2FBD: 20 E9 35 
-    jsr     Get_Object_Addr_Rocket_or_Fuel  ; 2FC0: 20 DA 2F 
+    jsr     Get_Object_UDG_Stat_Addr_Lvl_A  ; 2FC0: 20 DA 2F 
 
 ; Using index into object data, get addr of object data to A and Y and setup into ZP
 ; L_JMP_($2FC3)_($289C) OK
 Setup_Object_Addr
     pha                                     ; 2FC3: 48       
-    jsr     Get_Object_UDG_Addr_Small       ; 2FC4: 20 E5 2F 
+    jsr     Get_Object_UDG_Stat_Addr        ; 2FC4: 20 E5 2F 
     jsr     Load_Small_UDG_Addr_Setup_XY    ; 2FC7: 20 3D 37 
     pla                                     ; 2FCA: 68       
 
 ; Do it again to setup the object dimensions
-    jsr     Get_Object_UDG_Addr_Small       ; 2FCB: 20 E5 2F 
+    jsr     Get_Object_UDG_Stat_Addr        ; 2FCB: 20 E5 2F 
     jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 2FCE: 20 8D 37 
     jsr     Display_Object                  ; 2FD1: 20 4C 36 
     jsr     Update_Color_RAM                ; 2FD4: 20 1F 38 
@@ -4027,28 +4027,33 @@ Setup_Object_Addr
 
 
 
-;  dP      dP""b8 888888 888888      dP"Yb  88""Yb  88888      dP"Yb  88""Yb
-; dP      dP   `" 88__     88       dP   Yb 88__dP     88     dP   Yb 88__dP
-; Yb      Yb  "88 88""     88       Yb   dP 88""Yb o.  88     Yb   dP 88"Yb
-;  Yb      YboodP 888888   88        YbodP  88oodP "bodP'      YbodP  88  Yb
+;  dP""b8 888888 888888      dP"Yb  88""Yb  88888 888888  dP""b8 888888
+; dP   `" 88__     88       dP   Yb 88__dP     88 88__   dP   `"   88
+; Yb  "88 88""     88       Yb   dP 88""Yb o.  88 88""   Yb        88
+;  YboodP 888888   88        YbodP  88oodP "bodP' 888888  YboodP   88
 ; \
-; 88   88 8888b.   dP""b8        db    8888b.  8888b.  88""Yb     Yb
-; 88   88  8I  Yb dP   `"       dPYb    8I  Yb  8I  Yb 88__dP      Yb
-; Y8   8P  8I  dY Yb  "88      dP__Yb   8I  dY  8I  dY 88"Yb       dP
-; `YbodP' 8888Y"   YboodP     dP""""Yb 8888Y"  8888Y"  88  Yb     dP
+; 88   88 8888b.   dP""b8     .dP"Y8 888888    db    888888
+; 88   88  8I  Yb dP   `"     `Ybo."   88     dPYb     88
+; Y8   8P  8I  dY Yb  "88     o.`Y8b   88    dP__Yb    88
+; `YbodP' 8888Y"   YboodP     8bodP'   88   dP""""Yb   88
+; \
+;    db    8888b.  8888b.  88""Yb
+;   dPYb    8I  Yb  8I  Yb 88__dP
+;  dP__Yb   8I  dY  8I  dY 88"Yb
+; dP""""Yb 8888Y"  8888Y"  88  Yb
 
 ; Returns UDG object data index to Rocket Middle Section/Fuel depending on level
 ; L_JSR_($2FDA)_($231F) OK
 ; L_JSR_($2FDA)_($2F85) OK
 ; L_JSR_($2FDA)_($2FC0) OK
 ; L_JSR_($2FDA)_($3057) OK
-Get_Object_Addr_Rocket_or_Fuel
+Get_Object_UDG_Stat_Addr_Lvl_A
     lda     ZP_Level_Current_Player         ; 2FDA: A5 59    
 
 ; Calculate and return index to object's object based on A e.g. player level
 ; First ship is for levels 0-3, second ship for levels 4-7 then repeat
 ; L_JSR_($2FDC)_($285B) OK
-Get_Object_Addr_Rocket_or_Fue_1
+Get_Object_UDG_Stat_Addr_Level
     lsr     a                               ; 2FDC: 4A       
     and     #%00000110                      ; 2FDD: 29 06    
     ldy     #OBJECT_PARAM                   ; 2FDF: A0 06    
@@ -4063,11 +4068,11 @@ Get_Object_Addr_Rocket_or_Fue_1
 ; L_JSR_($2FE5)_($2FC4) OK
 ; L_JSR_($2FE5)_($2FCB) OK
 ; L_JSR_($2FE5)_($305A) OK
-Get_Object_UDG_Addr_Small
+Get_Object_UDG_Stat_Addr
     tax                                     ; 2FE5: AA       
-    lda     UDG_Object_Lookup_Lo,x          ; 2FE6: BD 87 3C 
+    lda     UDG_Lookup_Ship_Fuel_Vals,x     ; 2FE6: BD 87 3C 
     tay                                     ; 2FE9: A8       
-    lda     UDG_Object_Lookup_Hi,x          ; 2FEA: BD 88 3C 
+    lda     UDG_Lookup_Ship_Fuel_Vals+1,x   ; 2FEA: BD 88 3C 
     rts                                     ; 2FED: 60       
 ; ===========================================================
 
@@ -4164,12 +4169,12 @@ Load_Rocket_or_Fuel_UDGs
     jsr     Load_Object_Type_X_Y_Color      ; 3054: 20 E9 35 
 ; L_JSR_($3057)_($2F5F) OK
 Load_Rocket_or_Fuel_UDGs_1
-    jsr     Get_Object_Addr_Rocket_or_Fuel  ; 3057: 20 DA 2F 
+    jsr     Get_Object_UDG_Stat_Addr_Lvl_A  ; 3057: 20 DA 2F 
 ; L_JSR_($305A)_($2322) OK
 ; L_JSR_($305A)_($2BD8) OK
 ; L_JSR_($305A)_($2F88) OK
 Load_Rocket_or_Fuel_UDGs_2
-    jsr     Get_Object_UDG_Addr_Small       ; 305A: 20 E5 2F 
+    jsr     Get_Object_UDG_Stat_Addr        ; 305A: 20 E5 2F 
     jsr     Load_Small_UDG_Addr_Setup_XY    ; 305D: 20 3D 37 
     jmp     Display_Object_With_Setup_B     ; 3060: 4C 04 36 
 ; -----------------------
@@ -6279,9 +6284,9 @@ Get_Obj_UDG_Addr_4
     tax                                     ; 380C: AA       
 
 ; Using X just set, get index into the Object UDG table
-    lda     UDG_Lookup,x                    ; 380D: BD 5F 38  Address lo byte into Y
+    lda     UDG_Lookup_Jetman_Aliens,x      ; 380D: BD 5F 38  Address lo byte into Y
     tay                                     ; 3810: A8       
-    lda     UDG_Lookup+1,x                  ; 3811: BD 60 38  Address hi byte into A
+    lda     UDG_Lookup_Jetman_Aliens+1,x    ; 3811: BD 60 38  Address hi byte into A
     rts                                     ; 3814: 60       
 ; ===========================================================
 ; L_JSR_($3815)_($373A) OK
@@ -6385,11 +6390,11 @@ Update_Color_RAM_RTS
 ; Yb  "88 88"Yb   dP__Yb  88"""  888888 88 Yb      o.`Y8b
 ;  YboodP 88  Yb dP""""Yb 88     88  88 88  YboodP 8bodP'
 
-UDG_Lookup
+UDG_Lookup_Jetman_Aliens
     fdb     Jetman_Fly_Right_2              ; 385F: BE 3B    
     fdb     Jetman_Fly_Right_3              ; 3861: F1 3B    
     fdb     Jetman_Fly_Right_4              ; 3863: 3C 3C    
-    fdb     UDG_Object_Lookup_Lo            ; 3865: 87 3C    
+    fdb     UDG_Lookup_Ship_Fuel_Vals       ; 3865: 87 3C    
     fdb     Jetman_Fly_Left_3               ; 3867: 8B 3B    
     fdb     Jetman_Fly_Left_2               ; 3869: 40 3B    
     fdb     Jetman_Fly_Left_1               ; 386B: F5 3A    
@@ -7438,9 +7443,8 @@ Jetman_Fly_Right_4
     fcb     %00011000                       ; 3C84: 18       
     fcb     %00000010                       ; 3C85: 02       
     fcb     %00000000                       ; 3C86: 00       
-UDG_Object_Lookup_Lo
+UDG_Lookup_Ship_Fuel_Vals
     fcb     $D4                             ; 3C87: D4        $3CD4 = Ship_1_Bott
-UDG_Object_Lookup_Hi
     fcb     $3C                             ; 3C88: 3C       
     fdb     Ship_2_Bott                     ; 3C89: 3D 3D    
     fdb     Ship_1_Bott                     ; 3C8B: D4 3C    
@@ -7453,7 +7457,7 @@ UDG_Object_Lookup_Hi
     fdb     Ship_2_Top                      ; 3C99: 83 3D    
     fdb     Ship_1_Top                      ; 3C9B: 1A 3D    
     fdb     Ship_2_Top                      ; 3C9D: 83 3D    
-    fdb     Fuel                            ; 3C9F: 9C 3D     Multiple entries for simple UDG object indexing based on player level
+    fdb     Fuel                            ; 3C9F: 9C 3D     Multiple entries for UDG objects indexing based on player level
     fdb     Fuel                            ; 3CA1: 9C 3D    
     fdb     Fuel                            ; 3CA3: 9C 3D    
     fdb     Fuel                            ; 3CA5: 9C 3D    
