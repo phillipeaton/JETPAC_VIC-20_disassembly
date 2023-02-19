@@ -79,7 +79,7 @@ label      5f ZP_Subroutine_Addr_Lo     ;
 label      60 ZP_Subroutine_Addr_Hi     ;
 
 ; Non-Zero-Page Object Variables
-label    0380 Obj_Jetman
+label    0380 Obj_Jetman_State
 ;                         1xxx xxxx = Facing Left, not facing right
 ;                         xxxx xx1x = Standing
 ;                         xxxx xxx1 = Flying (Not on screen if !Flying & !Standing e.g. hit by alien)

@@ -75,7 +75,7 @@ Hardware_IRQ_Lo                 equ     $0314
 Hardware_IRQ_Hi                 equ     $0315
 NMI_Int_Vector_Lo               equ     $0318
 NMI_Int_Vector_Hi               equ     $0319
-Obj_Jetman                      equ     $0380
+Obj_Jetman_State                equ     $0380
 Obj_Jetman_Position_X           equ     $0381
 Obj_Jetman_Position_Y           equ     $0383
 Obj_Laser_0                     equ     $0388
@@ -917,7 +917,7 @@ Reset_S_O_1
     txa                                     ; 231A: 8A       
     pha                                     ; 231B: 48       
     jsr     Load_Object_Type_X_Y_Color      ; 231C: 20 E9 35 
-    jsr     Get_Object_UDG_Stat_Addr_Lvl_A  ; 231F: 20 DA 2F 
+    jsr     Get_Obj_UDG_Static_Addr_Level   ; 231F: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2322: 20 5A 30 
     lda     ZP00_Obj_List_Ptr_Lo            ; 2325: A5 00    
     clc                                     ; 2327: 18       
@@ -955,7 +955,7 @@ Init_Next_Jetman_Lives_Scores
 ; L_BRS_($235D)_($2364) OK
 LOOP_INJLS_1
     lda     Initial_Jetman_Obj_Params,x     ; 235D: BD 53 23 
-    sta     Obj_Jetman,x                    ; 2360: 9D 80 03 
+    sta     Obj_Jetman_State,x              ; 2360: 9D 80 03 
     dex                                     ; 2363: CA       
     bpl     LOOP_INJLS_1                    ; 2364: 10 F7    
 
@@ -1657,7 +1657,7 @@ SEI_Obj_Ptr_To_Jetman
 
     jsr     Load_ZP_Parameters              ; 2676: 20 9D 25 
     fcb     $00                             ; 2679: 00        ZP Offset for 1st address
-    fdb     Obj_Jetman                      ; 267A: 80 03     1st Address
+    fdb     Obj_Jetman_State                ; 267A: 80 03     1st Address
     fcb     $FF                             ; 267C: FF       
     jmp     Main_Loop                       ; 267D: 4C 07 26 
 ; -----------------------
@@ -1921,7 +1921,7 @@ Erase_Object_RAM
     lda     #$00                            ; 2766: A9 00    
 ; L_BRS_($2768)_($276C) OK
 Erase_Object_RAM_1
-    sta     Obj_Jetman,x                    ; 2768: 9D 80 03 
+    sta     Obj_Jetman_State,x              ; 2768: 9D 80 03 
     dex                                     ; 276B: CA       
     bpl     Erase_Object_RAM_1              ; 276C: 10 FA    
     rts                                     ; 276E: 60       
@@ -2163,8 +2163,8 @@ FP_1 jsr    Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35
     jsr     Test_Jetman_Object_Collide      ; 2854: 20 58 2D 
     bpl     Jump_To_Subroutine_List3        ; 2857: 10 1B    
     lda     #$00                            ; 2859: A9 00    
-    jsr     Get_Object_UDG_Stat_Addr_Level  ; 285B: 20 DC 2F 
-    jsr     Get_Object_UDG_Stat_Addr        ; 285E: 20 E5 2F 
+    jsr     Get_Object_UDG_Static_Addr_A    ; 285B: 20 DC 2F 
+    jsr     Get_Object_UDG_Static_Addr      ; 285E: 20 E5 2F 
     jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 2861: 20 8D 37 
     jsr     Display_Object_With_Setup_D     ; 2864: 20 10 36 
 
@@ -2261,7 +2261,7 @@ Init_Most_Objects
     lda     #$00                            ; 28D6: A9 00    
 ; L_BRS_($28D8)_($28DC) OK
 Loop_28D8
-    sta     Obj_Jetman,x                    ; 28D8: 9D 80 03 
+    sta     Obj_Jetman_State,x              ; 28D8: 9D 80 03 
     dex                                     ; 28DB: CA       
     bpl     Loop_28D8                       ; 28DC: 10 FA    
 
@@ -2528,7 +2528,7 @@ Object_Pointer_To_Jetman
     jsr     Save_Obj_List_Ptr               ; 2A45: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2A48: 20 9D 25 
     fcb     $00                             ; 2A4B: 00       
-    fdb     Obj_Jetman                      ; 2A4C: 80 03    
+    fdb     Obj_Jetman_State                ; 2A4C: 80 03    
     fcb     $FF                             ; 2A4E: FF       
 
 ; Set Jetman Move Speed to 1
@@ -2874,7 +2874,7 @@ Test_Platform_Collision_Bounc_3
 ; Test if Jetman is onscreen
 ; L_JSR_($2B4B)_($2655) OK
 Spawn_Rocket_Modules_Fuel_Cell
-    lda     Obj_Jetman                      ; 2B4B: AD 80 03 
+    lda     Obj_Jetman_State                ; 2B4B: AD 80 03 
     and     #%00111111                      ; 2B4E: 29 3F     Zero bits 6 & 7
     bne     Spawn_Rocket_Modules_Fuel_Ce_1  ; 2B50: D0 01    
 ; L_BRS_($2B52)_($2B55) OK
@@ -2928,7 +2928,7 @@ Init_Obj_Valuable_Table
 
 ; L_JSR_($2B8F)_($2658) OK
 Spawn_Valuables
-    lda     Obj_Jetman                      ; 2B8F: AD 80 03 
+    lda     Obj_Jetman_State                ; 2B8F: AD 80 03 
     and     #$3F                            ; 2B92: 29 3F     Zero bits 6 & 7 i.e. 00xxxxxx
     bne     Spawn_Valuables_1               ; 2B94: D0 01    
 ; L_BRS_($2B96)_($2B99) OK
@@ -3303,7 +3303,7 @@ Alien_Points_Lookup_Table
     fdb     $0025,$0035,$0045,$0055         ; 2CDB: 25 00 35 00 45 00 55 00 
 ; L_BRS_($2CE3)_($2CD8) OK
 Obj_Ptr_To_Alien_0_Jetman
-    lda     Obj_Jetman                      ; 2CE3: AD 80 03 
+    lda     Obj_Jetman_State                ; 2CE3: AD 80 03 
     and     #$3F                            ; 2CE6: 29 3F    
     cmp     #JETMAN_FLYING                  ; 2CE8: C9 01    
     beq     Set_Obj_List_Ptr_To_Alien_0     ; 2CEA: F0 05    
@@ -3433,7 +3433,7 @@ Level_Alien_Color_Lookup
 Test_Jetman_Object_Collide
     lda     ZP_Flash_Score_Countdown        ; 2D58: A5 5D    
     bne     Test_Jetman_Obj_Collide_1       ; 2D5A: D0 0D    
-    lda     Obj_Jetman                      ; 2D5C: AD 80 03 
+    lda     Obj_Jetman_State                ; 2D5C: AD 80 03 
     and     #$3F                            ; 2D5F: 29 3F    
     cmp     #$01                            ; 2D61: C9 01     Jetman flying?
     beq     Test_Jetman_Obj_Collide_2       ; 2D63: F0 09     Yes, branch
@@ -3576,11 +3576,11 @@ Restore_Player_Objects_6
     asl     a                               ; 2DF0: 0A       
 
     pha                                     ; 2DF1: 48       
-    jsr     Get_Object_UDG_Stat_Addr        ; 2DF2: 20 E5 2F 
+    jsr     Get_Object_UDG_Static_Addr      ; 2DF2: 20 E5 2F 
     jsr     Load_Small_UDG_Addr_Setup_XY    ; 2DF5: 20 3D 37 
     pla                                     ; 2DF8: 68       
 
-    jsr     Get_Object_UDG_Stat_Addr        ; 2DF9: 20 E5 2F 
+    jsr     Get_Object_UDG_Static_Addr      ; 2DF9: 20 E5 2F 
     jmp     Set_UDG_RAM_Ptr_Object_Dimen    ; 2DFC: 4C 8D 37 
 ; -----------------------
 ; L_JSR_($2DFF)_($2DD7) OK
@@ -3739,14 +3739,14 @@ ROCKET_BOTTOM_MODULE
 ; Don't display Jetman next time? Also zeroes Jetman X coord.
     jsr     Load_ZP_Parameters              ; 2E8F: 20 9D 25 
     fcb     $00                             ; 2E92: 00       
-    fdb     Obj_Jetman                      ; 2E93: 80 03    
+    fdb     Obj_Jetman_State                ; 2E93: 80 03    
     fcb     $FF                             ; 2E95: FF       
 
     jsr     Load_Object_Type_X_Y_Color      ; 2E96: 20 E9 35 
     jsr     Display_Object_With_Setup_AB    ; 2E99: 20 01 36 
 
     lda     #$00                            ; 2E9C: A9 00    
-    sta     Obj_Jetman                      ; 2E9E: 8D 80 03 
+    sta     Obj_Jetman_State                ; 2E9E: 8D 80 03 
     jsr     Restore_Obj_List_Ptr            ; 2EA1: 20 F0 28 
     inc     ZP_Num_Lives_P1                 ; 2EA4: E6 5A    
     jsr     Display_P1_Lives                ; 2EA6: 20 73 23 
@@ -3945,7 +3945,7 @@ Fuel_Dropped
 ; Fuel cell has landed, increment the counter
     inc     Obj_Rocket_Fuel_Lvl             ; 2F7F: EE B2 03 
     jsr     Load_Object_Type_X_Y_Color      ; 2F82: 20 E9 35 
-    jsr     Get_Object_UDG_Stat_Addr_Lvl_A  ; 2F85: 20 DA 2F 
+    jsr     Get_Obj_UDG_Static_Addr_Level   ; 2F85: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2F88: 20 5A 30 
     jmp     Disable_Object_In_List          ; 2F8B: 4C 65 2F 
 ; -----------------------
@@ -4005,18 +4005,18 @@ Rocket_Part_Or_Fuel_Move_Down
 ; L_JMP_($2FBD)_($3051) OK
 Setup_Object_Addr_Rocket_Fuel
     jsr     Load_Object_Type_X_Y_Color      ; 2FBD: 20 E9 35 
-    jsr     Get_Object_UDG_Stat_Addr_Lvl_A  ; 2FC0: 20 DA 2F 
+    jsr     Get_Obj_UDG_Static_Addr_Level   ; 2FC0: 20 DA 2F 
 
 ; Using index into object data, get addr of object data to A and Y and setup into ZP
 ; L_JMP_($2FC3)_($289C) OK
 Setup_Object_Addr
     pha                                     ; 2FC3: 48       
-    jsr     Get_Object_UDG_Stat_Addr        ; 2FC4: 20 E5 2F 
+    jsr     Get_Object_UDG_Static_Addr      ; 2FC4: 20 E5 2F 
     jsr     Load_Small_UDG_Addr_Setup_XY    ; 2FC7: 20 3D 37 
     pla                                     ; 2FCA: 68       
 
 ; Do it again to setup the object dimensions
-    jsr     Get_Object_UDG_Stat_Addr        ; 2FCB: 20 E5 2F 
+    jsr     Get_Object_UDG_Static_Addr      ; 2FCB: 20 E5 2F 
     jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 2FCE: 20 8D 37 
     jsr     Display_Object                  ; 2FD1: 20 4C 36 
     jsr     Update_Color_RAM                ; 2FD4: 20 1F 38 
@@ -4032,10 +4032,10 @@ Setup_Object_Addr
 ; Yb  "88 88""     88       Yb   dP 88""Yb o.  88 88""   Yb        88
 ;  YboodP 888888   88        YbodP  88oodP "bodP' 888888  YboodP   88
 ; \
-; 88   88 8888b.   dP""b8     .dP"Y8 888888    db    888888
-; 88   88  8I  Yb dP   `"     `Ybo."   88     dPYb     88
-; Y8   8P  8I  dY Yb  "88     o.`Y8b   88    dP__Yb    88
-; `YbodP' 8888Y"   YboodP     8bodP'   88   dP""""Yb   88
+; 88   88 8888b.   dP""b8     .dP"Y8 888888    db    888888 88  dP""b8
+; 88   88  8I  Yb dP   `"     `Ybo."   88     dPYb     88   88 dP   `"
+; Y8   8P  8I  dY Yb  "88     o.`Y8b   88    dP__Yb    88   88 Yb
+; `YbodP' 8888Y"   YboodP     8bodP'   88   dP""""Yb   88   88  YboodP
 ; \
 ;    db    8888b.  8888b.  88""Yb
 ;   dPYb    8I  Yb  8I  Yb 88__dP
@@ -4047,13 +4047,13 @@ Setup_Object_Addr
 ; L_JSR_($2FDA)_($2F85) OK
 ; L_JSR_($2FDA)_($2FC0) OK
 ; L_JSR_($2FDA)_($3057) OK
-Get_Object_UDG_Stat_Addr_Lvl_A
+Get_Obj_UDG_Static_Addr_Level
     lda     ZP_Level_Current_Player         ; 2FDA: A5 59    
 
 ; Calculate and return index to object's object based on A e.g. player level
 ; First ship is for levels 0-3, second ship for levels 4-7 then repeat
 ; L_JSR_($2FDC)_($285B) OK
-Get_Object_UDG_Stat_Addr_Level
+Get_Object_UDG_Static_Addr_A
     lsr     a                               ; 2FDC: 4A       
     and     #%00000110                      ; 2FDD: 29 06    
     ldy     #OBJECT_PARAM                   ; 2FDF: A0 06    
@@ -4068,7 +4068,7 @@ Get_Object_UDG_Stat_Addr_Level
 ; L_JSR_($2FE5)_($2FC4) OK
 ; L_JSR_($2FE5)_($2FCB) OK
 ; L_JSR_($2FE5)_($305A) OK
-Get_Object_UDG_Stat_Addr
+Get_Object_UDG_Static_Addr
     tax                                     ; 2FE5: AA       
     lda     UDG_Lookup_Ship_Fuel_Vals,x     ; 2FE6: BD 87 3C 
     tay                                     ; 2FE9: A8       
@@ -4169,12 +4169,12 @@ Load_Rocket_or_Fuel_UDGs
     jsr     Load_Object_Type_X_Y_Color      ; 3054: 20 E9 35 
 ; L_JSR_($3057)_($2F5F) OK
 Load_Rocket_or_Fuel_UDGs_1
-    jsr     Get_Object_UDG_Stat_Addr_Lvl_A  ; 3057: 20 DA 2F 
+    jsr     Get_Obj_UDG_Static_Addr_Level   ; 3057: 20 DA 2F 
 ; L_JSR_($305A)_($2322) OK
 ; L_JSR_($305A)_($2BD8) OK
 ; L_JSR_($305A)_($2F88) OK
 Load_Rocket_or_Fuel_UDGs_2
-    jsr     Get_Object_UDG_Stat_Addr        ; 305A: 20 E5 2F 
+    jsr     Get_Object_UDG_Static_Addr      ; 305A: 20 E5 2F 
     jsr     Load_Small_UDG_Addr_Setup_XY    ; 305D: 20 3D 37 
     jmp     Display_Object_With_Setup_B     ; 3060: 4C 04 36 
 ; -----------------------
@@ -6055,7 +6055,7 @@ JMP_Next_Obj_New_Update_Params
 ; L_JSR_($3737)_($3646) OK
 Load_Small_UDG_Addr_Setup_XY_
     jsr     Load_Object_Type_X_Y_Color      ; 3737: 20 E9 35 
-    jsr     Get_Object_UDG_Addr             ; 373A: 20 15 38 
+    jsr     Get_Obj_UDG_Stat_Addr_JM_Alien  ; 373A: 20 15 38 
 
 ; Load Small UDG address from A & Y
 ; L_JSR_($373D)_($27E7) OK
@@ -6219,11 +6219,11 @@ No_X_Wrap
 ; `YbodP' 8888Y"   YboodP     dP""""Yb 8888Y"  8888Y"  88  Yb
 
 ; L_BRS_($37D4)_($37F2) OK
-Get_Obj_UDG_Addr_1
+Get_Obj_UDG_Static_Addr_Alien
     pha                                     ; 37D4: 48       
     txa                                     ; 37D5: 8A       
     lsr     a                               ; 37D6: 4A       
-    and     #$02                            ; 37D7: 29 02    
+    and     #%00000010                      ; 37D7: 29 02     Zero bits 0 & 2-7
     tax                                     ; 37D9: AA       
     pla                                     ; 37DA: 68       
 
@@ -6233,8 +6233,9 @@ Get_Obj_UDG_Addr_1
     asl     a                               ; 37DF: 0A       
     clc                                     ; 37E0: 18       
     adc     #$20                            ; 37E1: 69 20    
-    jmp     Get_Obj_UDG_Addr_4              ; 37E3: 4C 07 38 
+    jmp     Get_Obj_UDG_Calc_Jetman_Alien   ; 37E3: 4C 07 38 
 ; -----------------------
+; OTHER ENTRY POINT
 ; L_JSR_($37E6)_($378A) OK
 Get_Obj_UDG_Addr_
     lda     ZP10_Object_Old_Position_X      ; 37E6: A5 10    
@@ -6242,23 +6243,27 @@ Get_Obj_UDG_Addr_
     tax                                     ; 37EA: AA       
     lda     ZP12_Object_Old_Type            ; 37EB: A5 12    
 
-; InReg: A=Saved Obj Type, X=Saved Object X AND $06/%110
-; But if it's the Jetman Object, Obj Type is instead Jetman Looks
+; InReg: A=Object Type (Jetman or Alien), X=animation frame
+; When object is Jetman, Object Type represents State i.e. flying, standing etc.
 ; and so $3F is masking out direction and test for walking AND flying???
 ; OutReg: UDG Addr Lo in Y, Hi in A
 ; CALLED ONLY FROM 381C or run into from 37E6
 ; L_JMP_($37ED)_($381C) OK
-Get_Obj_UDG_Addr_2
+Get_Obj_UDG_Jetman_or_Alien
     tay                                     ; 37ED: A8       
+
+; Jetman uses only bit 7 (direction he's facing) and bits 0 & 1 (standing/flying).
+; If other bits are used, object must be an Alien.
     and     #%00111111                      ; 37EE: 29 3F     Zero bits 6 & 7
     cmp     #%00000011                      ; 37F0: C9 03     Test bits 0 & 1
-    bcs     Get_Obj_UDG_Addr_1              ; 37F2: B0 E0     If A >= M, branch
+    bcs     Get_Obj_UDG_Static_Addr_Alien   ; 37F2: B0 E0     Carry Set if A >= compared value
     tya                                     ; 37F4: 98       
 
-; Test Jetman Looks Left/Right Direction???
+; Object is Jetman, test state, is he looking Left or Right?
     bit     MASK_10000000                   ; 37F5: 2C 1B 20 
-    beq     Get_Obj_UDG_Addr_3              ; 37F8: F0 06    
+    beq     Get_Obj_UDG_Calc_Jetman         ; 37F8: F0 06    
 
+; Jetman is looking left, set a bit in X, which holds the animation frame
     pha                                     ; 37FA: 48       
     txa                                     ; 37FB: 8A       
     ora     #%00001000                      ; 37FC: 09 08     Set bit 3
@@ -6267,7 +6272,7 @@ Get_Obj_UDG_Addr_2
 
 ; Subtract 1 and muliply by $10 i.e. left shift 4 bits
 ; L_BRS_($3800)_($37F8) OK
-Get_Obj_UDG_Addr_3
+Get_Obj_UDG_Calc_Jetman
     sec                                     ; 3800: 38       
     sbc     #$01                            ; 3801: E9 01    
     asl     a                               ; 3803: 0A       
@@ -6277,7 +6282,7 @@ Get_Obj_UDG_Addr_3
 
 ; Set bit in X defined by A, ZP variable being used as temp store
 ; L_JMP_($3807)_($37E3) OK
-Get_Obj_UDG_Addr_4
+Get_Obj_UDG_Calc_Jetman_Alien
     sta     ZP13                            ; 3807: 85 13    
     txa                                     ; 3809: 8A       
     ora     ZP13                            ; 380A: 05 13    
@@ -6289,13 +6294,17 @@ Get_Obj_UDG_Addr_4
     lda     UDG_Lookup_Jetman_Aliens+1,x    ; 3811: BD 60 38  Address hi byte into A
     rts                                     ; 3814: 60       
 ; ===========================================================
+
+; Get address of UDG Static Data for Jetman or Alien objects
+; Bits 1 & 2 of object's X position used to select UDG animation frame.
+; Animations have 2 or 4 frames and are minimum 2 pixels apart so bit 0 not used.
 ; L_JSR_($3815)_($373A) OK
-Get_Object_UDG_Addr
-    lda     ZP18_Object_New_Position_X      ; 3815: A5 18     Saved Object X
-    and     #$06                            ; 3817: 29 06    
+Get_Obj_UDG_Stat_Addr_JM_Alien
+    lda     ZP18_Object_New_Position_X      ; 3815: A5 18    
+    and     #%00000110                      ; 3817: 29 06     Reset bits 0 & 3-7
     tax                                     ; 3819: AA       
-    lda     ZP1A_Object_Type_New            ; 381A: A5 1A     Saved Object Type
-    jmp     Get_Obj_UDG_Addr_2              ; 381C: 4C ED 37 
+    lda     ZP1A_Object_Type_New            ; 381A: A5 1A    
+    jmp     Get_Obj_UDG_Jetman_or_Alien     ; 381C: 4C ED 37 
 
 
 
@@ -6391,22 +6400,22 @@ Update_Color_RAM_RTS
 ;  YboodP 88  Yb dP""""Yb 88     88  88 88  YboodP 8bodP'
 
 UDG_Lookup_Jetman_Aliens
-    fdb     Jetman_Fly_Right_2              ; 385F: BE 3B    
-    fdb     Jetman_Fly_Right_3              ; 3861: F1 3B    
-    fdb     Jetman_Fly_Right_4              ; 3863: 3C 3C    
-    fdb     UDG_Lookup_Ship_Fuel_Vals       ; 3865: 87 3C    
+    fdb     Jetman_Fly_Right_0              ; 385F: BE 3B    
+    fdb     Jetman_Fly_Right_1              ; 3861: F1 3B    
+    fdb     Jetman_Fly_Right_2              ; 3863: 3C 3C    
+    fdb     UDG_Lookup_Ship_Fuel_Vals       ; 3865: 87 3C     $3C87 = Jetman_Fly_Right_3
     fdb     Jetman_Fly_Left_3               ; 3867: 8B 3B    
     fdb     Jetman_Fly_Left_2               ; 3869: 40 3B    
     fdb     Jetman_Fly_Left_1               ; 386B: F5 3A    
-    fdb     Jetman_Fly_Right_1              ; 386D: CA 38    
-    fdb     Jetman_Walk_Left_1              ; 386F: F9 39    
-    fdb     Jetman_Walk_Left_2              ; 3871: 2C 3A    
-    fdb     Jetman_Walk_Left_3              ; 3873: 77 3A    
-    fdb     Jetman_Walk_Left_4              ; 3875: C2 3A    
-    fdb     Jetman_Walk_Right_4             ; 3877: C6 39    
-    fdb     Jetman_Walk_Right_3             ; 3879: 7B 39    
-    fdb     Jetman_Walk_Right_2             ; 387B: 30 39    
-    fdb     Jetman_Walk_Right_1             ; 387D: FD 38    
+    fdb     Jetman_Fly_Left_0               ; 386D: CA 38    
+    fdb     Jetman_Walk_Right_0             ; 386F: F9 39    
+    fdb     Jetman_Walk_Right_1             ; 3871: 2C 3A    
+    fdb     Jetman_Walk_Right_2             ; 3873: 77 3A    
+    fdb     Jetman_Walk_Right_3             ; 3875: C2 3A    
+    fdb     Jetman_Walk_Left_3              ; 3877: C6 39    
+    fdb     Jetman_Walk_Left_2              ; 3879: 7B 39    
+    fdb     Jetman_Walk_Left_1              ; 387B: 30 39    
+    fdb     Jetman_Walk_Left_0              ; 387D: FD 38    
     fdb     Alien_Fuzz_1                    ; 387F: 78 3E    
     fdb     Alien_Fuzz_2                    ; 3881: 99 3E    
     fdb     Alien_Fuzz_1                    ; 3883: 78 3E    
@@ -6471,7 +6480,7 @@ UDG_Lookup_Jetman_Aliens
     fcb     %00011000                       ; 38C7: 18       
     fcb     %00000001                       ; 38C8: 01       
     fcb     %00001000                       ; 38C9: 08       
-Jetman_Fly_Right_1
+Jetman_Fly_Left_0
     fcb     %11100000                       ; 38CA: E0       
     fcb     %01110000                       ; 38CB: 70       
     fcb     %10110100                       ; 38CC: B4       
@@ -6523,7 +6532,7 @@ Jetman_Fly_Right_1
     fcb     %00011000                       ; 38FA: 18       
     fcb     %00000001                       ; 38FB: 01       
     fcb     %00001000                       ; 38FC: 08       
-Jetman_Walk_Right_1
+Jetman_Walk_Left_0
     fcb     %10000000                       ; 38FD: 80       
     fcb     %11000000                       ; 38FE: C0       
     fcb     %11001000                       ; 38FF: C8       
@@ -6575,7 +6584,7 @@ Jetman_Walk_Right_1
     fcb     %00011000                       ; 392D: 18       
     fcb     %00000001                       ; 392E: 01       
     fcb     %00001000                       ; 392F: 08       
-Jetman_Walk_Right_2
+Jetman_Walk_Left_1
     fcb     %00000000                       ; 3930: 00       
     fcb     %00000000                       ; 3931: 00       
     fcb     %01000000                       ; 3932: 40       
@@ -6651,7 +6660,7 @@ Jetman_Walk_Right_2
     fcb     %00011000                       ; 3978: 18       
     fcb     %00000010                       ; 3979: 02       
     fcb     %00000000                       ; 397A: 00       
-Jetman_Walk_Right_3
+Jetman_Walk_Left_2
     fcb     %00000000                       ; 397B: 00       
     fcb     %00000000                       ; 397C: 00       
     fcb     %10000000                       ; 397D: 80       
@@ -6727,7 +6736,7 @@ Jetman_Walk_Right_3
     fcb     %00011000                       ; 39C3: 18       
     fcb     %00000010                       ; 39C4: 02       
     fcb     %00000000                       ; 39C5: 00       
-Jetman_Walk_Right_4
+Jetman_Walk_Left_3
     fcb     %10000000                       ; 39C6: 80       
     fcb     %00000000                       ; 39C7: 00       
     fcb     %11100000                       ; 39C8: E0       
@@ -6779,7 +6788,7 @@ Jetman_Walk_Right_4
     fcb     %00011000                       ; 39F6: 18       
     fcb     %00000001                       ; 39F7: 01       
     fcb     %00000000                       ; 39F8: 00       
-Jetman_Walk_Left_1
+Jetman_Walk_Right_0
     fcb     %11100000                       ; 39F9: E0       
     fcb     %10000000                       ; 39FA: 80       
     fcb     %01111000                       ; 39FB: 78       
@@ -6831,7 +6840,7 @@ Jetman_Walk_Left_1
     fcb     %00011000                       ; 3A29: 18       
     fcb     %00000001                       ; 3A2A: 01       
     fcb     %00000000                       ; 3A2B: 00       
-Jetman_Walk_Left_2
+Jetman_Walk_Right_1
     fcb     %00000000                       ; 3A2C: 00       
     fcb     %00000000                       ; 3A2D: 00       
     fcb     %00000000                       ; 3A2E: 00       
@@ -6907,7 +6916,7 @@ Jetman_Walk_Left_2
     fcb     %00011000                       ; 3A74: 18       
     fcb     %00000010                       ; 3A75: 02       
     fcb     %00000000                       ; 3A76: 00       
-Jetman_Walk_Left_3
+Jetman_Walk_Right_2
     fcb     %00000000                       ; 3A77: 00       
     fcb     %00000000                       ; 3A78: 00       
     fcb     %10000000                       ; 3A79: 80       
@@ -6983,7 +6992,7 @@ Jetman_Walk_Left_3
     fcb     %00011000                       ; 3ABF: 18       
     fcb     %00000010                       ; 3AC0: 02       
     fcb     %00000000                       ; 3AC1: 00       
-Jetman_Walk_Left_4
+Jetman_Walk_Right_3
     fcb     %10000000                       ; 3AC2: 80       
     fcb     %11000000                       ; 3AC3: C0       
     fcb     %11010000                       ; 3AC4: D0       
@@ -7239,7 +7248,7 @@ Jetman_Fly_Left_3
     fcb     %00011000                       ; 3BBB: 18       
     fcb     %00000001                       ; 3BBC: 01       
     fcb     %00000000                       ; 3BBD: 00       
-Jetman_Fly_Right_2
+Jetman_Fly_Right_0
     fcb     %11100000                       ; 3BBE: E0       
     fcb     %10000000                       ; 3BBF: 80       
     fcb     %01111000                       ; 3BC0: 78       
@@ -7291,7 +7300,7 @@ Jetman_Fly_Right_2
     fcb     %00011000                       ; 3BEE: 18       
     fcb     %00000001                       ; 3BEF: 01       
     fcb     %00000000                       ; 3BF0: 00       
-Jetman_Fly_Right_3
+Jetman_Fly_Right_1
     fcb     %00000000                       ; 3BF1: 00       
     fcb     %00000000                       ; 3BF2: 00       
     fcb     %00000000                       ; 3BF3: 00       
@@ -7367,7 +7376,7 @@ Jetman_Fly_Right_3
     fcb     %00011000                       ; 3C39: 18       
     fcb     %00000010                       ; 3C3A: 02       
     fcb     %00000000                       ; 3C3B: 00       
-Jetman_Fly_Right_4
+Jetman_Fly_Right_2
     fcb     %00000000                       ; 3C3C: 00       
     fcb     %00000000                       ; 3C3D: 00       
     fcb     %10000000                       ; 3C3E: 80       
@@ -7443,8 +7452,10 @@ Jetman_Fly_Right_4
     fcb     %00011000                       ; 3C84: 18       
     fcb     %00000010                       ; 3C85: 02       
     fcb     %00000000                       ; 3C86: 00       
+; $3C87 = Jetman_Fly_Right_3, it's referenced after the end of the object's static data
+
 UDG_Lookup_Ship_Fuel_Vals
-    fcb     $D4                             ; 3C87: D4        $3CD4 = Ship_1_Bott
+    fcb     $D4                             ; 3C87: D4       
     fcb     $3C                             ; 3C88: 3C       
     fdb     Ship_2_Bott                     ; 3C89: 3D 3D    
     fdb     Ship_1_Bott                     ; 3C8B: D4 3C    
