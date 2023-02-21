@@ -15,17 +15,17 @@ label      0C ZP0C_Object_New_UDG_RAM_Lo          ; 28
 label      0D ZP0D_Object_New_UDG_RAM_Hi          ; 10
 label      0E ZP0E                                ; 21
 label      0F ZP0F                                ; 12
-label      10 ZP10_Object_Old_Position_X          ; 04
+label      10 ZP10                                ; 04 Prev. ZP10_Object_Old_Position_X
 label      11 ZP11_Object_Old_Position_Y          ; 09
-label      12 ZP12_Object_Old_Type                ; 03
+label      12 ZP12                                ; 03 Prev. ZP12_Object_Old_Type
 label      13 ZP13                                ; 18
 label      14 ZP14_Object_Old_Width_Bytes         ; 08 Connected somehow. Shuffled in a subroutine.
 label      15 ZP15                                ; 08 Connected somehow. Shuffled in a subroutine.
 label      16 ZP16                                ; 05 Connected somehow. Shuffled in a subroutine.
 label      17 ZP17                                ; 04 Connected somehow. Shuffled in a subroutine.
-label      18 ZP18_Object_New_Position_X          ; 07
+label      18 ZP18                                ; 07 Prev. ZP18_Object_New_Position_X
 label      19 ZP19_Object_New_Position_Y          ; 12
-label      1A ZP1A_Object_Type_New                ; 03 Save_Obj_List_Params 2
+label      1A ZP1A                                ; 03 Prev. ZP1A_Object_Type_New
 label      1B ZP1B_Object_Color_New               ; 10 Save_Obj_List_Params 2
 label      1C ZP1C_Jetman_Action ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 ;                               1111 1111 = No action

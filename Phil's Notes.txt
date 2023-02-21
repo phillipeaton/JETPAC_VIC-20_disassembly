@@ -167,3 +167,10 @@ $FF       $FC       $E0       $00
 
 All sprites are drawn downwards in RAM, upwards on screen
 Sprites are drawn in blocks
+
+-------------
+Setting MAME conditional breakpoints
+
+bp 3815,w@0000=$03C8    Breakpoint at $3815 that only triggers when memory 
+                        location $0000 contains $03C8 i.e. is an Alien
+

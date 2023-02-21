@@ -417,21 +417,21 @@ comment  25D1 \ dP""b8    db    8b    d8 888888     .dP"Y8 888888    db    88""Y
 comment  25D1 \dP   `"   dPYb   88b  d88 88__       `Ybo."   88     dPYb   88__dP   88
 comment  25D1 \Yb  "88  dP__Yb  88YbdP88 88""       o.`Y8b   88    dP__Yb  88"Yb    88
 comment  25D1 \ YboodP dP""""Yb 88 YY 88 888888     8bodP'   88   dP""""Yb 88  Yb   88
-; Get_Object_UDG_Addr
+; Get_Obj_UDG_Stat_Addr
 comment  37D4
 comment  37D4
 comment  37D4
 comment  37D4
 comment  37D4
-comment  37D4 \ dP""b8 888888 888888      dP"Yb  88""Yb  88888 888888  dP""b8 888888
-comment  37D4 \dP   `" 88__     88       dP   Yb 88__dP     88 88__   dP   `"   88
-comment  37D4 \Yb  "88 88""     88       Yb   dP 88""Yb o.  88 88""   Yb        88
-comment  37D4 \ YboodP 888888   88        YbodP  88oodP "bodP' 888888  YboodP   88
+comment  37D4 \ dP""b8 888888 888888      dP"Yb  88""Yb  88888     88   88 8888b.   dP""b8
+comment  37D4 \dP   `" 88__     88       dP   Yb 88__dP     88     88   88  8I  Yb dP   `"
+comment  37D4 \Yb  "88 88""     88       Yb   dP 88""Yb o.  88     Y8   8P  8I  dY Yb  "88
+comment  37D4 \ YboodP 888888   88        YbodP  88oodP "bodP'     `YbodP' 8888Y"   YboodP
 comment  37D4 \
-comment  37D4 \88   88 8888b.   dP""b8        db    8888b.  8888b.  88""Yb
-comment  37D4 \88   88  8I  Yb dP   `"       dPYb    8I  Yb  8I  Yb 88__dP
-comment  37D4 \Y8   8P  8I  dY Yb  "88      dP__Yb   8I  dY  8I  dY 88"Yb
-comment  37D4 \`YbodP' 8888Y"   YboodP     dP""""Yb 8888Y"  8888Y"  88  Yb
+comment  37D4 \.dP"Y8 888888    db    888888        db    8888b.  8888b.  88""Yb
+comment  37D4 \`Ybo."   88     dPYb     88         dPYb    8I  Yb  8I  Yb 88__dP
+comment  37D4 \o.`Y8b   88    dP__Yb    88        dP__Yb   8I  dY  8I  dY 88"Yb
+comment  37D4 \8bodP'   88   dP""""Yb   88       dP""""Yb 8888Y"  8888Y"  88  Yb
 ; Initialise_Objects
 comment  2CD6
 comment  2CD6

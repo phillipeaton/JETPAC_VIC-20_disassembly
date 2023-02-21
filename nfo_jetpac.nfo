@@ -1363,16 +1363,16 @@ label    2FC3 Setup_Object_Addr
 comment  2FCB
 comment  2FCB Do it again to setup the object dimensions
 comment  2FDA
-comment  2FDA Returns UDG object data index to Rocket Middle Section/Fuel depending on level
-label    2FDA Get_Obj_UDG_Static_Addr_Level
+comment  2FDA Returns UDG object data offset to Rocket Middle Section/Fuel depending on which of the four levels
+label    2FDA Get_Obj_UDG_Stat_Addr_Ship_Lvl
 comment  2FDC
-comment  2FDC Calculate and return index to object's object based on A e.g. player level
+comment  2FDC Calculate and return offset to object's address based on A e.g. player level
 comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat
-label    2FDC Get_Object_UDG_Static_Addr_A
+label    2FDC Get_Obj_UDG_Stat_Addr_Ship_A
 binary   2FDE
 deflabel 2FE0 OBJECT_PARAM
 comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
-label    2FE5 Get_Object_UDG_Static_Addr
+label    2FE5 Get_Obj_UDG_Static_Addr_S_F_V
 comment  2FEE
 comment  2FEE At point when Jetman picks up Rocket or Fuel module
 label    2FEE Jetman_Collide_Rocket_Fuel
@@ -2109,20 +2109,32 @@ comment  37C6 Subtract $03 from 16-bit object UDG addr, i.e. so address
 comment  37C6 avoids the object dimension bytes
 comment  37CD
 comment  37D4
+comment  37D4 Aliens Types: 05=Fuzzball, 06=Saucer, 07=Ball, 08=Cross
+comment  37D4 All Aliens have only 2 animation states
+comment  37D4 InReg: A=Object Type (Alien), X=Animation Frame
+comment  37D4 OutReg: A=UDG Addr Hi, Y=UDG Addr Lo
 label    37D4 Get_Obj_UDG_Static_Addr_Alien
+comment  37D6
+comment  37D6 Convert the object's screen X position to an 0 or 2 animation frame data offset & put back into X
 lcomment 37D7 Zero bits 0 & 2-7
 binary   37D8
 comment  37DB
+comment  37DB Transform Object Types 5/6/7/8 to 2/3/4/5, then multiply by 4 to get the frame data offset offset
+comment  37DB Note, starting with offset 2 instead of 0 means 4 wasted bytes in the static data address table
+comment  37E0
+comment  37E0 Add $20 offset, which takes us to the start of the Alien UDG static data, past Jetman static data
 comment  37E6 OTHER ENTRY POINT
 label    37E6 Get_Obj_UDG_Addr_
 lcomment 37E8 Zero bits
 bin      37E9
 comment  37ED
-comment  37ED InReg: A=Object Type (Jetman or Alien), X=animation frame
-comment  37ED When object is Jetman, Object Type represents State i.e. flying, standing etc.
-comment  37ED and so $3F is masking out direction and test for walking AND flying???
-comment  37ED OutReg: UDG Addr Lo in Y, Hi in A
-comment  37ED CALLED ONLY FROM 381C or run into from 37E6
+comment  37ED When object is Jetman, Object Type represents State i.e. Flying/Standing, Facing Left/Right, Frame.
+comment  37ED There are 16 Jetman animation frames, 4 Fly Right, 4 Fly Left, 4 Stand Left, 4 Stand Right,
+comment  37ED in that order, in a list of 16-bit address to the UDG static data.
+comment  37ED This routine uses bit 7 of the Jetman Object Type to select Right or Left and bit 0 to
+comment  37ED select Flying or Standing, when creating an offset in register X.
+comment  37ED InReg: A=Object Type (Jetman), X=Animation Frame
+comment  37ED OutReg: A=UDG Addr Hi, Y=UDG Addr Lo
 label    37ED Get_Obj_UDG_Jetman_or_Alien
 comment  37EE
 comment  37EE Jetman uses only bit 7 (direction he's facing) and bits 0 & 1 (standing/flying).
@@ -2135,21 +2147,24 @@ lcomment 37F2 Carry Set if A >= compared value
 comment  37F5
 comment  37F5 Object is Jetman, test state, is he looking Left or Right?
 comment  37FA
-comment  37FA Jetman is looking left, set a bit in X, which holds the animation frame
+comment  37FA Jetman is looking left, set bit 3 in X, which adds $08 to the UDG static data address, meaning
+comment  37FA that it will point to the Jetman facing Left UDG static data addresses instead of facing Right.
 lcomment 37FC Set bit 3
 binary   37Fd
 comment  3800
-comment  3800 Subtract 1 and muliply by $10 i.e. left shift 4 bits
+comment  3800 A contains Jetman State, bit 7 is Direction-faced. SEC & SBC prepare ASLs to move bit 7 to bit 3
+comment  3800 This effectively adds $10 to the calculated UDG static data address when Jetman is Standing,
+comment  3800 meaning it points to the Jetman Standing static data addresses instead of Jetman Flying.
 label    3800 Get_Obj_UDG_Calc_Jetman
 comment  3807
-comment  3807 Set bit in X defined by A, ZP variable being used as temp store
+comment  3807 OR A and X together to produce full UDG static data table offset
 label    3807 Get_Obj_UDG_Calc_Jetman_Alien
 comment  380D
 comment  380D Using X just set, get index into the Object UDG table
 lcomment 380D Address lo byte into Y
 lcomment 3811 Address hi byte into A
 comment  3815
-comment  3815 Get address of UDG Static Data for Jetman or Alien objects
+comment  3815 Get address of UDG Static Data for Jetman or Alien objects and return in A and Y registers
 comment  3815 Bits 1 & 2 of object's X position used to select UDG animation frame.
 comment  3815 Animations have 2 or 4 frames and are minimum 2 pixels apart so bit 0 not used.
 label    3815 Get_Obj_UDG_Stat_Addr_JM_Alien

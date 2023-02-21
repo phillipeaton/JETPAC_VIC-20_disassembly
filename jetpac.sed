@@ -3,6 +3,7 @@
 
 # Local Zero Page variables for Display_Sprite routine
 
+# Display_Sprite
 /ZP02                            equ     $0002/a ZP02_Object_Old_Height_Index    equ     $0002
 /ZP03                            equ     $0003/a ZP03_Object_Old_Height          equ     $0003
 /ZP06                            equ     $0006/a ZP06_Object_Old_UDG_Stat_Lo     equ     $0006
@@ -41,3 +42,13 @@
 
 /; 3601/,/; 3734/s/ZP14                           /ZP14_Object_Old_Width_Bytes    /
 /; 3601/,/; 3734/s/ZP15                           /ZP15_Object_New_Width_Bytes    /
+
+# Get_Obj_UDG_Stat_Addr_JM_Alien
+/ZP10                            equ     $0010/a ZP10_Object_Position_X          equ     $0010
+/ZP12                            equ     $0012/a ZP12_Object_Type                equ     $0012
+/ZP18                            equ     $0018/a ZP18_Object_Position_X          equ     $0018
+/ZP1A                            equ     $001A/a ZP1A_Object_Type                equ     $001A
+/; 37D4/,/; 381C/s/ZP10                           /ZP10_Object_Position_X         /
+/; 37D4/,/; 381C/s/ZP12                           /ZP12_Object_Type               /
+/; 37D4/,/; 381C/s/ZP18                           /ZP18_Object_Position_X         /
+/; 37D4/,/; 381C/s/ZP1A                           /ZP1A_Object_Type               /
