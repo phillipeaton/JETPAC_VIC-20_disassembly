@@ -22,7 +22,6 @@
 /ZP14                            equ     $0014/a ZP14_Object_Old_Width_Bytes     equ     $0014
 /ZP15                            equ     $0015/a ZP15_Object_New_Width_Bytes     equ     $0015
 
-
 /; 3601/,/; 3734/s/ZP02                           /ZP02_Object_Old_Height_Index   /
 /; 3601/,/; 3734/s/ZP03                           /ZP03_Object_Old_Height         /
 /; 3601/,/; 3734/s/ZP06                           /ZP06_Object_Old_UDG_Stat_Lo    /
@@ -43,11 +42,13 @@
 /; 3601/,/; 3734/s/ZP14                           /ZP14_Object_Old_Width_Bytes    /
 /; 3601/,/; 3734/s/ZP15                           /ZP15_Object_New_Width_Bytes    /
 
+
 # Get_Obj_UDG_Stat_Addr_JM_Alien
 /ZP10                            equ     $0010/a ZP10_Object_Position_X          equ     $0010
 /ZP12                            equ     $0012/a ZP12_Object_Type                equ     $0012
 /ZP18                            equ     $0018/a ZP18_Object_Position_X          equ     $0018
 /ZP1A                            equ     $001A/a ZP1A_Object_Type                equ     $001A
+
 /; 37D4/,/; 381C/s/ZP10                           /ZP10_Object_Position_X         /
 /; 37D4/,/; 381C/s/ZP12                           /ZP12_Object_Type               /
 /; 37D4/,/; 381C/s/ZP18                           /ZP18_Object_Position_X         /

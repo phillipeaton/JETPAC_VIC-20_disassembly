@@ -1363,15 +1363,18 @@ label    2FC3 Setup_Object_Addr
 comment  2FCB
 comment  2FCB Do it again to setup the object dimensions
 comment  2FDA
-comment  2FDA Returns UDG object data offset to Rocket Middle Section/Fuel depending on which of the four levels
+comment  2FDA Return object's UDG static data address offset for Rocket Middle Section/Fuel
+comment  2FDA depending on which
+of the four levels (or multiple of) the player is currently on
 label    2FDA Get_Obj_UDG_Stat_Addr_Ship_Lvl
 comment  2FDC
-comment  2FDC Calculate and return offset to object's address based on A e.g. player level
+comment  2FDC Calculate and return object's UDG static data address offset based on A e.g. player level
 comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat
 label    2FDC Get_Obj_UDG_Stat_Addr_Ship_A
 binary   2FDE
 deflabel 2FE0 OBJECT_PARAM
-comment  2FE5 Using A as offset, Load A and Y with Ship UDG address
+comment  2FE5
+comment  2FE5 Using A as offset, Load A and Y with address of Ship, Fuel or Valuable UDG static data
 label    2FE5 Get_Obj_UDG_Static_Addr_S_F_V
 comment  2FEE
 comment  2FEE At point when Jetman picks up Rocket or Fuel module
@@ -2115,7 +2118,7 @@ comment  37D4 InReg: A=Object Type (Alien), X=Animation Frame
 comment  37D4 OutReg: A=UDG Addr Hi, Y=UDG Addr Lo
 label    37D4 Get_Obj_UDG_Static_Addr_Alien
 comment  37D6
-comment  37D6 Convert the object's screen X position to an 0 or 2 animation frame data offset & put back into X
+comment  37D6 Convert object's screen X position to 0 or 2 byte animation frame data offset & put back into X
 lcomment 37D7 Zero bits 0 & 2-7
 binary   37D8
 comment  37DB
@@ -2123,8 +2126,9 @@ comment  37DB Transform Object Types 5/6/7/8 to 2/3/4/5, then multiply by 4 to g
 comment  37DB Note, starting with offset 2 instead of 0 means 4 wasted bytes in the static data address table
 comment  37E0
 comment  37E0 Add $20 offset, which takes us to the start of the Alien UDG static data, past Jetman static data
-comment  37E6 OTHER ENTRY POINT
-label    37E6 Get_Obj_UDG_Addr_
+comment  37E6
+comment  37E6 Alternate entry point to routine using different ZP vars for object Position and Type
+label    37E6 Get_Obj_UDG_Stat_Addr_Alt
 lcomment 37E8 Zero bits
 bin      37E9
 comment  37ED
@@ -2178,20 +2182,28 @@ comment  3827 Setup Color RAM Pointer using UDG RAM X and Y
 comment  382A
 comment  382A Divide ZP_17 by $10, height of a color tile?
 comment  3835
-comment  3835 Outer loop decrementing ZP_0B
-comment  3835 Inner loop decrementing ZP_0A
-label    383B Update_Color_RAM_1
+comment  3835 Outer loop decrementing ZP0B
+comment  3835 Inner loop decrementing ZP0A
+label    383B LOOP_383B
 comment  383F
-label    383F Update_Color_RAM_2
+comment  383F Read colour from map and if it's green i.e. colour of the platforms, skip the colour change
+comment  383F otherwise write the updated colour to the screen map
+label    383F LOOP_383F
 lcomment 383F ZP0C_Col_RAM_Ptr_Lo
+lcomment 3841 Zero bits 3-7
+binary   3842
+deflabel 3844 GREEN
 comment  3847
 lcomment 3849 ZP0C_Col_RAM_Ptr_Lo
 comment  384B
-label    384B Update_Color_RAM_3
+label    384B SKIP_384B
 comment  384F
 lcomment 384F ZP0C_Col_RAM_Ptr_Lo
+deflabel 3853 SCREEN_WIDTH_COLOR_TILES
+deflabel 3855 SCREEN_WIDTH_COLOR_TILES
+comment  3858
 lcomment 3858 ZP0C_Col_RAM_Ptr_Lo
-comment  385A
+comment  385E
 label    385E Update_Color_RAM_RTS
 ;
 ; End of file contains graphics data
@@ -2213,18 +2225,18 @@ const    3C87-3C88
 word     3C89-3CB0
 binary   3CB1-3FFF
 ;
-label    38CA Jetman_Fly_Left_0
-label    38FD Jetman_Walk_Left_0
-label    3930 Jetman_Walk_Left_1
-label    397B Jetman_Walk_Left_2
-label    39C6 Jetman_Walk_Left_3
+label    38CA Jetman_Fly_Left_3
+label    38FD Jetman_Walk_Left_3
+label    3930 Jetman_Walk_Left_2
+label    397B Jetman_Walk_Left_1
+label    39C6 Jetman_Walk_Left_0
 label    39F9 Jetman_Walk_Right_0
 label    3A2C Jetman_Walk_Right_1
 label    3A77 Jetman_Walk_Right_2
 label    3AC2 Jetman_Walk_Right_3
-label    3AF5 Jetman_Fly_Left_1
-label    3B40 Jetman_Fly_Left_2
-label    3B8B Jetman_Fly_Left_3
+label    3AF5 Jetman_Fly_Left_2
+label    3B40 Jetman_Fly_Left_1
+label    3B8B Jetman_Fly_Left_0
 label    3BBE Jetman_Fly_Right_0
 label    3BF1 Jetman_Fly_Right_1
 label    3C3C Jetman_Fly_Right_2

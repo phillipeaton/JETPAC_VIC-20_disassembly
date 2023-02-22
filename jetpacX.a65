@@ -146,6 +146,8 @@ Color_RAM                       equ     $9600
 ; Used Definitions
 ;****************************************************
 
+SCREEN_WIDTH_COLOR_TILES        equ     $17
+GREEN                           equ     $05
 SCREEN_WIDTH_PIXELS             equ     $B8
 SCREEN_HEIGHT_PIXELS            equ     $B0
 OBJECT_COLOR_PARAM              equ     $05
@@ -158,7 +160,6 @@ JETMAN_Y_DIRECTION_PARAM        equ     $04
 JETMAN_POSITION_X_PARAM         equ     $01
 JETMAN_DIRECTION_X_PARAM        equ     $02
 JETMAN_X_DIRECTION_PARAM        equ     $02
-GREEN                           equ     $05
 OBJECT_PARAM                    equ     $06
 LIFECYCLE_STATE                 equ     $04
 FUEL_Y_WHEN_LANDED              equ     $A8
@@ -4043,22 +4044,23 @@ Setup_Object_Addr
 
 
 
-;  dP""b8 888888 888888      dP"Yb  88""Yb  88888 888888  dP""b8 888888
-; dP   `" 88__     88       dP   Yb 88__dP     88 88__   dP   `"   88
-; Yb  "88 88""     88       Yb   dP 88""Yb o.  88 88""   Yb        88
-;  YboodP 888888   88        YbodP  88oodP "bodP' 888888  YboodP   88
-; \
-; 88   88 8888b.   dP""b8     .dP"Y8 888888    db    888888 88  dP""b8
-; 88   88  8I  Yb dP   `"     `Ybo."   88     dPYb     88   88 dP   `"
-; Y8   8P  8I  dY Yb  "88     o.`Y8b   88    dP__Yb    88   88 Yb
-; `YbodP' 8888Y"   YboodP     8bodP'   88   dP""""Yb   88   88  YboodP
-; \
-;    db    8888b.  8888b.  88""Yb
-;   dPYb    8I  Yb  8I  Yb 88__dP
-;  dP__Yb   8I  dY  8I  dY 88"Yb
-; dP""""Yb 8888Y"  8888Y"  88  Yb
+;  dP""b8 888888 888888      dP"Yb  88""Yb  88888     88   88 8888b.   dP""b8
+; dP   `" 88__     88       dP   Yb 88__dP     88     88   88  8I  Yb dP   `"
+; Yb  "88 88""     88       Yb   dP 88""Yb o.  88     Y8   8P  8I  dY Yb  "88
+;  YboodP 888888   88        YbodP  88oodP "bodP'     `YbodP' 8888Y"   YboodP
 
-; Returns UDG object data offset to Rocket Middle Section/Fuel depending on which of the four levels
+; .dP"Y8 888888    db    888888        db    8888b.  8888b.  88""Yb
+; `Ybo."   88     dPYb     88         dPYb    8I  Yb  8I  Yb 88__dP
+; o.`Y8b   88    dP__Yb    88        dP__Yb   8I  dY  8I  dY 88"Yb
+; 8bodP'   88   dP""""Yb   88       dP""""Yb 8888Y"  8888Y"  88  Yb
+
+; .dP"Y8 88  88 88 88""Yb     888888 88   88 888888 88         Yb    dP    db    88
+; `Ybo." 88  88 88 88__dP     88__   88   88 88__   88          Yb  dP    dPYb   88
+; o.`Y8b 888888 88 88"""      88""   Y8   8P 88""   88  .o       YbdP    dP__Yb  88  .o
+; 8bodP' 88  88 88 88         88     `YbodP' 888888 88ood8        YP    dP""""Yb 88ood8
+
+; Return object's UDG static data address offset for Rocket Middle Section/Fuel
+; depending on which
 ; L_JSR_($2FDA)_($231F) OK
 ; L_JSR_($2FDA)_($2F85) OK
 ; L_JSR_($2FDA)_($2FC0) OK
@@ -4066,7 +4068,7 @@ Setup_Object_Addr
 Get_Obj_UDG_Stat_Addr_Ship_Lvl
     lda     ZP_Level_Current_Player         ; 2FDA: A5 59    
 
-; Calculate and return offset to object's address based on A e.g. player level
+; Calculate and return object's UDG static data address offset based on A e.g. player level
 ; First ship is for levels 0-3, second ship for levels 4-7 then repeat
 ; L_JSR_($2FDC)_($285B) OK
 Get_Obj_UDG_Stat_Addr_Ship_A
@@ -4077,7 +4079,8 @@ Get_Obj_UDG_Stat_Addr_Ship_A
     adc     (ZP00_Obj_List_Ptr_Lo),y        ; 2FE2: 71 00    
     rts                                     ; 2FE4: 60       
 ; ===========================================================
-; Using A as offset, Load A and Y with Ship UDG address
+
+; Using A as offset, Load A and Y with address of Ship, Fuel or Valuable UDG static data
 ; L_JSR_($2FE5)_($285E) OK
 ; L_JSR_($2FE5)_($2DF2) OK
 ; L_JSR_($2FE5)_($2DF9) OK
@@ -6153,7 +6156,7 @@ Load_Small_UDG_Addr_Setup_XY_1
 ; L_JSR_($378A)_($360D) OK
 ; L_JSR_($378A)_($3649) OK
 Set_UDG_RAM_Ptr_Object_Dimen_
-    jsr     Get_Obj_UDG_Addr_               ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
+    jsr     Get_Obj_UDG_Stat_Addr_Alt       ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
 
 ; Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
 ; L_JSR_($378D)_($27DB) OK
@@ -6228,11 +6231,16 @@ No_X_Wrap
 ; dP   `" 88__     88       dP   Yb 88__dP     88     88   88  8I  Yb dP   `"
 ; Yb  "88 88""     88       Yb   dP 88""Yb o.  88     Y8   8P  8I  dY Yb  "88
 ;  YboodP 888888   88        YbodP  88oodP "bodP'     `YbodP' 8888Y"   YboodP
-; \
+
 ; .dP"Y8 888888    db    888888        db    8888b.  8888b.  88""Yb
 ; `Ybo."   88     dPYb     88         dPYb    8I  Yb  8I  Yb 88__dP
 ; o.`Y8b   88    dP__Yb    88        dP__Yb   8I  dY  8I  dY 88"Yb
 ; 8bodP'   88   dP""""Yb   88       dP""""Yb 8888Y"  8888Y"  88  Yb
+
+;  88888 888888 888888 8b    d8    db    88b 88        db    88     88 888888 88b 88
+;     88 88__     88   88b  d88   dPYb   88Yb88       dPYb   88     88 88__   88Yb88
+; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88      dP__Yb  88  .o 88 88""   88 Y88
+; "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8     dP""""Yb 88ood8 88 888888 88  Y8
 
 ; Aliens Types: 05=Fuzzball, 06=Saucer, 07=Ball, 08=Cross
 ; All Aliens have only 2 animation states
@@ -6243,7 +6251,7 @@ Get_Obj_UDG_Static_Addr_Alien
     pha                                     ; 37D4: 48       
     txa                                     ; 37D5: 8A       
 
-; Convert the object's screen X position to an 0 or 2 animation frame data offset & put back into X
+; Convert object's screen X position to 0 or 2 byte animation frame data offset & put back into X
     lsr     a                               ; 37D6: 4A       
     and     #%00000010                      ; 37D7: 29 02     Zero bits 0 & 2-7
     tax                                     ; 37D9: AA       
@@ -6261,9 +6269,10 @@ Get_Obj_UDG_Static_Addr_Alien
     adc     #$20                            ; 37E1: 69 20    
     jmp     Get_Obj_UDG_Calc_Jetman_Alien   ; 37E3: 4C 07 38 
 ; -----------------------
-; OTHER ENTRY POINT
+
+; Alternate entry point to routine using different ZP vars for object Position and Type
 ; L_JSR_($37E6)_($378A) OK
-Get_Obj_UDG_Addr_
+Get_Obj_UDG_Stat_Addr_Alt
     lda     ZP10_Object_Position_X          ; 37E6: A5 10    
     and     #%00000110                      ; 37E8: 29 06     Zero bits
     tax                                     ; 37EA: AA       
@@ -6376,41 +6385,44 @@ Update_Color_RAM
     adc     #$02                            ; 3831: 69 02    
     sta     ZP0B                            ; 3833: 85 0B    
 
-; Outer loop decrementing ZP_0B
-; Inner loop decrementing ZP_0A
+; Outer loop decrementing ZP0B
+; Inner loop decrementing ZP0A
     lda     ZP16                            ; 3835: A5 16    
     sta     ZP0A                            ; 3837: 85 0A    
     inc     ZP0A                            ; 3839: E6 0A    
 ; L_BRS_($383B)_($385C) OK
-Update_Color_RAM_1
+LOOP_383B
     ldx     ZP0A                            ; 383B: A6 0A    
     ldy     #$00                            ; 383D: A0 00    
 
+; Read colour from map and if it's green i.e. colour of the platforms, skip the colour change
+; otherwise write the updated colour to the screen map
 ; L_BRS_($383F)_($384D) OK
-Update_Color_RAM_2
+LOOP_383F
     lda     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 383F: B1 0C     ZP0C_Col_RAM_Ptr_Lo
-    and     #$07                            ; 3841: 29 07    
-    cmp     #$05                            ; 3843: C9 05    
-    beq     Update_Color_RAM_3              ; 3845: F0 04    
+    and     #%00000111                      ; 3841: 29 07     Zero bits 3-7
+    cmp     #GREEN                          ; 3843: C9 05    
+    beq     SKIP_384B                       ; 3845: F0 04    
 
     lda     ZP1B_Object_Color_New           ; 3847: A5 1B    
     sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 3849: 91 0C     ZP0C_Col_RAM_Ptr_Lo
 
 ; L_BRS_($384B)_($3845) OK
-Update_Color_RAM_3
+SKIP_384B
     iny                                     ; 384B: C8       
     dex                                     ; 384C: CA       
-    bne     Update_Color_RAM_2              ; 384D: D0 F0    
+    bne     LOOP_383F                       ; 384D: D0 F0    
 
     lda     ZP0C_Object_New_UDG_RAM_Lo      ; 384F: A5 0C     ZP0C_Col_RAM_Ptr_Lo
     sec                                     ; 3851: 38       
-    sbc     #$17                            ; 3852: E9 17    
-    cmp     #$17                            ; 3854: C9 17    
+    sbc     #SCREEN_WIDTH_COLOR_TILES       ; 3852: E9 17    
+    cmp     #SCREEN_WIDTH_COLOR_TILES       ; 3854: C9 17    
     bcc     Update_Color_RAM_RTS            ; 3856: 90 06    
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 3858: 85 0C     ZP0C_Col_RAM_Ptr_Lo
 
+    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 3858: 85 0C     ZP0C_Col_RAM_Ptr_Lo
     dec     ZP0B                            ; 385A: C6 0B    
-    bne     Update_Color_RAM_1              ; 385C: D0 DD    
+    bne     LOOP_383B                       ; 385C: D0 DD    
+
 ; L_BRS_($385E)_($3856) OK
 Update_Color_RAM_RTS
     rts                                     ; 385E: 60       
@@ -6435,18 +6447,18 @@ UDG_Lookup_Jetman_Aliens
     fdb     Jetman_Fly_Right_1              ; 3861: F1 3B    
     fdb     Jetman_Fly_Right_2              ; 3863: 3C 3C    
     fdb     UDG_Lookup_Ship_Fuel_Vals       ; 3865: 87 3C     $3C87 = Jetman_Fly_Right_3
-    fdb     Jetman_Fly_Left_3               ; 3867: 8B 3B    
-    fdb     Jetman_Fly_Left_2               ; 3869: 40 3B    
-    fdb     Jetman_Fly_Left_1               ; 386B: F5 3A    
-    fdb     Jetman_Fly_Left_0               ; 386D: CA 38    
+    fdb     Jetman_Fly_Left_0               ; 3867: 8B 3B    
+    fdb     Jetman_Fly_Left_1               ; 3869: 40 3B    
+    fdb     Jetman_Fly_Left_2               ; 386B: F5 3A    
+    fdb     Jetman_Fly_Left_3               ; 386D: CA 38    
     fdb     Jetman_Walk_Right_0             ; 386F: F9 39    
     fdb     Jetman_Walk_Right_1             ; 3871: 2C 3A    
     fdb     Jetman_Walk_Right_2             ; 3873: 77 3A    
     fdb     Jetman_Walk_Right_3             ; 3875: C2 3A    
-    fdb     Jetman_Walk_Left_3              ; 3877: C6 39    
-    fdb     Jetman_Walk_Left_2              ; 3879: 7B 39    
-    fdb     Jetman_Walk_Left_1              ; 387B: 30 39    
-    fdb     Jetman_Walk_Left_0              ; 387D: FD 38    
+    fdb     Jetman_Walk_Left_0              ; 3877: C6 39    
+    fdb     Jetman_Walk_Left_1              ; 3879: 7B 39    
+    fdb     Jetman_Walk_Left_2              ; 387B: 30 39    
+    fdb     Jetman_Walk_Left_3              ; 387D: FD 38    
     fdb     Alien_Fuzz_1                    ; 387F: 78 3E    
     fdb     Alien_Fuzz_2                    ; 3881: 99 3E    
     fdb     Alien_Fuzz_1                    ; 3883: 78 3E    
@@ -6511,7 +6523,7 @@ UDG_Lookup_Jetman_Aliens
     fcb     %00011000                       ; 38C7: 18       
     fcb     %00000001                       ; 38C8: 01       
     fcb     %00001000                       ; 38C9: 08       
-Jetman_Fly_Left_0
+Jetman_Fly_Left_3
     fcb     %11100000                       ; 38CA: E0       
     fcb     %01110000                       ; 38CB: 70       
     fcb     %10110100                       ; 38CC: B4       
@@ -6563,7 +6575,7 @@ Jetman_Fly_Left_0
     fcb     %00011000                       ; 38FA: 18       
     fcb     %00000001                       ; 38FB: 01       
     fcb     %00001000                       ; 38FC: 08       
-Jetman_Walk_Left_0
+Jetman_Walk_Left_3
     fcb     %10000000                       ; 38FD: 80       
     fcb     %11000000                       ; 38FE: C0       
     fcb     %11001000                       ; 38FF: C8       
@@ -6615,7 +6627,7 @@ Jetman_Walk_Left_0
     fcb     %00011000                       ; 392D: 18       
     fcb     %00000001                       ; 392E: 01       
     fcb     %00001000                       ; 392F: 08       
-Jetman_Walk_Left_1
+Jetman_Walk_Left_2
     fcb     %00000000                       ; 3930: 00       
     fcb     %00000000                       ; 3931: 00       
     fcb     %01000000                       ; 3932: 40       
@@ -6691,7 +6703,7 @@ Jetman_Walk_Left_1
     fcb     %00011000                       ; 3978: 18       
     fcb     %00000010                       ; 3979: 02       
     fcb     %00000000                       ; 397A: 00       
-Jetman_Walk_Left_2
+Jetman_Walk_Left_1
     fcb     %00000000                       ; 397B: 00       
     fcb     %00000000                       ; 397C: 00       
     fcb     %10000000                       ; 397D: 80       
@@ -6767,7 +6779,7 @@ Jetman_Walk_Left_2
     fcb     %00011000                       ; 39C3: 18       
     fcb     %00000010                       ; 39C4: 02       
     fcb     %00000000                       ; 39C5: 00       
-Jetman_Walk_Left_3
+Jetman_Walk_Left_0
     fcb     %10000000                       ; 39C6: 80       
     fcb     %00000000                       ; 39C7: 00       
     fcb     %11100000                       ; 39C8: E0       
@@ -7075,7 +7087,7 @@ Jetman_Walk_Right_3
     fcb     %00011000                       ; 3AF2: 18       
     fcb     %00000001                       ; 3AF3: 01       
     fcb     %00001000                       ; 3AF4: 08       
-Jetman_Fly_Left_1
+Jetman_Fly_Left_2
     fcb     %00000000                       ; 3AF5: 00       
     fcb     %00000000                       ; 3AF6: 00       
     fcb     %01000000                       ; 3AF7: 40       
@@ -7151,7 +7163,7 @@ Jetman_Fly_Left_1
     fcb     %00011000                       ; 3B3D: 18       
     fcb     %00000010                       ; 3B3E: 02       
     fcb     %00000000                       ; 3B3F: 00       
-Jetman_Fly_Left_2
+Jetman_Fly_Left_1
     fcb     %00000000                       ; 3B40: 00       
     fcb     %00000000                       ; 3B41: 00       
     fcb     %00000000                       ; 3B42: 00       
@@ -7227,7 +7239,7 @@ Jetman_Fly_Left_2
     fcb     %00011000                       ; 3B88: 18       
     fcb     %00000010                       ; 3B89: 02       
     fcb     %00000000                       ; 3B8A: 00       
-Jetman_Fly_Left_3
+Jetman_Fly_Left_0
     fcb     %10000000                       ; 3B8B: 80       
     fcb     %00000000                       ; 3B8C: 00       
     fcb     %11100000                       ; 3B8D: E0       

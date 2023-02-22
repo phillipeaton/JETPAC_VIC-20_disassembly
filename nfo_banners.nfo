@@ -417,7 +417,7 @@ comment  25D1 \ dP""b8    db    8b    d8 888888     .dP"Y8 888888    db    88""Y
 comment  25D1 \dP   `"   dPYb   88b  d88 88__       `Ybo."   88     dPYb   88__dP   88
 comment  25D1 \Yb  "88  dP__Yb  88YbdP88 88""       o.`Y8b   88    dP__Yb  88"Yb    88
 comment  25D1 \ YboodP dP""""Yb 88 YY 88 888888     8bodP'   88   dP""""Yb 88  Yb   88
-; Get_Obj_UDG_Stat_Addr
+; Get_Obj_UDG_Static_Addr_Alien
 comment  37D4
 comment  37D4
 comment  37D4
@@ -427,11 +427,36 @@ comment  37D4 \ dP""b8 888888 888888      dP"Yb  88""Yb  88888     88   88 8888b
 comment  37D4 \dP   `" 88__     88       dP   Yb 88__dP     88     88   88  8I  Yb dP   `"
 comment  37D4 \Yb  "88 88""     88       Yb   dP 88""Yb o.  88     Y8   8P  8I  dY Yb  "88
 comment  37D4 \ YboodP 888888   88        YbodP  88oodP "bodP'     `YbodP' 8888Y"   YboodP
-comment  37D4 \
+comment  37D4
 comment  37D4 \.dP"Y8 888888    db    888888        db    8888b.  8888b.  88""Yb
 comment  37D4 \`Ybo."   88     dPYb     88         dPYb    8I  Yb  8I  Yb 88__dP
 comment  37D4 \o.`Y8b   88    dP__Yb    88        dP__Yb   8I  dY  8I  dY 88"Yb
 comment  37D4 \8bodP'   88   dP""""Yb   88       dP""""Yb 8888Y"  8888Y"  88  Yb
+comment  37D4
+comment  37D4 \ 88888 888888 888888 8b    d8    db    88b 88        db    88     88 888888 88b 88
+comment  37D4 \    88 88__     88   88b  d88   dPYb   88Yb88       dPYb   88     88 88__   88Yb88
+comment  37D4 \o.  88 88""     88   88YbdP88  dP__Yb  88 Y88      dP__Yb  88  .o 88 88""   88 Y88
+comment  37D4 \"bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8     dP""""Yb 88ood8 88 888888 88  Y8
+; Get_Object_UDG_Stat_Addr
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA
+comment  2FDA \ dP""b8 888888 888888      dP"Yb  88""Yb  88888     88   88 8888b.   dP""b8
+comment  2FDA \dP   `" 88__     88       dP   Yb 88__dP     88     88   88  8I  Yb dP   `"
+comment  2FDA \Yb  "88 88""     88       Yb   dP 88""Yb o.  88     Y8   8P  8I  dY Yb  "88
+comment  2FDA \ YboodP 888888   88        YbodP  88oodP "bodP'     `YbodP' 8888Y"   YboodP
+comment  2FDA
+comment  2FDA \.dP"Y8 888888    db    888888        db    8888b.  8888b.  88""Yb
+comment  2FDA \`Ybo."   88     dPYb     88         dPYb    8I  Yb  8I  Yb 88__dP
+comment  2FDA \o.`Y8b   88    dP__Yb    88        dP__Yb   8I  dY  8I  dY 88"Yb
+comment  2FDA \8bodP'   88   dP""""Yb   88       dP""""Yb 8888Y"  8888Y"  88  Yb
+comment  2FDA
+comment  2FDA \.dP"Y8 88  88 88 88""Yb     888888 88   88 888888 88         Yb    dP    db    88
+comment  2FDA \`Ybo." 88  88 88 88__dP     88__   88   88 88__   88          Yb  dP    dPYb   88
+comment  2FDA \o.`Y8b 888888 88 88"""      88""   Y8   8P 88""   88  .o       YbdP    dP__Yb  88  .o
+comment  2FDA \8bodP' 88  88 88 88         88     `YbodP' 888888 88ood8        YP    dP""""Yb 88ood8
 ; Initialise_Objects
 comment  2CD6
 comment  2CD6
@@ -802,26 +827,6 @@ comment  385F \ dP""b8 88""Yb    db    88""Yb 88  88 88  dP""b8 .dP"Y8
 comment  385F \dP   `" 88__dP   dPYb   88__dP 88  88 88 dP   `" `Ybo."
 comment  385F \Yb  "88 88"Yb   dP__Yb  88"""  888888 88 Yb      o.`Y8b
 comment  385F \ YboodP 88  Yb dP""""Yb 88     88  88 88  YboodP 8bodP'
-; Get_Object_UDG_Stat_Addr
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA
-comment  2FDA \ dP""b8 888888 888888      dP"Yb  88""Yb  88888 888888  dP""b8 888888
-comment  2FDA \dP   `" 88__     88       dP   Yb 88__dP     88 88__   dP   `"   88
-comment  2FDA \Yb  "88 88""     88       Yb   dP 88""Yb o.  88 88""   Yb        88
-comment  2FDA \ YboodP 888888   88        YbodP  88oodP "bodP' 888888  YboodP   88
-comment  2FDA \
-comment  2FDA \88   88 8888b.   dP""b8     .dP"Y8 888888    db    888888 88  dP""b8
-comment  2FDA \88   88  8I  Yb dP   `"     `Ybo."   88     dPYb     88   88 dP   `"
-comment  2FDA \Y8   8P  8I  dY Yb  "88     o.`Y8b   88    dP__Yb    88   88 Yb
-comment  2FDA \`YbodP' 8888Y"   YboodP     8bodP'   88   dP""""Yb   88   88  YboodP
-comment  2FDA \
-comment  2FDA \   db    8888b.  8888b.  88""Yb
-comment  2FDA \  dPYb    8I  Yb  8I  Yb 88__dP
-comment  2FDA \ dP__Yb   8I  dY  8I  dY 88"Yb
-comment  2FDA \dP""""Yb 8888Y"  8888Y"  88  Yb
 ; ( Interrupt_Related )
 comment  265E
 comment  265E
