@@ -53,3 +53,22 @@
 /; 37D4/,/; 381C/s/ZP12                           /ZP12_Object_Type               /
 /; 37D4/,/; 381C/s/ZP18                           /ZP18_Object_Position_X         /
 /; 37D4/,/; 381C/s/ZP1A                           /ZP1A_Object_Type               /
+
+
+# Update_Color_RAM
+/ZP0A                            equ     $000A/a ZP0A_Color_RAM_Tiles_X          equ     $000A
+/ZP0B                            equ     $000B/a ZP0B_Color_RAM_Tiles_Y          equ     $000B
+/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
+/ZP16                            equ     $0016/a ZP16_Object_Size_X_Columns      equ     $0016
+/ZP17                            equ     $0017/a ZP17_Object_Size_Y_Pixels       equ     $0017
+/ZP18                            equ     $0018/a ZP18_Object_Position_X_         equ     $0018
+/ZP19                            equ     $0019/a ZP19_Object_Position_Y          equ     $0019
+
+/; 381F/,/; 385E/s/ZP0A                           /ZP0A_Color_RAM_Tiles_X         /
+/; 381F/,/; 385E/s/ZP0B                           /ZP0B_Color_RAM_Tiles_Y         /
+/; 381F/,/; 385E/s/ZP0C                           /ZP0C_Color_RAM_Tile_Addr_Lo    /
+/; 381F/,/; 385E/s/(ZP0C),y                       /(ZP0C_Color_RAM_Tile_Addr_Lo),y/
+/; 381F/,/; 385E/s/ZP16                           /ZP16_Object_Size_X_Columns     /
+/; 381F/,/; 385E/s/ZP17                           /ZP17_Object_Size_Y_Pixels      /
+/; 381F/,/; 385E/s/ZP18                           /ZP18_Object_Position_X_        /
+/; 381F/,/; 385E/s/ZP19                           /ZP19_Object_Position_Y         /

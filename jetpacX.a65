@@ -18,8 +18,8 @@ ZP02                            equ     $0002
 ZP02_Object_Old_Height_Index    equ     $0002
 ZP03                            equ     $0003
 ZP03_Object_Old_Height          equ     $0003
-ZP04_Object_Old_UDG_RAM_Lo      equ     $0004
-ZP05_Object_Old_UDG_RAM_Hi      equ     $0005
+ZP04                            equ     $0004
+ZP05                            equ     $0005
 ZP06                            equ     $0006
 ZP06_Object_Old_UDG_Stat_Lo     equ     $0006
 ZP07                            equ     $0007
@@ -30,9 +30,12 @@ ZP09                            equ     $0009
 ZP09_Object_New_Y_Index         equ     $0009
 ZP0A                            equ     $000A
 ZP0A_Object_New_Height_Index    equ     $000A
+ZP0A_Color_RAM_Tiles_X          equ     $000A
 ZP0B                            equ     $000B
 ZP0B_Object_New_Height          equ     $000B
-ZP0C_Object_New_UDG_RAM_Lo      equ     $000C
+ZP0B_Color_RAM_Tiles_Y          equ     $000B
+ZP0C                            equ     $000C
+ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
 ZP0D_Object_New_UDG_RAM_Hi      equ     $000D
 ZP0E                            equ     $000E
 ZP0E_Object_New_UDG_Stat_Lo     equ     $000E
@@ -49,10 +52,14 @@ ZP14_Object_Old_Width_Bytes     equ     $0014
 ZP15                            equ     $0015
 ZP15_Object_New_Width_Bytes     equ     $0015
 ZP16                            equ     $0016
+ZP16_Object_Size_X_Columns      equ     $0016
 ZP17                            equ     $0017
+ZP17_Object_Size_Y_Pixels       equ     $0017
 ZP18                            equ     $0018
 ZP18_Object_Position_X          equ     $0018
-ZP19_Object_New_Position_Y      equ     $0019
+ZP18_Object_Position_X_         equ     $0018
+ZP19                            equ     $0019
+ZP19_Object_Position_Y          equ     $0019
 ZP1A                            equ     $001A
 ZP1A_Object_Type                equ     $001A
 ZP1B_Object_Color_New           equ     $001B
@@ -146,7 +153,7 @@ Color_RAM                       equ     $9600
 ; Used Definitions
 ;****************************************************
 
-SCREEN_WIDTH_COLOR_TILES        equ     $17
+SCREEN_WIDTH_COLUMNS            equ     $17
 GREEN                           equ     $05
 SCREEN_WIDTH_PIXELS             equ     $B8
 SCREEN_HEIGHT_PIXELS            equ     $B0
@@ -612,10 +619,10 @@ DISPLAY_LASERS
     ldy     #$02                            ; 21A5: A0 02     Y=$02, X-coord of laser horizontal end point
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 21A7: B1 00    
     sta     ZP06                            ; 21A9: 85 06    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 21AB: 85 04    
+    sta     ZP04                            ; 21AB: 85 04    
     dey                                     ; 21AD: 88        Y=$01, Y-coord of laser
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 21AE: B1 00    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 21B0: 85 05    
+    sta     ZP05                            ; 21B0: 85 05    
     sta     ZP13                            ; 21B2: 85 13    
 
 ; Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
@@ -641,7 +648,7 @@ FP1111
     dey                                     ; 21D3: 88       
     cmp     #$80                            ; 21D4: C9 80     Test Y coord bit 7 ???
     bcs     FP2222                          ; 21D6: B0 04    
-    lda     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 21D8: B1 04     Get X Coord
+    lda     (ZP04),y                        ; 21D8: B1 04     Get X Coord
     bne     FP4444                          ; 21DA: D0 20    
 ; L_BRS_($21DC)_($21D6) OK
 FP2222
@@ -650,17 +657,17 @@ FP2222
     sta     ZP06                            ; 21DD: 85 06    
 
 ; Invert the displayed 8-bit byte on-screen
-    lda     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 21DF: B1 04    
+    lda     (ZP04),y                        ; 21DF: B1 04    
     eor     #$FF                            ; 21E1: 49 FF    
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 21E3: 91 04    
+    sta     (ZP04),y                        ; 21E3: 91 04    
 
 ; Load current tile color, check it's not green, if not update tile color
-    lda     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 21E5: B1 0C     ZP0C_Col_RAM_Ptr_Lo
+    lda     (ZP0C),y                        ; 21E5: B1 0C     ZP0C_Col_RAM_Ptr_Lo
     and     #$0F                            ; 21E7: 29 0F     Zero top 4 bits
     cmp     #GREEN                          ; 21E9: C9 05     Test if 0101
     beq     FP3333                          ; 21EB: F0 04    
     lda     ZP1B_Object_Color_New           ; 21ED: A5 1B     Tile color
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 21EF: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 21EF: 91 0C     ZP0C_Col_RAM_Ptr_Lo
 
 ; Some kind of screen wrap?
 ; L_BRS_($21F1)_($21EB) OK
@@ -748,7 +755,7 @@ FP8888
 ; L_BRS_($2257)_($222E) OK
 FP9999
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2257: B1 00    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 2259: 85 04    
+    sta     ZP04                            ; 2259: 85 04    
     bit     MASK_00000001                   ; 225B: 2C 14 20 
     beq     CLC_ADC_08                      ; 225E: F0 25    
     clc                                     ; 2260: 18       
@@ -758,7 +765,7 @@ FPAAAA
     jsr     Laser_Wrap?                     ; 2263: 20 98 22 
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2266: 91 00    
     lda     ZP13                            ; 2268: A5 13    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 226A: 85 05    
+    sta     ZP05                            ; 226A: 85 05    
 
 ; EXOR-write data in ZP variable to UDG RAM
     tya                                     ; 226C: 98        Save Y
@@ -767,8 +774,8 @@ FPAAAA
     jsr     Laser_ZP17_15_to_ZP16_14        ; 2271: 20 8B 22 
     ldy     #$00                            ; 2274: A0 00    
     lda     ZP14_Object_Old_Width_Bytes     ; 2276: A5 14    
-    eor     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 2278: 51 04    
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 227A: 91 04    
+    eor     (ZP04),y                        ; 2278: 51 04    
+    sta     (ZP04),y                        ; 227A: 91 04    
     pla                                     ; 227C: 68       
     tay                                     ; 227D: A8        Restore Y
 
@@ -1147,10 +1154,10 @@ Display_1UP_HI_2UP_Titles
 ; L_BRS_($2429)_($244D) OK
 BACK_D1H2
     lda     STR_1UP_HI_2UP,x                ; 2429: BD 65 24 
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 242C: 85 04    
+    sta     ZP04                            ; 242C: 85 04    
     inx                                     ; 242E: E8       
     lda     STR_1UP_HI_2UP,x                ; 242F: BD 65 24 
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 2432: 85 05    
+    sta     ZP05                            ; 2432: 85 05    
     inx                                     ; 2434: E8       
     lda     STR_1UP_HI_2UP,x                ; 2435: BD 65 24 
     sta     ZP0E                            ; 2438: 85 0E    
@@ -1307,10 +1314,10 @@ Display_Game_Select
     sta     ZP08                            ; 24ED: 85 08    
 ; L_BRS_($24EF)_($251C) OK
 DGS1 lda    #$18                            ; 24EF: A9 18    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 24F1: 85 04    
+    sta     ZP04                            ; 24F1: 85 04    
     ldx     ZP08                            ; 24F3: A6 08    
     lda     Fn_Key_SP_Row_Offsets,x         ; 24F5: BD 1F 25 
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 24F8: 85 05    
+    sta     ZP05                            ; 24F8: 85 05    
     jsr     Setup_Color_RAM_Ptr             ; 24FA: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 24FD: 20 1D 35 
 
@@ -2054,11 +2061,11 @@ Display_Rocket_Flame_1
     adc     #$15                            ; 27B9: 69 15    
     sta     ZP11_Object_Old_Position_Y      ; 27BB: 85 11    
 
-    lda     ZP19_Object_New_Position_Y      ; 27BD: A5 19    
+    lda     ZP19                            ; 27BD: A5 19    
     pha                                     ; 27BF: 48       
     clc                                     ; 27C0: 18       
     adc     #$15                            ; 27C1: 69 15    
-    sta     ZP19_Object_New_Position_Y      ; 27C3: 85 19     0019 must be height of rocket
+    sta     ZP19                            ; 27C3: 85 19     0019 must be height of rocket
 
     cmp     #$AF                            ; 27C5: C9 AF     Check rocket height
     beq     Display_Flame                   ; 27C7: F0 50     Display Flame
@@ -2087,15 +2094,15 @@ Display_Rocket_Flame_2
     jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 27F1: 20 8D 37 
     jsr     Display_Object                  ; 27F4: 20 4C 36 
     lda     ZP18                            ; 27F7: A5 18    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 27F9: 85 04    
-    lda     ZP19_Object_New_Position_Y      ; 27FB: A5 19    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 27FD: 85 05    
+    sta     ZP04                            ; 27F9: 85 04    
+    lda     ZP19                            ; 27FB: A5 19    
+    sta     ZP05                            ; 27FD: 85 05    
     jsr     Setup_Color_RAM_Ptr             ; 27FF: 20 F7 34 
     lda     #$02                            ; 2802: A9 02    
     ldy     #$00                            ; 2804: A0 00    
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 2806: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 2806: 91 0C     ZP0C_Col_RAM_Ptr_Lo
     iny                                     ; 2808: C8       
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 2809: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 2809: 91 0C     ZP0C_Col_RAM_Ptr_Lo
 
 ; Restore 11 and 19 and return
 ; L_JMP_($280B)_($2816) OK
@@ -2103,7 +2110,7 @@ Display_Rocket_Flame_2
 ; L_JMP_($280B)_($282B) OK
 Display_Rocket_Flame_3
     pla                                     ; 280B: 68       
-    sta     ZP19_Object_New_Position_Y      ; 280C: 85 19    
+    sta     ZP19                            ; 280C: 85 19    
     pla                                     ; 280E: 68       
     sta     ZP11_Object_Old_Position_Y      ; 280F: 85 11    
     rts                                     ; 2811: 60       
@@ -3603,10 +3610,10 @@ Restore_Player_Objects_6
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
 Dec_Saved_Obj_List_Params_by_10
-    lda     ZP19_Object_New_Position_Y      ; 2DFF: A5 19    
+    lda     ZP19                            ; 2DFF: A5 19    
     sec                                     ; 2E01: 38       
     sbc     #$10                            ; 2E02: E9 10    
-    sta     ZP19_Object_New_Position_Y      ; 2E04: 85 19    
+    sta     ZP19                            ; 2E04: 85 19    
     lda     ZP11_Object_Old_Position_Y      ; 2E06: A5 11    
     sec                                     ; 2E08: 38       
     sbc     #$10                            ; 2E09: E9 10    
@@ -3849,11 +3856,11 @@ Rocket_Fuelled_Up_4
 Rocket_Fuelled_Up_5
     ldy     #$01                            ; 2F07: A0 01    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2F09: B1 00    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 2F0B: 85 04    
+    sta     ZP04                            ; 2F0B: 85 04    
 
     ldy     #$03                            ; 2F0D: A0 03    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2F0F: B1 00    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 2F11: 85 05    
+    sta     ZP05                            ; 2F11: 85 05    
 
     jsr     Setup_Color_RAM_Ptr             ; 2F13: 20 F7 34 
 ; L_JSR_($2F16)_($2EF7) OK
@@ -3861,13 +3868,13 @@ Rocket_Fuelled_Up_5
 Rocket_Fuelled_Up_6
     ldy     #$00                            ; 2F16: A0 00    
     lda     ZP1B_Object_Color_New           ; 2F18: A5 1B    
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 2F1A: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 2F1A: 91 0C     ZP0C_Col_RAM_Ptr_Lo
     iny                                     ; 2F1C: C8       
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 2F1D: 91 0C     ZP0C_Col_RAM_Ptr_Lo
-    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 2F1F: A5 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 2F1D: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    lda     ZP0C                            ; 2F1F: A5 0C     ZP0C_Col_RAM_Ptr_Lo
     sec                                     ; 2F21: 38       
     sbc     #$17                            ; 2F22: E9 17    
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 2F24: 85 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     ZP0C                            ; 2F24: 85 0C     ZP0C_Col_RAM_Ptr_Lo
     lda     ZP0D_Object_New_UDG_RAM_Hi      ; 2F26: A5 0D     ZP0D_Col_RAM_Ptr_Hi
     sbc     #$00                            ; 2F28: E9 00    
     sta     ZP0D_Object_New_UDG_RAM_Hi      ; 2F2A: 85 0D     ZP0D_Col_RAM_Ptr_Hi
@@ -3931,7 +3938,7 @@ Rocket_Part_Or_Fuel_Dropped
     lda     Obj_Rocket_Y                    ; 2F57: AD B3 03 
     sec                                     ; 2F5A: 38       
     sbc     ZP13                            ; 2F5B: E5 13    
-    sta     ZP19_Object_New_Position_Y      ; 2F5D: 85 19    
+    sta     ZP19                            ; 2F5D: 85 19    
     jsr     Load_Rocket_or_Fuel_UDGs_1      ; 2F5F: 20 57 30 
     inc     Obj_Rocket_Parts_Fuel_Counter   ; 2F62: EE B4 03 
 
@@ -4478,11 +4485,11 @@ Draw_Platforms
     jsr     _31B6_To_Tmp4_03_To_Tmp5_Yto00  ; 3152: 20 43 31 
 ; L_BRS_($3155)_($319F) OK
 DP_1 lda    (ZP08),y                        ; 3155: B1 08     Get X value from lookup table ($10)
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 3157: 85 04      and store
+    sta     ZP04                            ; 3157: 85 04      and store
 
     iny                                     ; 3159: C8       
     lda     (ZP08),y                        ; 315A: B1 08     Get Y value from lookup table ($40)
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 315C: 85 05      and store
+    sta     ZP05                            ; 315C: 85 05      and store
 
     iny                                     ; 315E: C8       
     lda     (ZP08),y                        ; 315F: B1 08     Get ??? value from lookup table ($03)
@@ -4523,7 +4530,7 @@ Loop_Next_Char
     ldy     #$00                            ; 318F: A0 00    
     lda     #GREEN                          ; 3191: A9 05    
 ; L_BRS_($3193)_($3198) OK
-DP_2 sta    (ZP0C_Object_New_UDG_RAM_Lo),y  ; 3193: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+DP_2 sta    (ZP0C),y                        ; 3193: 91 0C     ZP0C_Col_RAM_Ptr_Lo
     iny                                     ; 3195: C8       
     dec     ZP0B                            ; 3196: C6 0B    
     bpl     DP_2                            ; 3198: 10 F9    
@@ -5224,24 +5231,24 @@ Invert_UDG_Columns
     ldy     #$0F                            ; 347B: A0 0F     Number of pixel lines to reverse
 ; L_BRS_($347D)_($3484) OK
 Invert_UDG_Rows
-    lda     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 347D: B1 04     Get current byte of character
+    lda     (ZP04),y                        ; 347D: B1 04     Get current byte of character
     eor     #$FF                            ; 347F: 49 FF      invert it
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3481: 91 04      and write it back
+    sta     (ZP04),y                        ; 3481: 91 04      and write it back
     dey                                     ; 3483: 88       
     bpl     Invert_UDG_Rows                 ; 3484: 10 F7     All bytes inverted?
     dex                                     ; 3486: CA         If yes, continue to next column
     beq     Flash_Score_RTS                 ; 3487: F0 10     All columns inverted? If yes, finish
 
 ; Move to next column by adding $B0 (#176) pixel to X postion
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 3489: A5 04    
+    lda     ZP04                            ; 3489: A5 04    
     clc                                     ; 348B: 18       
     adc     #$B0                            ; 348C: 69 B0     $B0 = height of screen in pixels i.e. move one column right
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 348E: 85 04    
+    sta     ZP04                            ; 348E: 85 04    
 
 ; Move to top row by adding $B0 (#176) pixeln to X postion i.e. one column
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 3490: A5 05    
+    lda     ZP05                            ; 3490: A5 05    
     adc     #$00                            ; 3492: 69 00     Add the carry from the previous $B0 addition for X
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 3494: 85 05    
+    sta     ZP05                            ; 3494: 85 05    
     jmp     Invert_UDG_Columns              ; 3496: 4C 7B 34 
 ; -----------------------
 ; L_BRS_($3499)_($3477) OK
@@ -5368,7 +5375,7 @@ Display_Character
 
     lda     ZP_Invert                       ; 34F0: A5 57    
     dey                                     ; 34F2: 88       
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 34F3: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 34F3: 91 0C     ZP0C_Col_RAM_Ptr_Lo
     iny                                     ; 34F5: C8       
     rts                                     ; 34F6: 60       
 ; ===========================================================
@@ -5395,13 +5402,13 @@ Display_Character
 ; L_JSR_($34F7)_($34CC) OK
 ; L_JSR_($34F7)_($3827) OK
 Setup_Color_RAM_Ptr
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 34F7: A5 04     Get Addr_To lo-byte and divide by 8
+    lda     ZP04                            ; 34F7: A5 04     Get Addr_To lo-byte and divide by 8
     lsr     a                               ; 34F9: 4A        and store to Color RAM Ptr lo-byte.
     lsr     a                               ; 34FA: 4A        ZP_Addr_To is used to work out the column
     lsr     a                               ; 34FB: 4A       
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 34FC: 85 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     ZP0C                            ; 34FC: 85 0C     ZP0C_Col_RAM_Ptr_Lo
 
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 34FE: A5 05     Get Addr_To hi-byte, divide by $10
+    lda     ZP05                            ; 34FE: A5 05     Get Addr_To hi-byte, divide by $10
     lsr     a                               ; 3500: 4A        and use as index into Color RAM
     lsr     a                               ; 3501: 4A        Row Offsets i.e. 9600, 9617, 962e etc.
     lsr     a                               ; 3502: 4A        Divided by #16 because 16 y-pixels per
@@ -5409,8 +5416,8 @@ Setup_Color_RAM_Ptr
     tax                                     ; 3504: AA       
     lda     Color_RAM_Row_Offsets,x         ; 3505: BD 12 35 
     clc                                     ; 3508: 18       
-    adc     ZP0C_Object_New_UDG_RAM_Lo      ; 3509: 65 0C     ZP0C_Col_RAM_Ptr_Lo
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 350B: 85 0C     ZP0C_Col_RAM_Ptr_Lo
+    adc     ZP0C                            ; 3509: 65 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     ZP0C                            ; 350B: 85 0C     ZP0C_Col_RAM_Ptr_Lo
 
     lda     #$96                            ; 350D: A9 96     Store hi-byte of Color RAM
     sta     ZP0D_Object_New_UDG_RAM_Hi      ; 350F: 85 0D     to pointer hi-byte.
@@ -5449,34 +5456,34 @@ Color_RAM_Row_Offsets
 ; L_JSR_($351D)_($375D) OK
 ; L_JSR_($351D)_($37AB) OK
 Convert_XY_to_UDG_RAM_Addr
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 351D: A5 05     Addr_To = 18 68, as example i.e. X=$18 pixels from left, Y=$68 pixels from top
+    lda     ZP05                            ; 351D: A5 05     Addr_To = 18 68, as example i.e. X=$18 pixels from left, Y=$68 pixels from top
     tay                                     ; 351F: A8        Addr_To = 18 xx, 68 stashed to Y
 
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 3520: A5 04     Get Addr_To lo-byte, divide by 8, example = $18/8=3
+    lda     ZP04                            ; 3520: A5 04     Get Addr_To lo-byte, divide by 8, example = $18/8=3
     lsr     a                               ; 3522: 4A       
     lsr     a                               ; 3523: 4A       
     lsr     a                               ; 3524: 4A       
     tax                                     ; 3525: AA       
     lda     UDG_RAM_Column_Offsets,x        ; 3526: BD 45 35  Load Column offset (4th item = $21)
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 3529: 85 04     Store back to Addr_To lo-byte, Addr_To = 21 xx
+    sta     ZP04                            ; 3529: 85 04     Store back to Addr_To lo-byte, Addr_To = 21 xx
     lda     #$00                            ; 352B: A9 00     Reset Addr_To hi-byte to 00
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 352D: 85 05     Addr_To = 21 xx
+    sta     ZP05                            ; 352D: 85 05     Addr_To = 21 xx
 
     ldx     #$04                            ; 352F: A2 04     Rotate left Addr_To by 4 bits
 ; L_BRS_($3531)_($3536) OK
 Convert_XY_to_UDG_RAM_Addr_1
-    asl     ZP04_Object_Old_UDG_RAM_Lo      ; 3531: 06 04    
-    rol     ZP05_Object_Old_UDG_RAM_Hi      ; 3533: 26 05    
+    asl     ZP04                            ; 3531: 06 04    
+    rol     ZP05                            ; 3533: 26 05    
     dex                                     ; 3535: CA       
     bne     Convert_XY_to_UDG_RAM_Addr_1    ; 3536: D0 F9     Addr_To = 1x x2
 
     tya                                     ; 3538: 98        Get stashed Y = 68 to A
     clc                                     ; 3539: 18       
-    adc     ZP04_Object_Old_UDG_RAM_Lo      ; 353A: 65 04    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 353C: 85 04     Addr_To = 78 x2
+    adc     ZP04                            ; 353A: 65 04    
+    sta     ZP04                            ; 353C: 85 04     Addr_To = 78 x2
     lda     #$10                            ; 353E: A9 10    
-    adc     ZP05_Object_Old_UDG_RAM_Hi      ; 3540: 65 05    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 3542: 85 05     Addr_To = 78 12 = "F7 JOYSTICK" start position
+    adc     ZP05                            ; 3540: 65 05    
+    sta     ZP05                            ; 3542: 85 05     Addr_To = 78 12 = "F7 JOYSTICK" start position
     rts                                     ; 3544: 60       
 ; ===========================================================
 UDG_RAM_Column_Offsets
@@ -5531,10 +5538,10 @@ Reset_RAM
 ; L_BRS_($357B)_($3592) OK
 Reset_RAM_1
     lda     ZP06                            ; 357B: A5 06    
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 357D: 91 04    
+    sta     (ZP04),y                        ; 357D: 91 04    
     iny                                     ; 357F: C8       
     bne     Reset_RAM_2                     ; 3580: D0 02    
-    inc     ZP05_Object_Old_UDG_RAM_Hi      ; 3582: E6 05    
+    inc     ZP05                            ; 3582: E6 05    
 ; L_BRS_($3584)_($3580) OK
 Reset_RAM_2
     dec     ZP02                            ; 3584: C6 02    
@@ -5612,20 +5619,20 @@ Copy_Char_To_UDG_RAM_1
 ; L_BRS_($35B6)_($35BB) OK
 Copy_Char_To_UDG_RAM_2
     lda     (ZP06),y                        ; 35B6: B1 06     Copy bytes from given address with Y offset
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 35B8: 91 04     Copy bytes to given address with Y offset
+    sta     (ZP04),y                        ; 35B8: 91 04     Copy bytes to given address with Y offset
     dey                                     ; 35BA: 88        Decrement number of lines counter
     bpl     Copy_Char_To_UDG_RAM_2          ; 35BB: 10 F9     All lines copied? If no, loop back.
 
 ; Move the next character address to the next column
 ; L_JMP_($35BD)_($35D4) OK
 Copy_Char_To_UDG_RAM_NEXT
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 35BD: A5 04    
+    lda     ZP04                            ; 35BD: A5 04    
     clc                                     ; 35BF: 18       
     adc     #$B0                            ; 35C0: 69 B0     #B0=176=number of vertical pixels i.e. move to next char right
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 35C2: 85 04    
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 35C4: A5 05    
+    sta     ZP04                            ; 35C2: 85 04    
+    lda     ZP05                            ; 35C4: A5 05    
     adc     #$00                            ; 35C6: 69 00     Increment address hi-byte if previous addition overflowed
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 35C8: 85 05    
+    sta     ZP05                            ; 35C8: 85 05    
     rts                                     ; 35CA: 60       
 ; ===========================================================
 
@@ -5635,7 +5642,7 @@ Copy_Char_To_UDG_RAM_NEXT
 Copy_Char_To_UDG_RAM_INV
     lda     (ZP06),y                        ; 35CB: B1 06     Copy bytes from given address with Y offset
     eor     #$FF                            ; 35CD: 49 FF     Invert the byte (used to make the byte flash)
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 35CF: 91 04     Move bytes to given address with Y offset
+    sta     (ZP04),y                        ; 35CF: 91 04     Move bytes to given address with Y offset
     dey                                     ; 35D1: 88        Decrement number of lines counter
     bpl     Copy_Char_To_UDG_RAM_INV        ; 35D2: 10 F7     All lines copied? If no, loop back.
     jmp     Copy_Char_To_UDG_RAM_NEXT       ; 35D4: 4C BD 35  If yes, routine ends
@@ -5700,7 +5707,7 @@ Load_Object_Type_X_Y_Color
 
     ldy     #OBJECT_Y_POSITION_PARAM        ; 35F4: A0 03    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 35F6: B1 00    
-    sta     ZP19_Object_New_Position_Y      ; 35F8: 85 19    
+    sta     ZP19                            ; 35F8: 85 19    
 
     ldy     #OBJECT_COLOR_PARAM             ; 35FA: A0 05    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 35FC: B1 00    
@@ -5785,8 +5792,8 @@ Erase_Object_Moving_Downward
 ; L_BRS_($362F)_($3637) OK
 LOOP_362F
     lda     (ZP0E_Object_New_UDG_Stat_Lo),y ; 362F: B1 0E    
-    eor     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 3631: 51 0C    
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 3633: 91 0C    
+    eor     (ZP0C),y                        ; 3631: 51 0C    
+    sta     (ZP0C),y                        ; 3633: 91 0C    
 
 ; Decrement pointer into UDG static data and the loop index
     dey                                     ; 3635: 88       
@@ -5840,7 +5847,7 @@ Display_Object
 ; directly to erase/draw routine
     lda     ZP11_Object_Old_Position_Y      ; 365A: A5 11    
     sec                                     ; 365C: 38       
-    sbc     ZP19_Object_New_Position_Y      ; 365D: E5 19    
+    sbc     ZP19                            ; 365D: E5 19    
     beq     Erase_Old_Object                ; 365F: F0 27    
     bmi     Erase_Object_Moving_Downward    ; 3661: 30 B6    
 
@@ -5870,8 +5877,8 @@ Display_Object
 ; L_BRS_($3674)_($367C) OK
 LOOP_3674
     lda     (ZP06_Object_Old_UDG_Stat_Lo),y ; 3674: B1 06    
-    eor     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3676: 51 04    
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3678: 91 04    
+    eor     (ZP04),y                        ; 3676: 51 04    
+    sta     (ZP04),y                        ; 3678: 91 04    
 
 ; Decrement pointer into UDG static data and the loop index
     dey                                     ; 367A: 88       
@@ -5907,8 +5914,8 @@ Erase_Old_Object
 ; EXOR object data bytes from UDG static data to screen RAM to erase
     ldy     ZP08_Object_Old_Y_Index         ; 368E: A4 08    
     lda     (ZP06_Object_Old_UDG_Stat_Lo),y ; 3690: B1 06    
-    eor     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3692: 51 04    
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3694: 91 04    
+    eor     (ZP04),y                        ; 3692: 51 04    
+    sta     (ZP04),y                        ; 3694: 91 04    
 
     dec     ZP08_Object_Old_Y_Index         ; 3696: C6 08    
 
@@ -5923,8 +5930,8 @@ Draw_New_Object
 ; EXOR object data bytes from UDG static data to screen RAM to draw
     ldy     ZP09_Object_New_Y_Index         ; 369E: A4 09    
     lda     (ZP0E_Object_New_UDG_Stat_Lo),y ; 36A0: B1 0E    
-    eor     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 36A2: 51 0C    
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 36A4: 91 0C    
+    eor     (ZP0C),y                        ; 36A2: 51 0C    
+    sta     (ZP0C),y                        ; 36A4: 91 0C    
 
     dec     ZP09_Object_New_Y_Index         ; 36A6: C6 09    
     jmp     Erase_Old_Object                ; 36A8: 4C 88 36 
@@ -5953,32 +5960,32 @@ Next_Object_Old_Update_Params
     sta     ZP07_Object_Old_UDG_Stat_Hi     ; 36C0: 85 07    
 
 ; Move UDG RAM pointer to next vertical column
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36C2: A5 04    
+    lda     ZP04                            ; 36C2: A5 04    
     clc                                     ; 36C4: 18       
     adc     #SCREEN_HEIGHT_PIXELS           ; 36C5: 69 B0    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 36C7: 85 04    
+    sta     ZP04                            ; 36C7: 85 04    
 
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36C9: A5 05    
+    lda     ZP05                            ; 36C9: A5 05    
     adc     #$00                            ; 36CB: 69 00    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 36CD: 85 05    
+    sta     ZP05                            ; 36CD: 85 05    
 
 ; Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36CF: A5 04    
+    lda     ZP04                            ; 36CF: A5 04    
     sec                                     ; 36D1: 38       
     sbc     #$D1                            ; 36D2: E9 D1    
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36D4: A5 05    
+    lda     ZP05                            ; 36D4: A5 05    
     sbc     #$1E                            ; 36D6: E9 1E    
     bcc     Next_Object_New_Update_Params   ; 36D8: 90 0D    
 
 ; Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16 x $17 x 8=$FD0
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36DA: A5 04    
+    lda     ZP04                            ; 36DA: A5 04    
     sec                                     ; 36DC: 38       
     sbc     #$D0                            ; 36DD: E9 D0    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 36DF: 85 04    
+    sta     ZP04                            ; 36DF: 85 04    
 
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36E1: A5 05    
+    lda     ZP05                            ; 36E1: A5 05    
     sbc     #$0F                            ; 36E3: E9 0F    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 36E5: 85 05    
+    sta     ZP05                            ; 36E5: 85 05    
 
 ; Test if new object fully drawn, if not, move to the next vertical column to draw
 ; L_BRS_($36E7)_($36D8) OK
@@ -6000,17 +6007,17 @@ Next_Object_New_Update_Params
     sta     ZP0F_Object_New_UDG_Stat_Hi     ; 36F8: 85 0F    
 
 ; Move UDG RAM pointer to next vertical column
-    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 36FA: A5 0C    
+    lda     ZP0C                            ; 36FA: A5 0C    
     clc                                     ; 36FC: 18       
     adc     #$B0                            ; 36FD: 69 B0    
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 36FF: 85 0C    
+    sta     ZP0C                            ; 36FF: 85 0C    
 
     lda     ZP0D_Object_New_UDG_RAM_Hi      ; 3701: A5 0D    
     adc     #$00                            ; 3703: 69 00    
     sta     ZP0D_Object_New_UDG_RAM_Hi      ; 3705: 85 0D    
 
 ; Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
-    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 3707: A5 0C    
+    lda     ZP0C                            ; 3707: A5 0C    
     sec                                     ; 3709: 38       
     sbc     #$D1                            ; 370A: E9 D1    
     lda     ZP0D_Object_New_UDG_RAM_Hi      ; 370C: A5 0D    
@@ -6018,10 +6025,10 @@ Next_Object_New_Update_Params
     bcc     JMP_Display_Object              ; 3710: 90 0D    
 
 ; Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16 x $17 x 8=$FD0
-    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 3712: A5 0C    
+    lda     ZP0C                            ; 3712: A5 0C    
     sec                                     ; 3714: 38       
     sbc     #$D0                            ; 3715: E9 D0    
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 3717: 85 0C    
+    sta     ZP0C                            ; 3717: 85 0C    
 
     lda     ZP0D_Object_New_UDG_RAM_Hi      ; 3719: A5 0D    
     sbc     #$0F                            ; 371B: E9 0F    
@@ -6090,31 +6097,31 @@ Load_Small_UDG_Addr_Setup_XY
 
 ; Load UDG RAM XY coordinates
     lda     ZP18                            ; 3743: A5 18    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 3745: 85 04    
-    lda     ZP19_Object_New_Position_Y      ; 3747: A5 19    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 3749: 85 05    
+    sta     ZP04                            ; 3745: 85 04    
+    lda     ZP19                            ; 3747: A5 19    
+    sta     ZP05                            ; 3749: 85 05    
 
 ; Load and store UDG addr, including X co-ord wrap
     ldy     #$FF                            ; 374B: A0 FF    
     lda     (ZP0E),y                        ; 374D: B1 0E    
     clc                                     ; 374F: 18       
-    adc     ZP04_Object_Old_UDG_RAM_Lo      ; 3750: 65 04    
+    adc     ZP04                            ; 3750: 65 04    
     cmp     #SCREEN_WIDTH_PIXELS            ; 3752: C9 B8     $B8=screen width in pixels
     bcc     Load_Small_UDG_Addr_Setup_XY_1  ; 3754: 90 03    
     sec                                     ; 3756: 38       
     sbc     #SCREEN_WIDTH_PIXELS            ; 3757: E9 B8     Wrap
 ; L_BRS_($3759)_($3754) OK
 Load_Small_UDG_Addr_Setup_XY_1
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 3759: 85 04    
+    sta     ZP04                            ; 3759: 85 04    
     sta     ZP18                            ; 375B: 85 18    
 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 375D: 20 1D 35 
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 3760: A5 04    
+    lda     ZP04                            ; 3760: A5 04    
     sec                                     ; 3762: 38       
     sbc     #$FF                            ; 3763: E9 FF    
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 3765: 85 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     ZP0C                            ; 3765: 85 0C     ZP0C_Col_RAM_Ptr_Lo
 
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 3767: A5 05    
+    lda     ZP05                            ; 3767: A5 05    
     sbc     #$00                            ; 3769: E9 00    
     sta     ZP0D_Object_New_UDG_RAM_Hi      ; 376B: 85 0D     ZP0D_Col_RAM_Ptr_Hi
 
@@ -6173,32 +6180,32 @@ Set_UDG_RAM_Ptr_Object_Dimen
 
 ; Setup UDG RAM X & Y
     lda     ZP10                            ; 3793: A5 10    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 3795: 85 04    
+    sta     ZP04                            ; 3795: 85 04    
     lda     ZP11_Object_Old_Position_Y      ; 3797: A5 11    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 3799: 85 05    
+    sta     ZP05                            ; 3799: 85 05    
 
 ; Convert XY pixel coords to address, managing X axis wrap ($B8)
     ldy     #$FF                            ; 379B: A0 FF    
     lda     (ZP06),y                        ; 379D: B1 06    
     clc                                     ; 379F: 18       
-    adc     ZP04_Object_Old_UDG_RAM_Lo      ; 37A0: 65 04    
+    adc     ZP04                            ; 37A0: 65 04    
     cmp     #SCREEN_WIDTH_PIXELS            ; 37A2: C9 B8    
     bcc     No_X_Wrap                       ; 37A4: 90 03    
     sec                                     ; 37A6: 38       
     sbc     #SCREEN_WIDTH_PIXELS            ; 37A7: E9 B8    
 ; L_BRS_($37A9)_($37A4) OK
 No_X_Wrap
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 37A9: 85 04    
+    sta     ZP04                            ; 37A9: 85 04    
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 37AB: 20 1D 35 
 
 ; Subtract $FF from 16-bit UDG_RAM addr?
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 37AE: A5 04    
+    lda     ZP04                            ; 37AE: A5 04    
     sec                                     ; 37B0: 38       
     sbc     #$FF                            ; 37B1: E9 FF    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 37B3: 85 04    
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 37B5: A5 05    
+    sta     ZP04                            ; 37B3: 85 04    
+    lda     ZP05                            ; 37B5: A5 05    
     sbc     #$00                            ; 37B7: E9 00    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 37B9: 85 05    
+    sta     ZP05                            ; 37B9: 85 05    
 
 ; Get/store object width in characters (zero-based)
     ldy     #$FE                            ; 37BB: A0 FE    
@@ -6360,68 +6367,71 @@ Get_Obj_UDG_Stat_Addr_JM_Alien
 ; Yb      Yb   dP 88  .o Yb   dP 88"Yb      88"Yb   dP__Yb  88YbdP88
 ;  YboodP  YbodP  88ood8  YbodP  88  Yb     88  Yb dP""""Yb 88 YY 88
 
-
 ; L_JSR_($381F)_($2961) OK
 ; L_JSR_($381F)_($2CC6) OK
 ; L_JSR_($381F)_($2FD4) OK
 ; L_JSR_($381F)_($32FC) OK
 ; L_JSR_($381F)_($335B) OK
 Update_Color_RAM
-    lda     ZP18                            ; 381F: A5 18    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 3821: 85 04    
-    lda     ZP19_Object_New_Position_Y      ; 3823: A5 19    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 3825: 85 05    
-
-; Setup Color RAM Pointer using UDG RAM X and Y
+    lda     ZP18_Object_Position_X_         ; 381F: A5 18    
+    sta     ZP04                            ; 3821: 85 04    
+    lda     ZP19_Object_Position_Y          ; 3823: A5 19    
+    sta     ZP05                            ; 3825: 85 05    
+; Setup Color RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
     jsr     Setup_Color_RAM_Ptr             ; 3827: 20 F7 34 
 
-; Divide ZP_17 by $10, height of a color tile?
-    lda     ZP17                            ; 382A: A5 17    
+; Divide object height by $10 then add $02, so always update color on at least two vertical tiles
+; e.g. Jetman=$18->$03, Rocket_Top=$10->$03, Fuzz_Alien=$0A->$02
+    lda     ZP17_Object_Size_Y_Pixels       ; 382A: A5 17    
     lsr     a                               ; 382C: 4A       
     lsr     a                               ; 382D: 4A       
     lsr     a                               ; 382E: 4A       
     lsr     a                               ; 382F: 4A       
     clc                                     ; 3830: 18       
     adc     #$02                            ; 3831: 69 02    
-    sta     ZP0B                            ; 3833: 85 0B    
 
-; Outer loop decrementing ZP0B
-; Inner loop decrementing ZP0A
-    lda     ZP16                            ; 3835: A5 16    
-    sta     ZP0A                            ; 3837: 85 0A    
-    inc     ZP0A                            ; 3839: E6 0A    
+; Use ZP0B as outer loop for vertical tile rows
+    sta     ZP0B_Color_RAM_Tiles_Y          ; 3833: 85 0B    
+
+; Use ZP0A as inner loop for horizontal tile columns
+    lda     ZP16_Object_Size_X_Columns      ; 3835: A5 16    
+    sta     ZP0A_Color_RAM_Tiles_X          ; 3837: 85 0A    
+    inc     ZP0A_Color_RAM_Tiles_X          ; 3839: E6 0A    
 ; L_BRS_($383B)_($385C) OK
-LOOP_383B
-    ldx     ZP0A                            ; 383B: A6 0A    
+LOOP_OUTER_Y_383B
+    ldx     ZP0A_Color_RAM_Tiles_X          ; 383B: A6 0A    
     ldy     #$00                            ; 383D: A0 00    
 
-; Read colour from map and if it's green i.e. colour of the platforms, skip the colour change
-; otherwise write the updated colour to the screen map
+; Read color from map and if it's green i.e. color of the platforms, skip the color change
+; else write the updated color to the screen map
 ; L_BRS_($383F)_($384D) OK
-LOOP_383F
-    lda     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 383F: B1 0C     ZP0C_Col_RAM_Ptr_Lo
+LOOP_INNER_X_383F
+    lda     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 383F: B1 0C    
     and     #%00000111                      ; 3841: 29 07     Zero bits 3-7
     cmp     #GREEN                          ; 3843: C9 05    
     beq     SKIP_384B                       ; 3845: F0 04    
 
     lda     ZP1B_Object_Color_New           ; 3847: A5 1B    
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 3849: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 3849: 91 0C    
 
 ; L_BRS_($384B)_($3845) OK
 SKIP_384B
     iny                                     ; 384B: C8       
     dex                                     ; 384C: CA       
-    bne     LOOP_383F                       ; 384D: D0 F0    
+    bne     LOOP_INNER_X_383F               ; 384D: D0 F0    
 
-    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 384F: A5 0C     ZP0C_Col_RAM_Ptr_Lo
+; Move to next row to color (i.e. move up) and test for going out of
+; screen boundry at top of screen, early exit if so
+    lda     ZP0C_Color_RAM_Tile_Addr_Lo     ; 384F: A5 0C    
     sec                                     ; 3851: 38       
-    sbc     #SCREEN_WIDTH_COLOR_TILES       ; 3852: E9 17    
-    cmp     #SCREEN_WIDTH_COLOR_TILES       ; 3854: C9 17    
+    sbc     #SCREEN_WIDTH_COLUMNS           ; 3852: E9 17    
+    cmp     #SCREEN_WIDTH_COLUMNS           ; 3854: C9 17    
     bcc     Update_Color_RAM_RTS            ; 3856: 90 06    
 
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 3858: 85 0C     ZP0C_Col_RAM_Ptr_Lo
-    dec     ZP0B                            ; 385A: C6 0B    
-    bne     LOOP_383B                       ; 385C: D0 DD    
+; Update the Color RAM for the appropriate tile, move up one row
+    sta     ZP0C_Color_RAM_Tile_Addr_Lo     ; 3858: 85 0C    
+    dec     ZP0B_Color_RAM_Tiles_Y          ; 385A: C6 0B    
+    bne     LOOP_OUTER_Y_383B               ; 385C: D0 DD    
 
 ; L_BRS_($385E)_($3856) OK
 Update_Color_RAM_RTS

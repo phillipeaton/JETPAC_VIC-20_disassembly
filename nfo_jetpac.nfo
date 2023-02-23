@@ -2175,34 +2175,33 @@ label    3815 Get_Obj_UDG_Stat_Addr_JM_Alien
 lcomment 3817 Reset bits 0 & 3-7
 binary   3818
 comment  381F
-comment  381F
 label    381F Update_Color_RAM
-comment  3827
-comment  3827 Setup Color RAM Pointer using UDG RAM X and Y
+comment  3827 Setup Color RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
 comment  382A
-comment  382A Divide ZP_17 by $10, height of a color tile?
+comment  382A Divide object height by $10 then add $02, so always update color on at least two vertical tiles
+comment  382A e.g. Jetman=$18->$03, Rocket_Top=$10->$03, Fuzz_Alien=$0A->$02
+comment  3833
+comment  3833 Use ZP0B as outer loop for vertical tile rows
 comment  3835
-comment  3835 Outer loop decrementing ZP0B
-comment  3835 Inner loop decrementing ZP0A
-label    383B LOOP_383B
+comment  3835 Use ZP0A as inner loop for horizontal tile columns
+label    383B LOOP_OUTER_Y_383B
 comment  383F
-comment  383F Read colour from map and if it's green i.e. colour of the platforms, skip the colour change
-comment  383F otherwise write the updated colour to the screen map
-label    383F LOOP_383F
-lcomment 383F ZP0C_Col_RAM_Ptr_Lo
+comment  383F Read color from map and if it's green i.e. color of the platforms, skip the color change
+comment  383F else write the updated color to the screen map
+label    383F LOOP_INNER_X_383F
 lcomment 3841 Zero bits 3-7
 binary   3842
 deflabel 3844 GREEN
 comment  3847
-lcomment 3849 ZP0C_Col_RAM_Ptr_Lo
 comment  384B
 label    384B SKIP_384B
 comment  384F
-lcomment 384F ZP0C_Col_RAM_Ptr_Lo
-deflabel 3853 SCREEN_WIDTH_COLOR_TILES
-deflabel 3855 SCREEN_WIDTH_COLOR_TILES
+comment  384F Move to next row to color (i.e. move up) and test for going out of
+comment  384F screen boundry at top of screen, early exit if so
+deflabel 3853 SCREEN_WIDTH_COLUMNS
+deflabel 3855 SCREEN_WIDTH_COLUMNS
 comment  3858
-lcomment 3858 ZP0C_Col_RAM_Ptr_Lo
+comment  3858 Update the Color RAM for the appropriate tile, move up one row
 comment  385E
 label    385E Update_Color_RAM_RTS
 ;

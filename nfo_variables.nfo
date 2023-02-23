@@ -3,15 +3,15 @@ label      00 ZP00_Obj_List_Ptr_Lo                ; 182
 label      01 ZP01_Obj_List_Ptr_Hi                ; 111
 label      02 ZP02                                ; 46
 label      03 ZP03                                ; 17
-label      04 ZP04_Object_Old_UDG_RAM_Lo          ; 56
-label      05 ZP05_Object_Old_UDG_RAM_Hi          ; 35
+label      04 ZP04                                ; 56 Prev. ZP04_Object_Old_UDG_RAM_Lo
+label      05 ZP05                                ; 35 Prev. ZP05_Object_Old_UDG_RAM_Hi
 label      06 ZP06                                ; 51 06/07 used as addr of sprite data + several other 06 only uses
 label      07 ZP07                                ; 26 06/07 used as addr of sprite data + several other 06 only uses
 label      08 ZP08                                ; 42 Sprite Data Index ; Used with 09
 label      09 ZP09                                ; 11 Used with 08
 label      0A ZP0A                                ; 15
 label      0B ZP0B                                ; 18
-label      0C ZP0C_Object_New_UDG_RAM_Lo          ; 28
+label      0C ZP0C                                ; 28 Prev. ZP0C_Object_New_UDG_RAM_Lo
 label      0D ZP0D_Object_New_UDG_RAM_Hi          ; 10
 label      0E ZP0E                                ; 21
 label      0F ZP0F                                ; 12
@@ -24,7 +24,7 @@ label      15 ZP15                                ; 08 Connected somehow. Shuffl
 label      16 ZP16                                ; 05 Connected somehow. Shuffled in a subroutine.
 label      17 ZP17                                ; 04 Connected somehow. Shuffled in a subroutine.
 label      18 ZP18                                ; 07 Prev. ZP18_Object_New_Position_X
-label      19 ZP19_Object_New_Position_Y          ; 12
+label      19 ZP19                                ; 12 Prev. ZP19_Object_New_Position_Y
 label      1A ZP1A                                ; 03 Prev. ZP1A_Object_Type_New
 label      1B ZP1B_Object_Color_New               ; 10 Save_Obj_List_Params 2
 label      1C ZP1C_Jetman_Action ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
