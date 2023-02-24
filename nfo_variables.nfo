@@ -16,7 +16,7 @@ label      0D ZP0D_Object_New_UDG_RAM_Hi          ; 10
 label      0E ZP0E                                ; 21
 label      0F ZP0F                                ; 12
 label      10 ZP10                                ; 04 Prev. ZP10_Object_Old_Position_X
-label      11 ZP11_Object_Old_Position_Y          ; 09
+label      11 ZP11                                ; 09 Prev. ZP11_Object_Old_Position_Y
 label      12 ZP12                                ; 03 Prev. ZP12_Object_Old_Type
 label      13 ZP13                                ; 18
 label      14 ZP14_Object_Old_Width_Bytes         ; 08 Connected somehow. Shuffled in a subroutine.

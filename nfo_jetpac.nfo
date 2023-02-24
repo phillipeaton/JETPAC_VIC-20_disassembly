@@ -1363,19 +1363,19 @@ label    2FC3 Setup_Object_Addr
 comment  2FCB
 comment  2FCB Do it again to setup the object dimensions
 comment  2FDA
-comment  2FDA Return object's UDG static data address offset for Rocket Middle Section/Fuel
+comment  2FDA Return object's UDG data address offset for Rocket Middle Section/Fuel
 comment  2FDA depending on which
 of the four levels (or multiple of) the player is currently on
-label    2FDA Get_Obj_UDG_Stat_Addr_Ship_Lvl
+label    2FDA Get_Obj_UDG_Data_Addr_Ship_Lvl
 comment  2FDC
-comment  2FDC Calculate and return object's UDG static data address offset based on A e.g. player level
+comment  2FDC Calculate and return object's UDG data address offset based on A e.g. player level
 comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat
-label    2FDC Get_Obj_UDG_Stat_Addr_Ship_A
+label    2FDC Get_Obj_UDG_Data_Addr_Ship_A
 binary   2FDE
 deflabel 2FE0 OBJECT_PARAM
 comment  2FE5
-comment  2FE5 Using A as offset, Load A and Y with address of Ship, Fuel or Valuable UDG static data
-label    2FE5 Get_Obj_UDG_Static_Addr_S_F_V
+comment  2FE5 Using A as offset, Load A and Y with address of Ship, Fuel or Valuable UDG data
+label    2FE5 Get_Obj_UDG_Data_Addr_S_F_V
 comment  2FEE
 comment  2FEE At point when Jetman picks up Rocket or Fuel module
 label    2FEE Jetman_Collide_Rocket_Fuel
@@ -1959,12 +1959,12 @@ comment  3623 Subtract number of Y erase-only pixels from total object tile heig
 comment  3623 index for later
 comment  3626
 comment  362D
-comment  362D Erase old object data bytes from UDG static data to screen RAM by EXORing
+comment  362D Erase old object data bytes from UDG data to screen RAM by EXORing
 comment  362D ZP09 offset decrements from $FF, ZP0E holds address of old UDG object data,
 comment  362D ZP0C holds address of object data on screen to be written to
 label    362F LOOP_362F
 comment  3635
-comment  3635 Decrement pointer into UDG static data and the loop index
+comment  3635 Decrement pointer into UDG data and the loop index
 comment  3639
 comment  3639 Restore the number of pixel lines to erased and store to ZP13, then subtract it from
 comment  3639 ZP09, the updated address offset for erase/draw the first/next part of the new object
@@ -1976,7 +1976,7 @@ comment  364C
 label    364C Display_Object
 comment  364E ZP08 and ZP09 used as index into UDG RAM for old object and new object data
 comment  3652
-comment  3652 ZP03 contains the height of a object tile, from the UDG graphics static data
+comment  3652 ZP03 contains the height of a object tile, from the UDG graphics data
 comment  3652 e.g. Alien cross object height is $0A pixels/lines
 comment  3652 Rocket is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
 comment  3656
@@ -1996,12 +1996,12 @@ comment  3668 Subtract number of Y erase-only pixels from total object tile heig
 comment  3668 index for later
 comment  366B
 comment  3672
-comment  3672 Erase old object data bytes from UDG static data to screen RAM by EXORing
+comment  3672 Erase old object data bytes from UDG data to screen RAM by EXORing
 comment  3672 ZP08 offset decrements from $FF, ZP06 holds address of old UDG object data,
 comment  3672 ZP04 holds address of object data on screen to be written to
 label    3674 LOOP_3674
 comment  367A
-comment  367A Decrement pointer into UDG static data and the loop index
+comment  367A Decrement pointer into UDG data and the loop index
 comment  367E
 comment  367E Restore the number of pixel lines to erased and store to ZP13, then subtract it from
 comment  367E ZP08, the updated address offset for erase/draw the first/next part of the new object
@@ -2014,14 +2014,14 @@ comment  3688 to the same line with the new object data
 comment  3688 First test to see if old object fully erased, if yes jump to draw updated params
 label    3688 Erase_Old_Object
 comment  368E
-comment  368E EXOR object data bytes from UDG static data to screen RAM to erase
+comment  368E EXOR object data bytes from UDG data to screen RAM to erase
 comment  3696
 comment  3698
 comment  3698 If new object fully drawn, don't try drawing more, erase next old object line
 comment  369C
 label    369C Draw_New_Object
 comment  369E
-comment  369E EXOR object data bytes from UDG static data to screen RAM to draw
+comment  369E EXOR object data bytes from UDG data to screen RAM to draw
 comment  36A6
 comment  36AB
 comment  36AB Test if more lines to be drawn for new object, if yes, branch
@@ -2030,7 +2030,7 @@ comment  36AF
 comment  36AF Test if old object fully erased, if not, move to the next vertical column to erase
 comment  36B3
 comment  36B5
-comment  36B5 Move UDG static data 16-bit address pointer to the object data for the next column
+comment  36B5 Move UDG data 16-bit address pointer to the object data for the next column
 comment  36BC
 comment  36C2
 comment  36C2 Move UDG RAM pointer to next vertical column
@@ -2046,7 +2046,7 @@ comment  36E7 Test if new object fully drawn, if not, move to the next vertical 
 label    36E7 Next_Object_New_Update_Params
 comment  36EB
 comment  36ED
-comment  36ED Move UDG static data 16-bit address pointer to the object data for the next column
+comment  36ED Move UDG data 16-bit address pointer to the object data for the next column
 comment  36F4
 comment  36FA
 comment  36FA Move UDG RAM pointer to next vertical column
@@ -2116,30 +2116,30 @@ comment  37D4 Aliens Types: 05=Fuzzball, 06=Saucer, 07=Ball, 08=Cross
 comment  37D4 All Aliens have only 2 animation states
 comment  37D4 InReg: A=Object Type (Alien), X=Animation Frame
 comment  37D4 OutReg: A=UDG Addr Hi, Y=UDG Addr Lo
-label    37D4 Get_Obj_UDG_Static_Addr_Alien
+label    37D4 Get_Obj_UDG_Data_Addr_Alien
 comment  37D6
 comment  37D6 Convert object's screen X position to 0 or 2 byte animation frame data offset & put back into X
 lcomment 37D7 Zero bits 0 & 2-7
 binary   37D8
 comment  37DB
 comment  37DB Transform Object Types 5/6/7/8 to 2/3/4/5, then multiply by 4 to get the frame data offset offset
-comment  37DB Note, starting with offset 2 instead of 0 means 4 wasted bytes in the static data address table
+comment  37DB Note, starting with offset 2 instead of 0 means 4 wasted bytes in the data address table
 comment  37E0
-comment  37E0 Add $20 offset, which takes us to the start of the Alien UDG static data, past Jetman static data
+comment  37E0 Add $20 offset, which takes us to the start of the Alien UDG data, past Jetman UDG data
 comment  37E6
 comment  37E6 Alternate entry point to routine using different ZP vars for object Position and Type
-label    37E6 Get_Obj_UDG_Stat_Addr_Alt
+label    37E6 Get_Obj_UDG_Data_Addr_JM_Ali_1
 lcomment 37E8 Zero bits
 bin      37E9
 comment  37ED
 comment  37ED When object is Jetman, Object Type represents State i.e. Flying/Standing, Facing Left/Right, Frame.
 comment  37ED There are 16 Jetman animation frames, 4 Fly Right, 4 Fly Left, 4 Stand Left, 4 Stand Right,
-comment  37ED in that order, in a list of 16-bit address to the UDG static data.
+comment  37ED in that order, in a list of 16-bit address to the UDG data.
 comment  37ED This routine uses bit 7 of the Jetman Object Type to select Right or Left and bit 0 to
 comment  37ED select Flying or Standing, when creating an offset in register X.
 comment  37ED InReg: A=Object Type (Jetman), X=Animation Frame
 comment  37ED OutReg: A=UDG Addr Hi, Y=UDG Addr Lo
-label    37ED Get_Obj_UDG_Jetman_or_Alien
+label    37ED Get_Obj_UDG_Data_Addr_JM_Alien
 comment  37EE
 comment  37EE Jetman uses only bit 7 (direction he's facing) and bits 0 & 1 (standing/flying).
 comment  37EE If other bits are used, object must be an Alien.
@@ -2151,31 +2151,32 @@ lcomment 37F2 Carry Set if A >= compared value
 comment  37F5
 comment  37F5 Object is Jetman, test state, is he looking Left or Right?
 comment  37FA
-comment  37FA Jetman is looking left, set bit 3 in X, which adds $08 to the UDG static data address, meaning
-comment  37FA that it will point to the Jetman facing Left UDG static data addresses instead of facing Right.
+comment  37FA Jetman is looking left, set bit 3 in X, which adds $08 to the UDG data address, meaning
+comment  37FA that it will point to the Jetman facing Left UDG data addresses instead of facing Right.
 lcomment 37FC Set bit 3
 binary   37Fd
 comment  3800
 comment  3800 A contains Jetman State, bit 7 is Direction-faced. SEC & SBC prepare ASLs to move bit 7 to bit 3
-comment  3800 This effectively adds $10 to the calculated UDG static data address when Jetman is Standing,
-comment  3800 meaning it points to the Jetman Standing static data addresses instead of Jetman Flying.
-label    3800 Get_Obj_UDG_Calc_Jetman
+comment  3800 This effectively adds $10 to the calculated UDG data address when Jetman is Standing,
+comment  3800 meaning it points to the Jetman Standing data addresses instead of Jetman Flying.
+label    3800 Get_Obj_UDG_Data_Addr_Calc_JM
 comment  3807
-comment  3807 OR A and X together to produce full UDG static data table offset
-label    3807 Get_Obj_UDG_Calc_Jetman_Alien
+comment  3807 OR A and X together to produce full UDG data table offset
+label    3807 Get_Obj_UDG_Data_Addr_Calc
 comment  380D
 comment  380D Using X just set, get index into the Object UDG table
 lcomment 380D Address lo byte into Y
 lcomment 3811 Address hi byte into A
 comment  3815
-comment  3815 Get address of UDG Static Data for Jetman or Alien objects and return in A and Y registers
+comment  3815 Get address of UDG Data for Jetman or Alien objects and return in A and Y registers
 comment  3815 Bits 1 & 2 of object's X position used to select UDG animation frame.
 comment  3815 Animations have 2 or 4 frames and are minimum 2 pixels apart so bit 0 not used.
-label    3815 Get_Obj_UDG_Stat_Addr_JM_Alien
+label    3815 Get_Obj_UDG_Data_Addr_JM_Ali_2
 lcomment 3817 Reset bits 0 & 3-7
 binary   3818
 comment  381F
-label    381F Update_Color_RAM
+label    381F Colorize_Object
+comment  3827
 comment  3827 Setup Color RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
 comment  382A
 comment  382A Divide object height by $10 then add $02, so always update color on at least two vertical tiles
@@ -2184,17 +2185,17 @@ comment  3833
 comment  3833 Use ZP0B as outer loop for vertical tile rows
 comment  3835
 comment  3835 Use ZP0A as inner loop for horizontal tile columns
-label    383B LOOP_OUTER_Y_383B
+label    383B Loop_Y
 comment  383F
-comment  383F Read color from map and if it's green i.e. color of the platforms, skip the color change
-comment  383F else write the updated color to the screen map
-label    383F LOOP_INNER_X_383F
+comment  383F Read color from RAM and if it's green i.e. color of the platforms, skip the color change
+comment  383F else write the updated color to the color RAM
+label    383F Loop_X
 lcomment 3841 Zero bits 3-7
 binary   3842
 deflabel 3844 GREEN
 comment  3847
 comment  384B
-label    384B SKIP_384B
+label    384B Green_Ignored
 comment  384F
 comment  384F Move to next row to color (i.e. move up) and test for going out of
 comment  384F screen boundry at top of screen, early exit if so
@@ -2203,23 +2204,23 @@ deflabel 3855 SCREEN_WIDTH_COLUMNS
 comment  3858
 comment  3858 Update the Color RAM for the appropriate tile, move up one row
 comment  385E
-label    385E Update_Color_RAM_RTS
+label    385E Colorize_Object_RTS
 ;
 ; End of file contains graphics data
 ;
 ;unused   3861-3fff ; TEMP STOP THE OUTPUT OF THE GRAPHICS
 comment  385F
-lcomment 3865 $3C87 = Jetman_Fly_Right_3
-label    385F UDG_Lookup_Jetman_Aliens
-label    3860 UDG_Lookup_Jetman_Aliens+1
+label    385F UDG_Data_Jetman_Aliens
 break    385F-3FFF ; Output one byte per line
 word     385F-3896
+label    3860 UDG_Data_Jetman_Aliens+1
+lcomment 3865 $3C87 = Jetman_Fly_Right_3
 ;
 ; Objects and UDG start here
 ;
 comment  3897
 binary   3897-3C86
-byte     3C87-3C88
+word     3C87-3C88
 const    3C87-3C88
 word     3C89-3CB0
 binary   3CB1-3FFF
@@ -2239,10 +2240,10 @@ label    3B8B Jetman_Fly_Left_0
 label    3BBE Jetman_Fly_Right_0
 label    3BF1 Jetman_Fly_Right_1
 label    3C3C Jetman_Fly_Right_2
-comment  3C87 $3C87 = Jetman_Fly_Right_3, it's referenced after the end of the object's static data
+comment  3C87 $3C87 = Jetman_Fly_Right_3, it's referenced after the end of the object's data
 comment  3C87
-label    3C87 UDG_Lookup_Ship_Fuel_Vals
-label    3C88 UDG_Lookup_Ship_Fuel_Vals+1
+label    3C87 UDG_Data_Ship_Fuel_Valuables
+label    3C88 UDG_Data_Ship_Fuel_Valuables+1
 lcomment 3C9F Multiple entries for UDG objects indexing based on player level
 label    3E46 Alien_Ship_1
 label    3E61 Alien_Ship_2
