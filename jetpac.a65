@@ -32,7 +32,7 @@ ZP10                            equ     $0010
 ZP11                            equ     $0011
 ZP12                            equ     $0012
 ZP13                            equ     $0013
-ZP14_Object_Old_Width_Bytes     equ     $0014
+ZP14                            equ     $0014
 ZP15                            equ     $0015
 ZP16                            equ     $0016
 ZP17                            equ     $0017
@@ -132,6 +132,9 @@ Color_RAM                       equ     $9600
 
 SCREEN_WIDTH_COLUMNS            equ     $17
 GREEN                           equ     $05
+UDG_DATA_BITMAP_OFFSET          equ     $03
+UDG_DATA_WIDTH_BYTES_OFFSET     equ     $FE
+UDG_DATA_HEIGHT_PIXELS_OFFSET   equ     $FF
 SCREEN_WIDTH_PIXELS             equ     $B8
 SCREEN_HEIGHT_PIXELS            equ     $B0
 OBJECT_COLOR_PARAM              equ     $05
@@ -407,12 +410,12 @@ Test_Space
 ; 88   88 88__dP  8I  Yb   dPYb     88   88__
 ; Y8   8P 88"""   8I  dY  dP__Yb    88   88""
 ; `YbodP' 88     8888Y"  dP""""Yb   88   888888
-; \
+
 ; 88        db    .dP"Y8 888888 88""Yb
 ; 88       dPYb   `Ybo." 88__   88__dP
 ; 88  .o  dP__Yb  o.`Y8b 88""   88"Yb
 ; 88ood8 dP""""Yb 8bodP' 888888 88  Yb
-; \
+
 ;  dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
 ; dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
@@ -572,7 +575,7 @@ Laser_Jetman_Facing_Right_3
 ;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
 ;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
 ; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
-; \
+
 ; 88        db    .dP"Y8 888888 88""Yb .dP"Y8
 ; 88       dPYb   `Ybo." 88__   88__dP `Ybo."
 ; 88  .o  dP__Yb  o.`Y8b 88""   88"Yb  o.`Y8b
@@ -750,7 +753,7 @@ FPAAAA
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 226E: 20 1D 35 
     jsr     Laser_ZP17_15_to_ZP16_14        ; 2271: 20 8B 22 
     ldy     #$00                            ; 2274: A0 00    
-    lda     ZP14_Object_Old_Width_Bytes     ; 2276: A5 14    
+    lda     ZP14                            ; 2276: A5 14    
     eor     (ZP04),y                        ; 2278: 51 04    
     sta     (ZP04),y                        ; 227A: 91 04    
     pla                                     ; 227C: 68       
@@ -770,7 +773,7 @@ CLC_ADC_08
 ; L_JSR_($228B)_($2271) OK
 Laser_ZP17_15_to_ZP16_14
     lda     ZP15                            ; 228B: A5 15    
-    sta     ZP14_Object_Old_Width_Bytes     ; 228D: 85 14    
+    sta     ZP14                            ; 228D: 85 14    
     lda     ZP16                            ; 228F: A5 16    
     sta     ZP15                            ; 2291: 85 15    
     lda     ZP17                            ; 2293: A5 17    
@@ -824,12 +827,12 @@ Laser_JFL_2
 ; 88__dP 88__   `Ybo." 88__     88       88     88__    Yb  dP  88__   88
 ; 88"Yb  88""   o.`Y8b 88""     88       88  .o 88""     YbdP   88""   88  .o
 ; 88  Yb 888888 8bodP' 888888   88       88ood8 888888    YP    888888 88ood8
-; \
+
 ;    db    8888b.  8888b.      888888 Yb  dP 888888 88""Yb    db
 ;   dPYb    8I  Yb  8I  Yb     88__    YbdP    88   88__dP   dPYb
 ;  dP__Yb   8I  dY  8I  dY     88""    dPYb    88   88"Yb   dP__Yb
 ; dP""""Yb 8888Y"  8888Y"      888888 dP  Yb   88   88  Yb dP""""Yb
-; \
+
 ; 88     88 888888 888888
 ; 88     88 88__   88__
 ; 88  .o 88 88""   88""
@@ -1250,7 +1253,7 @@ GSFP2
 ;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
 ;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
 ; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
-; \
+
 ;  dP""b8    db    8b    d8 888888     .dP"Y8 888888 88     888888  dP""b8 888888
 ; dP   `"   dPYb   88b  d88 88__       `Ybo." 88__   88     88__   dP   `"   88
 ; Yb  "88  dP__Yb  88YbdP88 88""       o.`Y8b 88""   88  .o 88""   Yb        88
@@ -1357,7 +1360,7 @@ STR_SP_START_GAME
 ; 88     dP   Yb   dPYb    8I  Yb       dP  88__dP
 ; 88  .o Yb   dP  dP__Yb   8I  dY      dP   88"""
 ; 88ood8  YbodP  dP""""Yb 8888Y"      d8888 88
-; \
+
 ; 88""Yb    db    88""Yb    db    8b    d8 888888 888888 888888 88""Yb .dP"Y8
 ; 88__dP   dPYb   88__dP   dPYb   88b  d88 88__     88   88__   88__dP `Ybo."
 ; 88"""   dP__Yb  88"Yb   dP__Yb  88YbdP88 88""     88   88""   88"Yb  o.`Y8b
@@ -1623,7 +1626,7 @@ Spawn_Objects
 ; dP      88 88Yb88   88   88__   88__dP 88__dP 88   88 88__dP   88
 ; Yb      88 88 Y88   88   88""   88"Yb  88"Yb  Y8   8P 88"""    88
 ;  Yb     88 88  Y8   88   888888 88  Yb 88  Yb `YbodP' 88       88
-; \
+
 ; 88""Yb 888888 88        db    888888 888888 8888b.      Yb
 ; 88__dP 88__   88       dPYb     88   88__    8I  Yb      Yb
 ; 88"Yb  88""   88  .o  dP__Yb    88   88""    8I  dY      dP
@@ -1681,7 +1684,7 @@ Restore_Obj_Ptr_CLI
 ; `Ybo." 88   88 88__dP 88__dP dP   Yb 88   88   88   88 88Yb88 88__
 ; o.`Y8b Y8   8P 88""Yb 88"Yb  Yb   dP Y8   8P   88   88 88 Y88 88""
 ; 8bodP' `YbodP' 88oodP 88  Yb  YbodP  `YbodP'   88   88 88  Y8 888888
-; \
+
 ; 88     88 .dP"Y8 888888
 ; 88     88 `Ybo."   88
 ; 88  .o 88 o.`Y8b   88
@@ -1948,6 +1951,7 @@ Erase_HiScore_Setts_Etc_1
 ; dP   `" 88  88 88__   dP   `" 88odP      88Yb88 88__    Yb  db  dP
 ; Yb      888888 88""   Yb      88"Yb      88 Y88 88""     YbdPYbdP
 ;  YboodP 88  88 888888  YboodP 88  Yb     88  Y8 888888    YP  YP
+
 ; 88  88 88     .dP"Y8  dP""b8  dP"Yb  88""Yb 888888
 ; 88  88 88     `Ybo." dP   `" dP   Yb 88__dP 88__
 ; 888888 88     o.`Y8b Yb      Yb   dP 88"Yb  88""
@@ -2009,12 +2013,12 @@ Copy_Player_To_Hi_Score_1
 ;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
 ;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
 ; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
-; \
+
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
 ; 88  Yb  YbodP   YboodP 88  Yb 888888   88
-; \
+
 ; 888888 88        db    8b    d8 888888
 ; 88__   88       dPYb   88b  d88 88__
 ; 88""   88  .o  dP__Yb  88YbdP88 88""
@@ -2056,7 +2060,7 @@ Display_Rocket_Flame_1
     sec                                     ; 27D5: 38       
     sbc     #$01                            ; 27D6: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27D8: 20 2E 28 
-    jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 27DB: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 27DB: 20 8D 37 
     jsr     Display_Object_With_Setup_D     ; 27DE: 20 10 36 
 ; L_BRS_($27E1)_($27CD) OK
 Display_Rocket_Flame_2
@@ -2068,7 +2072,7 @@ Display_Rocket_Flame_2
     sec                                     ; 27EB: 38       
     sbc     #$01                            ; 27EC: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27EE: 20 2E 28 
-    jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 27F1: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 27F1: 20 8D 37 
     jsr     Display_Object                  ; 27F4: 20 4C 36 
     lda     ZP18                            ; 27F7: A5 18    
     sta     ZP04                            ; 27F9: 85 04    
@@ -2106,7 +2110,7 @@ Display_Flame
     sec                                     ; 281F: 38       
     sbc     #$01                            ; 2820: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 2822: 20 2E 28 
-    jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 2825: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 2825: 20 8D 37 
     jsr     Display_Object_With_Setup_D     ; 2828: 20 10 36 
     jmp     Display_Rocket_Flame_3          ; 282B: 4C 0B 28 
 ; -----------------------
@@ -2142,7 +2146,7 @@ Ptr_Final_Char_Hi
 ; 88__   88 88__dP 88__
 ; 88""   88 88"Yb  88""
 ; 88     88 88  Yb 888888
-; \
+
 ; 88""Yb 88""Yb 888888 .dP"Y8 .dP"Y8 888888 8888b.
 ; 88__dP 88__dP 88__   `Ybo." `Ybo." 88__    8I  Yb
 ; 88"""  88"Yb  88""   o.`Y8b o.`Y8b 88""    8I  dY
@@ -2166,7 +2170,7 @@ FP_1 jsr    Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35
     lda     #$00                            ; 2859: A9 00    
     jsr     Get_Obj_UDG_Data_Addr_Ship_A    ; 285B: 20 DC 2F 
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 285E: 20 E5 2F 
-    jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 2861: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 2861: 20 8D 37 
     jsr     Display_Object_With_Setup_D     ; 2864: 20 10 36 
 
 ; Jetman pickup Gem/Elements/Gold etc = 250 points
@@ -2553,7 +2557,7 @@ Object_Pointer_To_Jetman
 ; 88     88__    Yb  dP  88__   88         .d88
 ; 88  .o 88""     YbdP   88""   88  .o       88
 ; 88ood8 888888    YP    888888 88ood8       88
-; \
+
 ; 88""Yb 88     88   88 .dP"Y8 .dP"Y8 888888 .dP"Y8
 ; 88__dP 88     88   88 `Ybo." `Ybo." 88__   `Ybo."
 ; 88"""  88  .o Y8   8P o.`Y8b o.`Y8b 88""   o.`Y8b
@@ -2583,7 +2587,7 @@ Level_1_Plusses_1
 ; 88     88__    Yb  dP  88__   88         "' dP'
 ; 88  .o 88""     YbdP   88""   88  .o       dP'
 ; 88ood8 888888    YP    888888 88ood8     .d8888
-; \
+
 ; 88""Yb    db    88     88     .dP"Y8
 ; 88__dP   dPYb   88     88     `Ybo."
 ; 88""Yb  dP__Yb  88  .o 88  .o o.`Y8b
@@ -2677,7 +2681,7 @@ Update_Y_Direction_Random_1
 ; 88     88__    Yb  dP  88__   88           .dP
 ; 88  .o 88""     YbdP   88""   88  .o     o `Yb
 ; 88ood8 888888    YP    888888 88ood8     YbodP
-; \
+
 ; .dP"Y8    db    88   88  dP""b8 888888 88""Yb
 ; `Ybo."   dPYb   88   88 dP   `" 88__   88__dP
 ; o.`Y8b  dP__Yb  Y8   8P Yb      88""   88"Yb
@@ -2798,12 +2802,12 @@ Level_3_Saucer_Inc_Direction_Y
 ; 88__dP 88       dPYb     88   88__   dP   Yb 88__dP 88b  d88
 ; 88"""  88  .o  dP__Yb    88   88""   Yb   dP 88"Yb  88YbdP88
 ; 88     88ood8 dP""""Yb   88   88      YbodP  88  Yb 88 YY 88
-; \
+
 ;  dP""b8  dP"Yb  88     88     88 .dP"Y8 88  dP"Yb  88b 88
 ; dP   `" dP   Yb 88     88     88 `Ybo." 88 dP   Yb 88Yb88
 ; Yb      Yb   dP 88  .o 88  .o 88 o.`Y8b 88 Yb   dP 88 Y88
 ;  YboodP  YbodP  88ood8 88ood8 88 8bodP' 88  YbodP  88  Y8
-; \
+
 ;    db    88     88 888888 88b 88 .dP"Y8
 ;   dPYb   88     88 88__   88Yb88 `Ybo."
 ;  dP__Yb  88  .o 88 88""   88 Y88 o.`Y8b
@@ -2866,7 +2870,7 @@ Test_Platform_Collision_Bounc_3
 ; `Ybo." 88__dP   dPYb    Yb  db  dP  88Yb88
 ; o.`Y8b 88"""   dP__Yb    YbdPYbdP   88 Y88
 ; 8bodP' 88     dP""""Yb    YP  YP    88  Y8
-; \
+
 ;  dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
 ; dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
@@ -3035,7 +3039,7 @@ Object_X_Table
 ;   88   88__   `Ybo."   88       88       dPYb   `Ybo." 88__   88__dP
 ;   88   88""   o.`Y8b   88       88  .o  dP__Yb  o.`Y8b 88""   88"Yb
 ;   88   888888 8bodP'   88       88ood8 dP""""Yb 8bodP' 888888 88  Yb
-; \
+
 ; 88  88 88 888888 .dP"Y8
 ; 88  88 88   88   `Ybo."
 ; 888888 88   88   o.`Y8b
@@ -3155,7 +3159,7 @@ Test_Laser_Hits
 ; 88     88__    Yb  dP  88__   88         dP   Yb
 ; 88  .o 88""     YbdP   88""   88  .o     Yb   dP
 ; 88ood8 888888    YP    888888 88ood8      YbodP
-; \
+
 ; 888888 88   88 8888P 8888P 88""Yb    db    88     88
 ; 88__   88   88   dP    dP  88__dP   dPYb   88     88
 ; 88""   Y8   8P  dP    dP   88""Yb  dP__Yb  88  .o 88  .o
@@ -3288,7 +3292,7 @@ Wrap_Object_X_Position_Right
 ; 88 88Yb88 88   88   88   dPYb   88     88 `Ybo." 88__
 ; 88 88 Y88 88   88   88  dP__Yb  88  .o 88 o.`Y8b 88""
 ; 88 88  Y8 88   88   88 dP""""Yb 88ood8 88 8bodP' 888888
-; \
+
 ;  dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
 ; dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
@@ -3408,12 +3412,12 @@ Level_Alien_Color_Lookup
 ;   88   88__   `Ybo."   88           88 88__     88   88b  d88   dPYb   88Yb88
 ;   88   88""   o.`Y8b   88       o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
 ;   88   888888 8bodP'   88       "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
-; \
+
 ;  dP"Yb  88""Yb  88888 888888  dP""b8 888888
 ; dP   Yb 88__dP     88 88__   dP   `"   88
 ; Yb   dP 88""Yb o.  88 88""   Yb        88
 ;  YbodP  88oodP "bodP' 888888  YboodP   88
-; \
+
 ;  dP""b8  dP"Yb  88     88     88 8888b.  888888
 ; dP   `" dP   Yb 88     88     88  8I  Yb 88__
 ; Yb      Yb   dP 88  .o 88  .o 88  8I  dY 88""
@@ -3504,12 +3508,12 @@ Test_Jetman_Obj_Collide_5
 ; 88__dP 88__   `Ybo."   88   dP   Yb 88__dP 88__
 ; 88"Yb  88""   o.`Y8b   88   Yb   dP 88"Yb  88""
 ; 88  Yb 888888 8bodP'   88    YbodP  88  Yb 888888
-; \
+
 ; 88""Yb 88        db    Yb  dP 888888 88""Yb
 ; 88__dP 88       dPYb    YbdP  88__   88__dP
 ; 88"""  88  .o  dP__Yb    8P   88""   88"Yb
 ; 88     88ood8 dP""""Yb  dP    888888 88  Yb
-; \
+
 ;  dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
 ; dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
@@ -3582,7 +3586,7 @@ Restore_Player_Objects_6
     pla                                     ; 2DF8: 68       
 
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2DF9: 20 E5 2F 
-    jmp     Set_UDG_RAM_Ptr_Object_Dimen    ; 2DFC: 4C 8D 37 
+    jmp     Load_Obj_UDG_RAM_Addr_Size_XY   ; 2DFC: 4C 8D 37 
 ; -----------------------
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
@@ -3612,7 +3616,7 @@ Dec_Saved_Obj_List_Params_by_10
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
 ; 88  Yb  YbodP   YboodP 88  Yb 888888   88
-; \
+
 ;    db    .dP"Y8  dP""b8 888888 88b 88 8888b.
 ;   dPYb   `Ybo." dP   `" 88__   88Yb88  8I  Yb
 ;  dP__Yb  o.`Y8b Yb      88""   88 Y88  8I  dY
@@ -3663,7 +3667,7 @@ Rocket_At_Top
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
 ; 88  Yb  YbodP   YboodP 88  Yb 888888   88
-; \
+
 ; 8888b.  888888 .dP"Y8  dP""b8 888888 88b 88 8888b.
 ;  8I  Yb 88__   `Ybo." dP   `" 88__   88Yb88  8I  Yb
 ;  8I  dY 88""   o.`Y8b Yb      88""   88 Y88  8I  dY
@@ -3706,12 +3710,12 @@ ROCKET_DESCEND
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
 ; 88  Yb  YbodP   YboodP 88  Yb 888888   88
-; \
+
 ; 88""Yb  dP"Yb  888888 888888  dP"Yb  8b    d8
 ; 88__dP dP   Yb   88     88   dP   Yb 88b  d88
 ; 88""Yb Yb   dP   88     88   Yb   dP 88YbdP88
 ; 88oodP  YbodP    88     88    YbodP  88 YY 88
-; \
+
 ; 8b    d8  dP"Yb  8888b.  88   88 88     888888
 ; 88b  d88 dP   Yb  8I  Yb 88   88 88     88__
 ; 88YbdP88 Yb   dP  8I  dY Y8   8P 88  .o 88""
@@ -3762,7 +3766,7 @@ ROCKET_BOTTOM_MODULE
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
 ; 88  Yb  YbodP   YboodP 88  Yb 888888   88
-; \
+
 ; 888888 88   88 888888 88     88     888888 8888b.      88   88 88""Yb
 ; 88__   88   88 88__   88     88     88__    8I  Yb     88   88 88__dP
 ; 88""   Y8   8P 88""   88  .o 88  .o 88""    8I  dY     Y8   8P 88"""
@@ -3869,7 +3873,7 @@ Rocket_Fuelled_Up_6
 ; 88__dP dP   Yb dP   `" 88odP  88__     88       88__dP   dPYb   88__dP   88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88       88"""   dP__Yb  88"Yb    88
 ; 88  Yb  YbodP   YboodP 88  Yb 888888   88       88     dP""""Yb 88  Yb   88
-; \
+
 ;  dP"Yb  88""Yb     888888 88   88 888888 88
 ; dP   Yb 88__dP     88__   88   88 88__   88
 ; Yb   dP 88"Yb      88""   Y8   8P 88""   88  .o
@@ -4018,7 +4022,7 @@ Setup_Object_Addr
 
 ; Do it again to setup the object dimensions
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2FCB: 20 E5 2F 
-    jsr     Set_UDG_RAM_Ptr_Object_Dimen    ; 2FCE: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 2FCE: 20 8D 37 
     jsr     Display_Object                  ; 2FD1: 20 4C 36 
     jsr     Colorize_Object                 ; 2FD4: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2FD7: 4C 1A 26 
@@ -4087,12 +4091,12 @@ Get_Obj_UDG_Data_Addr_S_F_V
 ;     88 88__     88   88b  d88   dPYb   88Yb88
 ; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
 ; "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
-; \
+
 ;  dP""b8  dP"Yb  88     88     88 8888b.  888888
 ; dP   `" dP   Yb 88     88     88  8I  Yb 88__
 ; Yb      Yb   dP 88  .o 88  .o 88  8I  dY 88""
 ;  YboodP  YbodP  88ood8 88ood8 88 8888Y"  888888
-; \
+
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888     888888 88   88 888888 88
 ; 88__dP dP   Yb dP   `" 88odP  88__     88       88__   88   88 88__   88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88       88""   Y8   8P 88""   88  .o
@@ -4190,7 +4194,7 @@ Load_Rocket_or_Fuel_UDGs_2
 ; 88   88 88__dP  8I  Yb   dPYb     88   88__
 ; Y8   8P 88"""   8I  dY  dP__Yb    88   88""
 ; `YbodP' 88     8888Y"  dP""""Yb   88   888888
-; \
+
 ; .dP"Y8  dP""b8  dP"Yb  88""Yb 888888
 ; `Ybo." dP   `" dP   Yb 88__dP 88__
 ; o.`Y8b Yb      Yb   dP 88"Yb  88""
@@ -4258,12 +4262,12 @@ Read_ZP_Params_P2_Score
 ; 88__dP 88       dPYb     88   88__   dP   Yb 88__dP 88b  d88
 ; 88"""  88  .o  dP__Yb    88   88""   Yb   dP 88"Yb  88YbdP88
 ; 88     88ood8 dP""""Yb   88   88      YbodP  88  Yb 88 YY 88
-; \
+
 ;  dP""b8  dP"Yb  88     88     88 .dP"Y8 88  dP"Yb  88b 88
 ; dP   `" dP   Yb 88     88     88 `Ybo." 88 dP   Yb 88Yb88
 ; Yb      Yb   dP 88  .o 88  .o 88 o.`Y8b 88 Yb   dP 88 Y88
 ;  YboodP  YbodP  88ood8 88ood8 88 8bodP' 88  YbodP  88  Y8
-; \
+
 ; 888888 888888 .dP"Y8 888888
 ;   88   88__   `Ybo."   88
 ;   88   88""   o.`Y8b   88
@@ -4439,7 +4443,7 @@ Test_Platform_Collision10
 ;  8I  Yb 88__dP   dPYb    Yb  db  dP
 ;  8I  dY 88"Yb   dP__Yb    YbdPYbdP
 ; 8888Y"  88  Yb dP""""Yb    YP  YP
-; \
+
 ; 88""Yb 88        db    888888 888888  dP"Yb  88""Yb 8b    d8 .dP"Y8
 ; 88__dP 88       dPYb     88   88__   dP   Yb 88__dP 88b  d88 `Ybo."
 ; 88"""  88  .o  dP__Yb    88   88""   Yb   dP 88"Yb  88YbdP88 o.`Y8b
@@ -4549,7 +4553,7 @@ Next_UDG_Char
 ; 88   88 88__dP  8I  Yb   dPYb     88   88__
 ; Y8   8P 88"""   8I  dY  dP__Yb    88   88""
 ; `YbodP' 88     8888Y"  dP""""Yb   88   888888
-; \
+
 ;  88888 888888 888888 8b    d8    db    88b 88
 ;     88 88__     88   88b  d88   dPYb   88Yb88
 ; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
@@ -5064,12 +5068,12 @@ Jetman_Movement_4
 ; 88__dP 88__     dPYb    8I  Yb
 ; 88"Yb  88""    dP__Yb   8I  dY
 ; 88  Yb 888888 dP""""Yb 8888Y"
-; \
+
 ; 88  dP 888888 Yb  dP 88""Yb  dP"Yb     db    88""Yb 8888b.
 ; 88odP  88__    YbdP  88__dP dP   Yb   dPYb   88__dP  8I  Yb
 ; 88"Yb  88""     8P   88""Yb Yb   dP  dP__Yb  88"Yb   8I  dY
 ; 88  Yb 888888  dP    88oodP  YbodP  dP""""Yb 88  Yb 8888Y"
-; \
+
 ;  88888  dP"Yb  Yb  dP .dP"Y8 888888 88  dP""b8 88  dP
 ;     88 dP   Yb  YbdP  `Ybo."   88   88 dP   `" 88odP
 ; o.  88 Yb   dP   8P   o.`Y8b   88   88 Yb      88"Yb
@@ -5250,7 +5254,7 @@ Load_UDG_RAM_for_P2
 ;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP      88__dP dP   `"  8I  Yb
 ;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P       88""Yb Yb       8I  dY
 ; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP        88oodP  YboodP 8888Y"
-; \
+
 ; .dP"Y8 888888 88""Yb      dP""b8 88  88    db    88""Yb
 ; `Ybo."   88   88__dP     dP   `" 88  88   dPYb   88__dP
 ; o.`Y8b   88   88"Yb      Yb      888888  dP__Yb  88"Yb
@@ -5365,7 +5369,7 @@ Display_Character
 ; `Ybo." 88__     88   88   88 88__dP     dP   `" dP   Yb 88     dP   Yb 88__dP
 ; o.`Y8b 88""     88   Y8   8P 88"""      Yb      Yb   dP 88  .o Yb   dP 88"Yb
 ; 8bodP' 888888   88   `YbodP' 88          YboodP  YbodP  88ood8  YbodP  88  Yb
-; \
+
 ; 88""Yb    db    8b    d8     88""Yb 888888 88""Yb
 ; 88__dP   dPYb   88b  d88     88__dP   88   88__dP
 ; 88"Yb   dP__Yb  88YbdP88     88"""    88   88"Yb
@@ -5413,12 +5417,12 @@ Color_RAM_Row_Offsets
 ; dP   `" dP   Yb 88Yb88  Yb  dP  88__   88__dP   88        YbdP   YbdP
 ; Yb      Yb   dP 88 Y88   YbdP   88""   88"Yb    88        dPYb    8P
 ;  YboodP  YbodP  88  Y8    YP    888888 88  Yb   88       dP  Yb  dP
-; \
+
 ; 888888  dP"Yb      88   88 8888b.   dP""b8     88""Yb    db    8b    d8
 ;   88   dP   Yb     88   88  8I  Yb dP   `"     88__dP   dPYb   88b  d88
 ;   88   Yb   dP     Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88
 ;   88    YbodP      `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88
-; \
+
 ;    db    8888b.  8888b.  88""Yb
 ;   dPYb    8I  Yb  8I  Yb 88__dP
 ;  dP__Yb   8I  dY  8I  dY 88"Yb
@@ -5539,7 +5543,7 @@ Reset_RAM_2
 ; dP   `" dP   Yb 88__dP  YbdP     dP   `" 88  88   dPYb   88__dP
 ; Yb      Yb   dP 88"""    8P      Yb      888888  dP__Yb  88"Yb
 ;  YboodP  YbodP  88      dP        YboodP 88  88 dP""""Yb 88  Yb
-; \
+
 ; 888888  dP"Yb      88   88 8888b.   dP""b8     88""Yb    db    8b    d8
 ;   88   dP   Yb     88   88  8I  Yb dP   `"     88__dP   dPYb   88b  d88
 ;   88   Yb   dP     Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88
@@ -5633,7 +5637,7 @@ Copy_Char_To_UDG_RAM_INV
 ; dP      88     dP   Yb   dPYb    8I  Yb     dP   Yb 88__dP     88
 ; Yb      88  .o Yb   dP  dP__Yb   8I  dY     Yb   dP 88""Yb o.  88
 ;  Yb     88ood8  YbodP  dP""""Yb 8888Y"       YbodP  88oodP "bodP'
-; \
+
 ;    db    888888 888888 88""Yb 88 88""Yb .dP"Y8     Yb
 ;   dPYb     88     88   88__dP 88 88__dP `Ybo."      Yb
 ;  dP__Yb    88     88   88"Yb  88 88""Yb o.`Y8b      dP
@@ -5700,7 +5704,7 @@ Load_Object_Type_X_Y_Color
 ;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
 ;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
 ; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
-; \
+
 ;  dP"Yb  88""Yb  88888 888888  dP""b8 888888
 ; dP   Yb 88__dP     88 88__   dP   `"   88
 ; Yb   dP 88""Yb o.  88 88""   Yb        88
@@ -5717,14 +5721,14 @@ Display_Object_With_Setup_AB
 ; L_JMP_($3604)_($3060) OK
 Display_Object_With_Setup_B
     lda     #$00                            ; 3604: A9 00    
-    sta     ZP14_Object_Old_Width_Bytes     ; 3606: 85 14    
+    sta     ZP14                            ; 3606: 85 14    
     sta     ZP03                            ; 3608: 85 03    
     jmp     Display_Object                  ; 360A: 4C 4C 36 
 ; -----------------------
 
 ; L_JSR_($360D)_($28F9) OK
 Display_Object_With_Setup_CD
-    jsr     Set_UDG_RAM_Ptr_Object_Dimen_   ; 360D: 20 8A 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_XY1  ; 360D: 20 8A 37 
 
 ; L_JSR_($3610)_($27DE) OK
 ; L_JSR_($3610)_($2828) OK
@@ -5794,7 +5798,7 @@ LOOP_362F
 ; L_JSR_($3646)_($32F9) OK
 Display_Object_With_Setup
     jsr     Load_Small_UDG_Addr_Setup_XY_   ; 3646: 20 37 37 
-    jsr     Set_UDG_RAM_Ptr_Object_Dimen_   ; 3649: 20 8A 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_XY1  ; 3649: 20 8A 37 
 
 ; L_JSR_($364C)_($27F4) OK
 ; L_JSR_($364C)_($2EB8) OK
@@ -5921,10 +5925,10 @@ Next_Object_Old_Update_Params
     bne     Draw_New_Object                 ; 36AD: D0 ED    
 
 ; Test if old object fully erased, if not, move to the next vertical column to erase
-    lda     ZP14_Object_Old_Width_Bytes     ; 36AF: A5 14    
+    lda     ZP14                            ; 36AF: A5 14    
     beq     Object_Width_Complete           ; 36B1: F0 76    
 
-    dec     ZP14_Object_Old_Width_Bytes     ; 36B3: C6 14    
+    dec     ZP14                            ; 36B3: C6 14    
 
 ; Move UDG data 16-bit address pointer to the object data for the next column
     lda     ZP06                            ; 36B5: A5 06    
@@ -6029,7 +6033,7 @@ Object_Width_Complete
     sta     ZP03                            ; 372B: 85 03    
 
 ; Test if both old and new object heights are the same, if yes, return
-    lda     ZP14_Object_Old_Width_Bytes     ; 372D: A5 14    
+    lda     ZP14                            ; 372D: A5 14    
     ora     ZP15                            ; 372F: 05 15    
     bne     JMP_Next_Obj_New_Update_Params  ; 3731: D0 01    
     rts                                     ; 3733: 60       
@@ -6048,7 +6052,7 @@ JMP_Next_Obj_New_Update_Params
 ; 88     dP   Yb   dPYb    8I  Yb     `Ybo." 88b  d88   dPYb   88     88
 ; 88  .o Yb   dP  dP__Yb   8I  dY     o.`Y8b 88YbdP88  dP__Yb  88  .o 88  .o
 ; 88ood8  YbodP  dP""""Yb 8888Y"      8bodP' 88 YY 88 dP""""Yb 88ood8 88ood8
-; \
+
 ; 88   88 8888b.   dP""b8        db    8888b.  8888b.  88""Yb
 ; 88   88  8I  Yb dP   `"       dPYb    8I  Yb  8I  Yb 88__dP
 ; Y8   8P  8I  dY Yb  "88      dP__Yb   8I  dY  8I  dY 88"Yb
@@ -6127,41 +6131,49 @@ Load_Small_UDG_Addr_Setup_XY_1
 
 
 
-; .dP"Y8 888888 888888     88   88 8888b.   dP""b8
-; `Ybo." 88__     88       88   88  8I  Yb dP   `"
-; o.`Y8b 88""     88       Y8   8P  8I  dY Yb  "88
-; 8bodP' 888888   88       `YbodP' 8888Y"   YboodP
-; \
-; 88""Yb    db    8b    d8     88""Yb 888888 88""Yb
-; 88__dP   dPYb   88b  d88     88__dP   88   88__dP
-; 88"Yb   dP__Yb  88YbdP88     88"""    88   88"Yb
-; 88  Yb dP""""Yb 88 YY 88     88       88   88  Yb
+; 88      dP"Yb     db    8888b.       dP"Yb  88""Yb  88888
+; 88     dP   Yb   dPYb    8I  Yb     dP   Yb 88__dP     88
+; 88  .o Yb   dP  dP__Yb   8I  dY     Yb   dP 88""Yb o.  88
+; 88ood8  YbodP  dP""""Yb 8888Y"       YbodP  88oodP "bodP'
+
+; 88   88 8888b.   dP""b8     88""Yb    db    8b    d8        db    8888b.  8888b.  88""Yb
+; 88   88  8I  Yb dP   `"     88__dP   dPYb   88b  d88       dPYb    8I  Yb  8I  Yb 88__dP
+; Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88      dP__Yb   8I  dY  8I  dY 88"Yb
+; `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88     dP""""Yb 8888Y"  8888Y"  88  Yb
+
+; .dP"Y8 88 8888P 888888     Yb  dP Yb  dP
+; `Ybo." 88   dP  88__        YbdP   YbdP
+; o.`Y8b 88  dP   88""        dPYb    8P
+; 8bodP' 88 d8888 888888     dP  Yb  dP
 
 ; L_JSR_($378A)_($360D) OK
 ; L_JSR_($378A)_($3649) OK
-Set_UDG_RAM_Ptr_Object_Dimen_
+Load_Obj_UDG_RAM_Addr_Size_XY1
     jsr     Get_Obj_UDG_Data_Addr_JM_Ali_1  ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
 
-; Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
+; Store object UDG Addr from Y and A into ZP06 & 07, minus $100
+; Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
 ; L_JSR_($378D)_($27DB) OK
 ; L_JSR_($378D)_($27F1) OK
 ; L_JSR_($378D)_($2825) OK
 ; L_JSR_($378D)_($2861) OK
 ; L_JMP_($378D)_($2DFC) OK
 ; L_JSR_($378D)_($2FCE) OK
-Set_UDG_RAM_Ptr_Object_Dimen
+Load_Obj_UDG_RAM_Addr_Size_XY
     sty     ZP06                            ; 378D: 84 06    
     tay                                     ; 378F: A8       
     dey                                     ; 3790: 88       
-    sty     ZP07                            ; 3791: 84 07    
+    sty     ZP07                            ; 3791: 84 07     ZP07/06=$3BF7
 
-; Setup UDG RAM X & Y
+; Store object position in ZP04 & 05
     lda     ZP10                            ; 3793: A5 10    
     sta     ZP04                            ; 3795: 85 04    
     lda     ZP11                            ; 3797: A5 11    
-    sta     ZP05                            ; 3799: 85 05    
+    sta     ZP05                            ; 3799: 85 05     ZP04=X=$50 ZP05=Y=$5F
 
-; Convert XY pixel coords to address, managing X axis wrap ($B8)
+; Convert object position XY pixel coordinates to UDG RAM address, managing X axis wrap.
+; Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
+; will move object into next UDG RAM column.
     ldy     #$FF                            ; 379B: A0 FF    
     lda     (ZP06),y                        ; 379D: B1 06    
     clc                                     ; 379F: 18       
@@ -6172,33 +6184,35 @@ Set_UDG_RAM_Ptr_Object_Dimen
     sbc     #SCREEN_WIDTH_PIXELS            ; 37A7: E9 B8    
 ; L_BRS_($37A9)_($37A4) OK
 No_X_Wrap
-    sta     ZP04                            ; 37A9: 85 04    
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 37AB: 20 1D 35 
+    sta     ZP04                            ; 37A9: 85 04     ZP04=X=$50 ZP05=Y=$5F
+    jsr     Convert_XY_to_UDG_RAM_Addr      ; 37AB: 20 1D 35  ZP05/04=$173F i.e. rocket middle
+                                            ; section start position
 
-; Subtract $FF from 16-bit UDG_RAM addr?
+; ZP04/05 are now an address instead of X and Y coordinates.
+; Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
     lda     ZP04                            ; 37AE: A5 04    
     sec                                     ; 37B0: 38       
-    sbc     #$FF                            ; 37B1: E9 FF    
+    sbc     #UDG_DATA_HEIGHT_PIXELS_OFFSET  ; 37B1: E9 FF    
     sta     ZP04                            ; 37B3: 85 04    
     lda     ZP05                            ; 37B5: A5 05    
     sbc     #$00                            ; 37B7: E9 00    
     sta     ZP05                            ; 37B9: 85 05    
 
-; Get/store object width in characters (zero-based)
-    ldy     #$FE                            ; 37BB: A0 FE    
+; Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
+    ldy     #UDG_DATA_WIDTH_BYTES_OFFSET    ; 37BB: A0 FE    
     lda     (ZP06),y                        ; 37BD: B1 06    
-    sta     ZP14_Object_Old_Width_Bytes     ; 37BF: 85 14    
+    sta     ZP14                            ; 37BF: 85 14    
 
-; Get/store object height in pixels
+; Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
     dey                                     ; 37C1: 88       
     lda     (ZP06),y                        ; 37C2: B1 06    
     sta     ZP03                            ; 37C4: 85 03    
 
-; Subtract $03 from 16-bit object UDG addr, i.e. so address
+; Subtract $03 from 16-bit object UDG Data addrress, i.e. so address
 ; avoids the object dimension bytes
     lda     ZP06                            ; 37C6: A5 06    
     sec                                     ; 37C8: 38       
-    sbc     #$03                            ; 37C9: E9 03    
+    sbc     #UDG_DATA_BITMAP_OFFSET         ; 37C9: E9 03    
     sta     ZP06                            ; 37CB: 85 06    
 
     lda     ZP07                            ; 37CD: A5 07    

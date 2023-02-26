@@ -2089,27 +2089,39 @@ comment  3775
 comment  377C
 comment  3783
 comment  378A
-label    378A Set_UDG_RAM_Ptr_Object_Dimen_
+label    378A Load_Obj_UDG_RAM_Addr_Size_XY1
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
 comment  378D
-comment  378D Store UDG Addr -$100 in ZP 06 & 07, which is added later via Y
-label    378D Set_UDG_RAM_Ptr_Object_Dimen
+comment  378D Store object UDG Addr from Y and A into ZP06 & 07, minus $100
+label    378D Load_Obj_UDG_RAM_Addr_Size_XY
+comment  378D Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
+lcomment 3791 ZP07/06=$3BF7
 comment  3793
-comment  3793 Setup UDG RAM X & Y
+comment  3793 Store object position in ZP04 & 05
 comment  379B
-comment  379B Convert XY pixel coords to address, managing X axis wrap ($B8)
+comment  379B Convert object position XY pixel coordinates to UDG RAM address, managing X axis wrap.
+comment  379B Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
+comment  379B will move object into next UDG RAM column.
+lcomment 3799 ZP04=X=$50 ZP05=Y=$5F
 deflabel 37A3 SCREEN_WIDTH_PIXELS
 deflabel 37A8 SCREEN_WIDTH_PIXELS
 label    37A9 No_X_Wrap
+lcomment 37A9 ZP04=X=$50 ZP05=Y=$5F
+lcomment 37AB ZP05/04=$173F i.e. rocket middle
+lcomment 37AB section start position
 comment  37AE
-comment  37AE Subtract $FF from 16-bit UDG_RAM addr?
+comment  37AE ZP04/05 are now an address instead of X and Y coordinates.
+comment  37AE Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
+deflabel 37B2 UDG_DATA_HEIGHT_PIXELS_OFFSET
 comment  37BB
-comment  37BB Get/store object width in characters (zero-based)
+comment  37BB Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
+deflabel 37BC UDG_DATA_WIDTH_BYTES_OFFSET
 comment  37C1
-comment  37C1 Get/store object height in pixels
+comment  37C1 Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
 comment  37C6
-comment  37C6 Subtract $03 from 16-bit object UDG addr, i.e. so address
+comment  37C6 Subtract $03 from 16-bit object UDG Data addrress, i.e. so address
 comment  37C6 avoids the object dimension bytes
+deflabel 37CA UDG_DATA_BITMAP_OFFSET
 comment  37CD
 comment  37D4
 comment  37D4 Aliens Types: 05=Fuzzball, 06=Saucer, 07=Ball, 08=Cross

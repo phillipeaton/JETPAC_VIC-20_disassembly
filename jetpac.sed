@@ -75,17 +75,27 @@
 
 
 # Set_UDG_RAM_Ptr_Object_Dimen
+/ZP03                            equ     $0003/a ZP03_Object_Height_Pixels       equ     $0003
 /ZP04                            equ     $0004/a ZP04_Object_Position_X          equ     $0004
 /ZP05                            equ     $0005/a ZP05_Object_Position_Y          equ     $0005
+/ZP04                            equ     $0004/a ZP04_Object_UDG_RAM_Addr_Lo     equ     $0004
+/ZP05                            equ     $0005/a ZP05_Object_UDG_RAM_Addr_Hi     equ     $0005
 /ZP06                            equ     $0006/a ZP06_Object_UDG_Data_Addr_Lo    equ     $0006
 /ZP07                            equ     $0007/a ZP07_Object_UDG_Data_Addr_Hi    equ     $0007
 /ZP10                            equ     $0010/a ZP10_Object_Position_X_         equ     $0010
 /ZP11                            equ     $0011/a ZP11_Object_Position_Y          equ     $0011
+/ZP14                            equ     $0014/a ZP14_Object_Width_Bytes         equ     $0014
 
-/; 378A/,/; 37D3/s/ZP04                           /ZP04_Object_Position_X         /
-/; 378A/,/; 37D3/s/ZP05                           /ZP05_Object_Position_Y         /
+/; 378A/,/; 37D3/s/ZP03                           /ZP03_Object_Height_Pixels      /
+# Usages changes partway through routine - Start
+/; 378A/,/; 37AB/s/ZP04                           /ZP04_Object_Position_X         /
+/; 378A/,/; 37AB/s/ZP05                           /ZP05_Object_Position_Y         /
+/; 37AE/,/; 37D3/s/ZP04                           /ZP04_Object_UDG_RAM_Addr_Lo    /
+/; 37AE/,/; 37D3/s/ZP05                           /ZP05_Object_UDG_RAM_Addr_Hi    /
+# Usages changes partway through routine - End
 /; 378A/,/; 37D3/s/ZP06                           /ZP06_Object_UDG_Data_Addr_Lo   /
 /; 378A/,/; 37D3/s/(ZP06),y                       /(ZP06_Object_UDG_Data_Addr_Lo),y/
 /; 378A/,/; 37D3/s/ZP07                           /ZP07_Object_UDG_Data_Addr_Hi   /
 /; 378A/,/; 37D3/s/ZP10                           /ZP10_Object_Position_X_        /
 /; 378A/,/; 37D3/s/ZP11                           /ZP11_Object_Position_Y         /
+/; 378A/,/; 37D3/s/ZP14                           /ZP14_Object_Width_Bytes        /
