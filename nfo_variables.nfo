@@ -12,7 +12,7 @@ label      09 ZP09                                ; 11 Used with 08
 label      0A ZP0A                                ; 15
 label      0B ZP0B                                ; 18
 label      0C ZP0C                                ; 28 Prev. ZP0C_Object_New_UDG_RAM_Lo
-label      0D ZP0D_Object_New_UDG_RAM_Hi          ; 10
+label      0D ZP0D                                ; 10 Prev. ZP0D_Object_New_UDG_RAM_Hi
 label      0E ZP0E                                ; 21
 label      0F ZP0F                                ; 12
 label      10 ZP10                                ; 04 Prev. ZP10_Object_Old_Position_X

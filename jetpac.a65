@@ -25,7 +25,7 @@ ZP09                            equ     $0009
 ZP0A                            equ     $000A
 ZP0B                            equ     $000B
 ZP0C                            equ     $000C
-ZP0D_Object_New_UDG_RAM_Hi      equ     $000D
+ZP0D                            equ     $000D
 ZP0E                            equ     $000E
 ZP0F                            equ     $000F
 ZP10                            equ     $0010
@@ -2060,19 +2060,19 @@ Display_Rocket_Flame_1
     sec                                     ; 27D5: 38       
     sbc     #$01                            ; 27D6: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27D8: 20 2E 28 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 27DB: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27DB: 20 8D 37 
     jsr     Display_Object_With_Setup_D     ; 27DE: 20 10 36 
 ; L_BRS_($27E1)_($27CD) OK
 Display_Rocket_Flame_2
     lda     ZP_Rocket_Flame_Toggle          ; 27E1: A5 27    
     pha                                     ; 27E3: 48       
     jsr     Get_Flame_UDG_Addr              ; 27E4: 20 2E 28 
-    jsr     Load_Small_UDG_Addr_Setup_XY    ; 27E7: 20 3D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 27E7: 20 3D 37 
     pla                                     ; 27EA: 68       
     sec                                     ; 27EB: 38       
     sbc     #$01                            ; 27EC: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27EE: 20 2E 28 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 27F1: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27F1: 20 8D 37 
     jsr     Display_Object                  ; 27F4: 20 4C 36 
     lda     ZP18                            ; 27F7: A5 18    
     sta     ZP04                            ; 27F9: 85 04    
@@ -2110,7 +2110,7 @@ Display_Flame
     sec                                     ; 281F: 38       
     sbc     #$01                            ; 2820: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 2822: 20 2E 28 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 2825: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2825: 20 8D 37 
     jsr     Display_Object_With_Setup_D     ; 2828: 20 10 36 
     jmp     Display_Rocket_Flame_3          ; 282B: 4C 0B 28 
 ; -----------------------
@@ -2170,7 +2170,7 @@ FP_1 jsr    Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35
     lda     #$00                            ; 2859: A9 00    
     jsr     Get_Obj_UDG_Data_Addr_Ship_A    ; 285B: 20 DC 2F 
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 285E: 20 E5 2F 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 2861: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2861: 20 8D 37 
     jsr     Display_Object_With_Setup_D     ; 2864: 20 10 36 
 
 ; Jetman pickup Gem/Elements/Gold etc = 250 points
@@ -2391,7 +2391,7 @@ Explosions_1
     lda     Explosion_UDG_Ptr,x             ; 2954: BD 67 29 
     tay                                     ; 2957: A8       
     lda     Explosion_UDG_Ptr+1,x           ; 2958: BD 68 29 
-    jsr     Load_Small_UDG_Addr_Setup_XY    ; 295B: 20 3D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 295B: 20 3D 37 
     jsr     Display_Object_With_Setup_B     ; 295E: 20 04 36 
     jsr     Colorize_Object                 ; 2961: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2964: 4C 1A 26 
@@ -3582,11 +3582,11 @@ Restore_Player_Objects_6
 
     pha                                     ; 2DF1: 48       
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2DF2: 20 E5 2F 
-    jsr     Load_Small_UDG_Addr_Setup_XY    ; 2DF5: 20 3D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 2DF5: 20 3D 37 
     pla                                     ; 2DF8: 68       
 
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2DF9: 20 E5 2F 
-    jmp     Load_Obj_UDG_RAM_Addr_Size_XY   ; 2DFC: 4C 8D 37 
+    jmp     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2DFC: 4C 8D 37 
 ; -----------------------
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
@@ -3856,9 +3856,9 @@ Rocket_Fuelled_Up_6
     sec                                     ; 2F21: 38       
     sbc     #$17                            ; 2F22: E9 17    
     sta     ZP0C                            ; 2F24: 85 0C     ZP0C_Col_RAM_Ptr_Lo
-    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 2F26: A5 0D     ZP0D_Col_RAM_Ptr_Hi
+    lda     ZP0D                            ; 2F26: A5 0D     ZP0D_Col_RAM_Ptr_Hi
     sbc     #$00                            ; 2F28: E9 00    
-    sta     ZP0D_Object_New_UDG_RAM_Hi      ; 2F2A: 85 0D     ZP0D_Col_RAM_Ptr_Hi
+    sta     ZP0D                            ; 2F2A: 85 0D     ZP0D_Col_RAM_Ptr_Hi
     dec     ZP02                            ; 2F2C: C6 02    
     bne     Rocket_Fuelled_Up_6             ; 2F2E: D0 E6    
     rts                                     ; 2F30: 60       
@@ -4017,12 +4017,12 @@ Setup_Object_Addr_Rocket_Fuel
 Setup_Object_Addr
     pha                                     ; 2FC3: 48       
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2FC4: 20 E5 2F 
-    jsr     Load_Small_UDG_Addr_Setup_XY    ; 2FC7: 20 3D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 2FC7: 20 3D 37 
     pla                                     ; 2FCA: 68       
 
 ; Do it again to setup the object dimensions
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2FCB: 20 E5 2F 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_XY   ; 2FCE: 20 8D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2FCE: 20 8D 37 
     jsr     Display_Object                  ; 2FD1: 20 4C 36 
     jsr     Colorize_Object                 ; 2FD4: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2FD7: 4C 1A 26 
@@ -4182,7 +4182,7 @@ Load_Rocket_or_Fuel_UDGs_1
 ; L_JSR_($305A)_($2F88) OK
 Load_Rocket_or_Fuel_UDGs_2
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 305A: 20 E5 2F 
-    jsr     Load_Small_UDG_Addr_Setup_XY    ; 305D: 20 3D 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 305D: 20 3D 37 
     jmp     Display_Object_With_Setup_B     ; 3060: 4C 04 36 
 ; -----------------------
 
@@ -5401,7 +5401,7 @@ Setup_Color_RAM_Ptr
     sta     ZP0C                            ; 350B: 85 0C     ZP0C_Col_RAM_Ptr_Lo
 
     lda     #$96                            ; 350D: A9 96     Store hi-byte of Color RAM
-    sta     ZP0D_Object_New_UDG_RAM_Hi      ; 350F: 85 0D     to pointer hi-byte.
+    sta     ZP0D                            ; 350F: 85 0D     to pointer hi-byte.
                                             ; ZP0D_Col_RAM_Ptr_Hi
     rts                                     ; 3511: 60       
 ; ===========================================================
@@ -5714,7 +5714,7 @@ Load_Object_Type_X_Y_Color
 ; L_JSR_($3601)_($2E99) OK
 ; L_JSR_($3601)_($3358) OK
 Display_Object_With_Setup_AB
-    jsr     Load_Small_UDG_Addr_Setup_XY_   ; 3601: 20 37 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_V_1  ; 3601: 20 37 37 
 
 ; L_JSR_($3604)_($295E) OK
 ; L_JSR_($3604)_($2DD4) OK
@@ -5728,7 +5728,7 @@ Display_Object_With_Setup_B
 
 ; L_JSR_($360D)_($28F9) OK
 Display_Object_With_Setup_CD
-    jsr     Load_Obj_UDG_RAM_Addr_Size_XY1  ; 360D: 20 8A 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_JM1  ; 360D: 20 8A 37 
 
 ; L_JSR_($3610)_($27DE) OK
 ; L_JSR_($3610)_($2828) OK
@@ -5797,8 +5797,8 @@ LOOP_362F
 ; L_JSR_($3646)_($2CC3) OK
 ; L_JSR_($3646)_($32F9) OK
 Display_Object_With_Setup
-    jsr     Load_Small_UDG_Addr_Setup_XY_   ; 3646: 20 37 37 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_XY1  ; 3649: 20 8A 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_V_1  ; 3646: 20 37 37 
+    jsr     Load_Obj_UDG_RAM_Addr_Size_JM1  ; 3649: 20 8A 37 
 
 ; L_JSR_($364C)_($27F4) OK
 ; L_JSR_($364C)_($2EB8) OK
@@ -5993,15 +5993,15 @@ Next_Object_New_Update_Params
     adc     #$B0                            ; 36FD: 69 B0    
     sta     ZP0C                            ; 36FF: 85 0C    
 
-    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 3701: A5 0D    
+    lda     ZP0D                            ; 3701: A5 0D    
     adc     #$00                            ; 3703: 69 00    
-    sta     ZP0D_Object_New_UDG_RAM_Hi      ; 3705: 85 0D    
+    sta     ZP0D                            ; 3705: 85 0D    
 
 ; Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
     lda     ZP0C                            ; 3707: A5 0C    
     sec                                     ; 3709: 38       
     sbc     #$D1                            ; 370A: E9 D1    
-    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 370C: A5 0D    
+    lda     ZP0D                            ; 370C: A5 0D    
     sbc     #$1E                            ; 370E: E9 1E    
     bcc     JMP_Display_Object              ; 3710: 90 0D    
 
@@ -6011,9 +6011,9 @@ Next_Object_New_Update_Params
     sbc     #$D0                            ; 3715: E9 D0    
     sta     ZP0C                            ; 3717: 85 0C    
 
-    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 3719: A5 0D    
+    lda     ZP0D                            ; 3719: A5 0D    
     sbc     #$0F                            ; 371B: E9 0F    
-    sta     ZP0D_Object_New_UDG_RAM_Hi      ; 371D: 85 0D    
+    sta     ZP0D                            ; 371D: 85 0D    
 
 ; L_BRS_($371F)_($3710) OK
 JMP_Display_Object
@@ -6048,77 +6048,89 @@ JMP_Next_Obj_New_Update_Params
 
 
 
-; 88      dP"Yb     db    8888b.      .dP"Y8 8b    d8    db    88     88
-; 88     dP   Yb   dPYb    8I  Yb     `Ybo." 88b  d88   dPYb   88     88
-; 88  .o Yb   dP  dP__Yb   8I  dY     o.`Y8b 88YbdP88  dP__Yb  88  .o 88  .o
-; 88ood8  YbodP  dP""""Yb 8888Y"      8bodP' 88 YY 88 dP""""Yb 88ood8 88ood8
+; 88      dP"Yb     db    8888b.       dP"Yb  88""Yb  88888
+; 88     dP   Yb   dPYb    8I  Yb     dP   Yb 88__dP     88
+; 88  .o Yb   dP  dP__Yb   8I  dY     Yb   dP 88""Yb o.  88
+; 88ood8  YbodP  dP""""Yb 8888Y"       YbodP  88oodP "bodP'
 
-; 88   88 8888b.   dP""b8        db    8888b.  8888b.  88""Yb
-; 88   88  8I  Yb dP   `"       dPYb    8I  Yb  8I  Yb 88__dP
-; Y8   8P  8I  dY Yb  "88      dP__Yb   8I  dY  8I  dY 88"Yb
-; `YbodP' 8888Y"   YboodP     dP""""Yb 8888Y"  8888Y"  88  Yb
+; 88   88 8888b.   dP""b8     88""Yb    db    8b    d8        db    8888b.  8888b.  88""Yb
+; 88   88  8I  Yb dP   `"     88__dP   dPYb   88b  d88       dPYb    8I  Yb  8I  Yb 88__dP
+; Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88      dP__Yb   8I  dY  8I  dY 88"Yb
+; `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88     dP""""Yb 8888Y"  8888Y"  88  Yb
+
+; .dP"Y8 88 8888P 888888     Yb    dP
+; `Ybo." 88   dP  88__        Yb  dP
+; o.`Y8b 88  dP   88""         YbdP
+; 8bodP' 88 d8888 888888        YP
 
 ; L_JSR_($3737)_($3601) OK
 ; L_JSR_($3737)_($3646) OK
-Load_Small_UDG_Addr_Setup_XY_
+Load_Obj_UDG_RAM_Addr_Size_V_1
     jsr     Load_Object_Type_X_Y_Color      ; 3737: 20 E9 35 
     jsr     Get_Obj_UDG_Data_Addr_JM_Ali_2  ; 373A: 20 15 38 
 
-; Load Small UDG address from A & Y
+; Store object UDG Addr from Y and A into ZP0E & 0F, minus $100
 ; L_JSR_($373D)_($27E7) OK
 ; L_JSR_($373D)_($295B) OK
 ; L_JSR_($373D)_($2DF5) OK
 ; L_JSR_($373D)_($2FC7) OK
 ; L_JSR_($373D)_($305D) OK
-Load_Small_UDG_Addr_Setup_XY
+Load_Obj_UDG_RAM_Addr_Size_V
     sty     ZP0E                            ; 373D: 84 0E    
     tay                                     ; 373F: A8       
     dey                                     ; 3740: 88       
     sty     ZP0F                            ; 3741: 84 0F    
 
-; Load UDG RAM XY coordinates
+; Store object position in ZP04 & 05
     lda     ZP18                            ; 3743: A5 18    
     sta     ZP04                            ; 3745: 85 04    
     lda     ZP19                            ; 3747: A5 19    
     sta     ZP05                            ; 3749: 85 05    
 
-; Load and store UDG addr, including X co-ord wrap
+; Convert object position XY pixel coordinates to UDG RAM address, managing X axis wrap.
+; Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
+; will move object into next UDG RAM column.
     ldy     #$FF                            ; 374B: A0 FF    
     lda     (ZP0E),y                        ; 374D: B1 0E    
     clc                                     ; 374F: 18       
     adc     ZP04                            ; 3750: 65 04    
     cmp     #SCREEN_WIDTH_PIXELS            ; 3752: C9 B8     $B8=screen width in pixels
-    bcc     Load_Small_UDG_Addr_Setup_XY_1  ; 3754: 90 03    
+    bcc     No_X_Wrap_                      ; 3754: 90 03    
     sec                                     ; 3756: 38       
-    sbc     #SCREEN_WIDTH_PIXELS            ; 3757: E9 B8     Wrap
+    sbc     #SCREEN_WIDTH_PIXELS            ; 3757: E9 B8    
 ; L_BRS_($3759)_($3754) OK
-Load_Small_UDG_Addr_Setup_XY_1
+No_X_Wrap_
     sta     ZP04                            ; 3759: 85 04    
     sta     ZP18                            ; 375B: 85 18    
-
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 375D: 20 1D 35 
+
+; ZP04/05 are now an address instead of X and Y coordinates.
+; Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
     lda     ZP04                            ; 3760: A5 04    
     sec                                     ; 3762: 38       
-    sbc     #$FF                            ; 3763: E9 FF    
-    sta     ZP0C                            ; 3765: 85 0C     ZP0C_Col_RAM_Ptr_Lo
-
+    sbc     #UDG_DATA_HEIGHT_PIXELS_OFFSET  ; 3763: E9 FF    
+    sta     ZP0C                            ; 3765: 85 0C    
     lda     ZP05                            ; 3767: A5 05    
     sbc     #$00                            ; 3769: E9 00    
-    sta     ZP0D_Object_New_UDG_RAM_Hi      ; 376B: 85 0D     ZP0D_Col_RAM_Ptr_Hi
+    sta     ZP0D                            ; 376B: 85 0D    
 
-    ldy     #$FE                            ; 376D: A0 FE    
+; Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
+    ldy     #UDG_DATA_WIDTH_BYTES_OFFSET    ; 376D: A0 FE    
     lda     (ZP0E),y                        ; 376F: B1 0E    
     sta     ZP15                            ; 3771: 85 15    
     sta     ZP16                            ; 3773: 85 16    
 
+; Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
     dey                                     ; 3775: 88       
     lda     (ZP0E),y                        ; 3776: B1 0E    
     sta     ZP0B                            ; 3778: 85 0B    
     sta     ZP17                            ; 377A: 85 17    
 
+; Subtract $03 from 16-bit object UDG Data addrress, i.e. so address
+; avoids the object dimension bytes
     lda     ZP0E                            ; 377C: A5 0E    
     sec                                     ; 377E: 38       
-    sbc     #$03                            ; 377F: E9 03    
+    sbc     #UDG_DATA_BITMAP_OFFSET         ; 377F: E9 03    
     sta     ZP0E                            ; 3781: 85 0E    
 
     lda     ZP0F                            ; 3783: A5 0F    
@@ -6141,14 +6153,14 @@ Load_Small_UDG_Addr_Setup_XY_1
 ; Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88      dP__Yb   8I  dY  8I  dY 88"Yb
 ; `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88     dP""""Yb 8888Y"  8888Y"  88  Yb
 
-; .dP"Y8 88 8888P 888888     Yb  dP Yb  dP
-; `Ybo." 88   dP  88__        YbdP   YbdP
-; o.`Y8b 88  dP   88""        dPYb    8P
-; 8bodP' 88 d8888 888888     dP  Yb  dP
+; .dP"Y8 88 8888P 888888      88888 8b    d8
+; `Ybo." 88   dP  88__           88 88b  d88
+; o.`Y8b 88  dP   88""       o.  88 88YbdP88
+; 8bodP' 88 d8888 888888     "bodP' 88 YY 88
 
 ; L_JSR_($378A)_($360D) OK
 ; L_JSR_($378A)_($3649) OK
-Load_Obj_UDG_RAM_Addr_Size_XY1
+Load_Obj_UDG_RAM_Addr_Size_JM1
     jsr     Get_Obj_UDG_Data_Addr_JM_Ali_1  ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
 
 ; Store object UDG Addr from Y and A into ZP06 & 07, minus $100
@@ -6159,7 +6171,7 @@ Load_Obj_UDG_RAM_Addr_Size_XY1
 ; L_JSR_($378D)_($2861) OK
 ; L_JMP_($378D)_($2DFC) OK
 ; L_JSR_($378D)_($2FCE) OK
-Load_Obj_UDG_RAM_Addr_Size_XY
+Load_Obj_UDG_RAM_Addr_Size_JM
     sty     ZP06                            ; 378D: 84 06    
     tay                                     ; 378F: A8       
     dey                                     ; 3790: 88       

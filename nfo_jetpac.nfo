@@ -2067,33 +2067,40 @@ comment  372D Test if both old and new object heights are the same, if yes, retu
 comment  3734
 label    3734 JMP_Next_Obj_New_Update_Params
 comment  3737
-label    3737 Load_Small_UDG_Addr_Setup_XY_
+label    3737 Load_Obj_UDG_RAM_Addr_Size_V_1
 comment  373D
-comment  373D Load Small UDG address from A & Y
-label    373D Load_Small_UDG_Addr_Setup_XY
+comment  373D Store object UDG Addr from Y and A into ZP0E & 0F, minus $100
+label    373D Load_Obj_UDG_RAM_Addr_Size_V
 comment  3743
-comment  3743 Load UDG RAM XY coordinates
+comment  3743 Store object position in ZP04 & 05
 comment  374B
-comment  374B Load and store UDG addr, including X co-ord wrap
+comment  374B Convert object position XY pixel coordinates to UDG RAM address, managing X axis wrap.
+comment  374B Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
+comment  374B will move object into next UDG RAM column.
 lcomment 3752 $B8=screen width in pixels
 deflabel 3753 SCREEN_WIDTH_PIXELS
-lcomment 3757 Wrap
 deflabel 3758 SCREEN_WIDTH_PIXELS
-label    3759 Load_Small_UDG_Addr_Setup_XY_1
-comment  375D
-lcomment 3765 ZP0C_Col_RAM_Ptr_Lo
-comment  3767
-lcomment 376B ZP0D_Col_RAM_Ptr_Hi
+label    3759 No_X_Wrap_
+comment  3760
+comment  3760 ZP04/05 are now an address instead of X and Y coordinates.
+comment  3760 Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
+deflabel 3764 UDG_DATA_HEIGHT_PIXELS_OFFSET
 comment  376D
+comment  376D Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
+deflabel 376E UDG_DATA_WIDTH_BYTES_OFFSET
 comment  3775
+comment  3775 Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
 comment  377C
+comment  377C Subtract $03 from 16-bit object UDG Data addrress, i.e. so address
+comment  377C avoids the object dimension bytes
+deflabel 3780 UDG_DATA_BITMAP_OFFSET
 comment  3783
 comment  378A
-label    378A Load_Obj_UDG_RAM_Addr_Size_XY1
+label    378A Load_Obj_UDG_RAM_Addr_Size_JM1
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
 comment  378D
 comment  378D Store object UDG Addr from Y and A into ZP06 & 07, minus $100
-label    378D Load_Obj_UDG_RAM_Addr_Size_XY
+label    378D Load_Obj_UDG_RAM_Addr_Size_JM
 comment  378D Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
 lcomment 3791 ZP07/06=$3BF7
 comment  3793

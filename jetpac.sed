@@ -61,7 +61,7 @@
 /ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
 /ZP16                            equ     $0016/a ZP16_Object_Size_X_Columns      equ     $0016
 /ZP17                            equ     $0017/a ZP17_Object_Size_Y_Pixels       equ     $0017
-/ZP18                            equ     $0018/a ZP18_Object_Position_X_         equ     $0018
+#/ZP18                            equ     $0018/a ZP18_Object_Position_X_         equ     $0018 ALREADY DEFINED
 /ZP19                            equ     $0019/a ZP19_Object_Position_Y          equ     $0019
 
 /; 381F/,/; 385E/s/ZP0A                           /ZP0A_Color_RAM_Tiles_X         /
@@ -70,11 +70,11 @@
 /; 381F/,/; 385E/s/(ZP0C),y                       /(ZP0C_Color_RAM_Tile_Addr_Lo),y/
 /; 381F/,/; 385E/s/ZP16                           /ZP16_Object_Size_X_Columns     /
 /; 381F/,/; 385E/s/ZP17                           /ZP17_Object_Size_Y_Pixels      /
-/; 381F/,/; 385E/s/ZP18                           /ZP18_Object_Position_X_        /
+#/; 381F/,/; 385E/s/ZP18                           /ZP18_Object_Position_X         / ALREADY DEFINED
 /; 381F/,/; 385E/s/ZP19                           /ZP19_Object_Position_Y         /
 
 
-# Set_UDG_RAM_Ptr_Object_Dimen
+# Load_Obj_UDG_RAM_Addr_Size_JM
 /ZP03                            equ     $0003/a ZP03_Object_Height_Pixels       equ     $0003
 /ZP04                            equ     $0004/a ZP04_Object_Position_X          equ     $0004
 /ZP05                            equ     $0005/a ZP05_Object_Position_Y          equ     $0005
@@ -82,7 +82,7 @@
 /ZP05                            equ     $0005/a ZP05_Object_UDG_RAM_Addr_Hi     equ     $0005
 /ZP06                            equ     $0006/a ZP06_Object_UDG_Data_Addr_Lo    equ     $0006
 /ZP07                            equ     $0007/a ZP07_Object_UDG_Data_Addr_Hi    equ     $0007
-/ZP10                            equ     $0010/a ZP10_Object_Position_X_         equ     $0010
+#/ZP10                            equ     $0010/a ZP10_Object_Position_X          equ     $0010 ALREADY DEFINED
 /ZP11                            equ     $0011/a ZP11_Object_Position_Y          equ     $0011
 /ZP14                            equ     $0014/a ZP14_Object_Width_Bytes         equ     $0014
 
@@ -96,6 +96,38 @@
 /; 378A/,/; 37D3/s/ZP06                           /ZP06_Object_UDG_Data_Addr_Lo   /
 /; 378A/,/; 37D3/s/(ZP06),y                       /(ZP06_Object_UDG_Data_Addr_Lo),y/
 /; 378A/,/; 37D3/s/ZP07                           /ZP07_Object_UDG_Data_Addr_Hi   /
-/; 378A/,/; 37D3/s/ZP10                           /ZP10_Object_Position_X_        /
+/; 378A/,/; 37D3/s/ZP10                           /ZP10_Object_Position_X         /
 /; 378A/,/; 37D3/s/ZP11                           /ZP11_Object_Position_Y         /
 /; 378A/,/; 37D3/s/ZP14                           /ZP14_Object_Width_Bytes        /
+
+# Load_Obj_UDG_RAM_Addr_Size_V
+#/ZP04                            equ     $0004/a ZP04_Object_UDG_RAM_Addr_Lo     equ     $0004 ALREADY DEFINED
+#/ZP05                            equ     $0005/a ZP05_Object_UDG_RAM_Addr_Hi     equ     $0005 ALREADY DEFINED
+/ZP0B                            equ     $000B/a ZP0B_Object_Height_Pixels       equ     $000B
+/ZP0C                            equ     $000C/a ZP0C_Object_UDG_RAM_Addr_Lo     equ     $000C
+/ZP0D                            equ     $000D/a ZP0D_Object_UDG_RAM_Addr_Hi     equ     $000D
+/ZP0E                            equ     $000E/a ZP0E_Object_UDG_Data_Addr_Lo    equ     $000E
+/ZP0F                            equ     $000F/a ZP0F_Object_UDG_Data_Addr_Hi    equ     $000F
+/ZP15                            equ     $0015/a ZP15_Object_Width_Bytes         equ     $0015
+/ZP16                            equ     $0016/a ZP16_Object_Width_Bytes         equ     $0016
+/ZP17                            equ     $0017/a ZP17_Object_Height_Pixels       equ     $0017
+#/ZP18                            equ     $0018/a ZP18_Object_Position_X          equ     $0018
+#/ZP19                            equ     $0019/a ZP19_Object_Position_Y          equ     $0019
+
+# Usages changes partway through routine - Start
+/; 3737/,/; 375F/s/ZP04                           /ZP04_Object_Position_X         /
+/; 3737/,/; 375F/s/ZP05                           /ZP05_Object_Position_Y         /
+/; 3760/,/; 3789/s/ZP04                           /ZP04_Object_UDG_RAM_Addr_Lo    /
+/; 3760/,/; 3789/s/ZP05                           /ZP05_Object_UDG_RAM_Addr_Hi    /
+# Usages changes partway through routine - End
+/; 3737/,/; 3789/s/ZP0B                           /ZP0B_Object_Height_Pixels      /
+/; 3737/,/; 3789/s/ZP0C                           /ZP0C_Object_UDG_RAM_Addr_Lo    /
+/; 3737/,/; 3789/s/ZP0D                           /ZP0D_Object_UDG_RAM_Addr_Hi    /
+/; 3737/,/; 3789/s/ZP0E                           /ZP0E_Object_UDG_Data_Addr_Lo   /
+/; 3737/,/; 3789/s/(ZP0E),y                       /(ZP0E_Object_UDG_Data_Addr_Lo),y/
+/; 3737/,/; 3789/s/ZP0F                           /ZP0F_Object_UDG_Data_Addr_Hi   /
+/; 3737/,/; 3789/s/ZP15                           /ZP15_Object_Width_Bytes        /
+/; 3737/,/; 3789/s/ZP16                           /ZP16_Object_Width_Bytes        /
+/; 3737/,/; 3789/s/ZP17                           /ZP17_Object_Height_Pixels      /
+/; 3737/,/; 3789/s/ZP18                           /ZP18_Object_Position_X         /
+/; 3737/,/; 3789/s/ZP19                           /ZP19_Object_Position_Y         /
