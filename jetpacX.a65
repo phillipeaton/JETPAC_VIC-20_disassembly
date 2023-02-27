@@ -20,9 +20,11 @@ ZP03                            equ     $0003
 ZP03_Object_Old_Height          equ     $0003
 ZP03_Object_Height_Pixels       equ     $0003
 ZP04                            equ     $0004
+ZP04_Object_Old_UDG_RAM_Lo      equ     $0004
 ZP04_Object_Position_X          equ     $0004
 ZP04_Object_UDG_RAM_Addr_Lo     equ     $0004
 ZP05                            equ     $0005
+ZP05_Object_Old_UDG_RAM_Hi      equ     $0005
 ZP05_Object_Position_Y          equ     $0005
 ZP05_Object_UDG_RAM_Addr_Hi     equ     $0005
 ZP06                            equ     $0006
@@ -43,9 +45,11 @@ ZP0B_Object_New_Height          equ     $000B
 ZP0B_Color_RAM_Tiles_Y          equ     $000B
 ZP0B_Object_Height_Pixels       equ     $000B
 ZP0C                            equ     $000C
+ZP0C_Object_New_UDG_RAM_Lo      equ     $000C
 ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
 ZP0C_Object_UDG_RAM_Addr_Lo     equ     $000C
 ZP0D                            equ     $000D
+ZP0D_Object_New_UDG_RAM_Hi      equ     $000D
 ZP0D_Object_UDG_RAM_Addr_Hi     equ     $000D
 ZP0E                            equ     $000E
 ZP0E_Object_New_UDG_Data_Lo     equ     $000E
@@ -56,6 +60,7 @@ ZP0F_Object_UDG_Data_Addr_Hi    equ     $000F
 ZP10                            equ     $0010
 ZP10_Object_Position_X          equ     $0010
 ZP11                            equ     $0011
+ZP11_Object_Old_Position_Y      equ     $0011
 ZP11_Object_Position_Y          equ     $0011
 ZP12                            equ     $0012
 ZP12_Object_Type                equ     $0012
@@ -76,6 +81,7 @@ ZP17_Object_Height_Pixels       equ     $0017
 ZP18                            equ     $0018
 ZP18_Object_Position_X          equ     $0018
 ZP19                            equ     $0019
+ZP19_Object_New_Position_Y      equ     $0019
 ZP19_Object_Position_Y          equ     $0019
 ZP1A                            equ     $001A
 ZP1A_Object_Type                equ     $001A
@@ -2101,7 +2107,7 @@ Display_Rocket_Flame_1
     sbc     #$01                            ; 27D6: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27D8: 20 2E 28 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27DB: 20 8D 37 
-    jsr     Display_Object_With_Setup_D     ; 27DE: 20 10 36 
+    jsr     Display_Object_With_Setup_4     ; 27DE: 20 10 36 
 ; L_BRS_($27E1)_($27CD) OK
 Display_Rocket_Flame_2
     lda     ZP_Rocket_Flame_Toggle          ; 27E1: A5 27    
@@ -2151,7 +2157,7 @@ Display_Flame
     sbc     #$01                            ; 2820: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 2822: 20 2E 28 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2825: 20 8D 37 
-    jsr     Display_Object_With_Setup_D     ; 2828: 20 10 36 
+    jsr     Display_Object_With_Setup_4     ; 2828: 20 10 36 
     jmp     Display_Rocket_Flame_3          ; 282B: 4C 0B 28 
 ; -----------------------
 ; Using A to toggle, Load A and Y with Ship UDG address
@@ -2211,7 +2217,7 @@ FP_1 jsr    Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35
     jsr     Get_Obj_UDG_Data_Addr_Ship_A    ; 285B: 20 DC 2F 
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 285E: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2861: 20 8D 37 
-    jsr     Display_Object_With_Setup_D     ; 2864: 20 10 36 
+    jsr     Display_Object_With_Setup_4     ; 2864: 20 10 36 
 
 ; Jetman pickup Gem/Elements/Gold etc = 250 points
     jsr     Load_ZP_Parameters              ; 2867: 20 9D 25 
@@ -2359,7 +2365,7 @@ Restore_Obj_List_Ptr
 
 ; L_JSR_($28F9)_($2C8C) OK
 Change_Object_To_Explosion_1
-    jsr     Display_Object_With_Setup_CD    ; 28F9: 20 0D 36 
+    jsr     Display_Object_With_Setup_3     ; 28F9: 20 0D 36 
 
 ; Reset Alien? object direction
     lda     #$00                            ; 28FC: A9 00    
@@ -2432,7 +2438,7 @@ Explosions_1
     tay                                     ; 2957: A8       
     lda     Explosion_UDG_Ptr+1,x           ; 2958: BD 68 29 
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 295B: 20 3D 37 
-    jsr     Display_Object_With_Setup_B     ; 295E: 20 04 36 
+    jsr     Display_Object_With_Setup_2     ; 295E: 20 04 36 
     jsr     Colorize_Object                 ; 2961: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2964: 4C 1A 26 
 ; -----------------------
@@ -3436,7 +3442,7 @@ Init_Alien_Object
     lda     Level_Alien_Color_Lookup,x      ; 2D44: BD 50 2D 
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2D47: 91 00    
 
-    jmp     Display_Object_With_Setup_AB    ; 2D49: 4C 01 36 
+    jmp     Display_Object_With_Setup_1     ; 2D49: 4C 01 36 
 ; -----------------------
 Level_Alien_Type_Lookup
     fcb     $05,$08,$07,$06                 ; 2D4C: 05 08 07 06 
@@ -3595,7 +3601,7 @@ Restore_Player_Objects_4
 ; L_BRS_($2DD1)_($2DDA) OK
 Restore_Player_Objects_5
     jsr     Restore_Player_Objects_6        ; 2DD1: 20 E8 2D 
-    jsr     Display_Object_With_Setup_B     ; 2DD4: 20 04 36 
+    jsr     Display_Object_With_Setup_2     ; 2DD4: 20 04 36 
     jsr     Dec_Saved_Obj_List_Params_by_10 ; 2DD7: 20 FF 2D 
     bne     Restore_Player_Objects_5        ; 2DDA: D0 F5    
     rts                                     ; 2DDC: 60       
@@ -3788,7 +3794,7 @@ ROCKET_BOTTOM_MODULE
     fcb     $FF                             ; 2E95: FF       
 
     jsr     Load_Object_Type_X_Y_Color      ; 2E96: 20 E9 35 
-    jsr     Display_Object_With_Setup_AB    ; 2E99: 20 01 36 
+    jsr     Display_Object_With_Setup_1     ; 2E99: 20 01 36 
 
     lda     #$00                            ; 2E9C: A9 00    
     sta     Obj_Jetman_State                ; 2E9E: 8D 80 03 
@@ -4223,7 +4229,7 @@ Load_Rocket_or_Fuel_UDGs_1
 Load_Rocket_or_Fuel_UDGs_2
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 305A: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 305D: 20 3D 37 
-    jmp     Display_Object_With_Setup_B     ; 3060: 4C 04 36 
+    jmp     Display_Object_With_Setup_2     ; 3060: 4C 04 36 
 ; -----------------------
 
 
@@ -5013,7 +5019,7 @@ READ_CONTROLS
     jsr     Flash_Score                     ; 3351: 20 65 34 
     dec     ZP_Flash_Score_Countdown        ; 3354: C6 5D    
     bne     Flash_Display_Score_JMP         ; 3356: D0 0F    
-    jsr     Display_Object_With_Setup_AB    ; 3358: 20 01 36 
+    jsr     Display_Object_With_Setup_1     ; 3358: 20 01 36 
     jsr     Colorize_Object                 ; 335B: 20 1F 38 
     jsr     Display_1UP_HI_2UP_Titles       ; 335E: 20 25 24 
     jsr     Display_P1_Score                ; 3361: 20 71 24 
@@ -5753,13 +5759,13 @@ Load_Object_Type_X_Y_Color
 ; L_JMP_($3601)_($2D49) OK
 ; L_JSR_($3601)_($2E99) OK
 ; L_JSR_($3601)_($3358) OK
-Display_Object_With_Setup_AB
+Display_Object_With_Setup_1
     jsr     Load_Obj_UDG_RAM_Addr_Size_V_1  ; 3601: 20 37 37 
 
 ; L_JSR_($3604)_($295E) OK
 ; L_JSR_($3604)_($2DD4) OK
 ; L_JMP_($3604)_($3060) OK
-Display_Object_With_Setup_B
+Display_Object_With_Setup_2
     lda     #$00                            ; 3604: A9 00    
     sta     ZP14_Object_Old_Width_Bytes     ; 3606: 85 14    
     sta     ZP03_Object_Old_Height          ; 3608: 85 03    
@@ -5767,13 +5773,13 @@ Display_Object_With_Setup_B
 ; -----------------------
 
 ; L_JSR_($360D)_($28F9) OK
-Display_Object_With_Setup_CD
+Display_Object_With_Setup_3
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM1  ; 360D: 20 8A 37 
 
 ; L_JSR_($3610)_($27DE) OK
 ; L_JSR_($3610)_($2828) OK
 ; L_JSR_($3610)_($2864) OK
-Display_Object_With_Setup_D
+Display_Object_With_Setup_4
     lda     #$00                            ; 3610: A9 00    
     sta     ZP15_Object_New_Width_Bytes     ; 3612: 85 15    
     sta     ZP0B_Object_New_Height          ; 3614: 85 0B    
@@ -5807,19 +5813,19 @@ Erase_Object_Moving_Downward
     sta     ZP0A_Object_New_Height_Index    ; 362B: 85 0A    
 
 ; Erase old object data bytes from UDG data to screen RAM by EXORing
-; ZP09 offset decrements from $FF, ZP0E holds address of old UDG object data,
+; ZP09 index decrements from $FF, ZP0E holds address of old UDG object data,
 ; ZP0C holds address of object data on screen to be written to
     ldy     ZP09_Object_New_Y_Index         ; 362D: A4 09    
 ; L_BRS_($362F)_($3637) OK
-LOOP_362F
+Loop_Erase_Down
     lda     (ZP0E_Object_New_UDG_Data_Lo),y ; 362F: B1 0E    
-    eor     (ZP0C),y                        ; 3631: 51 0C    
-    sta     (ZP0C),y                        ; 3633: 91 0C    
+    eor     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 3631: 51 0C    
+    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 3633: 91 0C    
 
 ; Decrement pointer into UDG data and the loop index
     dey                                     ; 3635: 88       
     dex                                     ; 3636: CA       
-    bne     LOOP_362F                       ; 3637: D0 F6    
+    bne     Loop_Erase_Down                 ; 3637: D0 F6    
 
 ; Restore the number of pixel lines to erased and store to ZP13, then subtract it from
 ; ZP09, the updated address offset for erase/draw the first/next part of the new object
@@ -5853,32 +5859,30 @@ Display_Object
     sta     ZP08_Object_Old_Y_Index         ; 364E: 85 08    
     sta     ZP09_Object_New_Y_Index         ; 3650: 85 09    
 
-; ZP03 contains the height of a object tile, from the UDG graphics data
-; e.g. Alien cross object height is $0A pixels/lines
+; ZP03 & ZP0B contain heights of the old and new object bitmaps from the UDG graphics data
+; e.g. Alien Cross object height is $0A pixels/lines
 ; Rocket is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
     lda     ZP03_Object_Old_Height          ; 3652: A5 03    
     sta     ZP02_Object_Old_Height_Index    ; 3654: 85 02    
 
-; ZP0B contains what...needs more analysis, but appears to hold the same as ZP03
     lda     ZP0B_Object_New_Height          ; 3656: A5 0B    
     sta     ZP0A_Object_New_Height_Index    ; 3658: 85 0A    
 
 ; Test if updated object Y position has changed, if yes, horizontal pixels can be erased
 ; from top or bottom of old object that are outside new object position, else jump
 ; directly to erase/draw routine
-    lda     ZP11                            ; 365A: A5 11    
+    lda     ZP11_Object_Old_Position_Y      ; 365A: A5 11    
     sec                                     ; 365C: 38       
-    sbc     ZP19                            ; 365D: E5 19    
+    sbc     ZP19_Object_New_Position_Y      ; 365D: E5 19    
     beq     Erase_Old_Object                ; 365F: F0 27    
     bmi     Erase_Object_Moving_Downward    ; 3661: 30 B6    
 
 ; Erase_Object_Moving_Upward, see also comments for Erase_Object_Moving_Downward
-; Note code from 361E & 3663 is basically the same until Erase_Draw, but
-; using old and new object parameters
+; as it's basically the same code with a few tweaks
     cmp     ZP03_Object_Old_Height          ; 3663: C5 03    
     bcs     Erase_Old_Object                ; 3665: B0 21    
 
-; Set X as number of Y pixel-lines to erase only i.e. no following draw for this object
+; Set X to number of Y pixel-lines to be erased only i.e. no following draw for this object
     tax                                     ; 3667: AA       
 
 ; Subtract number of Y erase-only pixels from total object tile height and store to loop
@@ -5892,19 +5896,19 @@ Display_Object
     sta     ZP02_Object_Old_Height_Index    ; 3670: 85 02    
 
 ; Erase old object data bytes from UDG data to screen RAM by EXORing
-; ZP08 offset decrements from $FF, ZP06 holds address of old UDG object data,
+; ZP08 index decrements from $FF, ZP06 holds address of old UDG object data,
 ; ZP04 holds address of object data on screen to be written to
     ldy     ZP08_Object_Old_Y_Index         ; 3672: A4 08    
 ; L_BRS_($3674)_($367C) OK
-LOOP_3674
+Loop_Erase_Up
     lda     (ZP06_Object_Old_UDG_Data_Lo),y ; 3674: B1 06    
-    eor     (ZP04),y                        ; 3676: 51 04    
-    sta     (ZP04),y                        ; 3678: 91 04    
+    eor     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3676: 51 04    
+    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3678: 91 04    
 
 ; Decrement pointer into UDG data and the loop index
     dey                                     ; 367A: 88       
     dex                                     ; 367B: CA       
-    bne     LOOP_3674                       ; 367C: D0 F6    
+    bne     Loop_Erase_Up                   ; 367C: D0 F6    
 
 ; Restore the number of pixel lines to erased and store to ZP13, then subtract it from
 ; ZP08, the updated address offset for erase/draw the first/next part of the new object
@@ -5935,8 +5939,8 @@ Erase_Old_Object
 ; EXOR object data bytes from UDG data to screen RAM to erase
     ldy     ZP08_Object_Old_Y_Index         ; 368E: A4 08    
     lda     (ZP06_Object_Old_UDG_Data_Lo),y ; 3690: B1 06    
-    eor     (ZP04),y                        ; 3692: 51 04    
-    sta     (ZP04),y                        ; 3694: 91 04    
+    eor     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3692: 51 04    
+    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3694: 91 04    
 
     dec     ZP08_Object_Old_Y_Index         ; 3696: C6 08    
 
@@ -5951,8 +5955,8 @@ Draw_New_Object
 ; EXOR object data bytes from UDG data to screen RAM to draw
     ldy     ZP09_Object_New_Y_Index         ; 369E: A4 09    
     lda     (ZP0E_Object_New_UDG_Data_Lo),y ; 36A0: B1 0E    
-    eor     (ZP0C),y                        ; 36A2: 51 0C    
-    sta     (ZP0C),y                        ; 36A4: 91 0C    
+    eor     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 36A2: 51 0C    
+    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 36A4: 91 0C    
 
     dec     ZP09_Object_New_Y_Index         ; 36A6: C6 09    
     jmp     Erase_Old_Object                ; 36A8: 4C 88 36 
@@ -5981,39 +5985,39 @@ Next_Object_Old_Update_Params
     sta     ZP07_Object_Old_UDG_Data_Hi     ; 36C0: 85 07    
 
 ; Move UDG RAM pointer to next vertical column
-    lda     ZP04                            ; 36C2: A5 04    
+    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36C2: A5 04    
     clc                                     ; 36C4: 18       
     adc     #SCREEN_HEIGHT_PIXELS           ; 36C5: 69 B0    
-    sta     ZP04                            ; 36C7: 85 04    
+    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 36C7: 85 04    
 
-    lda     ZP05                            ; 36C9: A5 05    
+    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36C9: A5 05    
     adc     #$00                            ; 36CB: 69 00    
-    sta     ZP05                            ; 36CD: 85 05    
+    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 36CD: 85 05    
 
 ; Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
-    lda     ZP04                            ; 36CF: A5 04    
+    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36CF: A5 04    
     sec                                     ; 36D1: 38       
     sbc     #$D1                            ; 36D2: E9 D1    
-    lda     ZP05                            ; 36D4: A5 05    
+    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36D4: A5 05    
     sbc     #$1E                            ; 36D6: E9 1E    
     bcc     Next_Object_New_Update_Params   ; 36D8: 90 0D    
 
 ; Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16 x $17 x 8=$FD0
-    lda     ZP04                            ; 36DA: A5 04    
+    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36DA: A5 04    
     sec                                     ; 36DC: 38       
     sbc     #$D0                            ; 36DD: E9 D0    
-    sta     ZP04                            ; 36DF: 85 04    
+    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 36DF: 85 04    
 
-    lda     ZP05                            ; 36E1: A5 05    
+    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36E1: A5 05    
     sbc     #$0F                            ; 36E3: E9 0F    
-    sta     ZP05                            ; 36E5: 85 05    
+    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 36E5: 85 05    
 
 ; Test if new object fully drawn, if not, move to the next vertical column to draw
 ; L_BRS_($36E7)_($36D8) OK
 ; L_JMP_($36E7)_($3734) OK
 Next_Object_New_Update_Params
     lda     ZP15_Object_New_Width_Bytes     ; 36E7: A5 15    
-    beq     JMP_Display_Object_Zero_ZP0B    ; 36E9: F0 37    
+    beq     Zero_ZP0B_JMP_Display_Object    ; 36E9: F0 37    
 
     dec     ZP15_Object_New_Width_Bytes     ; 36EB: C6 15    
 
@@ -6028,32 +6032,32 @@ Next_Object_New_Update_Params
     sta     ZP0F_Object_New_UDG_Data_Hi     ; 36F8: 85 0F    
 
 ; Move UDG RAM pointer to next vertical column
-    lda     ZP0C                            ; 36FA: A5 0C    
+    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 36FA: A5 0C    
     clc                                     ; 36FC: 18       
-    adc     #$B0                            ; 36FD: 69 B0    
-    sta     ZP0C                            ; 36FF: 85 0C    
+    adc     #SCREEN_HEIGHT_PIXELS           ; 36FD: 69 B0    
+    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 36FF: 85 0C    
 
-    lda     ZP0D                            ; 3701: A5 0D    
+    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 3701: A5 0D    
     adc     #$00                            ; 3703: 69 00    
-    sta     ZP0D                            ; 3705: 85 0D    
+    sta     ZP0D_Object_New_UDG_RAM_Hi      ; 3705: 85 0D    
 
 ; Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
-    lda     ZP0C                            ; 3707: A5 0C    
+    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 3707: A5 0C    
     sec                                     ; 3709: 38       
     sbc     #$D1                            ; 370A: E9 D1    
-    lda     ZP0D                            ; 370C: A5 0D    
+    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 370C: A5 0D    
     sbc     #$1E                            ; 370E: E9 1E    
     bcc     JMP_Display_Object              ; 3710: 90 0D    
 
 ; Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16 x $17 x 8=$FD0
-    lda     ZP0C                            ; 3712: A5 0C    
+    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 3712: A5 0C    
     sec                                     ; 3714: 38       
     sbc     #$D0                            ; 3715: E9 D0    
-    sta     ZP0C                            ; 3717: 85 0C    
+    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 3717: 85 0C    
 
-    lda     ZP0D                            ; 3719: A5 0D    
+    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 3719: A5 0D    
     sbc     #$0F                            ; 371B: E9 0F    
-    sta     ZP0D                            ; 371D: 85 0D    
+    sta     ZP0D_Object_New_UDG_RAM_Hi      ; 371D: 85 0D    
 
 ; L_BRS_($371F)_($3710) OK
 JMP_Display_Object
@@ -6061,7 +6065,7 @@ JMP_Display_Object
 ; -----------------------
 
 ; L_BRS_($3722)_($36E9) OK
-JMP_Display_Object_Zero_ZP0B
+Zero_ZP0B_JMP_Display_Object
     lda     #$00                            ; 3722: A9 00    
     sta     ZP0B_Object_New_Height          ; 3724: 85 0B    
     jmp     Display_Object                  ; 3726: 4C 4C 36 
@@ -6110,6 +6114,7 @@ Load_Obj_UDG_RAM_Addr_Size_V_1
     jsr     Get_Obj_UDG_Data_Addr_JM_Ali_2  ; 373A: 20 15 38 
 
 ; Store object UDG Addr from Y and A into ZP0E & 0F, minus $100
+; Valuables, Platforms etc.
 ; L_JSR_($373D)_($27E7) OK
 ; L_JSR_($373D)_($295B) OK
 ; L_JSR_($373D)_($2DF5) OK
@@ -6134,7 +6139,7 @@ Load_Obj_UDG_RAM_Addr_Size_V
     lda     (ZP0E_Object_UDG_Data_Addr_Lo),y ; 374D: B1 0E    
     clc                                     ; 374F: 18       
     adc     ZP04_Object_Position_X          ; 3750: 65 04    
-    cmp     #SCREEN_WIDTH_PIXELS            ; 3752: C9 B8     $B8=screen width in pixels
+    cmp     #SCREEN_WIDTH_PIXELS            ; 3752: C9 B8    
     bcc     No_X_Wrap_                      ; 3754: 90 03    
     sec                                     ; 3756: 38       
     sbc     #SCREEN_WIDTH_PIXELS            ; 3757: E9 B8    
@@ -6146,11 +6151,11 @@ No_X_Wrap_
 
 ; ZP04/05 are now an address instead of X and Y coordinates.
 ; Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
-    lda     ZP04_Object_Position_X          ; 3760: A5 04    
+    lda     ZP04_Object_UDG_RAM_Addr_Lo     ; 3760: A5 04    
     sec                                     ; 3762: 38       
     sbc     #UDG_DATA_HEIGHT_PIXELS_OFFSET  ; 3763: E9 FF    
     sta     ZP0C_Object_UDG_RAM_Addr_Lo     ; 3765: 85 0C    
-    lda     ZP05_Object_Position_Y          ; 3767: A5 05    
+    lda     ZP05_Object_UDG_RAM_Addr_Hi     ; 3767: A5 05    
     sbc     #$00                            ; 3769: E9 00    
     sta     ZP0D_Object_UDG_RAM_Addr_Hi     ; 376B: 85 0D    
 
@@ -6204,6 +6209,7 @@ Load_Obj_UDG_RAM_Addr_Size_JM1
     jsr     Get_Obj_UDG_Data_Addr_JM_Ali_1  ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
 
 ; Store object UDG Addr from Y and A into ZP06 & 07, minus $100
+; Jetman, Rocket Modules, Aliens
 ; Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
 ; L_JSR_($378D)_($27DB) OK
 ; L_JSR_($378D)_($27F1) OK
@@ -6417,9 +6423,9 @@ Get_Obj_UDG_Data_Addr_JM_Ali_2
 ; L_JSR_($381F)_($335B) OK
 Colorize_Object
     lda     ZP18                            ; 381F: A5 18    
-    sta     ZP04_Object_Position_X          ; 3821: 85 04    
+    sta     ZP04                            ; 3821: 85 04    
     lda     ZP19_Object_Position_Y          ; 3823: A5 19    
-    sta     ZP05_Object_Position_Y          ; 3825: 85 05    
+    sta     ZP05                            ; 3825: 85 05    
 
 ; Setup Color RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
     jsr     Setup_Color_RAM_Ptr             ; 3827: 20 F7 34 

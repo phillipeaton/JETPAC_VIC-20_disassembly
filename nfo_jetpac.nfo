@@ -1938,13 +1938,13 @@ deflabel 35F5 OBJECT_Y_POSITION_PARAM
 comment  35FA
 deflabel 35FB OBJECT_COLOR_PARAM
 comment  3601
-label    3601 Display_Object_With_Setup_AB
+label    3601 Display_Object_With_Setup_1
 comment  3604
-label    3604 Display_Object_With_Setup_B
+label    3604 Display_Object_With_Setup_2
 comment  360D
-label    360D Display_Object_With_Setup_CD
+label    360D Display_Object_With_Setup_3
 comment  3610
-label    3610 Display_Object_With_Setup_D
+label    3610 Display_Object_With_Setup_4
 comment  3619
 comment  3619 When object is moving down the screen, the number of pixels it has moved down by will result
 comment  3619 in a number of pixel lines at the top of the object that need to be EXOR'd to erase them
@@ -1960,9 +1960,9 @@ comment  3623 index for later
 comment  3626
 comment  362D
 comment  362D Erase old object data bytes from UDG data to screen RAM by EXORing
-comment  362D ZP09 offset decrements from $FF, ZP0E holds address of old UDG object data,
+comment  362D ZP09 index decrements from $FF, ZP0E holds address of old UDG object data,
 comment  362D ZP0C holds address of object data on screen to be written to
-label    362F LOOP_362F
+label    362F Loop_Erase_Down
 comment  3635
 comment  3635 Decrement pointer into UDG data and the loop index
 comment  3639
@@ -1976,30 +1976,28 @@ comment  364C
 label    364C Display_Object
 comment  364E ZP08 and ZP09 used as index into UDG RAM for old object and new object data
 comment  3652
-comment  3652 ZP03 contains the height of a object tile, from the UDG graphics data
-comment  3652 e.g. Alien cross object height is $0A pixels/lines
+comment  3652 ZP03 & ZP0B contain heights of the old and new object bitmaps from the UDG graphics data
+comment  3652 e.g. Alien Cross object height is $0A pixels/lines
 comment  3652 Rocket is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
 comment  3656
-comment  3656 ZP0B contains what...needs more analysis, but appears to hold the same as ZP03
 comment  365A
 comment  365A Test if updated object Y position has changed, if yes, horizontal pixels can be erased
 comment  365A from top or bottom of old object that are outside new object position, else jump
 comment  365A directly to erase/draw routine
 comment  3663
 comment  3663 Erase_Object_Moving_Upward, see also comments for Erase_Object_Moving_Downward
-comment  3663 Note code from 361E & 3663 is basically the same until Erase_Draw, but
-comment  3663 using old and new object parameters
+comment  3663 as it's basically the same code with a few tweaks
 comment  3667
-comment  3667 Set X as number of Y pixel-lines to erase only i.e. no following draw for this object
+comment  3667 Set X to number of Y pixel-lines to be erased only i.e. no following draw for this object
 comment  3668
 comment  3668 Subtract number of Y erase-only pixels from total object tile height and store to loop
 comment  3668 index for later
 comment  366B
 comment  3672
 comment  3672 Erase old object data bytes from UDG data to screen RAM by EXORing
-comment  3672 ZP08 offset decrements from $FF, ZP06 holds address of old UDG object data,
+comment  3672 ZP08 index decrements from $FF, ZP06 holds address of old UDG object data,
 comment  3672 ZP04 holds address of object data on screen to be written to
-label    3674 LOOP_3674
+label    3674 Loop_Erase_Up
 comment  367A
 comment  367A Decrement pointer into UDG data and the loop index
 comment  367E
@@ -2050,6 +2048,7 @@ comment  36ED Move UDG data 16-bit address pointer to the object data for the ne
 comment  36F4
 comment  36FA
 comment  36FA Move UDG RAM pointer to next vertical column
+deflabel 36FE SCREEN_HEIGHT_PIXELS
 comment  3701
 comment  3707
 comment  3707 Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
@@ -2059,7 +2058,7 @@ comment  3719
 comment  371F
 label    371F JMP_Display_Object
 comment  3722
-label    3722 JMP_Display_Object_Zero_ZP0B
+label    3722 Zero_ZP0B_JMP_Display_Object
 comment  3729
 label    3729 Object_Width_Complete
 comment  372D
@@ -2070,6 +2069,7 @@ comment  3737
 label    3737 Load_Obj_UDG_RAM_Addr_Size_V_1
 comment  373D
 comment  373D Store object UDG Addr from Y and A into ZP0E & 0F, minus $100
+comment  373D Valuables, Platforms etc.
 label    373D Load_Obj_UDG_RAM_Addr_Size_V
 comment  3743
 comment  3743 Store object position in ZP04 & 05
@@ -2077,7 +2077,6 @@ comment  374B
 comment  374B Convert object position XY pixel coordinates to UDG RAM address, managing X axis wrap.
 comment  374B Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
 comment  374B will move object into next UDG RAM column.
-lcomment 3752 $B8=screen width in pixels
 deflabel 3753 SCREEN_WIDTH_PIXELS
 deflabel 3758 SCREEN_WIDTH_PIXELS
 label    3759 No_X_Wrap_
@@ -2100,8 +2099,9 @@ label    378A Load_Obj_UDG_RAM_Addr_Size_JM1
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
 comment  378D
 comment  378D Store object UDG Addr from Y and A into ZP06 & 07, minus $100
-label    378D Load_Obj_UDG_RAM_Addr_Size_JM
+comment  378D Jetman, Rocket Modules, Aliens
 comment  378D Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
+label    378D Load_Obj_UDG_RAM_Addr_Size_JM
 lcomment 3791 ZP07/06=$3BF7
 comment  3793
 comment  3793 Store object position in ZP04 & 05
