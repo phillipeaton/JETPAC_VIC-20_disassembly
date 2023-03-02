@@ -26,7 +26,7 @@ label      17 ZP17                                ; 04 Connected somehow. Shuffl
 label      18 ZP18                                ; 07 Prev. ZP18_Object_New_Position_X
 label      19 ZP19                                ; 12 Prev. ZP19_Object_New_Position_Y
 label      1A ZP1A                                ; 03 Prev. ZP1A_Object_Type_New
-label      1B ZP1B_Object_Color_New               ; 10 Save_Obj_List_Params 2
+label      1B ZP1B                                ; 10 Prev. ZP1B_Object_Color_New
 label      1C ZP1C_Jetman_Action ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 ;                               1111 1111 = No action
 ;                               1xxx xxxx = Not moving right

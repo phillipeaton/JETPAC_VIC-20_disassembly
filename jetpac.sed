@@ -152,3 +152,38 @@
 /; 3737/,/; 3789/s/ZP17                           /ZP17_Object_Height_Pixels      /
 /; 3737/,/; 3789/s/ZP18                           /ZP18_Object_Position_X         /
 /; 3737/,/; 3789/s/ZP19                           /ZP19_Object_Position_Y         /
+
+
+#Load_Object_Type_X_Y
+#/ZP10                            equ     $0010/a ZP10_Object_Position_X          equ     $0010
+#/ZP11                            equ     $0011/a ZP11_Object_Position_Y          equ     $0011
+#/ZP12                            equ     $0012/a ZP12_Object_Type                equ     $0012
+
+/; 35D7/,/; 35E8/s/ZP10                           /ZP10_Object_Position_X         /
+/; 35D7/,/; 35E8/s/ZP11                           /ZP11_Object_Position_Y         /
+/; 35D7/,/; 35E8/s/ZP12                           /ZP12_Object_Type               /
+
+
+#Load_Object_Type_X_Y_Color
+#/ZP18                            equ     $0018/a ZP18_Object_Position_X          equ     $0018
+#/ZP19                            equ     $0019/a ZP19_Object_Position_Y          equ     $0019
+#/ZP1A                            equ     $001A/a ZP1A_Object_Type                equ     $001A
+/ZP1B                            equ     $001B/a ZP1B_Object_Color               equ     $001B
+
+/; 35E9/,/; 3600/s/ZP18                           /ZP18_Object_Position_X         /
+/; 35E9/,/; 3600/s/ZP19                           /ZP19_Object_Position_Y         /
+/; 35E9/,/; 3600/s/ZP1A                           /ZP1A_Object_Type               /
+/; 35E9/,/; 3600/s/ZP1B                           /ZP1B_Object_Color              /
+
+#Copy_Char_To_UDG_RAM
+/ZP04                            equ     $0004/a ZP04_UDG_RAM_Addr_Lo            equ     $0004
+/ZP05                            equ     $0005/a ZP05_UDG_RAM_Addr_Hi            equ     $0005
+/ZP06                            equ     $0006/a ZP06_Char_ROM_Data_Addr_Lo      equ     $0006
+/ZP07                            equ     $0007/a ZP07_Char_ROM_Data_Addr_Hi      equ     $0007
+
+/; 3595/,/; 35D4/s/ZP04                           /ZP04_UDG_RAM_Addr_Lo           /
+/; 3595/,/; 35D4/s/(ZP04),y                       /(ZP04_UDG_RAM_Addr_Lo),y       /
+/; 3595/,/; 35D4/s/ZP05                           /ZP05_UDG_RAM_Addr_Hi           /
+/; 3595/,/; 35D4/s/ZP06                           /ZP06_Char_ROM_Data_Addr_Lo     /
+/; 3595/,/; 35D4/s/(ZP06),y                       /(ZP06_Char_ROM_Data_Addr_Lo),y /
+/; 3595/,/; 35D4/s/ZP07                           /ZP07_Char_ROM_Data_Addr_Hi     /
