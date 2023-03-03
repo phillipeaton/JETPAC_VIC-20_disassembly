@@ -4,7 +4,7 @@ label 0100-01ff Stack
 ;label 0200-03ff OS_Data
 label 0200-02FF Screen_RAM
 label 0300-03FF Other_RAM
-label 0400-0fff Block0_3K_RAM
+;label 0400-0fff Block0_3K_RAM * Removed, else branch labels don't show-up
 ;label 1000-11ff Screen_RAM
 ;label 1200-1fff Std_3.5k_RAM
 label 1000-1fff UDG_RAM * User-Defined Graphics characters

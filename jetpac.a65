@@ -5428,6 +5428,8 @@ Color_RAM_Row_Offsets
 ;  dP__Yb   8I  dY  8I  dY 88"Yb
 ; dP""""Yb 8888Y"  8888Y"  88  Yb
 
+; Example for "F7 JOYSTICK" start position
+; Convert X=$18 pixels from left, Y=$68 pixels from top, to UDG RAM Address $1278
 ; L_JSR_($351D)_($21BE) OK
 ; L_JSR_($351D)_($226E) OK
 ; L_JSR_($351D)_($24FD) OK
@@ -5437,38 +5439,47 @@ Color_RAM_Row_Offsets
 ; L_JSR_($351D)_($375D) OK
 ; L_JSR_($351D)_($37AB) OK
 Convert_XY_to_UDG_RAM_Addr
-    lda     ZP05                            ; 351D: A5 05     Addr_To = 18 68, as example i.e. X=$18 pixels from left, Y=$68 pixels from top
-    tay                                     ; 351F: A8        Addr_To = 18 xx, 68 stashed to Y
+    lda     ZP05                            ; 351D: A5 05     Y = $68
+    tay                                     ; 351F: A8       
 
-    lda     ZP04                            ; 3520: A5 04     Get Addr_To lo-byte, divide by 8, example = $18/8=3
+; Get Addr_To lo-byte by dividing X by 8, example $18/8 = 3
+    lda     ZP04                            ; 3520: A5 04     X = $18
     lsr     a                               ; 3522: 4A       
     lsr     a                               ; 3523: 4A       
-    lsr     a                               ; 3524: 4A       
+    lsr     a                               ; 3524: 4A        X = $03
     tax                                     ; 3525: AA       
-    lda     UDG_RAM_Column_Offsets,x        ; 3526: BD 45 35  Load Column offset (4th item = $21)
-    sta     ZP04                            ; 3529: 85 04     Store back to Addr_To lo-byte, Addr_To = 21 xx
-    lda     #$00                            ; 352B: A9 00     Reset Addr_To hi-byte to 00
-    sta     ZP05                            ; 352D: 85 05     Addr_To = 21 xx
 
-    ldx     #$04                            ; 352F: A2 04     Rotate left Addr_To by 4 bits
+; Load from column offset table (4th item = $21)
+    lda     UDG_RAM_Column_Offsets,x        ; 3526: BD 45 35 
+    sta     ZP04                            ; 3529: 85 04    
+    lda     #$00                            ; 352B: A9 00    
+    sta     ZP05                            ; 352D: 85 05     ZP05/04 = $0021
+
+; Rotate 16-bit address left by 4 bits
+    ldx     #$04                            ; 352F: A2 04    
 ; L_BRS_($3531)_($3536) OK
-Convert_XY_to_UDG_RAM_Addr_1
+Loop_Rotate
     asl     ZP04                            ; 3531: 06 04    
     rol     ZP05                            ; 3533: 26 05    
     dex                                     ; 3535: CA       
-    bne     Convert_XY_to_UDG_RAM_Addr_1    ; 3536: D0 F9     Addr_To = 1x x2
+    bne     Loop_Rotate                     ; 3536: D0 F9     ZP05/04 $0021 > $0210
 
-    tya                                     ; 3538: 98        Get stashed Y = 68 to A
+; Add stashed Y = $68 to address in ZP05/04
+    tya                                     ; 3538: 98       
     clc                                     ; 3539: 18       
     adc     ZP04                            ; 353A: 65 04    
-    sta     ZP04                            ; 353C: 85 04     Addr_To = 78 x2
+    sta     ZP04                            ; 353C: 85 04     ZP05/04 = $0278
+
+; Add $1000 to address in ZP05/04 to become $1278 i.e. "F7 JOYSTICK" start position
     lda     #$10                            ; 353E: A9 10    
     adc     ZP05                            ; 3540: 65 05    
-    sta     ZP05                            ; 3542: 85 05     Addr_To = 78 12 = "F7 JOYSTICK" start position
+    sta     ZP05                            ; 3542: 85 05     ZP05/04 = $1278
     rts                                     ; 3544: 60       
 ; ===========================================================
+
+; Bytes are middle two numbers in UDG RAM addr starting at $1000 e.g. $10B0, $1160 etc
 UDG_RAM_Column_Offsets
-    fcb     $00,$0B,$16,$21,$2C,$37,$42,$4D ; 3545: 00 0B 16 21 2C 37 42 4D  Bytes are middle two numbers in addr e.g. 10b0, 1160 etc
+    fcb     $00,$0B,$16,$21,$2C,$37,$42,$4D ; 3545: 00 0B 16 21 2C 37 42 4D 
     fcb     $58,$63,$6E,$79,$84,$8F,$9A,$A5 ; 354D: 58 63 6E 79 84 8F 9A A5 
     fcb     $B0,$BB,$C6,$D1,$DC,$E7,$F2     ; 3555: B0 BB C6 D1 DC E7 F2 
 
@@ -5481,13 +5492,7 @@ UDG_RAM_Column_Offsets
 ; 88"Yb  88""   o.`Y8b 88""     88       88"Yb   dP__Yb  88YbdP88
 ; 88  Yb 888888 8bodP' 888888   88       88  Yb dP""""Yb 88 YY 88
 
-; ----------------------------------------------------------
-; Reset RAM by filling with a data byte
-; ----------------------------------------------------------
-; ARGUMENTS : ZP_01 = number of bytes to fill
-;             ZP_02 = start address to fill from
-;             ZP_04 = Data byte to fill with
-; ----------------------------------------------------------
+; Fill 11 rows x 23 columns = 253 bytes = $FD bytes i.e. Color_RAM $9600 to $96FC
 ; L_JSR_($355C)_($2416) OK
 Reset_Color_RAM
     jsr     Load_ZP_Parameters              ; 355C: 20 9D 25 
@@ -5496,11 +5501,12 @@ Reset_Color_RAM
     fcb     $04                             ; 3562: 04       
     fdb     Color_RAM                       ; 3563: 00 96     Start address of bytes to fill
     fcb     $06                             ; 3565: 06       
-    fdb     $0001                           ; 3566: 01 00     Data to fill with (i.e. $01)
+    fdb     $0001                           ; 3566: 01 00     Data byte to fill with (i.e. $01)
     fcb     $FF                             ; 3568: FF       
-    jmp     Reset_RAM                       ; 3569: 4C 79 35 
+    jmp     Fill_RAM                        ; 3569: 4C 79 35 
 ; -----------------------
 
+; Fill 22 rows x 8 lines x 23 columns = 4,048 bytes = $FD0 bytes i.e. UDG_RAM $1000 to $1FCF
 ; L_JSR_($356C)_($2419) OK
 Reset_UDG_RAM
     jsr     Load_ZP_Parameters              ; 356C: 20 9D 25 
@@ -5509,30 +5515,33 @@ Reset_UDG_RAM
     fcb     $04                             ; 3572: 04       
     fdb     UDG_RAM                         ; 3573: 00 10     Start address of bytes to fill
     fcb     $06                             ; 3575: 06       
-    fcb     $00,$00                         ; 3576: 00 00     Data to fill with (i.e. $00)
+    fdb     $0000                           ; 3576: 00 00     Data byte to fill with (i.e. $00)
     fcb     $FF                             ; 3578: FF       
 
+; Fill ZP02/03 number of bytes of RAM starting at address ZP02/03 with data in ZP06
 ; L_JMP_($3579)_($3569) OK
-Reset_RAM
+Fill_RAM
     ldy     #$00                            ; 3579: A0 00    
 ; L_BRS_($357B)_($358A) OK
 ; L_BRS_($357B)_($3592) OK
-Reset_RAM_1
+Loop_Fill_RAM
     lda     ZP06                            ; 357B: A5 06    
     sta     (ZP04),y                        ; 357D: 91 04    
     iny                                     ; 357F: C8       
-    bne     Reset_RAM_2                     ; 3580: D0 02    
+    bne     No_Inc_Addr_Hi                  ; 3580: D0 02    
     inc     ZP05                            ; 3582: E6 05    
+
 ; L_BRS_($3584)_($3580) OK
-Reset_RAM_2
+No_Inc_Addr_Hi
     dec     ZP02                            ; 3584: C6 02    
     lda     ZP02                            ; 3586: A5 02    
     cmp     #$FF                            ; 3588: C9 FF    
-    bne     Reset_RAM_1                     ; 358A: D0 EF    
+    bne     Loop_Fill_RAM                   ; 358A: D0 EF    
+
     dec     ZP03                            ; 358C: C6 03    
     lda     ZP03                            ; 358E: A5 03    
     cmp     #$FF                            ; 3590: C9 FF    
-    bne     Reset_RAM_1                     ; 3592: D0 E7    
+    bne     Loop_Fill_RAM                   ; 3592: D0 E7    
     rts                                     ; 3594: 60       
 
 
@@ -5588,7 +5597,7 @@ Loop_Multiply_by_8
     clc                                     ; 35A2: 18       
     rol     ZP06                            ; 35A3: 26 06    
     rol     ZP07                            ; 35A5: 26 07     ZP07/06 progression:
-    dex                                     ; 35A7: CA        $0031 > $0062 > $00c4 > $0188
+    dex                                     ; 35A7: CA        $0031 > $0062 > $00C4 > $0188
     bne     Loop_Multiply_by_8              ; 35A8: D0 F8    
 
 ; Add $8000 Character ROM offset to address, $8188 is Character ROM address for character "1"
