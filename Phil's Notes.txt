@@ -18,7 +18,7 @@
 To debug JETPAC after a warm reset, set breakpoint at $201d then SYS4624 then SYS8221.
 
 Colour mapping is at $9600, #23 columns, #11 rows from 1UP to COPYRIGHT text
-Potentially more rows are used. 
+Potentially more rows are used.
 23rd column might be not used, it's not used on game selection screen.
 
 9600  07 05 01 01 01 01 01 01 07 07 05 04 07 07 01 01 01 01 01 01 01 06 04
@@ -42,34 +42,11 @@ Potentially more rows are used.
 01=white
 00=black
 
-1UP 
+1UP
 000000 are both on a single line, which is 15 pixels.
 Line spacing between lines appears large.
 
 23x11 tile map = 253 tiles. Each tile maps to a user-defined character in the $1000-$1fcf range, which effectively gives bitmapped graphics with X:Y 23*8 x 11*16 = X:Y 184x176 pixels.
-
-
-Attract/Game Selection screen
------------------------------
-208f ATTRACT_MODE
-  24b9
-    Z24A1 
-      Z24a4 x
-    AAAAA
-      INC_ADDRESS_AT_40 X
-    Z34CC
-      Z34F7 X
-      Z351D X
-      Z34E3
-        MV_CHARS_TO_UDGRAM 
-          Invrt_Pix_Lines
-    Z34F7
-    Z351D
-    BACK_34D6
-      Z34E3
-        MV_CHARS_TO_UDGRAM
-          Invrt_Pix_Lines
-loop
 
 
 --------------------------------------------------------------------------
@@ -105,8 +82,8 @@ C64/VIC20 Keyboard Layout
 STOP SL A  S  D  F  G  H  J  K  L  :  ;  =  RETURN      F5
 C= SHIFT Z  X  C  V  B  N  M  ,  .  /  SHIFT  CDN CRT   F7
          [        SPACE BAR       ]
-         
---------------------------------------------------------------------------         
+
+--------------------------------------------------------------------------
 
 VIA1
 
@@ -125,14 +102,14 @@ VIA2
 $9120   #37152     Port B output register
                    Keyboard column scan
                    (PB3) Bit 3=Cassette write line
-                   (PB7) Bit 7=Joy 3                   
-                   
---------------------------------------------------------------------------         
+                   (PB7) Bit 7=Joy 3
+
+--------------------------------------------------------------------------
 
 $5F = Height of item on middle platform e.g. rocket middle section, fuel, gem
 $3F = Height of item on left   platform e.g. rocket top    section, fuel, gem
 
-Rocket middle section is 16 pixels high 
+Rocket middle section is 16 pixels high
 
 ------------
 
@@ -152,10 +129,10 @@ fdb becomes .word
 labels get a ':' at the end (but not when referenced)
 
    org     $2000
-becomes 
+becomes
    * =     $2000 "xxx"
-   
-   
+
+
 -------------
 
 Laser decay sequence:
@@ -171,6 +148,11 @@ Sprites are drawn in blocks
 -------------
 Setting MAME conditional breakpoints
 
-bp 3815,w@0000=$03C8    Breakpoint at $3815 that only triggers when memory 
+bp 3815,w@0000=$03C8    Breakpoint at $3815 that only triggers when memory
                         location $0000 contains $03C8 i.e. is an Alien
+
+-------------
+First byte of a String definition contains reverse (bit 7) and color information (bits 0-2)
+If colour > 7 used, you just get wrong characters displayed
+When color is 0, it's invisible against the black background
 

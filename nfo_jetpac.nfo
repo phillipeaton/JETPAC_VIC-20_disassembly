@@ -1748,23 +1748,29 @@ comment  34A4 ARGUMENTS : ZP_UDG_RAM_X ZP_UDG_RAM_Y = UDG array absolute positio
 comment  34A4 \            ZP_Ptr_To_Str             = Players score in ZP as BCD e.g. 12 34 56
 comment  34A4 \            ZP_Temp_1                 = BCD byte counter i.e. number of bytes to display
 comment  34A4 ----------------------------------------------------------
+comment  34A4 Example for score of 12 34 56 at ZP51-53
 label    34A4 Display_BCD_Bytes
-lcomment 34A4 Pointer to raw 12 34 56 in ZP
-lcomment 34A6 Load first score byte i.e. 12
-lcomment 34A8 Divide by $10
+lcomment 34A6 A = 12 BCD i.e. First score byte
+comment  34A8
+comment  34A8 Divide by $10 to isolate first digit
 lcomment 34AB 12 has become 01
-lcomment 34AD Add $70, $40 gets subtracted later on
-lcomment 34AF and resultant $31st char in Char ROM is "1"
+comment  34AC
+comment  34AC Add $70, $40 gets subtracted in display routine, making 01 into a PETSCII "1"
 comment  34B4
-comment  34B4 Display 2nd score character
-lcomment 34B6 Load first score byte again i.e. 12
-lcomment 34B8 Mask top 4 bits, 12 becomes 02
+comment  34B4 Load first score byte again to display second score character
+lcomment 34B6 A = 12 BCD i.e. First score byte
+comment  34B8
+comment  34B8 Zero top 4 bits to isolate second digit
+lcomment 34B8 12 becomes 02
+binary   34B9
+comment  34BA
+comment  34BA Add $70, $40 gets subtracted in display routine, making 02 into a PETSCII "2"
 comment  34C1
-comment  34C1 Increment pointer to next score byte
-lcomment 34C5 Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
-label    34C7 Display_BCD_Bytes_0
-lcomment 34C7 Decrement number of bytes to display counter
-lcomment 34C9 If <> 0 yet, process another byte
+comment  34C1 Increment addres pointer to next score byte
+lcomment 34C3 Looks like a BUG, should inc ZP0F,
+lcomment 34C5 but in JETPAC it'll never happen
+comment  34C7
+label    34C7 No_Increment_Hi_Byte
 comment  34CC
 comment  34CC ----------------------------------------------------------
 comment  34CC NOT SURE WHAT THIS IS YET
@@ -1782,22 +1788,24 @@ comment  34CC ----------------------------------------------------------
 label    34CC Display_String_Setup
 label    34D2
 comment  34D2
-comment  34D2 Get string header byte, contains color data and reverse flag
+comment  34D2 Get string first byte header data, contains color data and reverse flag
 comment  34D6
+comment  34D6 Write a string of data to the screen, header byte includes reverse flag and colour attribute
 comment  34D6 Save color data and reverse flag to X
 label    34D6 Display_String
 comment  34D7
 comment  34D7 Get character to display and test if bit 7 is set, which signifys end of string
 comment  34DB
-comment  34DB If final character, branch and display and RTS, else JSR and display then next char
+comment  34DB If final character then (branch, display, RTS) else (JSR, display, next char)
 comment  34E3
-comment  34E3 Restore character value after testing for end of string
+comment  34E3 Restore character value after testing for end of string, excluding reverse bit
 label    34E3 Display_Character
 comment  34E6
-comment  34E6 Restore color and reverse data and store
+comment  34E6 Setup character display color
 comment  34E9
+comment  34E9 Display character on screen, saving Y and restoring afterwards
 comment  34F0
-lcomment 34F3 ZP0C_Col_RAM_Ptr_Lo
+comment  34F0 Colorize the character just written
 comment  34F7
 comment  34F7 Example for "F7 JOYSTICK" start position
 comment  34F7 Convert X=$18 pixels from left, Y=$68 pixels from top, to Color RAM Address $968D

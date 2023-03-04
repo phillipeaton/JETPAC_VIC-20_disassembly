@@ -5255,10 +5255,10 @@ Load_UDG_RAM_for_P2
 ;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P       88""Yb Yb       8I  dY
 ; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP        88oodP  YboodP 8888Y"
 
-; .dP"Y8 888888 88""Yb      dP""b8 88  88    db    88""Yb
-; `Ybo."   88   88__dP     dP   `" 88  88   dPYb   88__dP
-; o.`Y8b   88   88"Yb      Yb      888888  dP__Yb  88"Yb
-; 8bodP'   88   88  Yb      YboodP 88  88 dP""""Yb 88  Yb
+; 88""Yb Yb  dP 888888 888888 .dP"Y8
+; 88__dP  YbdP    88   88__   `Ybo."
+; 88""Yb   8P     88   88""   o.`Y8b
+; 88oodP  dP      88   888888 8bodP'
 
 ; ----------------------------------------------------------
 ; Display_BCD_Bytes
@@ -5271,38 +5271,48 @@ Load_UDG_RAM_for_P2
 ;             ZP_Ptr_To_Str             = Players score in ZP as BCD e.g. 12 34 56
 ;             ZP_Temp_1                 = BCD byte counter i.e. number of bytes to display
 ; ----------------------------------------------------------
+; Example for score of 12 34 56 at ZP51-53
 ; L_JMP_($34A4)_($247E) OK
 ; L_JMP_($34A4)_($248E) OK
 ; L_JMP_($34A4)_($249E) OK
 ; L_BRS_($34A4)_($34C9) OK
 Display_BCD_Bytes
-    ldy     #$00                            ; 34A4: A0 00     Pointer to raw 12 34 56 in ZP
-    lda     (ZP0E),y                        ; 34A6: B1 0E     Load first score byte i.e. 12
-    lsr     a                               ; 34A8: 4A        Divide by $10
+    ldy     #$00                            ; 34A4: A0 00    
+    lda     (ZP0E),y                        ; 34A6: B1 0E     A = 12 BCD i.e. First score byte
+
+; Divide by $10 to isolate first digit
+    lsr     a                               ; 34A8: 4A       
     lsr     a                               ; 34A9: 4A       
     lsr     a                               ; 34AA: 4A       
     lsr     a                               ; 34AB: 4A        12 has become 01
+
+; Add $70, $40 gets subtracted in display routine, making 01 into a PETSCII "1"
     clc                                     ; 34AC: 18       
-    adc     #$70                            ; 34AD: 69 70     Add $70, $40 gets subtracted later on
-    sta     ZP06                            ; 34AF: 85 06     and resultant $31st char in Char ROM is "1"
+    adc     #$70                            ; 34AD: 69 70    
+    sta     ZP06                            ; 34AF: 85 06    
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 34B1: 20 95 35 
 
-; Display 2nd score character
+; Load first score byte again to display second score character
     ldy     #$00                            ; 34B4: A0 00    
-    lda     (ZP0E),y                        ; 34B6: B1 0E     Load first score byte again i.e. 12
-    and     #$0F                            ; 34B8: 29 0F     Mask top 4 bits, 12 becomes 02
+    lda     (ZP0E),y                        ; 34B6: B1 0E     A = 12 BCD i.e. First score byte
+
+; Zero top 4 bits to isolate second digit
+    and     #%00001111                      ; 34B8: 29 0F     12 becomes 02
+
+; Add $70, $40 gets subtracted in display routine, making 02 into a PETSCII "2"
     adc     #$70                            ; 34BA: 69 70    
     sta     ZP06                            ; 34BC: 85 06    
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 34BE: 20 95 35 
 
-; Increment pointer to next score byte
+; Increment addres pointer to next score byte
     inc     ZP0E                            ; 34C1: E6 0E    
-    bne     Display_BCD_Bytes_0             ; 34C3: D0 02    
-    inc     ZP07                            ; 34C5: E6 07     Looks like a bug, should be incrementing ZP_Ptr_To_Str_Hi
+    bne     No_Increment_Hi_Byte            ; 34C3: D0 02     Looks like a BUG, should inc ZP0F,
+    inc     ZP07                            ; 34C5: E6 07     but in JETPAC it'll never happen
+
 ; L_BRS_($34C7)_($34C3) OK
-Display_BCD_Bytes_0
-    dec     ZP02                            ; 34C7: C6 02     Decrement number of bytes to display counter
-    bne     Display_BCD_Bytes               ; 34C9: D0 D9     If <> 0 yet, process another byte
+No_Increment_Hi_Byte
+    dec     ZP02                            ; 34C7: C6 02    
+    bne     Display_BCD_Bytes               ; 34C9: D0 D9    
     rts                                     ; 34CB: 60       
 ; ===========================================================
 
@@ -5327,10 +5337,11 @@ Display_String_Setup
     jsr     Setup_Color_RAM_Ptr             ; 34CC: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 34CF: 20 1D 35 
 
-; Get string header byte, contains color data and reverse flag
+; Get string first byte header data, contains color data and reverse flag
     ldy     #$00                            ; 34D2: A0 00    
     lda     (ZP0E),y                        ; 34D4: B1 0E    
 
+; Write a string of data to the screen, header byte includes reverse flag and colour attribute
 ; Save color data and reverse flag to X
 ; L_JSR_($34D6)_($2506) OK
 ; L_JMP_($34D6)_($34E0) OK
@@ -5342,32 +5353,34 @@ Display_String
     lda     (ZP0E),y                        ; 34D8: B1 0E    
     asl     a                               ; 34DA: 0A       
 
-; If final character, branch and display and RTS, else JSR and display then next char
+; If final character then (branch, display, RTS) else (JSR, display, next char)
     bcs     Display_Character               ; 34DB: B0 06    
     jsr     Display_Character               ; 34DD: 20 E3 34 
     jmp     Display_String                  ; 34E0: 4C D6 34 
 ; -----------------------
 
-; Restore character value after testing for end of string
+; Restore character value after testing for end of string, excluding reverse bit
 ; L_BRS_($34E3)_($34DB) OK
 ; L_JSR_($34E3)_($34DD) OK
 Display_Character
     lsr     a                               ; 34E3: 4A       
     sta     ZP06                            ; 34E4: 85 06    
 
-; Restore color and reverse data and store
+; Setup character display color
     txa                                     ; 34E6: 8A       
     sta     ZP_Reverse_And_Color_Data       ; 34E7: 85 57    
 
+; Display character on screen, saving Y and restoring afterwards
     tya                                     ; 34E9: 98       
     pha                                     ; 34EA: 48       
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 34EB: 20 95 35 
     pla                                     ; 34EE: 68       
     tay                                     ; 34EF: A8       
 
+; Colorize the character just written
     lda     ZP_Reverse_And_Color_Data       ; 34F0: A5 57    
     dey                                     ; 34F2: 88       
-    sta     (ZP0C),y                        ; 34F3: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 34F3: 91 0C    
     iny                                     ; 34F5: C8       
     rts                                     ; 34F6: 60       
 ; ===========================================================

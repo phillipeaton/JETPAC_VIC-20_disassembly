@@ -1,5 +1,5 @@
 # Returns replacement ZP08 between lines containing "; 364E" and "; 3650" form xxx.txt source file
-# sed '/; 3601/,/; 3734/s/ZP03                          /ZP03_Sprite_Height       /' jetpac.a65
+# sed '/; 34A4/,/; 3734/s/ZP03                          /ZP03_Sprite_Height       /' jetpac.a65
 
 # Local Zero Page variables for Display_Sprite routine
 
@@ -221,3 +221,14 @@
 /; 34CC/,/; 34F6/s/ZP0E                           /ZP0E_String_Addr_Lo            /
 /; 34CC/,/; 34F6/s/(ZP0C),y                       /(ZP0C_Color_RAM_Addr_Lo),y     /
 /; 34CC/,/; 34F6/s/(ZP0E),y                       /(ZP0E_String_Addr_Lo),y        /
+
+# Display_BCD_Bytes
+/ZP02                            equ     $0002/a ZP02_Num_Bytes_To_Display       equ     $0002
+/ZP06                            equ     $0006/a ZP06_Character_To_Display       equ     $0006
+/ZP07                            equ     $0007/a ZP07_Score_Data_Addr_Hi         equ     $0007
+/ZP0E                            equ     $000E/a ZP0E_Score_Data_Addr_Lo         equ     $000E
+/; 34A4/,/; 34CB/s/ZP02                           /ZP02_Num_Bytes_To_Display      /
+/; 34A4/,/; 34CB/s/ZP06                           /ZP06_Character_To_Display      /
+/; 34A4/,/; 34CB/s/ZP07                           /ZP07_Score_Data_Addr_Hi        /
+/; 34A4/,/; 34CB/s/ZP0E                           /ZP0E_Score_Data_Addr_Lo        /
+/; 34A4/,/; 34CB/s/(ZP0E),y                       /(ZP0E_Score_Data_Addr_Lo).y    /
