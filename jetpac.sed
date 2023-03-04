@@ -203,3 +203,21 @@
 /; 3531/,/; 3544/s/ZP04                           /ZP04_UDG_RAM_Addr_Lo           /
 /; 3531/,/; 3544/s/ZP05                           /ZP05_UDG_RAM_Addr_Hi           /
 
+# Setup_Color_RAM_Ptr
+#/ZP04                            equ     $0004/a ZP04_X_Coordinate               equ     $0004
+#/ZP05                            equ     $0005/a ZP05_Y_Coordinate               equ     $0005
+/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Addr_Lo          equ     $000C
+/ZP0D                            equ     $000D/a ZP0D_Color_RAM_Addr_Hi          equ     $000D
+/; 34F7/,/; 3511/s/ZP04                           /ZP04_X_Coordinate              /
+/; 34F7/,/; 3511/s/ZP05                           /ZP05_Y_Coordinate              /
+/; 34F7/,/; 3511/s/ZP0C                           /ZP0C_Color_RAM_Addr_Lo         /
+/; 34F7/,/; 3511/s/ZP0D                           /ZP0D_Color_RAM_Addr_Hi         /
+
+# Display_String
+/ZP06                            equ     $0006/a ZP06_Character_To_Display       equ     $0006
+#/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Addr_Lo          equ     $000C
+/ZP0E                            equ     $000E/a ZP0E_String_Addr_Lo             equ     $000E
+/; 34CC/,/; 34F6/s/ZP06                           /ZP06_Character_To_Display      /
+/; 34CC/,/; 34F6/s/ZP0E                           /ZP0E_String_Addr_Lo            /
+/; 34CC/,/; 34F6/s/(ZP0C),y                       /(ZP0C_Color_RAM_Addr_Lo),y     /
+/; 34CC/,/; 34F6/s/(ZP0E),y                       /(ZP0E_String_Addr_Lo),y        /

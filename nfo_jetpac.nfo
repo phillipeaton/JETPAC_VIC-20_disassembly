@@ -233,7 +233,7 @@ label    21DC FP2222
 lcomment 21DC Restore A
 comment  21DD
 comment  21DF
-comment  21DF Invert the displayed 8-bit byte on-screen
+comment  21DF Reverse the displayed 8-bit byte on-screen
 comment  21E5
 comment  21E5 Load current tile color, check it's not green, if not update tile color
 lcomment 21E5 ZP0C_Col_RAM_Ptr_Lo
@@ -667,7 +667,7 @@ comment  26F6 Read timer, subtract 1 and write back
 comment  26FE
 label    26FE Rocket_Part_or_Fuel_Cell_PickUp
 comment  2703
-comment  2703 Inverts the timer value so $10 countdown becomes $F0, F1, F2 etc. stored
+comment  2703 Reverses the timer value so $10 countdown becomes $F0, F1, F2 etc. stored
 comment  2703 to the oscillator on subsequent calls, making a pleasent short rising tone
 comment  2705
 comment  2705 Set top bit of oscillator channel to enable
@@ -927,7 +927,7 @@ comment  2AA2 Countdown timer at zero, randomly change Y direction using IRQ cou
 label    2AA2 Update_Y_Direction_Random
 binary   2AA5
 comment  2AAA
-comment  2AAA Invert Y direction up/down, randomly via IRQ
+comment  2AAA Reverse Y direction up/down, randomly via IRQ
 deflabel 2AAB OBJECT_Y_DIRECTION_PARAM
 binary   2AAD
 comment  2AB2
@@ -1715,15 +1715,15 @@ const    346D
 break    346F
 label    3470 Flash_Score_1
 lcomment 3479 Number of 8-bit wide characters to reverse
-label    347B Invert_UDG_Columns
+label    347B Reverse_UDG_Columns
 lcomment 347B Number of pixel lines to reverse
-label    347D Invert_UDG_Rows
+label    347D Reverse_UDG_Rows
 lcomment 347D Get current byte of character
-lcomment 347F \ invert it
+lcomment 347F \ reverse it
 lcomment 3481 \ and write it back
-lcomment 3484 All bytes inverted?
+lcomment 3484 All bytes reversed?
 lcomment 3486 \ If yes, continue to next column
-lcomment 3487 All columns inverted? If yes, finish
+lcomment 3487 All columns reversed? If yes, finish
 comment  3489
 comment  3489 Move to next column by adding $B0 (#176) pixel to X postion
 lcomment 348C $B0 = height of screen in pixels i.e. move one column right
@@ -1779,53 +1779,61 @@ comment  34CC ZP_UDG_RAM_X   = 08 A8 or 08 20
 comment  34CC ZP_UDG_RAM_Y   = 08 A8 or 08 20
 comment  34CC ZP_Addr_From   = 70 80 or 28 80
 comment  34CC ----------------------------------------------------------
-label    34CC Display_String
+label    34CC Display_String_Setup
 label    34D2
-lcomment 34D2 Y=string character pointer
-lcomment 34D4 Get character to display
-label    34D6 DSTR1
-lcomment 34D6 Stash character to X
-lcomment 34D7 Inc character pointer
-lcomment 34DA Test if character top bit is set = string end
-lcomment 34DB Display character then exit
-lcomment 34DD Display character
+comment  34D2
+comment  34D2 Get string header byte, contains color data and reverse flag
+comment  34D6
+comment  34D6 Save color data and reverse flag to X
+label    34D6 Display_String
+comment  34D7
+comment  34D7 Get character to display and test if bit 7 is set, which signifys end of string
+comment  34DB
+comment  34DB If final character, branch and display and RTS, else JSR and display then next char
 comment  34E3
+comment  34E3 Restore character value after testing for end of string
 label    34E3 Display_Character
+comment  34E6
+comment  34E6 Restore color and reverse data and store
 comment  34E9
 comment  34F0
 lcomment 34F3 ZP0C_Col_RAM_Ptr_Lo
 comment  34F7
+comment  34F7 Example for "F7 JOYSTICK" start position
+comment  34F7 Convert X=$18 pixels from left, Y=$68 pixels from top, to Color RAM Address $968D
 label    34F7 Setup_Color_RAM_Ptr
-lcomment 34F7 Get Addr_To lo-byte and divide by 8
-lcomment 34F9 and store to Color RAM Ptr lo-byte.
-lcomment 34FA ZP_Addr_To is used to work out the column
-lcomment 34FC ZP0C_Col_RAM_Ptr_Lo
+lcomment 34F7 ZP04 = $18
+comment  34F9
+comment  34F9 Divide X by 8 to get initial address Lo-byte
+lcomment 34FC ZP0C = $03
 comment  34FE
-lcomment 34FE Get Addr_To hi-byte, divide by $10
-lcomment 3500 and use as index into Color RAM
-lcomment 3501 Row Offsets i.e. 9600, 9617, 962e etc.
-lcomment 3502 Divided by #16 because 16 y-pixels per
-lcomment 3503 Color RAM tile.
-lcomment 3509 ZP0C_Col_RAM_Ptr_Lo
-lcomment 350B ZP0C_Col_RAM_Ptr_Lo
+comment  34FE Divide Y by $10 and use as index into Color RAM Row Offsets i.e. 9600, 9617, 962e etc.
+comment  34FE to get address Hi-byte. Divided by $10 because there are 16 Y-pixels per Color RAM tile.
+lcomment 34FE ZP05 = $68
+lcomment 3503 ZP05 = $06
+comment  3505
+comment  3505 Load from column offset table and add in the inital address Lo-byte
+lcomment 3505 A = $8A
+lcomment 350B ZP0C = $8D
 comment  350D
-lcomment 350D Store hi-byte of Color RAM
-lcomment 350F to pointer hi-byte.
-lcomment 350F ZP0D_Col_RAM_Ptr_Hi
+comment  350D Add $9600 to address in ZP0D/0C to become $968D i.e. "F7 JOYSTICK" start position
+lcomment 350F ZP0D/0C = $968D
+comment  3512
 label    3512 Color_RAM_Row_Offsets
 const    3512-351C
 comment  351D
 comment  351D Example for "F7 JOYSTICK" start position
 comment  351D Convert X=$18 pixels from left, Y=$68 pixels from top, to UDG RAM Address $1278
 label    351D Convert_XY_to_UDG_RAM_Addr
-lcomment 351D Y = $68
+lcomment 351D ZP05 = $68
 lcomment 351F
 comment  3520
-comment  3520 Get Addr_To lo-byte by dividing X by 8, example $18/8 = 3
-lcomment 3520 X = $18
-lcomment 3524 X = $03
+comment  3520 Divide X by 8 to get address Lo-byte
+lcomment 3520 ZP04 = $18
+lcomment 3524 ZP04 = $03
 comment  3526
-comment  3526 Load from column offset table (4th item = $21)
+comment  3526 Load from column offset table
+lcomment 3526 A = $21
 lcomment 352D ZP05/04 = $0021
 comment  352F
 comment  352F Rotate 16-bit address left by 4 bits
@@ -1911,7 +1919,7 @@ comment  35AA Add $8000 Character ROM offset to address, $8188 is Character ROM 
 lcomment 35AE ZP07/06 = $8188
 comment  35B0
 comment  35B0 Copy 8 bytes to display a complete character
-comment  35B0 Displayed character can be normal or inverted, e.g. for score or selected game options
+comment  35B0 Displayed character can be normal or reversed, e.g. for score or selected game options
 label    35B6 Copy_Char_To_UDG_RAM
 comment  35BD
 comment  35BD Move 16-bit UDG RAM address to the next-right column, $B0=176=number of vertical pixels
@@ -1919,8 +1927,8 @@ label    35BD Next_Column
 deflabel 35C1 SCREEN_HEIGHT_PIXELS
 comment  35C4
 comment  35CB
-comment  35CB Copy 8 bytes to display a complete character, EOR inverts the byte displayed
-label    35CB Copy_Char_To_UDG_RAM_Inverted
+comment  35CB Copy 8 bytes to display a complete character, EOR reverses the byte displayed
+label    35CB Copy_Char_To_UDG_RAM_Reversed
 comment  35D7
 label    35D7 Load_Object_Type_X_Y
 deflabel 35D8 OBJECT_TYPE_PARAM

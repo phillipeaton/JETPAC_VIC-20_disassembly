@@ -40,6 +40,7 @@ ZP06_Object_Old_UDG_Data_Lo     equ     $0006
 ZP06_Object_UDG_Data_Addr_Lo    equ     $0006
 ZP06_Char_ROM_Data_Addr_Lo      equ     $0006
 ZP06_Fill_Data_Byte             equ     $0006
+ZP06_Character_To_Display       equ     $0006
 ZP07                            equ     $0007
 ZP07_Object_Old_UDG_Data_Hi     equ     $0007
 ZP07_Object_UDG_Data_Addr_Hi    equ     $0007
@@ -59,12 +60,15 @@ ZP0C                            equ     $000C
 ZP0C_Object_New_UDG_RAM_Lo      equ     $000C
 ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
 ZP0C_Object_UDG_RAM_Addr_Lo     equ     $000C
+ZP0C_Color_RAM_Addr_Lo          equ     $000C
 ZP0D                            equ     $000D
 ZP0D_Object_New_UDG_RAM_Hi      equ     $000D
 ZP0D_Object_UDG_RAM_Addr_Hi     equ     $000D
+ZP0D_Color_RAM_Addr_Hi          equ     $000D
 ZP0E                            equ     $000E
 ZP0E_Object_New_UDG_Data_Lo     equ     $000E
 ZP0E_Object_UDG_Data_Addr_Lo    equ     $000E
+ZP0E_String_Addr_Lo             equ     $000E
 ZP0F                            equ     $000F
 ZP0F_Object_New_UDG_Data_Hi     equ     $000F
 ZP0F_Object_UDG_Data_Addr_Hi    equ     $000F
@@ -118,7 +122,7 @@ ZP_HW_IRQ_Count2                equ     $004B
 ZP_HW_IRQ_Count3                equ     $004C
 ZP_Score_P1                     equ     $0051
 ZP_Score_P2                     equ     $0054
-ZP_Invert                       equ     $0057
+ZP_Reverse_And_Color_Data       equ     $0057
 ZP_Flash_Counter                equ     $0058
 ZP_Level_Current_Player         equ     $0059
 ZP_Num_Lives_P1                 equ     $005A
@@ -694,7 +698,7 @@ FP2222
 
     sta     ZP06                            ; 21DD: 85 06    
 
-; Invert the displayed 8-bit byte on-screen
+; Reverse the displayed 8-bit byte on-screen
     lda     (ZP04),y                        ; 21DF: B1 04    
     eor     #$FF                            ; 21E1: 49 FF    
     sta     (ZP04),y                        ; 21E3: 91 04    
@@ -1208,7 +1212,7 @@ BACK_D1H2
     pha                                     ; 2442: 48       
     tya                                     ; 2443: 98       
     pha                                     ; 2444: 48       
-    jsr     Display_String                  ; 2445: 20 CC 34 
+    jsr     Display_String_Setup            ; 2445: 20 CC 34 
     pla                                     ; 2448: 68       
     tay                                     ; 2449: A8       
     pla                                     ; 244A: 68       
@@ -1333,7 +1337,7 @@ Display_Game_Select
     fcb     $0E                             ; 24D0: 0E       
     fdb     STR_JETPAC_GAME_SELECT          ; 24D1: 3A 25    
     fcb     $FF                             ; 24D3: FF       
-    jsr     Display_String                  ; 24D4: 20 CC 34 
+    jsr     Display_String_Setup            ; 24D4: 20 CC 34 
 
     jsr     Load_ZP_Parameters              ; 24D7: 20 9D 25 
     fcb     $04                             ; 24DA: 04        ZP_UDG_RAM_X
@@ -1341,7 +1345,7 @@ Display_Game_Select
     fcb     $0E                             ; 24DD: 0E       
     fdb     STRING_COPYRIGHT_1983_ACG       ; 24DE: 24 25    
     fcb     $FF                             ; 24E0: FF       
-    jsr     Display_String                  ; 24E1: 20 CC 34 
+    jsr     Display_String_Setup            ; 24E1: 20 CC 34 
 
     jsr     Load_ZP_Parameters              ; 24E4: 20 9D 25 
     fcb     $0E                             ; 24E7: 0E        ZP_Ptr_To_Str
@@ -1362,7 +1366,7 @@ DGS1 lda    #$18                            ; 24EF: A9 18
     ldy     #$00                            ; 2500: A0 00    
     ldx     ZP08                            ; 2502: A6 08    
     lda     ZP_Game_Sel_F1_Flash,x          ; 2504: B5 45    
-    jsr     DSTR1                           ; 2506: 20 D6 34 
+    jsr     Display_String                  ; 2506: 20 D6 34 
     iny                                     ; 2509: C8       
     tya                                     ; 250A: 98       
     clc                                     ; 250B: 18       
@@ -1862,7 +1866,7 @@ Rocket_Part_or_Fuel_Cell_PickUp
     jsr     Decrement_Oscillator_Timer      ; 26FE: 20 F2 26 
     beq     Sound_Done_Reset_Object_Param   ; 2701: F0 07    
 
-; Inverts the timer value so $10 countdown becomes $F0, F1, F2 etc. stored
+; Reverses the timer value so $10 countdown becomes $F0, F1, F2 etc. stored
 ; to the oscillator on subsequent calls, making a pleasent short rising tone
     eor     #$FF                            ; 2703: 49 FF    
 
@@ -2545,7 +2549,7 @@ Display_Game_Over_P1
     fcb     $FF                             ; 29F7: FF       
 ; L_JMP_($29F8)_($2A1C) OK
 Display_String_
-    jsr     Display_String                  ; 29F8: 20 CC 34 
+    jsr     Display_String_Setup            ; 29F8: 20 CC 34 
 
     jsr     Load_ZP_Parameters              ; 29FB: 20 9D 25 
     fcb     $02                             ; 29FE: 02        Into ZP addr 02 and 03...
@@ -2713,7 +2717,7 @@ Update_Y_Direction_Random
     adc     #$10                            ; 2AA6: 69 10    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2AA8: 91 00    
 
-; Invert Y direction up/down, randomly via IRQ
+; Reverse Y direction up/down, randomly via IRQ
     ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2AAA: A0 04    
     and     #%00000100                      ; 2AAC: 29 04    
     bit     ZP_HW_IRQ_Count3                ; 2AAE: 24 4C    
@@ -5266,17 +5270,17 @@ Flash_Score_1
     bne     Flash_Score_RTS                 ; 3477: D0 20    
     ldx     #$06                            ; 3479: A2 06     Number of 8-bit wide characters to reverse
 ; L_JMP_($347B)_($3496) OK
-Invert_UDG_Columns
+Reverse_UDG_Columns
     ldy     #$0F                            ; 347B: A0 0F     Number of pixel lines to reverse
 ; L_BRS_($347D)_($3484) OK
-Invert_UDG_Rows
+Reverse_UDG_Rows
     lda     (ZP04),y                        ; 347D: B1 04     Get current byte of character
-    eor     #$FF                            ; 347F: 49 FF      invert it
+    eor     #$FF                            ; 347F: 49 FF      reverse it
     sta     (ZP04),y                        ; 3481: 91 04      and write it back
     dey                                     ; 3483: 88       
-    bpl     Invert_UDG_Rows                 ; 3484: 10 F7     All bytes inverted?
+    bpl     Reverse_UDG_Rows                ; 3484: 10 F7     All bytes reversed?
     dex                                     ; 3486: CA         If yes, continue to next column
-    beq     Flash_Score_RTS                 ; 3487: F0 10     All columns inverted? If yes, finish
+    beq     Flash_Score_RTS                 ; 3487: F0 10     All columns reversed? If yes, finish
 
 ; Move to next column by adding $B0 (#176) pixel to X postion
     lda     ZP04                            ; 3489: A5 04    
@@ -5288,7 +5292,7 @@ Invert_UDG_Rows
     lda     ZP05                            ; 3490: A5 05    
     adc     #$00                            ; 3492: 69 00     Add the carry from the previous $B0 addition for X
     sta     ZP05                            ; 3494: 85 05    
-    jmp     Invert_UDG_Columns              ; 3496: 4C 7B 34 
+    jmp     Reverse_UDG_Columns             ; 3496: 4C 7B 34 
 ; -----------------------
 ; L_BRS_($3499)_($3477) OK
 ; L_BRS_($3499)_($3487) OK
@@ -5381,30 +5385,41 @@ Display_BCD_Bytes_0
 ; L_JSR_($34CC)_($24D4) OK
 ; L_JSR_($34CC)_($24E1) OK
 ; L_JSR_($34CC)_($29F8) OK
-Display_String
+Display_String_Setup
     jsr     Setup_Color_RAM_Ptr             ; 34CC: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 34CF: 20 1D 35 
-    ldy     #$00                            ; 34D2: A0 00     Y=string character pointer
-    lda     (ZP0E),y                        ; 34D4: B1 0E     Get character to display
+
+; Get string header byte, contains color data and reverse flag
+    ldy     #$00                            ; 34D2: A0 00    
+    lda     (ZP0E_String_Addr_Lo),y         ; 34D4: B1 0E    
+
+; Save color data and reverse flag to X
 ; L_JSR_($34D6)_($2506) OK
 ; L_JMP_($34D6)_($34E0) OK
-DSTR1
-    tax                                     ; 34D6: AA        Stash character to X
-    iny                                     ; 34D7: C8        Inc character pointer
-    lda     (ZP0E),y                        ; 34D8: B1 0E    
-    asl     a                               ; 34DA: 0A        Test if character top bit is set = string end
-    bcs     Display_Character               ; 34DB: B0 06     Display character then exit
-    jsr     Display_Character               ; 34DD: 20 E3 34  Display character
-    jmp     DSTR1                           ; 34E0: 4C D6 34 
+Display_String
+    tax                                     ; 34D6: AA       
+
+; Get character to display and test if bit 7 is set, which signifys end of string
+    iny                                     ; 34D7: C8       
+    lda     (ZP0E_String_Addr_Lo),y         ; 34D8: B1 0E    
+    asl     a                               ; 34DA: 0A       
+
+; If final character, branch and display and RTS, else JSR and display then next char
+    bcs     Display_Character               ; 34DB: B0 06    
+    jsr     Display_Character               ; 34DD: 20 E3 34 
+    jmp     Display_String                  ; 34E0: 4C D6 34 
 ; -----------------------
 
+; Restore character value after testing for end of string
 ; L_BRS_($34E3)_($34DB) OK
 ; L_JSR_($34E3)_($34DD) OK
 Display_Character
     lsr     a                               ; 34E3: 4A       
-    sta     ZP06                            ; 34E4: 85 06    
+    sta     ZP06_Character_To_Display       ; 34E4: 85 06    
+
+; Restore color and reverse data and store
     txa                                     ; 34E6: 8A       
-    sta     ZP_Invert                       ; 34E7: 85 57    
+    sta     ZP_Reverse_And_Color_Data       ; 34E7: 85 57    
 
     tya                                     ; 34E9: 98       
     pha                                     ; 34EA: 48       
@@ -5412,9 +5427,9 @@ Display_Character
     pla                                     ; 34EE: 68       
     tay                                     ; 34EF: A8       
 
-    lda     ZP_Invert                       ; 34F0: A5 57    
+    lda     ZP_Reverse_And_Color_Data       ; 34F0: A5 57    
     dey                                     ; 34F2: 88       
-    sta     (ZP0C),y                        ; 34F3: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C_Color_RAM_Addr_Lo),y      ; 34F3: 91 0C     ZP0C_Col_RAM_Ptr_Lo
     iny                                     ; 34F5: C8       
     rts                                     ; 34F6: 60       
 ; ===========================================================
@@ -5433,6 +5448,8 @@ Display_Character
 ; 88"Yb   dP__Yb  88YbdP88     88"""    88   88"Yb
 ; 88  Yb dP""""Yb 88 YY 88     88       88   88  Yb
 
+; Example for "F7 JOYSTICK" start position
+; Convert X=$18 pixels from left, Y=$68 pixels from top, to Color RAM Address $968D
 ; L_JSR_($34F7)_($21BB) OK
 ; L_JSR_($34F7)_($24FA) OK
 ; L_JSR_($34F7)_($27FF) OK
@@ -5441,28 +5458,35 @@ Display_Character
 ; L_JSR_($34F7)_($34CC) OK
 ; L_JSR_($34F7)_($3827) OK
 Setup_Color_RAM_Ptr
-    lda     ZP04                            ; 34F7: A5 04     Get Addr_To lo-byte and divide by 8
-    lsr     a                               ; 34F9: 4A        and store to Color RAM Ptr lo-byte.
-    lsr     a                               ; 34FA: 4A        ZP_Addr_To is used to work out the column
+    lda     ZP04_X_Coordinate               ; 34F7: A5 04     ZP04 = $18
+
+; Divide X by 8 to get initial address Lo-byte
+    lsr     a                               ; 34F9: 4A       
+    lsr     a                               ; 34FA: 4A       
     lsr     a                               ; 34FB: 4A       
-    sta     ZP0C                            ; 34FC: 85 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     ZP0C_Color_RAM_Addr_Lo          ; 34FC: 85 0C     ZP0C = $03
 
-    lda     ZP05                            ; 34FE: A5 05     Get Addr_To hi-byte, divide by $10
-    lsr     a                               ; 3500: 4A        and use as index into Color RAM
-    lsr     a                               ; 3501: 4A        Row Offsets i.e. 9600, 9617, 962e etc.
-    lsr     a                               ; 3502: 4A        Divided by #16 because 16 y-pixels per
-    lsr     a                               ; 3503: 4A        Color RAM tile.
+; Divide Y by $10 and use as index into Color RAM Row Offsets i.e. 9600, 9617, 962e etc.
+; to get address Hi-byte. Divided by $10 because there are 16 Y-pixels per Color RAM tile.
+    lda     ZP05_Y_Coordinate               ; 34FE: A5 05     ZP05 = $68
+    lsr     a                               ; 3500: 4A       
+    lsr     a                               ; 3501: 4A       
+    lsr     a                               ; 3502: 4A       
+    lsr     a                               ; 3503: 4A        ZP05 = $06
     tax                                     ; 3504: AA       
-    lda     Color_RAM_Row_Offsets,x         ; 3505: BD 12 35 
-    clc                                     ; 3508: 18       
-    adc     ZP0C                            ; 3509: 65 0C     ZP0C_Col_RAM_Ptr_Lo
-    sta     ZP0C                            ; 350B: 85 0C     ZP0C_Col_RAM_Ptr_Lo
 
-    lda     #$96                            ; 350D: A9 96     Store hi-byte of Color RAM
-    sta     ZP0D                            ; 350F: 85 0D     to pointer hi-byte.
-                                            ; ZP0D_Col_RAM_Ptr_Hi
+; Load from column offset table and add in the inital address Lo-byte
+    lda     Color_RAM_Row_Offsets,x         ; 3505: BD 12 35  A = $8A
+    clc                                     ; 3508: 18       
+    adc     ZP0C_Color_RAM_Addr_Lo          ; 3509: 65 0C    
+    sta     ZP0C_Color_RAM_Addr_Lo          ; 350B: 85 0C     ZP0C = $8D
+
+; Add $9600 to address in ZP0D/0C to become $968D i.e. "F7 JOYSTICK" start position
+    lda     #$96                            ; 350D: A9 96    
+    sta     ZP0D_Color_RAM_Addr_Hi          ; 350F: 85 0D     ZP0D/0C = $968D
     rts                                     ; 3511: 60       
 ; ===========================================================
+
 Color_RAM_Row_Offsets
     fcb     $00,$17,$2E,$45,$5C,$73,$8A,$A1 ; 3512: 00 17 2E 45 5C 73 8A A1 
     fcb     $B8,$CF,$E6                     ; 351A: B8 CF E6 
@@ -5497,18 +5521,18 @@ Color_RAM_Row_Offsets
 ; L_JSR_($351D)_($375D) OK
 ; L_JSR_($351D)_($37AB) OK
 Convert_XY_to_UDG_RAM_Addr
-    lda     ZP05_Y_Coordinate               ; 351D: A5 05     Y = $68
+    lda     ZP05_Y_Coordinate               ; 351D: A5 05     ZP05 = $68
     tay                                     ; 351F: A8       
 
-; Get Addr_To lo-byte by dividing X by 8, example $18/8 = 3
-    lda     ZP04_X_Coordinate               ; 3520: A5 04     X = $18
+; Divide X by 8 to get address Lo-byte
+    lda     ZP04_X_Coordinate               ; 3520: A5 04     ZP04 = $18
     lsr     a                               ; 3522: 4A       
     lsr     a                               ; 3523: 4A       
-    lsr     a                               ; 3524: 4A        X = $03
+    lsr     a                               ; 3524: 4A        ZP04 = $03
     tax                                     ; 3525: AA       
 
-; Load from column offset table (4th item = $21)
-    lda     UDG_RAM_Column_Offsets,x        ; 3526: BD 45 35 
+; Load from column offset table
+    lda     UDG_RAM_Column_Offsets,x        ; 3526: BD 45 35  A = $21
     sta     ZP04_X_Coordinate               ; 3529: 85 04    
     lda     #$00                            ; 352B: A9 00    
     sta     ZP05_Y_Coordinate               ; 352D: 85 05     ZP05/04 = $0021
@@ -5664,10 +5688,10 @@ Loop_Multiply_by_8
     sta     ZP07_Char_ROM_Data_Addr_Hi      ; 35AE: 85 07     ZP07/06 = $8188
 
 ; Copy 8 bytes to display a complete character
-; Displayed character can be normal or inverted, e.g. for score or selected game options
+; Displayed character can be normal or reversed, e.g. for score or selected game options
     ldy     #$07                            ; 35B0: A0 07    
-    lda     ZP_Invert                       ; 35B2: A5 57    
-    bmi     Copy_Char_To_UDG_RAM_Inverted   ; 35B4: 30 15    
+    lda     ZP_Reverse_And_Color_Data       ; 35B2: A5 57    
+    bmi     Copy_Char_To_UDG_RAM_Reversed   ; 35B4: 30 15    
 ; L_JMP_($35B6)_($239F) OK
 ; L_JSR_($35B6)_($3175) OK
 ; L_JSR_($35B6)_($317D) OK
@@ -5692,15 +5716,15 @@ Next_Column
     rts                                     ; 35CA: 60       
 ; ===========================================================
 
-; Copy 8 bytes to display a complete character, EOR inverts the byte displayed
+; Copy 8 bytes to display a complete character, EOR reverses the byte displayed
 ; L_BRS_($35CB)_($35B4) OK
 ; L_BRS_($35CB)_($35D2) OK
-Copy_Char_To_UDG_RAM_Inverted
+Copy_Char_To_UDG_RAM_Reversed
     lda     (ZP06_Char_ROM_Data_Addr_Lo),y  ; 35CB: B1 06    
     eor     #$FF                            ; 35CD: 49 FF    
     sta     (ZP04_UDG_RAM_Addr_Lo),y        ; 35CF: 91 04    
     dey                                     ; 35D1: 88       
-    bpl     Copy_Char_To_UDG_RAM_Inverted   ; 35D2: 10 F7    
+    bpl     Copy_Char_To_UDG_RAM_Reversed   ; 35D2: 10 F7    
     jmp     Next_Column                     ; 35D4: 4C BD 35 
 ; -----------------------
 
