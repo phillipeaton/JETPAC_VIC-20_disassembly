@@ -69,12 +69,12 @@ label      51-53 ZP_Score_P1            ; 3 bytes (Hi Score is stored where?)
 label      54-56 ZP_Score_P2            ; 3 bytes
 label      57 ZP_Reverse_And_Color_Data ; Used to flash game options & 1UP+score at player start
 label      58 ZP_Flash_Counter          ;
-label      59 ZP_Level_Current_Player   ;
-label      5a ZP_Num_Lives_P1           ;
-label      5b ZP_Level_Other_Player     ;
-label      5c ZP_Num_Lives_P2           ;
+label      59 ZP_Level_Active_Player    ;
+label      5a ZP_Number_Of_Lives_P1     ;
+label      5b ZP_Level_Inactive_Player  ;
+label      5c ZP_Number_Of_Lives_P2     ;
 label      5d ZP_Flash_Score_Countdown  ; 7f for 1 player, ff for 2 player
-label      5e ZP_P1_Or_P2               ;
+label      5e ZP_Active_Player          ;
 label      5f ZP_Subroutine_Addr_Lo     ;
 label      60 ZP_Subroutine_Addr_Hi     ;
 

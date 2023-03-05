@@ -1,5 +1,5 @@
 # Returns replacement ZP08 between lines containing "; 364E" and "; 3650" form xxx.txt source file
-# sed '/; 34A4/,/; 3734/s/ZP03                          /ZP03_Sprite_Height       /' jetpac.a65
+# sed '/; 3601/,/; 3734/s/ZP03                          /ZP03_Sprite_Height       /' jetpac.a65
 
 # Local Zero Page variables for Display_Sprite routine
 
@@ -224,11 +224,18 @@
 
 # Display_BCD_Bytes
 /ZP02                            equ     $0002/a ZP02_Num_Bytes_To_Display       equ     $0002
-/ZP06                            equ     $0006/a ZP06_Character_To_Display       equ     $0006
+#/ZP06                            equ     $0006/a ZP06_Character_To_Display       equ     $0006
 /ZP07                            equ     $0007/a ZP07_Score_Data_Addr_Hi         equ     $0007
 /ZP0E                            equ     $000E/a ZP0E_Score_Data_Addr_Lo         equ     $000E
 /; 34A4/,/; 34CB/s/ZP02                           /ZP02_Num_Bytes_To_Display      /
 /; 34A4/,/; 34CB/s/ZP06                           /ZP06_Character_To_Display      /
 /; 34A4/,/; 34CB/s/ZP07                           /ZP07_Score_Data_Addr_Hi        /
 /; 34A4/,/; 34CB/s/ZP0E                           /ZP0E_Score_Data_Addr_Lo        /
-/; 34A4/,/; 34CB/s/(ZP0E),y                       /(ZP0E_Score_Data_Addr_Lo).y    /
+/; 34A4/,/; 34CB/s/(ZP0E),y                       /(ZP0E_Score_Data_Addr_Lo),y    /
+
+# Flash Score
+#/ZP04                            equ     $0004/a ZP04_UDG_RAM_Addr_Lo       equ     $0004
+#/ZP05                            equ     $0005/a ZP05_UDG_RAM_Addr_Hi       equ     $0005
+/; 3465/,/; 34A1/s/ZP04                           /ZP04_UDG_RAM_Addr_Lo           /
+/; 3465/,/; 34A1/s/(ZP04),y                       /(ZP04_UDG_RAM_Addr_Lo),y       /
+/; 3465/,/; 34A1/s/ZP05                           /ZP05_UDG_RAM_Addr_Hi           /

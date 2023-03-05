@@ -1706,33 +1706,41 @@ comment  345A
 label    345C Read_Keyboard_1
 lcomment 345E Set bits 0-4 and 6-7 i.e. 11x11111
 comment  3465
+comment  3465 Reverse video the displayed score area for the active player
 label    3465 Flash_Score
-lcomment 3467 P1 or P2? Branch if P2
-lcomment 346C Store to ZP_UDG_RAM_X
+lcomment 346C ZP04
 const    346C
 lcomment 346D X Y position in pixels
 const    346D
 break    346F
+comment  3470
 label    3470 Flash_Score_1
-lcomment 3479 Number of 8-bit wide characters to reverse
-label    347B Reverse_UDG_Columns
-lcomment 347B Number of pixel lines to reverse
-label    347D Reverse_UDG_Rows
-lcomment 347D Get current byte of character
-lcomment 347F \ reverse it
-lcomment 3481 \ and write it back
-lcomment 3484 All bytes reversed?
-lcomment 3486 \ If yes, continue to next column
-lcomment 3487 All columns reversed? If yes, finish
+comment  3473
+comment  3473 Test IRQ counter, only continue once in 8 calls
+binary   3476
+comment  3479
+deflabel 347A NUM_OF_COLUMNS_TO_REVERSE
+comment  347B
+label    347B Loop_Reverse_UDG_Column
+deflabel 347C NUM_PIXEL_OF_LINES_TO_REVERSE
+label    347D Loop_Reverse_UDG_Pixel_Line
+comment  347D
+comment  347D Get current byte of character, reverse it and write it back
+binary   3480
+comment  3483
+comment  3483 All lines reversed? If no, loop back
+comment  3486
+comment  3486 All columns reversed? If yes, return
 comment  3489
-comment  3489 Move to next column by adding $B0 (#176) pixel to X postion
-lcomment 348C $B0 = height of screen in pixels i.e. move one column right
+comment  3489 Move to next column by adding a columns-worth ($B0 #176) of pixel lines to 16-bit UDG RAM Address
+deflabel 348D SCREEN_HEIGHT_PIXELS
 comment  3490
-comment  3490 Move to top row by adding $B0 (#176) pixeln to X postion i.e. one column
-lcomment 3492 Add the carry from the previous $B0 addition for X
+comment  3496
+comment  3499
 label    3499 Flash_Score_RTS
-label    349A Load_UDG_RAM_for_P2
-lcomment 349D Store to ZP_UDG_RAM_X
+comment  349A
+label    349A Load_UDG_RAM_Addr_For_P2
+lcomment 349D ZP04
 lcomment 349E X Y position in pixels
 const    349E
 break    34A0

@@ -62,12 +62,12 @@ ZP_Score_P1                     equ     $0051
 ZP_Score_P2                     equ     $0054
 ZP_Reverse_And_Color_Data       equ     $0057
 ZP_Flash_Counter                equ     $0058
-ZP_Level_Current_Player         equ     $0059
-ZP_Num_Lives_P1                 equ     $005A
-ZP_Level_Other_Player           equ     $005B
-ZP_Num_Lives_P2                 equ     $005C
+ZP_Level_Active_Player          equ     $0059
+ZP_Number_Of_Lives_P1           equ     $005A
+ZP_Level_Inactive_Player        equ     $005B
+ZP_Number_Of_Lives_P2           equ     $005C
 ZP_Flash_Score_Countdown        equ     $005D
-ZP_P1_Or_P2                     equ     $005E
+ZP_Active_Player                equ     $005E
 ZP_Subroutine_Addr_Lo           equ     $005F
 ZP_Subroutine_Addr_Hi           equ     $0060
 Screen_RAM                      equ     $0200
@@ -140,6 +140,8 @@ SCREEN_HEIGHT_PIXELS            equ     $B0
 OBJECT_COLOR_PARAM              equ     $05
 OBJECT_POSITION_Y_PARAM         equ     $03
 OBJECT_TYPE_PARAM               equ     $00
+NUM_PIXEL_OF_LINES_TO_REVERSE   equ     $0F
+NUM_OF_COLUMNS_TO_REVERSE       equ     $06
 JETMAN_PARAM                    equ     $00
 SCREEN_TOP                      equ     $28
 SCREEN_BOTTOM                   equ     $AF
@@ -844,11 +846,11 @@ Reset_Level_Add_Extra_Life
     jsr     Reset_Screen_Disp_Scores        ; 22BA: 20 16 24 
 
 ; Player at level 4, add another life
-    lda     ZP_Level_Current_Player         ; 22BD: A5 59    
+    lda     ZP_Level_Active_Player          ; 22BD: A5 59    
     and     #$03                            ; 22BF: 29 03    
     bne     Reset_Lev_Add_Extra_Life_2      ; 22C1: D0 0E    
     jsr     Reset_Some_Objects              ; 22C3: 20 0B 23 
-    inc     ZP_Num_Lives_P1                 ; 22C6: E6 5A    
+    inc     ZP_Number_Of_Lives_P1           ; 22C6: E6 5A    
     jsr     Init_Next_Jetman_Lives_Scores   ; 22C8: 20 5B 23 
 ; L_JMP_($22CB)_($22D4) OK
 ; L_JMP_($22CB)_($22E0) OK
@@ -970,7 +972,7 @@ LOOP_INJLS_1
 ; L_JMP_($236F)_($23D1) OK
 LDA_7F_Return
     sta     ZP_Flash_Score_Countdown        ; 236F: 85 5D     Store countdown
-    dec     ZP_Num_Lives_P1                 ; 2371: C6 5A    
+    dec     ZP_Number_Of_Lives_P1           ; 2371: C6 5A    
 
 ; L_JSR_($2373)_($22DA) OK
 ; L_JSR_($2373)_($2EA6) OK
@@ -1024,22 +1026,22 @@ Zero_Lives_To_UDG_RAM
 ; -----------------------
 ; L_JSR_($23B6)_($237A) OK
 Load_Num_Lives
-    lda     ZP_P1_Or_P2                     ; 23B6: A5 5E    
+    lda     ZP_Active_Player                ; 23B6: A5 5E    
     bne     Load_Num_Lives_P2               ; 23B8: D0 03    
 ; L_JMP_($23BA)_($23C4) OK
 Load_Num_Lives_P1
-    lda     ZP_Num_Lives_P1                 ; 23BA: A5 5A    
+    lda     ZP_Number_Of_Lives_P1           ; 23BA: A5 5A    
     rts                                     ; 23BC: 60       
 ; ===========================================================
 ; L_BRS_($23BD)_($23B8) OK
 ; L_BRS_($23BD)_($23C2) OK
 Load_Num_Lives_P2
-    lda     ZP_Num_Lives_P2                 ; 23BD: A5 5C    
+    lda     ZP_Number_Of_Lives_P2           ; 23BD: A5 5C    
     rts                                     ; 23BF: 60       
 ; ===========================================================
 ; L_JSR_($23C0)_($2389) OK
 Load_Num_Lives_Inverse
-    lda     ZP_P1_Or_P2                     ; 23C0: A5 5E    
+    lda     ZP_Active_Player                ; 23C0: A5 5E    
     beq     Load_Num_Lives_P2               ; 23C2: F0 F9    
     jmp     Load_Num_Lives_P1               ; 23C4: 4C BA 23 
 ; -----------------------
@@ -1065,21 +1067,21 @@ Setup_Player_Lives
 ; L_BRS_($23D6)_($23E5) OK
 BACK_SPL
     lda     #$00                            ; 23D6: A9 00    
-    sta     ZP_Level_Current_Player         ; 23D8: 85 59    
+    sta     ZP_Level_Active_Player          ; 23D8: 85 59    
 
     lda     #$04                            ; 23DA: A9 04    
-    sta     ZP_Num_Lives_P1                 ; 23DC: 85 5A    
+    sta     ZP_Number_Of_Lives_P1           ; 23DC: 85 5A    
     jsr     Init_Objects_1_To_3             ; 23DE: 20 FF 22 
     jsr     Swap_Player_And_Objects         ; 23E1: 20 F5 23 
     dey                                     ; 23E4: 88       
     bne     BACK_SPL                        ; 23E5: D0 EF    
 
     lda     #$05                            ; 23E7: A9 05    
-    sta     ZP_Num_Lives_P2                 ; 23E9: 85 5C    
+    sta     ZP_Number_Of_Lives_P2           ; 23E9: 85 5C    
     lda     Game_Settings                   ; 23EB: AD D3 1F 
     and     #$01                            ; 23EE: 29 01    
     bne     SKIP_SPL                        ; 23F0: D0 02    
-    sta     ZP_Num_Lives_P2                 ; 23F2: 85 5C    
+    sta     ZP_Number_Of_Lives_P2           ; 23F2: 85 5C    
 ; L_BRS_($23F4)_($23F0) OK
 SKIP_SPL
     rts                                     ; 23F4: 60       
@@ -1090,12 +1092,12 @@ Swap_Player_And_Objects
     ldx     #$01                            ; 23F5: A2 01    
 ; L_BRS_($23F7)_($2402) OK
 Swap_Player
-    lda     ZP_Level_Current_Player,x       ; 23F7: B5 59    
+    lda     ZP_Level_Active_Player,x        ; 23F7: B5 59    
     pha                                     ; 23F9: 48       
-    lda     ZP_Level_Other_Player,x         ; 23FA: B5 5B    
-    sta     ZP_Level_Current_Player,x       ; 23FC: 95 59    
+    lda     ZP_Level_Inactive_Player,x      ; 23FA: B5 5B    
+    sta     ZP_Level_Active_Player,x        ; 23FC: 95 59    
     pla                                     ; 23FE: 68       
-    sta     ZP_Level_Other_Player,x         ; 23FF: 95 5B    
+    sta     ZP_Level_Inactive_Player,x      ; 23FF: 95 5B    
     dex                                     ; 2401: CA       
     bpl     Swap_Player                     ; 2402: 10 F3    
 
@@ -2418,7 +2420,7 @@ Explosions_2
 Game_Over
     jsr     Check_New_Hi_Score              ; 2987: 20 7A 27 
     jsr     Reset_Screen_Disp_Scores        ; 298A: 20 16 24 
-    lda     ZP_P1_Or_P2                     ; 298D: A5 5E    
+    lda     ZP_Active_Player                ; 298D: A5 5E    
     bne     Game_Over_1                     ; 298F: D0 06    
     jsr     Display_Game_Over_P1            ; 2991: 20 EE 29 
     jmp     Reset_Game_Select               ; 2994: 4C 79 20 
@@ -2449,7 +2451,7 @@ Sound_Channels_Off_ETC
     bne     Sound_Channels_Off_ETC_3        ; 29C1: D0 0D    
 ; L_BRS_($29C3)_($29D2) OK
 Sound_Channels_Off_ETC_1
-    lda     ZP_Num_Lives_P1                 ; 29C3: A5 5A    
+    lda     ZP_Number_Of_Lives_P1           ; 29C3: A5 5A    
     beq     Game_Over                       ; 29C5: F0 C0    
 ; L_JMP_($29C7)_($29E4) OK
 Sound_Channels_Off_ETC_2
@@ -2459,23 +2461,23 @@ Sound_Channels_Off_ETC_2
 ; -----------------------
 ; L_BRS_($29D0)_($29C1) OK
 Sound_Channels_Off_ETC_3
-    lda     ZP_Num_Lives_P2                 ; 29D0: A5 5C    
+    lda     ZP_Number_Of_Lives_P2           ; 29D0: A5 5C    
     beq     Sound_Channels_Off_ETC_1        ; 29D2: F0 EF    
-    lda     ZP_Num_Lives_P1                 ; 29D4: A5 5A    
+    lda     ZP_Number_Of_Lives_P1           ; 29D4: A5 5A    
     bne     Sound_Channels_Off_ETC_4        ; 29D6: D0 03    
     jsr     Display_Game_Over               ; 29D8: 20 E7 29 
 ; L_BRS_($29DB)_($29D6) OK
 Sound_Channels_Off_ETC_4
     jsr     Swap_Player_And_Objects         ; 29DB: 20 F5 23 
-    lda     ZP_P1_Or_P2                     ; 29DE: A5 5E    
+    lda     ZP_Active_Player                ; 29DE: A5 5E    
     eor     #$FF                            ; 29E0: 49 FF    
-    sta     ZP_P1_Or_P2                     ; 29E2: 85 5E    
+    sta     ZP_Active_Player                ; 29E2: 85 5E    
     jmp     Sound_Channels_Off_ETC_2        ; 29E4: 4C C7 29 
 ; -----------------------
 ; L_JSR_($29E7)_($29D8) OK
 Display_Game_Over
     jsr     Reset_Screen_Disp_Scores        ; 29E7: 20 16 24 
-    lda     ZP_P1_Or_P2                     ; 29EA: A5 5E     Game Over for P1 or P2?
+    lda     ZP_Active_Player                ; 29EA: A5 5E     Game Over for P1 or P2?
     bne     Display_Game_Over_P2            ; 29EC: D0 24    
 ; L_JSR_($29EE)_($2991) OK
 Display_Game_Over_P1
@@ -3193,7 +3195,7 @@ LEVEL_0_FUZZBALL
 ; L_BRS_($2C78)_($2C6D) OK
 ; L_JMP_($2C78)_($2C9C) OK
 Alien_Hit_Update_Score
-    lda     ZP_Level_Current_Player         ; 2C78: A5 59    
+    lda     ZP_Level_Active_Player          ; 2C78: A5 59    
     and     #%00000011                      ; 2C7A: 29 03    
     asl     a                               ; 2C7C: 0A       
     tax                                     ; 2C7D: AA       
@@ -3348,7 +3350,7 @@ Next_Object
 ; Set type depending on current level i.e. 0, 1, 2 or 3
 ; L_BRS_($2D0F)_($2D01) OK
 Init_Alien_Object
-    lda     ZP_Level_Current_Player         ; 2D0F: A5 59    
+    lda     ZP_Level_Active_Player          ; 2D0F: A5 59    
     and     #$03                            ; 2D11: 29 03     Zero bits 2-7
     tax                                     ; 2D13: AA        Save current level
     lda     Level_Alien_Type_Lookup,x       ; 2D14: BD 4C 2D 
@@ -3387,7 +3389,7 @@ Init_Alien_Object
     sta     ZP02                            ; 2D39: 85 02    
 
 ; Set object colour randomly, lookup table has 2 colours per level
-    lda     ZP_Level_Current_Player         ; 2D3B: A5 59    
+    lda     ZP_Level_Active_Player          ; 2D3B: A5 59    
     asl     a                               ; 2D3D: 0A       
     and     #%00000110                      ; 2D3E: 29 06    
     clc                                     ; 2D40: 18       
@@ -3573,7 +3575,7 @@ Set_Object_UDG_Color
 ; L_JSR_($2DE8)_($2DD1) OK
 ; L_JSR_($2DE8)_($2EB5) OK
 Restore_Player_Objects_6
-    lda     ZP_Level_Current_Player         ; 2DE8: A5 59    
+    lda     ZP_Level_Active_Player          ; 2DE8: A5 59    
     lsr     a                               ; 2DEA: 4A       
     lsr     a                               ; 2DEB: 4A       
     and     #$03                            ; 2DEC: 29 03     Current level modulus 4
@@ -3644,7 +3646,7 @@ ROCKET_ASCEND
 ; -----------------------
 ; L_BRS_($2E34)_($2E20) OK
 Rocket_At_Top
-    inc     ZP_Level_Current_Player         ; 2E34: E6 59    
+    inc     ZP_Level_Active_Player          ; 2E34: E6 59    
     jsr     Reset_Objects_1_To_8            ; 2E36: 20 C9 28 
     ldy     #$00                            ; 2E39: A0 00    
     lda     #$0B                            ; 2E3B: A9 0B    
@@ -3753,7 +3755,7 @@ ROCKET_BOTTOM_MODULE
     lda     #$00                            ; 2E9C: A9 00    
     sta     Obj_Jetman_State                ; 2E9E: 8D 80 03 
     jsr     Restore_Obj_List_Ptr            ; 2EA1: 20 F0 28 
-    inc     ZP_Num_Lives_P1                 ; 2EA4: E6 5A    
+    inc     ZP_Number_Of_Lives_P1           ; 2EA4: E6 5A    
     jsr     Display_P1_Lives                ; 2EA6: 20 73 23 
     jmp     GOTO_NEXT_OBJECT                ; 2EA9: 4C 1A 26 
 ; -----------------------
@@ -4054,7 +4056,7 @@ Setup_Object_Addr
 ; L_JSR_($2FDA)_($2FC0) OK
 ; L_JSR_($2FDA)_($3057) OK
 Get_Obj_UDG_Data_Addr_Ship_Lvl
-    lda     ZP_Level_Current_Player         ; 2FDA: A5 59    
+    lda     ZP_Level_Active_Player          ; 2FDA: A5 59    
 
 ; Calculate and return object's UDG data address offset based on A e.g. player level
 ; First ship is for levels 0-3, second ship for levels 4-7 then repeat
@@ -4204,7 +4206,7 @@ Load_Rocket_or_Fuel_UDGs_2
 ; L_JSR_($3063)_($2C89) OK
 ; L_JSR_($3063)_($3000) OK
 Update_Score
-    lda     ZP_P1_Or_P2                     ; 3063: A5 5E    
+    lda     ZP_Active_Player                ; 3063: A5 5E    
     bne     Read_ZP_Params_P2_Score         ; 3065: D0 2A     If P2, setup P2 Score instead of P1 and then return after the param setup below
 
 ; Read ZP Params P1 Score
@@ -4237,7 +4239,7 @@ Add_3_Digit_BCD_To_Score
     sta     (ZP06),y                        ; 3084: 91 06    
     cld                                     ; 3086: D8        Clear Decimal Mode
 
-    lda     ZP_P1_Or_P2                     ; 3087: A5 5E     Decide if working with P1 or P2
+    lda     ZP_Active_Player                ; 3087: A5 5E     Decide if working with P1 or P2
     bne     Display_P2_Score_JMP            ; 3089: D0 03    
     jmp     Display_P1_Score                ; 308B: 4C 71 24 
 ; -----------------------
@@ -5192,55 +5194,69 @@ Read_Keyboard_1
 ; 88""   88  .o  dP__Yb  o.`Y8b 888888     o.`Y8b Yb      Yb   dP 88"Yb  88""
 ; 88     88ood8 dP""""Yb 8bodP' 88  88     8bodP'  YboodP  YbodP  88  Yb 888888
 
+; Reverse video the displayed score area for the active player
 ; L_JSR_($3465)_($3351) OK
 Flash_Score
-    lda     ZP_P1_Or_P2                     ; 3465: A5 5E    
-    bne     Load_UDG_RAM_for_P2             ; 3467: D0 31     P1 or P2? Branch if P2
+    lda     ZP_Active_Player                ; 3465: A5 5E    
+    bne     Load_UDG_RAM_Addr_For_P2        ; 3467: D0 31    
     jsr     Load_ZP_Parameters              ; 3469: 20 9D 25 
-    fcb     $04                             ; 346C: 04        Store to ZP_UDG_RAM_X
+    fcb     $04                             ; 346C: 04        ZP04
     fcb     $00,$00                         ; 346D: 00 00     X Y position in pixels
     fcb     $FF                             ; 346F: FF       
+
 ; L_JMP_($3470)_($34A1) OK
 Flash_Score_1
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 3470: 20 1D 35 
-    lda     ZP_HW_IRQ_Count1                ; 3473: A5 4A    
-    and     #$07                            ; 3475: 29 07    
-    bne     Flash_Score_RTS                 ; 3477: D0 20    
-    ldx     #$06                            ; 3479: A2 06     Number of 8-bit wide characters to reverse
-; L_JMP_($347B)_($3496) OK
-Reverse_UDG_Columns
-    ldy     #$0F                            ; 347B: A0 0F     Number of pixel lines to reverse
-; L_BRS_($347D)_($3484) OK
-Reverse_UDG_Rows
-    lda     (ZP04),y                        ; 347D: B1 04     Get current byte of character
-    eor     #$FF                            ; 347F: 49 FF      reverse it
-    sta     (ZP04),y                        ; 3481: 91 04      and write it back
-    dey                                     ; 3483: 88       
-    bpl     Reverse_UDG_Rows                ; 3484: 10 F7     All bytes reversed?
-    dex                                     ; 3486: CA         If yes, continue to next column
-    beq     Flash_Score_RTS                 ; 3487: F0 10     All columns reversed? If yes, finish
 
-; Move to next column by adding $B0 (#176) pixel to X postion
+; Test IRQ counter, only continue once in 8 calls
+    lda     ZP_HW_IRQ_Count1                ; 3473: A5 4A    
+    and     #%00000111                      ; 3475: 29 07    
+    bne     Flash_Score_RTS                 ; 3477: D0 20    
+
+    ldx     #NUM_OF_COLUMNS_TO_REVERSE      ; 3479: A2 06    
+
+; L_JMP_($347B)_($3496) OK
+Loop_Reverse_UDG_Column
+    ldy     #NUM_PIXEL_OF_LINES_TO_REVERSE  ; 347B: A0 0F    
+
+; Get current byte of character, reverse it and write it back
+; L_BRS_($347D)_($3484) OK
+Loop_Reverse_UDG_Pixel_Line
+    lda     (ZP04),y                        ; 347D: B1 04    
+    eor     #%11111111                      ; 347F: 49 FF    
+    sta     (ZP04),y                        ; 3481: 91 04    
+
+; All lines reversed? If no, loop back
+    dey                                     ; 3483: 88       
+    bpl     Loop_Reverse_UDG_Pixel_Line     ; 3484: 10 F7    
+
+; All columns reversed? If yes, return
+    dex                                     ; 3486: CA       
+    beq     Flash_Score_RTS                 ; 3487: F0 10    
+
+; Move to next column by adding a columns-worth ($B0 #176) of pixel lines to 16-bit UDG RAM Address
     lda     ZP04                            ; 3489: A5 04    
     clc                                     ; 348B: 18       
-    adc     #$B0                            ; 348C: 69 B0     $B0 = height of screen in pixels i.e. move one column right
+    adc     #SCREEN_HEIGHT_PIXELS           ; 348C: 69 B0    
     sta     ZP04                            ; 348E: 85 04    
 
-; Move to top row by adding $B0 (#176) pixeln to X postion i.e. one column
     lda     ZP05                            ; 3490: A5 05    
-    adc     #$00                            ; 3492: 69 00     Add the carry from the previous $B0 addition for X
+    adc     #$00                            ; 3492: 69 00    
     sta     ZP05                            ; 3494: 85 05    
-    jmp     Reverse_UDG_Columns             ; 3496: 4C 7B 34 
+
+    jmp     Loop_Reverse_UDG_Column         ; 3496: 4C 7B 34 
 ; -----------------------
+
 ; L_BRS_($3499)_($3477) OK
 ; L_BRS_($3499)_($3487) OK
 Flash_Score_RTS
     rts                                     ; 3499: 60       
 ; ===========================================================
+
 ; L_BRS_($349A)_($3467) OK
-Load_UDG_RAM_for_P2
+Load_UDG_RAM_Addr_For_P2
     jsr     Load_ZP_Parameters              ; 349A: 20 9D 25 
-    fcb     $04                             ; 349D: 04        Store to ZP_UDG_RAM_X
+    fcb     $04                             ; 349D: 04        ZP04
     fcb     $80,$00                         ; 349E: 80 00     X Y position in pixels
     fcb     $FF                             ; 34A0: FF       
     jmp     Flash_Score_1                   ; 34A1: 4C 70 34 
