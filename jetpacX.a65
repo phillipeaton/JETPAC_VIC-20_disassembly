@@ -4810,7 +4810,7 @@ P_TXA_Jump_R
 ; -----------------------
 JETMAN_FLYING_
     jsr     Load_Object_Type_X_Y            ; 3273: 20 D7 35 
-    jsr     Read_Keyboard_Or_Joystick       ; 3276: 20 F7 33  Returns A=%RLDU_F111
+    jsr     Read_Keyboard_Joystick          ; 3276: 20 F7 33  Returns A=%RLDU_F111
     sta     ZP1C_Jetman_Action              ; 3279: 85 1C    
     jsr     Test_Platform_Collision         ; 327B: 20 B3 30  Remove=Jetman+fuel/rocket part pick-up fly through platforms
     lda     ZP02                            ; 327E: A5 02    
@@ -5052,7 +5052,7 @@ Flash_Display_Score_JMP
 ; L_BRS_($336A)_($334F) OK
 Read_Controls_1
     jsr     Load_Object_Type_X_Y            ; 336A: 20 D7 35 
-    jsr     Read_Keyboard_Or_Joystick       ; 336D: 20 F7 33 
+    jsr     Read_Keyboard_Joystick          ; 336D: 20 F7 33 
     jsr     Test_Platform_Collision         ; 3370: 20 B3 30  Remove=Jetman+pickup flies/walks jiggle when standing on a platform
     lda     ZP02                            ; 3373: A5 02    
     bmi     Read_Controls_2                 ; 3375: 30 06    
@@ -5154,16 +5154,16 @@ Jetman_Movement_4
 ; Port B reads $FF=%1111_1111 when nothing pressed i.e. joystick inputs are active low
 ; L_BRS_($33D4)_($33FD) OK
 Read_Joystick
-    lda     VIA1_Port_A                     ; 33D4: AD 11 91  %xxFL_DUxx
+    lda     VIA1_Port_A                     ; 33D4: AD 11 91  %xxxL_DUxx
     rol     a                               ; 33D7: 2A       
-    rol     a                               ; 33D8: 2A        %FLDU_xx00
+    rol     a                               ; 33D8: 2A       
     ora     #%10001111                      ; 33D9: 09 8F     %1LDU_1111
     sta     ZP1C_Jetman_Action              ; 33DB: 85 1C     $FF when nothing pressed
 
 ; Read Fire button
-    lda     VIA1_Port_A                     ; 33DD: AD 11 91  %xxFL_DUxx
+    lda     VIA1_Port_A                     ; 33DD: AD 11 91  %xxFx_xxxx
     ror     a                               ; 33E0: 6A       
-    ror     a                               ; 33E1: 6A        %xxxx_FLDU
+    ror     a                               ; 33E1: 6A       
     ora     #%11110111                      ; 33E2: 09 F7     %1111_F111
     and     ZP1C_Jetman_Action              ; 33E4: 25 1C     %1LDU_F111
     sta     ZP1C_Jetman_Action              ; 33E6: 85 1C     $FF when nothing pressed
@@ -5171,7 +5171,7 @@ Read_Joystick
 ; Read direction Right
     lda     #$00                            ; 33E8: A9 00    
     sta     VIA2_DDR_B                      ; 33EA: 8D 22 91  Set Port B direction all lines read
-    lda     VIA2_Port_B                     ; 33ED: AD 20 91  %xxxx_Rxxx
+    lda     VIA2_Port_B                     ; 33ED: AD 20 91  %Rxxx_xxxx
     ora     #%01111111                      ; 33F0: 09 7F     %R111_1111
     and     ZP1C_Jetman_Action              ; 33F2: 25 1C     %RLDU_F111
     sta     ZP1C_Jetman_Action              ; 33F4: 85 1C     $FF when nothing pressed
@@ -5181,7 +5181,7 @@ Read_Joystick
 ; If joystick selected, branch and return without reading keyboard
 ; L_JSR_($33F7)_($3276) OK
 ; L_JSR_($33F7)_($336D) OK
-Read_Keyboard_Or_Joystick
+Read_Keyboard_Joystick
     lda     Game_Settings                   ; 33F7: AD D3 1F 
     bit     MASK_00000010                   ; 33FA: 2C 15 20 
     bne     Read_Joystick                   ; 33FD: D0 D5    
@@ -5195,64 +5195,70 @@ Read_Keyboard_Or_Joystick
     lda     #%00000000                      ; 3409: A9 00     Set Port B to all inputs
     sta     VIA2_DDR_B                      ; 340B: 8D 22 91 
 
-; Read keyboard matrix ############ TARGET %RLDU_F111
-    lda     VIA2_Port_B                     ; 340E: AD 20 91 
+; Read keyboard matrix, multiple keys can be pressed for each direction and fire, see
+; hardware documentation for more detail
+; Read right & left input keys at the same time (L: Z C B M . RSHFT) (R: LSHFT X V N , /)
+    lda     VIA2_Port_B                     ; 340E: AD 20 91  %xxxR_Lxxx
     rol     a                               ; 3411: 2A       
     rol     a                               ; 3412: 2A       
     rol     a                               ; 3413: 2A       
-    ora     #%00111111                      ; 3414: 09 3F     %xx11_1111
-    sta     ZP1C_Jetman_Action              ; 3416: 85 1C    
+    ora     #%00111111                      ; 3414: 09 3F     %RL11_1111
+    sta     ZP1C_Jetman_Action              ; 3416: 85 1C     %RL11_1111
 
-    lda     VIA2_Port_B                     ; 3418: AD 20 91 
-    tay                                     ; 341B: A8        Save A
+; Read Fire input keys, set 1 (S F H K : =)
+    lda     VIA2_Port_B                     ; 3418: AD 20 91  %xxFx_xxxx
+    tay                                     ; 341B: A8       
     ror     a                               ; 341C: 6A       
     ror     a                               ; 341D: 6A       
-    ora     #%11110111                      ; 341E: 09 F7     %1111_x111
+    ora     #%11110111                      ; 341E: 09 F7     %1111_F111
     and     ZP1C_Jetman_Action              ; 3420: 25 1C    
-    sta     ZP1C_Jetman_Action              ; 3422: 85 1C    
+    sta     ZP1C_Jetman_Action              ; 3422: 85 1C     %RL11_F111
 
-    tya                                     ; 3424: 98        Restore A
+; Read Fire input keys, set 2 (A D G J L ;)
+    tya                                     ; 3424: 98        %xxxx_xFxx
     rol     a                               ; 3425: 2A       
-    ora     #%11110111                      ; 3426: 09 F7     %1111_x111
+    ora     #%11110111                      ; 3426: 09 F7     %1111_F111
     and     ZP1C_Jetman_Action              ; 3428: 25 1C    
-    sta     ZP1C_Jetman_Action              ; 342A: 85 1C    
+    sta     ZP1C_Jetman_Action              ; 342A: 85 1C     %RL11_F111
 
+; Read Up input keys, set 1 (Q E T U O @ UA)
     lda     #%10000000                      ; 342C: A9 80    
     sta     VIA2_Port_A                     ; 342E: 8D 21 91 
-    lda     VIA2_Port_B                     ; 3431: AD 20 91 
+    lda     VIA2_Port_B                     ; 3431: AD 20 91  %xUxx_xxxx
     ror     a                               ; 3434: 6A       
     ror     a                               ; 3435: 6A       
-    ora     #%11101111                      ; 3436: 09 EF     %111x_1111
+    ora     #%11101111                      ; 3436: 09 EF     %111U_1111
     and     ZP1C_Jetman_Action              ; 3438: 25 1C    
-    sta     ZP1C_Jetman_Action              ; 343A: 85 1C    
+    sta     ZP1C_Jetman_Action              ; 343A: 85 1C     %RL1U_F111
 
+; Read Up input keys, set 2 (W R Y I P *)
     lda     #%10000001                      ; 343C: A9 81    
     sta     VIA2_Port_A                     ; 343E: 8D 21 91 
-    lda     VIA2_Port_B                     ; 3441: AD 20 91 
+    lda     VIA2_Port_B                     ; 3441: AD 20 91  %xxxx_xxUx
     rol     a                               ; 3444: 2A       
     rol     a                               ; 3445: 2A       
     rol     a                               ; 3446: 2A       
-    ora     #%11101111                      ; 3447: 09 EF     %111x1111
+    ora     #%11101111                      ; 3447: 09 EF     %111U_1111
     and     ZP1C_Jetman_Action              ; 3449: 25 1C    
-    sta     ZP1C_Jetman_Action              ; 344B: 85 1C    
+    sta     ZP1C_Jetman_Action              ; 344B: 85 1C     %RL1U_F111
 
+; Read Down input keys, set 1 and 2 (2 4 6 8 0 - HOM) & (1 3 5 7 9 + BP)
     lda     #%10000000                      ; 344D: A9 80    
     sta     VIA2_Port_A                     ; 344F: 8D 21 91 
-    lda     VIA2_Port_B                     ; 3452: AD 20 91 
-
+    lda     VIA2_Port_B                     ; 3452: AD 20 91  %Dxxx_xxxD
     tay                                     ; 3455: A8        Save A
-    jsr     Read_Keyboard_1                 ; 3456: 20 5C 34 
+    jsr     Read_Keyboard_Down              ; 3456: 20 5C 34 
     tya                                     ; 3459: 98        Restore A
-
     ror     a                               ; 345A: 6A       
     ror     a                               ; 345B: 6A       
+
 ; L_JSR_($345C)_($3456) OK
-Read_Keyboard_1
+Read_Keyboard_Down
     ror     a                               ; 345C: 6A       
     ror     a                               ; 345D: 6A       
-    ora     #%11011111                      ; 345E: 09 DF     %11x11111
+    ora     #%11011111                      ; 345E: 09 DF     %11D1_1111
     and     ZP1C_Jetman_Action              ; 3460: 25 1C    
-    sta     ZP1C_Jetman_Action              ; 3462: 85 1C    
+    sta     ZP1C_Jetman_Action              ; 3462: 85 1C     %RLDU_F111
     rts                                     ; 3464: 60       
 ; ===========================================================
 

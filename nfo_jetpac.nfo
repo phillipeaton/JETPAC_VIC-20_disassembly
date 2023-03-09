@@ -1665,15 +1665,13 @@ comment  33D4 VIA Port B Bit 7=Left
 comment  33D4 Port B read once for Right
 comment  33D4 Port B reads $FF=%1111_1111 when nothing pressed i.e. joystick inputs are active low
 label    33D4 Read_Joystick
-lcomment 33D4 %xxFL_DUxx
-lcomment 33D8 %FLDU_xx00
+lcomment 33D4 %xxxL_DUxx
 lcomment 33D9 %1LDU_1111
 binary   33DA
 lcomment 33DB $FF when nothing pressed
 comment  33DD
 comment  33DD Read Fire button
-lcomment 33DD %xxFL_DUxx
-lcomment 33E1 %xxxx_FLDU
+lcomment 33DD %xxFx_xxxx
 lcomment 33E2 %1111_F111
 binary   33E3
 lcomment 33E4 %1LDU_F111
@@ -1681,52 +1679,68 @@ lcomment 33E6 $FF when nothing pressed
 comment  33E8
 comment  33E8 Read direction Right
 lcomment 33EA Set Port B direction all lines read
-lcomment 33ED %xxxx_Rxxx
+lcomment 33ED %Rxxx_xxxx
 lcomment 33F0 %R111_1111
 binary   33F1
 lcomment 33F2 %RLDU_F111
 lcomment 33F4 $FF when nothing pressed
 comment  33F7
 comment  33F7 If joystick selected, branch and return without reading keyboard
-label    33F7 Read_Keyboard_Or_Joystick
+label    33F7 Read_Keyboard_Joystick
 comment  33FF
 comment  33FF Read Keyboard, only executed when joystick not selected
 comment  33FF Setup outputs to enable reading of Keyboard matrix
-lcomment  33FF Set Port A to all output
-lcomment  3404 Set Port A outputs
-lcomment  3409 Set Port B to all inputs
+lcomment 33FF Set Port A to all output
+lcomment 3404 Set Port A outputs
+lcomment 3409 Set Port B to all inputs
 binary   3400
 binary   3405
 binary   340A
 comment  340E
-comment  340E Read keyboard matrix ############ TARGET %RLDU_F111
-lcomment 3414 %xx11_1111
+comment  340E Read keyboard matrix, multiple keys can be pressed for each direction and fire, see
+comment  340E hardware documentation for more detail
+comment  340E Read right & left input keys at the same time (L: Z C B M . RSHFT) (R: LSHFT X V N , /)
+lcomment 340E %xxxR_Lxxx
+lcomment 3414 %RL11_1111
 binary   3415
+lcomment 3416 %RL11_1111
 comment  3418
-lcomment 341B Save A
-lcomment 341E %1111_x111
+comment  3418 Read Fire input keys, set 1 (S F H K : =)
+lcomment 3418 %xxFx_xxxx
+lcomment 341E %1111_F111
 binary   341F
+lcomment 3422 %RL11_F111
 comment  3424
-lcomment 3424 Restore A
-lcomment 3426 %1111_x111
+comment  3424 Read Fire input keys, set 2 (A D G J L ;)
+lcomment 3424 %xxxx_xFxx
+lcomment 3426 %1111_F111
 binary   3427
+lcomment 342A %RL11_F111
 comment  342C
+comment  342C Read Up input keys, set 1 (Q E T U O @ UA)
 binary   342D
-lcomment 3436 %111x_1111
+lcomment 3431 %xUxx_xxxx
+lcomment 3436 %111U_1111
 binary   3437
+lcomment 343A %RL1U_F111
 comment  343C
+comment  343C Read Up input keys, set 2 (W R Y I P \*)
 binary   343D
-lcomment 3447 %111x1111
+lcomment 3441 %xxxx_xxUx
+lcomment 3447 %111U_1111
 binary   3448
+lcomment 344B %RL1U_F111
 comment  344D
+comment  344D Read Down input keys, set 1 and 2 (2 4 6 8 0 - HOM) & (1 3 5 7 9 + BP)
 binary   344E
-comment  3455
+lcomment 3452 %Dxxx_xxxD
 lcomment 3455 Save A
 lcomment 3459 Restore A
-comment  345A
-label    345C Read_Keyboard_1
-lcomment 345E %11x11111
+comment  345C
+label    345C Read_Keyboard_Down
+lcomment 345E %11D1_1111
 binary   345F
+lcomment 3462 %RLDU_F111
 comment  3465
 comment  3465 Reverse video the displayed score area for the active player
 label    3465 Flash_Score
