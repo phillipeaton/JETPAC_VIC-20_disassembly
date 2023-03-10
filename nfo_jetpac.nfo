@@ -1631,32 +1631,69 @@ comment  331D
 label    331D V_D_Set_Jetman_Position_Y_Bott
 comment  3321
 label    3321 D_Set_Jetman_Standing
-deflabel 3322 JETMAN_PARAM
+deflabel 3322 JETMAN_STATE_PARAM
 comment  3325
 comment  3325 ROL saves bit 7 (facing direction), LDA #$04 sets bit 2, ROR restores bit 7 and moves
 comment  3325 bit 2 to bit 1 i.e. Jetman action is now Standing
 comment  332C
 label    332C Set_Obj_List_Ptr_Lo_To_7F
 binary   332F
+comment  3337
 label    3337 Set_Obj_List_Ptr_Lo_To_80
 binary   333A
 comment  3342
-label    3342 Add_B8
-label    3348 Add_48
+label    3342 Jetman_Wrap_Left_To_Right
+deflabel 3344 SCREEN_WIDTH_PIXELS
+comment  3348
+label    3348 Jetman_Wrap_Right_To_Left
+deflabel 3349 _100-SCREEN_WIDTH_PIXELS
+comment  334D
 label    334D READ_CONTROLS
+comment  3351
+comment  3351 At start of each life, flash active player score before level begin, until counter reaches zero
+comment  3358
+comment  3358 Display Jetman, color jetman and display scores
+comment  3367
 label    3367 Flash_Display_Score_JMP
+comment  336A
 label    336A Read_Controls_1
 lcomment 3370 Remove=Jetman+pickup flies/walks jiggle when standing on a platform
+comment  3377
+comment  3377 Jetman to Platform collision occurred
+deflabel 3378 JETMAN_POSITION_Y_PARAM
+comment  337D
 label    337D Read_Controls_2
+deflabel 337E JETMAN_STATE_PARAM
+comment  3385
+comment  3389
+comment  338D
 label    338D Read_Controls_3
+comment  338F
 label    338F Read_Controls_4
+deflabel 3390 JETMAN_X_DIRECTION_PARAM
+comment  3398
+comment  339B
+comment  339D
 label    339D Read_Controls_5
-label    339F Jetman_Movement_1
-label    33AF Jetman_Movement_2
+comment  339F
+label    339F Update_Jetman_Direction
+deflabel 33A0 JETMAN_X_DIRECTION_PARAM
+comment  33A3
+comment  33A3 Y becomes JETMAN_POSITION_X_PARAM
+deflabel 33AC SCREEN_WIDTH_PIXELS
+comment  33AF
+label    33AF Store_Jetman_New_Position_X
 lcomment 33B3 Test for direction Up
+binary   33B4
 lcomment 33B5 Yes, branch
+comment  33BA
 label    33BA Jetman_Movement_3
+deflabel 33BB JETMAN_Y_DIRECTION_PARAM
+comment  33C0
 label    33C0 Jetman_Movement_4
+deflabel 33C1 JETMAN_POSITION_Y_PARAM
+comment  33C9
+deflabel 33CA JETMAN_STATE_PARAM
 comment  33D4
 comment  33D4 VIA Port A Bit 2=Up, 3=Down, 4=Left, 5=Fire
 comment  33D4 Port A read twice, 1st for Up/Down/Left, 2nd for Fire
@@ -1734,8 +1771,6 @@ comment  344D
 comment  344D Read Down input keys, set 1 and 2 (2 4 6 8 0 - HOM) & (1 3 5 7 9 + BP)
 binary   344E
 lcomment 3452 %Dxxx_xxxD
-lcomment 3455 Save A
-lcomment 3459 Restore A
 comment  345C
 label    345C Read_Keyboard_Down
 lcomment 345E %11D1_1111

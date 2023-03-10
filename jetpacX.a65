@@ -207,13 +207,15 @@ OBJECT_POSITION_Y_PARAM         equ     $03
 OBJECT_TYPE_PARAM               equ     $00
 NUM_PIXEL_OF_LINES_TO_REVERSE   equ     $0F
 NUM_OF_COLUMNS_TO_REVERSE       equ     $06
-JETMAN_PARAM                    equ     $00
+JETMAN_STATE_PARAM              equ     $00
+JETMAN_POSITION_Y_PARAM         equ     $03
+JETMAN_Y_DIRECTION_PARAM        equ     $04
+JETMAN_X_DIRECTION_PARAM        equ     $02
+_100-SCREEN_WIDTH_PIXELS        equ     $48
 SCREEN_TOP                      equ     $28
 SCREEN_BOTTOM                   equ     $AF
-JETMAN_Y_DIRECTION_PARAM        equ     $04
 JETMAN_POSITION_X_PARAM         equ     $01
 JETMAN_DIRECTION_X_PARAM        equ     $02
-JETMAN_X_DIRECTION_PARAM        equ     $02
 OBJECT_PARAM                    equ     $06
 LIFECYCLE_STATE                 equ     $04
 FUEL_Y_WHEN_LANDED              equ     $A8
@@ -4979,7 +4981,7 @@ V_D_Set_Jetman_Position_Y_Bott
 
 ; L_JMP_($3321)_($31FD) OK
 D_Set_Jetman_Standing
-    ldy     #JETMAN_PARAM                   ; 3321: A0 00    
+    ldy     #JETMAN_STATE_PARAM             ; 3321: A0 00    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 3323: B1 00    
 
 ; ROL saves bit 7 (facing direction), LDA #$04 sets bit 2, ROR restores bit 7 and moves
@@ -5012,43 +5014,52 @@ Set_Obj_List_Ptr_Lo_To_7F
     and     #%01111111                      ; 332E: 29 7F    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 3330: 91 00    
     lda     #$01                            ; 3332: A9 01    
-    jmp     Jetman_Movement_1               ; 3334: 4C 9F 33 
+    jmp     Update_Jetman_Direction         ; 3334: 4C 9F 33 
 ; -----------------------
+
 ; L_BRS_($3337)_($3383) OK
 Set_Obj_List_Ptr_Lo_To_80
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 3337: B1 00    
     ora     #%10000000                      ; 3339: 09 80    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 333B: 91 00    
     lda     #$FF                            ; 333D: A9 FF    
-    jmp     Jetman_Movement_1               ; 333F: 4C 9F 33 
+    jmp     Update_Jetman_Direction         ; 333F: 4C 9F 33 
 ; -----------------------
 
 ; L_BRS_($3342)_($33A9) OK
-Add_B8
+Jetman_Wrap_Left_To_Right
     clc                                     ; 3342: 18       
-    adc     #$B8                            ; 3343: 69 B8    
-    jmp     Jetman_Movement_2               ; 3345: 4C AF 33 
+    adc     #SCREEN_WIDTH_PIXELS            ; 3343: 69 B8    
+    jmp     Store_Jetman_New_Position_X     ; 3345: 4C AF 33 
 ; -----------------------
+
 ; L_BRS_($3348)_($33AD) OK
-Add_48
-    adc     #$48                            ; 3348: 69 48    
-    jmp     Jetman_Movement_2               ; 334A: 4C AF 33 
+Jetman_Wrap_Right_To_Left
+    adc     #_100-SCREEN_WIDTH_PIXELS       ; 3348: 69 48    
+    jmp     Store_Jetman_New_Position_X     ; 334A: 4C AF 33 
 ; -----------------------
+
 READ_CONTROLS
     lda     ZP_Flash_Score_Countdown        ; 334D: A5 5D    
     beq     Read_Controls_1                 ; 334F: F0 19    
+
+; At start of each life, flash active player score before level begin, until counter reaches zero
     jsr     Flash_Score                     ; 3351: 20 65 34 
     dec     ZP_Flash_Score_Countdown        ; 3354: C6 5D    
     bne     Flash_Display_Score_JMP         ; 3356: D0 0F    
+
+; Display Jetman, color jetman and display scores
     jsr     Display_Object_With_Setup_1     ; 3358: 20 01 36 
     jsr     Colorize_Object                 ; 335B: 20 1F 38 
     jsr     Display_1UP_HI_2UP_Titles       ; 335E: 20 25 24 
     jsr     Display_P1_Score                ; 3361: 20 71 24 
     jsr     Display_P2_Score                ; 3364: 20 81 24 
+
 ; L_BRS_($3367)_($3356) OK
 Flash_Display_Score_JMP
     jmp     GOTO_NEXT_OBJECT                ; 3367: 4C 1A 26 
 ; -----------------------
+
 ; L_BRS_($336A)_($334F) OK
 Read_Controls_1
     jsr     Load_Object_Type_X_Y            ; 336A: 20 D7 35 
@@ -5056,70 +5067,87 @@ Read_Controls_1
     jsr     Test_Platform_Collision         ; 3370: 20 B3 30  Remove=Jetman+pickup flies/walks jiggle when standing on a platform
     lda     ZP02                            ; 3373: A5 02    
     bmi     Read_Controls_2                 ; 3375: 30 06    
-    ldy     #$03                            ; 3377: A0 03    
+
+; Jetman to Platform collision occurred
+    ldy     #JETMAN_POSITION_Y_PARAM        ; 3377: A0 03    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 3379: B1 00    
     bpl     Jetman_Movement_4               ; 337B: 10 43    
+
 ; L_BRS_($337D)_($3375) OK
 Read_Controls_2
-    ldy     #$00                            ; 337D: A0 00    
+    ldy     #JETMAN_STATE_PARAM             ; 337D: A0 00    
     bit     ZP1C_Jetman_Action              ; 337F: 24 1C    
     bpl     Set_Obj_List_Ptr_Lo_To_7F       ; 3381: 10 A9    
     bvc     Set_Obj_List_Ptr_Lo_To_80       ; 3383: 50 B2    
+
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 3385: B1 00    
     bmi     Read_Controls_3                 ; 3387: 30 04    
+
     ldx     #$01                            ; 3389: A2 01    
     bpl     Read_Controls_4                 ; 338B: 10 02    
+
 ; L_BRS_($338D)_($3387) OK
 Read_Controls_3
     ldx     #$FF                            ; 338D: A2 FF    
+
 ; L_BRS_($338F)_($338B) OK
 Read_Controls_4
-    ldy     #$02                            ; 338F: A0 02    
+    ldy     #JETMAN_X_DIRECTION_PARAM       ; 338F: A0 02    
     lda     ZP02                            ; 3391: A5 02    
     bpl     Read_Controls_5                 ; 3393: 10 08    
     bit     MASK_00000010                   ; 3395: 2C 15 20 
+
     php                                     ; 3398: 08       
     txa                                     ; 3399: 8A       
     plp                                     ; 339A: 28       
-    bne     Jetman_Movement_1               ; 339B: D0 02    
+
+    bne     Update_Jetman_Direction         ; 339B: D0 02    
+
 ; L_BRS_($339D)_($3393) OK
 Read_Controls_5
     lda     #$00                            ; 339D: A9 00    
+
 ; L_JMP_($339F)_($3334) OK
 ; L_JMP_($339F)_($333F) OK
 ; L_BRS_($339F)_($339B) OK
-Jetman_Movement_1
-    ldy     #$02                            ; 339F: A0 02    
+Update_Jetman_Direction
+    ldy     #JETMAN_X_DIRECTION_PARAM       ; 339F: A0 02    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33A1: 91 00    
+
+; Y becomes JETMAN_POSITION_X_PARAM
     dey                                     ; 33A3: 88       
     clc                                     ; 33A4: 18       
     adc     (ZP00_Obj_List_Ptr_Lo),y        ; 33A5: 71 00    
     cmp     #$F0                            ; 33A7: C9 F0    
-    bcs     Add_B8                          ; 33A9: B0 97    
-    cmp     #$B8                            ; 33AB: C9 B8    
-    bcs     Add_48                          ; 33AD: B0 99    
+    bcs     Jetman_Wrap_Left_To_Right       ; 33A9: B0 97    
+    cmp     #SCREEN_WIDTH_PIXELS            ; 33AB: C9 B8    
+    bcs     Jetman_Wrap_Right_To_Left       ; 33AD: B0 99    
+
 ; L_JMP_($33AF)_($3345) OK
 ; L_JMP_($33AF)_($334A) OK
-Jetman_Movement_2
+Store_Jetman_New_Position_X
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33AF: 91 00    
     lda     ZP1C_Jetman_Action              ; 33B1: A5 1C    
-    and     #$10                            ; 33B3: 29 10     Test for direction Up
+    and     #%00010000                      ; 33B3: 29 10     Test for direction Up
     beq     Jetman_Movement_3               ; 33B5: F0 03     Yes, branch
     jmp     X_Jetman_Screen_Update          ; 33B7: 4C F9 32 
 ; -----------------------
+
 ; L_BRS_($33BA)_($33B5) OK
 Jetman_Movement_3
-    ldy     #$04                            ; 33BA: A0 04    
+    ldy     #JETMAN_Y_DIRECTION_PARAM       ; 33BA: A0 04    
     lda     #$FE                            ; 33BC: A9 FE    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33BE: 91 00    
+
 ; L_BRS_($33C0)_($337B) OK
 Jetman_Movement_4
-    ldy     #$03                            ; 33C0: A0 03    
+    ldy     #JETMAN_POSITION_Y_PARAM        ; 33C0: A0 03    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 33C2: B1 00    
     sec                                     ; 33C4: 38       
     sbc     #$03                            ; 33C5: E9 03    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33C7: 91 00    
-    ldy     #$00                            ; 33C9: A0 00    
+
+    ldy     #JETMAN_STATE_PARAM             ; 33C9: A0 00    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 33CB: B1 00    
     rol     a                               ; 33CD: 2A       
     lda     #$02                            ; 33CE: A9 02    
@@ -5246,9 +5274,9 @@ Read_Keyboard_Joystick
     lda     #%10000000                      ; 344D: A9 80    
     sta     VIA2_Port_A                     ; 344F: 8D 21 91 
     lda     VIA2_Port_B                     ; 3452: AD 20 91  %Dxxx_xxxD
-    tay                                     ; 3455: A8        Save A
+    tay                                     ; 3455: A8       
     jsr     Read_Keyboard_Down              ; 3456: 20 5C 34 
-    tya                                     ; 3459: 98        Restore A
+    tya                                     ; 3459: 98       
     ror     a                               ; 345A: 6A       
     ror     a                               ; 345B: 6A       
 
