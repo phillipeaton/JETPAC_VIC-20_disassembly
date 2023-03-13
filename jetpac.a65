@@ -146,7 +146,7 @@ JETMAN_STATE_PARAM              equ     $00
 JETMAN_POSITION_Y_PARAM         equ     $03
 JETMAN_Y_DIRECTION_PARAM        equ     $04
 JETMAN_X_DIRECTION_PARAM        equ     $02
-_100-SCREEN_WIDTH_PIXELS        equ     $48
+_100_MINUS_SCREEN_WIDTH_PIXELS  equ     $48
 SCREEN_TOP                      equ     $28
 SCREEN_BOTTOM                   equ     $AF
 JETMAN_POSITION_X_PARAM         equ     $01
@@ -4944,21 +4944,21 @@ D_Set_Jetman_Standing
 ; #########################################################################################
 
 ; L_BRS_($332C)_($3381) OK
-Set_Obj_List_Ptr_Lo_To_7F
+Set_Jetman_Facing_Right
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 332C: B1 00    
-    and     #%01111111                      ; 332E: 29 7F    
+    and     #%01111111                      ; 332E: 29 7F     Zero bit 7
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 3330: 91 00    
     lda     #$01                            ; 3332: A9 01    
-    jmp     Update_Jetman_Direction         ; 3334: 4C 9F 33 
+    jmp     Update_Jetman_Direction_Posn    ; 3334: 4C 9F 33 
 ; -----------------------
 
 ; L_BRS_($3337)_($3383) OK
-Set_Obj_List_Ptr_Lo_To_80
+Set_Jetman_Facing_Left
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 3337: B1 00    
-    ora     #%10000000                      ; 3339: 09 80    
+    ora     #%10000000                      ; 3339: 09 80     Set bit 7
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 333B: 91 00    
     lda     #$FF                            ; 333D: A9 FF    
-    jmp     Update_Jetman_Direction         ; 333F: 4C 9F 33 
+    jmp     Update_Jetman_Direction_Posn    ; 333F: 4C 9F 33 
 ; -----------------------
 
 ; L_BRS_($3342)_($33A9) OK
@@ -4970,7 +4970,7 @@ Jetman_Wrap_Left_To_Right
 
 ; L_BRS_($3348)_($33AD) OK
 Jetman_Wrap_Right_To_Left
-    adc     #_100-SCREEN_WIDTH_PIXELS       ; 3348: 69 48    
+    adc     #_100_MINUS_SCREEN_WIDTH_PIXELS ; 3348: 69 48    
     jmp     Store_Jetman_New_Position_X     ; 334A: 4C AF 33 
 ; -----------------------
 
@@ -5001,51 +5001,59 @@ Read_Controls_1
     jsr     Read_Keyboard_Joystick          ; 336D: 20 F7 33 
     jsr     Test_Platform_Collision         ; 3370: 20 B3 30  Remove=Jetman+pickup flies/walks jiggle when standing on a platform
     lda     ZP02                            ; 3373: A5 02    
-    bmi     Read_Controls_2                 ; 3375: 30 06    
+    bmi     Set_Jetman_Facing_Direction     ; 3375: 30 06    
 
-; Jetman to Platform collision occurred
+; Jetman has walked off edge of platform, test if Position Y is negative, which
+; only appears to be the case when Jetman is below all the platforms
     ldy     #JETMAN_POSITION_Y_PARAM        ; 3377: A0 03    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 3379: B1 00    
-    bpl     Jetman_Movement_4               ; 337B: 10 43    
+    bpl     Jetman_From_Standing_To_Flying  ; 337B: 10 43    
 
 ; L_BRS_($337D)_($3375) OK
-Read_Controls_2
+Set_Jetman_Facing_Direction
     ldy     #JETMAN_STATE_PARAM             ; 337D: A0 00    
     bit     ZP1C_Jetman_Action              ; 337F: 24 1C    
-    bpl     Set_Obj_List_Ptr_Lo_To_7F       ; 3381: 10 A9    
-    bvc     Set_Obj_List_Ptr_Lo_To_80       ; 3383: 50 B2    
+    bpl     Set_Jetman_Facing_Right         ; 3381: 10 A9    
+    bvc     Set_Jetman_Facing_Left          ; 3383: 50 B2    
 
+; Test Jetman direction
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 3385: B1 00    
-    bmi     Read_Controls_3                 ; 3387: 30 04    
+    bmi     Jetman_Walking_Left             ; 3387: 30 04    
 
+; Jetman walking right, prepare new Direction X value
     ldx     #$01                            ; 3389: A2 01    
-    bpl     Read_Controls_4                 ; 338B: 10 02    
+    bpl     Test_Collision_Status????       ; 338B: 10 02    
 
+; Jetman walking left, prepare new Direction X value
 ; L_BRS_($338D)_($3387) OK
-Read_Controls_3
+Jetman_Walking_Left
     ldx     #$FF                            ; 338D: A2 FF    
 
 ; L_BRS_($338F)_($338B) OK
-Read_Controls_4
+Test_Collision_Status????
     ldy     #JETMAN_X_DIRECTION_PARAM       ; 338F: A0 02    
     lda     ZP02                            ; 3391: A5 02    
-    bpl     Read_Controls_5                 ; 3393: 10 08    
+    bpl     Jetman_Not_Moving_X_Axis        ; 3393: 10 08    
+
+; Set Zero flag as AND between between content of addr 2015 (i.e. 0000_0010) and A (i.e. ZP02)
+; DON'T KNOW WHY, guess need to decode ZP02 collision status
     bit     MASK_00000010                   ; 3395: 2C 15 20 
 
+; Move X into A without affecting the CPU status flags
     php                                     ; 3398: 08       
     txa                                     ; 3399: 8A       
     plp                                     ; 339A: 28       
 
-    bne     Update_Jetman_Direction         ; 339B: D0 02    
+    bne     Update_Jetman_Direction_Posn    ; 339B: D0 02    
 
 ; L_BRS_($339D)_($3393) OK
-Read_Controls_5
+Jetman_Not_Moving_X_Axis
     lda     #$00                            ; 339D: A9 00    
 
 ; L_JMP_($339F)_($3334) OK
 ; L_JMP_($339F)_($333F) OK
 ; L_BRS_($339F)_($339B) OK
-Update_Jetman_Direction
+Update_Jetman_Direction_Posn
     ldy     #JETMAN_X_DIRECTION_PARAM       ; 339F: A0 02    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33A1: 91 00    
 
@@ -5074,14 +5082,16 @@ Jetman_Movement_3
     lda     #$FE                            ; 33BC: A9 FE    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33BE: 91 00    
 
+; Move Jetman upwards by three pixels
 ; L_BRS_($33C0)_($337B) OK
-Jetman_Movement_4
+Jetman_From_Standing_To_Flying
     ldy     #JETMAN_POSITION_Y_PARAM        ; 33C0: A0 03    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 33C2: B1 00    
     sec                                     ; 33C4: 38       
     sbc     #$03                            ; 33C5: E9 03    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33C7: 91 00    
 
+; Change Jetman state from Standing to Flying
     ldy     #JETMAN_STATE_PARAM             ; 33C9: A0 00    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 33CB: B1 00    
     rol     a                               ; 33CD: 2A       

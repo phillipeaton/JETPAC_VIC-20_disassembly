@@ -1636,17 +1636,19 @@ comment  3325
 comment  3325 ROL saves bit 7 (facing direction), LDA #$04 sets bit 2, ROR restores bit 7 and moves
 comment  3325 bit 2 to bit 1 i.e. Jetman action is now Standing
 comment  332C
-label    332C Set_Obj_List_Ptr_Lo_To_7F
+label    332C Set_Jetman_Facing_Right
+lcomment 332E Zero bit 7
 binary   332F
 comment  3337
-label    3337 Set_Obj_List_Ptr_Lo_To_80
+label    3337 Set_Jetman_Facing_Left
+lcomment 3339 Set bit 7
 binary   333A
 comment  3342
 label    3342 Jetman_Wrap_Left_To_Right
 deflabel 3344 SCREEN_WIDTH_PIXELS
 comment  3348
 label    3348 Jetman_Wrap_Right_To_Left
-deflabel 3349 _100-SCREEN_WIDTH_PIXELS
+deflabel 3349 _100_MINUS_SCREEN_WIDTH_PIXELS
 comment  334D
 label    334D READ_CONTROLS
 comment  3351
@@ -1659,24 +1661,32 @@ comment  336A
 label    336A Read_Controls_1
 lcomment 3370 Remove=Jetman+pickup flies/walks jiggle when standing on a platform
 comment  3377
-comment  3377 Jetman to Platform collision occurred
+comment  3377 Jetman has walked off edge of platform, test if Position Y is negative, which
+comment  3377 only appears to be the case when Jetman is below all the platforms
 deflabel 3378 JETMAN_POSITION_Y_PARAM
 comment  337D
-label    337D Read_Controls_2
+label    337D Set_Jetman_Facing_Direction
 deflabel 337E JETMAN_STATE_PARAM
 comment  3385
+comment  3385 Test Jetman direction
 comment  3389
+comment  3389 Jetman walking right, prepare new Direction X value
 comment  338D
-label    338D Read_Controls_3
+comment  338D Jetman walking left, prepare new Direction X value
+label    338D Jetman_Walking_Left
 comment  338F
-label    338F Read_Controls_4
+label    338F Test_Collision_Status????
 deflabel 3390 JETMAN_X_DIRECTION_PARAM
+comment  3395
+comment  3395 Set Zero flag as AND between between content of addr 2015 (i.e. 0000_0010) and A (i.e. ZP02)
+comment  3395 DON'T KNOW WHY, guess need to decode ZP02 collision status
 comment  3398
+comment  3398 Move X into A without affecting the CPU status flags
 comment  339B
 comment  339D
-label    339D Read_Controls_5
+label    339D Jetman_Not_Moving_X_Axis
 comment  339F
-label    339F Update_Jetman_Direction
+label    339F Update_Jetman_Direction_Posn
 deflabel 33A0 JETMAN_X_DIRECTION_PARAM
 comment  33A3
 comment  33A3 Y becomes JETMAN_POSITION_X_PARAM
@@ -1690,9 +1700,11 @@ comment  33BA
 label    33BA Jetman_Movement_3
 deflabel 33BB JETMAN_Y_DIRECTION_PARAM
 comment  33C0
-label    33C0 Jetman_Movement_4
+comment  33C0 Move Jetman upwards by three pixels
+label    33C0 Jetman_From_Standing_To_Flying
 deflabel 33C1 JETMAN_POSITION_Y_PARAM
 comment  33C9
+comment  33C9 Change Jetman state from Standing to Flying
 deflabel 33CA JETMAN_STATE_PARAM
 comment  33D4
 comment  33D4 VIA Port A Bit 2=Up, 3=Down, 4=Left, 5=Fire
