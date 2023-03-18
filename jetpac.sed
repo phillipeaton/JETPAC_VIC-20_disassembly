@@ -3,6 +3,33 @@
 
 # Local Zero Page variables for Display_Sprite routine
 
+# DISPLAY_LASERS
+/ZP02                            equ     $0002/a ZP02_Laser_Param_Countdown      equ     $0002
+/ZP04                            equ     $0004/a ZP04_Laser_UDG_RAM_Lo           equ     $0004
+/ZP05                            equ     $0005/a ZP05_Laser_UDG_RAM_Hi           equ     $0005
+/ZP06                            equ     $0006/a ZP06_Laser_UDG_RAM_Lo           equ     $0006
+/ZP07                            equ     $0007/a ZP07_TEMP_SOMETHING             equ     $0007
+/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
+/ZP13                            equ     $0013/a ZP13_Laser_Position_Y           equ     $0013
+/ZP14                            equ     $0014/a ZP14_                           equ     $0014
+/ZP15                            equ     $0015/a ZP15_                           equ     $0015
+/ZP16                            equ     $0016/a ZP16_                           equ     $0016
+/ZP17                            equ     $0017/a ZP17_                           equ     $0017
+/ZP1B                            equ     $001B/a ZP1B_Laser_Color                equ     $001B
+/; 2195/,/; 22B9/s/ZP02                           /ZP02_Laser_Param_Countdown     /
+/; 2195/,/; 22B9/s/ZP04                           /ZP04_Laser_UDG_RAM_Lo          /
+/; 2195/,/; 22B9/s/(ZP04),y                       /(ZP04_Laser_UDG_RAM_Lo),y      /
+/; 2195/,/; 22B9/s/ZP05                           /ZP05_Laser_UDG_RAM_Hi          /
+/; 2195/,/; 22B9/s/ZP06                           /ZP06_Laser_UDG_RAM_Lo          /
+/; 2195/,/; 22B9/s/ZP07                           /ZP07_TEMP_SOMETHING            /
+/; 2195/,/; 22B9/s/ZP0C                           /ZP0C_Color_RAM_Tile_Addr_Lo    /
+/; 2195/,/; 22B9/s/(ZP0C),y                       /(ZP0C_Color_RAM_Tile_Addr_Lo),y/
+/; 2195/,/; 22B9/s/ZP13                           /ZP13_Laser_Position_Y          /
+/; 2195/,/; 22B9/s/ZP14                           /ZP14_                          /
+/; 2195/,/; 22B9/s/ZP15                           /ZP15_                          /
+/; 2195/,/; 22B9/s/ZP16                           /ZP16_                          /
+/; 2195/,/; 22B9/s/ZP1B                           /ZP1B_Laser_Color               /
+
 # Display_Object
 /ZP02                            equ     $0002/a ZP02_Object_Old_Height_Index    equ     $0002
 /ZP03                            equ     $0003/a ZP03_Object_Old_Height          equ     $0003
@@ -75,7 +102,7 @@
 # Colorize_Object
 /ZP0A                            equ     $000A/a ZP0A_Color_RAM_Tiles_X          equ     $000A
 /ZP0B                            equ     $000B/a ZP0B_Color_RAM_Tiles_Y          equ     $000B
-/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
+#/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
 /ZP16                            equ     $0016/a ZP16_Object_Size_X_Columns      equ     $0016
 /ZP17                            equ     $0017/a ZP17_Object_Size_Y_Pixels       equ     $0017
 #/ZP18                            equ     $0018/a ZP18_Object_Position_X_         equ     $0018 ALREADY DEFINED
@@ -239,3 +266,4 @@
 /; 3465/,/; 34A1/s/ZP04                           /ZP04_UDG_RAM_Addr_Lo           /
 /; 3465/,/; 34A1/s/(ZP04),y                       /(ZP04_UDG_RAM_Addr_Lo),y       /
 /; 3465/,/; 34A1/s/ZP05                           /ZP05_UDG_RAM_Addr_Hi           /
+

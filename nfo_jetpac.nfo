@@ -209,106 +209,143 @@ label    218D Laser_Jetman_Facing_Right_3
 lcomment 218D Restore saved Jetman attrib 00
 lcomment 2190 Add $10 for some reason??????????
 comment  2195
-label    2195 Fire_Pressed_0
+label    2195 Add_08
 label    219A DISPLAY_LASERS
 lcomment 219A ???????
+comment  21A0
+comment  21A0 Y becomes $07 i.e. Laser Color parameter
 lcomment 21A0 Y=$07, laser color addr
 lcomment 21A1 Fetch laser color
 lcomment 21A3 Store to ZP variable
 comment  21A5
 comment  21A5 Get laser X and Y-coord and store to temp vars
-lcomment 21A5 Y=$02, X-coord of laser horizontal end point
-lcomment 21AD Y=$01, Y-coord of laser
+deflabel 21A6 LASER_ENDPOINT_X
+comment  21AD
+comment  21AD Y becomes $01 i.e. Laser Position Y
 comment  21B4
 comment  21B4 Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
 comment  21C1
-comment  21C1 Test if X-coord of laser is on a boundary and wrap if necessary ######## NEEDS CONFIRM
+comment  21C1 Test if firing left or right
+comment  21C7
+comment  21C7 Add 8 if firing left or -8 if firing right ($F8 is -8)
 comment  21CB
-label    21CB FP1111
+label    21CB Firing_Left_Right_Continue
 lcomment 21CE Save A
-lcomment 21D1 Get Y Coord
-lcomment 21D4 Test Y coord bit 7 ???
-lcomment 21D8 Get X Coord
-label    21DC FP2222
+deflabel 21D0 LASER_POSITION_Y
+comment  21D3
+comment  21D3 Y becomes $00 i.e. Laser Type/Direction Facing parameter
+binary   21D5
+label    21DC Laser_Facing_Left???
+comment  21DC
 lcomment 21DC Restore A
-comment  21DD
 comment  21DF
 comment  21DF Reverse the displayed 8-bit byte on-screen
+binary   21E2
 comment  21E5
 comment  21E5 Load current tile color, check it's not green, if not update tile color
 lcomment 21E5 ZP0C_Col_RAM_Ptr_Lo
 lcomment 21E7 Zero top 4 bits
+binary   21E8
 lcomment 21E9 Test if 0101
 deflabel 21EA GREEN
-lcomment 21ED Tile color
+comment  21ED
 lcomment 21EF ZP0C_Col_RAM_Ptr_Lo
 comment  21F1
-comment  21F1 Some kind of screen wrap?
-label    21F1 FP3333
-label    21FC FP4444
+label    21F1 Setup_Delay_Pattens?
+comment  21F8
+binary   21F9
+label    21FC UDG_RAM_Zero_Bit_2
+lcomment 21FE Zero bit 2 i.e. xxxx_x0xx
+binary   21FF
 comment  2202
-comment  2202 Loads ZP 14/15/16/17 with seed values, which are something to do with the four lasers
-label    2202 FP5555
-lcomment 2205 ZP_0A_Lo/Hi
+comment  2202 Loads ZP 14/15/16/17 with laser decay pattern, initial laser is a line of $FF's then $03
+comment  2202 subtracted leaving $FC, then $1C subtracted leaving $E0, the subtracting $E0 leaves $00
+label    2202 Setup_Laser_Decay_Patterns
+lcomment 2205 ZP14/15
+lcomment 2206 Laser decay pattern
 break    2206
-lcomment 2208 ZP_0B_Lo/Hi
+lcomment 2208 ZP16/17
+lcomment 2209 Laser decay pattern
 break    2208
 break    2209
-lcomment 220B ZP_01_Lo/Hi
+lcomment 220B ZP02/03
+lcomment 220C Countdown for laser params
 break    220B
+const    220C
+word     220C
 break    220C
 break    220E
 comment  220F
 comment  220F Iterate round each of the laser shots that could be active for display
-label    2211 FP6666
+label    2211 Iterate_Laser_Params_2_3_4_5
 lcomment 2211 First time round, Y=3, next time 4 and so on
 lcomment 2212 Get one of the four laser object paramenters
 lcomment 2216 Zero bottom 3 bits, probably testing if laser shot ended
-lcomment 221D Active laser shots counter at zero?
+binary   2217
 lcomment 221F No, process next laser shot
 comment  2221
 comment  2221 All laser shows ended, zero laser shots object type
+deflabel 2222 LASER_TYPE_PARAM
 comment  2229
 comment  2229 Process laser shot, update parameters in object table
 label    2229 FP7777
 lcomment 2229 Get one of the four laser object paramenters
-lcomment 223A Zero bit top 6 bits
-lcomment 223C Set bit 2, now is 000001xx
+comment  2230
+binary   2235
+comment  2238
+lcomment 223A Zero bits 2-8 i.e. 0000_00xx
+binary   223B
+lcomment 223C Set bit 2 i.e. 0000_01xx
+binary   223D
+comment  2242
 lcomment 2244 Set bit 2
+binary   2245
 comment  2248
 comment  2248 Update object list parameteters from ZP temp vars
-label    2248 FP8888
+label    2248 Update_Obj_Params_And_Exit
 comment  224E
+deflabel 224F  LASER_ENDPOINT_X
 comment  2254
+comment  2257
 comment  2257 Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
 label    2257 FP9999
-label    2263 FPAAAA
+comment  225E
+comment  225E Add 8 if firing left or -8 if firing right ($F8 is -8)
+comment  2263
+label    2263 Firing_Left_Right_Continue_
+comment  2268
 comment  226C
 comment  226C EXOR-write data in ZP variable to UDG RAM
 lcomment 226C Save Y
+comment  226D
+comment  2274
+comment  227C
 lcomment 227D Restore Y
 comment  227E
 lcomment 2280 Iterate to next laser shot
 lcomment 2282 Update object list and exit subroutine
-label    2285 CLC_ADC_08
+label    2285 ADC_08_
 label    228B Laser_ZP17_15_to_ZP16_14
 comment  2298 Looks like it's doing some checks on the X coord, e.g. laser wraparound
-label    2298 Laser_Wrap?
-lcomment 229B $B8=screen width in pixels
-label    22A1 Laser_Wrap_1?
-lcomment 22A1 Save Y on Stack
-lcomment 22A5 Get object's type/direction byte
-lcomment 22A7 Test Bit 7 is set i.e. towards left
-lcomment 22AA No, branch
-lcomment 22AC Restore Y from Stack
+label    2298 Laser_Wrap
+binary   229A
+deflabel 229C SCREEN_WIDTH_PIXELS
+label    22A1 Laser_Wrap_Left_To_Right
+comment  22A3
+comment  22A3 Test top bit i.e. direction left or right
+deflabel 22A4 LASER_TYPE_PARAM
 comment  22AE
-lcomment 22AF Zero the top 5 bits
-lcomment 22B1 Set bits 7,5,4, now it's 1011 0xxx
-comment  22B4 Towards right
-label    22B4 Laser_JFL_2
-lcomment 22B4 Restore Y from Stack
+comment  22AE Set the approprite left to right X co-ordinate bits
+lcomment 22AF Zero top 5 bits i.e. 0000_0xxx
+binary   22B0
+lcomment 22B1 Set bits 7,5,4 i.e. 1011_0xxx
+binary   22B2
+comment  22B4
+label    22B4 Laser_Wrap_Right_To_Left
 comment  22B6
-lcomment 22B7 Zero the top 5 bits
+comment  22B6 Set the approprite right to left X co-ordinate bits
+lcomment 22B7 Zero top 5 bits i.e. 0000_0xxx
+binary   22B8
 comment  22BA
 label    22BA Reset_Level_Add_Extra_Life
 comment  22BD
@@ -1621,7 +1658,7 @@ comment  32F9
 label    32F9 X_Jetman_Screen_Update
 comment  32FF
 comment  32FF Test for fire pressed
-label    3309 SKIP_3309
+label    3309 No_Fire_Pressed
 comment  330C
 comment  330C Load and test Jetman Y Direction
 label    330C Y_Update_Jetman_Direction_Y
@@ -1686,7 +1723,7 @@ comment  339B
 comment  339D
 label    339D Jetman_Not_Moving_X_Axis
 comment  339F
-label    339F Update_Jetman_Direction_Posn
+label    339F Update_JM_Direction_Position_X
 deflabel 33A0 JETMAN_X_DIRECTION_PARAM
 comment  33A3
 comment  33A3 Y becomes JETMAN_POSITION_X_PARAM
@@ -1697,7 +1734,7 @@ lcomment 33B3 Test for direction Up
 binary   33B4
 lcomment 33B5 Yes, branch
 comment  33BA
-label    33BA Jetman_Movement_3
+label    33BA Update_JM_Direction_Position_Y
 deflabel 33BB JETMAN_Y_DIRECTION_PARAM
 comment  33C0
 comment  33C0 Move Jetman upwards by three pixels

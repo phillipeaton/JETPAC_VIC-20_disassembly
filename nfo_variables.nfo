@@ -92,7 +92,7 @@ label    0384 Obj_Jetman_Direction_Y    ; Range between FC=Up to 04=Down at rest
 ;label   0387 Obj_Jetman_0387
 
 
-; Byte 00/08= object type: 10/90=Laser Shot Left/Right
+; Byte 00/08= object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
 ; Byte 01/09= Laser Y-coord
 ; Byte 02/0A= X-coord of end of laser. Each shot is a different length and thus a different value is stored.
 ; Byte 03/0B= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.

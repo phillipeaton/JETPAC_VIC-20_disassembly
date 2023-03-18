@@ -15,6 +15,7 @@
 ZP00_Obj_List_Ptr_Lo            equ     $0000
 ZP01_Obj_List_Ptr_Hi            equ     $0001
 ZP02                            equ     $0002
+ZP02_Laser_Param_Countdown      equ     $0002
 ZP02_Object_Old_Height_Index    equ     $0002
 ZP02_Num_Of_Bytes_To_Fill_Lo    equ     $0002
 ZP02_Num_Bytes_To_Display       equ     $0002
@@ -23,6 +24,7 @@ ZP03_Object_Old_Height          equ     $0003
 ZP03_Object_Height_Pixels       equ     $0003
 ZP03_Num_Of_Bytes_To_Fill_Hi    equ     $0003
 ZP04                            equ     $0004
+ZP04_Laser_UDG_RAM_Lo           equ     $0004
 ZP04_Object_Old_UDG_RAM_Lo      equ     $0004
 ZP04_Object_Position_X          equ     $0004
 ZP04_Object_UDG_RAM_Addr_Lo     equ     $0004
@@ -30,6 +32,7 @@ ZP04_UDG_RAM_Addr_Lo            equ     $0004
 ZP04_Addr_To_Fill_Lo            equ     $0004
 ZP04_X_Coordinate               equ     $0004
 ZP05                            equ     $0005
+ZP05_Laser_UDG_RAM_Hi           equ     $0005
 ZP05_Object_Old_UDG_RAM_Hi      equ     $0005
 ZP05_Object_Position_Y          equ     $0005
 ZP05_Object_UDG_RAM_Addr_Hi     equ     $0005
@@ -37,12 +40,14 @@ ZP05_UDG_RAM_Addr_Hi            equ     $0005
 ZP05_Addr_To_Fill_Hi            equ     $0005
 ZP05_Y_Coordinate               equ     $0005
 ZP06                            equ     $0006
+ZP06_Laser_UDG_RAM_Lo           equ     $0006
 ZP06_Object_Old_UDG_Data_Lo     equ     $0006
 ZP06_Object_UDG_Data_Addr_Lo    equ     $0006
 ZP06_Char_ROM_Data_Addr_Lo      equ     $0006
 ZP06_Fill_Data_Byte             equ     $0006
 ZP06_Character_To_Display       equ     $0006
 ZP07                            equ     $0007
+ZP07_TEMP_SOMETHING             equ     $0007
 ZP07_Object_Old_UDG_Data_Hi     equ     $0007
 ZP07_Object_UDG_Data_Addr_Hi    equ     $0007
 ZP07_Char_ROM_Data_Addr_Hi      equ     $0007
@@ -59,8 +64,8 @@ ZP0B_Object_New_Height          equ     $000B
 ZP0B_Color_RAM_Tiles_Y          equ     $000B
 ZP0B_Object_Height_Pixels       equ     $000B
 ZP0C                            equ     $000C
-ZP0C_Object_New_UDG_RAM_Lo      equ     $000C
 ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
+ZP0C_Object_New_UDG_RAM_Lo      equ     $000C
 ZP0C_Object_UDG_RAM_Addr_Lo     equ     $000C
 ZP0C_Color_RAM_Addr_Lo          equ     $000C
 ZP0D                            equ     $000D
@@ -83,17 +88,22 @@ ZP11_Object_Position_Y          equ     $0011
 ZP12                            equ     $0012
 ZP12_Object_Type                equ     $0012
 ZP13                            equ     $0013
+ZP13_Laser_Position_Y           equ     $0013
 ZP13_Object_Lines_To_Erase      equ     $0013
 ZP14                            equ     $0014
+ZP14_                           equ     $0014
 ZP14_Object_Old_Width_Bytes     equ     $0014
 ZP14_Object_Width_Bytes         equ     $0014
 ZP15                            equ     $0015
+ZP15_                           equ     $0015
 ZP15_Object_New_Width_Bytes     equ     $0015
 ZP15_Object_Width_Bytes         equ     $0015
 ZP16                            equ     $0016
+ZP16_                           equ     $0016
 ZP16_Object_Size_X_Columns      equ     $0016
 ZP16_Object_Width_Bytes         equ     $0016
 ZP17                            equ     $0017
+ZP17_                           equ     $0017
 ZP17_Object_Size_Y_Pixels       equ     $0017
 ZP17_Object_Height_Pixels       equ     $0017
 ZP18                            equ     $0018
@@ -104,6 +114,7 @@ ZP19_Object_Position_Y          equ     $0019
 ZP1A                            equ     $001A
 ZP1A_Object_Type                equ     $001A
 ZP1B                            equ     $001B
+ZP1B_Laser_Color                equ     $001B
 ZP1B_Object_Color               equ     $001B
 ZP1C_Jetman_Action              equ     $001C
 ZP_Ship_UDG_Addr_Offset         equ     $001E
@@ -230,6 +241,9 @@ LASER_X_POSITION_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
 OBJECT_X_POSITION_PARAM         equ     $01
 OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
+LASER_TYPE_PARAM                equ     $00
+LASER_ENDPOINT_X                equ     $02
+LASER_POSITION_Y                equ     $01
 YELLOW                          equ     $07
 CYAN                            equ     $03
 BLUE                            equ     $06
@@ -553,7 +567,7 @@ Update_Laser_Object
     lda     ZP08                            ; 2127: A5 08    
     sec                                     ; 2129: 38       
     sbc     #$08                            ; 212A: E9 08    
-    jsr     Laser_Wrap?                     ; 212C: 20 98 22 
+    jsr     Laser_Wrap                      ; 212C: 20 98 22 
 ; L_JMP_($212F)_($2184) OK
 ; L_JMP_($212F)_($218A) OK
 Update_Laser_Object_1
@@ -652,116 +666,126 @@ Laser_Jetman_Facing_Right_3
 ; #########################################################################################
 
 ; L_BRS_($2195)_($21C7) OK
-Fire_Pressed_0
+Add_08
     adc     #$08                            ; 2195: 69 08    
-    jmp     FP1111                          ; 2197: 4C CB 21 
+    jmp     Firing_Left_Right_Continue      ; 2197: 4C CB 21 
 ; -----------------------
 DISPLAY_LASERS
     ldy     #$06                            ; 219A: A0 06     ???????
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 219C: B1 00    
-    sta     ZP07                            ; 219E: 85 07    
+    sta     ZP07_TEMP_SOMETHING             ; 219E: 85 07    
+
+; Y becomes $07 i.e. Laser Color parameter
     iny                                     ; 21A0: C8        Y=$07, laser color addr
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 21A1: B1 00     Fetch laser color
-    sta     ZP1B                            ; 21A3: 85 1B     Store to ZP variable
+    sta     ZP1B_Laser_Color                ; 21A3: 85 1B     Store to ZP variable
 
 ; Get laser X and Y-coord and store to temp vars
-    ldy     #$02                            ; 21A5: A0 02     Y=$02, X-coord of laser horizontal end point
+    ldy     #LASER_ENDPOINT_X               ; 21A5: A0 02    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 21A7: B1 00    
-    sta     ZP06                            ; 21A9: 85 06    
-    sta     ZP04                            ; 21AB: 85 04    
-    dey                                     ; 21AD: 88        Y=$01, Y-coord of laser
+    sta     ZP06_Laser_UDG_RAM_Lo           ; 21A9: 85 06    
+    sta     ZP04_Laser_UDG_RAM_Lo           ; 21AB: 85 04    
+
+; Y becomes $01 i.e. Laser Position Y
+    dey                                     ; 21AD: 88       
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 21AE: B1 00    
-    sta     ZP05                            ; 21B0: 85 05    
-    sta     ZP13                            ; 21B2: 85 13    
+    sta     ZP05_Laser_UDG_RAM_Hi           ; 21B0: 85 05    
+    sta     ZP13_Laser_Position_Y           ; 21B2: 85 13    
 
 ; Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
-    lda     ZP06                            ; 21B4: A5 06    
+    lda     ZP06_Laser_UDG_RAM_Lo           ; 21B4: A5 06    
     bit     MASK_00000100                   ; 21B6: 2C 16 20 
-    beq     FP5555                          ; 21B9: F0 47    
+    beq     Setup_Laser_Decay_Patterns      ; 21B9: F0 47    
     jsr     Setup_Color_RAM_Ptr             ; 21BB: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 21BE: 20 1D 35 
 
-; Test if X-coord of laser is on a boundary and wrap if necessary ######## NEEDS CONFIRM
-    lda     ZP06                            ; 21C1: A5 06    
+; Test if firing left or right
+    lda     ZP06_Laser_UDG_RAM_Lo           ; 21C1: A5 06    
     bit     MASK_00000001                   ; 21C3: 2C 14 20 
     clc                                     ; 21C6: 18       
-    beq     Fire_Pressed_0                  ; 21C7: F0 CC    
+
+; Add 8 if firing left or -8 if firing right ($F8 is -8)
+    beq     Add_08                          ; 21C7: F0 CC    
     adc     #$F8                            ; 21C9: 69 F8    
 
 ; L_JMP_($21CB)_($2197) OK
-FP1111
-    jsr     Laser_Wrap?                     ; 21CB: 20 98 22 
+Firing_Left_Right_Continue
+    jsr     Laser_Wrap                      ; 21CB: 20 98 22 
     tax                                     ; 21CE: AA        Save A
-    ldy     #$01                            ; 21CF: A0 01    
-    lda     (ZP00_Obj_List_Ptr_Lo),y        ; 21D1: B1 00     Get Y Coord
-    dey                                     ; 21D3: 88       
-    cmp     #$80                            ; 21D4: C9 80     Test Y coord bit 7 ???
-    bcs     FP2222                          ; 21D6: B0 04    
-    lda     (ZP04),y                        ; 21D8: B1 04     Get X Coord
-    bne     FP4444                          ; 21DA: D0 20    
-; L_BRS_($21DC)_($21D6) OK
-FP2222
-    txa                                     ; 21DC: 8A        Restore A
+    ldy     #LASER_POSITION_Y               ; 21CF: A0 01    
+    lda     (ZP00_Obj_List_Ptr_Lo),y        ; 21D1: B1 00    
 
-    sta     ZP06                            ; 21DD: 85 06    
+; Y becomes $00 i.e. Laser Type/Direction Facing parameter
+    dey                                     ; 21D3: 88       
+    cmp     #%10000000                      ; 21D4: C9 80    
+    bcs     Laser_Facing_Left???            ; 21D6: B0 04    
+    lda     (ZP04_Laser_UDG_RAM_Lo),y       ; 21D8: B1 04    
+    bne     UDG_RAM_Zero_Bit_2              ; 21DA: D0 20    
+
+; L_BRS_($21DC)_($21D6) OK
+Laser_Facing_Left???
+    txa                                     ; 21DC: 8A        Restore A
+    sta     ZP06_Laser_UDG_RAM_Lo           ; 21DD: 85 06    
 
 ; Reverse the displayed 8-bit byte on-screen
-    lda     (ZP04),y                        ; 21DF: B1 04    
-    eor     #$FF                            ; 21E1: 49 FF    
-    sta     (ZP04),y                        ; 21E3: 91 04    
+    lda     (ZP04_Laser_UDG_RAM_Lo),y       ; 21DF: B1 04    
+    eor     #%11111111                      ; 21E1: 49 FF    
+    sta     (ZP04_Laser_UDG_RAM_Lo),y       ; 21E3: 91 04    
 
 ; Load current tile color, check it's not green, if not update tile color
-    lda     (ZP0C),y                        ; 21E5: B1 0C     ZP0C_Col_RAM_Ptr_Lo
-    and     #$0F                            ; 21E7: 29 0F     Zero top 4 bits
+    lda     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 21E5: B1 0C     ZP0C_Col_RAM_Ptr_Lo
+    and     #%00001111                      ; 21E7: 29 0F     Zero top 4 bits
     cmp     #GREEN                          ; 21E9: C9 05     Test if 0101
-    beq     FP3333                          ; 21EB: F0 04    
-    lda     ZP1B                            ; 21ED: A5 1B     Tile color
-    sta     (ZP0C),y                        ; 21EF: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    beq     Setup_Delay_Pattens?            ; 21EB: F0 04    
 
-; Some kind of screen wrap?
+    lda     ZP1B_Laser_Color                ; 21ED: A5 1B    
+    sta     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 21EF: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+
 ; L_BRS_($21F1)_($21EB) OK
-FP3333
-    lda     ZP07                            ; 21F1: A5 07    
+Setup_Delay_Pattens?
+    lda     ZP07_TEMP_SOMETHING             ; 21F1: A5 07    
     sec                                     ; 21F3: 38       
     sbc     #$08                            ; 21F4: E9 08    
-    sta     ZP07                            ; 21F6: 85 07    
-    and     #$F8                            ; 21F8: 29 F8    
-    bne     FP5555                          ; 21FA: D0 06    
-; L_BRS_($21FC)_($21DA) OK
-FP4444
-    lda     ZP06                            ; 21FC: A5 06    
-    and     #$FB                            ; 21FE: 29 FB    
-    sta     ZP06                            ; 2200: 85 06    
+    sta     ZP07_TEMP_SOMETHING             ; 21F6: 85 07    
 
-; Loads ZP 14/15/16/17 with seed values, which are something to do with the four lasers
+    and     #%11111000                      ; 21F8: 29 F8    
+    bne     Setup_Laser_Decay_Patterns      ; 21FA: D0 06    
+; L_BRS_($21FC)_($21DA) OK
+UDG_RAM_Zero_Bit_2
+    lda     ZP06_Laser_UDG_RAM_Lo           ; 21FC: A5 06    
+    and     #%11111011                      ; 21FE: 29 FB     Zero bit 2 i.e. xxxx_x0xx
+    sta     ZP06_Laser_UDG_RAM_Lo           ; 2200: 85 06    
+
+; Loads ZP 14/15/16/17 with laser decay pattern, initial laser is a line of $FF's then $03
+; subtracted leaving $FC, then $1C subtracted leaving $E0, the subtracting $E0 leaves $00
 ; L_BRS_($2202)_($21B9) OK
 ; L_BRS_($2202)_($21FA) OK
-FP5555
+Setup_Laser_Decay_Patterns
     jsr     Load_ZP_Parameters              ; 2202: 20 9D 25 
-    fcb     $14                             ; 2205: 14        ZP_0A_Lo/Hi
-    fcb     $00,$03                         ; 2206: 00 03    
-    fcb     $16                             ; 2208: 16        ZP_0B_Lo/Hi
-    fcb     $1C,$E0                         ; 2209: 1C E0    
-    fcb     $02                             ; 220B: 02        ZP_01_Lo/Hi
-    fcb     $03,$00                         ; 220C: 03 00    
+    fcb     $14                             ; 2205: 14        ZP14/15
+    fcb     $00,$03                         ; 2206: 00 03     Laser decay pattern
+    fcb     $16                             ; 2208: 16        ZP16/17
+    fcb     $1C,$E0                         ; 2209: 1C E0     Laser decay pattern
+    fcb     $02                             ; 220B: 02        ZP02/03
+    fdb     $0003                           ; 220C: 03 00     Countdown for laser params
     fcb     $FF                             ; 220E: FF       
 
 ; Iterate round each of the laser shots that could be active for display
     ldy     #$02                            ; 220F: A0 02    
 ; L_BRS_($2211)_($221F) OK
 ; L_BRS_($2211)_($2280) OK
-FP6666
+Iterate_Laser_Params_2_3_4_5
     iny                                     ; 2211: C8        First time round, Y=3, next time 4 and so on
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2212: B1 00     Get one of the four laser object paramenters
-    eor     ZP06                            ; 2214: 45 06    
-    and     #$F8                            ; 2216: 29 F8     Zero bottom 3 bits, probably testing if laser shot ended
+    eor     ZP06_Laser_UDG_RAM_Lo           ; 2214: 45 06    
+    and     #%11111000                      ; 2216: 29 F8     Zero bottom 3 bits, probably testing if laser shot ended
     bne     FP7777                          ; 2218: D0 0F    
     jsr     Laser_ZP17_15_to_ZP16_14        ; 221A: 20 8B 22 
-    dec     ZP02                            ; 221D: C6 02     Active laser shots counter at zero?
-    bne     FP6666                          ; 221F: D0 F0     No, process next laser shot
+    dec     ZP02_Laser_Param_Countdown      ; 221D: C6 02    
+    bne     Iterate_Laser_Params_2_3_4_5    ; 221F: D0 F0     No, process next laser shot
 
 ; All laser shows ended, zero laser shots object type
-    lda     #$00                            ; 2221: A9 00    
+    lda     #LASER_TYPE_PARAM               ; 2221: A9 00    
     tay                                     ; 2223: A8       
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2224: 91 00    
     jmp     GOTO_NEXT_OBJECT                ; 2226: 4C 1A 26 
@@ -773,118 +797,133 @@ FP7777
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2229: B1 00     Get one of the four laser object paramenters
     bit     MASK_00000100                   ; 222B: 2C 16 20 
     bne     FP9999                          ; 222E: D0 27    
-    dec     ZP07                            ; 2230: C6 07    
-    lda     ZP07                            ; 2232: A5 07    
-    and     #$07                            ; 2234: 29 07    
-    bne     FP8888                          ; 2236: D0 10    
+
+    dec     ZP07_TEMP_SOMETHING             ; 2230: C6 07    
+    lda     ZP07_TEMP_SOMETHING             ; 2232: A5 07    
+    and     #%00000111                      ; 2234: 29 07    
+    bne     Update_Obj_Params_And_Exit      ; 2236: D0 10    
+
     lda     ZP_HW_IRQ_Count3                ; 2238: A5 4C    
-    and     #$03                            ; 223A: 29 03     Zero bit top 6 bits
-    ora     #$04                            ; 223C: 09 04     Set bit 2, now is 000001xx
-    ora     ZP07                            ; 223E: 05 07    
-    sta     ZP07                            ; 2240: 85 07    
+    and     #%00000011                      ; 223A: 29 03     Zero bits 2-8 i.e. 0000_00xx
+    ora     #%00000100                      ; 223C: 09 04     Set bit 2 i.e. 0000_01xx
+    ora     ZP07_TEMP_SOMETHING             ; 223E: 05 07    
+    sta     ZP07_TEMP_SOMETHING             ; 2240: 85 07    
+
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2242: B1 00    
-    ora     #$04                            ; 2244: 09 04     Set bit 2
+    ora     #%00000100                      ; 2244: 09 04     Set bit 2
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2246: 91 00    
 
 ; Update object list parameteters from ZP temp vars
 ; L_BRS_($2248)_($2236) OK
 ; L_JMP_($2248)_($2282) OK
-FP8888
+Update_Obj_Params_And_Exit
     ldy     #$06                            ; 2248: A0 06    
-    lda     ZP07                            ; 224A: A5 07    
+    lda     ZP07_TEMP_SOMETHING             ; 224A: A5 07    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 224C: 91 00    
 
-    ldy     #$02                            ; 224E: A0 02    
-    lda     ZP06                            ; 2250: A5 06    
+    ldy     #LASER_ENDPOINT_X               ; 224E: A0 02    
+    lda     ZP06_Laser_UDG_RAM_Lo           ; 2250: A5 06    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2252: 91 00    
 
     jmp     GOTO_NEXT_OBJECT                ; 2254: 4C 1A 26 
 ; -----------------------
+
 ; Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
 ; L_BRS_($2257)_($222E) OK
 FP9999
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2257: B1 00    
-    sta     ZP04                            ; 2259: 85 04    
+    sta     ZP04_Laser_UDG_RAM_Lo           ; 2259: 85 04    
     bit     MASK_00000001                   ; 225B: 2C 14 20 
-    beq     CLC_ADC_08                      ; 225E: F0 25    
+
+; Add 8 if firing left or -8 if firing right ($F8 is -8)
+    beq     ADC_08_                         ; 225E: F0 25    
     clc                                     ; 2260: 18       
     adc     #$F8                            ; 2261: 69 F8    
+
 ; L_JMP_($2263)_($2288) OK
-FPAAAA
-    jsr     Laser_Wrap?                     ; 2263: 20 98 22 
+Firing_Left_Right_Continue_
+    jsr     Laser_Wrap                      ; 2263: 20 98 22 
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2266: 91 00    
-    lda     ZP13                            ; 2268: A5 13    
-    sta     ZP05                            ; 226A: 85 05    
+
+    lda     ZP13_Laser_Position_Y           ; 2268: A5 13    
+    sta     ZP05_Laser_UDG_RAM_Hi           ; 226A: 85 05    
 
 ; EXOR-write data in ZP variable to UDG RAM
     tya                                     ; 226C: 98        Save Y
+
     pha                                     ; 226D: 48       
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 226E: 20 1D 35 
     jsr     Laser_ZP17_15_to_ZP16_14        ; 2271: 20 8B 22 
+
     ldy     #$00                            ; 2274: A0 00    
-    lda     ZP14                            ; 2276: A5 14    
-    eor     (ZP04),y                        ; 2278: 51 04    
-    sta     (ZP04),y                        ; 227A: 91 04    
+    lda     ZP14_                           ; 2276: A5 14    
+    eor     (ZP04_Laser_UDG_RAM_Lo),y       ; 2278: 51 04    
+    sta     (ZP04_Laser_UDG_RAM_Lo),y       ; 227A: 91 04    
+
     pla                                     ; 227C: 68       
     tay                                     ; 227D: A8        Restore Y
 
-    dec     ZP02                            ; 227E: C6 02    
-    bne     FP6666                          ; 2280: D0 8F     Iterate to next laser shot
-    jmp     FP8888                          ; 2282: 4C 48 22  Update object list and exit subroutine
+    dec     ZP02_Laser_Param_Countdown      ; 227E: C6 02    
+    bne     Iterate_Laser_Params_2_3_4_5    ; 2280: D0 8F     Iterate to next laser shot
+    jmp     Update_Obj_Params_And_Exit      ; 2282: 4C 48 22  Update object list and exit subroutine
 ; -----------------------
 ; L_BRS_($2285)_($225E) OK
-CLC_ADC_08
+ADC_08_
     clc                                     ; 2285: 18       
     adc     #$08                            ; 2286: 69 08    
-    jmp     FPAAAA                          ; 2288: 4C 63 22 
+    jmp     Firing_Left_Right_Continue_     ; 2288: 4C 63 22 
 ; -----------------------
 ; L_JSR_($228B)_($221A) OK
 ; L_JSR_($228B)_($2271) OK
 Laser_ZP17_15_to_ZP16_14
-    lda     ZP15                            ; 228B: A5 15    
-    sta     ZP14                            ; 228D: 85 14    
-    lda     ZP16                            ; 228F: A5 16    
-    sta     ZP15                            ; 2291: 85 15    
+    lda     ZP15_                           ; 228B: A5 15    
+    sta     ZP14_                           ; 228D: 85 14    
+    lda     ZP16_                           ; 228F: A5 16    
+    sta     ZP15_                           ; 2291: 85 15    
     lda     ZP17                            ; 2293: A5 17    
-    sta     ZP16                            ; 2295: 85 16    
+    sta     ZP16_                           ; 2295: 85 16    
     rts                                     ; 2297: 60       
 ; ===========================================================
 ; Looks like it's doing some checks on the X coord, e.g. laser wraparound
 ; L_JSR_($2298)_($212C) OK
 ; L_JSR_($2298)_($21CB) OK
 ; L_JSR_($2298)_($2263) OK
-Laser_Wrap?
+Laser_Wrap
     pha                                     ; 2298: 48       
-    and     #$F8                            ; 2299: 29 F8    
-    cmp     #$B8                            ; 229B: C9 B8     $B8=screen width in pixels
-    bcs     Laser_Wrap_1?                   ; 229D: B0 02    
+    and     #%11111000                      ; 2299: 29 F8    
+    cmp     #SCREEN_WIDTH_PIXELS            ; 229B: C9 B8    
+    bcs     Laser_Wrap_Left_To_Right        ; 229D: B0 02    
     pla                                     ; 229F: 68       
     rts                                     ; 22A0: 60       
 ; ===========================================================
 ; L_BRS_($22A1)_($229D) OK
-Laser_Wrap_1?
-    tya                                     ; 22A1: 98        Save Y on Stack
+Laser_Wrap_Left_To_Right
+    tya                                     ; 22A1: 98       
     pha                                     ; 22A2: 48       
-    ldy     #$00                            ; 22A3: A0 00    
-    lda     (ZP00_Obj_List_Ptr_Lo),y        ; 22A5: B1 00     Get object's type/direction byte
-    bit     MASK_10000000                   ; 22A7: 2C 1B 20  Test Bit 7 is set i.e. towards left
-    beq     Laser_JFL_2                     ; 22AA: F0 08     No, branch
-    pla                                     ; 22AC: 68        Restore Y from Stack
+
+; Test top bit i.e. direction left or right
+    ldy     #LASER_TYPE_PARAM               ; 22A3: A0 00    
+    lda     (ZP00_Obj_List_Ptr_Lo),y        ; 22A5: B1 00    
+    bit     MASK_10000000                   ; 22A7: 2C 1B 20 
+    beq     Laser_Wrap_Right_To_Left        ; 22AA: F0 08    
+    pla                                     ; 22AC: 68       
     tay                                     ; 22AD: A8       
 
+; Set the approprite left to right X co-ordinate bits
     pla                                     ; 22AE: 68       
-    and     #$07                            ; 22AF: 29 07     Zero the top 5 bits
-    ora     #$B0                            ; 22B1: 09 B0     Set bits 7,5,4, now it's 1011 0xxx
+    and     #%00000111                      ; 22AF: 29 07     Zero top 5 bits i.e. 0000_0xxx
+    ora     #%10110000                      ; 22B1: 09 B0     Set bits 7,5,4 i.e. 1011_0xxx
     rts                                     ; 22B3: 60       
 ; ===========================================================
-; Towards right
+
 ; L_BRS_($22B4)_($22AA) OK
-Laser_JFL_2
-    pla                                     ; 22B4: 68        Restore Y from Stack
+Laser_Wrap_Right_To_Left
+    pla                                     ; 22B4: 68       
     tay                                     ; 22B5: A8       
 
+; Set the approprite right to left X co-ordinate bits
     pla                                     ; 22B6: 68       
-    and     #$07                            ; 22B7: 29 07     Zero the top 5 bits
+    and     #%00000111                      ; 22B7: 29 07     Zero top 5 bits i.e. 0000_0xxx
     rts                                     ; 22B9: 60       
 ; ===========================================================
 
@@ -4950,10 +4989,10 @@ X_Jetman_Screen_Update
 ; Test for fire pressed
     lda     ZP1C_Jetman_Action              ; 32FF: A5 1C    
     bit     MASK_00001000                   ; 3301: 2C 17 20 
-    bne     SKIP_3309                       ; 3304: D0 03    
+    bne     No_Fire_Pressed                 ; 3304: D0 03    
     jsr     Update_Laser_Objects            ; 3306: 20 E9 20 
 ; L_BRS_($3309)_($3304) OK
-SKIP_3309
+No_Fire_Pressed
     jmp     GOTO_NEXT_OBJECT                ; 3309: 4C 1A 26 
 ; -----------------------
 
@@ -5014,7 +5053,7 @@ Set_Jetman_Facing_Right
     and     #%01111111                      ; 332E: 29 7F     Zero bit 7
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 3330: 91 00    
     lda     #$01                            ; 3332: A9 01    
-    jmp     Update_Jetman_Direction_Posn    ; 3334: 4C 9F 33 
+    jmp     Update_JM_Direction_Position_X  ; 3334: 4C 9F 33 
 ; -----------------------
 
 ; L_BRS_($3337)_($3383) OK
@@ -5023,7 +5062,7 @@ Set_Jetman_Facing_Left
     ora     #%10000000                      ; 3339: 09 80     Set bit 7
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 333B: 91 00    
     lda     #$FF                            ; 333D: A9 FF    
-    jmp     Update_Jetman_Direction_Posn    ; 333F: 4C 9F 33 
+    jmp     Update_JM_Direction_Position_X  ; 333F: 4C 9F 33 
 ; -----------------------
 
 ; L_BRS_($3342)_($33A9) OK
@@ -5109,7 +5148,7 @@ Test_Collision_Status????
     txa                                     ; 3399: 8A       
     plp                                     ; 339A: 28       
 
-    bne     Update_Jetman_Direction_Posn    ; 339B: D0 02    
+    bne     Update_JM_Direction_Position_X  ; 339B: D0 02    
 
 ; L_BRS_($339D)_($3393) OK
 Jetman_Not_Moving_X_Axis
@@ -5118,7 +5157,7 @@ Jetman_Not_Moving_X_Axis
 ; L_JMP_($339F)_($3334) OK
 ; L_JMP_($339F)_($333F) OK
 ; L_BRS_($339F)_($339B) OK
-Update_Jetman_Direction_Posn
+Update_JM_Direction_Position_X
     ldy     #JETMAN_X_DIRECTION_PARAM       ; 339F: A0 02    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33A1: 91 00    
 
@@ -5137,12 +5176,12 @@ Store_Jetman_New_Position_X
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33AF: 91 00    
     lda     ZP1C_Jetman_Action              ; 33B1: A5 1C    
     and     #%00010000                      ; 33B3: 29 10     Test for direction Up
-    beq     Jetman_Movement_3               ; 33B5: F0 03     Yes, branch
+    beq     Update_JM_Direction_Position_Y  ; 33B5: F0 03     Yes, branch
     jmp     X_Jetman_Screen_Update          ; 33B7: 4C F9 32 
 ; -----------------------
 
 ; L_BRS_($33BA)_($33B5) OK
-Jetman_Movement_3
+Update_JM_Direction_Position_Y
     ldy     #JETMAN_Y_DIRECTION_PARAM       ; 33BA: A0 04    
     lda     #$FE                            ; 33BC: A9 FE    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 33BE: 91 00    
