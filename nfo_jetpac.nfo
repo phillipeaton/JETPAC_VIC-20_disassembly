@@ -210,8 +210,9 @@ lcomment 218D Restore saved Jetman attrib 00
 lcomment 2190 Add $10 for some reason??????????
 comment  2195
 label    2195 Add_08
+comment  219A
 label    219A DISPLAY_LASERS
-lcomment 219A ???????
+deflabel 219B LASER_LENGTH_PARAM
 comment  21A0
 comment  21A0 Y becomes $07 i.e. Laser Color parameter
 lcomment 21A0 Y=$07, laser color addr
@@ -219,23 +220,24 @@ lcomment 21A1 Fetch laser color
 lcomment 21A3 Store to ZP variable
 comment  21A5
 comment  21A5 Get laser X and Y-coord and store to temp vars
-deflabel 21A6 LASER_ENDPOINT_X
+deflabel 21A6 LASER_POSITION_X
 comment  21AD
 comment  21AD Y becomes $01 i.e. Laser Position Y
 comment  21B4
-comment  21B4 Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
+comment  21B4 Test if full length of laser has now been reached, branch if yes
+comment  21BB
 comment  21C1
 comment  21C1 Test if firing left or right
 comment  21C7
 comment  21C7 Add 8 if firing left or -8 if firing right ($F8 is -8)
 comment  21CB
-label    21CB Firing_Left_Right_Continue
+label    21CB Handle_Wrap_And_Get_Y_Cooord
 lcomment 21CE Save A
 deflabel 21D0 LASER_POSITION_Y
 comment  21D3
 comment  21D3 Y becomes $00 i.e. Laser Type/Direction Facing parameter
 binary   21D5
-label    21DC Laser_Facing_Left???
+label    21DC Top_Bit_Was_Set
 comment  21DC
 lcomment 21DC Restore A
 comment  21DF
@@ -255,6 +257,7 @@ label    21F1 Setup_Delay_Pattens?
 comment  21F8
 binary   21F9
 label    21FC UDG_RAM_Zero_Bit_2
+comment  21FC
 lcomment 21FE Zero bit 2 i.e. xxxx_x0xx
 binary   21FF
 comment  2202
@@ -282,7 +285,6 @@ lcomment 2211 First time round, Y=3, next time 4 and so on
 lcomment 2212 Get one of the four laser object paramenters
 lcomment 2216 Zero bottom 3 bits, probably testing if laser shot ended
 binary   2217
-lcomment 221F No, process next laser shot
 comment  2221
 comment  2221 All laser shows ended, zero laser shots object type
 deflabel 2222 LASER_TYPE_PARAM
@@ -303,8 +305,9 @@ binary   2245
 comment  2248
 comment  2248 Update object list parameteters from ZP temp vars
 label    2248 Update_Obj_Params_And_Exit
+deflabel 2249 LASER_LENGTH_PARAM
 comment  224E
-deflabel 224F  LASER_ENDPOINT_X
+deflabel 224F LASER_POSITION_X
 comment  2254
 comment  2257
 comment  2257 Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
@@ -325,7 +328,8 @@ comment  227E
 lcomment 2280 Iterate to next laser shot
 lcomment 2282 Update object list and exit subroutine
 label    2285 ADC_08_
-label    228B Laser_ZP17_15_to_ZP16_14
+label    228B Laser_ZP17_To_16_To_15_To_14
+comment  2298
 comment  2298 Looks like it's doing some checks on the X coord, e.g. laser wraparound
 label    2298 Laser_Wrap
 binary   229A

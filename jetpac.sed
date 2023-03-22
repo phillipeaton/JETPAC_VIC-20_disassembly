@@ -5,10 +5,12 @@
 
 # DISPLAY_LASERS
 /ZP02                            equ     $0002/a ZP02_Laser_Param_Countdown      equ     $0002
-/ZP04                            equ     $0004/a ZP04_Laser_UDG_RAM_Lo           equ     $0004
-/ZP05                            equ     $0005/a ZP05_Laser_UDG_RAM_Hi           equ     $0005
-/ZP06                            equ     $0006/a ZP06_Laser_UDG_RAM_Lo           equ     $0006
-/ZP07                            equ     $0007/a ZP07_TEMP_SOMETHING             equ     $0007
+/ZP04                            equ     $0004/a ZP04_Laser_Position_X           equ     $0004
+/ZP05                            equ     $0005/a ZP05_Laser_Position_Y           equ     $0005
+/ZP04                            equ     $0004/a ZP04_Laser_UDG_RAM_Addr_Lo      equ     $0004
+/ZP05                            equ     $0005/a ZP05_Laser_UDG_RAM_Addr_Hi      equ     $0005
+/ZP06                            equ     $0006/a ZP06_Laser_Position_X           equ     $0006
+/ZP07                            equ     $0007/a ZP07_Laser_Length_Columns       equ     $0007
 /ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
 /ZP13                            equ     $0013/a ZP13_Laser_Position_Y           equ     $0013
 /ZP14                            equ     $0014/a ZP14_                           equ     $0014
@@ -17,17 +19,30 @@
 /ZP17                            equ     $0017/a ZP17_                           equ     $0017
 /ZP1B                            equ     $001B/a ZP1B_Laser_Color                equ     $001B
 /; 2195/,/; 22B9/s/ZP02                           /ZP02_Laser_Param_Countdown     /
-/; 2195/,/; 22B9/s/ZP04                           /ZP04_Laser_UDG_RAM_Lo          /
-/; 2195/,/; 22B9/s/(ZP04),y                       /(ZP04_Laser_UDG_RAM_Lo),y      /
-/; 2195/,/; 22B9/s/ZP05                           /ZP05_Laser_UDG_RAM_Hi          /
-/; 2195/,/; 22B9/s/ZP06                           /ZP06_Laser_UDG_RAM_Lo          /
-/; 2195/,/; 22B9/s/ZP07                           /ZP07_TEMP_SOMETHING            /
+
+/; 2195/,/; 21BE/s/ZP04                           /ZP04_Laser_Position_X          /
+/; 2195/,/; 21BE/s/ZP05                           /ZP05_Laser_Position_Y          /
+
+/; 21C1/,/; 2254/s/ZP04                           /ZP04_Laser_UDG_RAM_Addr_Lo     /
+/; 21C1/,/; 2254/s/(ZP04),y                       /(ZP04_Laser_UDG_RAM_Addr_Lo),y /
+/; 21C1/,/; 2254/s/ZP05                           /ZP05_Laser_UDG_RAM_Addr_Hi     /
+
+/; 2257/,/; 226E/s/ZP04                           /ZP04_Laser_Position_X          /
+/; 2257/,/; 226E/s/ZP05                           /ZP05_Laser_Position_Y          /
+
+/; 2271/,/; 22B9/s/ZP04                           /ZP04_Laser_UDG_RAM_Addr_Lo     /
+/; 2271/,/; 22B9/s/(ZP04),y                       /(ZP04_Laser_UDG_RAM_Addr_Lo),y /
+/; 2271/,/; 22B9/s/ZP05                           /ZP05_Laser_UDG_RAM_Addr_Hi     /
+
+/; 2195/,/; 22B9/s/ZP06                           /ZP06_Laser_Position_X          /
+/; 2195/,/; 22B9/s/ZP07                           /ZP07_Laser_Length_Columns      /
 /; 2195/,/; 22B9/s/ZP0C                           /ZP0C_Color_RAM_Tile_Addr_Lo    /
 /; 2195/,/; 22B9/s/(ZP0C),y                       /(ZP0C_Color_RAM_Tile_Addr_Lo),y/
 /; 2195/,/; 22B9/s/ZP13                           /ZP13_Laser_Position_Y          /
 /; 2195/,/; 22B9/s/ZP14                           /ZP14_                          /
 /; 2195/,/; 22B9/s/ZP15                           /ZP15_                          /
 /; 2195/,/; 22B9/s/ZP16                           /ZP16_                          /
+/; 2195/,/; 22B9/s/ZP17                           /ZP17_                          /
 /; 2195/,/; 22B9/s/ZP1B                           /ZP1B_Laser_Color               /
 
 # Display_Object

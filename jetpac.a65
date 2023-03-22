@@ -166,7 +166,8 @@ OBJECT_VALUABLE_TYPE            equ     $06
 OBJECT_X_POSITION_PARAM         equ     $01
 OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
 LASER_TYPE_PARAM                equ     $00
-LASER_ENDPOINT_X                equ     $02
+LASER_POSITION_X                equ     $02
+LASER_LENGTH_PARAM              equ     $06
 LASER_POSITION_Y                equ     $01
 YELLOW                          equ     $07
 CYAN                            equ     $03
@@ -592,10 +593,11 @@ Laser_Jetman_Facing_Right_3
 ; L_BRS_($2195)_($21C7) OK
 Add_08
     adc     #$08                            ; 2195: 69 08    
-    jmp     Firing_Left_Right_Continue      ; 2197: 4C CB 21 
+    jmp     Handle_Wrap_And_Get_Y_Cooord    ; 2197: 4C CB 21 
 ; -----------------------
+
 DISPLAY_LASERS
-    ldy     #$06                            ; 219A: A0 06     ???????
+    ldy     #LASER_LENGTH_PARAM             ; 219A: A0 06    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 219C: B1 00    
     sta     ZP07                            ; 219E: 85 07    
 
@@ -605,7 +607,7 @@ DISPLAY_LASERS
     sta     ZP1B                            ; 21A3: 85 1B     Store to ZP variable
 
 ; Get laser X and Y-coord and store to temp vars
-    ldy     #LASER_ENDPOINT_X               ; 21A5: A0 02    
+    ldy     #LASER_POSITION_X               ; 21A5: A0 02    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 21A7: B1 00    
     sta     ZP06                            ; 21A9: 85 06    
     sta     ZP04                            ; 21AB: 85 04    
@@ -616,10 +618,11 @@ DISPLAY_LASERS
     sta     ZP05                            ; 21B0: 85 05    
     sta     ZP13                            ; 21B2: 85 13    
 
-; Test if X-coord of laser is on a #16 boundary, update tile colour ######## NEEDS CONFIRM
+; Test if full length of laser has now been reached, branch if yes
     lda     ZP06                            ; 21B4: A5 06    
     bit     MASK_00000100                   ; 21B6: 2C 16 20 
     beq     Setup_Laser_Decay_Patterns      ; 21B9: F0 47    
+
     jsr     Setup_Color_RAM_Ptr             ; 21BB: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 21BE: 20 1D 35 
 
@@ -633,7 +636,7 @@ DISPLAY_LASERS
     adc     #$F8                            ; 21C9: 69 F8    
 
 ; L_JMP_($21CB)_($2197) OK
-Firing_Left_Right_Continue
+Handle_Wrap_And_Get_Y_Cooord
     jsr     Laser_Wrap                      ; 21CB: 20 98 22 
     tax                                     ; 21CE: AA        Save A
     ldy     #LASER_POSITION_Y               ; 21CF: A0 01    
@@ -642,12 +645,12 @@ Firing_Left_Right_Continue
 ; Y becomes $00 i.e. Laser Type/Direction Facing parameter
     dey                                     ; 21D3: 88       
     cmp     #%10000000                      ; 21D4: C9 80    
-    bcs     Laser_Facing_Left???            ; 21D6: B0 04    
+    bcs     Top_Bit_Was_Set                 ; 21D6: B0 04    
     lda     (ZP04),y                        ; 21D8: B1 04    
     bne     UDG_RAM_Zero_Bit_2              ; 21DA: D0 20    
 
 ; L_BRS_($21DC)_($21D6) OK
-Laser_Facing_Left???
+Top_Bit_Was_Set
     txa                                     ; 21DC: 8A        Restore A
     sta     ZP06                            ; 21DD: 85 06    
 
@@ -674,6 +677,7 @@ Setup_Delay_Pattens?
 
     and     #%11111000                      ; 21F8: 29 F8    
     bne     Setup_Laser_Decay_Patterns      ; 21FA: D0 06    
+
 ; L_BRS_($21FC)_($21DA) OK
 UDG_RAM_Zero_Bit_2
     lda     ZP06                            ; 21FC: A5 06    
@@ -704,9 +708,9 @@ Iterate_Laser_Params_2_3_4_5
     eor     ZP06                            ; 2214: 45 06    
     and     #%11111000                      ; 2216: 29 F8     Zero bottom 3 bits, probably testing if laser shot ended
     bne     FP7777                          ; 2218: D0 0F    
-    jsr     Laser_ZP17_15_to_ZP16_14        ; 221A: 20 8B 22 
+    jsr     Laser_ZP17_To_16_To_15_To_14    ; 221A: 20 8B 22 
     dec     ZP02                            ; 221D: C6 02    
-    bne     Iterate_Laser_Params_2_3_4_5    ; 221F: D0 F0     No, process next laser shot
+    bne     Iterate_Laser_Params_2_3_4_5    ; 221F: D0 F0    
 
 ; All laser shows ended, zero laser shots object type
     lda     #LASER_TYPE_PARAM               ; 2221: A9 00    
@@ -741,11 +745,11 @@ FP7777
 ; L_BRS_($2248)_($2236) OK
 ; L_JMP_($2248)_($2282) OK
 Update_Obj_Params_And_Exit
-    ldy     #$06                            ; 2248: A0 06    
+    ldy     #LASER_LENGTH_PARAM             ; 2248: A0 06    
     lda     ZP07                            ; 224A: A5 07    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 224C: 91 00    
 
-    ldy     #LASER_ENDPOINT_X               ; 224E: A0 02    
+    ldy     #LASER_POSITION_X               ; 224E: A0 02    
     lda     ZP06                            ; 2250: A5 06    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2252: 91 00    
 
@@ -777,7 +781,7 @@ Firing_Left_Right_Continue_
 
     pha                                     ; 226D: 48       
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 226E: 20 1D 35 
-    jsr     Laser_ZP17_15_to_ZP16_14        ; 2271: 20 8B 22 
+    jsr     Laser_ZP17_To_16_To_15_To_14    ; 2271: 20 8B 22 
 
     ldy     #$00                            ; 2274: A0 00    
     lda     ZP14                            ; 2276: A5 14    
@@ -799,7 +803,7 @@ ADC_08_
 ; -----------------------
 ; L_JSR_($228B)_($221A) OK
 ; L_JSR_($228B)_($2271) OK
-Laser_ZP17_15_to_ZP16_14
+Laser_ZP17_To_16_To_15_To_14
     lda     ZP15                            ; 228B: A5 15    
     sta     ZP14                            ; 228D: 85 14    
     lda     ZP16                            ; 228F: A5 16    
@@ -808,6 +812,7 @@ Laser_ZP17_15_to_ZP16_14
     sta     ZP16                            ; 2295: 85 16    
     rts                                     ; 2297: 60       
 ; ===========================================================
+
 ; Looks like it's doing some checks on the X coord, e.g. laser wraparound
 ; L_JSR_($2298)_($212C) OK
 ; L_JSR_($2298)_($21CB) OK
