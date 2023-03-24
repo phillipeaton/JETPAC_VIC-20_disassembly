@@ -720,15 +720,21 @@ Handle_Wrap_And_Get_Y_Cooord
     ldy     #LASER_POSITION_Y               ; 21CF: A0 01    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 21D1: B1 00    
 
-; Y becomes $00 i.e. Laser Type/Direction Facing parameter
+; Register Y becomes $00 i.e. Laser Type/Direction Facing parameter
     dey                                     ; 21D3: 88       
+
+; Laser Position Y in accumulator, test if laser shot positions near bottom of screen
+; i.e. at or below height of fully-built rocket, branch if it is near the bottom
     cmp     #%10000000                      ; 21D4: C9 80    
-    bcs     Top_Bit_Was_Set                 ; 21D6: B0 04    
+    bcs     Save_Laser_Position_X           ; 21D6: B0 04    
+
+; Test if laser address in UDG RAM is empty, jump if not empty
+; This stops you firing through objects when laser is above the top of the fully-built rocket
     lda     (ZP04_Laser_UDG_RAM_Addr_Lo),y  ; 21D8: B1 04    
     bne     UDG_RAM_Zero_Bit_2              ; 21DA: D0 20    
 
 ; L_BRS_($21DC)_($21D6) OK
-Top_Bit_Was_Set
+Save_Laser_Position_X
     txa                                     ; 21DC: 8A        Restore A
     sta     ZP06_Laser_Position_X           ; 21DD: 85 06    
 
@@ -737,29 +743,32 @@ Top_Bit_Was_Set
     eor     #%11111111                      ; 21E1: 49 FF    
     sta     (ZP04_Laser_UDG_RAM_Addr_Lo),y  ; 21E3: 91 04    
 
-; Load current tile color, check it's not green, if not update tile color
-    lda     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 21E5: B1 0C     ZP0C_Col_RAM_Ptr_Lo
-    and     #%00001111                      ; 21E7: 29 0F     Zero top 4 bits
-    cmp     #GREEN                          ; 21E9: C9 05     Test if 0101
-    beq     Setup_Delay_Pattens?            ; 21EB: F0 04    
+; Load current tile color, check it's not green, jump if it is
+    lda     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 21E5: B1 0C    
+    and     #%00001111                      ; 21E7: 29 0F     Zero top 4 bits 0000_xxxx
+    cmp     #GREEN                          ; 21E9: C9 05    
+    beq     Reduce_Laser_Length_Countdown   ; 21EB: F0 04    
 
+; Update laser tile color
     lda     ZP1B_Laser_Color                ; 21ED: A5 1B    
-    sta     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 21EF: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 21EF: 91 0C    
 
 ; L_BRS_($21F1)_($21EB) OK
-Setup_Delay_Pattens?
+Reduce_Laser_Length_Countdown
     lda     ZP07_Laser_Length_Columns       ; 21F1: A5 07    
     sec                                     ; 21F3: 38       
     sbc     #$08                            ; 21F4: E9 08    
     sta     ZP07_Laser_Length_Columns       ; 21F6: 85 07    
 
-    and     #%11111000                      ; 21F8: 29 F8    
+; Test if laser length is > 7, if yes branch
+    and     #%11111000                      ; 21F8: 29 F8     Zero bottom 3 bits xxxx_x000
     bne     Setup_Laser_Decay_Patterns      ; 21FA: D0 06    
 
+; Probably turns of further display of laser beam
 ; L_BRS_($21FC)_($21DA) OK
 UDG_RAM_Zero_Bit_2
     lda     ZP06_Laser_Position_X           ; 21FC: A5 06    
-    and     #%11111011                      ; 21FE: 29 FB     Zero bit 2 i.e. xxxx_x0xx
+    and     #%11111011                      ; 21FE: 29 FB     Zero bit 2 xxxx_x0xx
     sta     ZP06_Laser_Position_X           ; 2200: 85 06    
 
 ; Loads ZP 14/15/16/17 with laser decay pattern, initial laser is a line of $FF's then $03

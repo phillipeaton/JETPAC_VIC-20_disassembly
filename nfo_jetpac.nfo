@@ -235,30 +235,37 @@ label    21CB Handle_Wrap_And_Get_Y_Cooord
 lcomment 21CE Save A
 deflabel 21D0 LASER_POSITION_Y
 comment  21D3
-comment  21D3 Y becomes $00 i.e. Laser Type/Direction Facing parameter
+comment  21D3 Register Y becomes $00 i.e. Laser Type/Direction Facing parameter
+comment  21D4
+comment  21D4 Laser Position Y in accumulator, test if laser shot positions near bottom of screen
+comment  21D4 i.e. at or below height of fully-built rocket, branch if it is near the bottom
 binary   21D5
-label    21DC Top_Bit_Was_Set
+comment  21D8
+comment  21D8 Test if laser address in UDG RAM is empty, jump if not empty
+comment  21D8 This stops you firing through objects when laser is above the top of the fully-built rocket
+label    21DC Save_Laser_Position_X
 comment  21DC
 lcomment 21DC Restore A
 comment  21DF
 comment  21DF Reverse the displayed 8-bit byte on-screen
 binary   21E2
 comment  21E5
-comment  21E5 Load current tile color, check it's not green, if not update tile color
-lcomment 21E5 ZP0C_Col_RAM_Ptr_Lo
-lcomment 21E7 Zero top 4 bits
+comment  21E5 Load current tile color, check it's not green, jump if it is
+lcomment 21E7 Zero top 4 bits 0000_xxxx
 binary   21E8
-lcomment 21E9 Test if 0101
 deflabel 21EA GREEN
 comment  21ED
-lcomment 21EF ZP0C_Col_RAM_Ptr_Lo
+comment  21ED Update laser tile color
 comment  21F1
-label    21F1 Setup_Delay_Pattens?
+label    21F1 Reduce_Laser_Length_Countdown
 comment  21F8
+comment  21F8 Test if laser length is > 7, if yes branch
+lcomment 21F8 Zero bottom 3 bits xxxx_x000
 binary   21F9
 label    21FC UDG_RAM_Zero_Bit_2
 comment  21FC
-lcomment 21FE Zero bit 2 i.e. xxxx_x0xx
+comment  21FC Probably turns of further display of laser beam
+lcomment 21FE Zero bit 2 xxxx_x0xx
 binary   21FF
 comment  2202
 comment  2202 Loads ZP 14/15/16/17 with laser decay pattern, initial laser is a line of $FF's then $03
