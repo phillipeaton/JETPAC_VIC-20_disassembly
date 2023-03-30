@@ -146,41 +146,60 @@ comment  20E9 ARGUMENTS : sentiseutn
 comment  20E9 \            etinseut
 comment  20E9 \            setniseutn
 comment  20E9 ----------------------------------------------------------
+comment  20E9 Update laser objects once every four calls based on IRQ counter
 label    20E9 Update_Laser_Objects
-lcomment 20EB Update once every four calls
 comment  20F0
-label    20F0 Update_Laser_Objects_1
+label    20F0 Update_Laser_Objects_Init
 const    20F3
+lcomment 20F3 ZP06/07
 lcomment 20F4
 word     20F4
 const    20F6
 comment  20F7
-comment  20F7 Loop through the four possible Laser shots, branch if any are zero I.E. NOT SHOOTING???????
-label    20FB Update_Laser_Objects_2
+comment  20F7 Loop through the four possible Laser shots, branch if any are zero, i.e. first shot setup
+deflabel 20F8 MAX_LASER_SHOTS
+deflabel 20FA LASER_TYPE_PARAM
+label    20FB Loop_Update_Laser_Objects
+comment  20FB
 comment  20FF
-comment  20FF Move ZP index address to next 8 bytes i.e. next Laser shot
+comment  20FF Move 16-bit address pointer to next laser shot object i.e. 8 bytes ahead
+comment  2106
+comment  210C
+comment  210C Test if all Laser objects updated, if yes, return, else loop back
+comment  2110
+comment  2110 Get Jetman state attrib i.e. fly/no-fly and facing left/right
 label    2110 Update_Laser_Object
-lcomment 2110 Get Jetman attrib 00 i.e. fly/no-fly and facing left/right and ???
-lcomment 2112 Store for later
-lcomment 2113 Jetman looking left?
-lcomment 2115 Set bit 4, DON'T KNOW WHAT IT'S USED FOR??????????
-lcomment 2117 Store to inactive Laser attrib 00
+comment  2113
+comment  2113 Mask for Jetman facing left/right bit and store to variable
+lcomment 2113 Zero bits 0-6 x000_0000
+lcomment 2115 Set bit 4 x001_0000
 comment  2119
-lcomment 2119 Move to next Jetman attrib 01
-lcomment 211A Get Jetman attrib 01 i.e. X position
-lcomment 211C Zero the bottom 3 bits
-lcomment 211E Set bits 0 & 2
-lcomment 2120 Store for later
+comment  2119 Get Jetman Position X, manipulate bottom 3 bits and store to ZP08
+lcomment 211C Zero bits 0-3 xxxx_x000
+binary   211D
+lcomment 211E Set bits 0 & 2 xxxx_x101
+binary   211F
 comment  2122
-lcomment 2122 Restore Jetman attrib 00
-lcomment 2123 Jetman looking left?
-lcomment 2125 No, branch
-label    212f Update_Laser_Object_1
+comment  2122 Test again Jetman facing left/right
+deflabel 2124 MASK_JETMAN_DIRECTION
+binary   2124
+comment  2127
+comment  2127 Jetman facing left
+label    212F Update_Laser_Object_1
+comment  212F
+comment  2131
 comment  213C
-label    2145 Update_Laser_Object_2
+comment  2143
+binary   2144
+label    2145 Loop_Update_Laser
+comment  2145
+comment  2148
 comment  214B
+binary   214F
+binary   2152
 comment  2155
-comment  2155 Load a random laser color using the current 6522 timer value
+comment  2155 Load a random laser color value 0-7 using the current 6522 timer value
+binary   2159
 comment  2160
 comment  2160 Trigger laser sound
 comment  216B
@@ -201,11 +220,17 @@ lcomment 2173 Get Jetman attrib 01 i.e. ????????
 lcomment 2175 Zero bits 3-7, any bits 0-2 set?
 lcomment 2177 No, branch
 label    217E Laser_Jetman_Facing_Right_1
-lcomment 217E Zero bit 0
+comment  217E
+lcomment 217E Zero bit 0 xxxx_xxx0
+binary   217F
 lcomment 2180 TESING AT EDGE OF SCREEN?
+deflabel 2181 SCREEN_WIDTH_PIXELS
 label    2187 Laser_Jetman_Facing_Right_2
+comment  2187
 lcomment 2188 OFFSETTING EDGE OF SCREEN?
+deflabel 2189 SCREEN_WIDTH_PIXELS
 label    218D Laser_Jetman_Facing_Right_3
+comment  218D
 lcomment 218D Restore saved Jetman attrib 00
 lcomment 2190 Add $10 for some reason??????????
 comment  2195
@@ -286,28 +311,29 @@ word     220C
 break    220C
 break    220E
 comment  220F
-comment  220F Iterate round each of the laser shots that could be active for display
+comment  220F Iterate through each of the laser shots that could be active for display
 label    2211 Iterate_Laser_Params_2_3_4_5
-lcomment 2211 First time round, Y=3, next time 4 and so on
-lcomment 2212 Get one of the four laser object paramenters
-lcomment 2216 Zero bottom 3 bits, probably testing if laser shot ended
+lcomment 2216 Zero bottom 3 bits xxxx_x000
 binary   2217
+comment  221A
+comment  221A Test if all lasers
 comment  2221
-comment  2221 All laser shows ended, zero laser shots object type
+comment  2221 All laser shots ended, set laser shots object type to zero i.e. no laser shot
 deflabel 2222 LASER_TYPE_PARAM
 comment  2229
 comment  2229 Process laser shot, update parameters in object table
-label    2229 FP7777
-lcomment 2229 Get one of the four laser object paramenters
+comment  2229 Get one of the four laser object paramenters, test if bit 2 is set, ef
+label    2229 Process_Laser_Shot
 comment  2230
+lcomment 2234 Zero bits 3-7 0000_0xxx
 binary   2235
 comment  2238
-lcomment 223A Zero bits 2-8 i.e. 0000_00xx
+lcomment 223A Zero bits 2-7 i.e. 0000_00xx
 binary   223B
 lcomment 223C Set bit 2 i.e. 0000_01xx
 binary   223D
 comment  2242
-lcomment 2244 Set bit 2
+lcomment 2244 Set bit 2 xxxx_x1xx
 binary   2245
 comment  2248
 comment  2248 Update object list parameteters from ZP temp vars
@@ -318,7 +344,7 @@ deflabel 224F LASER_POSITION_X
 comment  2254
 comment  2257
 comment  2257 Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
-label    2257 FP9999
+label    2257 Update_Laser_Position_X
 comment  225E
 comment  225E Add 8 if firing left or -8 if firing right ($F8 is -8)
 comment  2263
@@ -335,7 +361,7 @@ comment  227E
 lcomment 2280 Iterate to next laser shot
 lcomment 2282 Update object list and exit subroutine
 label    2285 ADC_08_
-label    228B Laser_ZP17_To_16_To_15_To_14
+label    228B Update_Laser_Pattern_Data
 comment  2298
 comment  2298 Looks like it's doing some checks on the X coord, e.g. laser wraparound
 label    2298 Laser_Wrap

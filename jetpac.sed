@@ -13,10 +13,10 @@
 /ZP07                            equ     $0007/a ZP07_Laser_Length_Columns       equ     $0007
 /ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
 /ZP13                            equ     $0013/a ZP13_Laser_Position_Y           equ     $0013
-/ZP14                            equ     $0014/a ZP14_                           equ     $0014
-/ZP15                            equ     $0015/a ZP15_                           equ     $0015
-/ZP16                            equ     $0016/a ZP16_                           equ     $0016
-/ZP17                            equ     $0017/a ZP17_                           equ     $0017
+/ZP14                            equ     $0014/a ZP14_Laser_Decay_Patten_Data_0  equ     $0014
+/ZP15                            equ     $0015/a ZP15_Laser_Decay_Patten_Data_1  equ     $0015
+/ZP16                            equ     $0016/a ZP16_Laser_Decay_Patten_Data_2  equ     $0016
+/ZP17                            equ     $0017/a ZP17_Laser_Decay_Patten_Data_3  equ     $0017
 /ZP1B                            equ     $001B/a ZP1B_Laser_Color                equ     $001B
 /; 2195/,/; 22B9/s/ZP02                           /ZP02_Laser_Param_Countdown     /
 
@@ -39,10 +39,10 @@
 /; 2195/,/; 22B9/s/ZP0C                           /ZP0C_Color_RAM_Tile_Addr_Lo    /
 /; 2195/,/; 22B9/s/(ZP0C),y                       /(ZP0C_Color_RAM_Tile_Addr_Lo),y/
 /; 2195/,/; 22B9/s/ZP13                           /ZP13_Laser_Position_Y          /
-/; 2195/,/; 22B9/s/ZP14                           /ZP14_                          /
-/; 2195/,/; 22B9/s/ZP15                           /ZP15_                          /
-/; 2195/,/; 22B9/s/ZP16                           /ZP16_                          /
-/; 2195/,/; 22B9/s/ZP17                           /ZP17_                          /
+/; 2195/,/; 22B9/s/ZP14                           /ZP14_Laser_Decay_Patten_Data_0 /
+/; 2195/,/; 22B9/s/ZP15                           /ZP15_Laser_Decay_Patten_Data_1 /
+/; 2195/,/; 22B9/s/ZP16                           /ZP16_Laser_Decay_Patten_Data_2 /
+/; 2195/,/; 22B9/s/ZP17                           /ZP17_Laser_Decay_Patten_Data_3 /
 /; 2195/,/; 22B9/s/ZP1B                           /ZP1B_Laser_Color               /
 
 # Display_Object
