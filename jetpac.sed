@@ -3,6 +3,17 @@
 
 # Local Zero Page variables for Display_Sprite routine
 
+# Init_Laser_Objects
+/ZP06                            equ     $0006/a ZP06_Laser_Old_State_Lo         equ     $0006
+/ZP07                            equ     $0007/a ZP07_Laser_Old_State_Hi         equ     $0007
+/ZP06                            equ     $0006/a ZP06_Laser_New_State_Lo         equ     $0006
+/ZP08                            equ     $0008/a ZP08_Laser_Position_X_Start     equ     $0008
+/; 20E9/,/; 210F/s/ZP06                           /ZP06_Laser_Old_State_Lo        /
+/; 20E9/,/; 210F/s/(ZP06),y                       /(ZP06_Laser_Old_State_Lo),y    /
+/; 20E9/,/; 210F/s/ZP07                           /ZP07_Laser_Old_State_Hi        /
+/; 2110/,/; 2192/s/(ZP06),y                       /(ZP06_Laser_New_State_Lo),y    /
+/; 20E9/,/; 2192/s/ZP08                           /ZP08_Laser_Position_X_Start    /
+
 # DISPLAY_LASERS
 /ZP02                            equ     $0002/a ZP02_Laser_Param_Countdown      equ     $0002
 /ZP04                            equ     $0004/a ZP04_Laser_Position_X           equ     $0004

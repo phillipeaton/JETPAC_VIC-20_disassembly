@@ -93,12 +93,12 @@ label    0384 Obj_Jetman_Direction_Y    ; Range between FC=Up to 04=Down at rest
 
 
 ; Byte 00/08= object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
-; Byte 01/09= Laser Y-coord
-; Byte 02/0A= X-coord of end of laser. Each shot is a different length and thus a different value is stored.
+; Byte 01/09= Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
+; Byte 02/0A= X-coord of start of laser beam, calculated from position of Jetman.
 ; Byte 03/0B= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
 ; Byte 04/0C= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
 ; Byte 05/0D= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-; Byte 06/0E= ??????
+; Byte 06/0E= Laser shot beam length, randomly set using the IRQ counter.
 ; Byte 07/0F= Laser Color
 ;
 ; Laser_Color_Table

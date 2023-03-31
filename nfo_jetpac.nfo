@@ -139,17 +139,17 @@ lcomment 20E1 No, check for settings again
 comment  20E3
 comment  20E9
 comment  20E9 ----------------------------------------------------------
-comment  20E9 FUNCTION  : Update_Laser_Objects
+comment  20E9 FUNCTION  : Init_Laser_Objects
 comment  20E9 CALLED BY :
 comment  20E9 CALLS     : Nothing
 comment  20E9 ARGUMENTS : sentiseutn
 comment  20E9 \            etinseut
 comment  20E9 \            setniseutn
 comment  20E9 ----------------------------------------------------------
-comment  20E9 Update laser objects once every four calls based on IRQ counter
-label    20E9 Update_Laser_Objects
+comment  20E9 Initialise laser objects once every four calls based on IRQ counter if fire pressed
+label    20E9 Init_Laser_Objects
 comment  20F0
-label    20F0 Update_Laser_Objects_Init
+label    20F0 Init_Laser_Objects_Init
 const    20F3
 lcomment 20F3 ZP06/07
 lcomment 20F4
@@ -172,7 +172,9 @@ label    2110 Update_Laser_Object
 comment  2113
 comment  2113 Mask for Jetman facing left/right bit and store to variable
 lcomment 2113 Zero bits 0-6 x000_0000
+deflabel 2114 MASK_JETMAN_DIRECTION
 lcomment 2115 Set bit 4 x001_0000
+binary   2116
 comment  2119
 comment  2119 Get Jetman Position X, manipulate bottom 3 bits and store to ZP08
 lcomment 211C Zero bits 0-3 xxxx_x000
@@ -185,23 +187,31 @@ deflabel 2124 MASK_JETMAN_DIRECTION
 binary   2124
 comment  2127
 comment  2127 Jetman facing left
-label    212F Update_Laser_Object_1
+label    212F Update_Laser_Object_Params
 comment  212F
 comment  2131
+comment  2131 Get Jetman Position Y, subtract some pixels to get to gun nozzle height and store to laser object
+deflabel 2137 LASER_GUN_HEIGHT_OFFSET
 comment  213C
+comment  213C Fill Laser object parameters 2-5 with copies of X start position, but with bit 2 ANDed out
+deflabel 213D LASER_POSITION_X_PARAMS
 comment  2143
 binary   2144
 label    2145 Loop_Update_Laser
 comment  2145
 comment  2148
 comment  214B
+comment  214B Set laser shot beam length parameter 6 randomly using IRQ counter,
+comment  214B range 0100_0000 to 0111_1000 i.e. $40-$78
+lcomment 214E Zero bits 7,6,2-0 00xx_x000
 binary   214F
+lcomment 2151 Set bit 6 01xx_xx000
 binary   2152
 comment  2155
-comment  2155 Load a random laser color value 0-7 using the current 6522 timer value
+comment  2155 Load a random laser color value 0-7 using IRQ counter
 binary   2159
 comment  2160
-comment  2160 Trigger laser sound
+comment  2160 Trigger laser sound by setting parameters in sound object
 comment  216B
 label    216B Laser_Color_Table
 lcomment 216B Green not used, messes up colors if it's used
@@ -215,21 +225,22 @@ deflabel 2170 YELLOW
 deflabel 2171 CYAN
 deflabel 2172 YELLOW
 comment  2173
+comment  2173 Test if Jetman Position X is facing right at the start of a tile
 label    2173 Laser_Jetman_Facing_Right
-lcomment 2173 Get Jetman attrib 01 i.e. ????????
-lcomment 2175 Zero bits 3-7, any bits 0-2 set?
-lcomment 2177 No, branch
-label    217E Laser_Jetman_Facing_Right_1
+lcomment 2175 Zero bits 3-7 0000_0xxx
+binary   2176
+comment  2179
+comment  2179 Add to the laser start Position X
+label    217E Laser_Jetman_Facing_Right_Wrap
 comment  217E
+comment  217E Test for X coordinate screen wrap
 lcomment 217E Zero bit 0 xxxx_xxx0
 binary   217F
-lcomment 2180 TESING AT EDGE OF SCREEN?
 deflabel 2181 SCREEN_WIDTH_PIXELS
-label    2187 Laser_Jetman_Facing_Right_2
+label    2187 Wrap_Laser_Shot_Position_X
 comment  2187
-lcomment 2188 OFFSETTING EDGE OF SCREEN?
 deflabel 2189 SCREEN_WIDTH_PIXELS
-label    218D Laser_Jetman_Facing_Right_3
+label    218D Add_To_Laser_Start_Position_X
 comment  218D
 lcomment 218D Restore saved Jetman attrib 00
 lcomment 2190 Add $10 for some reason??????????
