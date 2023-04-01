@@ -459,7 +459,7 @@ Init_Laser_Objects_Init
 ; L_BRS_($20FB)_($210D) OK
 Loop_Update_Laser_Objects
     lda     (ZP06),y                        ; 20FB: B1 06    
-    beq     Update_Laser_Object             ; 20FD: F0 11    
+    beq     Init_Laser_Object               ; 20FD: F0 11    
 
 ; Move 16-bit address pointer to next laser shot object i.e. 8 bytes ahead
     lda     ZP06                            ; 20FF: A5 06    
@@ -479,7 +479,7 @@ Loop_Update_Laser_Objects
 
 ; Get Jetman state attrib i.e. fly/no-fly and facing left/right
 ; L_BRS_($2110)_($20FD) OK
-Update_Laser_Object
+Init_Laser_Object
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2110: B1 00    
     tax                                     ; 2112: AA       
 
@@ -508,7 +508,7 @@ Update_Laser_Object
 
 ; L_JMP_($212F)_($2184) OK
 ; L_JMP_($212F)_($218A) OK
-Update_Laser_Object_Params
+Init_Laser_Object_Params
     sta     ZP08                            ; 212F: 85 08    
 
 ; Get Jetman Position Y, subtract some pixels to get to gun nozzle height and store to laser object
@@ -530,12 +530,12 @@ Update_Laser_Object_Params
     and     #%11111011                      ; 2143: 29 FB    
 
 ; L_BRS_($2145)_($2149) OK
-Loop_Update_Laser
+Loop_Init_Laser
     iny                                     ; 2145: C8       
     sta     (ZP06),y                        ; 2146: 91 06    
 
     dex                                     ; 2148: CA       
-    bne     Loop_Update_Laser               ; 2149: D0 FA    
+    bne     Loop_Init_Laser                 ; 2149: D0 FA    
 
 ; Set laser shot beam length parameter 6 randomly using IRQ counter,
 ; range 0100_0000 to 0111_1000 i.e. $40-$78
@@ -562,8 +562,9 @@ Loop_Update_Laser
     rts                                     ; 216A: 60       
 ; ===========================================================
 
+; Green not used, it's used for the platforms only
 Laser_Color_Table
-    fcb     WHITE,RED,CYAN,PURPLE           ; 216B: 01 02 03 04  Green not used, messes up colors if it's used
+    fcb     WHITE,RED,CYAN,PURPLE           ; 216B: 01 02 03 04 
     fcb     BLUE,YELLOW,CYAN,YELLOW         ; 216F: 06 07 03 07 
 
 ; Test if Jetman Position X is facing right at the start of a tile
@@ -573,32 +574,34 @@ Laser_Jetman_Facing_Right
     and     #%00000111                      ; 2175: 29 07     Zero bits 3-7 0000_0xxx
     beq     Add_To_Laser_Start_Position_X   ; 2177: F0 14    
 
-; Add to the laser start Position X
+; Add to the laser start Position X $18 pixels to avoid drawing laser over Jetman on screen
     lda     ZP08                            ; 2179: A5 08    
     clc                                     ; 217B: 18       
     adc     #$18                            ; 217C: 69 18    
 
-; Test for X coordinate screen wrap
+; Test for X coordinate screen wraparound
 ; L_JMP_($217E)_($2192) OK
 Laser_Jetman_Facing_Right_Wrap
     and     #%11111110                      ; 217E: 29 FE     Zero bit 0 xxxx_xxx0
     cmp     #SCREEN_WIDTH_PIXELS            ; 2180: C9 B8    
     bcs     Wrap_Laser_Shot_Position_X      ; 2182: B0 03    
-    jmp     Update_Laser_Object_Params      ; 2184: 4C 2F 21 
+    jmp     Init_Laser_Object_Params        ; 2184: 4C 2F 21 
 ; -----------------------
 
+; Wrap the laser by subtracting the width of the screen in pixels from the X position
 ; L_BRS_($2187)_($2182) OK
 Wrap_Laser_Shot_Position_X
     sec                                     ; 2187: 38       
     sbc     #SCREEN_WIDTH_PIXELS            ; 2188: E9 B8    
-    jmp     Update_Laser_Object_Params      ; 218A: 4C 2F 21 
+    jmp     Init_Laser_Object_Params        ; 218A: 4C 2F 21 
 ; -----------------------
 
+; Add to the laser start Position X $10 pixels to avoid drawing laser over Jetman on screen
 ; L_BRS_($218D)_($2177) OK
 Add_To_Laser_Start_Position_X
-    lda     ZP08                            ; 218D: A5 08     Restore saved Jetman attrib 00
+    lda     ZP08                            ; 218D: A5 08    
     clc                                     ; 218F: 18       
-    adc     #$10                            ; 2190: 69 10     Add $10 for some reason??????????
+    adc     #$10                            ; 2190: 69 10    
     jmp     Laser_Jetman_Facing_Right_Wrap  ; 2192: 4C 7E 21 
 ; -----------------------
 
@@ -746,8 +749,8 @@ Iterate_Laser_Params_2_3_4_5
     and     #%11111000                      ; 2216: 29 F8     Zero bottom 3 bits xxxx_x000
     bne     Process_Laser_Shot              ; 2218: D0 0F    
 
-; Test if all lasers
-    jsr     Update_Laser_Pattern_Data       ; 221A: 20 8B 22 
+; Test if all possible laser parameters processed
+    jsr     Cascade_Laser_Pattern_Data      ; 221A: 20 8B 22 
     dec     ZP02                            ; 221D: C6 02    
     bne     Iterate_Laser_Params_2_3_4_5    ; 221F: D0 F0    
 
@@ -766,22 +769,24 @@ Process_Laser_Shot
     bit     MASK_00000100                   ; 222B: 2C 16 20 
     bne     Update_Laser_Position_X         ; 222E: D0 27    
 
+; Decrements length and test for exit condition
     dec     ZP07                            ; 2230: C6 07    
     lda     ZP07                            ; 2232: A5 07    
     and     #%00000111                      ; 2234: 29 07     Zero bits 3-7 0000_0xxx
     bne     Update_Obj_Params_And_Exit      ; 2236: D0 10    
 
+; Use IRQ counter to add some randomness to laser decay length patterns
     lda     ZP_HW_IRQ_Count3                ; 2238: A5 4C    
-    and     #%00000011                      ; 223A: 29 03     Zero bits 2-7 i.e. 0000_00xx
-    ora     #%00000100                      ; 223C: 09 04     Set bit 2 i.e. 0000_01xx
+    and     #%00000011                      ; 223A: 29 03     Zero bits 2-7 0000_00xx
+    ora     #%00000100                      ; 223C: 09 04     Set bit 2 0000_01xx
     ora     ZP07                            ; 223E: 05 07    
     sta     ZP07                            ; 2240: 85 07    
 
+; Register Y is 3 or 4 or 5 or 5 at this point, thus setting bit in laser x-coords
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2242: B1 00    
     ora     #%00000100                      ; 2244: 09 04     Set bit 2 xxxx_x1xx
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2246: 91 00    
 
-; Update object list parameteters from ZP temp vars
 ; L_BRS_($2248)_($2236) OK
 ; L_JMP_($2248)_($2282) OK
 Update_Obj_Params_And_Exit
@@ -796,7 +801,8 @@ Update_Obj_Params_And_Exit
     jmp     GOTO_NEXT_OBJECT                ; 2254: 4C 1A 26 
 ; -----------------------
 
-; Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
+; Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers
+; and increment/decrement by 8 depending on firing left or right
 ; L_BRS_($2257)_($222E) OK
 Update_Laser_Position_X
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2257: B1 00    
@@ -809,7 +815,7 @@ Update_Laser_Position_X
     adc     #$F8                            ; 2261: 69 F8    
 
 ; L_JMP_($2263)_($2288) OK
-Firing_Left_Right_Continue_
+Account_For_Wraparound
     jsr     Laser_Wrap                      ; 2263: 20 98 22 
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2266: 91 00    
 
@@ -817,33 +823,36 @@ Firing_Left_Right_Continue_
     sta     ZP05                            ; 226A: 85 05    
 
 ; EXOR-write data in ZP variable to UDG RAM
-    tya                                     ; 226C: 98        Save Y
-
+    tya                                     ; 226C: 98       
     pha                                     ; 226D: 48       
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 226E: 20 1D 35 
-    jsr     Update_Laser_Pattern_Data       ; 2271: 20 8B 22 
 
+    jsr     Convert_XY_to_UDG_RAM_Addr      ; 226E: 20 1D 35 
+    jsr     Cascade_Laser_Pattern_Data      ; 2271: 20 8B 22 
+
+; Apply laser decay pattern onto screen
     ldy     #$00                            ; 2274: A0 00    
     lda     ZP14                            ; 2276: A5 14    
     eor     (ZP04),y                        ; 2278: 51 04    
     sta     (ZP04),y                        ; 227A: 91 04    
 
     pla                                     ; 227C: 68       
-    tay                                     ; 227D: A8        Restore Y
+    tay                                     ; 227D: A8       
 
     dec     ZP02                            ; 227E: C6 02    
-    bne     Iterate_Laser_Params_2_3_4_5    ; 2280: D0 8F     Iterate to next laser shot
-    jmp     Update_Obj_Params_And_Exit      ; 2282: 4C 48 22  Update object list and exit subroutine
+    bne     Iterate_Laser_Params_2_3_4_5    ; 2280: D0 8F    
+    jmp     Update_Obj_Params_And_Exit      ; 2282: 4C 48 22 
 ; -----------------------
+
 ; L_BRS_($2285)_($225E) OK
 ADC_08_
     clc                                     ; 2285: 18       
     adc     #$08                            ; 2286: 69 08    
-    jmp     Firing_Left_Right_Continue_     ; 2288: 4C 63 22 
+    jmp     Account_For_Wraparound          ; 2288: 4C 63 22 
 ; -----------------------
+
 ; L_JSR_($228B)_($221A) OK
 ; L_JSR_($228B)_($2271) OK
-Update_Laser_Pattern_Data
+Cascade_Laser_Pattern_Data
     lda     ZP15                            ; 228B: A5 15    
     sta     ZP14                            ; 228D: 85 14    
     lda     ZP16                            ; 228F: A5 16    
@@ -859,12 +868,13 @@ Update_Laser_Pattern_Data
 ; L_JSR_($2298)_($2263) OK
 Laser_Wrap
     pha                                     ; 2298: 48       
-    and     #%11111000                      ; 2299: 29 F8    
+    and     #%11111000                      ; 2299: 29 F8     Zero bits 0-2 xxxx_x000
     cmp     #SCREEN_WIDTH_PIXELS            ; 229B: C9 B8    
     bcs     Laser_Wrap_Left_To_Right        ; 229D: B0 02    
     pla                                     ; 229F: 68       
     rts                                     ; 22A0: 60       
 ; ===========================================================
+
 ; L_BRS_($22A1)_($229D) OK
 Laser_Wrap_Left_To_Right
     tya                                     ; 22A1: 98       
@@ -875,13 +885,14 @@ Laser_Wrap_Left_To_Right
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 22A5: B1 00    
     bit     MASK_10000000                   ; 22A7: 2C 1B 20 
     beq     Laser_Wrap_Right_To_Left        ; 22AA: F0 08    
+
     pla                                     ; 22AC: 68       
     tay                                     ; 22AD: A8       
 
-; Set the approprite left to right X co-ordinate bits
+; Change X position from e.g. $FD to $B5, where $B8 is screen width in pixels
     pla                                     ; 22AE: 68       
-    and     #%00000111                      ; 22AF: 29 07     Zero top 5 bits i.e. 0000_0xxx
-    ora     #%10110000                      ; 22B1: 09 B0     Set bits 7,5,4 i.e. 1011_0xxx
+    and     #%00000111                      ; 22AF: 29 07     Zero bits 3-7 0000_0xxx
+    ora     #%10110000                      ; 22B1: 09 B0     Set bits 7,5,4 1011_0xxx
     rts                                     ; 22B3: 60       
 ; ===========================================================
 
@@ -890,9 +901,9 @@ Laser_Wrap_Right_To_Left
     pla                                     ; 22B4: 68       
     tay                                     ; 22B5: A8       
 
-; Set the approprite right to left X co-ordinate bits
+; Change X position to become left side of screen (between 0 and 7)
     pla                                     ; 22B6: 68       
-    and     #%00000111                      ; 22B7: 29 07     Zero top 5 bits i.e. 0000_0xxx
+    and     #%00000111                      ; 22B7: 29 07     Zero bits 3-7 0000_0xxx
     rts                                     ; 22B9: 60       
 ; ===========================================================
 

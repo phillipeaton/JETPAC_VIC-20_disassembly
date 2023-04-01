@@ -168,7 +168,7 @@ comment  210C
 comment  210C Test if all Laser objects updated, if yes, return, else loop back
 comment  2110
 comment  2110 Get Jetman state attrib i.e. fly/no-fly and facing left/right
-label    2110 Update_Laser_Object
+label    2110 Init_Laser_Object
 comment  2113
 comment  2113 Mask for Jetman facing left/right bit and store to variable
 lcomment 2113 Zero bits 0-6 x000_0000
@@ -187,7 +187,7 @@ deflabel 2124 MASK_JETMAN_DIRECTION
 binary   2124
 comment  2127
 comment  2127 Jetman facing left
-label    212F Update_Laser_Object_Params
+label    212F Init_Laser_Object_Params
 comment  212F
 comment  2131
 comment  2131 Get Jetman Position Y, subtract some pixels to get to gun nozzle height and store to laser object
@@ -197,7 +197,7 @@ comment  213C Fill Laser object parameters 2-5 with copies of X start position, 
 deflabel 213D LASER_POSITION_X_PARAMS
 comment  2143
 binary   2144
-label    2145 Loop_Update_Laser
+label    2145 Loop_Init_Laser
 comment  2145
 comment  2148
 comment  214B
@@ -213,8 +213,8 @@ binary   2159
 comment  2160
 comment  2160 Trigger laser sound by setting parameters in sound object
 comment  216B
+comment  216B Green not used, it's used for the platforms only
 label    216B Laser_Color_Table
-lcomment 216B Green not used, messes up colors if it's used
 deflabel 216B WHITE
 deflabel 216C RED
 deflabel 216D CYAN
@@ -230,20 +230,20 @@ label    2173 Laser_Jetman_Facing_Right
 lcomment 2175 Zero bits 3-7 0000_0xxx
 binary   2176
 comment  2179
-comment  2179 Add to the laser start Position X
+comment  2179 Add to the laser start Position X $18 pixels to avoid drawing laser over Jetman on screen
 label    217E Laser_Jetman_Facing_Right_Wrap
 comment  217E
-comment  217E Test for X coordinate screen wrap
+comment  217E Test for X coordinate screen wraparound
 lcomment 217E Zero bit 0 xxxx_xxx0
 binary   217F
 deflabel 2181 SCREEN_WIDTH_PIXELS
 label    2187 Wrap_Laser_Shot_Position_X
 comment  2187
+comment  2187 Wrap the laser by subtracting the width of the screen in pixels from the X position
 deflabel 2189 SCREEN_WIDTH_PIXELS
 label    218D Add_To_Laser_Start_Position_X
 comment  218D
-lcomment 218D Restore saved Jetman attrib 00
-lcomment 2190 Add $10 for some reason??????????
+comment  218D Add to the laser start Position X $10 pixels to avoid drawing laser over Jetman on screen
 comment  2195
 label    2195 Add_08
 comment  219A
@@ -327,7 +327,7 @@ label    2211 Iterate_Laser_Params_2_3_4_5
 lcomment 2216 Zero bottom 3 bits xxxx_x000
 binary   2217
 comment  221A
-comment  221A Test if all lasers
+comment  221A Test if all possible laser parameters processed
 comment  2221
 comment  2221 All laser shots ended, set laser shots object type to zero i.e. no laser shot
 deflabel 2222 LASER_TYPE_PARAM
@@ -336,63 +336,68 @@ comment  2229 Process laser shot, update parameters in object table
 comment  2229 Get one of the four laser object paramenters, test if bit 2 is set, ef
 label    2229 Process_Laser_Shot
 comment  2230
+comment  2230 Decrements length and test for exit condition
 lcomment 2234 Zero bits 3-7 0000_0xxx
 binary   2235
 comment  2238
-lcomment 223A Zero bits 2-7 i.e. 0000_00xx
+comment  2238 Use IRQ counter to add some randomness to laser decay length patterns
+lcomment 223A Zero bits 2-7 0000_00xx
 binary   223B
-lcomment 223C Set bit 2 i.e. 0000_01xx
+lcomment 223C Set bit 2 0000_01xx
 binary   223D
 comment  2242
+comment  2242 Register Y is 3 or 4 or 5 or 5 at this point, thus setting bit in laser x-coords
 lcomment 2244 Set bit 2 xxxx_x1xx
 binary   2245
 comment  2248
-comment  2248 Update object list parameteters from ZP temp vars
 label    2248 Update_Obj_Params_And_Exit
 deflabel 2249 LASER_LENGTH_PARAM
 comment  224E
 deflabel 224F LASER_POSITION_X
 comment  2254
 comment  2257
-comment  2257 Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers and
+comment  2257 Get X-coord from object list parameters and Y-coord, store to UDG RAM address pointers
+comment  2257 and increment/decrement by 8 depending on firing left or right
 label    2257 Update_Laser_Position_X
 comment  225E
 comment  225E Add 8 if firing left or -8 if firing right ($F8 is -8)
 comment  2263
-label    2263 Firing_Left_Right_Continue_
+label    2263 Account_For_Wraparound
 comment  2268
 comment  226C
 comment  226C EXOR-write data in ZP variable to UDG RAM
-lcomment 226C Save Y
-comment  226D
+comment  226E
 comment  2274
+comment  2274 Apply laser decay pattern onto screen
 comment  227C
-lcomment 227D Restore Y
 comment  227E
-lcomment 2280 Iterate to next laser shot
-lcomment 2282 Update object list and exit subroutine
 label    2285 ADC_08_
-label    228B Update_Laser_Pattern_Data
+label    228B Cascade_Laser_Pattern_Data
+comment  228B
+comment  2285
 comment  2298
 comment  2298 Looks like it's doing some checks on the X coord, e.g. laser wraparound
 label    2298 Laser_Wrap
+lcomment 2299 Zero bits 0-2 xxxx_x000
 binary   229A
 deflabel 229C SCREEN_WIDTH_PIXELS
 label    22A1 Laser_Wrap_Left_To_Right
+comment  22A1
 comment  22A3
 comment  22A3 Test top bit i.e. direction left or right
 deflabel 22A4 LASER_TYPE_PARAM
+comment  22AC
 comment  22AE
-comment  22AE Set the approprite left to right X co-ordinate bits
-lcomment 22AF Zero top 5 bits i.e. 0000_0xxx
+comment  22AE Change X position from e.g. $FD to $B5, where $B8 is screen width in pixels
+lcomment 22AF Zero bits 3-7 0000_0xxx
 binary   22B0
-lcomment 22B1 Set bits 7,5,4 i.e. 1011_0xxx
+lcomment 22B1 Set bits 7,5,4 1011_0xxx
 binary   22B2
 comment  22B4
 label    22B4 Laser_Wrap_Right_To_Left
 comment  22B6
-comment  22B6 Set the approprite right to left X co-ordinate bits
-lcomment 22B7 Zero top 5 bits i.e. 0000_0xxx
+comment  22B6 Change X position to become left side of screen (between 0 and 7)
+lcomment 22B7 Zero bits 3-7 0000_0xxx
 binary   22B8
 comment  22BA
 label    22BA Reset_Level_Add_Extra_Life
