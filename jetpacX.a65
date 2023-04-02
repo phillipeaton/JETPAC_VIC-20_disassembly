@@ -145,9 +145,9 @@ ZP_Score_P2                     equ     $0054
 ZP_Reverse_And_Color_Data       equ     $0057
 ZP_Flash_Counter                equ     $0058
 ZP_Level_Active_Player          equ     $0059
-ZP_Number_Of_Lives_P1           equ     $005A
+ZP_Num_Lives_Active_Player      equ     $005A
 ZP_Level_Inactive_Player        equ     $005B
-ZP_Number_Of_Lives_P2           equ     $005C
+ZP_Num_Lives_Inactive_Player    equ     $005C
 ZP_Flash_Score_Countdown        equ     $005D
 ZP_Active_Player                equ     $005E
 ZP_Subroutine_Addr_Lo           equ     $005F
@@ -173,13 +173,13 @@ Obj_Rocket_X                    equ     $03B1
 Obj_Rocket_Fuel_Lvl             equ     $03B2
 Obj_Rocket_Y                    equ     $03B3
 Obj_Rocket_Parts_Fuel_Counter   equ     $03B4
-Obj_Rock_Mod_Top_Fuel_Type      equ     $03B8
-Obj_Rock_Mod_Top_Fuel_X         equ     $03B9
-Obj_Rock_Mod_Top_Fuel_Status    equ     $03BC
-Obj_Rock_Mod_Mid_Valuable_Type  equ     $03C0
-Obj_Rock_Mod_Mid_Valuable_X     equ     $03C1
-Obj_Rock_Mod_Mid_Valuab_Status  equ     $03C4
-Obj_Rock_Mod_Mid_Valuable_Type_ equ     $03C6
+Obj_Rocket_Top_Or_Fuel_Type     equ     $03B8
+Obj_Rocket_Top_Or_Fuel_X        equ     $03B9
+Obj_Rocket_Top_Or_Fuel_Status   equ     $03BC
+Obj_Rocket_Mid_Or_Valuable_Typ  equ     $03C0
+Obj_Rocket_Mid_Or_Valuable_X    equ     $03C1
+Obj_Rocket_Mid_Or_Valu_Status   equ     $03C4
+Obj_Rocket_Mid_Or_Valu_Type     equ     $03C6
 Obj_Alien_0_0                   equ     $03C8
 UDG_RAM                         equ     $1000
 Display_P1_Score_Posn           equ     $1008
@@ -399,7 +399,7 @@ ISR_Rows
 ; L_JMP_($2079)_($2994) OK
 ; L_JMP_($2079)_($299A) OK
 Reset_Game_Select
-    jsr     Reset_Screen_Disp_Scores        ; 2079: 20 16 24 
+    jsr     Reset_Screen_Display_Scores     ; 2079: 20 16 24 
 
 ; Reset game selection flashing highlights
     lda     #$01                            ; 207C: A9 01    
@@ -492,7 +492,7 @@ Test_Space
     and     #$10                            ; 20DF: 29 10     Space Pressed?
     bne     Game_Select                     ; 20E1: D0 AC     No, check for settings again
 
-    jsr     Reset_Screen_Disp_Scores        ; 20E3: 20 16 24 
+    jsr     Reset_Screen_Display_Scores     ; 20E3: 20 16 24 
     jmp     Game_Start                      ; 20E6: 4C D1 25 
 ; -----------------------
 
@@ -1011,136 +1011,167 @@ Laser_Wrap_Right_To_Left
 ; L_JSR_($22BA)_($25DA) OK
 ; L_JSR_($22BA)_($2E44) OK
 Reset_Level_Add_Extra_Life
-    jsr     Reset_Screen_Disp_Scores        ; 22BA: 20 16 24 
+    jsr     Reset_Screen_Display_Scores     ; 22BA: 20 16 24 
 
-; Player at level 4, add another life
+; When level number ends in %11, add extra life e.g. 4th level, 8th level etc.
     lda     ZP_Level_Active_Player          ; 22BD: A5 59    
-    and     #$03                            ; 22BF: 29 03    
-    bne     Reset_Lev_Add_Extra_Life_2      ; 22C1: D0 0E    
-    jsr     Reset_Some_Objects              ; 22C3: 20 0B 23 
-    inc     ZP_Number_Of_Lives_P1           ; 22C6: E6 5A    
+    and     #%00000011                      ; 22BF: 29 03     Reset bits 2-7 0000_00xx
+    bne     Restore_Player_Objs_Init_Sound  ; 22C1: D0 0E    
+
+; Add extra life
+    jsr     Reset_Rocket_Obj_Params_Init    ; 22C3: 20 0B 23 
+    inc     ZP_Num_Lives_Active_Player      ; 22C6: E6 5A    
     jsr     Init_Next_Jetman_Lives_Scores   ; 22C8: 20 5B 23 
+
 ; L_JMP_($22CB)_($22D4) OK
 ; L_JMP_($22CB)_($22E0) OK
-Reset_Lev_Add_Extra_Life_1
+Draw_Platforms_Init_Sound
     jsr     Draw_Platforms                  ; 22CB: 20 52 31 
     jmp     Initialize_Sound_Object         ; 22CE: 4C AE 26 
 ; -----------------------
 
 ; L_BRS_($22D1)_($22C1) OK
-Reset_Lev_Add_Extra_Life_2
+Restore_Player_Objs_Init_Sound
     jsr     Restore_Player_Objects_4        ; 22D1: 20 CB 2D 
-    jmp     Reset_Lev_Add_Extra_Life_1      ; 22D4: 4C CB 22 
+    jmp     Draw_Platforms_Init_Sound       ; 22D4: 4C CB 22 
 ; -----------------------
 
 ; L_JSR_($22D7)_($29C7) OK
-Reset_Lev_Add_Extra_Life_3
-    jsr     Reset_Screen_Disp_Scores        ; 22D7: 20 16 24 
+Reset_Level
+    jsr     Reset_Screen_Display_Scores     ; 22D7: 20 16 24 
     jsr     Display_P1_Lives                ; 22DA: 20 73 23 
     jsr     Restore_Player_Objects          ; 22DD: 20 A1 2D 
-    jmp     Reset_Lev_Add_Extra_Life_1      ; 22E0: 4C CB 22 
+    jmp     Draw_Platforms_Init_Sound       ; 22E0: 4C CB 22 
 ; -----------------------
+
+
+
+
 
 ; L_JMP_($22E3)_($2B7C) OK
 ; L_JSR_($22E3)_($2DA6) OK
-Set_Obj_List_Type_Rocket_Fuel
+Set_Obj_Rocket_Top_Or_Fuel_Typ
     jsr     Save_Obj_List_Ptr               ; 22E3: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22E6: 20 9D 25 
-    fcb     $00                             ; 22E9: 00       
-    fdb     Obj_Rock_Mod_Top_Fuel_Type      ; 22EA: B8 03    
+    fcb     $00                             ; 22E9: 00        ZP00/01
+    fdb     Obj_Rocket_Top_Or_Fuel_Type     ; 22EA: B8 03    
     fcb     $FF                             ; 22EC: FF       
+
 ; L_JMP_($22ED)_($22FC) OK
-JMP_Reset_S_O_1
+Reset_Object
     ldx     #$01                            ; 22ED: A2 01    
-    jmp     Reset_S_O_1                     ; 22EF: 4C 1A 23 
+    jmp     Loop_Reset_Objects              ; 22EF: 4C 1A 23 
 ; -----------------------
 
 ; L_JSR_($22F2)_($2DB2) OK
-Object_RMS_Gem_Type
+Set_Obj_Rocket_Mid_Or_Valu_Typ
     jsr     Save_Obj_List_Ptr               ; 22F2: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22F5: 20 9D 25 
     fcb     $00                             ; 22F8: 00       
-    fdb     Obj_Rock_Mod_Mid_Valuable_Type  ; 22F9: C0 03    
+    fdb     Obj_Rocket_Mid_Or_Valuable_Typ  ; 22F9: C0 03    
     fcb     $FF                             ; 22FB: FF       
-    jmp     JMP_Reset_S_O_1                 ; 22FC: 4C ED 22 
+    jmp     Reset_Object                    ; 22FC: 4C ED 22 
 ; -----------------------
+
+
+
+
+
+; Reset rocket top, middle and bottom object parameters (i.e. 3 x 8 bytes) from static data table
 ; L_JSR_($22FF)_($230B) OK
 ; L_JSR_($22FF)_($23DE) OK
-Init_Objects_1_To_3
+Reset_Rocket_Obj_Params
     ldx     #$17                            ; 22FF: A2 17    
+
 ; L_BRS_($2301)_($2308) OK
-CBTSR1
-    lda     Inital_Screen_Object_Data,x     ; 2301: BD 3B 23 
+Loop_Reset_Rocket_Obj_Params
+    lda     Inital_Rocket_Objs_Data_Table,x ; 2301: BD 3B 23 
     sta     Obj_Rocket,x                    ; 2304: 9D B0 03 
     dex                                     ; 2307: CA       
-    bpl     CBTSR1                          ; 2308: 10 F7    
+    bpl     Loop_Reset_Rocket_Obj_Params    ; 2308: 10 F7    
     rts                                     ; 230A: 60       
 ; ===========================================================
+
 ; L_JSR_($230B)_($22C3) OK
-Reset_Some_Objects
-    jsr     Init_Objects_1_To_3             ; 230B: 20 FF 22 
+Reset_Rocket_Obj_Params_Init
+    jsr     Reset_Rocket_Obj_Params         ; 230B: 20 FF 22 
     jsr     Save_Obj_List_Ptr               ; 230E: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2311: 20 9D 25 
     fcb     $00                             ; 2314: 00       
-    fdb     Inital_Screen_Object_Data       ; 2315: 3B 23    
+    fdb     Inital_Rocket_Objs_Data_Table   ; 2315: 3B 23    
     fcb     $FF                             ; 2317: FF       
+
+; Reset rocket top, middle and bottom
     ldx     #$03                            ; 2318: A2 03    
+
 ; L_JMP_($231A)_($22EF) OK
 ; L_BRS_($231A)_($2335) OK
-Reset_S_O_1
+Loop_Reset_Objects
     txa                                     ; 231A: 8A       
     pha                                     ; 231B: 48       
+
     jsr     Load_Object_Type_X_Y_Color      ; 231C: 20 E9 35 
     jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 231F: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2322: 20 5A 30 
+
+; Move 16-bit address pointer to next object i.e. 8 bytes ahead
     lda     ZP00_Obj_List_Ptr_Lo            ; 2325: A5 00    
     clc                                     ; 2327: 18       
     adc     #$08                            ; 2328: 69 08    
     sta     ZP00_Obj_List_Ptr_Lo            ; 232A: 85 00    
+
     lda     ZP01_Obj_List_Ptr_Hi            ; 232C: A5 01    
     adc     #$00                            ; 232E: 69 00    
     sta     ZP01_Obj_List_Ptr_Hi            ; 2330: 85 01    
+
     pla                                     ; 2332: 68       
     tax                                     ; 2333: AA       
+
     dex                                     ; 2334: CA       
-    bne     Reset_S_O_1                     ; 2335: D0 E3    
+    bne     Loop_Reset_Objects              ; 2335: D0 E3    
+
     jsr     Restore_Obj_List_Ptr            ; 2337: 20 F0 28 
     rts                                     ; 233A: 60       
 ; ===========================================================
-Inital_Screen_Object_Data
-    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Rocket Bottom Section, $70=X, $AF=Y
-    fcb     $01,$00,$00,$1C                 ; 233F: 01 00 00 1C  ???
 
-    fcb     $04,$20,$00,$3F                 ; 2343: 04 20 00 3F  $04=Rocket Top Section, $20=X, $3F=Y
-    fcb     $00,$01,$10,$18                 ; 2347: 00 01 10 18  ???
+Inital_Rocket_Objs_Data_Table
+    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Rocket Bottom Section, $70=X, ???, $AF=Y
+    fcb     $01,$00,$00,$1C                 ; 233F: 01 00 00 1C  $01=Pickup Status, ???, Height on Landing, ???
 
-    fcb     $04,$50,$00,$5F                 ; 234B: 04 50 00 5F  $04=Rocket Middle Section, $50=X, $5F=Y
-    fcb     $01,$01,$08,$18                 ; 234F: 01 01 08 18  ???
+    fcb     $04,$20,$00,$3F                 ; 2343: 04 20 00 3F  $04=Rocket Top Section
+    fcb     $00,$01,$10,$18                 ; 2347: 00 01 10 18 
+
+    fcb     $04,$50,$00,$5F                 ; 234B: 04 50 00 5F  $04=Rocket Middle Section
+    fcb     $01,$01,$08,$18                 ; 234F: 01 01 08 18 
 
 Initial_Jetman_Obj_Params
     fcb     $02,$50,$00,$AF                 ; 2353: 02 50 00 AF  Image, X, Move Speed, Y
     fcb     $00,$01,$00,$00                 ; 2357: 00 01 00 00  Movement, ?, ?, ?
 
+; Loop through 8 attributes
 ; L_JSR_($235B)_($22C8) OK
 ; L_JSR_($235B)_($29CA) OK
 ; L_JSR_($235B)_($2E6E) OK
 Init_Next_Jetman_Lives_Scores
-    ldx     #$07                            ; 235B: A2 07     Loop through 8 attributes
+    ldx     #$07                            ; 235B: A2 07    
+
 ; L_BRS_($235D)_($2364) OK
-LOOP_INJLS_1
+Loop_Init_Jetman_Obj
     lda     Initial_Jetman_Obj_Params,x     ; 235D: BD 53 23 
     sta     Obj_Jetman_State,x              ; 2360: 9D 80 03 
     dex                                     ; 2363: CA       
-    bpl     LOOP_INJLS_1                    ; 2364: 10 F7    
+    bpl     Loop_Init_Jetman_Obj            ; 2364: 10 F7    
 
-    lda     Game_Settings                   ; 2366: AD D3 1F  More time between players when 2 player game
+; Test if two player game, if yes, give more time between players for switchover
+    lda     Game_Settings                   ; 2366: AD D3 1F 
     and     #$01                            ; 2369: 29 01     One player game?
     beq     LDA_7F                          ; 236B: F0 62     Yes, jump
     lda     #$FF                            ; 236D: A9 FF     Set countdown for 2 player game
+
 ; L_JMP_($236F)_($23D1) OK
 LDA_7F_Return
     sta     ZP_Flash_Score_Countdown        ; 236F: 85 5D     Store countdown
-    dec     ZP_Number_Of_Lives_P1           ; 2371: C6 5A    
+    dec     ZP_Num_Lives_Active_Player      ; 2371: C6 5A    
 
 ; L_JSR_($2373)_($22DA) OK
 ; L_JSR_($2373)_($2EA6) OK
@@ -1198,13 +1229,13 @@ Load_Num_Lives
     bne     Load_Num_Lives_P2               ; 23B8: D0 03    
 ; L_JMP_($23BA)_($23C4) OK
 Load_Num_Lives_P1
-    lda     ZP_Number_Of_Lives_P1           ; 23BA: A5 5A    
+    lda     ZP_Num_Lives_Active_Player      ; 23BA: A5 5A    
     rts                                     ; 23BC: 60       
 ; ===========================================================
 ; L_BRS_($23BD)_($23B8) OK
 ; L_BRS_($23BD)_($23C2) OK
 Load_Num_Lives_P2
-    lda     ZP_Number_Of_Lives_P2           ; 23BD: A5 5C    
+    lda     ZP_Num_Lives_Inactive_Player    ; 23BD: A5 5C    
     rts                                     ; 23BF: 60       
 ; ===========================================================
 ; L_JSR_($23C0)_($2389) OK
@@ -1238,18 +1269,18 @@ BACK_SPL
     sta     ZP_Level_Active_Player          ; 23D8: 85 59    
 
     lda     #$04                            ; 23DA: A9 04    
-    sta     ZP_Number_Of_Lives_P1           ; 23DC: 85 5A    
-    jsr     Init_Objects_1_To_3             ; 23DE: 20 FF 22 
+    sta     ZP_Num_Lives_Active_Player      ; 23DC: 85 5A    
+    jsr     Reset_Rocket_Obj_Params         ; 23DE: 20 FF 22 
     jsr     Swap_Player_And_Objects         ; 23E1: 20 F5 23 
     dey                                     ; 23E4: 88       
     bne     BACK_SPL                        ; 23E5: D0 EF    
 
     lda     #$05                            ; 23E7: A9 05    
-    sta     ZP_Number_Of_Lives_P2           ; 23E9: 85 5C    
+    sta     ZP_Num_Lives_Inactive_Player    ; 23E9: 85 5C    
     lda     Game_Settings                   ; 23EB: AD D3 1F 
     and     #$01                            ; 23EE: 29 01    
     bne     SKIP_SPL                        ; 23F0: D0 02    
-    sta     ZP_Number_Of_Lives_P2           ; 23F2: 85 5C    
+    sta     ZP_Num_Lives_Inactive_Player    ; 23F2: 85 5C    
 ; L_BRS_($23F4)_($23F0) OK
 SKIP_SPL
     rts                                     ; 23F4: 60       
@@ -1289,7 +1320,7 @@ Swap_Object
 ; L_JSR_($2416)_($22D7) OK
 ; L_JSR_($2416)_($298A) OK
 ; L_JSR_($2416)_($29E7) OK
-Reset_Screen_Disp_Scores
+Reset_Screen_Display_Scores
     jsr     Reset_Color_RAM                 ; 2416: 20 5C 35 
     jsr     Reset_UDG_RAM                   ; 2419: 20 6C 35 
     jsr     Display_P1_Score                ; 241C: 20 71 24  Puts 000000  000000  00 at top of screen
@@ -2424,7 +2455,7 @@ Reset_Objects_1_To_8
 
 ; L_BRS_($28CD)_($28D1) OK
 Reset_Objects_1_To_8_1
-    sta     Obj_Rock_Mod_Top_Fuel_Type,x    ; 28CD: 9D B8 03 
+    sta     Obj_Rocket_Top_Or_Fuel_Type,x   ; 28CD: 9D B8 03 
     dex                                     ; 28D0: CA       
     bpl     Reset_Objects_1_To_8_1          ; 28D1: 10 FA    
     rts                                     ; 28D3: 60       
@@ -2587,7 +2618,7 @@ Explosions_2
 ; L_BRS_($2987)_($29C5) OK
 Game_Over
     jsr     Check_New_Hi_Score              ; 2987: 20 7A 27 
-    jsr     Reset_Screen_Disp_Scores        ; 298A: 20 16 24 
+    jsr     Reset_Screen_Display_Scores     ; 298A: 20 16 24 
     lda     ZP_Active_Player                ; 298D: A5 5E    
     bne     Game_Over_1                     ; 298F: D0 06    
     jsr     Display_Game_Over_P1            ; 2991: 20 EE 29 
@@ -2606,32 +2637,32 @@ Sound_Channels_Off_ETC
     sta     VIC_RC_Frq_Osc3                 ; 29A5: 8D 0C 90 
     jsr     Init_Most_Objects               ; 29A8: 20 D4 28 
 
-    lda     Obj_Rock_Mod_Top_Fuel_Status    ; 29AB: AD BC 03 
+    lda     Obj_Rocket_Top_Or_Fuel_Status   ; 29AB: AD BC 03 
     and     #$FD                            ; 29AE: 29 FD    
-    sta     Obj_Rock_Mod_Top_Fuel_Status    ; 29B0: 8D BC 03 
+    sta     Obj_Rocket_Top_Or_Fuel_Status   ; 29B0: 8D BC 03 
 
-    lda     Obj_Rock_Mod_Mid_Valuab_Status  ; 29B3: AD C4 03 
+    lda     Obj_Rocket_Mid_Or_Valu_Status   ; 29B3: AD C4 03 
     and     #$FD                            ; 29B6: 29 FD    
-    sta     Obj_Rock_Mod_Mid_Valuab_Status  ; 29B8: 8D C4 03 
+    sta     Obj_Rocket_Mid_Or_Valu_Status   ; 29B8: 8D C4 03 
 
     lda     Game_Settings                   ; 29BB: AD D3 1F 
     bit     MASK_00000001                   ; 29BE: 2C 14 20 
     bne     Sound_Channels_Off_ETC_3        ; 29C1: D0 0D    
 ; L_BRS_($29C3)_($29D2) OK
 Sound_Channels_Off_ETC_1
-    lda     ZP_Number_Of_Lives_P1           ; 29C3: A5 5A    
+    lda     ZP_Num_Lives_Active_Player      ; 29C3: A5 5A    
     beq     Game_Over                       ; 29C5: F0 C0    
 ; L_JMP_($29C7)_($29E4) OK
 Sound_Channels_Off_ETC_2
-    jsr     Reset_Lev_Add_Extra_Life_3      ; 29C7: 20 D7 22 
+    jsr     Reset_Level                     ; 29C7: 20 D7 22 
     jsr     Init_Next_Jetman_Lives_Scores   ; 29CA: 20 5B 23 
     jmp     GOTO_NEXT_OBJECT                ; 29CD: 4C 1A 26 
 ; -----------------------
 ; L_BRS_($29D0)_($29C1) OK
 Sound_Channels_Off_ETC_3
-    lda     ZP_Number_Of_Lives_P2           ; 29D0: A5 5C    
+    lda     ZP_Num_Lives_Inactive_Player    ; 29D0: A5 5C    
     beq     Sound_Channels_Off_ETC_1        ; 29D2: F0 EF    
-    lda     ZP_Number_Of_Lives_P1           ; 29D4: A5 5A    
+    lda     ZP_Num_Lives_Active_Player      ; 29D4: A5 5A    
     bne     Sound_Channels_Off_ETC_4        ; 29D6: D0 03    
     jsr     Display_Game_Over               ; 29D8: 20 E7 29 
 ; L_BRS_($29DB)_($29D6) OK
@@ -2644,7 +2675,7 @@ Sound_Channels_Off_ETC_4
 ; -----------------------
 ; L_JSR_($29E7)_($29D8) OK
 Display_Game_Over
-    jsr     Reset_Screen_Disp_Scores        ; 29E7: 20 16 24 
+    jsr     Reset_Screen_Display_Scores     ; 29E7: 20 16 24 
     lda     ZP_Active_Player                ; 29EA: A5 5E     Game Over for P1 or P2?
     bne     Display_Game_Over_P2            ; 29EC: D0 24    
 ; L_JSR_($29EE)_($2991) OK
@@ -3065,7 +3096,7 @@ RTS_2B52
 Spawn_Rocket_Modules_Fuel_Ce_1
     cmp     #$03                            ; 2B53: C9 03    
     bcs     RTS_2B52                        ; 2B55: B0 FB    
-    lda     Obj_Rock_Mod_Top_Fuel_Type      ; 2B57: AD B8 03 
+    lda     Obj_Rocket_Top_Or_Fuel_Type     ; 2B57: AD B8 03 
     bne     RTS_2B52                        ; 2B5A: D0 F6    
 
 ; Return if ship is built and fuelled up
@@ -3084,14 +3115,14 @@ Spawn_Rocket_Modules_Fuel_Ce_1
 ; L_BRS_($2B6D)_($2B74) OK
 Loop_2B6D
     lda     Init_Obj_Rocket_or_Fuel_Table,x ; 2B6D: BD 7F 2B 
-    sta     Obj_Rock_Mod_Top_Fuel_Type,x    ; 2B70: 9D B8 03 
+    sta     Obj_Rocket_Top_Or_Fuel_Type,x   ; 2B70: 9D B8 03 
     dex                                     ; 2B73: CA       
     bpl     Loop_2B6D                       ; 2B74: 10 F7    
 
 ; Spawn object at a random X position
     jsr     Get_Random_X                    ; 2B76: 20 DE 2B 
-    sta     Obj_Rock_Mod_Top_Fuel_X         ; 2B79: 8D B9 03 
-    jmp     Set_Obj_List_Type_Rocket_Fuel   ; 2B7C: 4C E3 22 
+    sta     Obj_Rocket_Top_Or_Fuel_X        ; 2B79: 8D B9 03 
+    jmp     Set_Obj_Rocket_Top_Or_Fuel_Typ  ; 2B7C: 4C E3 22 
 ; -----------------------
 
 Init_Obj_Rocket_or_Fuel_Table
@@ -3118,7 +3149,7 @@ RTS_2B96
 Spawn_Valuables_1
     cmp     #$03                            ; 2B97: C9 03    
     bcs     RTS_2B96                        ; 2B99: B0 FB    
-    lda     Obj_Rock_Mod_Mid_Valuable_Type  ; 2B9B: AD C0 03 
+    lda     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2B9B: AD C0 03 
     bne     RTS_2B96                        ; 2B9E: D0 F6    
 
 ; Use counter to randomly spawn another valuable
@@ -3131,13 +3162,13 @@ Spawn_Valuables_1
 ; L_BRS_($2BA8)_($2BAF) OK
 Loop_2BA8
     lda     Init_Obj_Valuable_Table,x       ; 2BA8: BD 87 2B 
-    sta     Obj_Rock_Mod_Mid_Valuable_Type,x ; 2BAB: 9D C0 03 
+    sta     Obj_Rocket_Mid_Or_Valuable_Typ,x ; 2BAB: 9D C0 03 
     dex                                     ; 2BAE: CA       
     bpl     Loop_2BA8                       ; 2BAF: 10 F7    
 
 ; Spawn object at a random X position
     jsr     Get_Random_X                    ; 2BB1: 20 DE 2B 
-    sta     Obj_Rock_Mod_Mid_Valuable_X     ; 2BB4: 8D C1 03 
+    sta     Obj_Rocket_Mid_Or_Valuable_X    ; 2BB4: 8D C1 03 
 
 ; Use counter to setup next object type
     lda     ZP_HW_IRQ_Count3                ; 2BB7: A5 4C    
@@ -3153,7 +3184,7 @@ Loop_2BA8
 ; L_BRS_($2BC2)_($2BBE) OK
 SKIP_2BC2
     ora     #%00100000                      ; 2BC2: 09 20    
-    sta     Obj_Rock_Mod_Mid_Valuable_Type_ ; 2BC4: 8D C6 03 
+    sta     Obj_Rocket_Mid_Or_Valu_Type     ; 2BC4: 8D C6 03 
 
 ; 03C0 object starts as Rocket Module Middle, then Fuel Cell
 ; L_JSR_($2BC7)_($2DC5) OK
@@ -3691,16 +3722,16 @@ Test_Jetman_Obj_Collide_5
 
 ; L_JSR_($2DA1)_($22DD) OK
 Restore_Player_Objects
-    lda     Obj_Rock_Mod_Top_Fuel_Type      ; 2DA1: AD B8 03 
+    lda     Obj_Rocket_Top_Or_Fuel_Type     ; 2DA1: AD B8 03 
     beq     Restore_Player_Objects_1        ; 2DA4: F0 03    
-    jsr     Set_Obj_List_Type_Rocket_Fuel   ; 2DA6: 20 E3 22 
+    jsr     Set_Obj_Rocket_Top_Or_Fuel_Typ  ; 2DA6: 20 E3 22 
 ; L_BRS_($2DA9)_($2DA4) OK
 Restore_Player_Objects_1
-    lda     Obj_Rock_Mod_Mid_Valuable_Type  ; 2DA9: AD C0 03 
+    lda     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2DA9: AD C0 03 
     beq     Restore_Player_Objects_2        ; 2DAC: F0 07    
     cmp     #$0E                            ; 2DAE: C9 0E    
     beq     Restore_Player_Objects_3        ; 2DB0: F0 13    
-    jsr     Object_RMS_Gem_Type             ; 2DB2: 20 F2 22 
+    jsr     Set_Obj_Rocket_Mid_Or_Valu_Typ  ; 2DB2: 20 F2 22 
 ; L_BRS_($2DB5)_($2DAC) OK
 ; L_JMP_($2DB5)_($2DC8) OK
 Restore_Player_Objects_2
@@ -3723,11 +3754,11 @@ Restore_Player_Objects_4
     jsr     Set_Object_UDG_Color            ; 2DCB: 20 DD 2D 
     jsr     Load_Object_Type_X_Y_Color      ; 2DCE: 20 E9 35 
 ; L_BRS_($2DD1)_($2DDA) OK
-Restore_Player_Objects_5
+Loop_Restore_Player_Objects
     jsr     Restore_Player_Objects_6        ; 2DD1: 20 E8 2D 
     jsr     Display_Object_With_Setup_2     ; 2DD4: 20 04 36 
     jsr     Dec_Saved_Obj_List_Params_by_10 ; 2DD7: 20 FF 2D 
-    bne     Restore_Player_Objects_5        ; 2DDA: D0 F5    
+    bne     Loop_Restore_Player_Objects     ; 2DDA: D0 F5    
     rts                                     ; 2DDC: 60       
 ; ===========================================================
 ; L_JSR_($2DDD)_($2DCB) OK
@@ -3923,7 +3954,7 @@ ROCKET_BOTTOM_MODULE
     lda     #$00                            ; 2E9C: A9 00    
     sta     Obj_Jetman_State                ; 2E9E: 8D 80 03 
     jsr     Restore_Obj_List_Ptr            ; 2EA1: 20 F0 28 
-    inc     ZP_Number_Of_Lives_P1           ; 2EA4: E6 5A    
+    inc     ZP_Num_Lives_Active_Player      ; 2EA4: E6 5A    
     jsr     Display_P1_Lives                ; 2EA6: 20 73 23 
     jmp     GOTO_NEXT_OBJECT                ; 2EA9: 4C 1A 26 
 ; -----------------------
@@ -4071,9 +4102,9 @@ Rocket_Part_Or_Fuel_Dropped
 ; Rocket part landed, activate next object i.e. set
 ; status = not dropping and not picked-up by Jetman
 ; Note, using direct addressing, not using Y offset
-    lda     Obj_Rock_Mod_Top_Fuel_Status    ; 2F43: AD BC 03 
+    lda     Obj_Rocket_Top_Or_Fuel_Status   ; 2F43: AD BC 03 
     ora     #%00000001                      ; 2F46: 09 01     Set bit 0
-    sta     Obj_Rock_Mod_Top_Fuel_Status    ; 2F48: 8D BC 03 
+    sta     Obj_Rocket_Top_Or_Fuel_Status   ; 2F48: 8D BC 03 
     jsr     Load_Rocket_or_Fuel_UDGs        ; 2F4B: 20 54 30 
 
 ; Multiply rocket direction(???) by $10 and store

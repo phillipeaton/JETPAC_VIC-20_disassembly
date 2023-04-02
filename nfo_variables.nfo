@@ -70,9 +70,9 @@ label      54-56 ZP_Score_P2            ; 3 bytes
 label      57 ZP_Reverse_And_Color_Data ; Used to flash game options & 1UP+score at player start
 label      58 ZP_Flash_Counter          ;
 label      59 ZP_Level_Active_Player    ;
-label      5a ZP_Number_Of_Lives_P1     ;
+label      5a ZP_Num_Lives_Active_Player     ;
 label      5b ZP_Level_Inactive_Player  ;
-label      5c ZP_Number_Of_Lives_P2     ;
+label      5c ZP_Num_Lives_Inactive_Player     ;
 label      5d ZP_Flash_Score_Countdown  ; 7f for 1 player, ff for 2 player
 label      5e ZP_Active_Player          ;
 label      5f ZP_Subroutine_Addr_Lo     ;
@@ -153,24 +153,24 @@ label    03B4 Obj_Rocket_Parts_Fuel_Counter
 ;label   03B7 Obj_Rocket_7
 
 ; Rocket Part Top (RPT), then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
-label    03B8 Obj_Rock_Mod_Top_Fuel_Type ; Type = 04 when active, else 00
-label    03B9 Obj_Rock_Mod_Top_Fuel_X
-;label   03BA Obj_Rock_Mod_Top_Fuel_2
-;label   03BB Obj_Rock_Mod_Top_Fuel_Y
-label    03BC Obj_Rock_Mod_Top_Fuel_Status ; Rocket part Ready for pick-up/picked-up/Dropping
-;label   03BD Obj_Rock_Mod_Top_Fuel_5
-;label   03BE Obj_Rock_Mod_Top_Fuel_6 ; Height when rocket part/fuel cell has landed
-;label   03BF Obj_Rock_Mod_Top_Fuel_7
+label    03B8 Obj_Rocket_Top_Or_Fuel_Type ; Type = 04 when active, else 00
+label    03B9 Obj_Rocket_Top_Or_Fuel_X
+;label   03BA Obj_Rocket_Top_Or_Fuel_2
+;label   03BB Obj_Rocket_Top_Or_Fuel_Y
+label    03BC Obj_Rocket_Top_Or_Fuel_Status ; Rocket part Ready for pick-up/picked-up/Dropping
+;label   03BD Obj_Rocket_Top_Or_Fuel_5
+;label   03BE Obj_Rocket_Top_Or_Fuel_6 ; Height when rocket part/fuel cell has landed
+;label   03BF Obj_Rocket_Top_Or_Fuel_7
 
 ; Rocket Part Middle, then a valuable e.g. 03C0  0E 58 00 5E 00 03 28 18
-label    03C0 Obj_Rock_Mod_Mid_Valuable_Type ;
-label    03C1 Obj_Rock_Mod_Mid_Valuable_X
-;label   03C2 Obj_Rock_Mod_Mid_Valuable_2
-;label   03C3 Obj_Rock_Mod_Mid_Valuable_3
-label    03C4 Obj_Rock_Mod_Mid_Valuab_Status
-;label   03C5 Obj_Rock_Mod_Mid_Valuable_Color
-label    03C6 Obj_Rock_Mod_Mid_Valuable_Type_
-label    03C7 Obj_Rock_Mod_Mid_Valuable_7
+label    03C0 Obj_Rocket_Mid_Or_Valuable_Typ ;
+label    03C1 Obj_Rocket_Mid_Or_Valuable_X
+;label   03C2 Obj_Rocket_Mid_Or_Valuable_2
+;label   03C3 Obj_Rocket_Mid_Or_Valuable_3
+label    03C4 Obj_Rocket_Mid_Or_Valu_Status
+;label   03C5 Obj_Rocket_Mid_Or_Valu_Color
+label    03C6 Obj_Rocket_Mid_Or_Valu_Type
+label    03C7 Obj_Rocket_Mid_Or_Valuable_7
 
 
 ; Byte 00/08= object type

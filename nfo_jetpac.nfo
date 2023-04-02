@@ -402,38 +402,66 @@ binary   22B8
 comment  22BA
 label    22BA Reset_Level_Add_Extra_Life
 comment  22BD
-comment  22BD Player at level 4, add another life
-label    22CB Reset_Lev_Add_Extra_Life_1
+comment  22BD When level number ends in %11, add extra life e.g. 4th level, 8th level etc.
+lcomment 22BF Reset bits 2-7 0000_00xx
+binary   22C0
+comment  22C3
+comment  22C3 Add extra life
+label    22CB Draw_Platforms_Init_Sound
+comment  22CB
 comment  22D1
-label    22D1 Reset_Lev_Add_Extra_Life_2
+label    22D1 Restore_Player_Objs_Init_Sound
 comment  22D7
-label    22D7 Reset_Lev_Add_Extra_Life_3
+label    22D7 Reset_Level
 comment  22E3
-label    22E3 Set_Obj_List_Type_Rocket_Fuel
+comment  22E3
+comment  22E3
+comment  22E3
+comment  22E3
+label    22E3 Set_Obj_Rocket_Top_Or_Fuel_Typ
+lcomment 22E9 ZP00/01
 word     22EA
-label    22ED JMP_Reset_S_O_1
+label    22ED Reset_Object
 break    22ED
+comment  22ED
 comment  22F2
-label    22F2 Object_RMS_Gem_Type
+label    22F2 Set_Obj_Rocket_Mid_Or_Valu_Typ
 word     22F9
-label    22FF Init_Objects_1_To_3
-label    2301 CBTSR1
-label    230B Reset_Some_Objects
+label    22FF Reset_Rocket_Obj_Params
+comment  22FF
+comment  22FF
+comment  22FF
+comment  22FF
+comment  22FF
+comment  22FF Reset rocket top, middle and bottom object parameters (i.e. 3 x 8 bytes) from static data table
+label    2301 Loop_Reset_Rocket_Obj_Params
+comment  2301
+label    230B Reset_Rocket_Obj_Params_Init
+comment  230B
 word     2315
-label    231A Reset_S_O_1
-label    233B Inital_Screen_Object_Data
-lcomment 233B $09=Rocket Bottom Section, $70=X, $AF=Y
+label    231A Loop_Reset_Objects
+comment  231A
+comment  2318
+comment  2318 Reset rocket top, middle and bottom
+comment  231C
+comment  2325
+comment  2325 Move 16-bit address pointer to next object i.e. 8 bytes ahead
+comment  232C
+comment  2332
+comment  2334
+comment  2337
+label    233B Inital_Rocket_Objs_Data_Table
+lcomment 233B $09=Rocket Bottom Section, $70=X, ???, $AF=Y
 const    233B-235A
-lcomment 233F ???
+comment  233B
+lcomment 233F $01=Pickup Status, ???, Height on Landing, ???
 break    233F
 comment  2343
-lcomment 2343 $04=Rocket Top Section, $20=X, $3F=Y
+lcomment 2343 $04=Rocket Top Section
 break    2343
-lcomment 2347 ???
 break    2347
 comment  234B
-lcomment 234B $04=Rocket Middle Section, $50=X, $5F=Y
-lcomment 234F ???
+lcomment 234B $04=Rocket Middle Section
 break    234F
 comment  2353
 label    2353 Initial_Jetman_Obj_Params
@@ -442,14 +470,16 @@ lcomment 2357 Movement, ?, ?, ?
 break    2357
 comment  235B
 label    235B Init_Next_Jetman_Lives_Scores
-lcomment 235B Loop through 8 attributes
-label    235D LOOP_INJLS_1
+comment  235B Loop through 8 attributes
+label    235D Loop_Init_Jetman_Obj
+comment  235D
 comment  2366
-lcomment 2366 More time between players when 2 player game
+comment  2366 Test if two player game, if yes, give more time between players for switchover
 lcomment 2369 One player game?
 lcomment 236B Yes, jump
 lcomment 236D Set countdown for 2 player game
 label    236F LDA_7F_Return
+comment  236F
 lcomment 236F Store countdown
 comment  2373
 label    2373 Display_P1_Lives
@@ -503,7 +533,7 @@ label    23F7 Swap_Player
 comment  2404
 label    2406 Swap_Object
 comment  2416
-label    2416 Reset_Screen_Disp_Scores
+label    2416 Reset_Screen_Display_Scores
 lcomment 241C Puts 000000  000000  00 at top of screen
 comment  2425
 comment  2425 Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
@@ -1316,7 +1346,7 @@ label    2DB5 Restore_Player_Objects_2
 word     2DBC
 label    2DC5 Restore_Player_Objects_3
 label    2DCB Restore_Player_Objects_4
-label    2DD1 Restore_Player_Objects_5
+label    2DD1 Loop_Restore_Player_Objects
 label    2DDD Set_Object_UDG_Color
 label    2DE8 Restore_Player_Objects_6
 lcomment 2DEC Current level modulus 4
