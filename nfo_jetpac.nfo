@@ -433,7 +433,7 @@ comment  22FF
 comment  22FF
 comment  22FF
 comment  22FF
-comment  22FF Reset rocket top, middle and bottom object parameters (i.e. 3 x 8 bytes) from static data table
+comment  22FF Init rocket top, middle and bottom object parameters (i.e. 3 x 8 bytes) from static data table
 label    2301 Loop_Reset_Rocket_Obj_Params
 comment  2301
 label    230B Reset_Rocket_Obj_Params_Init
@@ -450,8 +450,8 @@ comment  232C
 comment  2332
 comment  2334
 comment  2337
-label    233B Inital_Rocket_Objs_Data_Table
-lcomment 233B $09=Rocket Bottom Section, $70=X, ???, $AF=Y
+label    233B Init_Rocket_Objs_Param_Table
+lcomment 233B $09=Rocket Bottom Section, Position_X, ???, Position_Y
 const    233B-235A
 comment  233B
 lcomment 233F $01=Pickup Status, ???, Height on Landing, ???
@@ -464,51 +464,62 @@ comment  234B
 lcomment 234B $04=Rocket Middle Section
 break    234F
 comment  2353
-label    2353 Initial_Jetman_Obj_Params
-lcomment 2353 Image, X, Move Speed, Y
-lcomment 2357 Movement, ?, ?, ?
+label    2353 Init_Jetman_Obj_Param_Table
+lcomment 2353 State, Posn_X, Dir_X, Posn_Y
+lcomment 2357 Dir_Y, ?, ?, ?
 break    2357
 comment  235B
 label    235B Init_Next_Jetman_Lives_Scores
-comment  235B Loop through 8 attributes
+comment  235B Reset Jetman object parameters (i.e. 1 x 8 bytes) from static data table
 label    235D Loop_Init_Jetman_Obj
 comment  235D
 comment  2366
-comment  2366 Test if two player game, if yes, give more time between players for switchover
-lcomment 2369 One player game?
-lcomment 236B Yes, jump
-lcomment 236D Set countdown for 2 player game
+comment  2366 Test if two player game, if yes, give $FF time between players for switchover instead of $7F
 label    236F LDA_7F_Return
 comment  236F
-lcomment 236F Store countdown
 comment  2373
-label    2373 Display_P1_Lives
-lcomment 2376 ZP Offset for 1st address
+label    2373 Display_Player_1_Lives
+lcomment 2376 ZP04/05
 const    2376
-lcomment 2377 1st Address
 word     2377
+comment  237A
+comment  237A Display number of lives, or erase from screen if zero
 comment  2382
-label    2382 Display_P2_Lives
-lcomment 2385 ZP Offset for 1st address
+label    2382 Display_Player_2_Lives
+lcomment 2385 ZP04/05
 const    2385
-lcomment 2386 1st Address
 word     2386
+comment  2389
+comment  2389 Display number of lives, or erase from screen if zero
 comment  238E
-label    238E Display_Number_Lives
+label    238E Display_Number_Of_Lives
 lcomment 238F $70 = "0" character
+deflabel 2390 CHARACTER_ZERO
 comment  2396
 comment  2396 Display Jetman Icon next to number of lives
+lcomment 2399 ZP06/07
 word     239A
-lcomment 239D 8 bytes of UDG data to copy
-label    23A2 Zero_Lives_To_UDG_RAM_1
-label    23A8 Zero_Lives_To_UDG_RAM
+comment  239D
+comment  239D Jetman UDG has 8 bytes of data to copy
+label    23A2 Erase_Player_1_Lives
+comment  23A2
+comment  23A8
+label    23A8 Erase_Player_Lives
+deflabel 23A9 CHARACTER_SPACE
 lcomment 23A8 $60 = Space character
 lcomment 23AF $60 = Space character
-label    23B6 Load_Num_Lives
-label    23BA Load_Num_Lives_P1
-label    23BD Load_Num_Lives_P2
-label    23C0 Load_Num_Lives_Inverse
-label    23C7 Jetman_Icon
+comment  23AF
+deflabel 23B0 CHARACTER_SPACE
+comment  23B6
+label    23B6 Load_Player_1_Lives
+comment  23BA
+label    23BA Load_Player_Active_Lives
+label    23BD Load_Player_Inactive_Lives
+comment  23BD
+label    23C0 Load_Player_2_Lives
+comment  23C0
+label    23C7 Jetman_Icon_UDG_Char_Data
+comment  23C7
 lcomment 23C7 ...##...
 const    23C7-23CE
 bin      23C7-23CE
@@ -523,11 +534,24 @@ lcomment 23CE .##..##.
 comment  23CF
 label    23CF LDA_7F
 comment  23D4
-label    23D4 Setup_Player_Lives
-label    23D6 BACK_SPL
+comment  23D4
+comment  23D4
+comment  23D4
+comment  23D4
+comment  23D4 Setup Active Player lives, then swap Inactive
+label    23D4 Setup_Player_Lives_XXXXXXXXXXX
+label    23D6 Loop_Setup_Player_Lives
+comment  23D6
+deflabel 23D7 PLAYER_1
 comment  23DA
+deflabel 23DB LIVES_INITIAL_PLAYER_1
+comment  23DE
 comment  23E7
-label    23F4 SKIP_SPL
+deflabel 23E8 LIVES_INITIAL_PLAYER_2
+comment  23EB
+binary   23EF
+label    23F4 Setup_Player_Lives_RTS
+comment  23F4
 label    23F5 Swap_Player_And_Objects
 label    23F7 Swap_Player
 comment  2404

@@ -61,21 +61,21 @@ label      46 ZP_Game_Sel_F3_Flash      ;
 label      47 ZP_Game_Sel_F5_Flash      ;
 label      48 ZP_Game_Sel_F7_Flash      ;
 label      49 ZP_Game_Sel_Start_Flash   ;
-label      4a ZP_HW_IRQ_Count1          ;
-label      4b ZP_HW_IRQ_Count2          ;
-label      4c ZP_HW_IRQ_Count3          ;
+label      4A ZP_HW_IRQ_Count1          ;
+label      4B ZP_HW_IRQ_Count2          ;
+label      4C ZP_HW_IRQ_Count3          ;
 
-label      51-53 ZP_Score_P1            ; 3 bytes (Hi Score is stored where?)
-label      54-56 ZP_Score_P2            ; 3 bytes
+label      51-53 ZP_Score_Player_1      ; 3 bytes (Hi Score is stored where?)
+label      54-56 ZP_Score_Player_2      ; 3 bytes
 label      57 ZP_Reverse_And_Color_Data ; Used to flash game options & 1UP+score at player start
 label      58 ZP_Flash_Counter          ;
 label      59 ZP_Level_Active_Player    ;
 label      5a ZP_Num_Lives_Active_Player     ;
 label      5b ZP_Level_Inactive_Player  ;
 label      5c ZP_Num_Lives_Inactive_Player     ;
-label      5d ZP_Flash_Score_Countdown  ; 7f for 1 player, ff for 2 player
-label      5e ZP_Active_Player          ;
-label      5f ZP_Subroutine_Addr_Lo     ;
+label      5D ZP_Flash_Score_Countdown  ; 7f for 1 player, ff for 2 player
+label      5E ZP_Active_Player          ;
+label      5F ZP_Subroutine_Addr_Lo     ;
 label      60 ZP_Subroutine_Addr_Hi     ;
 
 ; Non-Zero-Page Object Variables
@@ -205,13 +205,13 @@ label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00
 ;label   03F0 Obj_Alien_5_0 ;     03F0  05 19 F8 8D 00 06 00 00
 
 ; UDG RAM positions of score data
-label    1008 Display_P1_Score_Posn
-label    1420 Display_P1_Lives_Posn
-label    1588 Display_Hi_Score_Posn
-label    19a0 Display_P2_Lives_Posn
-label    1b08 Display_P2_Score_Posn
+label    1008 Player_1_Score_UDG_RAM_Addr
+label    1420 Player_1_Lives_UDG_RAM_Addr
+label    1588 Hi_Score_UDG_RAM_Addr
+label    19A0 Player_2_Lives_UDG_RAM_Addr
+label    1B08 Player_2_Score_UDG_RAM_Addr
 
 ; Other variables that are somewhat persistent i.e. not reset at game restart
-label    1fd0 Score_Hi
-label    1fd3 Game_Settings ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
+label    1FD0 Score_Hi
+label    1FD3 Game_Settings ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
 
