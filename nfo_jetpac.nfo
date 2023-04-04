@@ -629,13 +629,32 @@ const    249A
 word     249B
 const    249B
 break    249D
-label    24A1 Game_Sel_Flash_Period
+label    24A1 Game_Select_Flash
 comment  24A1
-label    24A4 GSFP1
-lcomment 24A5 Test settings bit 1, if not set, skip counter logic
+comment  24A1 Update the selected option flashing text status i.e. option selected and display yes/no
+comment  24A1 Register A enters with bit 0 set as Players 1 or 2, or Joystick or Keyboard
+comment  24A1 Register X enters as 0 or 2, which is an index into the Game Select Fn Key status
+comment  24A1 Code runs twice, first with JSR/RTS, then with normal run though, ending with RTS
+label    24A4 Game_Select_Flash_1
+comment  24A4
+comment  24A5
+comment  24A5 Test setting flag, if set, this is the unselcted option, skip the countup/invert part
+binary   24A6
 lcomment 24A9 Counter for flash period
+comment  24A9
+comment  24A9 This is the selected option, divide the counter by 8 and use it to set the display
+comment  24A9 selected on/off flag i.e. periodically flash it at about 2Hz
 lcomment 24AB remove the lasers? and flashes get faster
-label    24B2 GSFP2
+comment  24AE
+comment  24AE Convert the counter value into a display on/off flag toggle
+comment  24AE Set bit 7 to make this selected option flash
+binary   24AF
+binary   24B1
+label    24B2 Store_Option_Selection_State
+comment  24B2
+binary   24B6
+comment  24B5
+comment  24B5 Invert Register A bit 0, increment the Game Select Fn Key index and loop back (or RTS)
 comment  24B9
 label    24B9 Display_Game_Select
 comment  24CA

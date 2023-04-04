@@ -139,14 +139,14 @@ ZP_Rocket_Flame_Toggle          equ     $0027
 ZP_Player_Object_Stash          equ     $0028
 ZP_Param_Addr_Lo                equ     $0040
 ZP_Param_Addr_Hi                equ     $0041
-ZP_Game_Sel_F1_Flash            equ     $0045
+ZP_Game_Select_F1_Flash         equ     $0045
 ZP_HW_IRQ_Count1                equ     $004A
 ZP_HW_IRQ_Count2                equ     $004B
 ZP_HW_IRQ_Count3                equ     $004C
 ZP_Score_Player_1               equ     $0051
 ZP_Score_Player_2               equ     $0054
 ZP_Reverse_And_Color_Data       equ     $0057
-ZP_Flash_Counter                equ     $0058
+ZP_Flash_Countup                equ     $0058
 ZP_Level_Active_Player          equ     $0059
 ZP_Num_Lives_Active_Player      equ     $005A
 ZP_Level_Inactive_Player        equ     $005B
@@ -414,7 +414,7 @@ Reset_Game_Select
     ldx     #$05                            ; 207E: A2 05    
 ; L_BRS_($2080)_($2083) OK
 RGS_Flash
-    sta     ZP_Game_Sel_F1_Flash,x          ; 2080: 95 45    
+    sta     ZP_Game_Select_F1_Flash,x       ; 2080: 95 45    
     dex                                     ; 2082: CA       
     bpl     RGS_Flash                       ; 2083: 10 FB    
 
@@ -440,7 +440,7 @@ RGS_Flash
 ; ----------------------------------------------------------
 ; L_BRS_($208F)_($20E1) OK
 Game_Select
-    inc     ZP_Flash_Counter                ; 208F: E6 58    
+    inc     ZP_Flash_Countup                ; 208F: E6 58    
     lda     #$00                            ; 2091: A9 00    
     sta     VIA2_DDR_B                      ; 2093: 8D 22 91  Set Port B all bits to input
     lda     #$FF                            ; 2096: A9 FF    
@@ -1470,30 +1470,6 @@ Display_High_Score
     jmp     Display_BCD_Bytes               ; 249E: 4C A4 34 
 ; -----------------------
 
-; L_JSR_($24A1)_($24C0) OK
-; L_JSR_($24A1)_($24C7) OK
-Game_Sel_Flash_Period
-    jsr     GSFP1                           ; 24A1: 20 A4 24 
-; L_JSR_($24A4)_($24A1) OK
-GSFP1
-    pha                                     ; 24A4: 48       
-    and     #$01                            ; 24A5: 29 01     Test settings bit 1, if not set, skip counter logic
-    bne     GSFP2                           ; 24A7: D0 09    
-    lda     ZP_Flash_Counter                ; 24A9: A5 58     Counter for flash period
-    lsr     a                               ; 24AB: 4A        remove the lasers? and flashes get faster
-    lsr     a                               ; 24AC: 4A       
-    lsr     a                               ; 24AD: 4A       
-    and     #$01                            ; 24AE: 29 01    
-    ora     #$80                            ; 24B0: 09 80    
-; L_BRS_($24B2)_($24A7) OK
-GSFP2
-    sta     ZP_Game_Sel_F1_Flash,x          ; 24B2: 95 45    
-    pla                                     ; 24B4: 68       
-    eor     #$01                            ; 24B5: 49 01    
-    inx                                     ; 24B7: E8       
-    rts                                     ; 24B8: 60       
-; ===========================================================
-
 
 
 
@@ -1508,15 +1484,55 @@ GSFP2
 ; Yb  "88  dP__Yb  88YbdP88 88""       o.`Y8b 88""   88  .o 88""   Yb        88
 ;  YboodP dP""""Yb 88 YY 88 888888     8bodP' 888888 88ood8 888888  YboodP   88
 
+; Update the selected option flashing text status i.e. option selected and display yes/no
+; Register A enters with bit 0 set as Players 1 or 2, or Joystick or Keyboard
+; Register X enters as 0 or 2, which is an index into the Game Select Fn Key status
+; Code runs twice, first with JSR/RTS, then with normal run though, ending with RTS
+; L_JSR_($24A1)_($24C0) OK
+; L_JSR_($24A1)_($24C7) OK
+Game_Select_Flash
+    jsr     Game_Select_Flash_1             ; 24A1: 20 A4 24 
+
+; L_JSR_($24A4)_($24A1) OK
+Game_Select_Flash_1
+    pha                                     ; 24A4: 48       
+
+; Test setting flag, if set, this is the unselcted option, skip the countup/invert part
+    and     #%00000001                      ; 24A5: 29 01    
+    bne     Store_Option_Selection_State    ; 24A7: D0 09    
+
+; This is the selected option, divide the counter by 8 and use it to set the display
+; selected on/off flag i.e. periodically flash it at about 2Hz
+    lda     ZP_Flash_Countup                ; 24A9: A5 58     Counter for flash period
+    lsr     a                               ; 24AB: 4A        remove the lasers? and flashes get faster
+    lsr     a                               ; 24AC: 4A       
+    lsr     a                               ; 24AD: 4A       
+
+; Convert the counter value into a display on/off flag toggle
+; Set bit 7 to make this selected option flash
+    and     #%00000001                      ; 24AE: 29 01    
+    ora     #%10000000                      ; 24B0: 09 80    
+
+; L_BRS_($24B2)_($24A7) OK
+Store_Option_Selection_State
+    sta     ZP_Game_Select_F1_Flash,x       ; 24B2: 95 45    
+    pla                                     ; 24B4: 68       
+
+; Invert Register A bit 0, increment the Game Select Fn Key index and loop back (or RTS)
+    eor     #%00000001                      ; 24B5: 49 01    
+    inx                                     ; 24B7: E8       
+    rts                                     ; 24B8: 60       
+; ===========================================================
+
 ; L_JSR_($24B9)_($20D4) OK
 Display_Game_Select
     ldx     #$00                            ; 24B9: A2 00    
     lda     Game_Settings                   ; 24BB: AD D3 1F 
     and     #$01                            ; 24BE: 29 01    
-    jsr     Game_Sel_Flash_Period           ; 24C0: 20 A1 24 
+    jsr     Game_Select_Flash               ; 24C0: 20 A1 24 
     lda     Game_Settings                   ; 24C3: AD D3 1F 
     lsr     a                               ; 24C6: 4A       
-    jsr     Game_Sel_Flash_Period           ; 24C7: 20 A1 24 
+    jsr     Game_Select_Flash               ; 24C7: 20 A1 24 
 
     jsr     Load_ZP_Parameters              ; 24CA: 20 9D 25 
     fcb     $04                             ; 24CD: 04        ZP_UDG_RAM_X
@@ -1552,7 +1568,7 @@ DGS1 lda    #$18                            ; 24EF: A9 18
 
     ldy     #$00                            ; 2500: A0 00    
     ldx     ZP08                            ; 2502: A6 08    
-    lda     ZP_Game_Sel_F1_Flash,x          ; 2504: B5 45    
+    lda     ZP_Game_Select_F1_Flash,x       ; 2504: B5 45    
     jsr     Display_String                  ; 2506: 20 D6 34 
     iny                                     ; 2509: C8       
     tya                                     ; 250A: 98       

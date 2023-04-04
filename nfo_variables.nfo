@@ -1,32 +1,32 @@
-; Zero-Page variables                             ; Usage count
-label      00 ZP00_Obj_List_Ptr_Lo                ; 182
-label      01 ZP01_Obj_List_Ptr_Hi                ; 111
-label      02 ZP02                                ; 46
-label      03 ZP03                                ; 17
-label      04 ZP04                                ; 56 Prev. ZP04_Object_Old_UDG_RAM_Lo
-label      05 ZP05                                ; 35 Prev. ZP05_Object_Old_UDG_RAM_Hi
-label      06 ZP06                                ; 51 06/07 used as addr of sprite data + several other 06 only uses
-label      07 ZP07                                ; 26 06/07 used as addr of sprite data + several other 06 only uses
-label      08 ZP08                                ; 42 Sprite Data Index ; Used with 09
-label      09 ZP09                                ; 11 Used with 08
-label      0A ZP0A                                ; 15
-label      0B ZP0B                                ; 18
-label      0C ZP0C                                ; 28 Prev. ZP0C_Object_New_UDG_RAM_Lo
-label      0D ZP0D                                ; 10 Prev. ZP0D_Object_New_UDG_RAM_Hi
-label      0E ZP0E                                ; 21
-label      0F ZP0F                                ; 12
-label      10 ZP10                                ; 04 Prev. ZP10_Object_Old_Position_X
-label      11 ZP11                                ; 09 Prev. ZP11_Object_Old_Position_Y
-label      12 ZP12                                ; 03 Prev. ZP12_Object_Old_Type
-label      13 ZP13                                ; 18
-label      14 ZP14                                ; 08 _Object_Old_Width_Bytes ; Connected somehow. Shuffled in a subroutine.
-label      15 ZP15                                ; 08 Connected somehow. Shuffled in a subroutine.
-label      16 ZP16                                ; 05 Connected somehow. Shuffled in a subroutine.
-label      17 ZP17                                ; 04 Connected somehow. Shuffled in a subroutine.
-label      18 ZP18                                ; 07 Prev. ZP18_Object_New_Position_X
-label      19 ZP19                                ; 12 Prev. ZP19_Object_New_Position_Y
-label      1A ZP1A                                ; 03 Prev. ZP1A_Object_Type_New
-label      1B ZP1B                                ; 10 Prev. ZP1B_Object_Color_New
+; Zero-Page variables                        ; Usage count
+label      00 ZP00_Obj_List_Ptr_Lo           ; 182
+label      01 ZP01_Obj_List_Ptr_Hi           ; 111
+label      02 ZP02                           ; 46
+label      03 ZP03                           ; 17
+label      04 ZP04                           ; 56 Prev. ZP04_Object_Old_UDG_RAM_Lo
+label      05 ZP05                           ; 35 Prev. ZP05_Object_Old_UDG_RAM_Hi
+label      06 ZP06                           ; 51 06/07 used as addr of sprite data + several other 06 only uses
+label      07 ZP07                           ; 26 06/07 used as addr of sprite data + several other 06 only uses
+label      08 ZP08                           ; 42 Sprite Data Index ; Used with 09
+label      09 ZP09                           ; 11 Used with 08
+label      0A ZP0A                           ; 15
+label      0B ZP0B                           ; 18
+label      0C ZP0C                           ; 28 Prev. ZP0C_Object_New_UDG_RAM_Lo
+label      0D ZP0D                           ; 10 Prev. ZP0D_Object_New_UDG_RAM_Hi
+label      0E ZP0E                           ; 21
+label      0F ZP0F                           ; 12
+label      10 ZP10                           ; 04 Prev. ZP10_Object_Old_Position_X
+label      11 ZP11                           ; 09 Prev. ZP11_Object_Old_Position_Y
+label      12 ZP12                           ; 03 Prev. ZP12_Object_Old_Type
+label      13 ZP13                           ; 18
+label      14 ZP14                           ; 08 _Object_Old_Width_Bytes ; Connected somehow. Shuffled in a subroutine.
+label      15 ZP15                           ; 08 Connected somehow. Shuffled in a subroutine.
+label      16 ZP16                           ; 05 Connected somehow. Shuffled in a subroutine.
+label      17 ZP17                           ; 04 Connected somehow. Shuffled in a subroutine.
+label      18 ZP18                           ; 07 Prev. ZP18_Object_New_Position_X
+label      19 ZP19                           ; 12 Prev. ZP19_Object_New_Position_Y
+label      1A ZP1A                           ; 03 Prev. ZP1A_Object_Type_New
+label      1B ZP1B                           ; 10 Prev. ZP1B_Object_Color_New
 label      1C ZP1C_Jetman_Action ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 ;                               1111 1111 = No action
 ;                               1xxx xxxx = Not moving right
@@ -42,51 +42,51 @@ label      1C ZP1C_Jetman_Action ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fl
 ;                               1011 xxxx = Walk Left
 ;                               0111 xxxx = Walk right
 
-label      1E ZP_Ship_UDG_Addr_Offset   ;
-label      1F ZP_Ship_UDG_Addr_Color?   ;
-label      20 ZP_HW_IRQ_1_OR_0          ;
-label      21 ZP_HW_IRQ_Count           ;
-label      22 ZP_Save_Obj_List_Ptr_Lo   ;
-label      23 ZP_Save_Obj_List_Ptr_Hi   ;
-label      24 ZP_Save_Obj_List_Ptr_Lo2  ;
-label      25 ZP_Save_Obj_List_Ptr_Hi2  ;
-label      26 ZP_Rocket_Flame_On        ; Turns off at take-off and landing
-label      27 ZP_Rocket_Flame_Toggle    ; Counts up throughout the flight, used for flame animation
-label      0028-0039 ZP_Player_Object_Stash ;
-label      40 ZP_Param_Addr_Lo          ;
-label      41 ZP_Param_Addr_Hi          ;
+label      1E ZP_Ship_UDG_Addr_Offset        ;
+label      1F ZP_Ship_UDG_Addr_Color?        ;
+label      20 ZP_HW_IRQ_1_OR_0               ;
+label      21 ZP_HW_IRQ_Count                ;
+label      22 ZP_Save_Obj_List_Ptr_Lo        ;
+label      23 ZP_Save_Obj_List_Ptr_Hi        ;
+label      24 ZP_Save_Obj_List_Ptr_Lo2       ;
+label      25 ZP_Save_Obj_List_Ptr_Hi2       ;
+label      26 ZP_Rocket_Flame_On             ; Turns off at take-off and landing
+label      27 ZP_Rocket_Flame_Toggle         ; Counts up throughout the flight, used for flame animation
+label      0028-0039 ZP_Player_Object_Stash  ;
+label      40 ZP_Param_Addr_Lo               ;
+label      41 ZP_Param_Addr_Hi               ;
 
-label      45 ZP_Game_Sel_F1_Flash      ;
-label      46 ZP_Game_Sel_F3_Flash      ;
-label      47 ZP_Game_Sel_F5_Flash      ;
-label      48 ZP_Game_Sel_F7_Flash      ;
-label      49 ZP_Game_Sel_Start_Flash   ;
-label      4A ZP_HW_IRQ_Count1          ;
-label      4B ZP_HW_IRQ_Count2          ;
-label      4C ZP_HW_IRQ_Count3          ;
+label      45 ZP_Game_Select_F1_Flash        ; Bit 7 Inverse Video, Bit 0 Display On/Off
+label      46 ZP_Game_Select_F3_Flash        ; "
+label      47 ZP_Game_Select_F5_Flash        ; "
+label      48 ZP_Game_Select_F7_Flash        ; "
+label      49 ZP_Game_Select_Start_Game      ; No Inverse Video, Bit 0 Display On/Off
+label      4A ZP_HW_IRQ_Count1               ;
+label      4B ZP_HW_IRQ_Count2               ;
+label      4C ZP_HW_IRQ_Count3               ;
 
-label      51-53 ZP_Score_Player_1      ; 3 bytes (Hi Score is stored where?)
-label      54-56 ZP_Score_Player_2      ; 3 bytes
-label      57 ZP_Reverse_And_Color_Data ; Used to flash game options & 1UP+score at player start
-label      58 ZP_Flash_Counter          ;
-label      59 ZP_Level_Active_Player    ;
+label      51-53 ZP_Score_Player_1           ; 3 bytes (Hi Score is stored where?)
+label      54-56 ZP_Score_Player_2           ; 3 bytes
+label      57 ZP_Reverse_And_Color_Data      ; Used to flash game options & 1UP+score at player start
+label      58 ZP_Flash_Countup               ;
+label      59 ZP_Level_Active_Player         ;
 label      5a ZP_Num_Lives_Active_Player     ;
-label      5b ZP_Level_Inactive_Player  ;
-label      5c ZP_Num_Lives_Inactive_Player     ;
-label      5D ZP_Flash_Score_Countdown  ; 7f for 1 player, ff for 2 player
-label      5E ZP_Active_Player          ;
-label      5F ZP_Subroutine_Addr_Lo     ;
-label      60 ZP_Subroutine_Addr_Hi     ;
+label      5b ZP_Level_Inactive_Player       ;
+label      5c ZP_Num_Lives_Inactive_Player   ;
+label      5D ZP_Flash_Score_Countdown       ; 7f for 1 player, ff for 2 player
+label      5E ZP_Active_Player               ;
+label      5F ZP_Subroutine_Addr_Lo          ;
+label      60 ZP_Subroutine_Addr_Hi          ;
 
 ; Non-Zero-Page Object Variables
 label    0380 Obj_Jetman_State
 ;                         1xxx xxxx = Facing Left, not facing right
 ;                         xxxx xx1x = Standing
 ;                         xxxx xxx1 = Flying (Not on screen if !Flying & !Standing e.g. hit by alien)
-label    0381 Obj_Jetman_Position_X     ; Pixel Left=00 Right=B6 or B7
-label    0382 Obj_Jetman_Direction_X    ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
-label    0383 Obj_Jetman_Position_Y     ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
-label    0384 Obj_Jetman_Direction_Y    ; Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
+label    0381 Obj_Jetman_Position_X          ; Pixel Left=00 Right=B6 or B7
+label    0382 Obj_Jetman_Direction_X         ; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
+label    0383 Obj_Jetman_Position_Y          ; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
+label    0384 Obj_Jetman_Direction_Y         ; Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
 ;label   0385 Obj_Jetman_0385
 ;label   0386 Obj_Jetman_0386
 ;label   0387 Obj_Jetman_0387
@@ -213,5 +213,7 @@ label    1B08 Player_2_Score_UDG_RAM_Addr
 
 ; Other variables that are somewhat persistent i.e. not reset at game restart
 label    1FD0 Score_Hi
-label    1FD3 Game_Settings ; 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
+label    1FD3 Game_Settings ;
+;                         xxxx_xxx1 = 2 Player Selected (else 1 Player)
+;                         xxxx_xx1x = Joystick Selected (else Keyboard)
 
