@@ -451,10 +451,10 @@ comment  2332
 comment  2334
 comment  2337
 label    233B Init_Rocket_Objs_Param_Table
-lcomment 233B $09=Rocket Bottom Section, Position_X, ???, Position_Y
+lcomment 233B $09=Rocket Bottom Section, Posn_X, ?, Posn_Y
 const    233B-235A
 comment  233B
-lcomment 233F $01=Pickup Status, ???, Height on Landing, ???
+lcomment 233F $01=Pickup Status, ?, Height on Landing, ?
 break    233F
 comment  2343
 lcomment 2343 $04=Rocket Top Section
@@ -520,17 +520,17 @@ label    23C0 Load_Player_2_Lives
 comment  23C0
 label    23C7 Jetman_Icon_UDG_Char_Data
 comment  23C7
-lcomment 23C7 ...##...
+lcomment 23C7 \...##...
 const    23C7-23CE
 bin      23C7-23CE
 break    23C7-23CE
-lcomment 23C8 ..#..#..
-lcomment 23C9 ..####..
-lcomment 23CA .######.
-lcomment 23CB .#.##.#.
-lcomment 23CC ..####..
-lcomment 23CD ..####..
-lcomment 23CE .##..##.
+lcomment 23C8 \..#..#..
+lcomment 23C9 \..####..
+lcomment 23CA \.######.
+lcomment 23CB \.#.##.#.
+lcomment 23CC \..####..
+lcomment 23CD \..####..
+lcomment 23CE \.##..##.
 comment  23CF
 label    23CF LDA_7F
 comment  23D4
@@ -538,39 +538,56 @@ comment  23D4
 comment  23D4
 comment  23D4
 comment  23D4
-comment  23D4 Setup Active Player lives, then swap Inactive
-label    23D4 Setup_Player_Lives_XXXXXXXXXXX
+comment  23D4 Set Active Player, initial lives for both players and Rocket object parameters
+label    23D4 Setup_Player_Lives
 label    23D6 Loop_Setup_Player_Lives
 comment  23D6
 deflabel 23D7 PLAYER_1
 comment  23DA
 deflabel 23DB LIVES_INITIAL_PLAYER_1
 comment  23DE
+comment  23E1
 comment  23E7
 deflabel 23E8 LIVES_INITIAL_PLAYER_2
 comment  23EB
+comment  23EB Test if single player game, if yes, set Player 2 lives to 0 i.e. inactive player
 binary   23EF
 label    23F4 Setup_Player_Lives_RTS
 comment  23F4
 label    23F5 Swap_Player_And_Objects
+comment  23F5
+comment  23F5 When active player changes, swap current active/inactive player level and rocket object data
 label    23F7 Swap_Player
+comment  23F9
+comment  23FF
 comment  2404
 label    2406 Swap_Object
+comment  2406
+comment  2409
+comment  2410
 comment  2416
 label    2416 Reset_Screen_Display_Scores
-lcomment 241C Puts 000000  000000  00 at top of screen
 comment  2425
-comment  2425 Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
-label    2425 Display_1UP_HI_2UP_Titles
-lcomment 2427 3 strings to display, 1UP, HI and 2UP
-label    2429 BACK_D1H2
+comment  2425 Three strings to display across top of screen, 1UP, HI and 2UP
+label    2425 Display_1UP_HI_2UP_Text
+label    2429 Loop_Display_1UP_HI_2UP_Text
+comment  2429
+comment  242F
+comment  2435
+comment  243B
 comment  2441
 comment  244C
 label    2450 STR_1UP
+comment  2450
+deflabel 2450 WHITE
+lcomment  2451 `=Space, q=1, r=2
+lcomment 2456 Top bit=1 indicates end of string
 label    2457 STR_HI
 break    2457
+deflabel 2457 YELLOW
 label    245E STR_2UP
 break    245E
+deflabel 245E WHITE
 comment  2465
 label    2465 STR_1UP_HI_2UP
 lcomment 2465 X Y
@@ -581,48 +598,39 @@ word     246B
 lcomment 246D X Y
 word     246F
 comment  2471
-label    2471 Display_P1_Score
-lcomment 2474 ZP_UDG_RAM_X ZP_UDG_RAM_Y, but not in this case
-lcomment 2475 UDG array absolute position to display score at
+label    2471 Display_Player_1_Score
+lcomment 2474 ZP04/05
+lcomment 2475 UDG RAM address to display score at
 word     2475
-lcomment 2477 ZP_Ptr_To_Str
-lcomment 2478 Players score in ZP as BCD e.g. 12 34 56
+lcomment 2477 ZP0E/0F
+lcomment 2478 Players score BCD e.g. 12 34 56
 word     2478
-lcomment 247A ZP_Temp_1
+lcomment 247A ZP02/03
 lcomment 247B 3 bytes of BCD data to display e.g. 12 34 56
 word     247B
 const    247B
-label    2481 Display_P2_Score
-lcomment 2484
+label    2481 Display_Player_2_Score
+comment  2481
 const    2484
-lcomment 2485
 word     2485
-lcomment 2487
 const    2487
-lcomment 2488
 word     2488
-lcomment 248A
 const    248A
-lcomment 248B
 word     248B
 const    248B
 break    248D
-label    2491 Display_Hi_Score
-lcomment 2494
+label    2491 Display_High_Score
+comment  2491
 const    2494
-lcomment 2495
 word     2495
-lcomment 2497
 const    2497
-lcomment 2498
 word     2498
-lcomment 249A
 const    249A
-lcomment 249B
 word     249B
 const    249B
 break    249D
 label    24A1 Game_Sel_Flash_Period
+comment  24A1
 label    24A4 GSFP1
 lcomment 24A5 Test settings bit 1, if not set, skip counter logic
 lcomment 24A9 Counter for flash period

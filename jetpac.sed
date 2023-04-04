@@ -56,6 +56,21 @@
 /; 2195/,/; 22B9/s/ZP17                           /ZP17_Laser_Decay_Patten_Data_3 /
 /; 2195/,/; 22B9/s/ZP1B                           /ZP1B_Laser_Color               /
 
+# Display_1UP_HI_2UP_Text
+/ZP04                            equ     $0004/a ZP04_Position_X                 equ     $0004
+/ZP05                            equ     $0005/a ZP05_Position_Y                 equ     $0005
+/ZP0E                            equ     $000E/a ZP0E_String_Addr_Lo             equ     $000E
+/ZP0F                            equ     $000F/a ZP0F_String_Addr_Hi             equ     $000F
+/; 2429/,/; 244F/s/ZP04                           /ZP04_Position_X                /
+/; 2429/,/; 244F/s/ZP05                           /ZP05_Position_Y                /
+/; 2429/,/; 244F/s/ZP0E                           /ZP0E_String_Addr_Lo            /
+/; 2429/,/; 244F/s/ZP0F                           /ZP0F_String_Addr_Hi            /
+
+
+
+
+
+
 # Display_Object
 /ZP02                            equ     $0002/a ZP02_Object_Old_Height_Index    equ     $0002
 /ZP03                            equ     $0003/a ZP03_Object_Old_Height          equ     $0003
@@ -269,7 +284,7 @@
 # Display_String
 /ZP06                            equ     $0006/a ZP06_Character_To_Display       equ     $0006
 #/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Addr_Lo          equ     $000C
-/ZP0E                            equ     $000E/a ZP0E_String_Addr_Lo             equ     $000E
+#/ZP0E                            equ     $000E/a ZP0E_String_Addr_Lo             equ     $000E
 /; 34CC/,/; 34F6/s/ZP06                           /ZP06_Character_To_Display      /
 /; 34CC/,/; 34F6/s/ZP0E                           /ZP0E_String_Addr_Lo            /
 /; 34CC/,/; 34F6/s/(ZP0C),y                       /(ZP0C_Color_RAM_Addr_Lo),y     /

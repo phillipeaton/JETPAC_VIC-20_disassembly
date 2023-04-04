@@ -26,6 +26,7 @@ ZP03_Num_Of_Bytes_To_Fill_Hi    equ     $0003
 ZP04                            equ     $0004
 ZP04_Laser_Position_X           equ     $0004
 ZP04_Laser_UDG_RAM_Addr_Lo      equ     $0004
+ZP04_Position_X                 equ     $0004
 ZP04_Object_Old_UDG_RAM_Lo      equ     $0004
 ZP04_Object_Position_X          equ     $0004
 ZP04_Object_UDG_RAM_Addr_Lo     equ     $0004
@@ -35,6 +36,7 @@ ZP04_X_Coordinate               equ     $0004
 ZP05                            equ     $0005
 ZP05_Laser_Position_Y           equ     $0005
 ZP05_Laser_UDG_RAM_Addr_Hi      equ     $0005
+ZP05_Position_Y                 equ     $0005
 ZP05_Object_Old_UDG_RAM_Hi      equ     $0005
 ZP05_Object_Position_Y          equ     $0005
 ZP05_Object_UDG_RAM_Addr_Hi     equ     $0005
@@ -79,11 +81,12 @@ ZP0D_Object_New_UDG_RAM_Hi      equ     $000D
 ZP0D_Object_UDG_RAM_Addr_Hi     equ     $000D
 ZP0D_Color_RAM_Addr_Hi          equ     $000D
 ZP0E                            equ     $000E
+ZP0E_String_Addr_Lo             equ     $000E
 ZP0E_Object_New_UDG_Data_Lo     equ     $000E
 ZP0E_Object_UDG_Data_Addr_Lo    equ     $000E
-ZP0E_String_Addr_Lo             equ     $000E
 ZP0E_Score_Data_Addr_Lo         equ     $000E
 ZP0F                            equ     $000F
+ZP0F_String_Addr_Hi             equ     $000F
 ZP0F_Object_New_UDG_Data_Hi     equ     $000F
 ZP0F_Object_UDG_Data_Addr_Hi    equ     $000F
 ZP10                            equ     $0010
@@ -247,6 +250,8 @@ LASER_X_POSITION_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
 OBJECT_X_POSITION_PARAM         equ     $01
 OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
+WHITE                           equ     $01
+YELLOW                          equ     $07
 LIVES_INITIAL_PLAYER_2          equ     $05
 LIVES_INITIAL_PLAYER_1          equ     $04
 PLAYER_1                        equ     $00
@@ -256,12 +261,10 @@ LASER_TYPE_PARAM                equ     $00
 LASER_POSITION_X                equ     $02
 LASER_LENGTH_PARAM              equ     $06
 LASER_POSITION_Y                equ     $01
-YELLOW                          equ     $07
 CYAN                            equ     $03
 BLUE                            equ     $06
 PURPLE                          equ     $04
 RED                             equ     $02
-WHITE                           equ     $01
 LASER_POSITION_X_PARAMS         equ     $03
 LASER_GUN_HEIGHT_OFFSET         equ     $0D
 MASK_JETMAN_DIRECTION           equ     %10000000
@@ -1140,8 +1143,8 @@ Loop_Reset_Objects
 ; ===========================================================
 
 Init_Rocket_Objs_Param_Table
-    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Rocket Bottom Section, Position_X, ???, Position_Y
-    fcb     $01,$00,$00,$1C                 ; 233F: 01 00 00 1C  $01=Pickup Status, ???, Height on Landing, ???
+    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Rocket Bottom Section, Posn_X, ?, Posn_Y
+    fcb     $01,$00,$00,$1C                 ; 233F: 01 00 00 1C  $01=Pickup Status, ?, Height on Landing, ?
 
     fcb     $04,$20,$00,$3F                 ; 2343: 04 20 00 3F  $04=Rocket Top Section
     fcb     $00,$01,$10,$18                 ; 2347: 00 01 10 18 
@@ -1264,14 +1267,14 @@ Load_Player_2_Lives
 ; -----------------------
 
 Jetman_Icon_UDG_Char_Data
-    fcb     %00011000                       ; 23C7: 18        ..##...
-    fcb     %00100100                       ; 23C8: 24        .#..#..
-    fcb     %00111100                       ; 23C9: 3C        .####..
-    fcb     %01111110                       ; 23CA: 7E        ######.
-    fcb     %01011010                       ; 23CB: 5A        #.##.#.
-    fcb     %00111100                       ; 23CC: 3C        .####..
-    fcb     %00111100                       ; 23CD: 3C        .####..
-    fcb     %01100110                       ; 23CE: 66        ##..##.
+    fcb     %00011000                       ; 23C7: 18        ...##...
+    fcb     %00100100                       ; 23C8: 24        ..#..#..
+    fcb     %00111100                       ; 23C9: 3C        ..####..
+    fcb     %01111110                       ; 23CA: 7E        .######.
+    fcb     %01011010                       ; 23CB: 5A        .#.##.#.
+    fcb     %00111100                       ; 23CC: 3C        ..####..
+    fcb     %00111100                       ; 23CD: 3C        ..####..
+    fcb     %01100110                       ; 23CE: 66        .##..##.
 
 ; L_BRS_($23CF)_($236B) OK
 LDA_7F
@@ -1283,9 +1286,9 @@ LDA_7F
 
 
 
-; Setup Active Player lives, then swap Inactive
+; Set Active Player, initial lives for both players and Rocket object parameters
 ; L_JSR_($23D4)_($25D7) OK
-Setup_Player_Lives_XXXXXXXXXXX
+Setup_Player_Lives
     ldy     #$02                            ; 23D4: A0 02    
 
 ; L_BRS_($23D6)_($23E5) OK
@@ -1297,6 +1300,7 @@ Loop_Setup_Player_Lives
     sta     ZP_Num_Lives_Active_Player      ; 23DC: 85 5A    
 
     jsr     Reset_Rocket_Obj_Params         ; 23DE: 20 FF 22 
+
     jsr     Swap_Player_And_Objects         ; 23E1: 20 F5 23 
     dey                                     ; 23E4: 88       
     bne     Loop_Setup_Player_Lives         ; 23E5: D0 EF    
@@ -1304,6 +1308,7 @@ Loop_Setup_Player_Lives
     lda     #LIVES_INITIAL_PLAYER_2         ; 23E7: A9 05    
     sta     ZP_Num_Lives_Inactive_Player    ; 23E9: 85 5C    
 
+; Test if single player game, if yes, set Player 2 lives to 0 i.e. inactive player
     lda     Game_Settings                   ; 23EB: AD D3 1F 
     and     #%00000001                      ; 23EE: 29 01    
     bne     Setup_Player_Lives_RTS          ; 23F0: D0 02    
@@ -1313,6 +1318,8 @@ Loop_Setup_Player_Lives
 Setup_Player_Lives_RTS
     rts                                     ; 23F4: 60       
 ; ===========================================================
+
+; When active player changes, swap current active/inactive player level and rocket object data
 ; L_JSR_($23F5)_($23E1) OK
 ; L_JSR_($23F5)_($29DB) OK
 Swap_Player_And_Objects
@@ -1320,22 +1327,27 @@ Swap_Player_And_Objects
 ; L_BRS_($23F7)_($2402) OK
 Swap_Player
     lda     ZP_Level_Active_Player,x        ; 23F7: B5 59    
+
     pha                                     ; 23F9: 48       
     lda     ZP_Level_Inactive_Player,x      ; 23FA: B5 5B    
     sta     ZP_Level_Active_Player,x        ; 23FC: 95 59    
     pla                                     ; 23FE: 68       
+
     sta     ZP_Level_Inactive_Player,x      ; 23FF: 95 5B    
     dex                                     ; 2401: CA       
     bpl     Swap_Player                     ; 2402: 10 F3    
 
     ldx     #$17                            ; 2404: A2 17    
+
 ; L_BRS_($2406)_($2413) OK
 Swap_Object
     lda     Obj_Rocket,x                    ; 2406: BD B0 03 
+
     pha                                     ; 2409: 48       
     lda     ZP_Player_Object_Stash,x        ; 240A: B5 28    
     sta     Obj_Rocket,x                    ; 240C: 9D B0 03 
     pla                                     ; 240F: 68       
+
     sta     ZP_Player_Object_Stash,x        ; 2410: 95 28    
     dex                                     ; 2412: CA       
     bpl     Swap_Object                     ; 2413: 10 F1    
@@ -1351,28 +1363,32 @@ Swap_Object
 Reset_Screen_Display_Scores
     jsr     Reset_Color_RAM                 ; 2416: 20 5C 35 
     jsr     Reset_UDG_RAM                   ; 2419: 20 6C 35 
-    jsr     Display_P1_Score                ; 241C: 20 71 24  Puts 000000  000000  00 at top of screen
-    jsr     Display_Hi_Score                ; 241F: 20 91 24 
-    jsr     Display_P2_Score                ; 2422: 20 81 24 
+    jsr     Display_Player_1_Score          ; 241C: 20 71 24 
+    jsr     Display_High_Score              ; 241F: 20 91 24 
+    jsr     Display_Player_2_Score          ; 2422: 20 81 24 
 
-; Setup address to copy data from ($2450) into UDG array for 1UP HI 2UP
+; Three strings to display across top of screen, 1UP, HI and 2UP
 ; L_JSR_($2425)_($335E) OK
-Display_1UP_HI_2UP_Titles
+Display_1UP_HI_2UP_Text
     ldx     #$00                            ; 2425: A2 00    
-    ldy     #$03                            ; 2427: A0 03     3 strings to display, 1UP, HI and 2UP
+    ldy     #$03                            ; 2427: A0 03    
+
 ; L_BRS_($2429)_($244D) OK
-BACK_D1H2
+Loop_Display_1UP_HI_2UP_Text
     lda     STR_1UP_HI_2UP,x                ; 2429: BD 65 24 
-    sta     ZP04                            ; 242C: 85 04    
+    sta     ZP04_Position_X                 ; 242C: 85 04    
     inx                                     ; 242E: E8       
+
     lda     STR_1UP_HI_2UP,x                ; 242F: BD 65 24 
-    sta     ZP05                            ; 2432: 85 05    
+    sta     ZP05_Position_Y                 ; 2432: 85 05    
     inx                                     ; 2434: E8       
+
     lda     STR_1UP_HI_2UP,x                ; 2435: BD 65 24 
-    sta     ZP0E                            ; 2438: 85 0E    
+    sta     ZP0E_String_Addr_Lo             ; 2438: 85 0E    
     inx                                     ; 243A: E8       
+
     lda     STR_1UP_HI_2UP,x                ; 243B: BD 65 24 
-    sta     ZP0F                            ; 243E: 85 0F    
+    sta     ZP0F_String_Addr_Hi             ; 243E: 85 0F    
     inx                                     ; 2440: E8       
 
     txa                                     ; 2441: 8A       
@@ -1386,19 +1402,20 @@ BACK_D1H2
     tax                                     ; 244B: AA       
 
     dey                                     ; 244C: 88       
-    bne     BACK_D1H2                       ; 244D: D0 DA    
+    bne     Loop_Display_1UP_HI_2UP_Text    ; 244D: D0 DA    
     rts                                     ; 244F: 60       
 ; ===========================================================
+
 STR_1UP
-    fcb     $01                             ; 2450: 01       
-    fcc     "`qUP`"                         ; 2451: 60 71 55 50 60 
-    fcb     $E0                             ; 2456: E0       
+    fcb     WHITE                           ; 2450: 01       
+    fcc     "`qUP`"                         ; 2451: 60 71 55 50 60  `=Space, q=1, r=2
+    fcb     $E0                             ; 2456: E0        Top bit=1 indicates end of string
 STR_HI
-    fcb     $07                             ; 2457: 07       
+    fcb     YELLOW                          ; 2457: 07       
     fcc     "``HI`"                         ; 2458: 60 60 48 49 60 
     fcb     $E0                             ; 245D: E0       
 STR_2UP
-    fcb     $01                             ; 245E: 01       
+    fcb     WHITE                           ; 245E: 01       
     fcc     "``rUP"                         ; 245F: 60 60 72 55 50 
     fcb     $E0                             ; 2464: E0       
 
@@ -1413,21 +1430,22 @@ STR_1UP_HI_2UP
 ; L_JSR_($2471)_($241C) OK
 ; L_JMP_($2471)_($308B) OK
 ; L_JSR_($2471)_($3361) OK
-Display_P1_Score
+Display_Player_1_Score
     jsr     Load_ZP_Parameters              ; 2471: 20 9D 25 
-    fcb     $04                             ; 2474: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y, but not in this case
-    fdb     Player_1_Score_UDG_RAM_Addr     ; 2475: 08 10     UDG array absolute position to display score at
-    fcb     $0E                             ; 2477: 0E        ZP_Ptr_To_Str
-    fdb     ZP_Score_Player_1               ; 2478: 51 00     Players score in ZP as BCD e.g. 12 34 56
-    fcb     $02                             ; 247A: 02        ZP_Temp_1
+    fcb     $04                             ; 2474: 04        ZP04/05
+    fdb     Player_1_Score_UDG_RAM_Addr     ; 2475: 08 10     UDG RAM address to display score at
+    fcb     $0E                             ; 2477: 0E        ZP0E/0F
+    fdb     ZP_Score_Player_1               ; 2478: 51 00     Players score BCD e.g. 12 34 56
+    fcb     $02                             ; 247A: 02        ZP02/03
     fdb     $0003                           ; 247B: 03 00     3 bytes of BCD data to display e.g. 12 34 56
     fcb     $FF                             ; 247D: FF       
     jmp     Display_BCD_Bytes               ; 247E: 4C A4 34 
 ; -----------------------
+
 ; L_JSR_($2481)_($2422) OK
 ; L_JMP_($2481)_($308E) OK
 ; L_JSR_($2481)_($3364) OK
-Display_P2_Score
+Display_Player_2_Score
     jsr     Load_ZP_Parameters              ; 2481: 20 9D 25 
     fcb     $04                             ; 2484: 04       
     fdb     Player_2_Score_UDG_RAM_Addr     ; 2485: 08 1B    
@@ -1438,8 +1456,9 @@ Display_P2_Score
     fcb     $FF                             ; 248D: FF       
     jmp     Display_BCD_Bytes               ; 248E: 4C A4 34 
 ; -----------------------
+
 ; L_JSR_($2491)_($241F) OK
-Display_Hi_Score
+Display_High_Score
     jsr     Load_ZP_Parameters              ; 2491: 20 9D 25 
     fcb     $04                             ; 2494: 04       
     fdb     Hi_Score_UDG_RAM_Addr           ; 2495: 88 15    
@@ -1450,6 +1469,7 @@ Display_Hi_Score
     fcb     $FF                             ; 249D: FF       
     jmp     Display_BCD_Bytes               ; 249E: 4C A4 34 
 ; -----------------------
+
 ; L_JSR_($24A1)_($24C0) OK
 ; L_JSR_($24A1)_($24C7) OK
 Game_Sel_Flash_Period
@@ -1690,7 +1710,7 @@ IPA1 rts                                    ; 25D0: 60
 Game_Start
     jsr     Erase_Object_RAM                ; 25D1: 20 64 27 
     jsr     Erase_ZP_RAM                    ; 25D4: 20 5B 27 
-    jsr     Setup_Player_Lives_XXXXXXXXXXX  ; 25D7: 20 D4 23 
+    jsr     Setup_Player_Lives              ; 25D7: 20 D4 23 
     jsr     Reset_Level_Add_Extra_Life      ; 25DA: 20 BA 22 
     jmp     Main_Loop_Object_0              ; 25DD: 4C FA 25 
 ; -----------------------
@@ -4468,11 +4488,11 @@ Add_3_Digit_BCD_To_Score
 
     lda     ZP_Active_Player                ; 3087: A5 5E     Decide if working with P1 or P2
     bne     Display_P2_Score_JMP            ; 3089: D0 03    
-    jmp     Display_P1_Score                ; 308B: 4C 71 24 
+    jmp     Display_Player_1_Score          ; 308B: 4C 71 24 
 ; -----------------------
 ; L_BRS_($308E)_($3089) OK
 Display_P2_Score_JMP
-    jmp     Display_P2_Score                ; 308E: 4C 81 24 
+    jmp     Display_Player_2_Score          ; 308E: 4C 81 24 
 ; -----------------------
 ; L_BRS_($3091)_($3065) OK
 Read_ZP_Params_P2_Score
@@ -5211,9 +5231,9 @@ READ_CONTROLS
 ; Display Jetman, color jetman and display scores
     jsr     Display_Object_With_Setup_1     ; 3358: 20 01 36 
     jsr     Colorize_Object                 ; 335B: 20 1F 38 
-    jsr     Display_1UP_HI_2UP_Titles       ; 335E: 20 25 24 
-    jsr     Display_P1_Score                ; 3361: 20 71 24 
-    jsr     Display_P2_Score                ; 3364: 20 81 24 
+    jsr     Display_1UP_HI_2UP_Text         ; 335E: 20 25 24 
+    jsr     Display_Player_1_Score          ; 3361: 20 71 24 
+    jsr     Display_Player_2_Score          ; 3364: 20 81 24 
 
 ; L_BRS_($3367)_($3356) OK
 Flash_Display_Score_JMP
