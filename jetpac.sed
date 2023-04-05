@@ -66,6 +66,21 @@
 /; 2429/,/; 244F/s/ZP0E                           /ZP0E_String_Addr_Lo            /
 /; 2429/,/; 244F/s/ZP0F                           /ZP0F_String_Addr_Hi            /
 
+# Loop_Display_Game_Select
+#/ZP04                            equ     $0004/a ZP04_Position_X                 equ     $0004
+#/ZP05                            equ     $0005/a ZP05_Position_Y                 equ     $0005
+/ZP08                            equ     $0008/a ZP08_Row_Offset_Table_Index     equ     $0008
+#/ZP0E                            equ     $000E/a ZP0E_String_Addr_Lo             equ     $000E
+#/ZP0F                            equ     $000F/a ZP0F_String_Addr_Hi             equ     $000F
+/; 24EB/,/; 251E/s/ZP04                           /ZP04_Position_X                /
+/; 24EB/,/; 251E/s/ZP05                           /ZP05_Position_Y                /
+/; 24EB/,/; 251E/s/ZP08                           /ZP08_Row_Offset_Table_Index    /
+/; 24EB/,/; 251E/s/ZP0E                           /ZP0E_String_Addr_Lo            /
+/; 24EB/,/; 251E/s/ZP0F                           /ZP0F_String_Addr_Hi            /
+
+
+
+
 
 
 

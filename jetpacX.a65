@@ -61,6 +61,7 @@ ZP07_Char_ROM_Data_Addr_Hi      equ     $0007
 ZP07_Score_Data_Addr_Hi         equ     $0007
 ZP08                            equ     $0008
 ZP08_Laser_Position_X_Start     equ     $0008
+ZP08_Row_Offset_Table_Index     equ     $0008
 ZP08_Object_Old_Y_Index         equ     $0008
 ZP09                            equ     $0009
 ZP09_Object_New_Y_Index         equ     $0009
@@ -250,6 +251,8 @@ LASER_X_POSITION_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
 OBJECT_X_POSITION_PARAM         equ     $01
 OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
+OPTION_TEXT_ROWS                equ     $05
+TEXT_POSITION_X                 equ     $18
 WHITE                           equ     $01
 YELLOW                          equ     $07
 LIVES_INITIAL_PLAYER_2          equ     $05
@@ -537,7 +540,7 @@ Init_Laser_Objects
 
 ; L_BRS_($20F0)_($20ED) OK
 Init_Laser_Objects_Init
-    jsr     Load_ZP_Parameters              ; 20F0: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 20F0: 20 9D 25 
     fcb     $06                             ; 20F3: 06        ZP06/07
     fdb     Obj_Laser_0                     ; 20F4: 88 03    
     fcb     $FF                             ; 20F6: FF       
@@ -819,7 +822,7 @@ UDG_RAM_Zero_Bit_2
 ; L_BRS_($2202)_($21B9) OK
 ; L_BRS_($2202)_($21FA) OK
 Setup_Laser_Decay_Patterns
-    jsr     Load_ZP_Parameters              ; 2202: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2202: 20 9D 25 
     fcb     $14                             ; 2205: 14        ZP14/15
     fcb     $00,$03                         ; 2206: 00 03     Laser decay pattern
     fcb     $16                             ; 2208: 16        ZP16/17
@@ -1060,7 +1063,7 @@ Reset_Level
 ; L_JSR_($22E3)_($2DA6) OK
 Set_Obj_Rocket_Top_Or_Fuel_Typ
     jsr     Save_Obj_List_Ptr               ; 22E3: 20 E7 28 
-    jsr     Load_ZP_Parameters              ; 22E6: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 22E6: 20 9D 25 
     fcb     $00                             ; 22E9: 00        ZP00/01
     fdb     Obj_Rocket_Top_Or_Fuel_Type     ; 22EA: B8 03    
     fcb     $FF                             ; 22EC: FF       
@@ -1074,7 +1077,7 @@ Reset_Object
 ; L_JSR_($22F2)_($2DB2) OK
 Set_Obj_Rocket_Mid_Or_Valu_Typ
     jsr     Save_Obj_List_Ptr               ; 22F2: 20 E7 28 
-    jsr     Load_ZP_Parameters              ; 22F5: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 22F5: 20 9D 25 
     fcb     $00                             ; 22F8: 00       
     fdb     Obj_Rocket_Mid_Or_Valuable_Typ  ; 22F9: C0 03    
     fcb     $FF                             ; 22FB: FF       
@@ -1104,7 +1107,7 @@ Loop_Reset_Rocket_Obj_Params
 Reset_Rocket_Obj_Params_Init
     jsr     Reset_Rocket_Obj_Params         ; 230B: 20 FF 22 
     jsr     Save_Obj_List_Ptr               ; 230E: 20 E7 28 
-    jsr     Load_ZP_Parameters              ; 2311: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2311: 20 9D 25 
     fcb     $00                             ; 2314: 00       
     fdb     Init_Rocket_Objs_Param_Table    ; 2315: 3B 23    
     fcb     $FF                             ; 2317: FF       
@@ -1184,7 +1187,7 @@ LDA_7F_Return
 ; L_JSR_($2373)_($22DA) OK
 ; L_JSR_($2373)_($2EA6) OK
 Display_Player_1_Lives
-    jsr     Load_ZP_Parameters              ; 2373: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2373: 20 9D 25 
     fcb     $04                             ; 2376: 04        ZP04/05
     fdb     Player_1_Lives_UDG_RAM_Addr     ; 2377: 20 14    
     fcb     $FF                             ; 2379: FF       
@@ -1196,7 +1199,7 @@ Display_Player_1_Lives
 
 ; L_JMP_($2382)_($23A5) OK
 Display_Player_2_Lives
-    jsr     Load_ZP_Parameters              ; 2382: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2382: 20 9D 25 
     fcb     $04                             ; 2385: 04        ZP04/05
     fdb     Player_2_Lives_UDG_RAM_Addr     ; 2386: A0 19    
     fcb     $FF                             ; 2388: FF       
@@ -1213,7 +1216,7 @@ Display_Number_Of_Lives
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 2393: 20 95 35 
 
 ; Display Jetman Icon next to number of lives
-    jsr     Load_ZP_Parameters              ; 2396: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2396: 20 9D 25 
     fcb     $06                             ; 2399: 06        ZP06/07
     fdb     Jetman_Icon_UDG_Char_Data       ; 239A: C7 23    
     fcb     $FF                             ; 239C: FF       
@@ -1431,7 +1434,7 @@ STR_1UP_HI_2UP
 ; L_JMP_($2471)_($308B) OK
 ; L_JSR_($2471)_($3361) OK
 Display_Player_1_Score
-    jsr     Load_ZP_Parameters              ; 2471: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2471: 20 9D 25 
     fcb     $04                             ; 2474: 04        ZP04/05
     fdb     Player_1_Score_UDG_RAM_Addr     ; 2475: 08 10     UDG RAM address to display score at
     fcb     $0E                             ; 2477: 0E        ZP0E/0F
@@ -1446,7 +1449,7 @@ Display_Player_1_Score
 ; L_JMP_($2481)_($308E) OK
 ; L_JSR_($2481)_($3364) OK
 Display_Player_2_Score
-    jsr     Load_ZP_Parameters              ; 2481: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2481: 20 9D 25 
     fcb     $04                             ; 2484: 04       
     fdb     Player_2_Score_UDG_RAM_Addr     ; 2485: 08 1B    
     fcb     $0E                             ; 2487: 0E       
@@ -1459,7 +1462,7 @@ Display_Player_2_Score
 
 ; L_JSR_($2491)_($241F) OK
 Display_High_Score
-    jsr     Load_ZP_Parameters              ; 2491: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2491: 20 9D 25 
     fcb     $04                             ; 2494: 04       
     fdb     Hi_Score_UDG_RAM_Addr           ; 2495: 88 15    
     fcb     $0E                             ; 2497: 0E       
@@ -1503,8 +1506,8 @@ Game_Select_Flash_1
 
 ; This is the selected option, divide the counter by 8 and use it to set the display
 ; selected on/off flag i.e. periodically flash it at about 2Hz
-    lda     ZP_Flash_Countup                ; 24A9: A5 58     Counter for flash period
-    lsr     a                               ; 24AB: 4A        remove the lasers? and flashes get faster
+    lda     ZP_Flash_Countup                ; 24A9: A5 58    
+    lsr     a                               ; 24AB: 4A       
     lsr     a                               ; 24AC: 4A       
     lsr     a                               ; 24AD: 4A       
 
@@ -1527,92 +1530,110 @@ Store_Option_Selection_State
 ; L_JSR_($24B9)_($20D4) OK
 Display_Game_Select
     ldx     #$00                            ; 24B9: A2 00    
+
+; Set selected game options for 1 or 2 Player (Game_Settings bit 0)
     lda     Game_Settings                   ; 24BB: AD D3 1F 
-    and     #$01                            ; 24BE: 29 01    
+    and     #%00000001                      ; 24BE: 29 01    
     jsr     Game_Select_Flash               ; 24C0: 20 A1 24 
+
+; Set selected game options for Joystick or Keyboard (Game_Settings bit 1)
     lda     Game_Settings                   ; 24C3: AD D3 1F 
     lsr     a                               ; 24C6: 4A       
     jsr     Game_Select_Flash               ; 24C7: 20 A1 24 
 
-    jsr     Load_ZP_Parameters              ; 24CA: 20 9D 25 
-    fcb     $04                             ; 24CD: 04        ZP_UDG_RAM_X
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 24CA: 20 9D 25 
+    fcb     $04                             ; 24CD: 04        ZP04/05
     fcb     $08,$20                         ; 24CE: 08 20     X Y
-    fcb     $0E                             ; 24D0: 0E       
-    fdb     STR_JETPAC_GAME_SELECT          ; 24D1: 3A 25    
+    fcb     $0E                             ; 24D0: 0E        ZP0E/0F
+    fdb     STRING_JETPAC_GAME_SELECT       ; 24D1: 3A 25    
     fcb     $FF                             ; 24D3: FF       
     jsr     Display_String_Setup            ; 24D4: 20 CC 34 
 
-    jsr     Load_ZP_Parameters              ; 24D7: 20 9D 25 
-    fcb     $04                             ; 24DA: 04        ZP_UDG_RAM_X
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 24D7: 20 9D 25 
+    fcb     $04                             ; 24DA: 04        ZP04/05
     fcb     $08,$A8                         ; 24DB: 08 A8     X Y
-    fcb     $0E                             ; 24DD: 0E       
+    fcb     $0E                             ; 24DD: 0E        ZP0E/0F
     fdb     STRING_COPYRIGHT_1983_ACG       ; 24DE: 24 25    
     fcb     $FF                             ; 24E0: FF       
     jsr     Display_String_Setup            ; 24E1: 20 CC 34 
 
-    jsr     Load_ZP_Parameters              ; 24E4: 20 9D 25 
-    fcb     $0E                             ; 24E7: 0E        ZP_Ptr_To_Str
-    fdb     STR_F1_1_PLAYER_GAME            ; 24E8: 50 25     String address
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 24E4: 20 9D 25 
+    fcb     $0E                             ; 24E7: 0E        ZP0E/0F
+    fdb     STRING_F1_1_PLAYER_GAME         ; 24E8: 50 25    
     fcb     $FF                             ; 24EA: FF       
 
+; Setup and display attract screen game selection options
     lda     #$00                            ; 24EB: A9 00    
-    sta     ZP08                            ; 24ED: 85 08    
+    sta     ZP08_Row_Offset_Table_Index     ; 24ED: 85 08    
+
+; X position is hardcoded, Y position comes from a lookup table keyed on ZP08 Index
 ; L_BRS_($24EF)_($251C) OK
-DGS1 lda    #$18                            ; 24EF: A9 18    
-    sta     ZP04                            ; 24F1: 85 04    
-    ldx     ZP08                            ; 24F3: A6 08    
-    lda     Fn_Key_SP_Row_Offsets,x         ; 24F5: BD 1F 25 
-    sta     ZP05                            ; 24F8: 85 05    
+Loop_Display_Game_Select
+    lda     #TEXT_POSITION_X                ; 24EF: A9 18    
+    sta     ZP04_Position_X                 ; 24F1: 85 04    
+
+    ldx     ZP08_Row_Offset_Table_Index     ; 24F3: A6 08    
+    lda     Fn_And_SP_Row_Offsets,x         ; 24F5: BD 1F 25 
+    sta     ZP05_Position_Y                 ; 24F8: 85 05    
+
     jsr     Setup_Color_RAM_Ptr             ; 24FA: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 24FD: 20 1D 35 
 
+; Setup and call string display routine
     ldy     #$00                            ; 2500: A0 00    
-    ldx     ZP08                            ; 2502: A6 08    
+    ldx     ZP08_Row_Offset_Table_Index     ; 2502: A6 08    
     lda     ZP_Game_Select_F1_Flash,x       ; 2504: B5 45    
     jsr     Display_String                  ; 2506: 20 D6 34 
+
+; Display_String increments the Y register by number of characters displayed, now increment
+; it again and add it to 16-bit address of the next string to display in ZP0E/0F
     iny                                     ; 2509: C8       
     tya                                     ; 250A: 98       
     clc                                     ; 250B: 18       
-    adc     ZP0E                            ; 250C: 65 0E    
-    sta     ZP0E                            ; 250E: 85 0E    
-    lda     ZP0F                            ; 2510: A5 0F    
+    adc     ZP0E_String_Addr_Lo             ; 250C: 65 0E    
+    sta     ZP0E_String_Addr_Lo             ; 250E: 85 0E    
+
+    lda     ZP0F_String_Addr_Hi             ; 2510: A5 0F    
     adc     #$00                            ; 2512: 69 00    
-    sta     ZP0F                            ; 2514: 85 0F    
-    inc     ZP08                            ; 2516: E6 08    
-    lda     ZP08                            ; 2518: A5 08    
-    cmp     #$05                            ; 251A: C9 05    
-    bne     DGS1                            ; 251C: D0 D1    
+    sta     ZP0F_String_Addr_Hi             ; 2514: 85 0F    
+
+; Increment table index and test if all rows displayed
+    inc     ZP08_Row_Offset_Table_Index     ; 2516: E6 08    
+    lda     ZP08_Row_Offset_Table_Index     ; 2518: A5 08    
+    cmp     #OPTION_TEXT_ROWS               ; 251A: C9 05    
+    bne     Loop_Display_Game_Select        ; 251C: D0 D1    
     rts                                     ; 251E: 60       
 ; ===========================================================
-Fn_Key_SP_Row_Offsets
+
+Fn_And_SP_Row_Offsets
     fcb     $38,$48,$58,$68,$90             ; 251F: 38 48 58 68 90 
 
 STRING_COPYRIGHT_1983_ACG
     fcb     $01                             ; 2524: 01       
     fcc     "COPYRIGHT`qyxs`AnCnG"          ; 2525: 43 4F 50 59 52 49 47 48 54 60 71 79 78 73 60 41 6E 43 6E 47 
-    fcb     $EE                             ; 2539: EE        Top bit=1 indicates end of string
+    fcb     $EE                             ; 2539: EE        Bit 7 = 1 indicates string end, $EE = $6E + bit 7
                                             ; `= Space, qyxs = 1983, n=.
-STR_JETPAC_GAME_SELECT
+STRING_JETPAC_GAME_SELECT
     fcb     $01                             ; 253A: 01       
     fcc     "JETPAC`GAME`SELECTIO"          ; 253B: 4A 45 54 50 41 43 60 47 41 4D 45 60 53 45 4C 45 43 54 49 4F 
-    fcb     $CE                             ; 254F: CE       
-STR_F1_1_PLAYER_GAME
+    fcb     $CE                             ; 254F: CE        $CE = $4E + top bit, $4E = "N"
+STRING_F1_1_PLAYER_GAME
     fcb     $00                             ; 2550: 00       
     fcc     "Fq``q`PLAYER`GAM"              ; 2551: 46 71 60 60 71 60 50 4C 41 59 45 52 60 47 41 4D 
     fcb     $C5                             ; 2561: C5       
-STR_F3_2_PLAYER_GAME
+STRING_F3_2_PLAYER_GAME
     fcb     $00                             ; 2562: 00       
     fcc     "Fs``r`PLAYER`GAM"              ; 2563: 46 73 60 60 72 60 50 4C 41 59 45 52 60 47 41 4D 
     fcb     $C5                             ; 2573: C5       
-STR_F5_KEYBOARD
+STRING_F5_KEYBOARD
     fcb     $00                             ; 2574: 00       
     fcc     "Fu``KEYBOAR"                   ; 2575: 46 75 60 60 4B 45 59 42 4F 41 52 
     fcb     $C4                             ; 2580: C4       
-STR_F7_JOYSTICK
+STRING_F7_JOYSTICK
     fcb     $00                             ; 2581: 00       
     fcc     "Fw``JOYSTIC"                   ; 2582: 46 77 60 60 4A 4F 59 53 54 49 43 
     fcb     $CB                             ; 258D: CB       
-STR_SP_START_GAME
+STRING_SP_START_GAME
     fcb     $00                             ; 258E: 00       
     fcc     "SP``START`GAM"                 ; 258F: 53 50 60 60 53 54 41 52 54 60 47 41 4D 
     fcb     $C5                             ; 259C: C5       
@@ -1631,6 +1652,9 @@ STR_SP_START_GAME
 ; 88"""   dP__Yb  88"Yb   dP__Yb  88YbdP88 88""     88   88""   88"Yb  o.`Y8b
 ; 88     dP""""Yb 88  Yb dP""""Yb 88 YY 88 888888   88   888888 88  Yb 8bodP'
 
+; Parameters for this routine are assembled into ROM after the
+; call to this routine and accessed via the return address
+; stored on the stack.
 ; L_JSR_($259D)_($20F0) OK
 ; L_JSR_($259D)_($2202) OK
 ; L_JSR_($259D)_($22E6) OK
@@ -1663,12 +1687,9 @@ STR_SP_START_GAME
 ; L_JSR_($259D)_($349A) OK
 ; L_JSR_($259D)_($355C) OK
 ; L_JSR_($259D)_($356C) OK
-Load_ZP_Parameters
+Load_ZP_Parameters_XXXXXXXXXXX
     pla                                     ; 259D: 68       
-                                            ; Parameters for this routine are assembled into ROM after the
-                                            ; call to this routine and accessed via the return address
-                                            ; stored on the stack.
-    sta     ZP_Param_Addr_Lo                ; 259E: 85 40     Stash return address
+    sta     ZP_Param_Addr_Lo                ; 259E: 85 40    
     pla                                     ; 25A0: 68       
     sta     ZP_Param_Addr_Hi                ; 25A1: 85 41    
 
@@ -1924,7 +1945,7 @@ SEI_Obj_Ptr_To_Jetman
     lda     ZP01_Obj_List_Ptr_Hi            ; 2672: A5 01    
     sta     ZP_Save_Obj_List_Ptr_Hi         ; 2674: 85 23    
 
-    jsr     Load_ZP_Parameters              ; 2676: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2676: 20 9D 25 
     fcb     $00                             ; 2679: 00        ZP Offset for 1st address
     fdb     Obj_Jetman_State                ; 267A: 80 03     1st Address
     fcb     $FF                             ; 267C: FF       
@@ -2224,7 +2245,7 @@ Erase_HiScore_Setts_Etc_1
 
 ; L_JSR_($277A)_($2987) OK
 Check_New_Hi_Score
-    jsr     Load_ZP_Parameters              ; 277A: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 277A: 20 9D 25 
     fcb     $00                             ; 277D: 00        ZP_00
     fdb     Score_Hi                        ; 277E: D0 1F     Addr of High Score value
     fcb     $08                             ; 2780: 08        ZP_08
@@ -2233,7 +2254,7 @@ Check_New_Hi_Score
 
     jsr     Test_New_Hi_Score               ; 2784: 20 8E 27  Check Player 1 first
 
-    jsr     Load_ZP_Parameters              ; 2787: 20 9D 25  then follow through for Player 2
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2787: 20 9D 25  then follow through for Player 2
     fcb     $08                             ; 278A: 08        ZP_08
     fdb     ZP_Score_Player_2               ; 278B: 54 00     Addr of P2 High Score value
     fcb     $FF                             ; 278D: FF       
@@ -2439,7 +2460,7 @@ FP_1 jsr    Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35
     jsr     Display_Object_With_Setup_4     ; 2864: 20 10 36 
 
 ; Jetman pickup Gem/Elements/Gold etc = 250 points
-    jsr     Load_ZP_Parameters              ; 2867: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2867: 20 9D 25 
     fcb     $02                             ; 286A: 02       
     fdb     $0250                           ; 286B: 50 02    
     fcb     $FF                             ; 286D: FF       
@@ -2744,7 +2765,7 @@ Display_Game_Over
     bne     Display_Game_Over_P2            ; 29EC: D0 24    
 ; L_JSR_($29EE)_($2991) OK
 Display_Game_Over_P1
-    jsr     Load_ZP_Parameters              ; 29EE: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 29EE: 20 9D 25 
     fcb     $0E                             ; 29F1: 0E        ZP_Ptr_To_Str
     fdb     STR_GAME_OVER_PLAYER_1          ; 29F2: 1F 2A     Pointer to "GAME OVER PLAYER 1"
     fcb     $04                             ; 29F4: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y
@@ -2754,7 +2775,7 @@ Display_Game_Over_P1
 Display_String_
     jsr     Display_String_Setup            ; 29F8: 20 CC 34 
 
-    jsr     Load_ZP_Parameters              ; 29FB: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 29FB: 20 9D 25 
     fcb     $02                             ; 29FE: 02        Into ZP addr 02 and 03...
     fdb     $0000                           ; 29FF: 00 00     ..load 00 and 00
     fcb     $0A                             ; 2A01: 0A        Into ZP addr 0A and 0B
@@ -2777,7 +2798,7 @@ Delay_Loop_Game_Over
 ; L_JSR_($2A12)_($2997) OK
 ; L_BRS_($2A12)_($29EC) OK
 Display_Game_Over_P2
-    jsr     Load_ZP_Parameters              ; 2A12: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2A12: 20 9D 25 
     fcb     $0E                             ; 2A15: 0E        ZP_Ptr_To_Str
     fdb     STR_GAME_OVER_PLAYER_2          ; 2A16: 32 2A     Pointer to "GAME OVER PLAYER 2"
     fcb     $04                             ; 2A18: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y
@@ -2796,7 +2817,7 @@ STR_GAME_OVER_PLAYER_2
 ; L_JSR_($2A45)_($2C99) OK
 Object_Pointer_To_Jetman
     jsr     Save_Obj_List_Ptr               ; 2A45: 20 E7 28 
-    jsr     Load_ZP_Parameters              ; 2A48: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2A48: 20 9D 25 
     fcb     $00                             ; 2A4B: 00       
     fdb     Obj_Jetman_State                ; 2A4C: 80 03    
     fcb     $FF                             ; 2A4E: FF       
@@ -3254,7 +3275,7 @@ SKIP_2BC2
 ; L_JSR_($2BC7)_($2DC5) OK
 Load_ZP_Params_For_Object_03C0
     jsr     Save_Obj_List_Ptr               ; 2BC7: 20 E7 28 
-    jsr     Load_ZP_Parameters              ; 2BCA: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2BCA: 20 9D 25 
     fcb     $00                             ; 2BCD: 00       
     fdb     $03C0                           ; 2BCE: C0 03    
     fcb     $FF                             ; 2BD0: FF       
@@ -3800,7 +3821,7 @@ Restore_Player_Objects_1
 ; L_JMP_($2DB5)_($2DC8) OK
 Restore_Player_Objects_2
     jsr     Save_Obj_List_Ptr               ; 2DB5: 20 E7 28 
-    jsr     Load_ZP_Parameters              ; 2DB8: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2DB8: 20 9D 25 
     fcb     $00                             ; 2DBB: 00       
     fdb     Obj_Rocket                      ; 2DBC: B0 03    
     fcb     $FF                             ; 2DBE: FF       
@@ -4007,7 +4028,7 @@ ROCKET_BOTTOM_MODULE
     jsr     Save_Obj_List_Ptr               ; 2E8C: 20 E7 28 
 
 ; Don't display Jetman next time? Also zeroes Jetman X coord.
-    jsr     Load_ZP_Parameters              ; 2E8F: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2E8F: 20 9D 25 
     fcb     $00                             ; 2E92: 00       
     fdb     Obj_Jetman_State                ; 2E93: 80 03    
     fcb     $FF                             ; 2E95: FF       
@@ -4377,7 +4398,7 @@ Jetman_Collide_Rocket_Fuel
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2FF7: 91 00    
 
 ; Jetman pickup Rocket Module / Fuel Pod = 100 points
-    jsr     Load_ZP_Parameters              ; 2FF9: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2FF9: 20 9D 25 
     fcb     $02                             ; 2FFC: 02       
     fdb     $0100                           ; 2FFD: 00 01    
     fcb     $FF                             ; 2FFF: FF       
@@ -4473,7 +4494,7 @@ Update_Score
     bne     Read_ZP_Params_P2_Score         ; 3065: D0 2A     If P2, setup P2 Score instead of P1 and then return after the param setup below
 
 ; Read ZP Params P1 Score
-    jsr     Load_ZP_Parameters              ; 3067: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 3067: 20 9D 25 
     fcb     $06                             ; 306A: 06        ZP_03_Lo
     fdb     ZP_Score_Player_1               ; 306B: 51 00     P1 Score in ZP
     fcb     $FF                             ; 306D: FF       
@@ -4512,7 +4533,7 @@ Display_P2_Score_JMP
 ; -----------------------
 ; L_BRS_($3091)_($3065) OK
 Read_ZP_Params_P2_Score
-    jsr     Load_ZP_Parameters              ; 3091: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 3091: 20 9D 25 
     fcb     $06                             ; 3094: 06        ZP_Temp_2
     fdb     ZP_Score_Player_2               ; 3095: 54 00     P2 Score in ZP
     fcb     $FF                             ; 3097: FF       
@@ -5510,7 +5531,7 @@ Read_Keyboard_Down
 Flash_Score
     lda     ZP_Active_Player                ; 3465: A5 5E    
     bne     Load_UDG_RAM_Addr_For_P2        ; 3467: D0 31    
-    jsr     Load_ZP_Parameters              ; 3469: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 3469: 20 9D 25 
     fcb     $04                             ; 346C: 04        ZP04
     fcb     $00,$00                         ; 346D: 00 00     X Y position in pixels
     fcb     $FF                             ; 346F: FF       
@@ -5566,7 +5587,7 @@ Flash_Score_RTS
 
 ; L_BRS_($349A)_($3467) OK
 Load_UDG_RAM_Addr_For_P2
-    jsr     Load_ZP_Parameters              ; 349A: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 349A: 20 9D 25 
     fcb     $04                             ; 349D: 04        ZP04
     fcb     $80,$00                         ; 349E: 80 00     X Y position in pixels
     fcb     $FF                             ; 34A0: FF       
@@ -5855,7 +5876,7 @@ UDG_RAM_Column_Offsets
 ; Fill 11 rows x 23 columns = 253 bytes = $FD bytes i.e. Color_RAM $9600 to $96FC
 ; L_JSR_($355C)_($2416) OK
 Reset_Color_RAM
-    jsr     Load_ZP_Parameters              ; 355C: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 355C: 20 9D 25 
     fcb     $02                             ; 355F: 02       
     fdb     $00FC                           ; 3560: FC 00     Number of bytes to fill
     fcb     $04                             ; 3562: 04       
@@ -5869,7 +5890,7 @@ Reset_Color_RAM
 ; Fill 22 rows x 8 lines x 23 columns = 4,048 bytes = $FD0 bytes i.e. UDG_RAM $1000 to $1FCF
 ; L_JSR_($356C)_($2419) OK
 Reset_UDG_RAM
-    jsr     Load_ZP_Parameters              ; 356C: 20 9D 25 
+    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 356C: 20 9D 25 
     fcb     $02                             ; 356F: 02       
     fdb     $0FCF                           ; 3570: CF 0F     Number of bytes to fill
     fcb     $04                             ; 3572: 04       

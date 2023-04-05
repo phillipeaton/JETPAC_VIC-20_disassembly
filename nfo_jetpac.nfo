@@ -640,11 +640,9 @@ comment  24A4
 comment  24A5
 comment  24A5 Test setting flag, if set, this is the unselcted option, skip the countup/invert part
 binary   24A6
-lcomment 24A9 Counter for flash period
 comment  24A9
 comment  24A9 This is the selected option, divide the counter by 8 and use it to set the display
 comment  24A9 selected on/off flag i.e. periodically flash it at about 2Hz
-lcomment 24AB remove the lasers? and flashes get faster
 comment  24AE
 comment  24AE Convert the counter value into a display on/off flag toggle
 comment  24AE Set bit 7 to make this selected option flash
@@ -656,46 +654,67 @@ binary   24B6
 comment  24B5
 comment  24B5 Invert Register A bit 0, increment the Game Select Fn Key index and loop back (or RTS)
 comment  24B9
+comment  24BB
+comment  24BB Set selected game options for 1 or 2 Player (Game_Settings bit 0)
 label    24B9 Display_Game_Select
+binary   24BF
+comment  24C3
+comment  24C3 Set selected game options for Joystick or Keyboard (Game_Settings bit 1)
+
 comment  24CA
-lcomment 24CD ZP_UDG_RAM_X
+lcomment 24CD ZP04/05
 lcomment 24CE X Y
 break    24CE
 const    24CF
 break    24D0
+lcomment 24D0 ZP0E/0F
 word     24D1
 comment  24D7
-lcomment 24DA ZP_UDG_RAM_X
+lcomment 24DA ZP04/05
 lcomment 24DB X Y
 break    24DB
 break    24DD
+lcomment 24DD ZP0E/0F
 word     24DE
 comment  24E4
-lcomment 24E7 ZP_Ptr_To_Str
-lcomment 24E8 String address
+lcomment 24E7 ZP0E/0F
 word     24E8
 comment  24EB
-label    24EF DGS1
+comment  24EB Setup and display attract screen game selection options
+label    24EF Loop_Display_Game_Select
+comment  24EF
+comment  24EF X position is hardcoded, Y position comes from a lookup table keyed on ZP08 Index
+deflabel 24F0 TEXT_POSITION_X
+comment  24F3
+comment  24FA
 comment  2500
-label    251F Fn_Key_SP_Row_Offsets
+comment  2500 Setup and call string display routine
+comment  2509
+comment  2509 Display_String increments the Y register by number of characters displayed, now increment
+comment  2509 it again and add it to 16-bit address of the next string to display in ZP0E/0F
+comment  2510
+comment  2516
+comment  2516 Increment table index and test if all rows displayed
+deflabel 251B OPTION_TEXT_ROWS
+comment  251F
+label    251F Fn_And_SP_Row_Offsets
 const    251F-2523
 comment  2524
 label    2524 STRING_COPYRIGHT_1983_ACG
-lcomment 2539 Top bit=1 indicates end of string
+lcomment 2539 Bit 7 = 1 indicates string end, $EE = $6E + bit 7
 lcomment 2539 `= Space, qyxs = 1983, n=.
-label    253A STR_JETPAC_GAME_SELECT
-label    2550 STR_F1_1_PLAYER_GAME
-label    2562 STR_F3_2_PLAYER_GAME
-label    2574 STR_F5_KEYBOARD
-label    2581 STR_F7_JOYSTICK
-label    258E STR_SP_START_GAME
+label    253A STRING_JETPAC_GAME_SELECT
+lcomment 254F $CE = $4E + top bit, $4E = "N"
+label    2550 STRING_F1_1_PLAYER_GAME
+label    2562 STRING_F3_2_PLAYER_GAME
+label    2574 STRING_F5_KEYBOARD
+label    2581 STRING_F7_JOYSTICK
+label    258E STRING_SP_START_GAME
 comment  259D
-label    259D Load_ZP_Parameters
-lcomment 259D
-lcomment 259D Parameters for this routine are assembled into ROM after the
-lcomment 259D call to this routine and accessed via the return address
-lcomment 259D stored on the stack.
-lcomment 259E Stash return address
+label    259D Load_ZP_Parameters_XXXXXXXXXXX
+comment  259D Parameters for this routine are assembled into ROM after the
+comment  259D call to this routine and accessed via the return address
+comment  259D stored on the stack.
 comment  25A3
 label    25A5 LZPP_1
 lcomment 25A5 Load next parameter value, ZP address for next param else $FF
