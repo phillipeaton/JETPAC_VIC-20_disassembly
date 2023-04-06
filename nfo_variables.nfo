@@ -44,8 +44,8 @@ label      1C ZP1C_Jetman_Action ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fl
 
 label      1E ZP_Ship_UDG_Addr_Offset        ;
 label      1F ZP_Ship_UDG_Addr_Color?        ;
-label      20 ZP_HW_IRQ_1_OR_0               ;
-label      21 ZP_HW_IRQ_Count                ;
+label      20 ZP_HW_IRQ_Occurred             ;
+label      21 ZP_Alien_Spawn_Counter         ; When reaches $04, Alien spawns, incremented by Explosions and Lasers
 label      22 ZP_Save_Obj_List_Ptr_Lo        ;
 label      23 ZP_Save_Obj_List_Ptr_Hi        ;
 label      24 ZP_Save_Obj_List_Ptr_Lo2       ;

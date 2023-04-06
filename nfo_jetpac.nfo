@@ -711,54 +711,60 @@ label    2574 STRING_F5_KEYBOARD
 label    2581 STRING_F7_JOYSTICK
 label    258E STRING_SP_START_GAME
 comment  259D
-label    259D Load_ZP_Parameters_XXXXXXXXXXX
-comment  259D Parameters for this routine are assembled into ROM after the
-comment  259D call to this routine and accessed via the return address
-comment  259D stored on the stack.
+label    259D Load_ZP_Parameters
+comment  259D Parameters for this routine are assembled into memory directly after the
+comment  259D call to this routine. When the routine is called using JSR, the return address
+comment  259D will be the address of the first parameter, so they can be pulled off using PLA.
+comment  259D First two stack values are the 16-bit address where next two stack values will be stored.
 comment  25A3
-label    25A5 LZPP_1
-lcomment 25A5 Load next parameter value, ZP address for next param else $FF
-lcomment 25A7 Value $FF?
-lcomment 25A9 If No, Skip
-comment  25AE
+label    25A5 Loop_Test_Param_List_End
+comment  25A5
+comment  25A5 $FF signifies end of address/parameter data to load
+comment  25AB
+comment  25AB All parameters now loaded, push a new return address back onto the stack and RTS
 label    25B5 Load_ZP_Parameter
-lcomment 25B5 Stash to X number before string characters (string len?)
+comment  25B5
+comment  25B5 Register A contain 8-bit ZP address to store 16-bit value to, Register Y is 1
 comment  25B6
-lcomment 25B6 Address starts at end of previous opcode operand, so inc it
-lcomment 25B9 Y starts at 1
-lcomment 25BB Store the parameter value to requried ZP address lo-byte
+comment  25B6 Increment the param address, load the data stored there and store it to a ZP location
 comment  25BD
-lcomment 25BD Same again for hi-byte
+comment  25BD Inc the param address again, load the data stored there and store it to a ZP location
 comment  25C4
-lcomment 25C4 Move to next parameter
-lcomment 25C7 Go back and read the next parameter
+comment  25C4 Inc the param address again and loop back to process next data value
 label    25CA Inc_Param_Addr
-lcomment 25CA Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
-label    25D0 IPA1
+comment  25CA
+comment  25CA Increment the 16-bit parameter address, lo-byte then hi-byte if necessary
+comment  25D0
+label    25D0 Inc_Param_Addr_RTS
 comment  25D1
 label    25D1 Game_Start
 comment  25E0
 comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 used     25E0 Hardware_Interrupt_Handler
-lcomment 25E4 Reset VIA2 timer
+comment  25E2
+comment  25E2 Set IRQ Occured flag, used to prioritise Jetman object handling in main loop
+comment  25E4
+comment  25E4 Reset VIA2 timer, which directly regulates Jetman's update speed
 label    25F4 HIH_1
 comment  25FA
 comment  25FA ----------------------------------------------------------
 comment  25FA Game Main Loop
 comment  25FA ----------------------------------------------------------
-label    25FA Main_Loop_Object_0
-lcomment 25FE $03B0 = "Object_0"
-lcomment 2606 Enable interrupts
+label    25FA Main_Loop_Init
+comment  25FE
+comment  25FE Reset object list index to $03B0 i.e. Rocket Ascend/Decend
+comment  2606
+comment  2606 Enable interrupts (Clear Interupt Disable)
+comment  2607
 label    2607 Main_Loop
-lcomment 2609 Load Object Type into A from obj table 0380 upwards
-lcomment 260B Mulitply by two as 2 bytes in an address
-lcomment 260C Object Type becomes offset into Subroutine List
-lcomment 260D Load SR List offset into SR Vec Lo/Hi...
-lcomment 2617 ...and jump to it
+comment  2609
+comment  2609 Load Object Type into A from object table, multiply by two for address jump table index use
+comment  260C
+comment  260C Setup subroutine address from jump table + index and indirect jmp to it
 comment  261A
 label    261A GOTO_NEXT_OBJECT
-lcomment 261C Test Object Type value
-lcomment 261E If <>00, skip
+comment  261C
+comment  261C Test next object type, if non-zero, skip to next object
 comment  2620
 comment  2620 Test if object is a rocket module
 lcomment 2622 Is Object address $B0?
@@ -791,7 +797,7 @@ comment  265E $4FD7 / 1.108Mhz = 54.2Hz interrupt. Screen is 184 pixels
 comment  265E wide. At one pixel walking movement pet interrupt, Jetman
 comment  265E should get across the screen in about 3.5 seconds.
 comment  265E ----------------------------------------------------------
-label    265E Set_Jetman_Mvmt_Speed
+label    265E Reset_VIA2_Timer
 comment  2669
 label    2669 SEI_Obj_Ptr_To_Jetman
 lcomment 2669 Set Disable Interrupts flag

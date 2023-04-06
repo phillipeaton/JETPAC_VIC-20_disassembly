@@ -129,8 +129,8 @@ ZP1B_Object_Color               equ     $001B
 ZP1C_Jetman_Action              equ     $001C
 ZP_Ship_UDG_Addr_Offset         equ     $001E
 ZP_Ship_UDG_Addr_Color?         equ     $001F
-ZP_HW_IRQ_1_OR_0                equ     $0020
-ZP_HW_IRQ_Count                 equ     $0021
+ZP_HW_IRQ_Occurred              equ     $0020
+ZP_Alien_Spawn_Counter          equ     $0021
 ZP_Save_Obj_List_Ptr_Lo         equ     $0022
 ZP_Save_Obj_List_Ptr_Hi         equ     $0023
 ZP_Save_Obj_List_Ptr_Lo2        equ     $0024
@@ -351,7 +351,7 @@ NMI_Interrupt_Hardler
     lda     #$C0                            ; 203C: A9 C0    
     sta     VIA2_Int_Enable                 ; 203E: 8D 2E 91 
 
-    jsr     Set_Jetman_Mvmt_Speed           ; 2041: 20 5E 26 
+    jsr     Reset_VIA2_Timer                ; 2041: 20 5E 26 
 
 ; Set VIA outputs for keyboard scan
     lda     #$40                            ; 2044: A9 40    
@@ -540,7 +540,7 @@ Init_Laser_Objects
 
 ; L_BRS_($20F0)_($20ED) OK
 Init_Laser_Objects_Init
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 20F0: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 20F0: 20 9D 25 
     fcb     $06                             ; 20F3: 06        ZP06/07
     fdb     Obj_Laser_0                     ; 20F4: 88 03    
     fcb     $FF                             ; 20F6: FF       
@@ -822,7 +822,7 @@ UDG_RAM_Zero_Bit_2
 ; L_BRS_($2202)_($21B9) OK
 ; L_BRS_($2202)_($21FA) OK
 Setup_Laser_Decay_Patterns
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2202: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2202: 20 9D 25 
     fcb     $14                             ; 2205: 14        ZP14/15
     fcb     $00,$03                         ; 2206: 00 03     Laser decay pattern
     fcb     $16                             ; 2208: 16        ZP16/17
@@ -1063,7 +1063,7 @@ Reset_Level
 ; L_JSR_($22E3)_($2DA6) OK
 Set_Obj_Rocket_Top_Or_Fuel_Typ
     jsr     Save_Obj_List_Ptr               ; 22E3: 20 E7 28 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 22E6: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 22E6: 20 9D 25 
     fcb     $00                             ; 22E9: 00        ZP00/01
     fdb     Obj_Rocket_Top_Or_Fuel_Type     ; 22EA: B8 03    
     fcb     $FF                             ; 22EC: FF       
@@ -1077,7 +1077,7 @@ Reset_Object
 ; L_JSR_($22F2)_($2DB2) OK
 Set_Obj_Rocket_Mid_Or_Valu_Typ
     jsr     Save_Obj_List_Ptr               ; 22F2: 20 E7 28 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 22F5: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 22F5: 20 9D 25 
     fcb     $00                             ; 22F8: 00       
     fdb     Obj_Rocket_Mid_Or_Valuable_Typ  ; 22F9: C0 03    
     fcb     $FF                             ; 22FB: FF       
@@ -1107,7 +1107,7 @@ Loop_Reset_Rocket_Obj_Params
 Reset_Rocket_Obj_Params_Init
     jsr     Reset_Rocket_Obj_Params         ; 230B: 20 FF 22 
     jsr     Save_Obj_List_Ptr               ; 230E: 20 E7 28 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2311: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2311: 20 9D 25 
     fcb     $00                             ; 2314: 00       
     fdb     Init_Rocket_Objs_Param_Table    ; 2315: 3B 23    
     fcb     $FF                             ; 2317: FF       
@@ -1187,7 +1187,7 @@ LDA_7F_Return
 ; L_JSR_($2373)_($22DA) OK
 ; L_JSR_($2373)_($2EA6) OK
 Display_Player_1_Lives
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2373: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2373: 20 9D 25 
     fcb     $04                             ; 2376: 04        ZP04/05
     fdb     Player_1_Lives_UDG_RAM_Addr     ; 2377: 20 14    
     fcb     $FF                             ; 2379: FF       
@@ -1199,7 +1199,7 @@ Display_Player_1_Lives
 
 ; L_JMP_($2382)_($23A5) OK
 Display_Player_2_Lives
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2382: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2382: 20 9D 25 
     fcb     $04                             ; 2385: 04        ZP04/05
     fdb     Player_2_Lives_UDG_RAM_Addr     ; 2386: A0 19    
     fcb     $FF                             ; 2388: FF       
@@ -1216,7 +1216,7 @@ Display_Number_Of_Lives
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 2393: 20 95 35 
 
 ; Display Jetman Icon next to number of lives
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2396: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2396: 20 9D 25 
     fcb     $06                             ; 2399: 06        ZP06/07
     fdb     Jetman_Icon_UDG_Char_Data       ; 239A: C7 23    
     fcb     $FF                             ; 239C: FF       
@@ -1434,7 +1434,7 @@ STR_1UP_HI_2UP
 ; L_JMP_($2471)_($308B) OK
 ; L_JSR_($2471)_($3361) OK
 Display_Player_1_Score
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2471: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2471: 20 9D 25 
     fcb     $04                             ; 2474: 04        ZP04/05
     fdb     Player_1_Score_UDG_RAM_Addr     ; 2475: 08 10     UDG RAM address to display score at
     fcb     $0E                             ; 2477: 0E        ZP0E/0F
@@ -1449,7 +1449,7 @@ Display_Player_1_Score
 ; L_JMP_($2481)_($308E) OK
 ; L_JSR_($2481)_($3364) OK
 Display_Player_2_Score
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2481: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2481: 20 9D 25 
     fcb     $04                             ; 2484: 04       
     fdb     Player_2_Score_UDG_RAM_Addr     ; 2485: 08 1B    
     fcb     $0E                             ; 2487: 0E       
@@ -1462,7 +1462,7 @@ Display_Player_2_Score
 
 ; L_JSR_($2491)_($241F) OK
 Display_High_Score
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2491: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2491: 20 9D 25 
     fcb     $04                             ; 2494: 04       
     fdb     Hi_Score_UDG_RAM_Addr           ; 2495: 88 15    
     fcb     $0E                             ; 2497: 0E       
@@ -1541,7 +1541,7 @@ Display_Game_Select
     lsr     a                               ; 24C6: 4A       
     jsr     Game_Select_Flash               ; 24C7: 20 A1 24 
 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 24CA: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 24CA: 20 9D 25 
     fcb     $04                             ; 24CD: 04        ZP04/05
     fcb     $08,$20                         ; 24CE: 08 20     X Y
     fcb     $0E                             ; 24D0: 0E        ZP0E/0F
@@ -1549,7 +1549,7 @@ Display_Game_Select
     fcb     $FF                             ; 24D3: FF       
     jsr     Display_String_Setup            ; 24D4: 20 CC 34 
 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 24D7: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 24D7: 20 9D 25 
     fcb     $04                             ; 24DA: 04        ZP04/05
     fcb     $08,$A8                         ; 24DB: 08 A8     X Y
     fcb     $0E                             ; 24DD: 0E        ZP0E/0F
@@ -1557,7 +1557,7 @@ Display_Game_Select
     fcb     $FF                             ; 24E0: FF       
     jsr     Display_String_Setup            ; 24E1: 20 CC 34 
 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 24E4: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 24E4: 20 9D 25 
     fcb     $0E                             ; 24E7: 0E        ZP0E/0F
     fdb     STRING_F1_1_PLAYER_GAME         ; 24E8: 50 25    
     fcb     $FF                             ; 24EA: FF       
@@ -1652,9 +1652,10 @@ STRING_SP_START_GAME
 ; 88"""   dP__Yb  88"Yb   dP__Yb  88YbdP88 88""     88   88""   88"Yb  o.`Y8b
 ; 88     dP""""Yb 88  Yb dP""""Yb 88 YY 88 888888   88   888888 88  Yb 8bodP'
 
-; Parameters for this routine are assembled into ROM after the
-; call to this routine and accessed via the return address
-; stored on the stack.
+; Parameters for this routine are assembled into memory directly after the
+; call to this routine. When the routine is called using JSR, the return address
+; will be the address of the first parameter, so they can be pulled off using PLA.
+; First two stack values are the 16-bit address where next two stack values will be stored.
 ; L_JSR_($259D)_($20F0) OK
 ; L_JSR_($259D)_($2202) OK
 ; L_JSR_($259D)_($22E6) OK
@@ -1687,51 +1688,63 @@ STRING_SP_START_GAME
 ; L_JSR_($259D)_($349A) OK
 ; L_JSR_($259D)_($355C) OK
 ; L_JSR_($259D)_($356C) OK
-Load_ZP_Parameters_XXXXXXXXXXX
+Load_ZP_Parameters
     pla                                     ; 259D: 68       
     sta     ZP_Param_Addr_Lo                ; 259E: 85 40    
     pla                                     ; 25A0: 68       
     sta     ZP_Param_Addr_Hi                ; 25A1: 85 41    
 
     ldy     #$01                            ; 25A3: A0 01    
-; L_JMP_($25A5)_($25C7) OK
-LZPP_1
-    lda     (ZP_Param_Addr_Lo),y            ; 25A5: B1 40     Load next parameter value, ZP address for next param else $FF
-    cmp     #$FF                            ; 25A7: C9 FF     Value $FF?
-    bne     Load_ZP_Parameter               ; 25A9: D0 0A     If No, Skip
-    jsr     Inc_Param_Addr                  ; 25AB: 20 CA 25 
 
+; $FF signifies end of address/parameter data to load
+; L_JMP_($25A5)_($25C7) OK
+Loop_Test_Param_List_End
+    lda     (ZP_Param_Addr_Lo),y            ; 25A5: B1 40    
+    cmp     #$FF                            ; 25A7: C9 FF    
+    bne     Load_ZP_Parameter               ; 25A9: D0 0A    
+
+; All parameters now loaded, push a new return address back onto the stack and RTS
+    jsr     Inc_Param_Addr                  ; 25AB: 20 CA 25 
     lda     ZP_Param_Addr_Hi                ; 25AE: A5 41    
     pha                                     ; 25B0: 48       
     lda     ZP_Param_Addr_Lo                ; 25B1: A5 40    
     pha                                     ; 25B3: 48       
     rts                                     ; 25B4: 60       
 ; ===========================================================
+
+; Register A contain 8-bit ZP address to store 16-bit value to, Register Y is 1
 ; L_BRS_($25B5)_($25A9) OK
 Load_ZP_Parameter
-    tax                                     ; 25B5: AA        Stash to X number before string characters (string len?)
+    tax                                     ; 25B5: AA       
 
-    jsr     Inc_Param_Addr                  ; 25B6: 20 CA 25  Address starts at end of previous opcode operand, so inc it
-    lda     (ZP_Param_Addr_Lo),y            ; 25B9: B1 40     Y starts at 1
-    sta     ZP00_Obj_List_Ptr_Lo,x          ; 25BB: 95 00     Store the parameter value to requried ZP address lo-byte
+; Increment the param address, load the data stored there and store it to a ZP location
+    jsr     Inc_Param_Addr                  ; 25B6: 20 CA 25 
+    lda     (ZP_Param_Addr_Lo),y            ; 25B9: B1 40    
+    sta     ZP00_Obj_List_Ptr_Lo,x          ; 25BB: 95 00    
 
-    jsr     Inc_Param_Addr                  ; 25BD: 20 CA 25  Same again for hi-byte
+; Inc the param address again, load the data stored there and store it to a ZP location
+    jsr     Inc_Param_Addr                  ; 25BD: 20 CA 25 
     lda     (ZP_Param_Addr_Lo),y            ; 25C0: B1 40    
     sta     ZP01_Obj_List_Ptr_Hi,x          ; 25C2: 95 01    
 
-    jsr     Inc_Param_Addr                  ; 25C4: 20 CA 25  Move to next parameter
-    jmp     LZPP_1                          ; 25C7: 4C A5 25  Go back and read the next parameter
+; Inc the param address again and loop back to process next data value
+    jsr     Inc_Param_Addr                  ; 25C4: 20 CA 25 
+    jmp     Loop_Test_Param_List_End        ; 25C7: 4C A5 25 
 ; -----------------------
+
+; Increment the 16-bit parameter address, lo-byte then hi-byte if necessary
 ; L_JSR_($25CA)_($25AB) OK
 ; L_JSR_($25CA)_($25B6) OK
 ; L_JSR_($25CA)_($25BD) OK
 ; L_JSR_($25CA)_($25C4) OK
 Inc_Param_Addr
-    inc     ZP_Param_Addr_Lo                ; 25CA: E6 40     Inc address at $40, inc lo-byte, then hi-byte if lo-byte=0
-    bne     IPA1                            ; 25CC: D0 02    
+    inc     ZP_Param_Addr_Lo                ; 25CA: E6 40    
+    bne     Inc_Param_Addr_RTS              ; 25CC: D0 02    
     inc     ZP_Param_Addr_Hi                ; 25CE: E6 41    
+
 ; L_BRS_($25D0)_($25CC) OK
-IPA1 rts                                    ; 25D0: 60       
+Inc_Param_Addr_RTS
+    rts                                     ; 25D0: 60       
 ; ===========================================================
 
 
@@ -1749,14 +1762,18 @@ Game_Start
     jsr     Erase_ZP_RAM                    ; 25D4: 20 5B 27 
     jsr     Setup_Player_Lives              ; 25D7: 20 D4 23 
     jsr     Reset_Level_Add_Extra_Life      ; 25DA: 20 BA 22 
-    jmp     Main_Loop_Object_0              ; 25DD: 4C FA 25 
+    jmp     Main_Loop_Init                  ; 25DD: 4C FA 25 
 ; -----------------------
 
 ; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 Hardware_Interrupt_Handler
     lda     #$01                            ; 25E0: A9 01    
-    sta     ZP_HW_IRQ_1_OR_0                ; 25E2: 85 20    
-    jsr     Set_Jetman_Mvmt_Speed           ; 25E4: 20 5E 26  Reset VIA2 timer
+
+; Set IRQ Occured flag, used to prioritise Jetman object handling in main loop
+    sta     ZP_HW_IRQ_Occurred              ; 25E2: 85 20    
+
+; Reset VIA2 timer, which directly regulates Jetman's update speed
+    jsr     Reset_VIA2_Timer                ; 25E4: 20 5E 26 
     lda     VIC_R4_TV_Raster                ; 25E7: AD 04 90 
     adc     ZP_HW_IRQ_Count3                ; 25EA: 65 4C    
     sta     ZP_HW_IRQ_Count3                ; 25EC: 85 4C    
@@ -1787,26 +1804,35 @@ HIH_1
 ; ----------------------------------------------------------
 ; L_JMP_($25FA)_($25DD) OK
 ; L_JMP_($25FA)_($265B) OK
-Main_Loop_Object_0
+Main_Loop_Init
     lda     #$00                            ; 25FA: A9 00    
-    sta     ZP_HW_IRQ_Count                 ; 25FC: 85 21    
-    lda     #$B0                            ; 25FE: A9 B0     $03B0 = "Object_0"
+    sta     ZP_Alien_Spawn_Counter          ; 25FC: 85 21    
+
+; Reset object list index to $03B0 i.e. Rocket Ascend/Decend
+    lda     #$B0                            ; 25FE: A9 B0    
     sta     ZP00_Obj_List_Ptr_Lo            ; 2600: 85 00    
     lda     #$03                            ; 2602: A9 03    
     sta     ZP01_Obj_List_Ptr_Hi            ; 2604: 85 01    
-    cli                                     ; 2606: 58        Enable interrupts
+
+; Enable interrupts (Clear Interupt Disable)
+    cli                                     ; 2606: 58       
+
 ; L_BRS_($2607)_($2643) OK
 ; L_JMP_($2607)_($267D) OK
 Main_Loop
     ldy     #$00                            ; 2607: A0 00    
-    lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2609: B1 00     Load Object Type into A from obj table 0380 upwards
-    asl     a                               ; 260B: 0A        Mulitply by two as 2 bytes in an address
-    tay                                     ; 260C: A8        Object Type becomes offset into Subroutine List
-    lda     Subroutine_List,y               ; 260D: B9 8C 26  Load SR List offset into SR Vec Lo/Hi...
+
+; Load Object Type into A from object table, multiply by two for address jump table index use
+    lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2609: B1 00    
+    asl     a                               ; 260B: 0A       
+
+; Setup subroutine address from jump table + index and indirect jmp to it
+    tay                                     ; 260C: A8       
+    lda     Subroutine_List,y               ; 260D: B9 8C 26 
     sta     ZP_Subroutine_Addr_Lo           ; 2610: 85 5F    
     lda     Subroutine_List+1,y             ; 2612: B9 8D 26 
     sta     ZP_Subroutine_Addr_Hi           ; 2615: 85 60    
-    jmp     (ZP_Subroutine_Addr_Lo)         ; 2617: 6C 5F 00  ..and jump to it
+    jmp     (ZP_Subroutine_Addr_Lo)         ; 2617: 6C 5F 00 
 ; -----------------------
 
 
@@ -1843,8 +1869,10 @@ Main_Loop
 ; L_JMP_($261A)_($3367) OK
 GOTO_NEXT_OBJECT
     ldy     #$00                            ; 261A: A0 00    
-    lda     (ZP00_Obj_List_Ptr_Lo),y        ; 261C: B1 00     Test Object Type value
-    bne     Inc_Object_List_Ptr             ; 261E: D0 10     If <>00, skip
+
+; Test next object type, if non-zero, skip to next object
+    lda     (ZP00_Obj_List_Ptr_Lo),y        ; 261C: B1 00    
+    bne     Inc_Object_List_Ptr             ; 261E: D0 10    
 
 ; Test if object is a rocket module
     lda     ZP00_Obj_List_Ptr_Lo            ; 2620: A5 00    
@@ -1873,7 +1901,7 @@ Inc_Object_List_Ptr
     sta     ZP00_Obj_List_Ptr_Lo            ; 2635: 85 00    
 
 ; If interrupt happened, update Jetman, it has higher priority
-    lda     ZP_HW_IRQ_1_OR_0                ; 2637: A5 20     H/W interrupt happened?
+    lda     ZP_HW_IRQ_Occurred              ; 2637: A5 20     H/W interrupt happened?
     bne     SEI_Obj_Ptr_To_Jetman           ; 2639: D0 2E     If yes, jump
 
 ; L_JMP_($263B)_($2689) OK
@@ -1884,7 +1912,7 @@ Main_Loop_Continue
     and     ZP00_Obj_List_Ptr_Lo            ; 2641: 25 00    
     bne     Main_Loop                       ; 2643: D0 C2    
 
-    lda     ZP_HW_IRQ_Count                 ; 2645: A5 21    
+    lda     ZP_Alien_Spawn_Counter          ; 2645: A5 21    
     cmp     #$04                            ; 2647: C9 04    
     bcc     Test_Score_Flash_Time_At_Zero   ; 2649: 90 07    
 
@@ -1901,7 +1929,7 @@ Test_Score_Flash_Time_At_Zero
 Spawn_Objects
     jsr     Spawn_Rocket_Modules_Fuel_Cell  ; 2655: 20 4B 2B 
     jsr     Spawn_Valuables                 ; 2658: 20 8F 2B 
-    jmp     Main_Loop_Object_0              ; 265B: 4C FA 25 
+    jmp     Main_Loop_Init                  ; 265B: 4C FA 25 
 ; -----------------------
 
 
@@ -1926,7 +1954,7 @@ Spawn_Objects
 ; ----------------------------------------------------------
 ; L_JSR_($265E)_($2041) OK
 ; L_JSR_($265E)_($25E4) OK
-Set_Jetman_Mvmt_Speed
+Reset_VIA2_Timer
     lda     #$D7                            ; 265E: A9 D7    
     sta     VIA2_T1_Cnt_Lo                  ; 2660: 8D 24 91 
     lda     #$4F                            ; 2663: A9 4F    
@@ -1938,14 +1966,14 @@ Set_Jetman_Mvmt_Speed
 SEI_Obj_Ptr_To_Jetman
     sei                                     ; 2669: 78        Set Disable Interrupts flag
     lda     #$00                            ; 266A: A9 00    
-    sta     ZP_HW_IRQ_1_OR_0                ; 266C: 85 20    
+    sta     ZP_HW_IRQ_Occurred              ; 266C: 85 20    
 
     lda     ZP00_Obj_List_Ptr_Lo            ; 266E: A5 00    
     sta     ZP_Save_Obj_List_Ptr_Lo         ; 2670: 85 22    
     lda     ZP01_Obj_List_Ptr_Hi            ; 2672: A5 01    
     sta     ZP_Save_Obj_List_Ptr_Hi         ; 2674: 85 23    
 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2676: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2676: 20 9D 25 
     fcb     $00                             ; 2679: 00        ZP Offset for 1st address
     fdb     Obj_Jetman_State                ; 267A: 80 03     1st Address
     fcb     $FF                             ; 267C: FF       
@@ -2245,7 +2273,7 @@ Erase_HiScore_Setts_Etc_1
 
 ; L_JSR_($277A)_($2987) OK
 Check_New_Hi_Score
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 277A: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 277A: 20 9D 25 
     fcb     $00                             ; 277D: 00        ZP_00
     fdb     Score_Hi                        ; 277E: D0 1F     Addr of High Score value
     fcb     $08                             ; 2780: 08        ZP_08
@@ -2254,7 +2282,7 @@ Check_New_Hi_Score
 
     jsr     Test_New_Hi_Score               ; 2784: 20 8E 27  Check Player 1 first
 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2787: 20 9D 25  then follow through for Player 2
+    jsr     Load_ZP_Parameters              ; 2787: 20 9D 25  then follow through for Player 2
     fcb     $08                             ; 278A: 08        ZP_08
     fdb     ZP_Score_Player_2               ; 278B: 54 00     Addr of P2 High Score value
     fcb     $FF                             ; 278D: FF       
@@ -2460,7 +2488,7 @@ FP_1 jsr    Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35
     jsr     Display_Object_With_Setup_4     ; 2864: 20 10 36 
 
 ; Jetman pickup Gem/Elements/Gold etc = 250 points
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2867: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2867: 20 9D 25 
     fcb     $02                             ; 286A: 02       
     fdb     $0250                           ; 286B: 50 02    
     fcb     $FF                             ; 286D: FF       
@@ -2655,7 +2683,7 @@ Store_Object_Type_2
     rts                                     ; 2933: 60       
 ; ===========================================================
 EXPLOSIONS
-    inc     ZP_HW_IRQ_Count                 ; 2934: E6 21    
+    inc     ZP_Alien_Spawn_Counter          ; 2934: E6 21    
     jsr     Load_Object_Type_X_Y_Color      ; 2936: 20 E9 35 
     ldy     #$02                            ; 2939: A0 02    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 293B: B1 00    
@@ -2765,7 +2793,7 @@ Display_Game_Over
     bne     Display_Game_Over_P2            ; 29EC: D0 24    
 ; L_JSR_($29EE)_($2991) OK
 Display_Game_Over_P1
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 29EE: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 29EE: 20 9D 25 
     fcb     $0E                             ; 29F1: 0E        ZP_Ptr_To_Str
     fdb     STR_GAME_OVER_PLAYER_1          ; 29F2: 1F 2A     Pointer to "GAME OVER PLAYER 1"
     fcb     $04                             ; 29F4: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y
@@ -2775,7 +2803,7 @@ Display_Game_Over_P1
 Display_String_
     jsr     Display_String_Setup            ; 29F8: 20 CC 34 
 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 29FB: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 29FB: 20 9D 25 
     fcb     $02                             ; 29FE: 02        Into ZP addr 02 and 03...
     fdb     $0000                           ; 29FF: 00 00     ..load 00 and 00
     fcb     $0A                             ; 2A01: 0A        Into ZP addr 0A and 0B
@@ -2798,7 +2826,7 @@ Delay_Loop_Game_Over
 ; L_JSR_($2A12)_($2997) OK
 ; L_BRS_($2A12)_($29EC) OK
 Display_Game_Over_P2
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2A12: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2A12: 20 9D 25 
     fcb     $0E                             ; 2A15: 0E        ZP_Ptr_To_Str
     fdb     STR_GAME_OVER_PLAYER_2          ; 2A16: 32 2A     Pointer to "GAME OVER PLAYER 2"
     fcb     $04                             ; 2A18: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y
@@ -2817,7 +2845,7 @@ STR_GAME_OVER_PLAYER_2
 ; L_JSR_($2A45)_($2C99) OK
 Object_Pointer_To_Jetman
     jsr     Save_Obj_List_Ptr               ; 2A45: 20 E7 28 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2A48: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2A48: 20 9D 25 
     fcb     $00                             ; 2A4B: 00       
     fdb     Obj_Jetman_State                ; 2A4C: 80 03    
     fcb     $FF                             ; 2A4E: FF       
@@ -3275,7 +3303,7 @@ SKIP_2BC2
 ; L_JSR_($2BC7)_($2DC5) OK
 Load_ZP_Params_For_Object_03C0
     jsr     Save_Obj_List_Ptr               ; 2BC7: 20 E7 28 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2BCA: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2BCA: 20 9D 25 
     fcb     $00                             ; 2BCD: 00       
     fdb     $03C0                           ; 2BCE: C0 03    
     fcb     $FF                             ; 2BD0: FF       
@@ -3429,7 +3457,7 @@ Goto_Next_Obj
 ; L_JSR_($2C5F)_($2ABC) OK
 ; L_JSR_($2C5F)_($2C6A) OK
 Test_Laser_Hits
-    inc     ZP_HW_IRQ_Count                 ; 2C5F: E6 21    
+    inc     ZP_Alien_Spawn_Counter          ; 2C5F: E6 21    
     jsr     Load_Object_Type_X_Y            ; 2C61: 20 D7 35 
     jsr     Test_Laser_Hits_1               ; 2C64: 20 F8 2B 
     lda     ZP02                            ; 2C67: A5 02    
@@ -3821,7 +3849,7 @@ Restore_Player_Objects_1
 ; L_JMP_($2DB5)_($2DC8) OK
 Restore_Player_Objects_2
     jsr     Save_Obj_List_Ptr               ; 2DB5: 20 E7 28 
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2DB8: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2DB8: 20 9D 25 
     fcb     $00                             ; 2DBB: 00       
     fdb     Obj_Rocket                      ; 2DBC: B0 03    
     fcb     $FF                             ; 2DBE: FF       
@@ -4028,7 +4056,7 @@ ROCKET_BOTTOM_MODULE
     jsr     Save_Obj_List_Ptr               ; 2E8C: 20 E7 28 
 
 ; Don't display Jetman next time? Also zeroes Jetman X coord.
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2E8F: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2E8F: 20 9D 25 
     fcb     $00                             ; 2E92: 00       
     fdb     Obj_Jetman_State                ; 2E93: 80 03    
     fcb     $FF                             ; 2E95: FF       
@@ -4398,7 +4426,7 @@ Jetman_Collide_Rocket_Fuel
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2FF7: 91 00    
 
 ; Jetman pickup Rocket Module / Fuel Pod = 100 points
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 2FF9: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 2FF9: 20 9D 25 
     fcb     $02                             ; 2FFC: 02       
     fdb     $0100                           ; 2FFD: 00 01    
     fcb     $FF                             ; 2FFF: FF       
@@ -4494,7 +4522,7 @@ Update_Score
     bne     Read_ZP_Params_P2_Score         ; 3065: D0 2A     If P2, setup P2 Score instead of P1 and then return after the param setup below
 
 ; Read ZP Params P1 Score
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 3067: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 3067: 20 9D 25 
     fcb     $06                             ; 306A: 06        ZP_03_Lo
     fdb     ZP_Score_Player_1               ; 306B: 51 00     P1 Score in ZP
     fcb     $FF                             ; 306D: FF       
@@ -4533,7 +4561,7 @@ Display_P2_Score_JMP
 ; -----------------------
 ; L_BRS_($3091)_($3065) OK
 Read_ZP_Params_P2_Score
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 3091: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 3091: 20 9D 25 
     fcb     $06                             ; 3094: 06        ZP_Temp_2
     fdb     ZP_Score_Player_2               ; 3095: 54 00     P2 Score in ZP
     fcb     $FF                             ; 3097: FF       
@@ -5531,7 +5559,7 @@ Read_Keyboard_Down
 Flash_Score
     lda     ZP_Active_Player                ; 3465: A5 5E    
     bne     Load_UDG_RAM_Addr_For_P2        ; 3467: D0 31    
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 3469: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 3469: 20 9D 25 
     fcb     $04                             ; 346C: 04        ZP04
     fcb     $00,$00                         ; 346D: 00 00     X Y position in pixels
     fcb     $FF                             ; 346F: FF       
@@ -5587,7 +5615,7 @@ Flash_Score_RTS
 
 ; L_BRS_($349A)_($3467) OK
 Load_UDG_RAM_Addr_For_P2
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 349A: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 349A: 20 9D 25 
     fcb     $04                             ; 349D: 04        ZP04
     fcb     $80,$00                         ; 349E: 80 00     X Y position in pixels
     fcb     $FF                             ; 34A0: FF       
@@ -5876,7 +5904,7 @@ UDG_RAM_Column_Offsets
 ; Fill 11 rows x 23 columns = 253 bytes = $FD bytes i.e. Color_RAM $9600 to $96FC
 ; L_JSR_($355C)_($2416) OK
 Reset_Color_RAM
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 355C: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 355C: 20 9D 25 
     fcb     $02                             ; 355F: 02       
     fdb     $00FC                           ; 3560: FC 00     Number of bytes to fill
     fcb     $04                             ; 3562: 04       
@@ -5890,7 +5918,7 @@ Reset_Color_RAM
 ; Fill 22 rows x 8 lines x 23 columns = 4,048 bytes = $FD0 bytes i.e. UDG_RAM $1000 to $1FCF
 ; L_JSR_($356C)_($2419) OK
 Reset_UDG_RAM
-    jsr     Load_ZP_Parameters_XXXXXXXXXXX  ; 356C: 20 9D 25 
+    jsr     Load_ZP_Parameters              ; 356C: 20 9D 25 
     fcb     $02                             ; 356F: 02       
     fdb     $0FCF                           ; 3570: CF 0F     Number of bytes to fill
     fcb     $04                             ; 3572: 04       
