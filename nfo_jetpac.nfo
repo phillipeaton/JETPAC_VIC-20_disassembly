@@ -760,7 +760,7 @@ label    25FA Main_Loop_Init
 comment  25FE
 comment  25FE Reset object list index to $03B0 i.e. Rocket Ascend/Decend
 comment  2606
-comment  2606 Enable interrupts (Clear Interupt Disable)
+comment  2606 Enable Interrupts (Clear Interrupt Disable)
 comment  2607
 label    2607 Main_Loop
 comment  2609
@@ -806,22 +806,27 @@ comment  265E
 comment  265E ----------------------------------------------------------
 comment  265E VIA2 timer interrupts used to update Jetman movement
 comment  265E $4FD7 / 1.108Mhz = 54.2Hz interrupt. Screen is 184 pixels
-comment  265E wide. At one pixel walking movement pet interrupt, Jetman
+comment  265E wide. At one pixel walking movement per interrupt, Jetman
 comment  265E should get across the screen in about 3.5 seconds.
 comment  265E ----------------------------------------------------------
 label    265E Reset_VIA2_Timer
 comment  2669
+comment  2669 Disable Interrupts (Set Interupt Disable)
+comment  2669 Save current object list pointer and set Jetman to be the next object
 label    2669 SEI_Obj_Ptr_To_Jetman
-lcomment 2669 Set Disable Interrupts flag
+comment  266A
 comment  266E
+comment  266E Save the current object list ptr and load up the Jetman object parameters
 comment  2676
-lcomment 2679 ZP Offset for 1st address
+comment  2676 Load up the Jetman object parameters
+lcomment 2679 ZP00/01
 const    2679
-lcomment 267A 1st Address
 word     267A
 comment  2680
-label    2680 Restore_Obj_Ptr_CLI
-lcomment 2688 Clear Disable Interrupts flag
+comment  2680
+label    2680 Restore_Saved_Obj_Ptr_And_CLI
+comment  2688
+comment  2688 Enable Interrupts (Clear Disable Interrupts)
 comment  268C
 label    268C Subroutine_List
 lcomment 268C 00
@@ -844,8 +849,10 @@ lcomment 26A8 0E
 lcomment 26AA 0F
 lcomment 26AC 10
 comment  26AE
+comment  26AE Init sound object parameters (i.e. 8 bytes) from static data table
 label    26AE Initialize_Sound_Object
-label    26B0 Initialize_Sound_Object_1
+comment  26B0
+label    26B0 Loop_Initialize_Sound_Object
 comment  26B9
 comment  26B9 Initialize sound channels
 comment  26C5
@@ -855,9 +862,8 @@ comment  26CD
 comment  26CD Read and play sound channel data from the Sound object
 label    26CD SOUND_UPDATE
 comment  26D1
-comment  26D1 Uses the Subroutine_Addr_Hi as an index, a bit confusing to read...oh well
-comment  26D1 1st/3rd/5th parameter indicates which sound to play, 2/4/6 is the period
-label    26D1 Sound_Loop
+comment  26D1 1st/3rd/5th parameter indicates which sound to play, 2nd/4th/6th is the period
+label    26D1 Loop_Sound_Update
 comment  26D7
 comment  26D7 Jump to Sound player using X as jump table index
 comment  26E4

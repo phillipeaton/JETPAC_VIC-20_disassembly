@@ -1734,7 +1734,7 @@ Main_Loop_Init
     lda     #$03                            ; 2602: A9 03    
     sta     ZP01_Obj_List_Ptr_Hi            ; 2604: 85 01    
 
-; Enable interrupts (Clear Interupt Disable)
+; Enable Interrupts (Clear Interrupt Disable)
     cli                                     ; 2606: 58       
 
 ; L_BRS_($2607)_($2643) OK
@@ -1831,7 +1831,7 @@ Inc_Object_List_Ptr
 Main_Loop_Continue
     lda     ZP00_Obj_List_Ptr_Lo            ; 263B: A5 00    
     cmp     #OBJECT_ROCKET_ADDRESS          ; 263D: C9 B0    
-    beq     Restore_Obj_Ptr_CLI             ; 263F: F0 3F    
+    beq     Restore_Saved_Obj_Ptr_And_CLI   ; 263F: F0 3F    
 
 ; Current object is Jetman, a laser beam or the sound object
 ; Test if current object addres lo-byte is zero, i.e. starting at beginning of list, branch if not
@@ -1877,7 +1877,7 @@ Spawn_Objects
 ; ----------------------------------------------------------
 ; VIA2 timer interrupts used to update Jetman movement
 ; $4FD7 / 1.108Mhz = 54.2Hz interrupt. Screen is 184 pixels
-; wide. At one pixel walking movement pet interrupt, Jetman
+; wide. At one pixel walking movement per interrupt, Jetman
 ; should get across the screen in about 3.5 seconds.
 ; ----------------------------------------------------------
 ; L_JSR_($265E)_($2041) OK
@@ -1890,31 +1890,39 @@ Reset_VIA2_Timer
     rts                                     ; 2668: 60       
 ; ===========================================================
 
+; Disable Interrupts (Set Interupt Disable)
+; Save current object list pointer and set Jetman to be the next object
 ; L_BRS_($2669)_($2639) OK
 SEI_Obj_Ptr_To_Jetman
-    sei                                     ; 2669: 78        Set Disable Interrupts flag
+    sei                                     ; 2669: 78       
+
     lda     #$00                            ; 266A: A9 00    
     sta     ZP_HW_IRQ_Occurred              ; 266C: 85 20    
 
+; Save the current object list ptr and load up the Jetman object parameters
     lda     ZP00_Obj_List_Ptr_Lo            ; 266E: A5 00    
     sta     ZP_Save_Obj_List_Ptr_Lo         ; 2670: 85 22    
     lda     ZP01_Obj_List_Ptr_Hi            ; 2672: A5 01    
     sta     ZP_Save_Obj_List_Ptr_Hi         ; 2674: 85 23    
 
+; Load up the Jetman object parameters
     jsr     Load_ZP_Parameters              ; 2676: 20 9D 25 
-    fcb     $00                             ; 2679: 00        ZP Offset for 1st address
-    fdb     Obj_Jetman_State                ; 267A: 80 03     1st Address
+    fcb     $00                             ; 2679: 00        ZP00/01
+    fdb     Obj_Jetman_State                ; 267A: 80 03    
     fcb     $FF                             ; 267C: FF       
     jmp     Main_Loop                       ; 267D: 4C 07 26 
 ; -----------------------
 
+
 ; L_BRS_($2680)_($263F) OK
-Restore_Obj_Ptr_CLI
+Restore_Saved_Obj_Ptr_And_CLI
     lda     ZP_Save_Obj_List_Ptr_Lo         ; 2680: A5 22    
     sta     ZP00_Obj_List_Ptr_Lo            ; 2682: 85 00    
     lda     ZP_Save_Obj_List_Ptr_Hi         ; 2684: A5 23    
     sta     ZP01_Obj_List_Ptr_Hi            ; 2686: 85 01    
-    cli                                     ; 2688: 58        Clear Disable Interrupts flag
+
+; Enable Interrupts (Clear Disable Interrupts)
+    cli                                     ; 2688: 58       
     jmp     Main_Loop_Continue              ; 2689: 4C 3B 26 
 ; -----------------------
 
@@ -1951,15 +1959,17 @@ Subroutine_List
     fdb     GOTO_NEXT_OBJECT                ; 26AA: 1A 26     0F
     fdb     DISPLAY_LASERS                  ; 26AC: 9A 21     10
 
+; Init sound object parameters (i.e. 8 bytes) from static data table
 ; L_JMP_($26AE)_($22CE) OK
 Initialize_Sound_Object
     ldx     #$07                            ; 26AE: A2 07    
+
 ; L_BRS_($26B0)_($26B7) OK
-Initialize_Sound_Object_1
+Loop_Initialize_Sound_Object
     lda     Init_Sound_Object_Table,x       ; 26B0: BD C5 26 
     sta     Obj_Sound,x                     ; 26B3: 9D A8 03 
     dex                                     ; 26B6: CA       
-    bpl     Initialize_Sound_Object_1       ; 26B7: 10 F7    
+    bpl     Loop_Initialize_Sound_Object    ; 26B7: 10 F7    
 
 ; Initialize sound channels
     lda     #$00                            ; 26B9: A9 00    
@@ -1990,10 +2000,9 @@ SOUND_UPDATE
     lda     #$01                            ; 26CD: A9 01    
     sta     ZP_Subroutine_Addr_Hi           ; 26CF: 85 60    
 
-; Uses the Subroutine_Addr_Hi as an index, a bit confusing to read...oh well
-; 1st/3rd/5th parameter indicates which sound to play, 2/4/6 is the period
+; 1st/3rd/5th parameter indicates which sound to play, 2nd/4th/6th is the period
 ; L_BRS_($26D1)_($26ED) OK
-Sound_Loop
+Loop_Sound_Update
     ldy     ZP_Subroutine_Addr_Hi           ; 26D1: A4 60    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 26D3: B1 00    
     asl     a                               ; 26D5: 0A       
@@ -2017,7 +2026,7 @@ Goto_Next_Sound
     adc     #$02                            ; 26E7: 69 02    
     sta     ZP_Subroutine_Addr_Hi           ; 26E9: 85 60    
     cmp     #$07                            ; 26EB: C9 07    
-    bcc     Sound_Loop                      ; 26ED: 90 E2    
+    bcc     Loop_Sound_Update               ; 26ED: 90 E2    
     jmp     GOTO_NEXT_OBJECT                ; 26EF: 4C 1A 26 
 ; -----------------------
 
