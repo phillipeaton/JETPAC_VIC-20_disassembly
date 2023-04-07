@@ -475,6 +475,7 @@ label    235D Loop_Init_Jetman_Obj
 comment  235D
 comment  2366
 comment  2366 Test if two player game, if yes, give $FF time between players for switchover instead of $7F
+binary   236A
 label    236F LDA_7F_Return
 comment  236F
 comment  2373
@@ -554,14 +555,14 @@ comment  23EB Test if single player game, if yes, set Player 2 lives to 0 i.e. i
 binary   23EF
 label    23F4 Setup_Player_Lives_RTS
 comment  23F4
-label    23F5 Swap_Player_And_Objects
+label    23F5 Swap_Player_And_Obj_Rocket
 comment  23F5
 comment  23F5 When active player changes, swap current active/inactive player level and rocket object data
 label    23F7 Swap_Player
 comment  23F9
 comment  23FF
 comment  2404
-label    2406 Swap_Object
+label    2406 Loop_Swap_Rocket_Object
 comment  2406
 comment  2409
 comment  2410
@@ -745,7 +746,12 @@ comment  25E2
 comment  25E2 Set IRQ Occured flag, used to prioritise Jetman object handling in main loop
 comment  25E4
 comment  25E4 Reset VIA2 timer, which directly regulates Jetman's update speed
-label    25F4 HIH_1
+comment  25E7
+comment  25E7 Use TV Raster value as a pseudo-random number generator
+comment  25EE
+comment  25EE Increment 16-bit counter
+comment  25F4
+label    25F4 Restore_Registers_And_RTI
 comment  25FA
 comment  25FA ----------------------------------------------------------
 comment  25FA Game Main Loop
@@ -766,27 +772,33 @@ label    261A GOTO_NEXT_OBJECT
 comment  261C
 comment  261C Test next object type, if non-zero, skip to next object
 comment  2620
-comment  2620 Test if object is a rocket module
-lcomment 2622 Is Object address $B0?
-lcomment 2624 If not, skip
+comment  2620 Test if current object address is Jetman, a laser beam, the sound object or zero, branch if yes
+deflabel 2623 OBJECT_ROCKET_ADDRESS
 comment  2626
-comment  2626 Delay loop
-comment  2626 $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds
-label    262A Delay_Loop_0A00
+comment  2626 Current object is a rocket part or an Alien
+comment  2626 Delay loop, adjusting Register Y from $02 to $0F makes aliens move ~40% slower across screen
+comment  2626 $100 x $02 x (2+3 cycles) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds
+comment  262A
+label    262A Loop_Delay_0A00_Cycles
 comment  2630
-comment  2630 Increment Object Pointer to next Obj i.e. by adding 8
+comment  2630 Increment Object Pointer to next Obj i.e. by adding 8 bytes
 label    2630 Inc_Object_List_Ptr
 comment  2637
-comment  2637 If interrupt happened, update Jetman, it has higher priority
-lcomment 2637 H/W interrupt happened?
-lcomment 2639 If yes, jump
+comment  2637 If interrupt had occurred, set Jetman object next, it has higher priority
 comment  263B
+comment  263B Test if current object is Jetman, a laser beam, the sound object or zero, branch if not
 label    263B Main_Loop_Continue
-lcomment 263D Is Object address a rocket module?
+deflabel 263E OBJECT_ROCKET_ADDRESS
+comment  2641
+comment  2641 Current object is Jetman, a laser beam or the sound object
+comment  2641 Test if current object addres lo-byte is zero, i.e. starting at beginning of list, branch if not
 comment  2645
+comment  2645 Test to see if Spawn counter has reached four yet, branch if not
 comment  264B
+comment  264B Test TV Raster counter, spawn object ever eight attepts i.e. when data = xxxx_x111
+binary   264F
 comment  2652
-comment  2652 Test if score flash time is zero, if yes, setup objects
+comment  2652 Test if score flash time is zero, if yes, reset next object pointer and spawn setup objects
 label    2652 Test_Score_Flash_Time_At_Zero
 comment  2655
 label    2655 Spawn_Objects

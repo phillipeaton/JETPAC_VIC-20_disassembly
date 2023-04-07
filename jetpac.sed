@@ -56,6 +56,10 @@
 /; 2195/,/; 22B9/s/ZP17                           /ZP17_Laser_Decay_Patten_Data_3 /
 /; 2195/,/; 22B9/s/ZP1B                           /ZP1B_Laser_Color               /
 
+# Display_Number_Of_Lives
+/ZP06                            equ     $0006/a ZP06_Character_To_Copy          equ     $0006
+/; 238E/,/; 23B3/s/ZP06                           /ZP06_Character_To_Copy         /
+
 # Display_1UP_HI_2UP_Text
 /ZP04                            equ     $0004/a ZP04_Position_X                 equ     $0004
 /ZP05                            equ     $0005/a ZP05_Position_Y                 equ     $0005
@@ -77,8 +81,6 @@
 /; 24EB/,/; 251E/s/ZP08                           /ZP08_Row_Offset_Table_Index    /
 /; 24EB/,/; 251E/s/ZP0E                           /ZP0E_String_Addr_Lo            /
 /; 24EB/,/; 251E/s/ZP0F                           /ZP0F_String_Addr_Hi            /
-
-
 
 
 

@@ -52,7 +52,7 @@ label      24 ZP_Save_Obj_List_Ptr_Lo2       ;
 label      25 ZP_Save_Obj_List_Ptr_Hi2       ;
 label      26 ZP_Rocket_Flame_On             ; Turns off at take-off and landing
 label      27 ZP_Rocket_Flame_Toggle         ; Counts up throughout the flight, used for flame animation
-label      0028-0039 ZP_Player_Object_Stash  ;
+label      0028-0039 ZP_Obj_Rocket_Saved     ;
 label      40 ZP_Param_Addr_Lo               ;
 label      41 ZP_Param_Addr_Hi               ;
 
@@ -61,9 +61,9 @@ label      46 ZP_Game_Select_F3_Flash        ; "
 label      47 ZP_Game_Select_F5_Flash        ; "
 label      48 ZP_Game_Select_F7_Flash        ; "
 label      49 ZP_Game_Select_Start_Game      ; No Inverse Video, Bit 0 Display On/Off
-label      4A ZP_HW_IRQ_Count1               ;
-label      4B ZP_HW_IRQ_Count2               ;
-label      4C ZP_HW_IRQ_Count3               ;
+label      4A ZP_HW_IRQ_Counter_Lo           ;
+label      4B ZP_HW_IRQ_Counter_Hi           ;
+label      4C ZP_HW_IRQ_Random               ;
 
 label      51-53 ZP_Score_Player_1           ; 3 bytes (Hi Score is stored where?)
 label      54-56 ZP_Score_Player_2           ; 3 bytes

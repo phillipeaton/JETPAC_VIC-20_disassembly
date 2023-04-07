@@ -51,13 +51,13 @@ ZP_Save_Obj_List_Ptr_Lo2        equ     $0024
 ZP_Save_Obj_List_Ptr_Hi2        equ     $0025
 ZP_Rocket_Flame_On              equ     $0026
 ZP_Rocket_Flame_Toggle          equ     $0027
-ZP_Player_Object_Stash          equ     $0028
+ZP_Obj_Rocket_Saved             equ     $0028
 ZP_Param_Addr_Lo                equ     $0040
 ZP_Param_Addr_Hi                equ     $0041
 ZP_Game_Select_F1_Flash         equ     $0045
-ZP_HW_IRQ_Count1                equ     $004A
-ZP_HW_IRQ_Count2                equ     $004B
-ZP_HW_IRQ_Count3                equ     $004C
+ZP_HW_IRQ_Counter_Lo            equ     $004A
+ZP_HW_IRQ_Counter_Hi            equ     $004B
+ZP_HW_IRQ_Random                equ     $004C
 ZP_Score_Player_1               equ     $0051
 ZP_Score_Player_2               equ     $0054
 ZP_Reverse_And_Color_Data       equ     $0057
@@ -165,6 +165,7 @@ LASER_X_POSITION_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
 OBJECT_X_POSITION_PARAM         equ     $01
 OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
+OBJECT_ROCKET_ADDRESS           equ     $B0
 OPTION_TEXT_ROWS                equ     $05
 TEXT_POSITION_X                 equ     $18
 WHITE                           equ     $01
@@ -446,7 +447,7 @@ Test_Space
 ; Initialise laser objects once every four calls based on IRQ counter if fire pressed
 ; L_JSR_($20E9)_($3306) OK
 Init_Laser_Objects
-    lda     ZP_HW_IRQ_Count1                ; 20E9: A5 4A    
+    lda     ZP_HW_IRQ_Counter_Lo            ; 20E9: A5 4A    
     and     #$03                            ; 20EB: 29 03    
     beq     Init_Laser_Objects_Init         ; 20ED: F0 01    
     rts                                     ; 20EF: 60       
@@ -547,7 +548,7 @@ Loop_Init_Laser
 ; Set laser shot beam length parameter 6 randomly using IRQ counter,
 ; range 0100_0000 to 0111_1000 i.e. $40-$78
     iny                                     ; 214B: C8       
-    lda     ZP_HW_IRQ_Count3                ; 214C: A5 4C    
+    lda     ZP_HW_IRQ_Random                ; 214C: A5 4C    
     and     #%00111000                      ; 214E: 29 38     Zero bits 7,6,2-0 00xx_x000
     clc                                     ; 2150: 18       
     adc     #%01000000                      ; 2151: 69 40     Set bit 6 01xx_xx000
@@ -555,7 +556,7 @@ Loop_Init_Laser
 
 ; Load a random laser color value 0-7 using IRQ counter
     iny                                     ; 2155: C8       
-    lda     ZP_HW_IRQ_Count3                ; 2156: A5 4C    
+    lda     ZP_HW_IRQ_Random                ; 2156: A5 4C    
     and     #%00000111                      ; 2158: 29 07    
     tax                                     ; 215A: AA       
     lda     Laser_Color_Table,x             ; 215B: BD 6B 21 
@@ -783,7 +784,7 @@ Process_Laser_Shot
     bne     Update_Obj_Params_And_Exit      ; 2236: D0 10    
 
 ; Use IRQ counter to add some randomness to laser decay length patterns
-    lda     ZP_HW_IRQ_Count3                ; 2238: A5 4C    
+    lda     ZP_HW_IRQ_Random                ; 2238: A5 4C    
     and     #%00000011                      ; 223A: 29 03     Zero bits 2-7 0000_00xx
     ora     #%00000100                      ; 223C: 09 04     Set bit 2 0000_01xx
     ora     ZP07                            ; 223E: 05 07    
@@ -1089,7 +1090,7 @@ Loop_Init_Jetman_Obj
 
 ; Test if two player game, if yes, give $FF time between players for switchover instead of $7F
     lda     Game_Settings                   ; 2366: AD D3 1F 
-    and     #$01                            ; 2369: 29 01    
+    and     #%00000001                      ; 2369: 29 01    
     beq     LDA_7F                          ; 236B: F0 62    
     lda     #$FF                            ; 236D: A9 FF    
 
@@ -1218,7 +1219,7 @@ Loop_Setup_Player_Lives
 
     jsr     Reset_Rocket_Obj_Params         ; 23DE: 20 FF 22 
 
-    jsr     Swap_Player_And_Objects         ; 23E1: 20 F5 23 
+    jsr     Swap_Player_And_Obj_Rocket      ; 23E1: 20 F5 23 
     dey                                     ; 23E4: 88       
     bne     Loop_Setup_Player_Lives         ; 23E5: D0 EF    
 
@@ -1239,7 +1240,7 @@ Setup_Player_Lives_RTS
 ; When active player changes, swap current active/inactive player level and rocket object data
 ; L_JSR_($23F5)_($23E1) OK
 ; L_JSR_($23F5)_($29DB) OK
-Swap_Player_And_Objects
+Swap_Player_And_Obj_Rocket
     ldx     #$01                            ; 23F5: A2 01    
 ; L_BRS_($23F7)_($2402) OK
 Swap_Player
@@ -1257,17 +1258,17 @@ Swap_Player
     ldx     #$17                            ; 2404: A2 17    
 
 ; L_BRS_($2406)_($2413) OK
-Swap_Object
+Loop_Swap_Rocket_Object
     lda     Obj_Rocket,x                    ; 2406: BD B0 03 
 
     pha                                     ; 2409: 48       
-    lda     ZP_Player_Object_Stash,x        ; 240A: B5 28    
+    lda     ZP_Obj_Rocket_Saved,x           ; 240A: B5 28    
     sta     Obj_Rocket,x                    ; 240C: 9D B0 03 
     pla                                     ; 240F: 68       
 
-    sta     ZP_Player_Object_Stash,x        ; 2410: 95 28    
+    sta     ZP_Obj_Rocket_Saved,x           ; 2410: 95 28    
     dex                                     ; 2412: CA       
-    bpl     Swap_Object                     ; 2413: 10 F1    
+    bpl     Loop_Swap_Rocket_Object         ; 2413: 10 F1    
     rts                                     ; 2415: 60       
 ; ===========================================================
 
@@ -1688,14 +1689,19 @@ Hardware_Interrupt_Handler
 
 ; Reset VIA2 timer, which directly regulates Jetman's update speed
     jsr     Reset_VIA2_Timer                ; 25E4: 20 5E 26 
+
+; Use TV Raster value as a pseudo-random number generator
     lda     VIC_R4_TV_Raster                ; 25E7: AD 04 90 
-    adc     ZP_HW_IRQ_Count3                ; 25EA: 65 4C    
-    sta     ZP_HW_IRQ_Count3                ; 25EC: 85 4C    
-    inc     ZP_HW_IRQ_Count1                ; 25EE: E6 4A    
-    bne     HIH_1                           ; 25F0: D0 02    
-    inc     ZP_HW_IRQ_Count2                ; 25F2: E6 4B    
+    adc     ZP_HW_IRQ_Random                ; 25EA: 65 4C    
+    sta     ZP_HW_IRQ_Random                ; 25EC: 85 4C    
+
+; Increment 16-bit counter
+    inc     ZP_HW_IRQ_Counter_Lo            ; 25EE: E6 4A    
+    bne     Restore_Registers_And_RTI       ; 25F0: D0 02    
+    inc     ZP_HW_IRQ_Counter_Hi            ; 25F2: E6 4B    
+
 ; L_BRS_($25F4)_($25F0) OK
-HIH_1
+Restore_Registers_And_RTI
     pla                                     ; 25F4: 68       
     tay                                     ; 25F5: A8       
     pla                                     ; 25F6: 68       
@@ -1788,24 +1794,26 @@ GOTO_NEXT_OBJECT
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 261C: B1 00    
     bne     Inc_Object_List_Ptr             ; 261E: D0 10    
 
-; Test if object is a rocket module
+; Test if current object address is Jetman, a laser beam, the sound object or zero, branch if yes
     lda     ZP00_Obj_List_Ptr_Lo            ; 2620: A5 00    
-    cmp     #$B0                            ; 2622: C9 B0     Is Object address $B0?
-    bcc     Inc_Object_List_Ptr             ; 2624: 90 0A     If not, skip
+    cmp     #OBJECT_ROCKET_ADDRESS          ; 2622: C9 B0    
+    bcc     Inc_Object_List_Ptr             ; 2624: 90 0A    
 
-; Delay loop
-; $100 x $02 x (2+3) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds
+; Current object is a rocket part or an Alien
+; Delay loop, adjusting Register Y from $02 to $0F makes aliens move ~40% slower across screen
+; $100 x $02 x (2+3 cycles) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds
     ldy     #$02                            ; 2626: A0 02    
     ldx     #$00                            ; 2628: A2 00    
+
 ; L_BRS_($262A)_($262B) OK
 ; L_BRS_($262A)_($262E) OK
-Delay_Loop_0A00
+Loop_Delay_0A00_Cycles
     dex                                     ; 262A: CA       
-    bne     Delay_Loop_0A00                 ; 262B: D0 FD    
+    bne     Loop_Delay_0A00_Cycles          ; 262B: D0 FD    
     dey                                     ; 262D: 88       
-    bne     Delay_Loop_0A00                 ; 262E: D0 FA    
+    bne     Loop_Delay_0A00_Cycles          ; 262E: D0 FA    
 
-; Increment Object Pointer to next Obj i.e. by adding 8
+; Increment Object Pointer to next Obj i.e. by adding 8 bytes
 ; L_BRS_($2630)_($261E) OK
 ; L_BRS_($2630)_($2624) OK
 Inc_Object_List_Ptr
@@ -1814,27 +1822,33 @@ Inc_Object_List_Ptr
     adc     #$08                            ; 2633: 69 08    
     sta     ZP00_Obj_List_Ptr_Lo            ; 2635: 85 00    
 
-; If interrupt happened, update Jetman, it has higher priority
-    lda     ZP_HW_IRQ_Occurred              ; 2637: A5 20     H/W interrupt happened?
-    bne     SEI_Obj_Ptr_To_Jetman           ; 2639: D0 2E     If yes, jump
+; If interrupt had occurred, set Jetman object next, it has higher priority
+    lda     ZP_HW_IRQ_Occurred              ; 2637: A5 20    
+    bne     SEI_Obj_Ptr_To_Jetman           ; 2639: D0 2E    
 
+; Test if current object is Jetman, a laser beam, the sound object or zero, branch if not
 ; L_JMP_($263B)_($2689) OK
 Main_Loop_Continue
     lda     ZP00_Obj_List_Ptr_Lo            ; 263B: A5 00    
-    cmp     #$B0                            ; 263D: C9 B0     Is Object address a rocket module?
+    cmp     #OBJECT_ROCKET_ADDRESS          ; 263D: C9 B0    
     beq     Restore_Obj_Ptr_CLI             ; 263F: F0 3F    
+
+; Current object is Jetman, a laser beam or the sound object
+; Test if current object addres lo-byte is zero, i.e. starting at beginning of list, branch if not
     and     ZP00_Obj_List_Ptr_Lo            ; 2641: 25 00    
     bne     Main_Loop                       ; 2643: D0 C2    
 
+; Test to see if Spawn counter has reached four yet, branch if not
     lda     ZP_Alien_Spawn_Counter          ; 2645: A5 21    
     cmp     #$04                            ; 2647: C9 04    
     bcc     Test_Score_Flash_Time_At_Zero   ; 2649: 90 07    
 
+; Test TV Raster counter, spawn object ever eight attepts i.e. when data = xxxx_x111
     lda     VIC_R4_TV_Raster                ; 264B: AD 04 90 
-    and     #$07                            ; 264E: 29 07    
+    and     #%00000111                      ; 264E: 29 07    
     bne     Spawn_Objects                   ; 2650: D0 03    
 
-; Test if score flash time is zero, if yes, setup objects
+; Test if score flash time is zero, if yes, reset next object pointer and spawn setup objects
 ; L_BRS_($2652)_($2649) OK
 Test_Score_Flash_Time_At_Zero
     jsr     Obj_Ptr_To_Alien_0_Flsh_Ctr     ; 2652: 20 D6 2C 
@@ -2445,7 +2459,7 @@ Set_Obj_Posn_05_To_06
     jmp     SR3_Store_To_Obj_Posn_05_06     ; 28A1: 4C 94 28 
 ; -----------------------
 Set_Obj_Posn_05_To_03_Or_00
-    lda     ZP_HW_IRQ_Count1                ; 28A4: A5 4A    
+    lda     ZP_HW_IRQ_Counter_Lo            ; 28A4: A5 4A    
     and     #$1F                            ; 28A6: 29 1F    
     cmp     #$18                            ; 28A8: C9 18    
     bcs     Set_Obj_Posn_05_To_03           ; 28AA: B0 05    
@@ -2458,7 +2472,7 @@ Set_Obj_Posn_05_To_03
     jmp     SR3_Store_To_Obj_Posn_05_06     ; 28B3: 4C 94 28 
 ; -----------------------
 Set_Obj_Posn_05_To_01_Or_Other
-    lda     ZP_HW_IRQ_Count1                ; 28B6: A5 4A    
+    lda     ZP_HW_IRQ_Counter_Lo            ; 28B6: A5 4A    
     lsr     a                               ; 28B8: 4A       
     lsr     a                               ; 28B9: 4A       
     and     #$07                            ; 28BA: 29 07    
@@ -2576,7 +2590,7 @@ Store_Object_Type
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2917: 91 00    
 
 ; Change Alien?/Explosion object colour based on timer
-    lda     ZP_HW_IRQ_Count3                ; 2919: A5 4C    
+    lda     ZP_HW_IRQ_Random                ; 2919: A5 4C    
     and     #$07                            ; 291B: 29 07     Zero bits 3-8 i.e. 00000xxx
     bne     Store_Object_Type_1             ; 291D: D0 02    
     ora     #$01                            ; 291F: 09 01     Set bit 0 i.e. xxxxxxx1
@@ -2601,7 +2615,7 @@ EXPLOSIONS
     jsr     Load_Object_Type_X_Y_Color      ; 2936: 20 E9 35 
     ldy     #$02                            ; 2939: A0 02    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 293B: B1 00    
-    and     ZP_HW_IRQ_Count1                ; 293D: 25 4A    
+    and     ZP_HW_IRQ_Counter_Lo            ; 293D: 25 4A    
     bne     Explosions_1                    ; 293F: D0 09    
     ldy     #$04                            ; 2941: A0 04    
     lda     (ZP00_Obj_List_Ptr_Lo),y        ; 2943: B1 00    
@@ -2694,7 +2708,7 @@ Sound_Channels_Off_ETC_3
     jsr     Display_Game_Over               ; 29D8: 20 E7 29 
 ; L_BRS_($29DB)_($29D6) OK
 Sound_Channels_Off_ETC_4
-    jsr     Swap_Player_And_Objects         ; 29DB: 20 F5 23 
+    jsr     Swap_Player_And_Obj_Rocket      ; 29DB: 20 F5 23 
     lda     ZP_Active_Player                ; 29DE: A5 5E    
     eor     #$FF                            ; 29E0: 49 FF    
     sta     ZP_Active_Player                ; 29E2: 85 5E    
@@ -2878,7 +2892,7 @@ Alien_Direction_Left
 ; Countdown timer at zero, randomly change Y direction using IRQ counter, range $10-$1F
 ; L_BRS_($2AA2)_($2A7C) OK
 Update_Y_Direction_Random
-    lda     ZP_HW_IRQ_Count3                ; 2AA2: A5 4C    
+    lda     ZP_HW_IRQ_Random                ; 2AA2: A5 4C    
     and     #%00001111                      ; 2AA4: 29 0F    
     adc     #$10                            ; 2AA6: 69 10    
     sta     (ZP00_Obj_List_Ptr_Lo),y        ; 2AA8: 91 00    
@@ -2886,7 +2900,7 @@ Update_Y_Direction_Random
 ; Reverse Y direction up/down, randomly via IRQ
     ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2AAA: A0 04    
     and     #%00000100                      ; 2AAC: 29 04    
-    bit     ZP_HW_IRQ_Count3                ; 2AAE: 24 4C    
+    bit     ZP_HW_IRQ_Random                ; 2AAE: 24 4C    
     bmi     Update_Y_Direction_Random_1     ; 2AB0: 30 05    
 
 ; Do the inversion on the direction byte
@@ -3132,7 +3146,7 @@ Spawn_Rocket_Modules_Fuel_Ce_1
     bcs     RTS_2B52                        ; 2B61: B0 EF    
 
 ; Use counter to randomly spawn another Fuel Cell
-    lda     ZP_HW_IRQ_Count1                ; 2B63: A5 4A    
+    lda     ZP_HW_IRQ_Counter_Lo            ; 2B63: A5 4A    
     eor     #%11111111                      ; 2B65: 49 FF    
     and     #%00001111                      ; 2B67: 29 0F    
     bne     RTS_2B52                        ; 2B69: D0 E7    
@@ -3180,7 +3194,7 @@ Spawn_Valuables_1
     bne     RTS_2B96                        ; 2B9E: D0 F6    
 
 ; Use counter to randomly spawn another valuable
-    lda     ZP_HW_IRQ_Count1                ; 2BA0: A5 4A    
+    lda     ZP_HW_IRQ_Counter_Lo            ; 2BA0: A5 4A    
     and     #%01111111                      ; 2BA2: 29 7F    
     bne     RTS_2B96                        ; 2BA4: D0 F0    
 
@@ -3198,7 +3212,7 @@ Loop_2BA8
     sta     Obj_Rocket_Mid_Or_Valuable_X    ; 2BB4: 8D C1 03 
 
 ; Use counter to setup next object type
-    lda     ZP_HW_IRQ_Count3                ; 2BB7: A5 4C    
+    lda     ZP_HW_IRQ_Random                ; 2BB7: A5 4C    
     and     #%00001110                      ; 2BB9: 29 0E    
     bit     MASK_00001000                   ; 2BBB: 2C 17 20 
     beq     SKIP_2BC2                       ; 2BBE: F0 02    
@@ -3589,7 +3603,7 @@ Init_Alien_Object
 
 ; Set initial direction randomly using IRQ counter
     iny                                     ; 2D1D: C8       
-    lda     ZP_HW_IRQ_Count3                ; 2D1E: A5 4C    
+    lda     ZP_HW_IRQ_Random                ; 2D1E: A5 4C    
     tax                                     ; 2D20: AA       
     and     #$10                            ; 2D21: 29 10    
     sec                                     ; 2D23: 38       
@@ -4016,7 +4030,7 @@ Rocket_Fuelled_Up_1
     jsr     Dec_Saved_Obj_List_Params_by_10 ; 2EBB: 20 FF 2D 
     bne     Rocket_Fuelled_Up_1             ; 2EBE: D0 F5    
 
-    lda     ZP_HW_IRQ_Count1                ; 2EC0: A5 4A    
+    lda     ZP_HW_IRQ_Counter_Lo            ; 2EC0: A5 4A    
     lsr     a                               ; 2EC2: 4A       
     lsr     a                               ; 2EC3: 4A       
     and     #$04                            ; 2EC4: 29 04    
@@ -4990,7 +5004,7 @@ P_Update_Jetman_Position_X
     bvc     N_Flying_Left                   ; 328F: 50 97    
 
     tax                                     ; 3291: AA       
-    lda     ZP_HW_IRQ_Count1                ; 3292: A5 4A    
+    lda     ZP_HW_IRQ_Counter_Lo            ; 3292: A5 4A    
     and     #%00000001                      ; 3294: 29 01    
     beq     P_TXA_Jump_R                    ; 3296: F0 D7    
     txa                                     ; 3298: 8A       
@@ -5483,7 +5497,7 @@ Flash_Score_1
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 3470: 20 1D 35 
 
 ; Test IRQ counter, only continue once in 8 calls
-    lda     ZP_HW_IRQ_Count1                ; 3473: A5 4A    
+    lda     ZP_HW_IRQ_Counter_Lo            ; 3473: A5 4A    
     and     #%00000111                      ; 3475: 29 07    
     bne     Flash_Score_RTS                 ; 3477: D0 20    
 
