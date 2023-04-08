@@ -82,11 +82,13 @@
 /; 24EB/,/; 251E/s/ZP0E                           /ZP0E_String_Addr_Lo            /
 /; 24EB/,/; 251E/s/ZP0F                           /ZP0F_String_Addr_Hi            /
 
+# SOUND_UPDATE
+/ZP08                            equ     $0008/a ZP08_Subroutine_Addr_Lo         equ     $0008
+/ZP09                            equ     $0009/a ZP09_Subroutine_Addr_Hi         equ     $0009
 
-
-
-
-
+/; 26D7/,/; 26E1/s/ZP08                           /ZP08_Subroutine_Addr_Lo        /
+/; 26D7/,/; 26E1/s/(ZP08)                         /(ZP08_Subroutine_Addr_Lo)      /
+/; 26D7/,/; 26E1/s/ZP09                           /ZP09_Subroutine_Addr_Hi        /
 
 # Display_Object
 /ZP02                            equ     $0002/a ZP02_Object_Old_Height_Index    equ     $0002
