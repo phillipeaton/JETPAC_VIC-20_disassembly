@@ -118,21 +118,22 @@ label    0388 Obj_Laser_0 ;
 ;label   03A0 Obj_Laser_3
 
 ; Byte 00/08= object type:
-;        03=Explosion->00
-;        04=Rocket_Part/Fuel
-;        05=Fuzzball
-;        06=Saucer
-;        07=Ball
-;        08=Cross
-;        09=Rocket Bottom Part
-;        0A=Rocket Ascend;
-;        0B=Rocket Descend
-;        0C=Flame
-;        0D=???
-;        0E=flashing valuable
+;        03 = Explosion->00
+;        04 = Rocket_Part/Fuel
+;        05 = Level 0 Alien Fuzzball
+;        06 = Level 3 Saucer
+;        07 = Level 2 Alien Ball
+;        08 = Level 1 Cross
+;        09 = Rocket Bottom Part
+;        0A = Rocket Ascend
+;        0B = Rocket Descend
+;        0C = Sound
+;        0D = ???
+;        0E = Valuable
 
                           ;            0  1  2  3  4  5  6  7
                           ;     03B0  09 70 00 AF 01 00 00 1C
+; Sound object 1st/3rd/5th parameter indicates which sound to play, 2nd/4th/6th is the period
 label    03A8 Obj_Sound      ; Type = 0C always
 label    03A9 Obj_Sound_Collision
 label    03AA Obj_Sound_Collision_Timer

@@ -90,6 +90,16 @@
 /; 26D7/,/; 26E1/s/(ZP08)                         /(ZP08_Subroutine_Addr_Lo)      /
 /; 26D7/,/; 26E1/s/ZP09                           /ZP09_Subroutine_Addr_Hi        /
 
+# Check_New_Hi_Score
+/ZP_Obj_List_Ptr_Lo              equ     $0000/a ZP00_Hi_Score_Addr              equ     $0000
+/ZP08                            equ     $0008/a ZP08_Player_Score_Addr          equ     $0008
+
+/; 277A/,/; 27A9/s/(ZP_Obj_List_Ptr_Lo),y         /(ZP00_Hi_Score_Addr),y         /
+/; 277A/,/; 27A9/s/(ZP08),y                       /(ZP08_Player_Score_Addr),y     /
+
+
+
+
 # Display_Object
 /ZP02                            equ     $0002/a ZP02_Object_Old_Height_Index    equ     $0002
 /ZP03                            equ     $0003/a ZP03_Object_Old_Height          equ     $0003

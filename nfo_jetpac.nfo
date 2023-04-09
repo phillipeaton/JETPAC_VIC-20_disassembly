@@ -862,14 +862,14 @@ comment  26CD
 comment  26CD Read and play sound channel data from the Sound object
 label    26CD SOUND_UPDATE
 comment  26D1
-comment  26D1 Sound object 1st/3rd/5th parameter indicates which sound to play, 2nd/4th/6th is the period
+comment  26D1 Sound object parameter 01/03/05 indicates which sound to play, 02/04/06 is the period
 label    26D1 Loop_Sound_Update
 comment  26D7
 comment  26D7 Jump to Sound player using Register X as jump table index
 comment  26E4
 comment  26E4 Update index to next 2-byte oscillator/timer pair, stopping when
 comment  26E4 all 3 processed i.e. at 7th parameter. Sound 0 is valid
-comment  26E4 but 'empty' sound call.
+comment  26E4 but 'empty' sound call, so just moves to next 2-byte oscillator/timer pair.
 label    26E4 Goto_Next_Sound
 deflabel 26E8 WORD_SIZE
 comment  26F2
@@ -897,17 +897,20 @@ comment  2710 Register A contains frequency, Y selects channel via X
 label    2710 Output_Sound
 comment  2716
 comment  271C
-label    271C Valuable_Pkup_Rocket_Part_Lands
+label    271C Valuable_Pkup_Rocket_Part_Land
 comment  2721
 comment  2721 Manipulate timer to make a nice sound
+binary   2723
 comment  2727
 label    2727 Laser_Beam_Active
 comment  272C
 comment  272C Manipulate timer to make a nice sound
+binary   2731
 comment  2735
 label    2735 Rocket_Flight
 comment  273A
 comment  273A Utilise rocket object height to manipulate noise sound channel
+binary   273F
 comment  2743
 label    2743 Subroutine_Sound_Jump_Table
 lcomment 2743 00
@@ -922,63 +925,81 @@ comment  274F
 label    274F Collision_Explosion
 comment  2754
 comment  2754 Manipulate timer to make an explosion sound, though doesn't use noise
+binary   2757
 comment  275B
-comment  275B Erase $100 bytes zero page
+comment  275B Erase $100 bytes Zero Page RAM
 label    275B Erase_ZP_RAM
-label    275E Erase_ZP_RAM_1
+comment  275E
+label    275E Loop_Erase_ZP_RAM
+comment  2764
+comment  2764 Erase $80 bytes Object RAM
 label    2764 Erase_Object_RAM
-label    2768 Erase_Object_RAM_1
-comment  276F Erase $30 bytes at end of UDGs $1fd0-$2000
-label    276F Erase_HiScore_Setts_Etc
-label    2773 Erase_HiScore_Setts_Etc_1
+comment  2768
+label    2768 Loop_Erase_Object_RAM
+comment  276F
+comment  276F Erase $30 bytes High Score & Game Settings at $1FD0-$2000
+label    276F Erase_Hi_Score_Game_Settings
+comment  2773
+label    2773 Loop_Erase_Hi_Score_Game_Sets
 comment  277A
 label    277A Check_New_Hi_Score
-lcomment 277D ZP_00
+lcomment 277D ZP00
 const    277D
-lcomment 277E Addr of High Score value
+lcomment 277E Hi Score value addr
 word     277E
-lcomment 2780 ZP_08
+lcomment 2780 ZP08
 const    2780
-lcomment 2781 Addr of P1 High Score value
+lcomment 2781 Player 1 Score value addr
 word     2781
 comment  2784
-lcomment 2784 Check Player 1 first
+comment  2784 Check Player 1 first
 comment  2787
-lcomment 2787  then follow through for Player 2
-lcomment 278A ZP_08
+comment 2787 \...then follow through for Player 2
+lcomment 278A ZP08
 const    278A
-lcomment 278B Addr of P2 High Score value
+lcomment 278B Player 2 Score value addr
 word     278B
 comment  278E
 comment  278E Compare Hi Score BCD bytes
 label    278E Test_New_Hi_Score
+comment  2790
 label    2790 Compare_BCD_Byte
-lcomment 2796 Branch if SCORE_HI < Player Score
-lcomment 2798 SCORE_HI >= Player Score, so return
+comment  2796
+comment  2796 Branch if Player Score > Score_Hi
+comment  2798
+comment  2798 Score_Hi >= Player Score, so return
+comment  2799
+comment  2799 Test if all 3 BCD bytes have been compared, if not loop to next BDC byte
 label    2799 Move_To_Next_BCD_Byte
-lcomment 279B All BCD bytes checked?
-lcomment 279D No, check the next BCD byte
-label    27A0 Copy_Player_To_Hi_Score
-lcomment 27A0 3 BCD bytes, 02, 01, 00
-label    27A2 Copy_Player_To_Hi_Score_1
+comment  27A0
+label    27A0 Copy_Player_Score_To_Hi_Score
+comment  27A0 Player score is 3 BCD bytes
+comment  27A2
+label    27A2 Loop_Copy_Player_To_Hi_Score
 lcomment 27A7 Return when all bytes copied
 comment  27AA
 label    27AA Display_Rocket_Flame
 lcomment 27AE Object $0A = Flame (or maybe Rocket?)
+comment  27B3
 label    27B3 Display_Rocket_Flame_1
 comment  27B5
 comment  27BD
 lcomment 27C3 0019 must be height of rocket
 comment  27C5
 lcomment 27C5 Check rocket height
-lcomment 27C7 Display Flame
-lcomment 27C9 Don't display Flame
 comment  27CB
-label    27E1 Display_Rocket_Flame_2
+comment  27CF
+comment  27D3
+comment  27E1
+label    27E1 Display_Rocket_Flame_On_Screen
+comment  27F7
+comment  27FB
+comment  27FF
+comment  2808
 lcomment 2806 ZP0C_Col_RAM_Ptr_Lo
 lcomment 2809 ZP0C_Col_RAM_Ptr_Lo
 comment  280B
-comment  280B Restore 11 and 19 and return
+comment  280B Restore ZP11 and ZP19 and return
 label    280B Display_Rocket_Flame_3
 label    2812 No_Display_Flame
 label    2819 Display_Flame

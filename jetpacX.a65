@@ -13,6 +13,7 @@
 ;****************************************************
 
 ZP_Obj_List_Ptr_Lo              equ     $0000
+ZP00_Hi_Score_Addr              equ     $0000
 ZP_Obj_List_Ptr_Hi              equ     $0001
 ZP02                            equ     $0002
 ZP02_Laser_Param_Countdown      equ     $0002
@@ -64,6 +65,7 @@ ZP08                            equ     $0008
 ZP08_Laser_Position_X_Start     equ     $0008
 ZP08_Row_Offset_Table_Index     equ     $0008
 ZP08_Subroutine_Addr_Lo         equ     $0008
+ZP08_Player_Score_Addr          equ     $0008
 ZP08_Object_Old_Y_Index         equ     $0008
 ZP09                            equ     $0009
 ZP09_Subroutine_Addr_Hi         equ     $0009
@@ -345,7 +347,7 @@ NMI_Interrupt_Hardler
     lda     #$20                            ; 2027: A9 20    
     sta     NMI_Int_Vector_Hi               ; 2029: 8D 19 03 
 
-    jsr     Erase_HiScore_Setts_Etc         ; 202C: 20 6F 27 
+    jsr     Erase_Hi_Score_Game_Settings    ; 202C: 20 6F 27 
     jsr     Erase_ZP_RAM                    ; 202F: 20 5B 27 
 
 ; Setup I/O data direction and interrupt enables
@@ -2090,7 +2092,7 @@ SOUND_UPDATE
     lda     #$01                            ; 26CD: A9 01    
     sta     ZP_Subroutine_Addr_Hi           ; 26CF: 85 60    
 
-; Sound object 1st/3rd/5th parameter indicates which sound to play, 2nd/4th/6th is the period
+; Sound object parameter 01/03/05 indicates which sound to play, 02/04/06 is the period
 ; L_BRS_($26D1)_($26ED) OK
 Loop_Sound_Update
     ldy     ZP_Subroutine_Addr_Hi           ; 26D1: A4 60    
@@ -2108,7 +2110,7 @@ Loop_Sound_Update
 
 ; Update index to next 2-byte oscillator/timer pair, stopping when
 ; all 3 processed i.e. at 7th parameter. Sound 0 is valid
-; but 'empty' sound call.
+; but 'empty' sound call, so just moves to next 2-byte oscillator/timer pair.
 ; L_JMP_($26E4)_($2719) OK
 Goto_Next_Sound
     lda     ZP_Subroutine_Addr_Hi           ; 26E4: A5 60    
@@ -2185,13 +2187,13 @@ Output_Sound
     jmp     Goto_Next_Sound                 ; 2719: 4C E4 26 
 ; -----------------------
 
-Valuable_Pkup_Rocket_Part_Lands
+Valuable_Pkup_Rocket_Part_Land
     jsr     Decrement_Oscillator_Timer      ; 271C: 20 F2 26 
     beq     Sound_Done_Reset_Object_Param   ; 271F: F0 E9    
 
 ; Manipulate timer to make a nice sound
     asl     a                               ; 2721: 0A       
-    eor     #$F3                            ; 2722: 49 F3    
+    eor     #%11110011                      ; 2722: 49 F3    
     jmp     Enable_Oscillator_Channel       ; 2724: 4C 05 27 
 ; -----------------------
 
@@ -2204,7 +2206,7 @@ Laser_Beam_Active
     asl     a                               ; 272D: 0A       
     asl     a                               ; 272E: 0A       
     asl     a                               ; 272F: 0A       
-    ora     #$0F                            ; 2730: 09 0F    
+    ora     #%00001111                      ; 2730: 09 0F    
     jmp     Enable_Oscillator_Channel       ; 2732: 4C 05 27 
 ; -----------------------
 
@@ -2215,14 +2217,14 @@ Rocket_Flight
 ; Utilise rocket object height to manipulate noise sound channel
     lda     Obj_Rocket_Y                    ; 273A: AD B3 03 
     lsr     a                               ; 273D: 4A       
-    eor     #$FE                            ; 273E: 49 FE    
+    eor     #%11111110                      ; 273E: 49 FE    
     jmp     Enable_Oscillator_Channel       ; 2740: 4C 05 27 
 ; -----------------------
 
 Subroutine_Sound_Jump_Table
     fdb     Goto_Next_Sound                 ; 2743: E4 26     00
     fdb     Rocket_Part_or_Fuel_Cell_Pickup ; 2745: FE 26     01
-    fdb     Valuable_Pkup_Rocket_Part_Lands ; 2747: 1C 27     02
+    fdb     Valuable_Pkup_Rocket_Part_Land  ; 2747: 1C 27     02
     fdb     Laser_Beam_Active               ; 2749: 27 27     03
     fdb     Rocket_Flight                   ; 274B: 35 27     04
     fdb     Collision_Explosion             ; 274D: 4F 27     05
@@ -2234,7 +2236,7 @@ Collision_Explosion
 ; Manipulate timer to make an explosion sound, though doesn't use noise
     asl     a                               ; 2754: 0A       
     asl     a                               ; 2755: 0A       
-    eor     #$E3                            ; 2756: 49 E3    
+    eor     #%11100011                      ; 2756: 49 E3    
     jmp     Enable_Oscillator_Channel       ; 2758: 4C 05 27 
 ; -----------------------
 
@@ -2247,40 +2249,46 @@ Collision_Explosion
 ; 88""   88"Yb   dP__Yb  o.`Y8b 88""       88"Yb   dP__Yb  88YbdP88
 ; 888888 88  Yb dP""""Yb 8bodP' 888888     88  Yb dP""""Yb 88 YY 88
 
-; Erase $100 bytes zero page
+; Erase $100 bytes Zero Page RAM
 ; L_JSR_($275B)_($202F) OK
 ; L_JSR_($275B)_($25D4) OK
 Erase_ZP_RAM
     ldx     #$00                            ; 275B: A2 00    
     txa                                     ; 275D: 8A       
+
 ; L_BRS_($275E)_($2761) OK
-Erase_ZP_RAM_1
+Loop_Erase_ZP_RAM
     sta     ZP_Obj_List_Ptr_Lo,x            ; 275E: 95 00    
     inx                                     ; 2760: E8       
-    bne     Erase_ZP_RAM_1                  ; 2761: D0 FB    
+    bne     Loop_Erase_ZP_RAM               ; 2761: D0 FB    
     rts                                     ; 2763: 60       
 ; ===========================================================
+
+; Erase $80 bytes Object RAM
 ; L_JSR_($2764)_($25D1) OK
 Erase_Object_RAM
     ldx     #$7F                            ; 2764: A2 7F    
     lda     #$00                            ; 2766: A9 00    
+
 ; L_BRS_($2768)_($276C) OK
-Erase_Object_RAM_1
+Loop_Erase_Object_RAM
     sta     Obj_Jetman_State,x              ; 2768: 9D 80 03 
     dex                                     ; 276B: CA       
-    bpl     Erase_Object_RAM_1              ; 276C: 10 FA    
+    bpl     Loop_Erase_Object_RAM           ; 276C: 10 FA    
     rts                                     ; 276E: 60       
 ; ===========================================================
-; Erase $30 bytes at end of UDGs $1fd0-$2000
+
+; Erase $30 bytes High Score & Game Settings at $1FD0-$2000
 ; L_JSR_($276F)_($202C) OK
-Erase_HiScore_Setts_Etc
+Erase_Hi_Score_Game_Settings
     ldx     #$2F                            ; 276F: A2 2F    
     lda     #$00                            ; 2771: A9 00    
+
 ; L_BRS_($2773)_($2777) OK
-Erase_HiScore_Setts_Etc_1
+Loop_Erase_Hi_Score_Game_Sets
     sta     Score_Hi,x                      ; 2773: 9D D0 1F 
     dex                                     ; 2776: CA       
-    bpl     Erase_HiScore_Setts_Etc_1       ; 2777: 10 FA    
+    bpl     Loop_Erase_Hi_Score_Game_Sets   ; 2777: 10 FA    
     rts                                     ; 2779: 60       
 ; ===========================================================
 
@@ -2301,48 +2309,60 @@ Erase_HiScore_Setts_Etc_1
 ; L_JSR_($277A)_($2987) OK
 Check_New_Hi_Score
     jsr     Load_ZP_Parameters              ; 277A: 20 9D 25 
-    fcb     $00                             ; 277D: 00        ZP_00
-    fdb     Score_Hi                        ; 277E: D0 1F     Addr of High Score value
-    fcb     $08                             ; 2780: 08        ZP_08
-    fdb     ZP_Score_Player_1               ; 2781: 51 00     Addr of P1 High Score value
+    fcb     $00                             ; 277D: 00        ZP00
+    fdb     Score_Hi                        ; 277E: D0 1F     Hi Score value addr
+    fcb     $08                             ; 2780: 08        ZP08
+    fdb     ZP_Score_Player_1               ; 2781: 51 00     Player 1 Score value addr
     fcb     $FF                             ; 2783: FF       
 
-    jsr     Test_New_Hi_Score               ; 2784: 20 8E 27  Check Player 1 first
+; Check Player 1 first
+    jsr     Test_New_Hi_Score               ; 2784: 20 8E 27 
 
-    jsr     Load_ZP_Parameters              ; 2787: 20 9D 25  then follow through for Player 2
-    fcb     $08                             ; 278A: 08        ZP_08
-    fdb     ZP_Score_Player_2               ; 278B: 54 00     Addr of P2 High Score value
+; ...then follow through for Player 2
+    jsr     Load_ZP_Parameters              ; 2787: 20 9D 25 
+    fcb     $08                             ; 278A: 08        ZP08
+    fdb     ZP_Score_Player_2               ; 278B: 54 00     Player 2 Score value addr
     fcb     $FF                             ; 278D: FF       
 
 ; Compare Hi Score BCD bytes
 ; L_JSR_($278E)_($2784) OK
 Test_New_Hi_Score
     ldy     #$00                            ; 278E: A0 00    
+
 ; L_BRS_($2790)_($279D) OK
 Compare_BCD_Byte
-    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2790: B1 00    
-    cmp     (ZP08),y                        ; 2792: D1 08    
+    lda     (ZP00_Hi_Score_Addr),y          ; 2790: B1 00    
+    cmp     (ZP08_Player_Score_Addr),y      ; 2792: D1 08    
     beq     Move_To_Next_BCD_Byte           ; 2794: F0 03    
-    bcc     Copy_Player_To_Hi_Score         ; 2796: 90 08     Branch if SCORE_HI < Player Score
-    rts                                     ; 2798: 60        SCORE_HI >= Player Score, so return
+
+; Branch if Player Score > Score_Hi
+    bcc     Copy_Player_Score_To_Hi_Score   ; 2796: 90 08    
+
+; Score_Hi >= Player Score, so return
+    rts                                     ; 2798: 60       
 ; ===========================================================
+
+; Test if all 3 BCD bytes have been compared, if not loop to next BDC byte
 ; L_BRS_($2799)_($2794) OK
 Move_To_Next_BCD_Byte
     iny                                     ; 2799: C8       
     tya                                     ; 279A: 98       
-    cmp     #$03                            ; 279B: C9 03     All BCD bytes checked?
-    bne     Compare_BCD_Byte                ; 279D: D0 F1     No, check the next BCD byte
+    cmp     #$03                            ; 279B: C9 03    
+    bne     Compare_BCD_Byte                ; 279D: D0 F1    
     rts                                     ; 279F: 60       
 ; ===========================================================
+
+; Player score is 3 BCD bytes
 ; L_BRS_($27A0)_($2796) OK
-Copy_Player_To_Hi_Score
-    ldy     #$02                            ; 27A0: A0 02     3 BCD bytes, 02, 01, 00
+Copy_Player_Score_To_Hi_Score
+    ldy     #$02                            ; 27A0: A0 02    
+
 ; L_BRS_($27A2)_($27A7) OK
-Copy_Player_To_Hi_Score_1
-    lda     (ZP08),y                        ; 27A2: B1 08    
-    sta     (ZP_Obj_List_Ptr_Lo),y          ; 27A4: 91 00    
+Loop_Copy_Player_To_Hi_Score
+    lda     (ZP08_Player_Score_Addr),y      ; 27A2: B1 08    
+    sta     (ZP00_Hi_Score_Addr),y          ; 27A4: 91 00    
     dey                                     ; 27A6: 88       
-    bpl     Copy_Player_To_Hi_Score_1       ; 27A7: 10 F9     Return when all bytes copied
+    bpl     Loop_Copy_Player_To_Hi_Score    ; 27A7: 10 F9     Return when all bytes copied
     rts                                     ; 27A9: 60       
 ; ===========================================================
 
@@ -2373,6 +2393,7 @@ Display_Rocket_Flame
     bcs     Display_Rocket_Flame_1          ; 27B0: B0 01    
     rts                                     ; 27B2: 60       
 ; ===========================================================
+
 ; L_BRS_($27B3)_($27B0) OK
 Display_Rocket_Flame_1
     inc     ZP_Rocket_Flame_Toggle          ; 27B3: E6 27    
@@ -2390,21 +2411,24 @@ Display_Rocket_Flame_1
     sta     ZP19                            ; 27C3: 85 19     0019 must be height of rocket
 
     cmp     #$AF                            ; 27C5: C9 AF     Check rocket height
-    beq     Display_Flame                   ; 27C7: F0 50     Display Flame
-    bcs     No_Display_Flame                ; 27C9: B0 47     Don't display Flame
+    beq     Display_Flame                   ; 27C7: F0 50    
+    bcs     No_Display_Flame                ; 27C9: B0 47    
 
     lda     ZP_Rocket_Flame_On              ; 27CB: A5 26    
-    bne     Display_Rocket_Flame_2          ; 27CD: D0 12    
+    bne     Display_Rocket_Flame_On_Screen  ; 27CD: D0 12    
+
     lda     #$01                            ; 27CF: A9 01    
     sta     ZP_Rocket_Flame_On              ; 27D1: 85 26    
+
     lda     ZP_Rocket_Flame_Toggle          ; 27D3: A5 27    
     sec                                     ; 27D5: 38       
     sbc     #$01                            ; 27D6: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27D8: 20 2E 28 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27DB: 20 8D 37 
     jsr     Display_Object_With_Setup_4     ; 27DE: 20 10 36 
+
 ; L_BRS_($27E1)_($27CD) OK
-Display_Rocket_Flame_2
+Display_Rocket_Flame_On_Screen
     lda     ZP_Rocket_Flame_Toggle          ; 27E1: A5 27    
     pha                                     ; 27E3: 48       
     jsr     Get_Flame_UDG_Addr              ; 27E4: 20 2E 28 
@@ -2415,18 +2439,22 @@ Display_Rocket_Flame_2
     jsr     Get_Flame_UDG_Addr              ; 27EE: 20 2E 28 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27F1: 20 8D 37 
     jsr     Display_Object                  ; 27F4: 20 4C 36 
+
     lda     ZP18                            ; 27F7: A5 18    
     sta     ZP04                            ; 27F9: 85 04    
+
     lda     ZP19                            ; 27FB: A5 19    
     sta     ZP05                            ; 27FD: 85 05    
+
     jsr     Setup_Color_RAM_Ptr             ; 27FF: 20 F7 34 
     lda     #$02                            ; 2802: A9 02    
     ldy     #$00                            ; 2804: A0 00    
     sta     (ZP0C),y                        ; 2806: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+
     iny                                     ; 2808: C8       
     sta     (ZP0C),y                        ; 2809: 91 0C     ZP0C_Col_RAM_Ptr_Lo
 
-; Restore 11 and 19 and return
+; Restore ZP11 and ZP19 and return
 ; L_JMP_($280B)_($2816) OK
 ; L_BRS_($280B)_($281B) OK
 ; L_JMP_($280B)_($282B) OK
