@@ -98,6 +98,7 @@ ZP0F_Object_UDG_Data_Addr_Hi    equ     $000F
 ZP10                            equ     $0010
 ZP10_Object_Position_X          equ     $0010
 ZP11                            equ     $0011
+ZP11_Object_Ship_Position_Y     equ     $0011
 ZP11_Object_Old_Position_Y      equ     $0011
 ZP11_Object_Position_Y          equ     $0011
 ZP12                            equ     $0012
@@ -122,8 +123,10 @@ ZP17_Laser_Decay_Patten_Data_3  equ     $0017
 ZP17_Object_Size_Y_Pixels       equ     $0017
 ZP17_Object_Height_Pixels       equ     $0017
 ZP18                            equ     $0018
+ZP18_Object_Flame_Position_X    equ     $0018
 ZP18_Object_Position_X          equ     $0018
 ZP19                            equ     $0019
+ZP19_Object_Flame_Position_Y    equ     $0019
 ZP19_Object_New_Position_Y      equ     $0019
 ZP19_Object_Position_Y          equ     $0019
 ZP1A                            equ     $001A
@@ -140,8 +143,8 @@ ZP_Obj_List_Ptr_Save_Lo         equ     $0022
 ZP_Obj_List_Ptr_Save_Hi         equ     $0023
 ZP_Obj_List_Ptr_Save_2_Lo       equ     $0024
 ZP_Obj_List_Ptr_Save_2_Hi       equ     $0025
-ZP_Rocket_Flame_On              equ     $0026
-ZP_Rocket_Flame_Toggle          equ     $0027
+ZP_Rocket_Flame_State           equ     $0026
+ZP_Rocket_Flame_UDG_Toggle      equ     $0027
 ZP_Obj_Rocket_Saved             equ     $0028
 ZP_Param_Addr_Lo                equ     $0040
 ZP_Param_Addr_Hi                equ     $0041
@@ -256,6 +259,9 @@ LASER_X_POSITION_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
 OBJECT_X_POSITION_PARAM         equ     $01
 OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
+RED                             equ     $02
+FLAME_SPACE_AVAILABLE           equ     $AF
+OBJECT_TYPE_ROCKET_ASCEND       equ     $0A
 WORD_SIZE                       equ     $02
 OBJECT_ROCKET_ADDRESS           equ     $B0
 OPTION_TEXT_ROWS                equ     $05
@@ -274,7 +280,6 @@ LASER_POSITION_Y                equ     $01
 CYAN                            equ     $03
 BLUE                            equ     $06
 PURPLE                          equ     $04
-RED                             equ     $02
 LASER_POSITION_X_PARAMS         equ     $03
 LASER_GUN_HEIGHT_OFFSET         equ     $0D
 MASK_JETMAN_DIRECTION           equ     %10000000
@@ -2387,40 +2392,47 @@ Loop_Copy_Player_To_Hi_Score
 
 ; L_JSR_($27AA)_($2EAF) OK
 Display_Rocket_Flame
-    ldy     #$00                            ; 27AA: A0 00    
+    ldy     #OBJECT_TYPE_PARAM              ; 27AA: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 27AC: B1 00    
-    cmp     #$0A                            ; 27AE: C9 0A     Object $0A = Flame (or maybe Rocket?)
-    bcs     Display_Rocket_Flame_1          ; 27B0: B0 01    
+    cmp     #OBJECT_TYPE_ROCKET_ASCEND      ; 27AE: C9 0A    
+
+; Carry set if memory less than value in Register A, meaning branch on Ascend and Decend
+    bcs     Display_Rocket_Flame_Asc_Desc   ; 27B0: B0 01    
     rts                                     ; 27B2: 60       
 ; ===========================================================
 
 ; L_BRS_($27B3)_($27B0) OK
-Display_Rocket_Flame_1
-    inc     ZP_Rocket_Flame_Toggle          ; 27B3: E6 27    
+Display_Rocket_Flame_Asc_Desc
+    inc     ZP_Rocket_Flame_UDG_Toggle      ; 27B3: E6 27    
 
-    lda     ZP11                            ; 27B5: A5 11    
+    lda     ZP11_Object_Ship_Position_Y     ; 27B5: A5 11    
     pha                                     ; 27B7: 48       
     clc                                     ; 27B8: 18       
     adc     #$15                            ; 27B9: 69 15    
-    sta     ZP11                            ; 27BB: 85 11    
+    sta     ZP11_Object_Ship_Position_Y     ; 27BB: 85 11    
 
-    lda     ZP19                            ; 27BD: A5 19    
+    lda     ZP19_Object_Flame_Position_Y    ; 27BD: A5 19    
     pha                                     ; 27BF: 48       
     clc                                     ; 27C0: 18       
     adc     #$15                            ; 27C1: 69 15    
-    sta     ZP19                            ; 27C3: 85 19     0019 must be height of rocket
+    sta     ZP19_Object_Flame_Position_Y    ; 27C3: 85 19    
 
-    cmp     #$AF                            ; 27C5: C9 AF     Check rocket height
+; On ascend, BCS followed each time until Flame Space Available, which triggers Display_Flame
+; once, after that, both branches fail. Descend is similar.
+    cmp     #FLAME_SPACE_AVAILABLE          ; 27C5: C9 AF    
     beq     Display_Flame                   ; 27C7: F0 50    
-    bcs     No_Display_Flame                ; 27C9: B0 47    
+    bcs     Set_Rocket_Flame_Status_Off     ; 27C9: B0 47    
 
-    lda     ZP_Rocket_Flame_On              ; 27CB: A5 26    
+; Rocket flame should now be on, if yes, display it
+    lda     ZP_Rocket_Flame_State           ; 27CB: A5 26    
     bne     Display_Rocket_Flame_On_Screen  ; 27CD: D0 12    
 
+; If flame not yet on, i.e. first time round, turn the flame status on
     lda     #$01                            ; 27CF: A9 01    
-    sta     ZP_Rocket_Flame_On              ; 27D1: 85 26    
+    sta     ZP_Rocket_Flame_State           ; 27D1: 85 26    
 
-    lda     ZP_Rocket_Flame_Toggle          ; 27D3: A5 27    
+; Load the correct Flame UDG address and display the flame
+    lda     ZP_Rocket_Flame_UDG_Toggle      ; 27D3: A5 27    
     sec                                     ; 27D5: 38       
     sbc     #$01                            ; 27D6: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27D8: 20 2E 28 
@@ -2429,10 +2441,12 @@ Display_Rocket_Flame_1
 
 ; L_BRS_($27E1)_($27CD) OK
 Display_Rocket_Flame_On_Screen
-    lda     ZP_Rocket_Flame_Toggle          ; 27E1: A5 27    
+    lda     ZP_Rocket_Flame_UDG_Toggle      ; 27E1: A5 27    
     pha                                     ; 27E3: 48       
     jsr     Get_Flame_UDG_Addr              ; 27E4: 20 2E 28 
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 27E7: 20 3D 37 
+
+; Load the correct Flame UDG address and display the flame
     pla                                     ; 27EA: 68       
     sec                                     ; 27EB: 38       
     sbc     #$01                            ; 27EC: E9 01    
@@ -2440,70 +2454,76 @@ Display_Rocket_Flame_On_Screen
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27F1: 20 8D 37 
     jsr     Display_Object                  ; 27F4: 20 4C 36 
 
-    lda     ZP18                            ; 27F7: A5 18    
-    sta     ZP04                            ; 27F9: 85 04    
+    lda     ZP18_Object_Flame_Position_X    ; 27F7: A5 18    
+    sta     ZP04_Object_Position_X          ; 27F9: 85 04    
 
-    lda     ZP19                            ; 27FB: A5 19    
-    sta     ZP05                            ; 27FD: 85 05    
+    lda     ZP19_Object_Flame_Position_Y    ; 27FB: A5 19    
+    sta     ZP05_Object_Position_Y          ; 27FD: 85 05    
 
     jsr     Setup_Color_RAM_Ptr             ; 27FF: 20 F7 34 
-    lda     #$02                            ; 2802: A9 02    
+    lda     #RED                            ; 2802: A9 02    
     ldy     #$00                            ; 2804: A0 00    
-    sta     (ZP0C),y                        ; 2806: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 2806: 91 0C    
 
     iny                                     ; 2808: C8       
-    sta     (ZP0C),y                        ; 2809: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C_Color_RAM_Tile_Addr_Lo),y ; 2809: 91 0C    
 
 ; Restore ZP11 and ZP19 and return
 ; L_JMP_($280B)_($2816) OK
 ; L_BRS_($280B)_($281B) OK
 ; L_JMP_($280B)_($282B) OK
-Display_Rocket_Flame_3
+Restore_And_RTS
     pla                                     ; 280B: 68       
-    sta     ZP19                            ; 280C: 85 19    
+    sta     ZP19_Object_Flame_Position_Y    ; 280C: 85 19    
     pla                                     ; 280E: 68       
-    sta     ZP11                            ; 280F: 85 11    
+    sta     ZP11_Object_Ship_Position_Y     ; 280F: 85 11    
     rts                                     ; 2811: 60       
 ; ===========================================================
+
 ; L_BRS_($2812)_($27C9) OK
-No_Display_Flame
+Set_Rocket_Flame_Status_Off
     lda     #$00                            ; 2812: A9 00    
-    sta     ZP_Rocket_Flame_On              ; 2814: 85 26    
-    jmp     Display_Rocket_Flame_3          ; 2816: 4C 0B 28 
+    sta     ZP_Rocket_Flame_State           ; 2814: 85 26    
+    jmp     Restore_And_RTS                 ; 2816: 4C 0B 28 
 ; -----------------------
+
 ; L_BRS_($2819)_($27C7) OK
 Display_Flame
-    lda     ZP_Rocket_Flame_On              ; 2819: A5 26    
-    beq     Display_Rocket_Flame_3          ; 281B: F0 EE    
-    lda     ZP_Rocket_Flame_Toggle          ; 281D: A5 27    
+    lda     ZP_Rocket_Flame_State           ; 2819: A5 26    
+    beq     Restore_And_RTS                 ; 281B: F0 EE    
+
+    lda     ZP_Rocket_Flame_UDG_Toggle      ; 281D: A5 27    
     sec                                     ; 281F: 38       
     sbc     #$01                            ; 2820: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 2822: 20 2E 28 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2825: 20 8D 37 
     jsr     Display_Object_With_Setup_4     ; 2828: 20 10 36 
-    jmp     Display_Rocket_Flame_3          ; 282B: 4C 0B 28 
+    jmp     Restore_And_RTS                 ; 282B: 4C 0B 28 
 ; -----------------------
+
 ; Using A to toggle, Load A and Y with Ship UDG address
+; LSR and AND make the toggle only happen every 4 calls so you can see it on-screen
 ; L_JSR_($282E)_($27D8) OK
 ; L_JSR_($282E)_($27E4) OK
 ; L_JSR_($282E)_($27EE) OK
 ; L_JSR_($282E)_($2822) OK
 Get_Flame_UDG_Addr
     lsr     a                               ; 282E: 4A       
-    and     #$02                            ; 282F: 29 02    
+    and     #%00000010                      ; 282F: 29 02    
     tax                                     ; 2831: AA       
-    lda     Ptr_Rocket_Flame_Lo,x           ; 2832: BD 3A 28 
+    lda     Ptr_Rocket_Flame_Frame_0_Lo,x   ; 2832: BD 3A 28 
     tay                                     ; 2835: A8       
-    lda     Ptr_Rocket_Flame_Hi,x           ; 2836: BD 3B 28 
+    lda     Ptr_Rocket_Flame_Frame_0_Hi,x   ; 2836: BD 3B 28 
     rts                                     ; 2839: 60       
 ; ===========================================================
-Ptr_Rocket_Flame_Lo
-    fcb     $D5                             ; 283A: D5        Addr of rocket flame UDG
-Ptr_Rocket_Flame_Hi
+
+Ptr_Rocket_Flame_Frame_0_Lo
+    fcb     $D5                             ; 283A: D5       
+Ptr_Rocket_Flame_Frame_0_Hi
     fcb     $3F                             ; 283B: 3F       
-Ptr_Final_Char_Lo
-    fcb     $F8                             ; 283C: F8        Addr of final char UDG
-Ptr_Final_Char_Hi
+Ptr_Rocket_Flame_Frame_1_Lo
+    fcb     $F8                             ; 283C: F8       
+Ptr_Rocket_Flame_Frame_1_Hi
     fcb     $3F                             ; 283D: 3F       
 
 
@@ -4023,7 +4043,7 @@ Rocket_At_Top
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E42: 91 00    
     jsr     Reset_Level_Add_Extra_Life      ; 2E44: 20 BA 22 
     lda     #$00                            ; 2E47: A9 00    
-    sta     ZP_Rocket_Flame_On              ; 2E49: 85 26    
+    sta     ZP_Rocket_Flame_State           ; 2E49: 85 26    
     jmp     GOTO_NEXT_OBJECT                ; 2E4B: 4C 1A 26 
 ; -----------------------
 
@@ -6578,7 +6598,7 @@ Load_Obj_UDG_RAM_Addr_Size_V
 ; Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
 ; will move object into next UDG RAM column.
     ldy     #$FF                            ; 374B: A0 FF    
-    lda     (ZP0E_Object_UDG_Data_Addr_Lo),y ; 374D: B1 0E    
+    lda     (ZP0E_Object_UDG_Data_Addr_Lo),y; 374D: B1 0E    
     clc                                     ; 374F: 18       
     adc     ZP04_Object_Position_X          ; 3750: 65 04    
     cmp     #SCREEN_WIDTH_PIXELS            ; 3752: C9 B8    
@@ -6603,13 +6623,13 @@ No_X_Wrap_
 
 ; Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
     ldy     #UDG_DATA_WIDTH_BYTES_OFFSET    ; 376D: A0 FE    
-    lda     (ZP0E_Object_UDG_Data_Addr_Lo),y ; 376F: B1 0E    
+    lda     (ZP0E_Object_UDG_Data_Addr_Lo),y; 376F: B1 0E    
     sta     ZP15_Object_Width_Bytes         ; 3771: 85 15    
     sta     ZP16_Object_Width_Bytes         ; 3773: 85 16    
 
 ; Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
     dey                                     ; 3775: 88       
-    lda     (ZP0E_Object_UDG_Data_Addr_Lo),y ; 3776: B1 0E    
+    lda     (ZP0E_Object_UDG_Data_Addr_Lo),y; 3776: B1 0E    
     sta     ZP0B_Object_Height_Pixels       ; 3778: 85 0B    
     sta     ZP17_Object_Height_Pixels       ; 377A: 85 17    
 
@@ -6675,7 +6695,7 @@ Load_Obj_UDG_RAM_Addr_Size_JM
 ; Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
 ; will move object into next UDG RAM column.
     ldy     #$FF                            ; 379B: A0 FF    
-    lda     (ZP06_Object_UDG_Data_Addr_Lo),y ; 379D: B1 06    
+    lda     (ZP06_Object_UDG_Data_Addr_Lo),y; 379D: B1 06    
     clc                                     ; 379F: 18       
     adc     ZP04_Object_Position_X          ; 37A0: 65 04    
     cmp     #SCREEN_WIDTH_PIXELS            ; 37A2: C9 B8    
@@ -6700,12 +6720,12 @@ No_X_Wrap
 
 ; Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
     ldy     #UDG_DATA_WIDTH_BYTES_OFFSET    ; 37BB: A0 FE    
-    lda     (ZP06_Object_UDG_Data_Addr_Lo),y ; 37BD: B1 06    
+    lda     (ZP06_Object_UDG_Data_Addr_Lo),y; 37BD: B1 06    
     sta     ZP14_Object_Width_Bytes         ; 37BF: 85 14    
 
 ; Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
     dey                                     ; 37C1: 88       
-    lda     (ZP06_Object_UDG_Data_Addr_Lo),y ; 37C2: B1 06    
+    lda     (ZP06_Object_UDG_Data_Addr_Lo),y; 37C2: B1 06    
     sta     ZP03_Object_Height_Pixels       ; 37C4: 85 03    
 
 ; Subtract $03 from 16-bit object UDG Data addrress, i.e. so address

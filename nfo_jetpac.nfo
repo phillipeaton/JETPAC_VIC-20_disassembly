@@ -979,39 +979,52 @@ label    27A2 Loop_Copy_Player_To_Hi_Score
 lcomment 27A7 Return when all bytes copied
 comment  27AA
 label    27AA Display_Rocket_Flame
-lcomment 27AE Object $0A = Flame (or maybe Rocket?)
+deflabel 27AB OBJECT_TYPE_PARAM
+deflabel 27AF OBJECT_TYPE_ROCKET_ASCEND
+comment  27B0
+comment  27B0 Carry set if memory less than value in Register A, meaning branch on Ascend and Decend
 comment  27B3
-label    27B3 Display_Rocket_Flame_1
+label    27B3 Display_Rocket_Flame_Asc_Desc
 comment  27B5
 comment  27BD
-lcomment 27C3 0019 must be height of rocket
 comment  27C5
-lcomment 27C5 Check rocket height
+comment  27C5 On ascend, BCS followed each time until Flame Space Available, which triggers Display_Flame
+comment  27C5 once, after that, both branches fail. Descend is similar.
+deflabel 27C6 FLAME_SPACE_AVAILABLE
 comment  27CB
+comment  27CB Rocket flame should now be on, if yes, display it
 comment  27CF
+comment  27CF If flame not yet on, i.e. first time round, turn the flame status on
 comment  27D3
+comment  27D3 Load the correct Flame UDG address and display the flame
 comment  27E1
 label    27E1 Display_Rocket_Flame_On_Screen
+comment  27EA
+comment  27EA Load the correct Flame UDG address and display the flame
 comment  27F7
 comment  27FB
 comment  27FF
+deflabel 2803 RED
 comment  2808
-lcomment 2806 ZP0C_Col_RAM_Ptr_Lo
-lcomment 2809 ZP0C_Col_RAM_Ptr_Lo
 comment  280B
 comment  280B Restore ZP11 and ZP19 and return
-label    280B Display_Rocket_Flame_3
-label    2812 No_Display_Flame
+label    280B Restore_And_RTS
+comment  2812
+label    2812 Set_Rocket_Flame_Status_Off
+comment  2819
 label    2819 Display_Flame
+comment  281D
+comment  282E
 comment  282E Using A to toggle, Load A and Y with Ship UDG address
+comment  282E LSR and AND make the toggle only happen every 4 calls so you can see it on-screen
 label    282E Get_Flame_UDG_Addr
-label    283A Ptr_Rocket_Flame_Lo
-lcomment 283A Addr of rocket flame UDG
+binary   2830
+comment  283A
+label    283A Ptr_Rocket_Flame_Frame_0_Lo
 const    283A-283d
-label    283B Ptr_Rocket_Flame_Hi
-label    283C Ptr_Final_Char_Lo
-lcomment 283C Addr of final char UDG
-label    283D Ptr_Final_Char_Hi
+label    283B Ptr_Rocket_Flame_Frame_0_Hi
+label    283C Ptr_Rocket_Flame_Frame_1_Lo
+label    283D Ptr_Rocket_Flame_Frame_1_Hi
 comment  283E
 label    283E FIRE_PRESSED
 lcomment 2841 Remove=Gems all fall through platforms and floor, reentering at top
