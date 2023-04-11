@@ -1002,6 +1002,7 @@ label    27E1 Display_Rocket_Flame_On_Screen
 comment  27EA
 comment  27EA Load the correct Flame UDG address and display the flame
 comment  27F7
+comment  27F7 Set the flame color tile to red, uses two tiles
 comment  27FB
 comment  27FF
 deflabel 2803 RED
@@ -1012,6 +1013,7 @@ label    280B Restore_And_RTS
 comment  2812
 label    2812 Set_Rocket_Flame_Status_Off
 comment  2819
+comment  2819 Display flame if flame state is on, else return
 label    2819 Display_Flame
 comment  281D
 comment  282E
@@ -1020,46 +1022,81 @@ comment  282E LSR and AND make the toggle only happen every 4 calls so you can s
 label    282E Get_Flame_UDG_Addr
 binary   2830
 comment  283A
+comment  283A Flame animation is produced by toggling between two animation frames
 label    283A Ptr_Rocket_Flame_Frame_0_Lo
 const    283A-283d
 label    283B Ptr_Rocket_Flame_Frame_0_Hi
 label    283C Ptr_Rocket_Flame_Frame_1_Lo
 label    283D Ptr_Rocket_Flame_Frame_1_Hi
 comment  283E
-label    283E FIRE_PRESSED
-lcomment 2841 Remove=Gems all fall through platforms and floor, reentering at top
-label    2851 FP_1
+comment  283E Remove "Test_Platform_Collision"=Gems all fall through platforms and floor, reentering at top
+label    283E VALUABLES
+comment  2848
+comment  2848 Move valuable Y position down screen by 2 pixels
+deflabel 2849 OBJECT_POSITION_Y_PARAM
+comment  2851
+label    2851 Valuable_Landed
+comment  2859
+comment  2859 Object has been picked-up, remove from screen. S F V = Ship Fuel Valuable
 comment  2867
-comment  2867 Jetman pickup Gem/Elements/Gold etc = 250 points
+comment  2867 Jetman pickup valuable = 250 points, then remove from object list
+lcomment 286A ZP02/03
 word     286B
 const    286B
 break    286D
+comment  2874
+deflabel 2875 VALUABLE_TYPE
+binary   2879
+comment  287A
 label    2874 Jump_To_Subroutine_List3
-label    2888 Subroutine_List3
+comment  2880
+comment  2888
+label    2888 Subroutine_List_Valuables
 word     2888-2891
 break    2888-2891
-label    2889 Subroutine_List3+1
-label    2892 Set_Obj_Posn_05_To_07
-label    2894 SR3_Store_To_Obj_Posn_05_06
-label    289F Set_Obj_Posn_05_To_06
-label    28A4 Set_Obj_Posn_05_To_03_Or_00
-label    28B1 Set_Obj_Posn_05_To_03
-label    28B6 Set_Obj_Posn_05_To_01_Or_Other
-label    28C0 Set_Obj_Posn_05_To_01_Or_Oth_1
+label    2889 Subroutine_List_Valuables+1
+comment  2892
+label    2892 Valuable_Gold_Bar
+deflabel 2893 YELLOW
+comment  2894
+label    2894 Store_Color_Setup_Object_Print
+deflabel 2895 OBJECT_COLOR_PARAM
+comment  2898
+deflabel 2899 OBJECT_VALUABLE_TYPE_PARAM
+label    289F Valuable_Mineral
+comment  289F
+deflabel 28A0 BLUE
+comment  28A4
+label    28A4 Valuable_Plutonium
+binary   28A7
+binary   28A9
+comment  28AC
+comment  28B1
+label    28B1 Valuable_Plutonium_Set_Color
+deflabel 28B2 CYAN
+comment  28B6
+label    28B6 Valuable_Gemstone
+binary   28BB
+comment  28BE
+binary   28BF
+comment  28C0
+label    28C0 Valuable_Gemstone_Set_Color
+comment  28C9
 label    28C9 Reset_Objects_1_To_8
 comment  28CD
-comment  28CD
-comment  28CD
-comment  28CD
-comment  28CD
 label    28CD Reset_Objects_1_To_8_1
+comment  28D4
 comment  28D4 Init Jetman, Lasers, Rocket and Aliens
 label    28D4 Init_Most_Objects
+comment  28D8
 label    28D8 Loop_28D8
 comment  28DE
 comment  28DE Init all Alien objects
+comment  28E0
 label    28E0 Loop_28E0
+comment  28E7
 label    28E7 Save_Obj_List_Ptr
+comment  28F0
 label    28F0 Restore_Obj_List_Ptr
 comment  28F9
 label    28F9 Change_Object_To_Explosion_1
@@ -1290,7 +1327,7 @@ comment  2BB7 Use counter to setup next object type
 binary   2BBA
 comment  2BC0
 comment  2BC0 Bit 3 wasn't set, so zero all bits apart from bit 3
-comment  2BC0 Bit 3 will make the object the diamond which cycles through all colors
+comment  2BC0 Bit 3 will make the object the gemstone which cycles through all colors
 binary   2BC1
 comment  2BC2
 comment  2BC2 Make the valuble type $2x, maybe used as an offset later?
@@ -1435,7 +1472,7 @@ comment  2D58
 comment  2D58 ----------------------------------------------------------
 comment  2D58 FUNCTION : Tests if Jetman and the current object have
 comment  2D58 \           overlapped i.e. collided. Object can be rocket
-comment  2D58 \           part, fuel pod, gem or alien.
+comment  2D58 \           part, fuel cell, gem or alien.
 comment  2D58 ENTRY : ZP_Obj_List_Ptr = Current Object
 comment  2D58 \        Obj_Jetman_Looks = Status of Jetman
 comment  2D58 EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
@@ -1515,7 +1552,7 @@ lcomment 2E7A Set by collision test
 lcomment 2E7C Collision? If no, branch
 comment  2E7E
 comment  2E7E Collision occured, handle it
-lcomment 2E80 Get number of fuel pods delivered into rocket
+lcomment 2E80 Get number of fuel cells delivered into rocket
 lcomment 2E82 Rocket fully fueled up?
 deflabel 2E83 FUELLED_UP
 lcomment 2E84 No, branch
@@ -1614,8 +1651,7 @@ comment  2FCB
 comment  2FCB Do it again to setup the object dimensions
 comment  2FDA
 comment  2FDA Return object's UDG data address offset for Rocket Middle Section/Fuel
-comment  2FDA depending on which
-of the four levels (or multiple of) the player is currently on
+comment  2FDA depending on which of the four levels (or multiple of) the player is currently on
 label    2FDA Get_Obj_UDG_Data_Addr_Ship_Lvl
 comment  2FDC
 comment  2FDC Calculate and return object's UDG data address offset based on A e.g. player level
@@ -1632,7 +1668,7 @@ label    2FEE Jetman_Collide_Rocket_Fuel
 lcomment 2FF1 Diag attrib? Not sure...
 lcomment 2FF5 Zero all bits except bit 1 i.e. 000000x0
 comment  2FF9
-comment  2FF9 Jetman pickup Rocket Module / Fuel Pod = 100 points
+comment  2FF9 Jetman pickup Rocket Module / Fuel Cell = 100 points
 word     2FFD
 const    2FFD
 comment  3003
@@ -2634,9 +2670,9 @@ label    3D1A Ship_1_Top
 label    3D3D Ship_2_Bott
 label    3D60 Ship_2_Mid
 label    3D83 Ship_2_Top
-label    3D9C Fuel
+label    3D9C Fuel_Cell
 label    3DAF Gold_Bar
-label    3DCA Diamond
+label    3DCA Gemstone
 label    3DE3 Plutonium
 label    3E00 Isotope
 label    3E15 Mineral

@@ -165,6 +165,11 @@ LASER_X_POSITION_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
 OBJECT_X_POSITION_PARAM         equ     $01
 OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
+CYAN                            equ     $03
+BLUE                            equ     $06
+OBJECT_VALUABLE_TYPE_PARAM      equ     $06
+YELLOW                          equ     $07
+VALUABLE_TYPE                   equ     $06
 RED                             equ     $02
 FLAME_SPACE_AVAILABLE           equ     $AF
 OBJECT_TYPE_ROCKET_ASCEND       equ     $0A
@@ -173,7 +178,6 @@ OBJECT_ROCKET_ADDRESS           equ     $B0
 OPTION_TEXT_ROWS                equ     $05
 TEXT_POSITION_X                 equ     $18
 WHITE                           equ     $01
-YELLOW                          equ     $07
 LIVES_INITIAL_PLAYER_2          equ     $05
 LIVES_INITIAL_PLAYER_1          equ     $04
 PLAYER_1                        equ     $00
@@ -183,8 +187,6 @@ LASER_TYPE_PARAM                equ     $00
 LASER_POSITION_X                equ     $02
 LASER_LENGTH_PARAM              equ     $06
 LASER_POSITION_Y                equ     $01
-CYAN                            equ     $03
-BLUE                            equ     $06
 PURPLE                          equ     $04
 LASER_POSITION_X_PARAMS         equ     $03
 LASER_GUN_HEIGHT_OFFSET         equ     $0D
@@ -1958,7 +1960,7 @@ Subroutine_List
     fdb     ROCKET_DESCEND                  ; 26A2: 4E 2E     0B
     fdb     SOUND_UPDATE                    ; 26A4: CD 26     0C
     fdb     GOTO_NEXT_OBJECT                ; 26A6: 1A 26     0D
-    fdb     FIRE_PRESSED                    ; 26A8: 3E 28     0E
+    fdb     VALUABLES                       ; 26A8: 3E 28     0E
     fdb     GOTO_NEXT_OBJECT                ; 26AA: 1A 26     0F
     fdb     DISPLAY_LASERS                  ; 26AC: 9A 21     10
 
@@ -2360,6 +2362,7 @@ Display_Rocket_Flame_On_Screen
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27F1: 20 8D 37 
     jsr     Display_Object                  ; 27F4: 20 4C 36 
 
+; Set the flame color tile to red, uses two tiles
     lda     ZP18                            ; 27F7: A5 18    
     sta     ZP04                            ; 27F9: 85 04    
 
@@ -2393,6 +2396,7 @@ Set_Rocket_Flame_Status_Off
     jmp     Restore_And_RTS                 ; 2816: 4C 0B 28 
 ; -----------------------
 
+; Display flame if flame state is on, else return
 ; L_BRS_($2819)_($27C7) OK
 Display_Flame
     lda     ZP_Rocket_Flame_State           ; 2819: A5 26    
@@ -2423,6 +2427,7 @@ Get_Flame_UDG_Addr
     rts                                     ; 2839: 60       
 ; ===========================================================
 
+; Flame animation is produced by toggling between two animation frames
 Ptr_Rocket_Flame_Frame_0_Lo
     fcb     $D5                             ; 283A: D5       
 Ptr_Rocket_Flame_Frame_0_Hi
@@ -2448,104 +2453,122 @@ Ptr_Rocket_Flame_Frame_1_Hi
 ; 88     88  Yb 888888 8bodP' 8bodP' 888888 8888Y"
 ; #########################################################################################
 
-FIRE_PRESSED
+; Remove "Test_Platform_Collision"=Gems all fall through platforms and floor, reentering at top
+VALUABLES
     jsr     Load_Object_Type_X_Y            ; 283E: 20 D7 35 
-    jsr     Test_Platform_Collision         ; 2841: 20 B3 30  Remove=Gems all fall through platforms and floor, reentering at top
+    jsr     Test_Platform_Collision         ; 2841: 20 B3 30 
     lda     ZP02                            ; 2844: A5 02    
-    bmi     FP_1                            ; 2846: 30 09    
-    ldy     #$03                            ; 2848: A0 03    
+    bmi     Valuable_Landed                 ; 2846: 30 09    
+
+; Move valuable Y position down screen by 2 pixels
+    ldy     #OBJECT_POSITION_Y_PARAM        ; 2848: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 284A: B1 00    
     clc                                     ; 284C: 18       
     adc     #$02                            ; 284D: 69 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 284F: 91 00    
+
 ; L_BRS_($2851)_($2846) OK
-FP_1 jsr    Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35 
+Valuable_Landed
+    jsr     Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35 
     jsr     Test_Jetman_Object_Collide      ; 2854: 20 58 2D 
     bpl     Jump_To_Subroutine_List3        ; 2857: 10 1B    
+
+; Object has been picked-up, remove from screen. S F V = Ship Fuel Valuable
     lda     #$00                            ; 2859: A9 00    
     jsr     Get_Obj_UDG_Data_Addr_Ship_A    ; 285B: 20 DC 2F 
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 285E: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2861: 20 8D 37 
     jsr     Display_Object_With_Setup_4     ; 2864: 20 10 36 
 
-; Jetman pickup Gem/Elements/Gold etc = 250 points
+; Jetman pickup valuable = 250 points, then remove from object list
     jsr     Load_ZP_Parameters              ; 2867: 20 9D 25 
-    fcb     $02                             ; 286A: 02       
+    fcb     $02                             ; 286A: 02        ZP02/03
     fdb     $0250                           ; 286B: 50 02    
     fcb     $FF                             ; 286D: FF       
     jsr     Update_Score                    ; 286E: 20 63 30 
     jmp     Disable_Object_In_List          ; 2871: 4C 65 2F 
 ; -----------------------
+
 ; L_BRS_($2874)_($2857) OK
 Jump_To_Subroutine_List3
-    ldy     #$06                            ; 2874: A0 06    
+    ldy     #VALUABLE_TYPE                  ; 2874: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2876: B1 00    
-    and     #$0E                            ; 2878: 29 0E    
+    and     #%00001110                      ; 2878: 29 0E    
+
     tax                                     ; 287A: AA       
-    lda     Subroutine_List3,x              ; 287B: BD 88 28 
+    lda     Subroutine_List_Valuables,x     ; 287B: BD 88 28 
     sta     ZP08                            ; 287E: 85 08    
-    lda     Subroutine_List3+1,x            ; 2880: BD 89 28 
+
+    lda     Subroutine_List_Valuables+1,x   ; 2880: BD 89 28 
     sta     ZP09                            ; 2883: 85 09    
     jmp     (ZP08)                          ; 2885: 6C 08 00 
-Subroutine_List3
-    fdb     Set_Obj_Posn_05_To_07           ; 2888: 92 28    
-    fdb     Set_Obj_Posn_05_To_03_Or_00     ; 288A: A4 28    
-    fdb     Set_Obj_Posn_05_To_03_Or_00     ; 288C: A4 28    
-    fdb     Set_Obj_Posn_05_To_06           ; 288E: 9F 28    
-    fdb     Set_Obj_Posn_05_To_01_Or_Other  ; 2890: B6 28    
-Set_Obj_Posn_05_To_07
-    lda     #$07                            ; 2892: A9 07    
+
+Subroutine_List_Valuables
+    fdb     Valuable_Gold_Bar               ; 2888: 92 28    
+    fdb     Valuable_Plutonium              ; 288A: A4 28    
+    fdb     Valuable_Plutonium              ; 288C: A4 28    
+    fdb     Valuable_Mineral                ; 288E: 9F 28    
+    fdb     Valuable_Gemstone               ; 2890: B6 28    
+
+Valuable_Gold_Bar
+    lda     #YELLOW                         ; 2892: A9 07    
+
 ; L_JMP_($2894)_($28A1) OK
 ; L_JMP_($2894)_($28AE) OK
 ; L_JMP_($2894)_($28B3) OK
 ; L_BRS_($2894)_($28C2) OK
 ; L_JMP_($2894)_($28C6) OK
-SR3_Store_To_Obj_Posn_05_06
-    ldy     #$05                            ; 2894: A0 05    
+Store_Color_Setup_Object_Print
+    ldy     #OBJECT_COLOR_PARAM             ; 2894: A0 05    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2896: 91 00    
-    ldy     #$06                            ; 2898: A0 06    
+
+    ldy     #OBJECT_VALUABLE_TYPE_PARAM     ; 2898: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 289A: B1 00    
     jmp     Setup_Object_Addr               ; 289C: 4C C3 2F 
 ; -----------------------
-Set_Obj_Posn_05_To_06
-    lda     #$06                            ; 289F: A9 06    
-    jmp     SR3_Store_To_Obj_Posn_05_06     ; 28A1: 4C 94 28 
+
+Valuable_Mineral
+    lda     #BLUE                           ; 289F: A9 06    
+    jmp     Store_Color_Setup_Object_Print  ; 28A1: 4C 94 28 
 ; -----------------------
-Set_Obj_Posn_05_To_03_Or_00
+
+Valuable_Plutonium
     lda     ZP_HW_IRQ_Counter_Lo            ; 28A4: A5 4A    
-    and     #$1F                            ; 28A6: 29 1F    
-    cmp     #$18                            ; 28A8: C9 18    
-    bcs     Set_Obj_Posn_05_To_03           ; 28AA: B0 05    
+    and     #%00011111                      ; 28A6: 29 1F    
+    cmp     #%00011000                      ; 28A8: C9 18    
+    bcs     Valuable_Plutonium_Set_Color    ; 28AA: B0 05    
+
     lda     #$00                            ; 28AC: A9 00    
-    jmp     SR3_Store_To_Obj_Posn_05_06     ; 28AE: 4C 94 28 
+    jmp     Store_Color_Setup_Object_Print  ; 28AE: 4C 94 28 
 ; -----------------------
+
 ; L_BRS_($28B1)_($28AA) OK
-Set_Obj_Posn_05_To_03
-    lda     #$03                            ; 28B1: A9 03    
-    jmp     SR3_Store_To_Obj_Posn_05_06     ; 28B3: 4C 94 28 
+Valuable_Plutonium_Set_Color
+    lda     #CYAN                           ; 28B1: A9 03    
+    jmp     Store_Color_Setup_Object_Print  ; 28B3: 4C 94 28 
 ; -----------------------
-Set_Obj_Posn_05_To_01_Or_Other
+
+Valuable_Gemstone
     lda     ZP_HW_IRQ_Counter_Lo            ; 28B6: A5 4A    
     lsr     a                               ; 28B8: 4A       
     lsr     a                               ; 28B9: 4A       
-    and     #$07                            ; 28BA: 29 07    
-    bne     Set_Obj_Posn_05_To_01_Or_Oth_1  ; 28BC: D0 02    
-    ora     #$01                            ; 28BE: 09 01    
+    and     #%00000111                      ; 28BA: 29 07    
+    bne     Valuable_Gemstone_Set_Color     ; 28BC: D0 02    
+
+    ora     #%00000001                      ; 28BE: 09 01    
+
 ; L_BRS_($28C0)_($28BC) OK
-Set_Obj_Posn_05_To_01_Or_Oth_1
+Valuable_Gemstone_Set_Color
     cmp     #$05                            ; 28C0: C9 05    
-    bne     SR3_Store_To_Obj_Posn_05_06     ; 28C2: D0 D0    
+    bne     Store_Color_Setup_Object_Print  ; 28C2: D0 D0    
     lda     #$01                            ; 28C4: A9 01    
-    jmp     SR3_Store_To_Obj_Posn_05_06     ; 28C6: 4C 94 28 
+    jmp     Store_Color_Setup_Object_Print  ; 28C6: 4C 94 28 
 ; -----------------------
+
 ; L_JSR_($28C9)_($2E36) OK
 Reset_Objects_1_To_8
     ldx     #$47                            ; 28C9: A2 47    
     lda     #$00                            ; 28CB: A9 00    
-
-
-
-
 
 ; L_BRS_($28CD)_($28D1) OK
 Reset_Objects_1_To_8_1
@@ -2554,11 +2577,13 @@ Reset_Objects_1_To_8_1
     bpl     Reset_Objects_1_To_8_1          ; 28D1: 10 FA    
     rts                                     ; 28D3: 60       
 ; ===========================================================
+
 ; Init Jetman, Lasers, Rocket and Aliens
 ; L_JSR_($28D4)_($29A8) OK
 Init_Most_Objects
     ldx     #$2F                            ; 28D4: A2 2F    
     lda     #$00                            ; 28D6: A9 00    
+
 ; L_BRS_($28D8)_($28DC) OK
 Loop_28D8
     sta     Obj_Jetman_State,x              ; 28D8: 9D 80 03 
@@ -2567,6 +2592,7 @@ Loop_28D8
 
 ; Init all Alien objects
     ldx     #$2F                            ; 28DE: A2 2F    
+
 ; L_BRS_($28E0)_($28E4) OK
 Loop_28E0
     sta     Obj_Alien_0_0,x                 ; 28E0: 9D C8 03 
@@ -2574,6 +2600,7 @@ Loop_28E0
     bpl     Loop_28E0                       ; 28E4: 10 FA    
     rts                                     ; 28E6: 60       
 ; ===========================================================
+
 ; L_JSR_($28E7)_($22E3) OK
 ; L_JSR_($28E7)_($22F2) OK
 ; L_JSR_($28E7)_($230E) OK
@@ -2588,6 +2615,7 @@ Save_Obj_List_Ptr
     sta     ZP_Obj_List_Ptr_Save_2_Hi       ; 28ED: 85 25    
     rts                                     ; 28EF: 60       
 ; ===========================================================
+
 ; L_JSR_($28F0)_($2337) OK
 ; L_JMP_($28F0)_($2A5C) OK
 ; L_JMP_($28F0)_($2BDB) OK
@@ -3271,7 +3299,7 @@ Loop_2BA8
     beq     SKIP_2BC2                       ; 2BBE: F0 02    
 
 ; Bit 3 wasn't set, so zero all bits apart from bit 3
-; Bit 3 will make the object the diamond which cycles through all colors
+; Bit 3 will make the object the gemstone which cycles through all colors
     and     #%00001000                      ; 2BC0: 29 08    
 
 ; Make the valuble type $2x, maybe used as an offset later?
@@ -3721,7 +3749,7 @@ Level_Alien_Color_Lookup
 ; ----------------------------------------------------------
 ; FUNCTION : Tests if Jetman and the current object have
 ;            overlapped i.e. collided. Object can be rocket
-;            part, fuel pod, gem or alien.
+;            part, fuel cell, gem or alien.
 ; ENTRY : ZP_Obj_List_Ptr = Current Object
 ;         Obj_Jetman_Looks = Status of Jetman
 ; EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
@@ -4026,7 +4054,7 @@ ROCKET_BOTTOM_MODULE
 
 ; Collision occured, handle it
     ldy     #$02                            ; 2E7E: A0 02    
-    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E80: B1 00     Get number of fuel pods delivered into rocket
+    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E80: B1 00     Get number of fuel cells delivered into rocket
     cmp     #FUELLED_UP                     ; 2E82: C9 06     Rocket fully fueled up?
     bcc     Rocket_Fuelled_Up               ; 2E84: 90 26     No, branch
 
@@ -4343,7 +4371,7 @@ Setup_Object_Addr
 ; 8bodP' 88  88 88 88         88     `YbodP' 888888 88ood8        YP    dP""""Yb 88ood8
 
 ; Return object's UDG data address offset for Rocket Middle Section/Fuel
-; depending on which
+; depending on which of the four levels (or multiple of) the player is currently on
 ; L_JSR_($2FDA)_($231F) OK
 ; L_JSR_($2FDA)_($2F85) OK
 ; L_JSR_($2FDA)_($2FC0) OK
@@ -4406,7 +4434,7 @@ Jetman_Collide_Rocket_Fuel
     ora     #$02                            ; 2FF5: 09 02     Zero all bits except bit 1 i.e. 000000x0
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2FF7: 91 00    
 
-; Jetman pickup Rocket Module / Fuel Pod = 100 points
+; Jetman pickup Rocket Module / Fuel Cell = 100 points
     jsr     Load_ZP_Parameters              ; 2FF9: 20 9D 25 
     fcb     $02                             ; 2FFC: 02       
     fdb     $0100                           ; 2FFD: 00 01    
@@ -7938,15 +7966,15 @@ UDG_Data_Ship_Fuel_Valuables
     fdb     Ship_2_Top                      ; 3C99: 83 3D    
     fdb     Ship_1_Top                      ; 3C9B: 1A 3D    
     fdb     Ship_2_Top                      ; 3C9D: 83 3D    
-    fdb     Fuel                            ; 3C9F: 9C 3D     Multiple entries for UDG objects indexing based on player level
-    fdb     Fuel                            ; 3CA1: 9C 3D    
-    fdb     Fuel                            ; 3CA3: 9C 3D    
-    fdb     Fuel                            ; 3CA5: 9C 3D    
+    fdb     Fuel_Cell                       ; 3C9F: 9C 3D     Multiple entries for UDG objects indexing based on player level
+    fdb     Fuel_Cell                       ; 3CA1: 9C 3D    
+    fdb     Fuel_Cell                       ; 3CA3: 9C 3D    
+    fdb     Fuel_Cell                       ; 3CA5: 9C 3D    
     fdb     Gold_Bar                        ; 3CA7: AF 3D    
     fdb     Plutonium                       ; 3CA9: E3 3D    
     fdb     Isotope                         ; 3CAB: 00 3E    
     fdb     Mineral                         ; 3CAD: 15 3E    
-    fdb     Diamond                         ; 3CAF: CA 3D    
+    fdb     Gemstone                        ; 3CAF: CA 3D    
     fcb     %11110111                       ; 3CB1: F7       
     fcb     %11110111                       ; 3CB2: F7       
     fcb     %11110111                       ; 3CB3: F7       
@@ -8188,7 +8216,8 @@ Ship_2_Top
     fcb     %00001011                       ; 3D99: 0B       
     fcb     %00000001                       ; 3D9A: 01       
     fcb     %00000000                       ; 3D9B: 00       
-Fuel fcb    %11111000                       ; 3D9C: F8       
+Fuel_Cell
+    fcb     %11111000                       ; 3D9C: F8       
     fcb     %11101100                       ; 3D9D: EC       
     fcb     %11011110                       ; 3D9E: DE       
     fcb     %00111111                       ; 3D9F: 3F       
@@ -8235,7 +8264,7 @@ Gold_Bar
     fcb     %00001100                       ; 3DC7: 0C       
     fcb     %00000001                       ; 3DC8: 01       
     fcb     %00000000                       ; 3DC9: 00       
-Diamond
+Gemstone
     fcb     %11111000                       ; 3DCA: F8       
     fcb     %00000100                       ; 3DCB: 04       
     fcb     %00010010                       ; 3DCC: 12       

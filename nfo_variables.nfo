@@ -167,7 +167,7 @@ label    03BC Obj_Rocket_Top_Or_Fuel_Status ; Rocket part Ready for pick-up/pick
 label    03C0 Obj_Rocket_Mid_Or_Valuable_Typ ;
 label    03C1 Obj_Rocket_Mid_Or_Valuable_X
 ;label   03C2 Obj_Rocket_Mid_Or_Valuable_2
-;label   03C3 Obj_Rocket_Mid_Or_Valuable_3
+;label   03C3 Obj_Rocket_Mid_Or_Valuable_Y
 label    03C4 Obj_Rocket_Mid_Or_Valu_Status
 ;label   03C5 Obj_Rocket_Mid_Or_Valu_Color
 label    03C6 Obj_Rocket_Mid_Or_Valu_Type
@@ -182,7 +182,12 @@ label    03C7 Obj_Rocket_Mid_Or_Valuable_7
 ;                          Level 1/2: 08=down, f8=up, always x8
 ;                          Level 3:   Same as 1/2 but xF seen at Jetman explode
 ; Byte 05/0D= colour - bottom 3 bits of byte
-; Byte 06/0E= For Gem, affects colors and flashing of Byte 05
+; Byte 06/0E= For Valuable, affects colors and flashing of Byte 05
+;             $20=gold bar (yellow)
+;             $22=plutonium (cyan)
+;             $24=isotope (cyan/black flash)
+;             $26=mineral (blue)
+;             $28=gemstone (multicolor cycle)
 ; Byte 06/0E= For Alien Ball Level, it's a countdown from $18 to 0 for Y reversal
 
 ; Aliens 1-6
