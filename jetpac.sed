@@ -110,6 +110,10 @@
 /; 27AA/,/; 2839/s/ZP18                            /ZP18_Object_Flame_Position_X    /
 /; 27AA/,/; 2839/s/ZP19                            /ZP19_Object_Flame_Position_Y    /
 
+# VALUABLES
+/; 2874/,/; 2885/s/ZP08                            /ZP08_Subroutine_Addr_Lo         /
+/; 2874/,/; 2885/s/(ZP08)                          /(ZP08_Subroutine_Addr_Lo)       /
+/; 2874/,/; 2885/s/ZP09                            /ZP09_Subroutine_Addr_Hi         /
 
 
 

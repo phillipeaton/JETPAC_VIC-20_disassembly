@@ -1048,7 +1048,8 @@ comment  2874
 deflabel 2875 VALUABLE_TYPE
 binary   2879
 comment  287A
-label    2874 Jump_To_Subroutine_List3
+label    2874 Animate_Valuable
+comment  287A Use valuable type to index into subroutine list and jump to subroutine
 comment  2880
 comment  2888
 label    2888 Subroutine_List_Valuables
@@ -1059,7 +1060,7 @@ comment  2892
 label    2892 Valuable_Gold_Bar
 deflabel 2893 YELLOW
 comment  2894
-label    2894 Store_Color_Setup_Object_Print
+label    2894 Save_Color_And_Display_Object
 deflabel 2895 OBJECT_COLOR_PARAM
 comment  2898
 deflabel 2899 OBJECT_VALUABLE_TYPE_PARAM
@@ -1067,34 +1068,43 @@ label    289F Valuable_Mineral
 comment  289F
 deflabel 28A0 BLUE
 comment  28A4
+comment  28A4 Use IRQ counter to toggle object color between black and cyan
 label    28A4 Valuable_Plutonium
 binary   28A7
 binary   28A9
 comment  28AC
+deflabel 28AD BLACK
 comment  28B1
 label    28B1 Valuable_Plutonium_Set_Color
 deflabel 28B2 CYAN
 comment  28B6
+comment  28B6 Use IRQ counter to cycle through colors, two LSRs quadruple the time between changes
 label    28B6 Valuable_Gemstone
 binary   28BB
 comment  28BE
+comment  28BE Change color from black to white
 binary   28BF
 comment  28C0
+comment  28C0 If new color is green, change it to white, green is reserved for platform logic
 label    28C0 Valuable_Gemstone_Set_Color
+deflabel 28C1 GREEN
+deflabel 28C5 WHITE
 comment  28C9
-label    28C9 Reset_Objects_1_To_8
+comment  28C9 Reset rocket parts/fuel/valuables and alien objects, $47 is 9 objects' data
+label    28C9 Reset_Objects_And_Aliens
 comment  28CD
-label    28CD Reset_Objects_1_To_8_1
+label    28CD Loop_Reset_Objects_And_Aliens
 comment  28D4
-comment  28D4 Init Jetman, Lasers, Rocket and Aliens
-label    28D4 Init_Most_Objects
+comment  28D4 Reset Jetman, Lasers, Sounds, Rocket and Aliens, $2F is 6 objects' data
+label    28D4 Reset_Objects_Multiple
 comment  28D8
-label    28D8 Loop_28D8
+label    28D8 Loop_Reset_Objects_Multiple
 comment  28DE
 comment  28DE Init all Alien objects
 comment  28E0
-label    28E0 Loop_28E0
+label    28E0 Loop_Reset_Objects_Aliens
 comment  28E7
+comment  28E7 General save and restore of object list pointer, not used as part of interrupt handler
 label    28E7 Save_Obj_List_Ptr
 comment  28F0
 label    28F0 Restore_Obj_List_Ptr
@@ -1104,8 +1114,10 @@ comment  28FC
 comment  28FC Reset Alien? object direction
 comment  2902
 comment  2902 Setup Alien? object color flashing/cycling
-lcomment 2906 Zero bits 0-5 i.e. xx000000
-lcomment 2908 Set bits 0-1 i.e. xxxxxx11
+lcomment 2906 Zero bits 0-5 xx000000
+binary   2907
+lcomment 2908 Set bits 0-1 xxxxxx11
+binary   2909
 comment  290A
 label    290A Store_Object_Type
 comment  290E
@@ -1114,8 +1126,10 @@ comment  2914
 comment  2914 Reset diagonal jiggles
 comment  2919
 comment  2919 Change Alien?/Explosion object colour based on timer
-lcomment 291B Zero bits 3-8 i.e. 00000xxx
-lcomment 291F Set bit 0 i.e. xxxxxxx1
+lcomment 291B Zero bits 3-8 00000xxx
+binary   291C
+lcomment 291F Set bit 0 xxxxxxx1
+binary   2920
 label    2921 Store_Object_Type_1
 lcomment 2925 Color code
 label    2927 Store_Object_Type_2
@@ -1129,18 +1143,32 @@ label    2968 Explosion_UDG_Ptr+1
 break    2969
 break    296E
 label    2975 Explosions_2
+binary   297F
+binary   2981
+comment  2987
 label    2987 Game_Over
-label    2997 Game_Over_1
+comment  2997
+label    2997 Game_Over_Player_2
+comment  299D
 label    299D Sound_Channels_Off_ETC
 comment  29AB
+binary   29AF
 comment  29B3
+binary   29B7
 comment  29BB
+comment  29C3
 label    29C3 Sound_Channels_Off_ETC_1
+comment  29C7
 label    29C7 Sound_Channels_Off_ETC_2
+comment  29D0
 label    29D0 Sound_Channels_Off_ETC_3
+comment  29DB
 label    29DB Sound_Channels_Off_ETC_4
+binary   29E1
+comment  29E7
 label    29E7 Display_Game_Over
 lcomment 29EA Game Over for P1 or P2?
+comment  29EE
 label    29EE Display_Game_Over_P1
 lcomment 29F1 ZP_Ptr_To_Str
 lcomment 29F2 Pointer to "GAME OVER PLAYER 1"
@@ -1148,8 +1176,8 @@ word     29F2
 lcomment 29F4 ZP_UDG_RAM_X ZP_UDG_RAM_Y
 lcomment 29F5 X Y
 word     29F5
+comment  29F8
 label    29F8 Display_String_
-comment  29FB
 lcomment 29FE Into ZP addr 02 and 03...
 lcomment 29FF ...load 00 and 00
 word     29FF
@@ -1172,8 +1200,10 @@ const    2A18
 lcomment 2A19 X Y
 word     2A19
 label    2A1F STR_GAME_OVER_PLAYER_1
+comment  2A32
 label    2A32 STR_GAME_OVER_PLAYER_2
 break    2A32
+comment  2A45
 label    2A45 Object_Pointer_To_Jetman
 word     2A4C
 comment  2A4F

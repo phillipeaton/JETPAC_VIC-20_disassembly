@@ -139,10 +139,10 @@ ZP_Ship_UDG_Addr_Offset         equ     $001E
 ZP_Ship_UDG_Addr_Color?         equ     $001F
 ZP_HW_IRQ_Occurred              equ     $0020
 ZP_Alien_Spawn_Counter          equ     $0021
-ZP_Obj_List_Ptr_Save_Lo         equ     $0022
-ZP_Obj_List_Ptr_Save_Hi         equ     $0023
-ZP_Obj_List_Ptr_Save_2_Lo       equ     $0024
-ZP_Obj_List_Ptr_Save_2_Hi       equ     $0025
+ZP_Obj_List_Ptr_Save_IRQ_Lo     equ     $0022
+ZP_Obj_List_Ptr_Save_IRQ_Hi     equ     $0023
+ZP_Obj_List_Ptr_Save_Lo         equ     $0024
+ZP_Obj_List_Ptr_Save_Hi         equ     $0025
 ZP_Rocket_Flame_State           equ     $0026
 ZP_Rocket_Flame_UDG_Toggle      equ     $0027
 ZP_Obj_Rocket_Saved             equ     $0028
@@ -259,7 +259,9 @@ LASER_X_POSITION_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
 OBJECT_X_POSITION_PARAM         equ     $01
 OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
+WHITE                           equ     $01
 CYAN                            equ     $03
+BLACK                           equ     $00
 BLUE                            equ     $06
 OBJECT_VALUABLE_TYPE_PARAM      equ     $06
 YELLOW                          equ     $07
@@ -271,7 +273,6 @@ WORD_SIZE                       equ     $02
 OBJECT_ROCKET_ADDRESS           equ     $B0
 OPTION_TEXT_ROWS                equ     $05
 TEXT_POSITION_X                 equ     $18
-WHITE                           equ     $01
 LIVES_INITIAL_PLAYER_2          equ     $05
 LIVES_INITIAL_PLAYER_1          equ     $04
 PLAYER_1                        equ     $00
@@ -2000,9 +2001,9 @@ SEI_Obj_Ptr_To_Jetman
 
 ; Save the current object list ptr and load up the Jetman object parameters
     lda     ZP_Obj_List_Ptr_Lo              ; 266E: A5 00    
-    sta     ZP_Obj_List_Ptr_Save_Lo         ; 2670: 85 22    
+    sta     ZP_Obj_List_Ptr_Save_IRQ_Lo     ; 2670: 85 22    
     lda     ZP_Obj_List_Ptr_Hi              ; 2672: A5 01    
-    sta     ZP_Obj_List_Ptr_Save_Hi         ; 2674: 85 23    
+    sta     ZP_Obj_List_Ptr_Save_IRQ_Hi     ; 2674: 85 23    
 
 ; Load Jetman object parameters
     jsr     Load_ZP_Parameters              ; 2676: 20 9D 25 
@@ -2015,9 +2016,9 @@ SEI_Obj_Ptr_To_Jetman
 
 ; L_BRS_($2680)_($263F) OK
 Restore_Saved_Obj_Ptr_And_CLI
-    lda     ZP_Obj_List_Ptr_Save_Lo         ; 2680: A5 22    
+    lda     ZP_Obj_List_Ptr_Save_IRQ_Lo     ; 2680: A5 22    
     sta     ZP_Obj_List_Ptr_Lo              ; 2682: 85 00    
-    lda     ZP_Obj_List_Ptr_Save_Hi         ; 2684: A5 23    
+    lda     ZP_Obj_List_Ptr_Save_IRQ_Hi     ; 2684: A5 23    
     sta     ZP_Obj_List_Ptr_Hi              ; 2686: 85 01    
 
 ; Enable Interrupts (Clear Disable Interrupts)
@@ -2536,15 +2537,10 @@ Ptr_Rocket_Flame_Frame_1_Hi
 
 
 ; #########################################################################################
-; 888888 88 88""Yb 888888
-; 88__   88 88__dP 88__
-; 88""   88 88"Yb  88""
-; 88     88 88  Yb 888888
-
-; 88""Yb 88""Yb 888888 .dP"Y8 .dP"Y8 888888 8888b.
-; 88__dP 88__dP 88__   `Ybo." `Ybo." 88__    8I  Yb
-; 88"""  88"Yb  88""   o.`Y8b o.`Y8b 88""    8I  dY
-; 88     88  Yb 888888 8bodP' 8bodP' 888888 8888Y"
+; Yb    dP    db    88     88   88    db    88""Yb 88     888888 .dP"Y8
+;  Yb  dP    dPYb   88     88   88   dPYb   88__dP 88     88__   `Ybo."
+;   YbdP    dP__Yb  88  .o Y8   8P  dP__Yb  88""Yb 88  .o 88""   o.`Y8b
+;    YP    dP""""Yb 88ood8 `YbodP' dP""""Yb 88oodP 88ood8 888888 8bodP'
 ; #########################################################################################
 
 ; Remove "Test_Platform_Collision"=Gems all fall through platforms and floor, reentering at top
@@ -2565,7 +2561,7 @@ VALUABLES
 Valuable_Landed
     jsr     Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35 
     jsr     Test_Jetman_Object_Collide      ; 2854: 20 58 2D 
-    bpl     Jump_To_Subroutine_List3        ; 2857: 10 1B    
+    bpl     Animate_Valuable                ; 2857: 10 1B    
 
 ; Object has been picked-up, remove from screen. S F V = Ship Fuel Valuable
     lda     #$00                            ; 2859: A9 00    
@@ -2584,18 +2580,19 @@ Valuable_Landed
 ; -----------------------
 
 ; L_BRS_($2874)_($2857) OK
-Jump_To_Subroutine_List3
+Animate_Valuable
     ldy     #VALUABLE_TYPE                  ; 2874: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2876: B1 00    
     and     #%00001110                      ; 2878: 29 0E    
 
+; Use valuable type to index into subroutine list and jump to subroutine
     tax                                     ; 287A: AA       
     lda     Subroutine_List_Valuables,x     ; 287B: BD 88 28 
-    sta     ZP08                            ; 287E: 85 08    
+    sta     ZP08_Subroutine_Addr_Lo         ; 287E: 85 08    
 
     lda     Subroutine_List_Valuables+1,x   ; 2880: BD 89 28 
-    sta     ZP09                            ; 2883: 85 09    
-    jmp     (ZP08)                          ; 2885: 6C 08 00 
+    sta     ZP09_Subroutine_Addr_Hi         ; 2883: 85 09    
+    jmp     (ZP08_Subroutine_Addr_Lo)       ; 2885: 6C 08 00 
 
 Subroutine_List_Valuables
     fdb     Valuable_Gold_Bar               ; 2888: 92 28    
@@ -2612,7 +2609,7 @@ Valuable_Gold_Bar
 ; L_JMP_($2894)_($28B3) OK
 ; L_BRS_($2894)_($28C2) OK
 ; L_JMP_($2894)_($28C6) OK
-Store_Color_Setup_Object_Print
+Save_Color_And_Display_Object
     ldy     #OBJECT_COLOR_PARAM             ; 2894: A0 05    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2896: 91 00    
 
@@ -2623,25 +2620,27 @@ Store_Color_Setup_Object_Print
 
 Valuable_Mineral
     lda     #BLUE                           ; 289F: A9 06    
-    jmp     Store_Color_Setup_Object_Print  ; 28A1: 4C 94 28 
+    jmp     Save_Color_And_Display_Object   ; 28A1: 4C 94 28 
 ; -----------------------
 
+; Use IRQ counter to toggle object color between black and cyan
 Valuable_Plutonium
     lda     ZP_HW_IRQ_Counter_Lo            ; 28A4: A5 4A    
     and     #%00011111                      ; 28A6: 29 1F    
     cmp     #%00011000                      ; 28A8: C9 18    
     bcs     Valuable_Plutonium_Set_Color    ; 28AA: B0 05    
 
-    lda     #$00                            ; 28AC: A9 00    
-    jmp     Store_Color_Setup_Object_Print  ; 28AE: 4C 94 28 
+    lda     #BLACK                          ; 28AC: A9 00    
+    jmp     Save_Color_And_Display_Object   ; 28AE: 4C 94 28 
 ; -----------------------
 
 ; L_BRS_($28B1)_($28AA) OK
 Valuable_Plutonium_Set_Color
     lda     #CYAN                           ; 28B1: A9 03    
-    jmp     Store_Color_Setup_Object_Print  ; 28B3: 4C 94 28 
+    jmp     Save_Color_And_Display_Object   ; 28B3: 4C 94 28 
 ; -----------------------
 
+; Use IRQ counter to cycle through colors, two LSRs quadruple the time between changes
 Valuable_Gemstone
     lda     ZP_HW_IRQ_Counter_Lo            ; 28B6: A5 4A    
     lsr     a                               ; 28B8: 4A       
@@ -2649,52 +2648,79 @@ Valuable_Gemstone
     and     #%00000111                      ; 28BA: 29 07    
     bne     Valuable_Gemstone_Set_Color     ; 28BC: D0 02    
 
+; Change color from black to white
     ora     #%00000001                      ; 28BE: 09 01    
 
+; If new color is green, change it to white, green is reserved for platform logic
 ; L_BRS_($28C0)_($28BC) OK
 Valuable_Gemstone_Set_Color
-    cmp     #$05                            ; 28C0: C9 05    
-    bne     Store_Color_Setup_Object_Print  ; 28C2: D0 D0    
-    lda     #$01                            ; 28C4: A9 01    
-    jmp     Store_Color_Setup_Object_Print  ; 28C6: 4C 94 28 
+    cmp     #GREEN                          ; 28C0: C9 05    
+    bne     Save_Color_And_Display_Object   ; 28C2: D0 D0    
+    lda     #WHITE                          ; 28C4: A9 01    
+    jmp     Save_Color_And_Display_Object   ; 28C6: 4C 94 28 
 ; -----------------------
 
+
+
+
+
+; 88""Yb 888888 .dP"Y8 888888 888888      dP"Yb  88""Yb  88888 888888  dP""b8 888888 .dP"Y8
+; 88__dP 88__   `Ybo." 88__     88       dP   Yb 88__dP     88 88__   dP   `"   88   `Ybo."
+; 88"Yb  88""   o.`Y8b 88""     88       Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
+; 88  Yb 888888 8bodP' 888888   88        YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
+
+; Reset rocket parts/fuel/valuables and alien objects, $47 is 9 objects' data
 ; L_JSR_($28C9)_($2E36) OK
-Reset_Objects_1_To_8
+Reset_Objects_And_Aliens
     ldx     #$47                            ; 28C9: A2 47    
     lda     #$00                            ; 28CB: A9 00    
 
 ; L_BRS_($28CD)_($28D1) OK
-Reset_Objects_1_To_8_1
+Loop_Reset_Objects_And_Aliens
     sta     Obj_Rocket_Top_Or_Fuel_Type,x   ; 28CD: 9D B8 03 
     dex                                     ; 28D0: CA       
-    bpl     Reset_Objects_1_To_8_1          ; 28D1: 10 FA    
+    bpl     Loop_Reset_Objects_And_Aliens   ; 28D1: 10 FA    
     rts                                     ; 28D3: 60       
 ; ===========================================================
 
-; Init Jetman, Lasers, Rocket and Aliens
+; Reset Jetman, Lasers, Sounds, Rocket and Aliens, $2F is 6 objects' data
 ; L_JSR_($28D4)_($29A8) OK
-Init_Most_Objects
+Reset_Objects_Multiple
     ldx     #$2F                            ; 28D4: A2 2F    
     lda     #$00                            ; 28D6: A9 00    
 
 ; L_BRS_($28D8)_($28DC) OK
-Loop_28D8
+Loop_Reset_Objects_Multiple
     sta     Obj_Jetman_State,x              ; 28D8: 9D 80 03 
     dex                                     ; 28DB: CA       
-    bpl     Loop_28D8                       ; 28DC: 10 FA    
+    bpl     Loop_Reset_Objects_Multiple     ; 28DC: 10 FA    
 
 ; Init all Alien objects
     ldx     #$2F                            ; 28DE: A2 2F    
 
 ; L_BRS_($28E0)_($28E4) OK
-Loop_28E0
+Loop_Reset_Objects_Aliens
     sta     Obj_Alien_0_0,x                 ; 28E0: 9D C8 03 
     dex                                     ; 28E3: CA       
-    bpl     Loop_28E0                       ; 28E4: 10 FA    
+    bpl     Loop_Reset_Objects_Aliens       ; 28E4: 10 FA    
     rts                                     ; 28E6: 60       
 ; ===========================================================
 
+
+
+
+
+; .dP"Y8    db    Yb    dP 888888     88""Yb 888888 .dP"Y8 888888  dP"Yb  88""Yb 888888
+; `Ybo."   dPYb    Yb  dP  88__       88__dP 88__   `Ybo."   88   dP   Yb 88__dP 88__
+; o.`Y8b  dP__Yb    YbdP   88""       88"Yb  88""   o.`Y8b   88   Yb   dP 88"Yb  88""
+; 8bodP' dP""""Yb    YP    888888     88  Yb 888888 8bodP'   88    YbodP  88  Yb 888888
+
+;  dP"Yb  88""Yb  88888     88     88 .dP"Y8 888888     88""Yb 888888 88""Yb
+; dP   Yb 88__dP     88     88     88 `Ybo."   88       88__dP   88   88__dP
+; Yb   dP 88""Yb o.  88     88  .o 88 o.`Y8b   88       88"""    88   88"Yb
+;  YbodP  88oodP "bodP'     88ood8 88 8bodP'   88       88       88   88  Yb
+
+; General save and restore of object list pointer, not used as part of interrupt handler
 ; L_JSR_($28E7)_($22E3) OK
 ; L_JSR_($28E7)_($22F2) OK
 ; L_JSR_($28E7)_($230E) OK
@@ -2704,9 +2730,9 @@ Loop_28E0
 ; L_JSR_($28E7)_($2E8C) OK
 Save_Obj_List_Ptr
     lda     ZP_Obj_List_Ptr_Lo              ; 28E7: A5 00    
-    sta     ZP_Obj_List_Ptr_Save_2_Lo       ; 28E9: 85 24    
+    sta     ZP_Obj_List_Ptr_Save_Lo         ; 28E9: 85 24    
     lda     ZP_Obj_List_Ptr_Hi              ; 28EB: A5 01    
-    sta     ZP_Obj_List_Ptr_Save_2_Hi       ; 28ED: 85 25    
+    sta     ZP_Obj_List_Ptr_Save_Hi         ; 28ED: 85 25    
     rts                                     ; 28EF: 60       
 ; ===========================================================
 
@@ -2716,9 +2742,9 @@ Save_Obj_List_Ptr
 ; L_JMP_($28F0)_($2DC2) OK
 ; L_JSR_($28F0)_($2EA1) OK
 Restore_Obj_List_Ptr
-    lda     ZP_Obj_List_Ptr_Save_2_Lo       ; 28F0: A5 24    
+    lda     ZP_Obj_List_Ptr_Save_Lo         ; 28F0: A5 24    
     sta     ZP_Obj_List_Ptr_Lo              ; 28F2: 85 00    
-    lda     ZP_Obj_List_Ptr_Save_2_Hi       ; 28F4: A5 25    
+    lda     ZP_Obj_List_Ptr_Save_Hi         ; 28F4: A5 25    
     sta     ZP_Obj_List_Ptr_Hi              ; 28F6: 85 01    
     rts                                     ; 28F8: 60       
 ; ===========================================================
@@ -2746,8 +2772,8 @@ Change_Object_To_Explosion_1
 ; Setup Alien? object color flashing/cycling
     ldy     #$00                            ; 2902: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2904: B1 00    
-    and     #$C0                            ; 2906: 29 C0     Zero bits 0-5 i.e. xx000000
-    ora     #$03                            ; 2908: 09 03     Set bits 0-1 i.e. xxxxxx11
+    and     #%11000000                      ; 2906: 29 C0     Zero bits 0-5 xx000000
+    ora     #%00000011                      ; 2908: 09 03     Set bits 0-1 xxxxxx11
 
 ; L_JSR_($290A)_($2A59) OK
 Store_Object_Type
@@ -2766,9 +2792,9 @@ Store_Object_Type
 
 ; Change Alien?/Explosion object colour based on timer
     lda     ZP_HW_IRQ_Random                ; 2919: A5 4C    
-    and     #$07                            ; 291B: 29 07     Zero bits 3-8 i.e. 00000xxx
+    and     #%00000111                      ; 291B: 29 07     Zero bits 3-8 00000xxx
     bne     Store_Object_Type_1             ; 291D: D0 02    
-    ora     #$01                            ; 291F: 09 01     Set bit 0 i.e. xxxxxxx1
+    ora     #%00000001                      ; 291F: 09 01     Set bit 0 xxxxxxx1
 ; L_BRS_($2921)_($291D) OK
 Store_Object_Type_1
     cmp     #$05                            ; 2921: C9 05    
@@ -2826,54 +2852,69 @@ Explosions_2
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2978: 91 00    
     ldy     #$06                            ; 297A: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 297C: B1 00    
-    and     #$3F                            ; 297E: 29 3F    
-    cmp     #$03                            ; 2980: C9 03    
+    and     #%00111111                      ; 297E: 29 3F    
+    cmp     #%00000011                      ; 2980: C9 03    
     bcc     Sound_Channels_Off_ETC          ; 2982: 90 19    
     jmp     GOTO_NEXT_OBJECT                ; 2984: 4C 1A 26 
 ; -----------------------
+
+
+
+
+
+;  dP""b8    db    8b    d8 888888      dP"Yb  Yb    dP 888888 88""Yb
+; dP   `"   dPYb   88b  d88 88__       dP   Yb  Yb  dP  88__   88__dP
+; Yb  "88  dP__Yb  88YbdP88 88""       Yb   dP   YbdP   88""   88"Yb
+;  YboodP dP""""Yb 88 YY 88 888888      YbodP     YP    888888 88  Yb
+
 ; L_BRS_($2987)_($29C5) OK
 Game_Over
     jsr     Check_New_Hi_Score              ; 2987: 20 7A 27 
     jsr     Reset_Screen_Display_Scores     ; 298A: 20 16 24 
     lda     ZP_Active_Player                ; 298D: A5 5E    
-    bne     Game_Over_1                     ; 298F: D0 06    
+    bne     Game_Over_Player_2              ; 298F: D0 06    
     jsr     Display_Game_Over_P1            ; 2991: 20 EE 29 
     jmp     Reset_Game_Select               ; 2994: 4C 79 20 
 ; -----------------------
+
 ; L_BRS_($2997)_($298F) OK
-Game_Over_1
+Game_Over_Player_2
     jsr     Display_Game_Over_P2            ; 2997: 20 12 2A 
     jmp     Reset_Game_Select               ; 299A: 4C 79 20 
 ; -----------------------
+
 ; L_BRS_($299D)_($2982) OK
 Sound_Channels_Off_ETC
     lda     #$00                            ; 299D: A9 00    
     sta     VIC_RA_Frq_Osc1                 ; 299F: 8D 0A 90 
     sta     VIC_RB_Frq_Osc2                 ; 29A2: 8D 0B 90 
     sta     VIC_RC_Frq_Osc3                 ; 29A5: 8D 0C 90 
-    jsr     Init_Most_Objects               ; 29A8: 20 D4 28 
+    jsr     Reset_Objects_Multiple          ; 29A8: 20 D4 28 
 
     lda     Obj_Rocket_Top_Or_Fuel_Status   ; 29AB: AD BC 03 
-    and     #$FD                            ; 29AE: 29 FD    
+    and     #%11111101                      ; 29AE: 29 FD    
     sta     Obj_Rocket_Top_Or_Fuel_Status   ; 29B0: 8D BC 03 
 
     lda     Obj_Rocket_Mid_Or_Valu_Status   ; 29B3: AD C4 03 
-    and     #$FD                            ; 29B6: 29 FD    
+    and     #%11111101                      ; 29B6: 29 FD    
     sta     Obj_Rocket_Mid_Or_Valu_Status   ; 29B8: 8D C4 03 
 
     lda     Game_Settings                   ; 29BB: AD D3 1F 
     bit     MASK_00000001                   ; 29BE: 2C 14 20 
     bne     Sound_Channels_Off_ETC_3        ; 29C1: D0 0D    
+
 ; L_BRS_($29C3)_($29D2) OK
 Sound_Channels_Off_ETC_1
     lda     ZP_Num_Lives_Active_Player      ; 29C3: A5 5A    
     beq     Game_Over                       ; 29C5: F0 C0    
+
 ; L_JMP_($29C7)_($29E4) OK
 Sound_Channels_Off_ETC_2
     jsr     Reset_Level                     ; 29C7: 20 D7 22 
     jsr     Init_Next_Jetman_Lives_Scores   ; 29CA: 20 5B 23 
     jmp     GOTO_NEXT_OBJECT                ; 29CD: 4C 1A 26 
 ; -----------------------
+
 ; L_BRS_($29D0)_($29C1) OK
 Sound_Channels_Off_ETC_3
     lda     ZP_Num_Lives_Inactive_Player    ; 29D0: A5 5C    
@@ -2881,19 +2922,22 @@ Sound_Channels_Off_ETC_3
     lda     ZP_Num_Lives_Active_Player      ; 29D4: A5 5A    
     bne     Sound_Channels_Off_ETC_4        ; 29D6: D0 03    
     jsr     Display_Game_Over               ; 29D8: 20 E7 29 
+
 ; L_BRS_($29DB)_($29D6) OK
 Sound_Channels_Off_ETC_4
     jsr     Swap_Player_And_Obj_Rocket      ; 29DB: 20 F5 23 
     lda     ZP_Active_Player                ; 29DE: A5 5E    
-    eor     #$FF                            ; 29E0: 49 FF    
+    eor     #%11111111                      ; 29E0: 49 FF    
     sta     ZP_Active_Player                ; 29E2: 85 5E    
     jmp     Sound_Channels_Off_ETC_2        ; 29E4: 4C C7 29 
 ; -----------------------
+
 ; L_JSR_($29E7)_($29D8) OK
 Display_Game_Over
     jsr     Reset_Screen_Display_Scores     ; 29E7: 20 16 24 
     lda     ZP_Active_Player                ; 29EA: A5 5E     Game Over for P1 or P2?
     bne     Display_Game_Over_P2            ; 29EC: D0 24    
+
 ; L_JSR_($29EE)_($2991) OK
 Display_Game_Over_P1
     jsr     Load_ZP_Parameters              ; 29EE: 20 9D 25 
@@ -2902,10 +2946,10 @@ Display_Game_Over_P1
     fcb     $04                             ; 29F4: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y
     fdb     $6010                           ; 29F5: 10 60     X Y
     fcb     $FF                             ; 29F7: FF       
+
 ; L_JMP_($29F8)_($2A1C) OK
 Display_String_
     jsr     Display_String_Setup            ; 29F8: 20 CC 34 
-
     jsr     Load_ZP_Parameters              ; 29FB: 20 9D 25 
     fcb     $02                             ; 29FE: 02        Into ZP addr 02 and 03...
     fdb     $0000                           ; 29FF: 00 00     ..load 00 and 00
@@ -2941,10 +2985,12 @@ STR_GAME_OVER_PLAYER_1
     fcb     $01                             ; 2A1F: 01       
     fcc     "GAME`OVER`PLAYER`"             ; 2A20: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
     fcb     $F1                             ; 2A31: F1       
+
 STR_GAME_OVER_PLAYER_2
     fcb     $01                             ; 2A32: 01       
     fcc     "GAME`OVER`PLAYER`"             ; 2A33: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
     fcb     $F2                             ; 2A44: F2       
+
 ; L_JSR_($2A45)_($2C99) OK
 Object_Pointer_To_Jetman
     jsr     Save_Obj_List_Ptr               ; 2A45: 20 E7 28 
@@ -4062,7 +4108,7 @@ ROCKET_ASCEND
 ; L_BRS_($2E34)_($2E20) OK
 Rocket_At_Top
     inc     ZP_Level_Active_Player          ; 2E34: E6 59    
-    jsr     Reset_Objects_1_To_8            ; 2E36: 20 C9 28 
+    jsr     Reset_Objects_And_Aliens        ; 2E36: 20 C9 28 
     ldy     #$00                            ; 2E39: A0 00    
     lda     #$0B                            ; 2E3B: A9 0B    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E3D: 91 00    

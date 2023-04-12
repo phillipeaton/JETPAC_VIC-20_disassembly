@@ -46,10 +46,10 @@ label      1E ZP_Ship_UDG_Addr_Offset        ;
 label      1F ZP_Ship_UDG_Addr_Color?        ;
 label      20 ZP_HW_IRQ_Occurred             ;
 label      21 ZP_Alien_Spawn_Counter         ; When reaches $04, Alien spawns, incremented by Explosions and Lasers
-label      22 ZP_Obj_List_Ptr_Save_Lo        ;
-label      23 ZP_Obj_List_Ptr_Save_Hi        ;
-label      24 ZP_Obj_List_Ptr_Save_2_Lo      ;
-label      25 ZP_Obj_List_Ptr_Save_2_Hi      ;
+label      22 ZP_Obj_List_Ptr_Save_IRQ_Lo    ;
+label      23 ZP_Obj_List_Ptr_Save_IRQ_Hi    ;
+label      24 ZP_Obj_List_Ptr_Save_Lo      ;
+label      25 ZP_Obj_List_Ptr_Save_Hi      ;
 label      26 ZP_Rocket_Flame_State          ; Turns off at take-off and landing
 label      27 ZP_Rocket_Flame_UDG_Toggle     ; Counts up throughout the flight, used for flame animation
 label      0028-0039 ZP_Obj_Rocket_Saved     ;
