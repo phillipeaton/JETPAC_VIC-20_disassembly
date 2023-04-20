@@ -1090,12 +1090,12 @@ label    28C0 Valuable_Gemstone_Set_Color
 deflabel 28C1 GREEN
 deflabel 28C5 WHITE
 comment  28C9
-comment  28C9 Reset rocket parts/fuel/valuables and alien objects, $47 is 9 objects' data
+comment  28C9 Reset rocket parts/fuel/valuables and alien objects, $47 is 9 objects data
 label    28C9 Reset_Objects_And_Aliens
 comment  28CD
 label    28CD Loop_Reset_Objects_And_Aliens
 comment  28D4
-comment  28D4 Reset Jetman, Lasers, Sounds, Rocket and Aliens, $2F is 6 objects' data
+comment  28D4 Reset Jetman, Lasers, Sounds, Rocket and Aliens, $2F is 6 objects data
 label    28D4 Reset_Objects_Multiple
 comment  28D8
 label    28D8 Loop_Reset_Objects_Multiple
@@ -1109,11 +1109,14 @@ label    28E7 Save_Obj_List_Ptr
 comment  28F0
 label    28F0 Restore_Obj_List_Ptr
 comment  28F9
-label    28F9 Change_Object_To_Explosion_1
+label    28F9 Change_Object_To_Explosion
 comment  28FC
-comment  28FC Reset Alien? object direction
+comment  28FC Reset object X direction
+deflabel 28FF OBJECT_X_DIRECTION_PARAM
 comment  2902
-comment  2902 Setup Alien? object color flashing/cycling
+comment  2902 Get object type, zero middle four bits, preserve bits 6 and 7, set bits 1 & 2
+comment  2902 The AND and OR probably for jetman object
+deflabel 2903 OBJECT_TYPE_PARAM
 lcomment 2906 Zero bits 0-5 xx000000
 binary   2907
 lcomment 2908 Set bits 0-1 xxxxxx11
@@ -1121,30 +1124,62 @@ binary   2909
 comment  290A
 label    290A Store_Object_Type
 comment  290E
-comment  290E Change object type to an Explosion
+comment  290E Change object type to an explosion
+deflabel 290F OBJECT_TYPE_PARAM
+deflabel 2911 OBJECT_TYPE_EXPLOSION
 comment  2914
-comment  2914 Reset diagonal jiggles
+comment  2914 Use parameter as animation frame counter, now reset it
+deflabel 2916 EXPLOSION_ANIMATION_FRAME
 comment  2919
-comment  2919 Change Alien?/Explosion object colour based on timer
+comment  2919 Change explosion object colour based on IRQ random generator
 lcomment 291B Zero bits 3-8 00000xxx
 binary   291C
 lcomment 291F Set bit 0 xxxxxxx1
-binary   2920
-label    2921 Store_Object_Type_1
+comment  291F
+comment  291F Color is black, bump it to white by incrementing
+deflabel 2920 WHITE
+label    2921 Test_New_Color_Is_Green
+comment  2921
+deflabel 2922 GREEN
 lcomment 2925 Color code
-label    2927 Store_Object_Type_2
+comment  2925
+comment  2925 If color is green, bump to Blue, Green only used for platforms
+deflabel 2926 BLUE
+comment  2927
+label    2927 Store_Updated_Explosion_Color
 comment  292B
 comment  292B Trigger explosion sound (noise + regular oscillator)
-label    2934 EXPLOSIONS
-label    294A Explosions_1
+deflabel 292C OBJECT_COLOR_PARAM
+comment  2934
+comment  2934 If an alien explosion occurs, add a new alien
+label    2934 ANIMATE_EXPLOSIONS
+comment  2939
+comment  2939 Add randomness to how long an animation frame is displayed using the IRQ counter
+comment  2941
+comment  2941 Increment explosion animation frame count
+deflabel 2942 EXPLOSION_ANIMATION_FRAME
+comment  294A
+label    294A Test_Explosion_Animation_Done
+deflabel 294B EXPLOSION_ANIMATION_FRAME
+deflabel 294F EXPLOSION_ANIMATION_FRAMES
+comment  2952
+comment  2952 Setup Registers A and Y to point to the correct explosion UDG data
+comment  295B
+comment  295B Update the explosion on screen
+comment  2967
 label    2967 Explosion_UDG_Ptr
 word     2967-2974
 label    2968 Explosion_UDG_Ptr+1
 break    2969
 break    296E
-label    2975 Explosions_2
+comment  2975
+label    2975 Disable_Explosion_Obj_In_List
+deflabel 2976 OBJECT_TYPE_PARAM
+comment  297A
+deflabel 297B OBJECT_TYPE_PARAM_SAVED
 binary   297F
 binary   2981
+comment  2982
 comment  2987
 label    2987 Game_Over
 comment  2997
@@ -1199,12 +1234,13 @@ lcomment 2A18 ZP_UDG_RAM_X ZP_UDG_RAM_Y
 const    2A18
 lcomment 2A19 X Y
 word     2A19
+comment  2A1F
 label    2A1F STR_GAME_OVER_PLAYER_1
 comment  2A32
 label    2A32 STR_GAME_OVER_PLAYER_2
 break    2A32
 comment  2A45
-label    2A45 Object_Pointer_To_Jetman
+label    2A45 Set_Obj_List_Ptr_To_Jetman
 word     2A4C
 comment  2A4F
 comment  2A4F Set Jetman Move Speed to 1
@@ -1431,7 +1467,7 @@ comment  2C7E Get score high byte and save
 comment  2C84
 comment  2C84 Get score low byte and save
 comment  2C8C
-label    2C8C Change_Object_To_Explosion
+label    2C8C Change_Object_To_Explosion_Nxt
 comment  2C92
 comment  2C92
 comment  2C92

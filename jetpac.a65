@@ -165,10 +165,14 @@ LASER_X_POSITION_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
 OBJECT_X_POSITION_PARAM         equ     $01
 OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
+OBJECT_TYPE_PARAM_SAVED         equ     $06
+EXPLOSION_ANIMATION_FRAMES      equ     $07
+EXPLOSION_ANIMATION_FRAME       equ     $04
+BLUE                            equ     $06
 WHITE                           equ     $01
+OBJECT_TYPE_EXPLOSION           equ     $03
 CYAN                            equ     $03
 BLACK                           equ     $00
-BLUE                            equ     $06
 OBJECT_VALUABLE_TYPE_PARAM      equ     $06
 YELLOW                          equ     $07
 VALUABLE_TYPE                   equ     $06
@@ -1950,7 +1954,7 @@ Subroutine_List
     fdb     GOTO_NEXT_OBJECT                ; 268C: 1A 26     00
     fdb     JETMAN_FLYING_                  ; 268E: 73 32     01
     fdb     READ_CONTROLS                   ; 2690: 4D 33     02
-    fdb     EXPLOSIONS                      ; 2692: 34 29     03
+    fdb     ANIMATE_EXPLOSIONS              ; 2692: 34 29     03
     fdb     ROCKET_PART_OR_FUEL             ; 2694: 8E 2F     04
     fdb     LEVEL_0_FUZZBALL                ; 2696: 6A 2C     05
     fdb     LEVEL_3_SAUCER                  ; 2698: BC 2A     06
@@ -2575,7 +2579,7 @@ Valuable_Gemstone_Set_Color
 ; 88"Yb  88""   o.`Y8b 88""     88       Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 ; 88  Yb 888888 8bodP' 888888   88        YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
-; Reset rocket parts/fuel/valuables and alien objects, $47 is 9 objects' data
+; Reset rocket parts/fuel/valuables and alien objects, $47 is 9 objects data
 ; L_JSR_($28C9)_($2E36) OK
 Reset_Objects_And_Aliens
     ldx     #$47                            ; 28C9: A2 47    
@@ -2589,7 +2593,7 @@ Loop_Reset_Objects_And_Aliens
     rts                                     ; 28D3: 60       
 ; ===========================================================
 
-; Reset Jetman, Lasers, Sounds, Rocket and Aliens, $2F is 6 objects' data
+; Reset Jetman, Lasers, Sounds, Rocket and Aliens, $2F is 6 objects data
 ; L_JSR_($28D4)_($29A8) OK
 Reset_Objects_Multiple
     ldx     #$2F                            ; 28D4: A2 2F    
@@ -2667,16 +2671,17 @@ Restore_Obj_List_Ptr
 ; #########################################################################################
 
 ; L_JSR_($28F9)_($2C8C) OK
-Change_Object_To_Explosion_1
+Change_Object_To_Explosion
     jsr     Display_Object_With_Setup_3     ; 28F9: 20 0D 36 
 
-; Reset Alien? object direction
+; Reset object X direction
     lda     #$00                            ; 28FC: A9 00    
-    ldy     #$02                            ; 28FE: A0 02    
+    ldy     #OBJECT_X_DIRECTION_PARAM       ; 28FE: A0 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2900: 91 00    
 
-; Setup Alien? object color flashing/cycling
-    ldy     #$00                            ; 2902: A0 00    
+; Get object type, zero middle four bits, preserve bits 6 and 7, set bits 1 & 2
+; The AND and OR probably for jetman object
+    ldy     #OBJECT_TYPE_PARAM              ; 2902: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2904: B1 00    
     and     #%11000000                      ; 2906: 29 C0     Zero bits 0-5 xx000000
     ora     #%00000011                      ; 2908: 09 03     Set bits 0-1 xxxxxx11
@@ -2686,80 +2691,101 @@ Store_Object_Type
     ldy     #$06                            ; 290A: A0 06    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 290C: 91 00    
 
-; Change object type to an Explosion
-    ldy     #$00                            ; 290E: A0 00    
-    lda     #$03                            ; 2910: A9 03    
+; Change object type to an explosion
+    ldy     #OBJECT_TYPE_PARAM              ; 290E: A0 00    
+    lda     #OBJECT_TYPE_EXPLOSION          ; 2910: A9 03    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2912: 91 00    
 
-; Reset diagonal jiggles
+; Use parameter as animation frame counter, now reset it
     tya                                     ; 2914: 98       
-    ldy     #$04                            ; 2915: A0 04    
+    ldy     #EXPLOSION_ANIMATION_FRAME      ; 2915: A0 04    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2917: 91 00    
 
-; Change Alien?/Explosion object colour based on timer
+; Change explosion object colour based on IRQ random generator
     lda     ZP_HW_IRQ_Random                ; 2919: A5 4C    
     and     #%00000111                      ; 291B: 29 07     Zero bits 3-8 00000xxx
-    bne     Store_Object_Type_1             ; 291D: D0 02    
-    ora     #%00000001                      ; 291F: 09 01     Set bit 0 xxxxxxx1
+    bne     Test_New_Color_Is_Green         ; 291D: D0 02    
+
+; Color is black, bump it to white by incrementing
+    ora     #WHITE                          ; 291F: 09 01     Set bit 0 xxxxxxx1
+
 ; L_BRS_($2921)_($291D) OK
-Store_Object_Type_1
-    cmp     #$05                            ; 2921: C9 05    
-    bne     Store_Object_Type_2             ; 2923: D0 02    
-    lda     #$06                            ; 2925: A9 06     Color code
+Test_New_Color_Is_Green
+    cmp     #GREEN                          ; 2921: C9 05    
+    bne     Store_Updated_Explosion_Color   ; 2923: D0 02    
+
+; If color is green, bump to Blue, Green only used for platforms
+    lda     #BLUE                           ; 2925: A9 06     Color code
+
 ; L_BRS_($2927)_($2923) OK
-Store_Object_Type_2
+Store_Updated_Explosion_Color
     ldy     #$05                            ; 2927: A0 05    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2929: 91 00    
 
 ; Trigger explosion sound (noise + regular oscillator)
-    lda     #$05                            ; 292B: A9 05    
+    lda     #OBJECT_COLOR_PARAM             ; 292B: A9 05    
     sta     Obj_Sound_Noise                 ; 292D: 8D AB 03 
     sta     Obj_Sound_Noise_Timer           ; 2930: 8D AC 03 
     rts                                     ; 2933: 60       
 ; ===========================================================
-EXPLOSIONS
+
+; If an alien explosion occurs, add a new alien
+ANIMATE_EXPLOSIONS
     inc     ZP_Alien_Spawn_Counter          ; 2934: E6 21    
     jsr     Load_Object_Type_X_Y_Color      ; 2936: 20 E9 35 
+
+; Add randomness to how long an animation frame is displayed using the IRQ counter
     ldy     #$02                            ; 2939: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 293B: B1 00    
     and     ZP_HW_IRQ_Counter_Lo            ; 293D: 25 4A    
-    bne     Explosions_1                    ; 293F: D0 09    
-    ldy     #$04                            ; 2941: A0 04    
+    bne     Test_Explosion_Animation_Done   ; 293F: D0 09    
+
+; Increment explosion animation frame count
+    ldy     #EXPLOSION_ANIMATION_FRAME      ; 2941: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2943: B1 00    
     clc                                     ; 2945: 18       
     adc     #$01                            ; 2946: 69 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2948: 91 00    
+
 ; L_BRS_($294A)_($293F) OK
-Explosions_1
-    ldy     #$04                            ; 294A: A0 04    
+Test_Explosion_Animation_Done
+    ldy     #EXPLOSION_ANIMATION_FRAME      ; 294A: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 294C: B1 00    
-    cmp     #$07                            ; 294E: C9 07    
-    bcs     Explosions_2                    ; 2950: B0 23    
+    cmp     #EXPLOSION_ANIMATION_FRAMES     ; 294E: C9 07    
+    bcs     Disable_Explosion_Obj_In_List   ; 2950: B0 23    
+
+; Setup Registers A and Y to point to the correct explosion UDG data
     asl     a                               ; 2952: 0A       
     tax                                     ; 2953: AA       
     lda     Explosion_UDG_Ptr,x             ; 2954: BD 67 29 
     tay                                     ; 2957: A8       
     lda     Explosion_UDG_Ptr+1,x           ; 2958: BD 68 29 
+
+; Update the explosion on screen
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 295B: 20 3D 37 
     jsr     Display_Object_With_Setup_2     ; 295E: 20 04 36 
     jsr     Colorize_Object                 ; 2961: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2964: 4C 1A 26 
 ; -----------------------
+
 Explosion_UDG_Ptr
     fdb     Explosion_1                     ; 2967: 74 3F    
     fdb     Explosion_1,Explosion_2         ; 2969: 74 3F 9B 3F 
     fdb     Explosion_3                     ; 296D: B2 3F    
     fdb     Explosion_1,Explosion_2         ; 296F: 74 3F 9B 3F 
     fdb     Explosion_3                     ; 2973: B2 3F    
+
 ; L_BRS_($2975)_($2950) OK
-Explosions_2
-    ldy     #$00                            ; 2975: A0 00    
+Disable_Explosion_Obj_In_List
+    ldy     #OBJECT_TYPE_PARAM              ; 2975: A0 00    
     tya                                     ; 2977: 98       
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2978: 91 00    
-    ldy     #$06                            ; 297A: A0 06    
+
+    ldy     #OBJECT_TYPE_PARAM_SAVED        ; 297A: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 297C: B1 00    
     and     #%00111111                      ; 297E: 29 3F    
     cmp     #%00000011                      ; 2980: C9 03    
+
     bcc     Sound_Channels_Off_ETC          ; 2982: 90 19    
     jmp     GOTO_NEXT_OBJECT                ; 2984: 4C 1A 26 
 ; -----------------------
@@ -2887,6 +2913,7 @@ Display_Game_Over_P2
     fcb     $FF                             ; 2A1B: FF       
     jmp     Display_String_                 ; 2A1C: 4C F8 29 
 ; -----------------------
+
 STR_GAME_OVER_PLAYER_1
     fcb     $01                             ; 2A1F: 01       
     fcc     "GAME`OVER`PLAYER`"             ; 2A20: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
@@ -2897,8 +2924,22 @@ STR_GAME_OVER_PLAYER_2
     fcc     "GAME`OVER`PLAYER`"             ; 2A33: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
     fcb     $F2                             ; 2A44: F2       
 
+
+
+
+
+; .dP"Y8 888888 888888      dP"Yb  88""Yb  88888     88     88 .dP"Y8 888888
+; `Ybo." 88__     88       dP   Yb 88__dP     88     88     88 `Ybo."   88
+; o.`Y8b 88""     88       Yb   dP 88""Yb o.  88     88  .o 88 o.`Y8b   88
+; 8bodP' 888888   88        YbodP  88oodP "bodP'     88ood8 88 8bodP'   88
+
+; 88""Yb 888888 88""Yb     888888  dP"Yb       88888 888888 888888 8b    d8    db    88b 88
+; 88__dP   88   88__dP       88   dP   Yb         88 88__     88   88b  d88   dPYb   88Yb88
+; 88"""    88   88"Yb        88   Yb   dP     o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
+; 88       88   88  Yb       88    YbodP      "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
+
 ; L_JSR_($2A45)_($2C99) OK
-Object_Pointer_To_Jetman
+Set_Obj_List_Ptr_To_Jetman
     jsr     Save_Obj_List_Ptr               ; 2A45: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2A48: 20 9D 25 
     fcb     $00                             ; 2A4B: 00       
@@ -3544,7 +3585,7 @@ LEVEL_0_FUZZBALL
     jsr     Test_Platform_Collision         ; 2C6F: 20 B3 30 
     lda     ZP02                            ; 2C72: A5 02    
     bpl     Test_Jetman_Collide             ; 2C74: 10 1C    
-    bmi     Change_Object_To_Explosion      ; 2C76: 30 14    
+    bmi     Change_Object_To_Explosion_Nxt  ; 2C76: 30 14    
 
 
 
@@ -3578,8 +3619,8 @@ Alien_Hit_Update_Score
     jsr     Update_Score                    ; 2C89: 20 63 30 
 
 ; L_BRS_($2C8C)_($2C76) OK
-Change_Object_To_Explosion
-    jsr     Change_Object_To_Explosion_1    ; 2C8C: 20 F9 28 
+Change_Object_To_Explosion_Nxt
+    jsr     Change_Object_To_Explosion      ; 2C8C: 20 F9 28 
     jmp     GOTO_NEXT_OBJECT                ; 2C8F: 4C 1A 26 
 ; -----------------------
 
@@ -3597,7 +3638,7 @@ Test_Jetman_Collide
     bpl     Update_Object_Position          ; 2C97: 10 06    
 
 ; Alien has hit Jetman
-    jsr     Object_Pointer_To_Jetman        ; 2C99: 20 45 2A 
+    jsr     Set_Obj_List_Ptr_To_Jetman      ; 2C99: 20 45 2A 
     jmp     Alien_Hit_Update_Score          ; 2C9C: 4C 78 2C 
 ; -----------------------
 
