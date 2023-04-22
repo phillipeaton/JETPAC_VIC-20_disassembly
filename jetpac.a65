@@ -2685,11 +2685,11 @@ Change_Object_To_Explosion
     ldy     #OBJECT_TYPE_PARAM              ; 2902: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2904: B1 00    
     and     #%11000000                      ; 2906: 29 C0     Zero bits 0-5 xx000000
-    ora     #%00000011                      ; 2908: 09 03     Set bits 0-1 xxxxxx11
+    ora     #%00000011                      ; 2908: 09 03     Set bits 0-1 xx000011
 
 ; L_JSR_($290A)_($2A59) OK
-Store_Object_Type
-    ldy     #$06                            ; 290A: A0 06    
+Save_Object_Type
+    ldy     #OBJECT_TYPE_PARAM_SAVED        ; 290A: A0 06    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 290C: 91 00    
 
 ; Change object type to an explosion
@@ -2720,11 +2720,11 @@ Test_New_Colour_Is_Green
 
 ; L_BRS_($2927)_($2923) OK
 Store_Updated_Explosion_Colour
-    ldy     #$05                            ; 2927: A0 05    
+    ldy     #OBJECT_COLOUR_PARAM            ; 2927: A0 05    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2929: 91 00    
 
 ; Trigger explosion sound (noise + regular oscillator)
-    lda     #OBJECT_COLOUR_PARAM            ; 292B: A9 05    
+    lda     #$05                            ; 292B: A9 05    
     sta     Obj_Sound_Noise                 ; 292D: 8D AB 03 
     sta     Obj_Sound_Noise_Timer           ; 2930: 8D AC 03 
     rts                                     ; 2933: 60       
@@ -2735,7 +2735,8 @@ ANIMATE_EXPLOSIONS
     inc     ZP_Alien_Spawn_Counter          ; 2934: E6 21    
     jsr     Load_Object_Type_X_Y_Colour     ; 2936: 20 E9 35 
 
-; Add randomness to how long an animation frame is displayed using the IRQ counter
+; Appears to add randomness to how long an animation frame is displayed using the IRQ counter
+; Param 02 of alien object is always set to zero, for Jetman is always set to one
     ldy     #$02                            ; 2939: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 293B: B1 00    
     and     ZP_HW_IRQ_Counter_Lo            ; 293D: 25 4A    
@@ -2758,9 +2759,9 @@ Test_Explosion_Animation_Done
 ; Setup Registers A and Y to point to the correct explosion UDG data
     asl     a                               ; 2952: 0A       
     tax                                     ; 2953: AA       
-    lda     Explosion_UDG_Ptr,x             ; 2954: BD 67 29 
+    lda     Explosion_UDG_RAM_Addr_Table,x  ; 2954: BD 67 29 
     tay                                     ; 2957: A8       
-    lda     Explosion_UDG_Ptr+1,x           ; 2958: BD 68 29 
+    lda     Explosion_UDG_RAM_Addr_Table+1,x ; 2958: BD 68 29 
 
 ; Update the explosion on screen
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 295B: 20 3D 37 
@@ -2769,25 +2770,29 @@ Test_Explosion_Animation_Done
     jmp     GOTO_NEXT_OBJECT                ; 2964: 4C 1A 26 
 ; -----------------------
 
-Explosion_UDG_Ptr
-    fdb     Explosion_1                     ; 2967: 74 3F    
-    fdb     Explosion_1,Explosion_2         ; 2969: 74 3F 9B 3F 
-    fdb     Explosion_3                     ; 296D: B2 3F    
-    fdb     Explosion_1,Explosion_2         ; 296F: 74 3F 9B 3F 
-    fdb     Explosion_3                     ; 2973: B2 3F    
+Explosion_UDG_RAM_Addr_Table
+    fdb     Explosion_UDG_RAM_Addr_Frame_1  ; 2967: 74 3F    
+    fdb     Explosion_UDG_RAM_Addr_Frame_1  ; 2969: 74 3F    
+    fdb     Explosion_UDG_RAM_Addr_Frame_2  ; 296B: 9B 3F    
+    fdb     Explosion_UDG_RAM_Addr_Frame_3  ; 296D: B2 3F    
+    fdb     Explosion_UDG_RAM_Addr_Frame_1  ; 296F: 74 3F    
+    fdb     Explosion_UDG_RAM_Addr_Frame_2  ; 2971: 9B 3F    
+    fdb     Explosion_UDG_RAM_Addr_Frame_3  ; 2973: B2 3F    
 
+; Disable explosion object by setting object type to zero
 ; L_BRS_($2975)_($2950) OK
 Disable_Explosion_Obj_In_List
     ldy     #OBJECT_TYPE_PARAM              ; 2975: A0 00    
     tya                                     ; 2977: 98       
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2978: 91 00    
 
+; Test if object was an Alien or Jetman, branch if Jetman
     ldy     #OBJECT_TYPE_PARAM_SAVED        ; 297A: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 297C: B1 00    
     and     #%00111111                      ; 297E: 29 3F    
     cmp     #%00000011                      ; 2980: C9 03    
+    bcc     Reset_Objects_Test_Game_Over    ; 2982: 90 19    
 
-    bcc     Sound_Channels_Off_ETC          ; 2982: 90 19    
     jmp     GOTO_NEXT_OBJECT                ; 2984: 4C 1A 26 
 ; -----------------------
 
@@ -2806,77 +2811,83 @@ Game_Over
     jsr     Reset_Screen_Display_Scores     ; 298A: 20 16 24 
     lda     ZP_Active_Player                ; 298D: A5 5E    
     bne     Game_Over_Player_2              ; 298F: D0 06    
-    jsr     Display_Game_Over_P1            ; 2991: 20 EE 29 
+    jsr     Display_Game_Over_Player_1      ; 2991: 20 EE 29 
     jmp     Reset_Game_Select               ; 2994: 4C 79 20 
 ; -----------------------
 
 ; L_BRS_($2997)_($298F) OK
 Game_Over_Player_2
-    jsr     Display_Game_Over_P2            ; 2997: 20 12 2A 
+    jsr     Display_Game_Over_Player_2      ; 2997: 20 12 2A 
     jmp     Reset_Game_Select               ; 299A: 4C 79 20 
 ; -----------------------
 
 ; L_BRS_($299D)_($2982) OK
-Sound_Channels_Off_ETC
+Reset_Objects_Test_Game_Over
     lda     #$00                            ; 299D: A9 00    
     sta     VIC_RA_Frq_Osc1                 ; 299F: 8D 0A 90 
     sta     VIC_RB_Frq_Osc2                 ; 29A2: 8D 0B 90 
     sta     VIC_RC_Frq_Osc3                 ; 29A5: 8D 0C 90 
     jsr     Reset_Objects_Multiple          ; 29A8: 20 D4 28 
 
+; Unset "Picked-up by Jetman"
     lda     Obj_Rocket_Top_Or_Fuel_Status   ; 29AB: AD BC 03 
     and     #%11111101                      ; 29AE: 29 FD    
     sta     Obj_Rocket_Top_Or_Fuel_Status   ; 29B0: 8D BC 03 
 
+; Unset "Picked-up by Jetman"
     lda     Obj_Rocket_Mid_Or_Valu_Status   ; 29B3: AD C4 03 
     and     #%11111101                      ; 29B6: 29 FD    
     sta     Obj_Rocket_Mid_Or_Valu_Status   ; 29B8: 8D C4 03 
 
+; Test if 1 or 2 Player Game, branch if 2 Player
     lda     Game_Settings                   ; 29BB: AD D3 1F 
     bit     MASK_00000001                   ; 29BE: 2C 14 20 
-    bne     Sound_Channels_Off_ETC_3        ; 29C1: D0 0D    
+    bne     Test_Game_Over_Inactive_Player  ; 29C1: D0 0D    
 
 ; L_BRS_($29C3)_($29D2) OK
-Sound_Channels_Off_ETC_1
+Test_Game_Over_Active_Player
     lda     ZP_Num_Lives_Active_Player      ; 29C3: A5 5A    
     beq     Game_Over                       ; 29C5: F0 C0    
 
 ; L_JMP_($29C7)_($29E4) OK
-Sound_Channels_Off_ETC_2
+Reset_Level_Init_Next_Jetman
     jsr     Reset_Level                     ; 29C7: 20 D7 22 
     jsr     Init_Next_Jetman_Lives_Scores   ; 29CA: 20 5B 23 
     jmp     GOTO_NEXT_OBJECT                ; 29CD: 4C 1A 26 
 ; -----------------------
 
 ; L_BRS_($29D0)_($29C1) OK
-Sound_Channels_Off_ETC_3
+Test_Game_Over_Inactive_Player
     lda     ZP_Num_Lives_Inactive_Player    ; 29D0: A5 5C    
-    beq     Sound_Channels_Off_ETC_1        ; 29D2: F0 EF    
+    beq     Test_Game_Over_Active_Player    ; 29D2: F0 EF    
+
+; Test Game Over Active Player, if not swap status data
     lda     ZP_Num_Lives_Active_Player      ; 29D4: A5 5A    
-    bne     Sound_Channels_Off_ETC_4        ; 29D6: D0 03    
+    bne     Swap_Active_Player_And_Objects  ; 29D6: D0 03    
+
     jsr     Display_Game_Over               ; 29D8: 20 E7 29 
 
 ; L_BRS_($29DB)_($29D6) OK
-Sound_Channels_Off_ETC_4
+Swap_Active_Player_And_Objects
     jsr     Swap_Player_And_Obj_Rocket      ; 29DB: 20 F5 23 
     lda     ZP_Active_Player                ; 29DE: A5 5E    
     eor     #%11111111                      ; 29E0: 49 FF    
     sta     ZP_Active_Player                ; 29E2: 85 5E    
-    jmp     Sound_Channels_Off_ETC_2        ; 29E4: 4C C7 29 
+    jmp     Reset_Level_Init_Next_Jetman    ; 29E4: 4C C7 29 
 ; -----------------------
 
 ; L_JSR_($29E7)_($29D8) OK
 Display_Game_Over
     jsr     Reset_Screen_Display_Scores     ; 29E7: 20 16 24 
-    lda     ZP_Active_Player                ; 29EA: A5 5E     Game Over for P1 or P2?
-    bne     Display_Game_Over_P2            ; 29EC: D0 24    
+    lda     ZP_Active_Player                ; 29EA: A5 5E    
+    bne     Display_Game_Over_Player_2      ; 29EC: D0 24    
 
 ; L_JSR_($29EE)_($2991) OK
-Display_Game_Over_P1
+Display_Game_Over_Player_1
     jsr     Load_ZP_Parameters              ; 29EE: 20 9D 25 
-    fcb     $0E                             ; 29F1: 0E        ZP_Ptr_To_Str
-    fdb     STR_GAME_OVER_PLAYER_1          ; 29F2: 1F 2A     Pointer to "GAME OVER PLAYER 1"
-    fcb     $04                             ; 29F4: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y
+    fcb     $0E                             ; 29F1: 0E        ZP0E/0F
+    fdb     STR_GAME_OVER_PLAYER_1          ; 29F2: 1F 2A    
+    fcb     $04                             ; 29F4: 04        ZP04/05
     fdb     $6010                           ; 29F5: 10 60     X Y
     fcb     $FF                             ; 29F7: FF       
 
@@ -2884,10 +2895,10 @@ Display_Game_Over_P1
 Display_String_
     jsr     Display_String_Setup            ; 29F8: 20 CC 34 
     jsr     Load_ZP_Parameters              ; 29FB: 20 9D 25 
-    fcb     $02                             ; 29FE: 02        Into ZP addr 02 and 03...
-    fdb     $0000                           ; 29FF: 00 00     ..load 00 and 00
-    fcb     $0A                             ; 2A01: 0A        Into ZP addr 0A and 0B
-    fdb     $00F8                           ; 2A02: F8 00     ..load F8 and 00
+    fcb     $02                             ; 29FE: 02        ZP02/03
+    fdb     $0000                           ; 29FF: 00 00    
+    fcb     $0A                             ; 2A01: 0A        ZP0A/0B
+    fdb     $00F8                           ; 2A02: F8 00    
     fcb     $FF                             ; 2A04: FF       
 
 ; Delay loop $100^2 x ($100-$f8=$08) x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
@@ -2905,11 +2916,11 @@ Delay_Loop_Game_Over
 ; ===========================================================
 ; L_JSR_($2A12)_($2997) OK
 ; L_BRS_($2A12)_($29EC) OK
-Display_Game_Over_P2
+Display_Game_Over_Player_2
     jsr     Load_ZP_Parameters              ; 2A12: 20 9D 25 
-    fcb     $0E                             ; 2A15: 0E        ZP_Ptr_To_Str
-    fdb     STR_GAME_OVER_PLAYER_2          ; 2A16: 32 2A     Pointer to "GAME OVER PLAYER 2"
-    fcb     $04                             ; 2A18: 04        ZP_UDG_RAM_X ZP_UDG_RAM_Y
+    fcb     $0E                             ; 2A15: 0E        ZP0E/0F
+    fdb     STR_GAME_OVER_PLAYER_2          ; 2A16: 32 2A    
+    fcb     $04                             ; 2A18: 04        ZP04/05
     fdb     $6010                           ; 2A19: 10 60     X Y
     fcb     $FF                             ; 2A1B: FF       
     jmp     Display_String_                 ; 2A1C: 4C F8 29 
@@ -2955,7 +2966,7 @@ Set_Obj_List_Ptr_To_Jetman
 ; Object type
     ldy     #$00                            ; 2A55: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A57: B1 00    
-    jsr     Store_Object_Type               ; 2A59: 20 0A 29 
+    jsr     Save_Object_Type                ; 2A59: 20 0A 29 
     jmp     Restore_Obj_List_Ptr            ; 2A5C: 4C F0 28 
 ; -----------------------
 
@@ -8790,7 +8801,7 @@ Alien_Cross_2
     fcb     %00010000                       ; 3F71: 10       
     fcb     %00000010                       ; 3F72: 02       
     fcb     %00000000                       ; 3F73: 00       
-Explosion_1
+Explosion_UDG_RAM_Addr_Frame_1
     fcb     %10000000                       ; 3F74: 80       
     fcb     %11000000                       ; 3F75: C0       
     fcb     %11011000                       ; 3F76: D8       
@@ -8830,7 +8841,7 @@ Explosion_1
     fcb     %00001100                       ; 3F98: 0C       
     fcb     %00000010                       ; 3F99: 02       
     fcb     %00000000                       ; 3F9A: 00       
-Explosion_2
+Explosion_UDG_RAM_Addr_Frame_2
     fcb     %11000000                       ; 3F9B: C0       
     fcb     %01100000                       ; 3F9C: 60       
     fcb     %11110110                       ; 3F9D: F6       
@@ -8854,7 +8865,7 @@ Explosion_2
     fcb     %00001010                       ; 3FAF: 0A       
     fcb     %00000001                       ; 3FB0: 01       
     fcb     %00000000                       ; 3FB1: 00       
-Explosion_3
+Explosion_UDG_RAM_Addr_Frame_3
     fcb     %11111100                       ; 3FB2: FC       
     fcb     %01111010                       ; 3FB3: 7A       
     fcb     %11110100                       ; 3FB4: F4       

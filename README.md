@@ -25,9 +25,11 @@ Tools are setup, dasmfw can disassemble the binary, as65 can reassemble it to an
 
 MAME is setup as the debugger, I'm using MAME over VICE mainly because I'm used to it and, crucially for me, with MAME you can alter the width of the memory dump windows, AFAIK you can't do that with VICE.
 
+All the code has been analyzed and understood at least once, but documenting it all consistently takes a lot of time, but most of it is already pretty readable.
+
 - Code/Data/Graphics sections are 100% identified.
 - Memory map is 100% complete (see also Excel spreadsheet)
-- Zero Page and other variables ~50% identified. 
-- Code labels and commenting ~25% complete.
+- Zero Page and other variables ~75% identified.
+- Code labels and commenting ~60% complete.
 
 #### Phillip Eaton 2022-05-09

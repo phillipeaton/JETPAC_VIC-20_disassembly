@@ -1119,10 +1119,11 @@ comment  2902 The AND and OR probably for jetman object
 deflabel 2903 OBJECT_TYPE_PARAM
 lcomment 2906 Zero bits 0-5 xx000000
 binary   2907
-lcomment 2908 Set bits 0-1 xxxxxx11
+lcomment 2908 Set bits 0-1 xx000011
 binary   2909
 comment  290A
-label    290A Store_Object_Type
+label    290A Save_Object_Type
+deflabel 290B OBJECT_TYPE_PARAM_SAVED
 comment  290E
 comment  290E Change object type to an explosion
 deflabel 290F OBJECT_TYPE_PARAM
@@ -1147,14 +1148,15 @@ comment  2925 If colour is green, bump to Blue, Green only used for platforms
 deflabel 2926 COLOUR_BLUE
 comment  2927
 label    2927 Store_Updated_Explosion_Colour
+deflabel 2928 OBJECT_COLOUR_PARAM
 comment  292B
 comment  292B Trigger explosion sound (noise + regular oscillator)
-deflabel 292C OBJECT_COLOUR_PARAM
 comment  2934
 comment  2934 If an alien explosion occurs, add a new alien
 label    2934 ANIMATE_EXPLOSIONS
 comment  2939
-comment  2939 Add randomness to how long an animation frame is displayed using the IRQ counter
+comment  2939 Appears to add randomness to how long an animation frame is displayed using the IRQ counter
+comment  2939 Param 02 of alien object is always set to zero, for Jetman is always set to one
 comment  2941
 comment  2941 Increment explosion animation frame count
 deflabel 2942 EXPLOSION_ANIMATION_FRAME
@@ -1167,58 +1169,62 @@ comment  2952 Setup Registers A and Y to point to the correct explosion UDG data
 comment  295B
 comment  295B Update the explosion on screen
 comment  2967
-label    2967 Explosion_UDG_Ptr
+label    2967 Explosion_UDG_RAM_Addr_Table
 word     2967-2974
-label    2968 Explosion_UDG_Ptr+1
+label    2968 Explosion_UDG_RAM_Addr_Table+1
 break    2969
 break    296E
 comment  2975
+comment  2975 Disable explosion object by setting object type to zero
 label    2975 Disable_Explosion_Obj_In_List
 deflabel 2976 OBJECT_TYPE_PARAM
 comment  297A
+comment  297A Test if object was an Alien or Jetman, branch if Jetman
 deflabel 297B OBJECT_TYPE_PARAM_SAVED
 binary   297F
 binary   2981
-comment  2982
+comment  2984
 comment  2987
 label    2987 Game_Over
 comment  2997
 label    2997 Game_Over_Player_2
 comment  299D
-label    299D Sound_Channels_Off_ETC
+label    299D Reset_Objects_Test_Game_Over
 comment  29AB
+comment  29AB Unset "Picked-up by Jetman"
 binary   29AF
 comment  29B3
+comment  29B3 Unset "Picked-up by Jetman"
 binary   29B7
 comment  29BB
+comment  29BB Test if 1 or 2 Player Game, branch if 2 Player
 comment  29C3
-label    29C3 Sound_Channels_Off_ETC_1
+label    29C3 Test_Game_Over_Active_Player
 comment  29C7
-label    29C7 Sound_Channels_Off_ETC_2
+label    29C7 Reset_Level_Init_Next_Jetman
 comment  29D0
-label    29D0 Sound_Channels_Off_ETC_3
+label    29D0 Test_Game_Over_Inactive_Player
+comment  29D4
+comment  29D4 Test Game Over Active Player, if not swap status data
+comment  29D8
 comment  29DB
-label    29DB Sound_Channels_Off_ETC_4
+label    29DB Swap_Active_Player_And_Objects
 binary   29E1
 comment  29E7
 label    29E7 Display_Game_Over
-lcomment 29EA Game Over for P1 or P2?
 comment  29EE
-label    29EE Display_Game_Over_P1
-lcomment 29F1 ZP_Ptr_To_Str
-lcomment 29F2 Pointer to "GAME OVER PLAYER 1"
+label    29EE Display_Game_Over_Player_1
+lcomment 29F1 ZP0E/0F
 word     29F2
-lcomment 29F4 ZP_UDG_RAM_X ZP_UDG_RAM_Y
+lcomment 29F4 ZP04/05
 lcomment 29F5 X Y
 word     29F5
 comment  29F8
 label    29F8 Display_String_
-lcomment 29FE Into ZP addr 02 and 03...
-lcomment 29FF ...load 00 and 00
+lcomment 29FE ZP02/03
 word     29FF
 const    29FF
-lcomment 2A01 Into ZP addr 0A and 0B
-lcomment 2A02 ...load F8 and 00
+lcomment 2A01 ZP0A/0B
 word     2A02
 const    2A02
 comment  2A05
@@ -1226,11 +1232,10 @@ comment  2A05 Delay loop $100^2 x ($100-$f8=$08) x (5+3) = $400,000 = 4,194,304 
 label    2A05 Delay_Loop_Game_Over
 lcomment 2A05 5 cycles
 lcomment 2A07 3 cycles when taken, 2 when not taken
-label    2A12 Display_Game_Over_P2
-lcomment 2A15 ZP_Ptr_To_Str
-lcomment 2A16 Pointer to "GAME OVER PLAYER 2"
+label    2A12 Display_Game_Over_Player_2
+lcomment 2A15 ZP0E/0F
 word     2A16
-lcomment 2A18 ZP_UDG_RAM_X ZP_UDG_RAM_Y
+lcomment 2A18 ZP04/05
 const    2A18
 lcomment 2A19 X Y
 word     2A19
@@ -2742,7 +2747,7 @@ label    3DCA Gemstone
 label    3DE3 Plutonium
 label    3E00 Isotope
 label    3E15 Mineral
-label    3F74 Explosion_1
-label    3F9B Explosion_2
-label    3FB2 Explosion_3
+label    3F74 Explosion_UDG_RAM_Addr_Frame_1
+label    3F9B Explosion_UDG_RAM_Addr_Frame_2
+label    3FB2 Explosion_UDG_RAM_Addr_Frame_3
 ; End of File
