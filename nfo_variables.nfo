@@ -26,7 +26,7 @@ label      17 ZP17                           ; 04 Connected somehow. Shuffled in
 label      18 ZP18                           ; 07 Prev. ZP18_Object_New_Position_X
 label      19 ZP19                           ; 12 Prev. ZP19_Object_New_Position_Y
 label      1A ZP1A                           ; 03 Prev. ZP1A_Object_Type_New
-label      1B ZP1B                           ; 10 Prev. ZP1B_Object_Color_New
+label      1B ZP1B                           ; 10 Prev. ZP1B_Object_Colour_New
 label      1C ZP_Jetman_Action  ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 ;                               1111 1111 = No action
 ;                               1xxx xxxx = Not moving right
@@ -43,13 +43,13 @@ label      1C ZP_Jetman_Action  ;FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly
 ;                               0111 xxxx = Walk right
 
 label      1E ZP_Ship_UDG_Addr_Offset        ;
-label      1F ZP_Ship_UDG_Addr_Color?        ;
+label      1F ZP_Ship_UDG_Addr_Colour?       ;
 label      20 ZP_HW_IRQ_Occurred             ;
 label      21 ZP_Alien_Spawn_Counter         ; When reaches $04, Alien spawns, incremented by Explosions and Lasers
 label      22 ZP_Obj_List_Ptr_Save_IRQ_Lo    ;
 label      23 ZP_Obj_List_Ptr_Save_IRQ_Hi    ;
-label      24 ZP_Obj_List_Ptr_Save_Lo      ;
-label      25 ZP_Obj_List_Ptr_Save_Hi      ;
+label      24 ZP_Obj_List_Ptr_Save_Lo        ;
+label      25 ZP_Obj_List_Ptr_Save_Hi        ;
 label      26 ZP_Rocket_Flame_State          ; Turns off at take-off and landing
 label      27 ZP_Rocket_Flame_UDG_Toggle     ; Counts up throughout the flight, used for flame animation
 label      0028-0039 ZP_Obj_Rocket_Saved     ;
@@ -67,7 +67,7 @@ label      4C ZP_HW_IRQ_Random               ;
 
 label      51-53 ZP_Score_Player_1           ; 3 bytes (Hi Score is stored where?)
 label      54-56 ZP_Score_Player_2           ; 3 bytes
-label      57 ZP_Reverse_And_Color_Data      ; Used to flash game options & 1UP+score at player start
+label      57 ZP_Reverse_And_Colour_Data     ; Used to flash game options & 1UP+score at player start
 label      58 ZP_Flash_Countup               ;
 label      59 ZP_Level_Active_Player         ;
 label      5a ZP_Num_Lives_Active_Player     ;
@@ -99,17 +99,17 @@ label    0384 Obj_Jetman_Direction_Y         ; Range between FC=Up to 04=Down at
 ; Byte 04/0C= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
 ; Byte 05/0D= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
 ; Byte 06/0E= Laser shot beam length, randomly set using the IRQ counter.
-; Byte 07/0F= Laser Color
+; Byte 07/0F= Laser Colour
 ;
-; Laser_Color_Table
-;         fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colors if it's used
+; Laser_Colour_Table
+;         fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colours if it's used
 ;         fcb     BLUE,YELLOW,CYAN,YELLOW ; 216F: 06 07 03 07
 ;
 ; Laser decay sequence as written to UDG RAM:
 ; $FF       $FC       $E0       $00
 ; %11111111 %11111100 %11100000 %00000000
 
-label    0388 Obj_Laser_0 ;
+label    0388 Obj_Laser_0
 
 ;label   0390 Obj_Laser_1
 
@@ -131,8 +131,8 @@ label    0388 Obj_Laser_0 ;
 ;        0D = ???
 ;        0E = Valuable
 
-                          ;            0  1  2  3  4  5  6  7
-                          ;     03B0  09 70 00 AF 01 00 00 1C
+                             ;            0  1  2  3  4  5  6  7
+                             ;     03B0  09 70 00 AF 01 00 00 1C
 ; Sound object 1st/3rd/5th parameter indicates which sound to play, 2nd/4th/6th is the period
 label    03A8 Obj_Sound      ; Type = 0C always
 label    03A9 Obj_Sound_Collision
@@ -169,7 +169,7 @@ label    03C1 Obj_Rocket_Mid_Or_Valuable_X
 ;label   03C2 Obj_Rocket_Mid_Or_Valuable_2
 ;label   03C3 Obj_Rocket_Mid_Or_Valuable_Y
 label    03C4 Obj_Rocket_Mid_Or_Valu_Status
-;label   03C5 Obj_Rocket_Mid_Or_Valu_Color
+;label   03C5 Obj_Rocket_Mid_Or_Valu_Colour
 label    03C6 Obj_Rocket_Mid_Or_Valu_Type
 label    03C7 Obj_Rocket_Mid_Or_Valuable_7
 
@@ -182,12 +182,12 @@ label    03C7 Obj_Rocket_Mid_Or_Valuable_7
 ;                          Level 1/2: 08=down, f8=up, always x8
 ;                          Level 3:   Same as 1/2 but xF seen at Jetman explode
 ; Byte 05/0D= colour - bottom 3 bits of byte
-; Byte 06/0E= For Valuable, affects colors and flashing of Byte 05
+; Byte 06/0E= For Valuable, affects colours and flashing of Byte 05
 ;             $20=gold bar (yellow)
 ;             $22=plutonium (cyan)
 ;             $24=isotope (cyan/black flash)
 ;             $26=mineral (blue)
-;             $28=gemstone (multicolor cycle)
+;             $28=gemstone (multicolour cycle)
 ; Byte 06/0E= For Alien Ball Level, it's a countdown from $18 to 0 for Y reversal
 
 ; Aliens 1-6

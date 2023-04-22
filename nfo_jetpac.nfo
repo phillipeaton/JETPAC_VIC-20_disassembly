@@ -25,7 +25,7 @@ lcomment 200E VIC_RA_Frq_Osc1
 lcomment 200F VIC_RB_Frq_Osc2
 lcomment 2010 VIC_RC_Frq_Osc3
 lcomment 2011 VIC_RD_Frq_Noise
-lcomment 2012 VIC_RE_Vol_Color
+lcomment 2012 VIC_RE_Vol_Colour
 lcomment 2013 VIC_RF_BckBdrCol
 comment  2014
 comment  2014 Quick lookup for BIT instruction
@@ -80,17 +80,17 @@ comment  2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 
 comment  2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
 comment  2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
 label    2064 ISR_Cols
-deflabel 2065 COLUMNS
+deflabel 2065 SCREEN_COLUMNS
 label    2067 ISR_Rows
-deflabel 206C ROWS
-deflabel 2076 ROWS
+deflabel 206C SCREEN_ROWS
+deflabel 2076 SCREEN_ROWS
 comment  2079
 label    2079 Reset_Game_Select
 comment  207C
 comment  207C Reset game selection flashing highlights
 label    2080 RGS_Flash
 comment  2085
-comment  2085 Setup volume and color
+comment  2085 Setup volume and colour
 comment  208A
 comment  208A Disable sound object
 comment  208F
@@ -208,22 +208,22 @@ binary   214F
 lcomment 2151 Set bit 6 01xx_xx000
 binary   2152
 comment  2155
-comment  2155 Load a random laser color value 0-7 using IRQ counter
+comment  2155 Load a random laser colour value 0-7 using IRQ counter
 binary   2159
 comment  2160
 comment  2160 Trigger laser sound by setting parameters in sound object
 comment  216B
 comment  216B Green not used, it's used for the platforms only
-label    216B Laser_Color_Table
-deflabel 216B WHITE
-deflabel 216C RED
-deflabel 216D CYAN
-deflabel 216E PURPLE
-deflabel 216F BLUE
+label    216B Laser_Colour_Table
+deflabel 216B COLOUR_WHITE
+deflabel 216C COLOUR_RED
+deflabel 216D COLOUR_CYAN
+deflabel 216E COLOUR_PURPLE
+deflabel 216F COLOUR_BLUE
 break    216F
-deflabel 2170 YELLOW
-deflabel 2171 CYAN
-deflabel 2172 YELLOW
+deflabel 2170 COLOUR_YELLOW
+deflabel 2171 COLOUR_CYAN
+deflabel 2172 COLOUR_YELLOW
 comment  2173
 comment  2173 Test if Jetman Position X is facing right at the start of a tile
 label    2173 Laser_Jetman_Facing_Right
@@ -250,9 +250,9 @@ comment  219A
 label    219A DISPLAY_LASERS
 deflabel 219B LASER_LENGTH_PARAM
 comment  21A0
-comment  21A0 Y becomes $07 i.e. Laser Color parameter
-lcomment 21A0 Y=$07, laser color addr
-lcomment 21A1 Fetch laser color
+comment  21A0 Y becomes $07 i.e. Laser Colour parameter
+lcomment 21A0 Y=$07, laser colour addr
+lcomment 21A1 Fetch laser colour
 lcomment 21A3 Store to ZP variable
 comment  21A5
 comment  21A5 Get laser X and Y-coord and store to temp vars
@@ -286,12 +286,12 @@ comment  21DF
 comment  21DF Reverse the displayed 8-bit byte on-screen
 binary   21E2
 comment  21E5
-comment  21E5 Load current tile color, check it's not green, jump if it is
+comment  21E5 Load current tile colour, check it's not green, jump if it is
 lcomment 21E7 Zero top 4 bits 0000_xxxx
 binary   21E8
-deflabel 21EA GREEN
+deflabel 21EA COLOUR_GREEN
 comment  21ED
-comment  21ED Update laser tile color
+comment  21ED Update laser tile colour
 comment  21F1
 label    21F1 Reduce_Laser_Length_Countdown
 comment  21F8
@@ -580,15 +580,15 @@ comment  2441
 comment  244C
 label    2450 STR_1UP
 comment  2450
-deflabel 2450 WHITE
+deflabel 2450 COLOUR_WHITE
 lcomment  2451 `=Space, q=1, r=2
 lcomment 2456 Top bit=1 indicates end of string
 label    2457 STR_HI
 break    2457
-deflabel 2457 YELLOW
+deflabel 2457 COLOUR_YELLOW
 label    245E STR_2UP
 break    245E
-deflabel 245E WHITE
+deflabel 245E COLOUR_WHITE
 comment  2465
 label    2465 STR_1UP_HI_2UP
 lcomment 2465 X Y
@@ -1002,10 +1002,10 @@ label    27E1 Display_Rocket_Flame_On_Screen
 comment  27EA
 comment  27EA Load the correct Flame UDG address and display the flame
 comment  27F7
-comment  27F7 Set the flame color tile to red, uses two tiles
+comment  27F7 Set the flame colour tile to red, uses two tiles
 comment  27FB
 comment  27FF
-deflabel 2803 RED
+deflabel 2803 COLOUR_RED
 comment  2808
 comment  280B
 comment  280B Restore ZP11 and ZP19 and return
@@ -1058,37 +1058,37 @@ break    2888-2891
 label    2889 Subroutine_List_Valuables+1
 comment  2892
 label    2892 Valuable_Gold_Bar
-deflabel 2893 YELLOW
+deflabel 2893 COLOUR_YELLOW
 comment  2894
-label    2894 Save_Color_And_Display_Object
-deflabel 2895 OBJECT_COLOR_PARAM
+label    2894 Save_Colour_And_Display_Object
+deflabel 2895 OBJECT_COLOUR_PARAM
 comment  2898
 deflabel 2899 OBJECT_VALUABLE_TYPE_PARAM
 label    289F Valuable_Mineral
 comment  289F
-deflabel 28A0 BLUE
+deflabel 28A0 COLOUR_BLUE
 comment  28A4
-comment  28A4 Use IRQ counter to toggle object color between black and cyan
+comment  28A4 Use IRQ counter to toggle object colour between black and cyan
 label    28A4 Valuable_Plutonium
 binary   28A7
 binary   28A9
 comment  28AC
-deflabel 28AD BLACK
+deflabel 28AD COLOUR_BLACK
 comment  28B1
-label    28B1 Valuable_Plutonium_Set_Color
-deflabel 28B2 CYAN
+label    28B1 Valuable_Plutonium_Set_Colour
+deflabel 28B2 COLOUR_CYAN
 comment  28B6
-comment  28B6 Use IRQ counter to cycle through colors, two LSRs quadruple the time between changes
+comment  28B6 Use IRQ counter to cycle through colours, two LSRs quadruple the time between changes
 label    28B6 Valuable_Gemstone
 binary   28BB
 comment  28BE
-comment  28BE Change color from black to white
+comment  28BE Change colour from black to white
 binary   28BF
 comment  28C0
-comment  28C0 If new color is green, change it to white, green is reserved for platform logic
-label    28C0 Valuable_Gemstone_Set_Color
-deflabel 28C1 GREEN
-deflabel 28C5 WHITE
+comment  28C0 If new colour is green, change it to white, green is reserved for platform logic
+label    28C0 Valuable_Gemstone_Set_Colour
+deflabel 28C1 COLOUR_GREEN
+deflabel 28C5 COLOUR_WHITE
 comment  28C9
 comment  28C9 Reset rocket parts/fuel/valuables and alien objects, $47 is 9 objects data
 label    28C9 Reset_Objects_And_Aliens
@@ -1112,7 +1112,7 @@ comment  28F9
 label    28F9 Change_Object_To_Explosion
 comment  28FC
 comment  28FC Reset object X direction
-deflabel 28FF OBJECT_X_DIRECTION_PARAM
+deflabel 28FF OBJECT_DIRECTION_X_PARAM
 comment  2902
 comment  2902 Get object type, zero middle four bits, preserve bits 6 and 7, set bits 1 & 2
 comment  2902 The AND and OR probably for jetman object
@@ -1136,20 +1136,20 @@ lcomment 291B Zero bits 3-8 00000xxx
 binary   291C
 lcomment 291F Set bit 0 xxxxxxx1
 comment  291F
-comment  291F Color is black, bump it to white by incrementing
-deflabel 2920 WHITE
-label    2921 Test_New_Color_Is_Green
+comment  291F Colour is black, bump it to white by incrementing
+deflabel 2920 COLOUR_WHITE
+label    2921 Test_New_Colour_Is_Green
 comment  2921
-deflabel 2922 GREEN
-lcomment 2925 Color code
+deflabel 2922 COLOUR_GREEN
+lcomment 2925 Colour code
 comment  2925
-comment  2925 If color is green, bump to Blue, Green only used for platforms
-deflabel 2926 BLUE
+comment  2925 If colour is green, bump to Blue, Green only used for platforms
+deflabel 2926 COLOUR_BLUE
 comment  2927
-label    2927 Store_Updated_Explosion_Color
+label    2927 Store_Updated_Explosion_Colour
 comment  292B
 comment  292B Trigger explosion sound (noise + regular oscillator)
-deflabel 292C OBJECT_COLOR_PARAM
+deflabel 292C OBJECT_COLOUR_PARAM
 comment  2934
 comment  2934 If an alien explosion occurs, add a new alien
 label    2934 ANIMATE_EXPLOSIONS
@@ -1260,17 +1260,17 @@ comment  2A75 so update direction
 label    2A75 Level_2_Balls_1
 comment  2A78
 comment  2A78 Read Y direction reversal countdown, branch if zero, else decrement countdown
-deflabel 2A79 OBJECT_Y_DIR_COUNTDOWN_PARAM
+deflabel 2A79 OBJECT_DIR_Y_COUNTDOWN_PARAM
 comment  2A83
 comment  2A83
 comment  2A83
 comment  2A83 Below routine common to Level 1 and 2
 label    2A83 Update_Alien_X_Y_Direction
-deflabel 2A84 OBJECT_X_DIRECTION_PARAM
+deflabel 2A84 OBJECT_DIRECTION_X_PARAM
 label    2A8B Update_Alien_X_Direction
 comment  2A8D
 comment  2A8D Update_Alien_Y_Direction
-deflabel 2A8E OBJECT_Y_DIRECTION_PARAM
+deflabel 2A8E OBJECT_DIRECTION_Y_PARAM
 label    2A95 Update_Alien_Y_Direction
 comment  2A9A
 label    2A9A Alien_Direction_Up
@@ -1281,7 +1281,7 @@ label    2AA2 Update_Y_Direction_Random
 binary   2AA5
 comment  2AAA
 comment  2AAA Reverse Y direction up/down, randomly via IRQ
-deflabel 2AAB OBJECT_Y_DIRECTION_PARAM
+deflabel 2AAB OBJECT_DIRECTION_Y_PARAM
 binary   2AAD
 comment  2AB2
 comment  2AB2 Do the inversion on the direction byte
@@ -1300,7 +1300,7 @@ comment  2AC7 Saucers home-in on Jetman, thus below code is in four sections:
 comment  2AC7 - Two sections update X depending on whether alien is left or right of Jetman
 comment  2AC7 - Two sections update Y depending on whether alien is above or below Jetman
 comment  2AC7 Update Alien Direction X
-deflabel 2AC8 OBJECT_X_POSITION_PARAM
+deflabel 2AC8 OBJECT_POSITION_X_PARAM
 comment  2ACB
 comment  2ACB Update Y register to index Direction X
 comment  2ACC
@@ -1393,7 +1393,7 @@ comment  2BB7 Use counter to setup next object type
 binary   2BBA
 comment  2BC0
 comment  2BC0 Bit 3 wasn't set, so zero all bits apart from bit 3
-comment  2BC0 Bit 3 will make the object the gemstone which cycles through all colors
+comment  2BC0 Bit 3 will make the object the gemstone which cycles through all colours
 binary   2BC1
 comment  2BC2
 comment  2BC2 Make the valuble type $2x, maybe used as an offset later?
@@ -1431,7 +1431,7 @@ lcomment 2C0B Object X
 comment  2C10
 comment  2C10 Test if laser X-coords have bit 2 set, not sure why
 label    2C10 BACK_2C10
-deflabel 2C11 LASER_X_POSITION_PARAM
+deflabel 2C11 LASER_POSITION_X_PARAM
 lcomment 2C12 X-coord of end of laser
 lcomment 2C1A Delayed X-coord of end of laser
 comment  2C21
@@ -1479,14 +1479,14 @@ comment  2C99 Alien has hit Jetman
 comment  2C9F
 comment  2C9F Get object direction/speed and use to create new X value
 label    2C9F Update_Object_Position
-deflabel 2CA0 OBJECT_X_DIRECTION_PARAM
+deflabel 2CA0 OBJECT_DIRECTION_X_PARAM
 comment  2CAB
 comment  2CAB Take care of X screen wrapping (note $f0=-16 decimal)
 deflabel 2CB0 SCREEN_WIDTH_PIXELS
 label    2CB3 Update_Object_X_Position
 comment  2CB5
 comment  2CB5 Get object direction/speed and use to create new Y value
-deflabel 2CB6 OBJECT_Y_DIRECTION_PARAM
+deflabel 2CB6 OBJECT_DIRECTION_Y_PARAM
 comment  2CC3
 comment  2CCC
 label    2CCC Wrap_Object_X_Position_Left
@@ -1532,7 +1532,7 @@ comment  2D3B Set object colour randomly, lookup table has 2 colours per level
 binary   2D3F
 comment  2D49
 label    2D4C Level_Alien_Type_Lookup
-label    2D50 Level_Alien_Color_Lookup
+label    2D50 Level_Alien_Colour_Lookup
 break    2D54
 comment  2D58
 comment  2D58 ----------------------------------------------------------
@@ -1580,7 +1580,7 @@ word     2DBC
 label    2DC5 Restore_Player_Objects_3
 label    2DCB Restore_Player_Objects_4
 label    2DD1 Loop_Restore_Player_Objects
-label    2DDD Set_Object_UDG_Color
+label    2DDD Set_Object_UDG_Colour
 label    2DE8 Restore_Player_Objects_6
 lcomment 2DEC Current level modulus 4
 comment  2DF1
@@ -1651,7 +1651,7 @@ comment  2F31
 comment  2F31 Test if rocket part has landed, $08=middle part, $10=top part
 comment  2F31 $18=Fuel (?!)
 label    2F31 Rocket_Part_Or_Fuel_Dropped
-deflabel 2F32 OBJECT_Y_WHEN_LANDED_PARAM
+deflabel 2F32 OBJECT_POS_Y_WHEN_LANDED_PARAM
 comment  2F39
 comment  2F39 Rocket part dropped, add current Y postion to landed Y position
 comment  2F39 and test to see if object has hit the ground
@@ -1677,7 +1677,7 @@ comment  2F6A landing on rocket base
 comment  2F74
 label    2F77 Fuel_Dropped
 deflabel 2F78 OBJECT_POSITION_Y_PARAM
-deflabel 2F7C FUEL_Y_WHEN_LANDED
+deflabel 2F7C FUEL_POSITION_Y_WHEN_LANDED
 comment  2F7F
 comment  2F7F Fuel cell has landed, increment the counter
 comment  2F8E On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
@@ -1858,8 +1858,8 @@ comment  3178 Copy middle platform and right end UDG chars to RAM, 9 bytes per c
 label    317B Loop_Next_Char
 comment  3180
 comment  3186
-comment  3186 Set the color mapping for the platforms to Green
-deflabel 3192 GREEN
+comment  3186 Set the colour mapping for the platforms to Green
+deflabel 3192 COLOUR_GREEN
 label    3193 DP_2
 lcomment 3193 ZP0C_Col_RAM_Ptr_Lo
 label    31A2 Next_UDG_Char_Loop_Next_Char
@@ -1871,7 +1871,7 @@ break    31B9
 break    31BC
 comment  31BF
 label    31BF A_Left_Right_Impact
-deflabel 31C0 JETMAN_X_DIRECTION_PARAM
+deflabel 31C0 JETMAN_DIRECTION_X_PARAM
 comment  31C7
 comment  31C7 Load and test Jetman X Direction/Velocity
 comment  31CB
@@ -1901,13 +1901,13 @@ comment  31F2 1xxx0111 = Left impact
 label    31F2 H_Jetman_Hits_Surface
 comment  31F7
 comment  31F7 Test Obj_Jetman_At_Rest???
-deflabel 31F8 JETMAN_Y_DIRECTION_PARAM
+deflabel 31F8 JETMAN_DIRECTION_Y_PARAM
 comment  3200
 label    3200 I_Left_Right_Up_Impact
 comment  3208
 comment  3208 Test Obj_Jetman_At_Rest???
 label    3208 J_Flying_Up_Impact
-deflabel 3209 JETMAN_Y_DIRECTION_PARAM
+deflabel 3209 JETMAN_DIRECTION_Y_PARAM
 binary   3211
 comment  3212
 label    3212 K_Jump_U
@@ -1933,7 +1933,7 @@ label    3273 JETMAN_FLYING_
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
 label    3285 P_Update_Jetman_Position_X
-deflabel 3286 JETMAN_X_DIRECTION_PARAM
+deflabel 3286 JETMAN_DIRECTION_X_PARAM
 comment  3291
 binary   3295
 label    32A2 Q_Store_Jetman_Direction_X
@@ -1947,7 +1947,7 @@ deflabel 32B7 SCREEN_WIDTH_PIXELS
 label    32BA R__Store_Jetman_Position_X
 comment  32BC
 label    32C7 T_Update_Jetman_Position_Y
-deflabel 32C8 JETMAN_Y_DIRECTION_PARAM
+deflabel 32C8 JETMAN_DIRECTION_Y_PARAM
 comment  32C9
 lcomment 32CB Test for direction Down
 lcomment 32CE Yes, branch
@@ -2006,7 +2006,7 @@ label    334D READ_CONTROLS
 comment  3351
 comment  3351 At start of each life, flash active player score before level begin, until counter reaches zero
 comment  3358
-comment  3358 Display Jetman, color jetman and display scores
+comment  3358 Display Jetman, colour jetman and display scores
 comment  3367
 label    3367 Flash_Display_Score_JMP
 comment  336A
@@ -2028,7 +2028,7 @@ comment  338D Jetman walking left, prepare new Direction X value
 label    338D Jetman_Walking_Left
 comment  338F
 label    338F Test_Collision_Status????
-deflabel 3390 JETMAN_X_DIRECTION_PARAM
+deflabel 3390 JETMAN_DIRECTION_X_PARAM
 comment  3395
 comment  3395 Set Zero flag as AND between between content of addr 2015 (i.e. 0000_0010) and A (i.e. ZP02)
 comment  3395 DON'T KNOW WHY, guess need to decode ZP02 collision status
@@ -2039,7 +2039,7 @@ comment  339D
 label    339D Jetman_Not_Moving_X_Axis
 comment  339F
 label    339F Update_JM_Direction_Position_X
-deflabel 33A0 JETMAN_X_DIRECTION_PARAM
+deflabel 33A0 JETMAN_DIRECTION_X_PARAM
 comment  33A3
 comment  33A3 Y becomes JETMAN_POSITION_X_PARAM
 deflabel 33AC SCREEN_WIDTH_PIXELS
@@ -2050,7 +2050,7 @@ binary   33B4
 lcomment 33B5 Yes, branch
 comment  33BA
 label    33BA Update_JM_Direction_Position_Y
-deflabel 33BB JETMAN_Y_DIRECTION_PARAM
+deflabel 33BB JETMAN_DIRECTION_Y_PARAM
 comment  33C0
 comment  33C0 Move Jetman upwards by three pixels
 label    33C0 Jetman_From_Standing_To_Flying
@@ -2223,7 +2223,7 @@ comment  34CC CALLED BY :
 comment  34CC CALLS     :
 comment  34CC ARGUMENTS :
 comment  34CC ZP_PTR_TO_STR  = "COPYRIGHT`qyxs`An" or "JETPAC`GAME`SELEC"
-comment  34CC ZP_ColorRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
+comment  34CC ZP_ColourRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
 comment  34CC ZP_UDG_RAM_X   = 08 A8 or 08 20
 comment  34CC ZP_UDG_RAM_Y   = 08 A8 or 08 20
 comment  34CC ZP_Addr_From   = 70 80 or 28 80
@@ -2231,10 +2231,10 @@ comment  34CC ----------------------------------------------------------
 label    34CC Display_String_Setup
 label    34D2
 comment  34D2
-comment  34D2 Get string first byte header data, contains color data and reverse flag
+comment  34D2 Get string first byte header data, contains colour data and reverse flag
 comment  34D6
 comment  34D6 Write a string of data to the screen, header byte includes reverse flag and colour attribute
-comment  34D6 Save color data and reverse flag to X
+comment  34D6 Save colour data and reverse flag to X
 label    34D6 Display_String
 comment  34D7
 comment  34D7 Get character to display and test if bit 7 is set, which signifys end of string
@@ -2244,22 +2244,22 @@ comment  34E3
 comment  34E3 Restore character value after testing for end of string, excluding reverse bit
 label    34E3 Display_Character
 comment  34E6
-comment  34E6 Setup character display color
+comment  34E6 Setup character display colour
 comment  34E9
 comment  34E9 Display character on screen, saving Y and restoring afterwards
 comment  34F0
-comment  34F0 Colorize the character just written
+comment  34F0 Colourize the character just written
 comment  34F7
 comment  34F7 Example for "F7 JOYSTICK" start position
-comment  34F7 Convert X=$18 pixels from left, Y=$68 pixels from top, to Color RAM Address $968D
-label    34F7 Setup_Color_RAM_Ptr
+comment  34F7 Convert X=$18 pixels from left, Y=$68 pixels from top, to Colour RAM Address $968D
+label    34F7 Setup_Colour_RAM_Ptr
 lcomment 34F7 ZP04 = $18
 comment  34F9
 comment  34F9 Divide X by 8 to get initial address Lo-byte
 lcomment 34FC ZP0C = $03
 comment  34FE
-comment  34FE Divide Y by $10 and use as index into Color RAM Row Offsets i.e. 9600, 9617, 962e etc.
-comment  34FE to get address Hi-byte. Divided by $10 because there are 16 Y-pixels per Color RAM tile.
+comment  34FE Divide Y by $10 and use as index into Colour RAM Row Offsets i.e. 9600, 9617, 962e etc.
+comment  34FE to get address Hi-byte. Divided by $10 because there are 16 Y-pixels per Colour RAM tile.
 lcomment 34FE ZP05 = $68
 lcomment 3503 ZP05 = $06
 comment  3505
@@ -2270,7 +2270,7 @@ comment  350D
 comment  350D Add $9600 to address in ZP0D/0C to become $968D i.e. "F7 JOYSTICK" start position
 lcomment 350F ZP0D/0C = $968D
 comment  3512
-label    3512 Color_RAM_Row_Offsets
+label    3512 Colour_RAM_Row_Offsets
 const    3512-351C
 comment  351D
 comment  351D Example for "F7 JOYSTICK" start position
@@ -2301,8 +2301,8 @@ comment  3545
 comment  3545 Bytes are middle two numbers in UDG RAM addr starting at $1000 e.g. $10B0, $1160 etc
 const    3545-3557
 comment  355C
-comment  355C Fill 11 rows x 23 columns = 253 bytes = $FD bytes i.e. Color_RAM $9600 to $96FC
-label    355C Reset_Color_RAM
+comment  355C Fill 11 rows x 23 columns = 253 bytes = $FD bytes i.e. Colour_RAM $9600 to $96FC
+label    355C Reset_Colour_RAM
 const    355F
 lcomment 3560 Number of bytes to fill
 word     3560
@@ -2386,13 +2386,13 @@ deflabel 35D8 OBJECT_TYPE_PARAM
 comment  35DD
 comment  35E2
 deflabel 35E3 OBJECT_POSITION_Y_PARAM
-label    35E9 Load_Object_Type_X_Y_Color
+label    35E9 Load_Object_Type_X_Y_Colour
 deflabel 35EA OBJECT_TYPE_PARAM
 comment  35EF
 comment  35F4
 deflabel 35F5 OBJECT_POSITION_Y_PARAM
 comment  35FA
-deflabel 35FB OBJECT_COLOR_PARAM
+deflabel 35FB OBJECT_COLOUR_PARAM
 comment  3601
 label    3601 Display_Object_With_Setup_1
 comment  3604
@@ -2652,11 +2652,11 @@ label    3815 Get_Obj_UDG_Data_Addr_JM_Ali_2
 lcomment 3817 Reset bits 0 & 3-7
 binary   3818
 comment  381F
-label    381F Colorize_Object
+label    381F Colourize_Object
 comment  3827
-comment  3827 Setup Color RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
+comment  3827 Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
 comment  382A
-comment  382A Divide object height by $10 then add $02, so always update color on at least two vertical tiles
+comment  382A Divide object height by $10 then add $02, so always update colour on at least two vertical tiles
 comment  382A e.g. Jetman=$18->$03, Rocket_Top=$10->$03, Fuzz_Alien=$0A->$02
 comment  3833
 comment  3833 Use ZP0B as outer loop for vertical tile rows
@@ -2664,24 +2664,24 @@ comment  3835
 comment  3835 Use ZP0A as inner loop for horizontal tile columns
 label    383B Loop_Y
 comment  383F
-comment  383F Read color from RAM and if it's green i.e. color of the platforms, skip the color change
-comment  383F else write the updated color to the color RAM
+comment  383F Read colour from RAM and if it's green i.e. colour of the platforms, skip the colour change
+comment  383F else write the updated colour to the colour RAM
 label    383F Loop_X
 lcomment 3841 Zero bits 3-7
 binary   3842
-deflabel 3844 GREEN
+deflabel 3844 COLOUR_GREEN
 comment  3847
 comment  384B
 label    384B Green_Ignored
 comment  384F
-comment  384F Move to next row to color (i.e. move up) and test for going out of
+comment  384F Move to next row to colour (i.e. move up) and test for going out of
 comment  384F screen boundry at top of screen, early exit if so
 deflabel 3853 SCREEN_WIDTH_COLUMNS
 deflabel 3855 SCREEN_WIDTH_COLUMNS
 comment  3858
-comment  3858 Update the Color RAM for the appropriate tile, move up one row
+comment  3858 Update the Colour RAM for the appropriate tile, move up one row
 comment  385E
-label    385E Colorize_Object_RTS
+label    385E Colourize_Object_RTS
 ;
 ; End of file contains graphics data
 ;

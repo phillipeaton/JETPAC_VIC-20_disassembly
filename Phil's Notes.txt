@@ -152,7 +152,7 @@ bp 3815,w@0000=$03C8    Breakpoint at $3815 that only triggers when memory
                         location $0000 contains $03C8 i.e. is an Alien
 
 -------------
-First byte of a String definition contains reverse (bit 7) and color information (bits 0-2)
+First byte of a String definition contains reverse (bit 7) and colour information (bits 0-2)
 If colour > 7 used, you just get wrong characters displayed
-When color is 0, it's invisible against the black background
+When colour is 0, it's invisible against the black background
 

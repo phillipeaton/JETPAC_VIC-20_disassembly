@@ -22,13 +22,13 @@
 /ZP05                            equ     $0005/a ZP05_Laser_UDG_RAM_Addr_Hi      equ     $0005
 /ZP06                            equ     $0006/a ZP06_Laser_Position_X           equ     $0006
 /ZP07                            equ     $0007/a ZP07_Laser_Length_Columns       equ     $0007
-/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
+/ZP0C                            equ     $000C/a ZP0C_Colour_RAM_Tile_Addr_Lo    equ     $000C
 /ZP13                            equ     $0013/a ZP13_Laser_Position_Y           equ     $0013
 /ZP14                            equ     $0014/a ZP14_Laser_Decay_Patten_Data_0  equ     $0014
 /ZP15                            equ     $0015/a ZP15_Laser_Decay_Patten_Data_1  equ     $0015
 /ZP16                            equ     $0016/a ZP16_Laser_Decay_Patten_Data_2  equ     $0016
 /ZP17                            equ     $0017/a ZP17_Laser_Decay_Patten_Data_3  equ     $0017
-/ZP1B                            equ     $001B/a ZP1B_Laser_Color                equ     $001B
+/ZP1B                            equ     $001B/a ZP1B_Laser_Colour               equ     $001B
 /; 2195/,/; 22B9/s/ZP02                            /ZP02_Laser_Param_Countdown      /
 
 /; 2195/,/; 21BE/s/ZP04                            /ZP04_Laser_Position_X           /
@@ -47,14 +47,14 @@
 
 /; 2195/,/; 22B9/s/ZP06                            /ZP06_Laser_Position_X           /
 /; 2195/,/; 22B9/s/ZP07                            /ZP07_Laser_Length_Columns       /
-/; 2195/,/; 22B9/s/ZP0C                            /ZP0C_Color_RAM_Tile_Addr_Lo     /
-/; 2195/,/; 22B9/s/(ZP0C),y                        /(ZP0C_Color_RAM_Tile_Addr_Lo),y /
+/; 2195/,/; 22B9/s/ZP0C                            /ZP0C_Colour_RAM_Tile_Addr_Lo    /
+/; 2195/,/; 22B9/s/(ZP0C),y                        /(ZP0C_Colour_RAM_Tile_Addr_Lo),y/
 /; 2195/,/; 22B9/s/ZP13                            /ZP13_Laser_Position_Y           /
 /; 2195/,/; 22B9/s/ZP14                            /ZP14_Laser_Decay_Patten_Data_0  /
 /; 2195/,/; 22B9/s/ZP15                            /ZP15_Laser_Decay_Patten_Data_1  /
 /; 2195/,/; 22B9/s/ZP16                            /ZP16_Laser_Decay_Patten_Data_2  /
 /; 2195/,/; 22B9/s/ZP17                            /ZP17_Laser_Decay_Patten_Data_3  /
-/; 2195/,/; 22B9/s/ZP1B                            /ZP1B_Laser_Color                /
+/; 2195/,/; 22B9/s/ZP1B                            /ZP1B_Laser_Colour               /
 
 # Display_Number_Of_Lives
 /ZP06                            equ     $0006/a ZP06_Character_To_Copy          equ     $0006
@@ -99,13 +99,13 @@
 # Display_Rocket_Flame
 #/ZP04                            equ     $0004/a ZP04_UDG_RAM_Addr_Lo            equ     $0004
 #/ZP05                            equ     $0005/a ZP05_UDG_RAM_Addr_Hi            equ     $0005
-#/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
+#/ZP0C                            equ     $000C/a ZP0C_Colour_RAM_Tile_Addr_Lo    equ     $000C
 /ZP11                            equ     $0011/a ZP11_Object_Ship_Position_Y     equ     $0011
 /ZP18                            equ     $0018/a ZP18_Object_Flame_Position_X    equ     $0018
 /ZP19                            equ     $0019/a ZP19_Object_Flame_Position_Y    equ     $0019
 /; 27AA/,/; 2839/s/ZP04                            /ZP04_Object_Position_X          /
 /; 27AA/,/; 2839/s/ZP05                            /ZP05_Object_Position_Y          /
-/; 27AA/,/; 2839/s/(ZP0C),y                        /(ZP0C_Color_RAM_Tile_Addr_Lo),y /
+/; 27AA/,/; 2839/s/(ZP0C),y                        /(ZP0C_Colour_RAM_Tile_Addr_Lo),y/
 /; 27AA/,/; 2839/s/ZP11                            /ZP11_Object_Ship_Position_Y     /
 /; 27AA/,/; 2839/s/ZP18                            /ZP18_Object_Flame_Position_X    /
 /; 27AA/,/; 2839/s/ZP19                            /ZP19_Object_Flame_Position_Y    /
@@ -190,18 +190,18 @@
 /; 37D4/,/; 381C/s/ZP1A                            /ZP1A_Object_Type                /
 
 
-# Colorize_Object
-/ZP0A                            equ     $000A/a ZP0A_Color_RAM_Tiles_X          equ     $000A
-/ZP0B                            equ     $000B/a ZP0B_Color_RAM_Tiles_Y          equ     $000B
-#/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Tile_Addr_Lo     equ     $000C
+# Colourize_Object
+/ZP0A                            equ     $000A/a ZP0A_Colour_RAM_Tiles_X         equ     $000A
+/ZP0B                            equ     $000B/a ZP0B_Colour_RAM_Tiles_Y         equ     $000B
+#/ZP0C                            equ     $000C/a ZP0C_Colour_RAM_Tile_Addr_Lo     equ     $000C
 /ZP16                            equ     $0016/a ZP16_Object_Size_X_Columns      equ     $0016
 /ZP17                            equ     $0017/a ZP17_Object_Size_Y_Pixels       equ     $0017
 #/ZP18                            equ     $0018/a ZP18_Object_Position_X_         equ     $0018 ALREADY DEFINED
 /ZP19                            equ     $0019/a ZP19_Object_Position_Y          equ     $0019
-/; 381F/,/; 385E/s/ZP0A                            /ZP0A_Color_RAM_Tiles_X          /
-/; 381F/,/; 385E/s/ZP0B                            /ZP0B_Color_RAM_Tiles_Y          /
-/; 381F/,/; 385E/s/ZP0C                            /ZP0C_Color_RAM_Tile_Addr_Lo     /
-/; 381F/,/; 385E/s/(ZP0C),y                        /(ZP0C_Color_RAM_Tile_Addr_Lo),y /
+/; 381F/,/; 385E/s/ZP0A                            /ZP0A_Colour_RAM_Tiles_X         /
+/; 381F/,/; 385E/s/ZP0B                            /ZP0B_Colour_RAM_Tiles_Y         /
+/; 381F/,/; 385E/s/ZP0C                            /ZP0C_Colour_RAM_Tile_Addr_Lo    /
+/; 381F/,/; 385E/s/(ZP0C),y                        /(ZP0C_Colour_RAM_Tile_Addr_Lo),y/
 /; 381F/,/; 385E/s/ZP16                            /ZP16_Object_Size_X_Columns      /
 /; 381F/,/; 385E/s/ZP17                            /ZP17_Object_Size_Y_Pixels       /
 #/; 381F/,/; 385E/s/ZP18                            /ZP18_Object_Position_X          / ALREADY DEFINED
@@ -277,15 +277,15 @@
 /; 35D7/,/; 35E8/s/ZP12                            /ZP12_Object_Type                /
 
 
-# Load_Object_Type_X_Y_Color
+# Load_Object_Type_X_Y_Colour
 #/ZP18                            equ     $0018/a ZP18_Object_Position_X          equ     $0018
 #/ZP19                            equ     $0019/a ZP19_Object_Position_Y          equ     $0019
 #/ZP1A                            equ     $001A/a ZP1A_Object_Type                equ     $001A
-/ZP1B                            equ     $001B/a ZP1B_Object_Color               equ     $001B
+/ZP1B                            equ     $001B/a ZP1B_Object_Colour              equ     $001B
 /; 35E9/,/; 3600/s/ZP18                            /ZP18_Object_Position_X          /
 /; 35E9/,/; 3600/s/ZP19                            /ZP19_Object_Position_Y          /
 /; 35E9/,/; 3600/s/ZP1A                            /ZP1A_Object_Type                /
-/; 35E9/,/; 3600/s/ZP1B                            /ZP1B_Object_Color               /
+/; 35E9/,/; 3600/s/ZP1B                            /ZP1B_Object_Colour              /
 
 # Copy_Char_To_UDG_RAM
 /ZP04                            equ     $0004/a ZP04_UDG_RAM_Addr_Lo            equ     $0004
@@ -321,23 +321,23 @@
 /; 3531/,/; 3544/s/ZP04                            /ZP04_UDG_RAM_Addr_Lo            /
 /; 3531/,/; 3544/s/ZP05                            /ZP05_UDG_RAM_Addr_Hi            /
 
-# Setup_Color_RAM_Ptr
+# Setup_Colour_RAM_Ptr
 #/ZP04                            equ     $0004/a ZP04_X_Coordinate               equ     $0004
 #/ZP05                            equ     $0005/a ZP05_Y_Coordinate               equ     $0005
-/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Addr_Lo          equ     $000C
-/ZP0D                            equ     $000D/a ZP0D_Color_RAM_Addr_Hi          equ     $000D
+/ZP0C                            equ     $000C/a ZP0C_Colour_RAM_Addr_Lo         equ     $000C
+/ZP0D                            equ     $000D/a ZP0D_Colour_RAM_Addr_Hi         equ     $000D
 /; 34F7/,/; 3511/s/ZP04                            /ZP04_X_Coordinate               /
 /; 34F7/,/; 3511/s/ZP05                            /ZP05_Y_Coordinate               /
-/; 34F7/,/; 3511/s/ZP0C                            /ZP0C_Color_RAM_Addr_Lo          /
-/; 34F7/,/; 3511/s/ZP0D                            /ZP0D_Color_RAM_Addr_Hi          /
+/; 34F7/,/; 3511/s/ZP0C                            /ZP0C_Colour_RAM_Addr_Lo         /
+/; 34F7/,/; 3511/s/ZP0D                            /ZP0D_Colour_RAM_Addr_Hi         /
 
 # Display_String
 /ZP06                            equ     $0006/a ZP06_Character_To_Display       equ     $0006
-#/ZP0C                            equ     $000C/a ZP0C_Color_RAM_Addr_Lo          equ     $000C
+#/ZP0C                            equ     $000C/a ZP0C_Colour_RAM_Addr_Lo          equ     $000C
 #/ZP0E                            equ     $000E/a ZP0E_String_Addr_Lo             equ     $000E
 /; 34CC/,/; 34F6/s/ZP06                            /ZP06_Character_To_Display       /
 /; 34CC/,/; 34F6/s/ZP0E                            /ZP0E_String_Addr_Lo             /
-/; 34CC/,/; 34F6/s/(ZP0C),y                        /(ZP0C_Color_RAM_Addr_Lo),y      /
+/; 34CC/,/; 34F6/s/(ZP0C),y                        /(ZP0C_Colour_RAM_Addr_Lo),y     /
 /; 34CC/,/; 34F6/s/(ZP0E),y                        /(ZP0E_String_Addr_Lo),y         /
 
 # Display_BCD_Bytes

@@ -42,7 +42,7 @@ ZP1A                            equ     $001A
 ZP1B                            equ     $001B
 ZP_Jetman_Action                equ     $001C
 ZP_Ship_UDG_Addr_Offset         equ     $001E
-ZP_Ship_UDG_Addr_Color?         equ     $001F
+ZP_Ship_UDG_Addr_Colour?        equ     $001F
 ZP_HW_IRQ_Occurred              equ     $0020
 ZP_Alien_Spawn_Counter          equ     $0021
 ZP_Obj_List_Ptr_Save_IRQ_Lo     equ     $0022
@@ -60,7 +60,7 @@ ZP_HW_IRQ_Counter_Hi            equ     $004B
 ZP_HW_IRQ_Random                equ     $004C
 ZP_Score_Player_1               equ     $0051
 ZP_Score_Player_2               equ     $0054
-ZP_Reverse_And_Color_Data       equ     $0057
+ZP_Reverse_And_Colour_Data      equ     $0057
 ZP_Flash_Countup                equ     $0058
 ZP_Level_Active_Player          equ     $0059
 ZP_Num_Lives_Active_Player      equ     $005A
@@ -112,7 +112,7 @@ VIC_R4_TV_Raster                equ     $9004
 VIC_RA_Frq_Osc1                 equ     $900A
 VIC_RB_Frq_Osc2                 equ     $900B
 VIC_RC_Frq_Osc3                 equ     $900C
-VIC_RE_Vol_Color                equ     $900E
+VIC_RE_Vol_Colour               equ     $900E
 VIA1_Port_B                     equ     $9110
 VIA1_Port_A                     equ     $9111
 VIA1_DDR_A                      equ     $9113
@@ -124,59 +124,58 @@ VIA2_DDR_A                      equ     $9123
 VIA2_T1_Cnt_Lo                  equ     $9124
 VIA2_T1_Cnt_Hi                  equ     $9125
 VIA2_Int_Enable                 equ     $912E
-Color_RAM                       equ     $9600
+Colour_RAM                      equ     $9600
 
 ;****************************************************
 ; Used Definitions
 ;****************************************************
 
 SCREEN_WIDTH_COLUMNS            equ     $17
-GREEN                           equ     $05
+COLOUR_GREEN                    equ     $05
 UDG_DATA_BITMAP_OFFSET          equ     $03
 UDG_DATA_WIDTH_BYTES_OFFSET     equ     $FE
 UDG_DATA_HEIGHT_PIXELS_OFFSET   equ     $FF
 SCREEN_WIDTH_PIXELS             equ     $B8
 SCREEN_HEIGHT_PIXELS            equ     $B0
-OBJECT_COLOR_PARAM              equ     $05
+OBJECT_COLOUR_PARAM             equ     $05
 OBJECT_POSITION_Y_PARAM         equ     $03
 OBJECT_TYPE_PARAM               equ     $00
 NUM_PIXEL_OF_LINES_TO_REVERSE   equ     $0F
 NUM_OF_COLUMNS_TO_REVERSE       equ     $06
 JETMAN_STATE_PARAM              equ     $00
 JETMAN_POSITION_Y_PARAM         equ     $03
-JETMAN_Y_DIRECTION_PARAM        equ     $04
-JETMAN_X_DIRECTION_PARAM        equ     $02
+JETMAN_DIRECTION_Y_PARAM        equ     $04
+JETMAN_DIRECTION_X_PARAM        equ     $02
 _100_MINUS_SCREEN_WIDTH_PIXELS  equ     $48
 SCREEN_TOP                      equ     $28
 SCREEN_BOTTOM                   equ     $AF
 JETMAN_POSITION_X_PARAM         equ     $01
-JETMAN_DIRECTION_X_PARAM        equ     $02
 OBJECT_PARAM                    equ     $06
 LIFECYCLE_STATE                 equ     $04
-FUEL_Y_WHEN_LANDED              equ     $A8
-OBJECT_Y_WHEN_LANDED_PARAM      equ     $06
+FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
+OBJECT_POS_Y_WHEN_LANDED_PARAM  equ     $06
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
 JETMAN_STANDING                 equ     $02
 JETMAN_FLYING                   equ     $01
-OBJECT_Y_DIRECTION_PARAM        equ     $04
-OBJECT_X_DIRECTION_PARAM        equ     $02
-LASER_X_POSITION_PARAM          equ     $02
+OBJECT_DIRECTION_Y_PARAM        equ     $04
+OBJECT_DIRECTION_X_PARAM        equ     $02
+LASER_POSITION_X_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
-OBJECT_X_POSITION_PARAM         equ     $01
-OBJECT_Y_DIR_COUNTDOWN_PARAM    equ     $06
+OBJECT_POSITION_X_PARAM         equ     $01
+OBJECT_DIR_Y_COUNTDOWN_PARAM    equ     $06
 OBJECT_TYPE_PARAM_SAVED         equ     $06
 EXPLOSION_ANIMATION_FRAMES      equ     $07
 EXPLOSION_ANIMATION_FRAME       equ     $04
-BLUE                            equ     $06
-WHITE                           equ     $01
+COLOUR_BLUE                     equ     $06
+COLOUR_WHITE                    equ     $01
 OBJECT_TYPE_EXPLOSION           equ     $03
-CYAN                            equ     $03
-BLACK                           equ     $00
+COLOUR_CYAN                     equ     $03
+COLOUR_BLACK                    equ     $00
 OBJECT_VALUABLE_TYPE_PARAM      equ     $06
-YELLOW                          equ     $07
+COLOUR_YELLOW                   equ     $07
 VALUABLE_TYPE                   equ     $06
-RED                             equ     $02
+COLOUR_RED                      equ     $02
 FLAME_SPACE_AVAILABLE           equ     $AF
 OBJECT_TYPE_ROCKET_ASCEND       equ     $0A
 WORD_SIZE                       equ     $02
@@ -192,13 +191,13 @@ LASER_TYPE_PARAM                equ     $00
 LASER_POSITION_X                equ     $02
 LASER_LENGTH_PARAM              equ     $06
 LASER_POSITION_Y                equ     $01
-PURPLE                          equ     $04
+COLOUR_PURPLE                   equ     $04
 LASER_POSITION_X_PARAMS         equ     $03
 LASER_GUN_HEIGHT_OFFSET         equ     $0D
 MASK_JETMAN_DIRECTION           equ     %10000000
 MAX_LASER_SHOTS                 equ     $04
-ROWS                            equ     $0B
-COLUMNS                         equ     $17
+SCREEN_ROWS                     equ     $0B
+SCREEN_COLUMNS                  equ     $17
 
 ;****************************************************
 ; Program's Code Areas
@@ -225,7 +224,7 @@ VIC_Init_Tab
     fcb     $00                             ; 200F: 00        VIC_RB_Frq_Osc2
     fcb     $00                             ; 2010: 00        VIC_RC_Frq_Osc3
     fcb     $00                             ; 2011: 00        VIC_RD_Frq_Noise
-    fcb     $00                             ; 2012: 00        VIC_RE_Vol_Color
+    fcb     $00                             ; 2012: 00        VIC_RE_Vol_Colour
     fcb     $08                             ; 2013: 08        VIC_RF_BckBdrCol
 
 ; Quick lookup for BIT instruction
@@ -316,20 +315,20 @@ Reset_VIC
     txa                                     ; 2063: 8A       
 ; L_BRS_($2064)_($2077) OK
 ISR_Cols
-    ldy     #COLUMNS                        ; 2064: A0 17    
+    ldy     #SCREEN_COLUMNS                 ; 2064: A0 17    
     pha                                     ; 2066: 48       
 ; L_BRS_($2067)_($206F) OK
 ISR_Rows
     sta     Screen_RAM,x                    ; 2067: 9D 00 02 
     clc                                     ; 206A: 18       
-    adc     #ROWS                           ; 206B: 69 0B    
+    adc     #SCREEN_ROWS                    ; 206B: 69 0B    
     inx                                     ; 206D: E8       
     dey                                     ; 206E: 88       
     bne     ISR_Rows                        ; 206F: D0 F6    
     pla                                     ; 2071: 68       
     clc                                     ; 2072: 18       
     adc     #$01                            ; 2073: 69 01    
-    cmp     #ROWS                           ; 2075: C9 0B    
+    cmp     #SCREEN_ROWS                    ; 2075: C9 0B    
     bne     ISR_Cols                        ; 2077: D0 EB    
 
 ; L_JMP_($2079)_($2994) OK
@@ -346,9 +345,9 @@ RGS_Flash
     dex                                     ; 2082: CA       
     bpl     RGS_Flash                       ; 2083: 10 FB    
 
-; Setup volume and color
+; Setup volume and colour
     lda     #$0F                            ; 2085: A9 0F    
-    sta     VIC_RE_Vol_Color                ; 2087: 8D 0E 90 
+    sta     VIC_RE_Vol_Colour               ; 2087: 8D 0E 90 
 
 ; Disable sound object
     lda     #$00                            ; 208A: A9 00    
@@ -564,12 +563,12 @@ Loop_Init_Laser
     adc     #%01000000                      ; 2151: 69 40     Set bit 6 01xx_xx000
     sta     (ZP06),y                        ; 2153: 91 06    
 
-; Load a random laser color value 0-7 using IRQ counter
+; Load a random laser colour value 0-7 using IRQ counter
     iny                                     ; 2155: C8       
     lda     ZP_HW_IRQ_Random                ; 2156: A5 4C    
     and     #%00000111                      ; 2158: 29 07    
     tax                                     ; 215A: AA       
-    lda     Laser_Color_Table,x             ; 215B: BD 6B 21 
+    lda     Laser_Colour_Table,x            ; 215B: BD 6B 21 
     sta     (ZP06),y                        ; 215E: 91 06    
 
 ; Trigger laser sound by setting parameters in sound object
@@ -581,9 +580,11 @@ Loop_Init_Laser
 ; ===========================================================
 
 ; Green not used, it's used for the platforms only
-Laser_Color_Table
-    fcb     WHITE,RED,CYAN,PURPLE           ; 216B: 01 02 03 04 
-    fcb     BLUE,YELLOW,CYAN,YELLOW         ; 216F: 06 07 03 07 
+Laser_Colour_Table
+    fcb     COLOUR_WHITE,COLOUR_RED         ; 216B: 01 02    
+    fcb     COLOUR_CYAN,COLOUR_PURPLE       ; 216D: 03 04    
+    fcb     COLOUR_BLUE,COLOUR_YELLOW       ; 216F: 06 07    
+    fcb     COLOUR_CYAN,COLOUR_YELLOW       ; 2171: 03 07    
 
 ; Test if Jetman Position X is facing right at the start of a tile
 ; L_BRS_($2173)_($2125) OK
@@ -650,9 +651,9 @@ DISPLAY_LASERS
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 219C: B1 00    
     sta     ZP07                            ; 219E: 85 07    
 
-; Y becomes $07 i.e. Laser Color parameter
-    iny                                     ; 21A0: C8        Y=$07, laser color addr
-    lda     (ZP_Obj_List_Ptr_Lo),y          ; 21A1: B1 00     Fetch laser color
+; Y becomes $07 i.e. Laser Colour parameter
+    iny                                     ; 21A0: C8        Y=$07, laser colour addr
+    lda     (ZP_Obj_List_Ptr_Lo),y          ; 21A1: B1 00     Fetch laser colour
     sta     ZP1B                            ; 21A3: 85 1B     Store to ZP variable
 
 ; Get laser X and Y-coord and store to temp vars
@@ -672,7 +673,7 @@ DISPLAY_LASERS
     bit     MASK_00000100                   ; 21B6: 2C 16 20 
     beq     Setup_Laser_Decay_Patterns      ; 21B9: F0 47    
 
-    jsr     Setup_Color_RAM_Ptr             ; 21BB: 20 F7 34 
+    jsr     Setup_Colour_RAM_Ptr            ; 21BB: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 21BE: 20 1D 35 
 
 ; Test if firing left or right
@@ -714,13 +715,13 @@ Save_Laser_Position_X
     eor     #%11111111                      ; 21E1: 49 FF    
     sta     (ZP04),y                        ; 21E3: 91 04    
 
-; Load current tile color, check it's not green, jump if it is
+; Load current tile colour, check it's not green, jump if it is
     lda     (ZP0C),y                        ; 21E5: B1 0C    
     and     #%00001111                      ; 21E7: 29 0F     Zero top 4 bits 0000_xxxx
-    cmp     #GREEN                          ; 21E9: C9 05    
+    cmp     #COLOUR_GREEN                   ; 21E9: C9 05    
     beq     Reduce_Laser_Length_Countdown   ; 21EB: F0 04    
 
-; Update laser tile color
+; Update laser tile colour
     lda     ZP1B                            ; 21ED: A5 1B    
     sta     (ZP0C),y                        ; 21EF: 91 0C    
 
@@ -1046,7 +1047,7 @@ Loop_Reset_Objects
     txa                                     ; 231A: 8A       
     pha                                     ; 231B: 48       
 
-    jsr     Load_Object_Type_X_Y_Color      ; 231C: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 231C: 20 E9 35 
     jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 231F: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2322: 20 5A 30 
 
@@ -1289,7 +1290,7 @@ Loop_Swap_Rocket_Object
 ; L_JSR_($2416)_($298A) OK
 ; L_JSR_($2416)_($29E7) OK
 Reset_Screen_Display_Scores
-    jsr     Reset_Color_RAM                 ; 2416: 20 5C 35 
+    jsr     Reset_Colour_RAM                ; 2416: 20 5C 35 
     jsr     Reset_UDG_RAM                   ; 2419: 20 6C 35 
     jsr     Display_Player_1_Score          ; 241C: 20 71 24 
     jsr     Display_High_Score              ; 241F: 20 91 24 
@@ -1335,15 +1336,15 @@ Loop_Display_1UP_HI_2UP_Text
 ; ===========================================================
 
 STR_1UP
-    fcb     WHITE                           ; 2450: 01       
+    fcb     COLOUR_WHITE                    ; 2450: 01       
     fcc     "`qUP`"                         ; 2451: 60 71 55 50 60  `=Space, q=1, r=2
     fcb     $E0                             ; 2456: E0        Top bit=1 indicates end of string
 STR_HI
-    fcb     YELLOW                          ; 2457: 07       
+    fcb     COLOUR_YELLOW                   ; 2457: 07       
     fcc     "``HI`"                         ; 2458: 60 60 48 49 60 
     fcb     $E0                             ; 245D: E0       
 STR_2UP
-    fcb     WHITE                           ; 245E: 01       
+    fcb     COLOUR_WHITE                    ; 245E: 01       
     fcc     "``rUP"                         ; 245F: 60 60 72 55 50 
     fcb     $E0                             ; 2464: E0       
 
@@ -1501,7 +1502,7 @@ Loop_Display_Game_Select
     lda     Fn_And_SP_Row_Offsets,x         ; 24F5: BD 1F 25 
     sta     ZP05                            ; 24F8: 85 05    
 
-    jsr     Setup_Color_RAM_Ptr             ; 24FA: 20 F7 34 
+    jsr     Setup_Colour_RAM_Ptr            ; 24FA: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 24FD: 20 1D 35 
 
 ; Setup and call string display routine
@@ -2367,15 +2368,15 @@ Display_Rocket_Flame_On_Screen
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27F1: 20 8D 37 
     jsr     Display_Object                  ; 27F4: 20 4C 36 
 
-; Set the flame color tile to red, uses two tiles
+; Set the flame colour tile to red, uses two tiles
     lda     ZP18                            ; 27F7: A5 18    
     sta     ZP04                            ; 27F9: 85 04    
 
     lda     ZP19                            ; 27FB: A5 19    
     sta     ZP05                            ; 27FD: 85 05    
 
-    jsr     Setup_Color_RAM_Ptr             ; 27FF: 20 F7 34 
-    lda     #RED                            ; 2802: A9 02    
+    jsr     Setup_Colour_RAM_Ptr            ; 27FF: 20 F7 34 
+    lda     #COLOUR_RED                     ; 2802: A9 02    
     ldy     #$00                            ; 2804: A0 00    
     sta     (ZP0C),y                        ; 2806: 91 0C    
 
@@ -2469,7 +2470,7 @@ VALUABLES
 
 ; L_BRS_($2851)_($2846) OK
 Valuable_Landed
-    jsr     Load_Object_Type_X_Y_Color      ; 2851: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 2851: 20 E9 35 
     jsr     Test_Jetman_Object_Collide      ; 2854: 20 58 2D 
     bpl     Animate_Valuable                ; 2857: 10 1B    
 
@@ -2512,15 +2513,15 @@ Subroutine_List_Valuables
     fdb     Valuable_Gemstone               ; 2890: B6 28    
 
 Valuable_Gold_Bar
-    lda     #YELLOW                         ; 2892: A9 07    
+    lda     #COLOUR_YELLOW                  ; 2892: A9 07    
 
 ; L_JMP_($2894)_($28A1) OK
 ; L_JMP_($2894)_($28AE) OK
 ; L_JMP_($2894)_($28B3) OK
 ; L_BRS_($2894)_($28C2) OK
 ; L_JMP_($2894)_($28C6) OK
-Save_Color_And_Display_Object
-    ldy     #OBJECT_COLOR_PARAM             ; 2894: A0 05    
+Save_Colour_And_Display_Object
+    ldy     #OBJECT_COLOUR_PARAM            ; 2894: A0 05    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2896: 91 00    
 
     ldy     #OBJECT_VALUABLE_TYPE_PARAM     ; 2898: A0 06    
@@ -2529,45 +2530,45 @@ Save_Color_And_Display_Object
 ; -----------------------
 
 Valuable_Mineral
-    lda     #BLUE                           ; 289F: A9 06    
-    jmp     Save_Color_And_Display_Object   ; 28A1: 4C 94 28 
+    lda     #COLOUR_BLUE                    ; 289F: A9 06    
+    jmp     Save_Colour_And_Display_Object  ; 28A1: 4C 94 28 
 ; -----------------------
 
-; Use IRQ counter to toggle object color between black and cyan
+; Use IRQ counter to toggle object colour between black and cyan
 Valuable_Plutonium
     lda     ZP_HW_IRQ_Counter_Lo            ; 28A4: A5 4A    
     and     #%00011111                      ; 28A6: 29 1F    
     cmp     #%00011000                      ; 28A8: C9 18    
-    bcs     Valuable_Plutonium_Set_Color    ; 28AA: B0 05    
+    bcs     Valuable_Plutonium_Set_Colour   ; 28AA: B0 05    
 
-    lda     #BLACK                          ; 28AC: A9 00    
-    jmp     Save_Color_And_Display_Object   ; 28AE: 4C 94 28 
+    lda     #COLOUR_BLACK                   ; 28AC: A9 00    
+    jmp     Save_Colour_And_Display_Object  ; 28AE: 4C 94 28 
 ; -----------------------
 
 ; L_BRS_($28B1)_($28AA) OK
-Valuable_Plutonium_Set_Color
-    lda     #CYAN                           ; 28B1: A9 03    
-    jmp     Save_Color_And_Display_Object   ; 28B3: 4C 94 28 
+Valuable_Plutonium_Set_Colour
+    lda     #COLOUR_CYAN                    ; 28B1: A9 03    
+    jmp     Save_Colour_And_Display_Object  ; 28B3: 4C 94 28 
 ; -----------------------
 
-; Use IRQ counter to cycle through colors, two LSRs quadruple the time between changes
+; Use IRQ counter to cycle through colours, two LSRs quadruple the time between changes
 Valuable_Gemstone
     lda     ZP_HW_IRQ_Counter_Lo            ; 28B6: A5 4A    
     lsr     a                               ; 28B8: 4A       
     lsr     a                               ; 28B9: 4A       
     and     #%00000111                      ; 28BA: 29 07    
-    bne     Valuable_Gemstone_Set_Color     ; 28BC: D0 02    
+    bne     Valuable_Gemstone_Set_Colour    ; 28BC: D0 02    
 
-; Change color from black to white
+; Change colour from black to white
     ora     #%00000001                      ; 28BE: 09 01    
 
-; If new color is green, change it to white, green is reserved for platform logic
+; If new colour is green, change it to white, green is reserved for platform logic
 ; L_BRS_($28C0)_($28BC) OK
-Valuable_Gemstone_Set_Color
-    cmp     #GREEN                          ; 28C0: C9 05    
-    bne     Save_Color_And_Display_Object   ; 28C2: D0 D0    
-    lda     #WHITE                          ; 28C4: A9 01    
-    jmp     Save_Color_And_Display_Object   ; 28C6: 4C 94 28 
+Valuable_Gemstone_Set_Colour
+    cmp     #COLOUR_GREEN                   ; 28C0: C9 05    
+    bne     Save_Colour_And_Display_Object  ; 28C2: D0 D0    
+    lda     #COLOUR_WHITE                   ; 28C4: A9 01    
+    jmp     Save_Colour_And_Display_Object  ; 28C6: 4C 94 28 
 ; -----------------------
 
 
@@ -2676,7 +2677,7 @@ Change_Object_To_Explosion
 
 ; Reset object X direction
     lda     #$00                            ; 28FC: A9 00    
-    ldy     #OBJECT_X_DIRECTION_PARAM       ; 28FE: A0 02    
+    ldy     #OBJECT_DIRECTION_X_PARAM       ; 28FE: A0 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2900: 91 00    
 
 ; Get object type, zero middle four bits, preserve bits 6 and 7, set bits 1 & 2
@@ -2704,26 +2705,26 @@ Store_Object_Type
 ; Change explosion object colour based on IRQ random generator
     lda     ZP_HW_IRQ_Random                ; 2919: A5 4C    
     and     #%00000111                      ; 291B: 29 07     Zero bits 3-8 00000xxx
-    bne     Test_New_Color_Is_Green         ; 291D: D0 02    
+    bne     Test_New_Colour_Is_Green        ; 291D: D0 02    
 
-; Color is black, bump it to white by incrementing
-    ora     #WHITE                          ; 291F: 09 01     Set bit 0 xxxxxxx1
+; Colour is black, bump it to white by incrementing
+    ora     #COLOUR_WHITE                   ; 291F: 09 01     Set bit 0 xxxxxxx1
 
 ; L_BRS_($2921)_($291D) OK
-Test_New_Color_Is_Green
-    cmp     #GREEN                          ; 2921: C9 05    
-    bne     Store_Updated_Explosion_Color   ; 2923: D0 02    
+Test_New_Colour_Is_Green
+    cmp     #COLOUR_GREEN                   ; 2921: C9 05    
+    bne     Store_Updated_Explosion_Colour  ; 2923: D0 02    
 
-; If color is green, bump to Blue, Green only used for platforms
-    lda     #BLUE                           ; 2925: A9 06     Color code
+; If colour is green, bump to Blue, Green only used for platforms
+    lda     #COLOUR_BLUE                    ; 2925: A9 06     Colour code
 
 ; L_BRS_($2927)_($2923) OK
-Store_Updated_Explosion_Color
+Store_Updated_Explosion_Colour
     ldy     #$05                            ; 2927: A0 05    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2929: 91 00    
 
 ; Trigger explosion sound (noise + regular oscillator)
-    lda     #OBJECT_COLOR_PARAM             ; 292B: A9 05    
+    lda     #OBJECT_COLOUR_PARAM            ; 292B: A9 05    
     sta     Obj_Sound_Noise                 ; 292D: 8D AB 03 
     sta     Obj_Sound_Noise_Timer           ; 2930: 8D AC 03 
     rts                                     ; 2933: 60       
@@ -2732,7 +2733,7 @@ Store_Updated_Explosion_Color
 ; If an alien explosion occurs, add a new alien
 ANIMATE_EXPLOSIONS
     inc     ZP_Alien_Spawn_Counter          ; 2934: E6 21    
-    jsr     Load_Object_Type_X_Y_Color      ; 2936: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 2936: 20 E9 35 
 
 ; Add randomness to how long an animation frame is displayed using the IRQ counter
     ldy     #$02                            ; 2939: A0 02    
@@ -2764,7 +2765,7 @@ Test_Explosion_Animation_Done
 ; Update the explosion on screen
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 295B: 20 3D 37 
     jsr     Display_Object_With_Setup_2     ; 295E: 20 04 36 
-    jsr     Colorize_Object                 ; 2961: 20 1F 38 
+    jsr     Colourize_Object                ; 2961: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2964: 4C 1A 26 
 ; -----------------------
 
@@ -3017,7 +3018,7 @@ Level_2_Balls_1
     jsr     Test_Platform_Collision_Bounce  ; 2A75: 20 16 2B 
 
 ; Read Y direction reversal countdown, branch if zero, else decrement countdown
-    ldy     #OBJECT_Y_DIR_COUNTDOWN_PARAM   ; 2A78: A0 06    
+    ldy     #OBJECT_DIR_Y_COUNTDOWN_PARAM   ; 2A78: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A7A: B1 00    
     beq     Update_Y_Direction_Random       ; 2A7C: F0 24    
     sec                                     ; 2A7E: 38       
@@ -3029,7 +3030,7 @@ Level_2_Balls_1
 ; Below routine common to Level 1 and 2
 ; L_JMP_($2A83)_($2A6A) OK
 Update_Alien_X_Y_Direction
-    ldy     #OBJECT_X_DIRECTION_PARAM       ; 2A83: A0 02    
+    ldy     #OBJECT_DIRECTION_X_PARAM       ; 2A83: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A85: B1 00    
     bmi     Alien_Direction_Left            ; 2A87: 30 15    
     lda     #$08                            ; 2A89: A9 08    
@@ -3038,7 +3039,7 @@ Update_Alien_X_Direction
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2A8B: 91 00    
 
 ; Update_Alien_Y_Direction
-    ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2A8D: A0 04    
+    ldy     #OBJECT_DIRECTION_Y_PARAM       ; 2A8D: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A8F: B1 00    
     bmi     Alien_Direction_Up              ; 2A91: 30 07    
     lda     #$08                            ; 2A93: A9 08    
@@ -3066,7 +3067,7 @@ Update_Y_Direction_Random
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AA8: 91 00    
 
 ; Reverse Y direction up/down, randomly via IRQ
-    ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2AAA: A0 04    
+    ldy     #OBJECT_DIRECTION_Y_PARAM       ; 2AAA: A0 04    
     and     #%00000100                      ; 2AAC: 29 04    
     bit     ZP_HW_IRQ_Random                ; 2AAE: 24 4C    
     bmi     Update_Y_Direction_Random_1     ; 2AB0: 30 05    
@@ -3115,7 +3116,7 @@ Level_3_Saucer_Update_X
 ; - Two sections update X depending on whether alien is left or right of Jetman
 ; - Two sections update Y depending on whether alien is above or below Jetman
 ; Update Alien Direction X
-    ldy     #OBJECT_X_POSITION_PARAM        ; 2AC7: A0 01    
+    ldy     #OBJECT_POSITION_X_PARAM        ; 2AC7: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AC9: B1 00    
 
 ; Update Y register to index Direction X
@@ -3386,7 +3387,7 @@ Loop_2BA8
     beq     SKIP_2BC2                       ; 2BBE: F0 02    
 
 ; Bit 3 wasn't set, so zero all bits apart from bit 3
-; Bit 3 will make the object the gemstone which cycles through all colors
+; Bit 3 will make the object the gemstone which cycles through all colours
     and     #%00001000                      ; 2BC0: 29 08    
 
 ; Make the valuble type $2x, maybe used as an offset later?
@@ -3403,7 +3404,7 @@ Load_ZP_Params_For_Object_03C0
     fcb     $00                             ; 2BCD: 00       
     fdb     $03C0                           ; 2BCE: C0 03    
     fcb     $FF                             ; 2BD0: FF       
-    jsr     Load_Object_Type_X_Y_Color      ; 2BD1: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 2BD1: 20 E9 35 
 
     ldy     #OBJECT_VALUABLE_TYPE           ; 2BD4: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2BD6: B1 00    
@@ -3481,7 +3482,7 @@ Test_Laser_Hits_1
 ; Test if laser X-coords have bit 2 set, not sure why
 ; L_BRS_($2C10)_($2C5C) OK
 BACK_2C10
-    ldy     #LASER_X_POSITION_PARAM         ; 2C10: A0 02    
+    ldy     #LASER_POSITION_X_PARAM         ; 2C10: A0 02    
     lda     (ZP08),y                        ; 2C12: B1 08     X-coord of end of laser
     bit     MASK_00000100                   ; 2C14: 2C 16 20 
     bne     SKIP_2C21                       ; 2C17: D0 08    
@@ -3645,7 +3646,7 @@ Test_Jetman_Collide
 ; Get object direction/speed and use to create new X value
 ; L_BRS_($2C9F)_($2C97) OK
 Update_Object_Position
-    ldy     #OBJECT_X_DIRECTION_PARAM       ; 2C9F: A0 02    
+    ldy     #OBJECT_DIRECTION_X_PARAM       ; 2C9F: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2CA1: B1 00    
     dey                                     ; 2CA3: 88       
     pha                                     ; 2CA4: 48       
@@ -3666,7 +3667,7 @@ Update_Object_X_Position
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2CB3: 91 00    
 
 ; Get object direction/speed and use to create new Y value
-    ldy     #OBJECT_Y_DIRECTION_PARAM       ; 2CB5: A0 04    
+    ldy     #OBJECT_DIRECTION_Y_PARAM       ; 2CB5: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2CB7: B1 00    
     dey                                     ; 2CB9: 88       
     pha                                     ; 2CBA: 48       
@@ -3678,7 +3679,7 @@ Update_Object_X_Position
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2CC1: 91 00    
 
     jsr     Display_Object_With_Setup       ; 2CC3: 20 46 36 
-    jsr     Colorize_Object                 ; 2CC6: 20 1F 38 
+    jsr     Colourize_Object                ; 2CC6: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2CC9: 4C 1A 26 
 ; -----------------------
 
@@ -3803,14 +3804,14 @@ Init_Alien_Object
     clc                                     ; 2D40: 18       
     adc     ZP02                            ; 2D41: 65 02    
     tax                                     ; 2D43: AA       
-    lda     Level_Alien_Color_Lookup,x      ; 2D44: BD 50 2D 
+    lda     Level_Alien_Colour_Lookup,x     ; 2D44: BD 50 2D 
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2D47: 91 00    
 
     jmp     Display_Object_With_Setup_1     ; 2D49: 4C 01 36 
 ; -----------------------
 Level_Alien_Type_Lookup
     fcb     $05,$08,$07,$06                 ; 2D4C: 05 08 07 06 
-Level_Alien_Color_Lookup
+Level_Alien_Colour_Lookup
     fcb     $02,$06,$03,$07                 ; 2D50: 02 06 03 07 
     fcb     $06,$07,$02,$04                 ; 2D54: 06 07 02 04 
 
@@ -3960,8 +3961,8 @@ Restore_Player_Objects_3
 ; L_JSR_($2DCB)_($22D1) OK
 ; L_JSR_($2DCB)_($2DBF) OK
 Restore_Player_Objects_4
-    jsr     Set_Object_UDG_Color            ; 2DCB: 20 DD 2D 
-    jsr     Load_Object_Type_X_Y_Color      ; 2DCE: 20 E9 35 
+    jsr     Set_Object_UDG_Colour           ; 2DCB: 20 DD 2D 
+    jsr     Load_Object_Type_X_Y_Colour     ; 2DCE: 20 E9 35 
 ; L_BRS_($2DD1)_($2DDA) OK
 Loop_Restore_Player_Objects
     jsr     Restore_Player_Objects_6        ; 2DD1: 20 E8 2D 
@@ -3972,10 +3973,10 @@ Loop_Restore_Player_Objects
 ; ===========================================================
 ; L_JSR_($2DDD)_($2DCB) OK
 ; L_JSR_($2DDD)_($2EB2) OK
-Set_Object_UDG_Color
+Set_Object_UDG_Colour
     ldy     #$04                            ; 2DDD: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2DDF: B1 00    
-    sta     ZP_Ship_UDG_Addr_Color?         ; 2DE1: 85 1F    
+    sta     ZP_Ship_UDG_Addr_Colour?        ; 2DE1: 85 1F    
     lda     #$00                            ; 2DE3: A9 00    
     sta     ZP_Ship_UDG_Addr_Offset         ; 2DE5: 85 1E    
     rts                                     ; 2DE7: 60       
@@ -4013,7 +4014,7 @@ Dec_Saved_Obj_List_Params_by_10
     clc                                     ; 2E0F: 18       
     adc     #$04                            ; 2E10: 69 04    
     sta     ZP_Ship_UDG_Addr_Offset         ; 2E12: 85 1E    
-    dec     ZP_Ship_UDG_Addr_Color?         ; 2E14: C6 1F    
+    dec     ZP_Ship_UDG_Addr_Colour?        ; 2E14: C6 1F    
     rts                                     ; 2E16: 60       
 ; ===========================================================
 
@@ -4157,7 +4158,7 @@ ROCKET_BOTTOM_MODULE
     fdb     Obj_Jetman_State                ; 2E93: 80 03    
     fcb     $FF                             ; 2E95: FF       
 
-    jsr     Load_Object_Type_X_Y_Color      ; 2E96: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 2E96: 20 E9 35 
     jsr     Display_Object_With_Setup_1     ; 2E99: 20 01 36 
 
     lda     #$00                            ; 2E9C: A9 00    
@@ -4188,9 +4189,9 @@ ROCKET_BOTTOM_MODULE
 ; L_BRS_($2EAC)_($2E7C) OK
 ; L_BRS_($2EAC)_($2E84) OK
 Rocket_Fuelled_Up
-    jsr     Load_Object_Type_X_Y_Color      ; 2EAC: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 2EAC: 20 E9 35 
     jsr     Display_Rocket_Flame            ; 2EAF: 20 AA 27 
-    jsr     Set_Object_UDG_Color            ; 2EB2: 20 DD 2D 
+    jsr     Set_Object_UDG_Colour           ; 2EB2: 20 DD 2D 
 ; L_BRS_($2EB5)_($2EBE) OK
 Rocket_Fuelled_Up_1
     jsr     Restore_Player_Objects_6        ; 2EB5: 20 E8 2D 
@@ -4253,7 +4254,7 @@ Rocket_Fuelled_Up_5
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F0F: B1 00    
     sta     ZP05                            ; 2F11: 85 05    
 
-    jsr     Setup_Color_RAM_Ptr             ; 2F13: 20 F7 34 
+    jsr     Setup_Colour_RAM_Ptr            ; 2F13: 20 F7 34 
 ; L_JSR_($2F16)_($2EF7) OK
 ; L_BRS_($2F16)_($2F2E) OK
 Rocket_Fuelled_Up_6
@@ -4294,7 +4295,7 @@ Rocket_Fuelled_Up_6
 ; $18=Fuel (?!)
 ; L_BRS_($2F31)_($2F98) OK
 Rocket_Part_Or_Fuel_Dropped
-    ldy     #OBJECT_Y_WHEN_LANDED_PARAM     ; 2F31: A0 06    
+    ldy     #OBJECT_POS_Y_WHEN_LANDED_PARAM ; 2F31: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F33: B1 00    
     cmp     #$18                            ; 2F35: C9 18    
     beq     Fuel_Dropped                    ; 2F37: F0 3E    
@@ -4354,12 +4355,12 @@ Disable_Object_In_List
 Fuel_Dropped
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2F77: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F79: B1 00    
-    cmp     #FUEL_Y_WHEN_LANDED             ; 2F7B: C9 A8    
+    cmp     #FUEL_POSITION_Y_WHEN_LANDED    ; 2F7B: C9 A8    
     bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F7D: 90 33    
 
 ; Fuel cell has landed, increment the counter
     inc     Obj_Rocket_Fuel_Lvl             ; 2F7F: EE B2 03 
-    jsr     Load_Object_Type_X_Y_Color      ; 2F82: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 2F82: 20 E9 35 
     jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 2F85: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2F88: 20 5A 30 
     jmp     Disable_Object_In_List          ; 2F8B: 4C 65 2F 
@@ -4419,7 +4420,7 @@ Rocket_Part_Or_Fuel_Move_Down
 ; L_JMP_($2FBD)_($301B) OK
 ; L_JMP_($2FBD)_($3051) OK
 Setup_Object_Addr_Rocket_Fuel
-    jsr     Load_Object_Type_X_Y_Color      ; 2FBD: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 2FBD: 20 E9 35 
     jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 2FC0: 20 DA 2F 
 
 ; Using index into object data, get addr of object data to A and Y and setup into ZP
@@ -4434,7 +4435,7 @@ Setup_Object_Addr
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2FCB: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2FCE: 20 8D 37 
     jsr     Display_Object                  ; 2FD1: 20 4C 36 
-    jsr     Colorize_Object                 ; 2FD4: 20 1F 38 
+    jsr     Colourize_Object                ; 2FD4: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2FD7: 4C 1A 26 
 ; -----------------------
 
@@ -4583,7 +4584,7 @@ Copy_Jetman_XY_To_Object_1
 ; -----------------------
 ; L_JSR_($3054)_($2F4B) OK
 Load_Rocket_or_Fuel_UDGs
-    jsr     Load_Object_Type_X_Y_Color      ; 3054: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 3054: 20 E9 35 
 ; L_JSR_($3057)_($2F5F) OK
 Load_Rocket_or_Fuel_UDGs_1
     jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 3057: 20 DA 2F 
@@ -4887,7 +4888,7 @@ DP_1 lda    (ZP08),y                        ; 3155: B1 08     Get X value from l
     sta     ZP0B                            ; 3161: 85 0B      and store
 
     sty     ZP03                            ; 3163: 84 03    
-    jsr     Setup_Color_RAM_Ptr             ; 3165: 20 F7 34 
+    jsr     Setup_Colour_RAM_Ptr            ; 3165: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 3168: 20 1D 35 
 
 ; Load Temp_3 with addr of left end platform UDG char
@@ -4912,14 +4913,14 @@ Loop_Next_Char
     beq     Next_UDG_Char_Loop_Next_Char    ; 3182: F0 1E    
     bpl     Loop_Next_Char                  ; 3184: 10 F5    
 
-; Set the color mapping for the platforms to Green
+; Set the colour mapping for the platforms to Green
     ldy     ZP03                            ; 3186: A4 03    
     lda     (ZP08),y                        ; 3188: B1 08    
     clc                                     ; 318A: 18       
     adc     #$01                            ; 318B: 69 01    
     sta     ZP0B                            ; 318D: 85 0B    
     ldy     #$00                            ; 318F: A0 00    
-    lda     #GREEN                          ; 3191: A9 05    
+    lda     #COLOUR_GREEN                   ; 3191: A9 05    
 ; L_BRS_($3193)_($3198) OK
 DP_2 sta    (ZP0C),y                        ; 3193: 91 0C     ZP0C_Col_RAM_Ptr_Lo
     iny                                     ; 3195: C8       
@@ -4972,7 +4973,7 @@ Next_UDG_Char
 
 ; L_BRS_($31BF)_($3203) OK
 A_Left_Right_Impact
-    ldy     #JETMAN_X_DIRECTION_PARAM       ; 31BF: A0 02    
+    ldy     #JETMAN_DIRECTION_X_PARAM       ; 31BF: A0 02    
     clc                                     ; 31C1: 18       
     bit     MASK_00000001                   ; 31C2: 2C 14 20 
     beq     E_Fly_Left_Impact               ; 31C5: F0 18    
@@ -5039,7 +5040,7 @@ H_Jetman_Hits_Surface
     beq     I_Left_Right_Up_Impact          ; 31F5: F0 09    
 
 ; Test Obj_Jetman_At_Rest???
-    ldy     #JETMAN_Y_DIRECTION_PARAM       ; 31F7: A0 04    
+    ldy     #JETMAN_DIRECTION_Y_PARAM       ; 31F7: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31F9: B1 00    
     bmi     C_Jump_P                        ; 31FB: 30 CE    
     jmp     D_Set_Jetman_Standing           ; 31FD: 4C 21 33 
@@ -5055,7 +5056,7 @@ I_Left_Right_Up_Impact
 ; Test Obj_Jetman_At_Rest???
 ; L_JMP_($3208)_($32C4) OK
 J_Flying_Up_Impact
-    ldy     #JETMAN_Y_DIRECTION_PARAM       ; 3208: A0 04    
+    ldy     #JETMAN_DIRECTION_Y_PARAM       ; 3208: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 320A: B1 00    
     beq     M_Flying_Up_Impact_Bounce       ; 320C: F0 0A    
     bpl     J_Jump_T                        ; 320E: 10 05    
@@ -5164,7 +5165,7 @@ JETMAN_FLYING_
 ; L_JMP_($3285)_($3205) OK
 ; L_BRS_($3285)_($3280) OK
 P_Update_Jetman_Position_X
-    ldy     #JETMAN_X_DIRECTION_PARAM       ; 3285: A0 02    
+    ldy     #JETMAN_DIRECTION_X_PARAM       ; 3285: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3287: B1 00    
     ldy     #$00                            ; 3289: A0 00    
     bit     ZP_Jetman_Action                ; 328B: 24 1C    
@@ -5230,7 +5231,7 @@ R__Store_Jetman_Position_X
 ; L_BRS_($32C7)_($32BE) OK
 ; L_BRS_($32C7)_($32C2) OK
 T_Update_Jetman_Position_Y
-    ldy     #JETMAN_Y_DIRECTION_PARAM       ; 32C7: A0 04    
+    ldy     #JETMAN_DIRECTION_Y_PARAM       ; 32C7: A0 04    
 
     lda     ZP_Jetman_Action                ; 32C9: A5 1C    
     bit     MASK_00100000                   ; 32CB: 2C 19 20  Test for direction Down
@@ -5286,7 +5287,7 @@ W_Store_Jetman_Parameter
 ; L_JMP_($32F9)_($33B7) OK
 X_Jetman_Screen_Update
     jsr     Display_Object_With_Setup       ; 32F9: 20 46 36 
-    jsr     Colorize_Object                 ; 32FC: 20 1F 38 
+    jsr     Colourize_Object                ; 32FC: 20 1F 38 
 
 ; Test for fire pressed
     lda     ZP_Jetman_Action                ; 32FF: A5 1C    
@@ -5389,9 +5390,9 @@ READ_CONTROLS
     dec     ZP_Flash_Score_Countdown        ; 3354: C6 5D    
     bne     Flash_Display_Score_JMP         ; 3356: D0 0F    
 
-; Display Jetman, color jetman and display scores
+; Display Jetman, colour jetman and display scores
     jsr     Display_Object_With_Setup_1     ; 3358: 20 01 36 
-    jsr     Colorize_Object                 ; 335B: 20 1F 38 
+    jsr     Colourize_Object                ; 335B: 20 1F 38 
     jsr     Display_1UP_HI_2UP_Text         ; 335E: 20 25 24 
     jsr     Display_Player_1_Score          ; 3361: 20 71 24 
     jsr     Display_Player_2_Score          ; 3364: 20 81 24 
@@ -5437,7 +5438,7 @@ Jetman_Walking_Left
 
 ; L_BRS_($338F)_($338B) OK
 Test_Collision_Status????
-    ldy     #JETMAN_X_DIRECTION_PARAM       ; 338F: A0 02    
+    ldy     #JETMAN_DIRECTION_X_PARAM       ; 338F: A0 02    
     lda     ZP02                            ; 3391: A5 02    
     bpl     Jetman_Not_Moving_X_Axis        ; 3393: 10 08    
 
@@ -5460,7 +5461,7 @@ Jetman_Not_Moving_X_Axis
 ; L_JMP_($339F)_($333F) OK
 ; L_BRS_($339F)_($339B) OK
 Update_JM_Direction_Position_X
-    ldy     #JETMAN_X_DIRECTION_PARAM       ; 339F: A0 02    
+    ldy     #JETMAN_DIRECTION_X_PARAM       ; 339F: A0 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 33A1: 91 00    
 
 ; Y becomes JETMAN_POSITION_X_PARAM
@@ -5484,7 +5485,7 @@ Store_Jetman_New_Position_X
 
 ; L_BRS_($33BA)_($33B5) OK
 Update_JM_Direction_Position_Y
-    ldy     #JETMAN_Y_DIRECTION_PARAM       ; 33BA: A0 04    
+    ldy     #JETMAN_DIRECTION_Y_PARAM       ; 33BA: A0 04    
     lda     #$FE                            ; 33BC: A9 FE    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 33BE: 91 00    
 
@@ -5796,7 +5797,7 @@ No_Increment_Hi_Byte
 ; CALLS     :
 ; ARGUMENTS :
 ; ZP_PTR_TO_STR  = "COPYRIGHT`qyxs`An" or "JETPAC`GAME`SELEC"
-; ZP_ColorRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
+; ZP_ColourRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
 ; ZP_UDG_RAM_X   = 08 A8 or 08 20
 ; ZP_UDG_RAM_Y   = 08 A8 or 08 20
 ; ZP_Addr_From   = 70 80 or 28 80
@@ -5806,15 +5807,15 @@ No_Increment_Hi_Byte
 ; L_JSR_($34CC)_($24E1) OK
 ; L_JSR_($34CC)_($29F8) OK
 Display_String_Setup
-    jsr     Setup_Color_RAM_Ptr             ; 34CC: 20 F7 34 
+    jsr     Setup_Colour_RAM_Ptr            ; 34CC: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 34CF: 20 1D 35 
 
-; Get string first byte header data, contains color data and reverse flag
+; Get string first byte header data, contains colour data and reverse flag
     ldy     #$00                            ; 34D2: A0 00    
     lda     (ZP0E),y                        ; 34D4: B1 0E    
 
 ; Write a string of data to the screen, header byte includes reverse flag and colour attribute
-; Save color data and reverse flag to X
+; Save colour data and reverse flag to X
 ; L_JSR_($34D6)_($2506) OK
 ; L_JMP_($34D6)_($34E0) OK
 Display_String
@@ -5838,9 +5839,9 @@ Display_Character
     lsr     a                               ; 34E3: 4A       
     sta     ZP06                            ; 34E4: 85 06    
 
-; Setup character display color
+; Setup character display colour
     txa                                     ; 34E6: 8A       
-    sta     ZP_Reverse_And_Color_Data       ; 34E7: 85 57    
+    sta     ZP_Reverse_And_Colour_Data      ; 34E7: 85 57    
 
 ; Display character on screen, saving Y and restoring afterwards
     tya                                     ; 34E9: 98       
@@ -5849,8 +5850,8 @@ Display_Character
     pla                                     ; 34EE: 68       
     tay                                     ; 34EF: A8       
 
-; Colorize the character just written
-    lda     ZP_Reverse_And_Color_Data       ; 34F0: A5 57    
+; Colourize the character just written
+    lda     ZP_Reverse_And_Colour_Data      ; 34F0: A5 57    
     dey                                     ; 34F2: 88       
     sta     (ZP0C),y                        ; 34F3: 91 0C    
     iny                                     ; 34F5: C8       
@@ -5872,7 +5873,7 @@ Display_Character
 ; 88  Yb dP""""Yb 88 YY 88     88       88   88  Yb
 
 ; Example for "F7 JOYSTICK" start position
-; Convert X=$18 pixels from left, Y=$68 pixels from top, to Color RAM Address $968D
+; Convert X=$18 pixels from left, Y=$68 pixels from top, to Colour RAM Address $968D
 ; L_JSR_($34F7)_($21BB) OK
 ; L_JSR_($34F7)_($24FA) OK
 ; L_JSR_($34F7)_($27FF) OK
@@ -5880,7 +5881,7 @@ Display_Character
 ; L_JSR_($34F7)_($3165) OK
 ; L_JSR_($34F7)_($34CC) OK
 ; L_JSR_($34F7)_($3827) OK
-Setup_Color_RAM_Ptr
+Setup_Colour_RAM_Ptr
     lda     ZP04                            ; 34F7: A5 04     ZP04 = $18
 
 ; Divide X by 8 to get initial address Lo-byte
@@ -5889,8 +5890,8 @@ Setup_Color_RAM_Ptr
     lsr     a                               ; 34FB: 4A       
     sta     ZP0C                            ; 34FC: 85 0C     ZP0C = $03
 
-; Divide Y by $10 and use as index into Color RAM Row Offsets i.e. 9600, 9617, 962e etc.
-; to get address Hi-byte. Divided by $10 because there are 16 Y-pixels per Color RAM tile.
+; Divide Y by $10 and use as index into Colour RAM Row Offsets i.e. 9600, 9617, 962e etc.
+; to get address Hi-byte. Divided by $10 because there are 16 Y-pixels per Colour RAM tile.
     lda     ZP05                            ; 34FE: A5 05     ZP05 = $68
     lsr     a                               ; 3500: 4A       
     lsr     a                               ; 3501: 4A       
@@ -5899,7 +5900,7 @@ Setup_Color_RAM_Ptr
     tax                                     ; 3504: AA       
 
 ; Load from column offset table and add in the inital address Lo-byte
-    lda     Color_RAM_Row_Offsets,x         ; 3505: BD 12 35  A = $8A
+    lda     Colour_RAM_Row_Offsets,x        ; 3505: BD 12 35  A = $8A
     clc                                     ; 3508: 18       
     adc     ZP0C                            ; 3509: 65 0C    
     sta     ZP0C                            ; 350B: 85 0C     ZP0C = $8D
@@ -5910,7 +5911,7 @@ Setup_Color_RAM_Ptr
     rts                                     ; 3511: 60       
 ; ===========================================================
 
-Color_RAM_Row_Offsets
+Colour_RAM_Row_Offsets
     fcb     $00,$17,$2E,$45,$5C,$73,$8A,$A1 ; 3512: 00 17 2E 45 5C 73 8A A1 
     fcb     $B8,$CF,$E6                     ; 351A: B8 CF E6 
 
@@ -5997,14 +5998,14 @@ UDG_RAM_Column_Offsets
 ; 88"Yb  88""   o.`Y8b 88""     88       88"Yb   dP__Yb  88YbdP88
 ; 88  Yb 888888 8bodP' 888888   88       88  Yb dP""""Yb 88 YY 88
 
-; Fill 11 rows x 23 columns = 253 bytes = $FD bytes i.e. Color_RAM $9600 to $96FC
+; Fill 11 rows x 23 columns = 253 bytes = $FD bytes i.e. Colour_RAM $9600 to $96FC
 ; L_JSR_($355C)_($2416) OK
-Reset_Color_RAM
+Reset_Colour_RAM
     jsr     Load_ZP_Parameters              ; 355C: 20 9D 25 
     fcb     $02                             ; 355F: 02       
     fdb     $00FC                           ; 3560: FC 00     Number of bytes to fill
     fcb     $04                             ; 3562: 04       
-    fdb     Color_RAM                       ; 3563: 00 96     Start address of bytes to fill
+    fdb     Colour_RAM                      ; 3563: 00 96     Start address of bytes to fill
     fcb     $06                             ; 3565: 06       
     fdb     $0001                           ; 3566: 01 00     Data byte to fill with (i.e. $01)
     fcb     $FF                             ; 3568: FF       
@@ -6113,7 +6114,7 @@ Loop_Multiply_by_8
 ; Copy 8 bytes to display a complete character
 ; Displayed character can be normal or reversed, e.g. for score or selected game options
     ldy     #$07                            ; 35B0: A0 07    
-    lda     ZP_Reverse_And_Color_Data       ; 35B2: A5 57    
+    lda     ZP_Reverse_And_Colour_Data      ; 35B2: A5 57    
     bmi     Copy_Char_To_UDG_RAM_Reversed   ; 35B4: 30 15    
 ; L_JMP_($35B6)_($239F) OK
 ; L_JSR_($35B6)_($3175) OK
@@ -6204,7 +6205,7 @@ Load_Object_Type_X_Y
 ; L_JSR_($35E9)_($2FBD) OK
 ; L_JSR_($35E9)_($3054) OK
 ; L_JSR_($35E9)_($3737) OK
-Load_Object_Type_X_Y_Color
+Load_Object_Type_X_Y_Colour
     ldy     #OBJECT_TYPE_PARAM              ; 35E9: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35EB: B1 00    
     sta     ZP1A                            ; 35ED: 85 1A    
@@ -6217,7 +6218,7 @@ Load_Object_Type_X_Y_Color
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35F6: B1 00    
     sta     ZP19                            ; 35F8: 85 19    
 
-    ldy     #OBJECT_COLOR_PARAM             ; 35FA: A0 05    
+    ldy     #OBJECT_COLOUR_PARAM            ; 35FA: A0 05    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35FC: B1 00    
     sta     ZP1B                            ; 35FE: 85 1B    
     rts                                     ; 3600: 60       
@@ -6593,7 +6594,7 @@ JMP_Next_Obj_New_Update_Params
 ; L_JSR_($3737)_($3601) OK
 ; L_JSR_($3737)_($3646) OK
 Load_Obj_UDG_RAM_Addr_Size_V_1
-    jsr     Load_Object_Type_X_Y_Color      ; 3737: 20 E9 35 
+    jsr     Load_Object_Type_X_Y_Colour     ; 3737: 20 E9 35 
     jsr     Get_Obj_UDG_Data_Addr_JM_Ali_2  ; 373A: 20 15 38 
 
 ; Store object UDG Addr from Y and A into ZP0E & 0F, minus $100
@@ -6904,16 +6905,16 @@ Get_Obj_UDG_Data_Addr_JM_Ali_2
 ; L_JSR_($381F)_($2FD4) OK
 ; L_JSR_($381F)_($32FC) OK
 ; L_JSR_($381F)_($335B) OK
-Colorize_Object
+Colourize_Object
     lda     ZP18                            ; 381F: A5 18    
     sta     ZP04                            ; 3821: 85 04    
     lda     ZP19                            ; 3823: A5 19    
     sta     ZP05                            ; 3825: 85 05    
 
-; Setup Color RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
-    jsr     Setup_Color_RAM_Ptr             ; 3827: 20 F7 34 
+; Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
+    jsr     Setup_Colour_RAM_Ptr            ; 3827: 20 F7 34 
 
-; Divide object height by $10 then add $02, so always update color on at least two vertical tiles
+; Divide object height by $10 then add $02, so always update colour on at least two vertical tiles
 ; e.g. Jetman=$18->$03, Rocket_Top=$10->$03, Fuzz_Alien=$0A->$02
     lda     ZP17                            ; 382A: A5 17    
     lsr     a                               ; 382C: 4A       
@@ -6935,13 +6936,13 @@ Loop_Y
     ldx     ZP0A                            ; 383B: A6 0A    
     ldy     #$00                            ; 383D: A0 00    
 
-; Read color from RAM and if it's green i.e. color of the platforms, skip the color change
-; else write the updated color to the color RAM
+; Read colour from RAM and if it's green i.e. colour of the platforms, skip the colour change
+; else write the updated colour to the colour RAM
 ; L_BRS_($383F)_($384D) OK
 Loop_X
     lda     (ZP0C),y                        ; 383F: B1 0C    
     and     #%00000111                      ; 3841: 29 07     Zero bits 3-7
-    cmp     #GREEN                          ; 3843: C9 05    
+    cmp     #COLOUR_GREEN                   ; 3843: C9 05    
     beq     Green_Ignored                   ; 3845: F0 04    
 
     lda     ZP1B                            ; 3847: A5 1B    
@@ -6953,21 +6954,21 @@ Green_Ignored
     dex                                     ; 384C: CA       
     bne     Loop_X                          ; 384D: D0 F0    
 
-; Move to next row to color (i.e. move up) and test for going out of
+; Move to next row to colour (i.e. move up) and test for going out of
 ; screen boundry at top of screen, early exit if so
     lda     ZP0C                            ; 384F: A5 0C    
     sec                                     ; 3851: 38       
     sbc     #SCREEN_WIDTH_COLUMNS           ; 3852: E9 17    
     cmp     #SCREEN_WIDTH_COLUMNS           ; 3854: C9 17    
-    bcc     Colorize_Object_RTS             ; 3856: 90 06    
+    bcc     Colourize_Object_RTS            ; 3856: 90 06    
 
-; Update the Color RAM for the appropriate tile, move up one row
+; Update the Colour RAM for the appropriate tile, move up one row
     sta     ZP0C                            ; 3858: 85 0C    
     dec     ZP0B                            ; 385A: C6 0B    
     bne     Loop_Y                          ; 385C: D0 DD    
 
 ; L_BRS_($385E)_($3856) OK
-Colorize_Object_RTS
+Colourize_Object_RTS
     rts                                     ; 385E: 60       
 ; ===========================================================
 
