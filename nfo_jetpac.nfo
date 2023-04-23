@@ -1122,7 +1122,7 @@ binary   2907
 lcomment 2908 Set bits 0-1 xx000011
 binary   2909
 comment  290A
-label    290A Save_Object_Type
+label    290A Set_Object_Type_To_Explosion
 deflabel 290B OBJECT_TYPE_PARAM_SAVED
 comment  290E
 comment  290E Change object type to an explosion
@@ -1186,6 +1186,8 @@ binary   2981
 comment  2984
 comment  2987
 label    2987 Game_Over
+comment  2991
+comment  2991 Game Over Player 1
 comment  2997
 label    2997 Game_Over_Player_2
 comment  299D
@@ -1205,7 +1207,7 @@ label    29C7 Reset_Level_Init_Next_Jetman
 comment  29D0
 label    29D0 Test_Game_Over_Inactive_Player
 comment  29D4
-comment  29D4 Test Game Over Active Player, if not swap status data
+comment  29D4 Test Game Over Active Player, if not swap to other players data
 comment  29D8
 comment  29DB
 label    29DB Swap_Active_Player_And_Objects
@@ -1218,9 +1220,12 @@ lcomment 29F1 ZP0E/0F
 word     29F2
 lcomment 29F4 ZP04/05
 lcomment 29F5 X Y
-word     29F5
+const    29F6
+break    29F7
 comment  29F8
-label    29F8 Display_String_
+label    29F8 Display_Game_Over_Player_1_2
+comment  29FB
+comment  29FB Setup Game Over Delay Loop
 lcomment 29FE ZP02/03
 word     29FF
 const    29FF
@@ -1228,29 +1233,36 @@ lcomment 2A01 ZP0A/0B
 word     2A02
 const    2A02
 comment  2A05
-comment  2A05 Delay loop $100^2 x ($100-$f8=$08) x (5+3) = $400,000 = 4,194,304 cycles @ 1.108MHz PAL = 3.785 Seconds
+comment  2A05 Wait a few seconds when Game Over is displayed on screen
+comment  2A05 Delay loop $100^2 x ($100-$F8=$08) x (5+3=$08) = $400,000
+comment  2A05 \                                           = 4,194,304 cycles @ 1.108MHz PAL
+comment  2A05 \                                           = 3.785 Seconds
 label    2A05 Delay_Loop_Game_Over
 lcomment 2A05 5 cycles
 lcomment 2A07 3 cycles when taken, 2 when not taken
+comment  2A12
 label    2A12 Display_Game_Over_Player_2
 lcomment 2A15 ZP0E/0F
 word     2A16
 lcomment 2A18 ZP04/05
 const    2A18
 lcomment 2A19 X Y
-word     2A19
+const    2A1A
+break    2A1B
 comment  2A1F
 label    2A1F STR_GAME_OVER_PLAYER_1
 comment  2A32
 label    2A32 STR_GAME_OVER_PLAYER_2
 break    2A32
 comment  2A45
-label    2A45 Set_Obj_List_Ptr_To_Jetman
+comment  2A45 Jetman has collided with an alien, setup object ready to become an explosion
+label    2A45 Setup_Jetman_Explosion
 word     2A4C
 comment  2A4F
-comment  2A4F Set Jetman Move Speed to 1
+comment  2A4F Reset Jetman direction parameter, i.e. stop moving
+deflabel 2A50 OBJECT_JETMAN_DIRECTION_PARAM
 comment  2A55
-comment  2A55 Object type
+comment  2A55 Save object type and then change it to an explosion
 comment  2A5F
 label    2A5F LEVEL_1_PLUSSES
 comment  2A67
@@ -2233,7 +2245,7 @@ comment  34CC ZP_UDG_RAM_X   = 08 A8 or 08 20
 comment  34CC ZP_UDG_RAM_Y   = 08 A8 or 08 20
 comment  34CC ZP_Addr_From   = 70 80 or 28 80
 comment  34CC ----------------------------------------------------------
-label    34CC Display_String_Setup
+label    34CC Display_String_With_Setup
 label    34D2
 comment  34D2
 comment  34D2 Get string first byte header data, contains colour data and reverse flag
