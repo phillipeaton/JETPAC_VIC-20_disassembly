@@ -69,9 +69,9 @@ label      51-53 ZP_Score_Player_1           ; 3 bytes (Hi Score is stored where
 label      54-56 ZP_Score_Player_2           ; 3 bytes
 label      57 ZP_Reverse_And_Colour_Data     ; Used to flash game options & 1UP+score at player start
 label      58 ZP_Flash_Countup               ;
-label      59 ZP_Level_Active_Player         ;
+label      59 ZP_Wave_Active_Player          ;
 label      5a ZP_Num_Lives_Active_Player     ;
-label      5b ZP_Level_Inactive_Player       ;
+label      5b ZP_Wave_Inactive_Player        ;
 label      5c ZP_Num_Lives_Inactive_Player   ;
 label      5D ZP_Flash_Score_Countdown       ; 7f for 1 player, ff for 2 player
 label      5E ZP_Active_Player               ;
@@ -120,10 +120,10 @@ label    0388 Obj_Laser_0
 ; Byte 00/08= object type:
 ;        03 = Explosion->00
 ;        04 = Rocket_Part/Fuel
-;        05 = Level 0 Alien Fuzzball
-;        06 = Level 3 Saucer
-;        07 = Level 2 Alien Ball
-;        08 = Level 1 Cross
+;        05 = Wave 0 Fuzzballs
+;        06 = Wave 3 Saucers
+;        07 = Wave 2 Spheres
+;        08 = Wave 1 Plusses
 ;        09 = Rocket Bottom Part
 ;        0A = Rocket Ascend
 ;        0B = Rocket Descend
@@ -181,9 +181,9 @@ label    03C7 Obj_Rocket_Mid_Or_Valuable_7
 ; Byte 01/09= X postion
 ; Byte 02/0A= X direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
 ; Byte 03/0B= Y position
-; Byte 04/0C= Y Direction, Level 0:   x0=horizontal, x1-7=descending 7= fast 0=slow
-;                          Level 1/2: 08=down, f8=up, always x8
-;                          Level 3:   Same as 1/2 but xF seen at Jetman explode
+; Byte 04/0C= Y Direction, Wave 0:   x0=horizontal, x1-7=descending 7= fast 0=slow
+;                          Wave 1/2: 08=down, f8=up, always x8
+;                          Wave 3:   Same as 1/2 but xF seen at Jetman explode
 ; Byte 05/0D= colour - bottom 3 bits of byte
 ; Byte 06/0E= For Valuable, affects colours and flashing of Byte 05
 ;             $20=gold bar (yellow)
@@ -191,7 +191,7 @@ label    03C7 Obj_Rocket_Mid_Or_Valuable_7
 ;             $24=isotope (cyan/black flash)
 ;             $26=mineral (blue)
 ;             $28=gemstone (multicolour cycle)
-; Byte 06/0E= For Alien Ball Level, it's a countdown from $18 to 0 for Y reversal
+; Byte 06/0E= For Alien Sphere Wave, it's a countdown from $18 to 0 for Y reversal
 
 ; Aliens 1-6
 label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00

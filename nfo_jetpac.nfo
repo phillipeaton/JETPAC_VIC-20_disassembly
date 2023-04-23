@@ -402,7 +402,7 @@ binary   22B8
 comment  22BA
 label    22BA Reset_Level_Add_Extra_Life
 comment  22BD
-comment  22BD When level number ends in %11, add extra life e.g. 4th level, 8th level etc.
+comment  22BD When wave number ends in %11, add extra life e.g. 4th wave, 8th wave etc.
 lcomment 22BF Reset bits 2-7 0000_00xx
 binary   22C0
 comment  22C3
@@ -557,7 +557,7 @@ label    23F4 Setup_Player_Lives_RTS
 comment  23F4
 label    23F5 Swap_Player_And_Obj_Rocket
 comment  23F5
-comment  23F5 When active player changes, swap current active/inactive player level and rocket object data
+comment  23F5 When active player changes, swap current active/inactive player wave and rocket object data
 label    23F7 Swap_Player
 comment  23F9
 comment  23FF
@@ -1264,53 +1264,62 @@ deflabel 2A50 OBJECT_JETMAN_DIRECTION_PARAM
 comment  2A55
 comment  2A55 Save object type and then change it to an explosion
 comment  2A5F
-label    2A5F LEVEL_1_PLUSSES
+label    2A5F WAVE_1_PLUSSES
 comment  2A67
-comment  2A67 Alien not hit by laser, check to see if hit platform, aliens bounce off after Level 0 so
+comment  2A67 Alien not hit by laser, check to see if hit platform, aliens bounce off after first wave, so
 comment  2A67 update direction
-label    2A67 Level_1_Plusses_1
+label    2A67 Wave_1_Plusses_Move
 comment  2A6D
-label    2A6D LEVEL_2_BALLS
+label    2A6D WAVE_2_SPHERES
 comment  2A75
-comment  2A75 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0
+comment  2A75 Alien not hit by laser, check to see if hit platform, aliens bounce off after wave 0
 comment  2A75 so update direction
-label    2A75 Level_2_Balls_1
+label    2A75 Wave_2_Spheres_Move
 comment  2A78
 comment  2A78 Read Y direction reversal countdown, branch if zero, else decrement countdown
 deflabel 2A79 OBJECT_DIR_Y_COUNTDOWN_PARAM
 comment  2A83
 comment  2A83
 comment  2A83
-comment  2A83 Below routine common to Level 1 and 2
+comment  2A83
+comment  2A83 Below routine common to waves 1 and 2
 label    2A83 Update_Alien_X_Y_Direction
 deflabel 2A84 OBJECT_DIRECTION_X_PARAM
+deflabel 2A8A DIRECTION_X_RIGHT
+comment  2A8B
 label    2A8B Update_Alien_X_Direction
 comment  2A8D
 comment  2A8D Update_Alien_Y_Direction
 deflabel 2A8E OBJECT_DIRECTION_Y_PARAM
+deflabel 2A94 DIRECTION_Y_DOWN
+comment  2A95
 label    2A95 Update_Alien_Y_Direction
 comment  2A9A
 label    2A9A Alien_Direction_Up
+deflabel 2A9B DIRECTION_Y_UP
+comment  2A9E
 label    2A9E Alien_Direction_Left
+deflabel 2A9F DIRECTION_X_LEFT
 comment  2AA2
-comment  2AA2 Countdown timer at zero, randomly change Y direction using IRQ counter, range $10-$1F
+comment  2AA2 Reset random Y direction change countdown using IRQ random number, range $10-$1F
 label    2AA2 Update_Y_Direction_Random
 binary   2AA5
+binary   2AA7
 comment  2AAA
 comment  2AAA Reverse Y direction up/down, randomly via IRQ
 deflabel 2AAB OBJECT_DIRECTION_Y_PARAM
 binary   2AAD
 comment  2AB2
-comment  2AB2 Do the inversion on the direction byte
+comment  2AB2 Invert on the direction byte
 binary   2AB3
 comment  2AB7
-label    2AB7 Update_Y_Direction_Random_1
+label    2AB7 Store_Object_Direction_Y
 comment  2ABC
-label    2ABC LEVEL_3_SAUCER
+label    2ABC WAVE_3_SAUCER
 comment  2AC4
-comment  2AC4 Alien not hit by laser, check to see if hit platform, aliens bounce off after level 0 so
+comment  2AC4 Alien not hit by laser, check to see if hit platform, aliens bounce off after wave 0 so
 comment  2AC4 update direction
-label    2AC4 Level_3_Saucer_Update_X
+label    2AC4 Wave_3_Saucer_Move
 comment  2AC7
 comment  2AC7
 comment  2AC7 Saucers home-in on Jetman, thus below code is in four sections:
@@ -1326,35 +1335,42 @@ comment  2AD2
 comment  2AD2 Load Direction X, jump if alien is moving right
 comment  2AD7
 comment  2AD7 Test Direction X, when FC reached, Direction resets to $03
+deflabel 2AD8 DIRECTION_X_LEFT_MAX
 comment  2ADB
 comment  2ADB Alien and Jetman Position X is now equal, decrement direction
-label    2ADB Level_3_Saucer_Dec_Direction_X
+label    2ADB Wave_3_Saucer_Dec_Direction_X
 comment  2ADD
-label    2ADD Level_3_Saucer_Store_Directn_X
+label    2ADD Wave_3_Saucer_Store_Directn_X
 comment  2ADF
 comment  2ADF
 comment  2ADF Update Alien Direction Y, same as Update Direction X, so deliberately fewer comments
-label    2ADF Level_3_Saucer_Update_Y
+label    2ADF Wave_3_Saucer_Update_Y
 deflabel 2AE0 OBJECT_POSITION_Y_PARAM
 comment  2AEA
 comment  2AEA Load Direction Y, jump if alien is moving down
-label    2AF3 Level_3_Saucer_Dec_Direction_Y
+deflabel 2AF0 DIRECTION_Y_UP_MAX
+comment  2AF3
+label    2AF3 Wave_3_Saucer_Dec_Direction_Y
 comment  2AF5
-label    2AF5 Level_3_Saucer_Store_Directn_Y
+label    2AF5 Wave_3_Saucer_Store_Directn_Y
 comment  2AF7
-label    2AF7 Level_3_Saucer_EXIT
+label    2AF7 Wave_3_Saucer_EXIT
 comment  2AFA
 comment  2AFA Alien is to the left of Jetman
-label    2AFA Level_3_Saucer_Alien_Left_X
-label    2B03 Level_3_Saucer_Inc_Direction_X
+label    2AFA Wave_3_Saucer_Alien_Left_X
+deflabel 2B00 DIRECTION_X_RIGHT_MAX
+comment  2B03
+label    2B03 Wave_3_Saucer_Inc_Direction_X
 comment  2B08
 comment  2B08 Alien is to the below Jetman
-label    2B08 Level_3_Saucer_Alien_Below_Y
-label    2B11 Level_3_Saucer_Inc_Direction_Y
+label    2B08 Wave_3_Saucer_Alien_Below_Y
+deflabel 2B0E DIRECTION_Y_DOWN_MAX
+comment  2B11
+label    2B11 Wave_3_Saucer_Inc_Direction_Y
 comment  2B16
 comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change
 label    2B16 Test_Platform_Collision_Bounce
-lcomment 2B16 Remove=(Not triggered on first level, so don't yet know)
+lcomment 2B16 Remove=(Not triggered on first wave, so don't yet know)
 comment  2B1D
 comment  2B24
 comment  2B2B
@@ -1471,12 +1487,12 @@ comment  2C5A
 comment  2C5A Decrement object counter, return when all processed
 label    2C5F Test_Laser_Hits
 comment  2C6A
-label    2C6A LEVEL_0_FUZZBALL
+label    2C6A WAVE_0_FUZZBALL
 comment  2C6F
 comment  2C6F Alien not hit by laser, test if alien hit platform, if yes explode,
 comment  2C6F else test if alien hit Jetman
 comment  2C78
-comment  2C78 Alien has been hit by laser, use current player level to create points table offset
+comment  2C78 Alien has been hit by laser, use current player wave to create points table offset
 label    2C78 Alien_Hit_Update_Score
 binary   2C7B
 comment  2C7E
@@ -1530,10 +1546,10 @@ comment  2D03 Move pointer to next object
 lcomment 2D0A Dec object counter
 comment  2D0F Initiate new alien object
 comment  2D0F InReg Y always 0
-comment  2D0F Set type depending on current level i.e. 0, 1, 2 or 3
+comment  2D0F Set type depending on current wave i.e. 0, 1, 2 or 3
 label    2D0F Init_Alien_Object
 lcomment 2D11 Zero bits 2-7
-lcomment 2D13 Save current level
+lcomment 2D13 Save current wave
 comment  2D19
 comment  2D19 Set initial X position to 1
 comment  2D1D
@@ -1545,11 +1561,11 @@ comment  2D30 Set diagonal movement randomly or not
 comment  2D35
 comment  2D35 Set object colour randomly, store 0 or 1 in ZP_02
 comment  2D3B
-comment  2D3B Set object colour randomly, lookup table has 2 colours per level
+comment  2D3B Set object colour randomly, lookup table has 2 colours per wave
 binary   2D3F
 comment  2D49
-label    2D4C Level_Alien_Type_Lookup
-label    2D50 Level_Alien_Colour_Lookup
+label    2D4C Wave_Alien_Type_Lookup
+label    2D50 Wave_Alien_Colour_Lookup
 break    2D54
 comment  2D58
 comment  2D58 ----------------------------------------------------------
@@ -1599,7 +1615,7 @@ label    2DCB Restore_Player_Objects_4
 label    2DD1 Loop_Restore_Player_Objects
 label    2DDD Set_Object_UDG_Colour
 label    2DE8 Restore_Player_Objects_6
-lcomment 2DEC Current level modulus 4
+lcomment 2DEC Current wave modulus 4
 comment  2DF1
 comment  2DF9
 label    2DFF Dec_Saved_Obj_List_Params_by_10
@@ -1737,7 +1753,7 @@ comment  2FDA Return object's UDG data address offset for Rocket Middle Section/
 comment  2FDA depending on which of the four levels (or multiple of) the player is currently on
 label    2FDA Get_Obj_UDG_Data_Addr_Ship_Lvl
 comment  2FDC
-comment  2FDC Calculate and return object's UDG data address offset based on A e.g. player level
+comment  2FDC Calculate and return object's UDG data address offset based on A e.g. player wave
 comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat
 label    2FDC Get_Obj_UDG_Data_Addr_Ship_A
 binary   2FDE
@@ -2021,7 +2037,7 @@ deflabel 3349 _100_MINUS_SCREEN_WIDTH_PIXELS
 comment  334D
 label    334D READ_CONTROLS
 comment  3351
-comment  3351 At start of each life, flash active player score before level begin, until counter reaches zero
+comment  3351 At start of each life, flash active player score before wave begins, until counter reaches zero
 comment  3358
 comment  3358 Display Jetman, colour jetman and display scores
 comment  3367
@@ -2738,7 +2754,7 @@ comment  3C87 $3C87 = Jetman_Fly_Right_3, it's referenced after the end of the o
 comment  3C87
 label    3C87 UDG_Data_Ship_Fuel_Valuables
 label    3C88 UDG_Data_Ship_Fuel_Valuables+1
-lcomment 3C9F Multiple entries for UDG objects indexing based on player level
+lcomment 3C9F Multiple entries for UDG objects indexing based on player wave
 label    3E46 Alien_Ship_1
 label    3E61 Alien_Ship_2
 label    3E78 Alien_Fuzz_1
