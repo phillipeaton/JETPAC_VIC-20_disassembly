@@ -162,6 +162,8 @@ OBJECT_DIRECTION_Y_PARAM        equ     $04
 OBJECT_DIRECTION_X_PARAM        equ     $02
 LASER_POSITION_X_PARAM          equ     $02
 OBJECT_VALUABLE_TYPE            equ     $06
+OBJECT_DIRECTION_Y              equ     $04
+OBJECT_DIRECTION_X              equ     $02
 DIRECTION_Y_DOWN_MAX            equ     $04
 DIRECTION_X_RIGHT_MAX           equ     $04
 DIRECTION_Y_UP_MAX              equ     $FC
@@ -3245,66 +3247,76 @@ Wave_3_Saucer_Inc_Direction_Y
 
 
 
-; 88""Yb 88        db    888888 888888  dP"Yb  88""Yb 8b    d8
-; 88__dP 88       dPYb     88   88__   dP   Yb 88__dP 88b  d88
-; 88"""  88  .o  dP__Yb    88   88""   Yb   dP 88"Yb  88YbdP88
-; 88     88ood8 dP""""Yb   88   88      YbodP  88  Yb 88 YY 88
+; 888888 888888 .dP"Y8 888888     88""Yb 88        db    888888 888888  dP"Yb  88""Yb 8b    d8
+;   88   88__   `Ybo."   88       88__dP 88       dPYb     88   88__   dP   Yb 88__dP 88b  d88
+;   88   88""   o.`Y8b   88       88"""  88  .o  dP__Yb    88   88""   Yb   dP 88"Yb  88YbdP88
+;   88   888888 8bodP'   88       88     88ood8 dP""""Yb   88   88      YbodP  88  Yb 88 YY 88
 
 ;  dP""b8  dP"Yb  88     88     88 .dP"Y8 88  dP"Yb  88b 88
 ; dP   `" dP   Yb 88     88     88 `Ybo." 88 dP   Yb 88Yb88
 ; Yb      Yb   dP 88  .o 88  .o 88 o.`Y8b 88 Yb   dP 88 Y88
 ;  YboodP  YbodP  88ood8 88ood8 88 8bodP' 88  YbodP  88  Y8
 
-;    db    88     88 888888 88b 88 .dP"Y8
-;   dPYb   88     88 88__   88Yb88 `Ybo."
-;  dP__Yb  88  .o 88 88""   88 Y88 o.`Y8b
-; dP""""Yb 88ood8 88 888888 88  Y8 8bodP'
+; 88""Yb  dP"Yb  88   88 88b 88  dP""b8 888888
+; 88__dP dP   Yb 88   88 88Yb88 dP   `" 88__
+; 88""Yb Yb   dP Y8   8P 88 Y88 Yb      88""
+; 88oodP  YbodP  `YbodP' 88  Y8  YboodP 888888
 
 ; Test if alien has hit a platform, if yes, bounce off with direction change
 ; L_JSR_($2B16)_($2A67) OK
 ; L_JSR_($2B16)_($2A75) OK
 ; L_JSR_($2B16)_($2AC4) OK
 Test_Platform_Collision_Bounce
-    jsr     Test_Platform_Collision         ; 2B16: 20 B3 30  Remove=(Not triggered on first wave, so don't yet know)
+    jsr     Test_Platform_Collision         ; 2B16: 20 B3 30 
     lda     ZP02                            ; 2B19: A5 02    
-    bpl     Test_Platform_Collision_Bou_RTS ; 2B1B: 10 19    
+    bpl     Test_RTS                        ; 2B1B: 10 19    
 
-    ldy     #$02                            ; 2B1D: A0 02    
+    ldy     #OBJECT_DIRECTION_X             ; 2B1D: A0 02    
     bit     MASK_00000100                   ; 2B1F: 2C 16 20 
-    bne     Test_Platform_Collision_Bounc_2 ; 2B22: D0 13    
+    bne     Invert_Direction                ; 2B22: D0 13    
 
-    ldy     #$04                            ; 2B24: A0 04    
+    ldy     #OBJECT_DIRECTION_Y             ; 2B24: A0 04    
     bit     MASK_00001000                   ; 2B26: 2C 17 20 
-    bne     Test_Platform_Collision_Bounc_3 ; 2B29: D0 17    
+    bne     Invert_Direction_Y_Down_To_Up   ; 2B29: D0 17    
 
+; Invert Direction Y Up to Down, not sure about the branch-plus RTS test?
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B2B: B1 00    
-    bpl     Test_Platform_Collision_Bou_RTS ; 2B2D: 10 07    
+    bpl     Test_RTS                        ; 2B2D: 10 07    
+
+; This code ran to invent X or Y direction.
 ; L_BRS_($2B2F)_($2B40) OK
-Test_Platform_Collision_Bounc_1
-    eor     #$FF                            ; 2B2F: 49 FF    
+Invert_Direction_X_or_Y
+    eor     #%11111111                      ; 2B2F: 49 FF    
     clc                                     ; 2B31: 18       
     adc     #$03                            ; 2B32: 69 03    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2B34: 91 00    
+
 ; L_BRS_($2B36)_($2B1B) OK
 ; L_BRS_($2B36)_($2B2D) OK
 ; L_BRS_($2B36)_($2B3E) OK
 ; L_BRS_($2B36)_($2B44) OK
-Test_Platform_Collision_Bou_RTS
+Test_RTS
     rts                                     ; 2B36: 60       
 ; ==========================================
+
 ; L_BRS_($2B37)_($2B22) OK
-Test_Platform_Collision_Bounc_2
+Invert_Direction
     bit     MASK_00000001                   ; 2B37: 2C 14 20 
-    bne     Test_Platform_Collision_Bounc_3 ; 2B3A: D0 06    
+    bne     Invert_Direction_Y_Down_To_Up   ; 2B3A: D0 06    
+
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B3C: B1 00    
-    bpl     Test_Platform_Collision_Bou_RTS ; 2B3E: 10 F6    
-    bmi     Test_Platform_Collision_Bounc_1 ; 2B40: 30 ED    
+    bpl     Test_RTS                        ; 2B3E: 10 F6    
+    bmi     Invert_Direction_X_or_Y         ; 2B40: 30 ED    
+
+; If Direction Y is up, return
 ; L_BRS_($2B42)_($2B29) OK
 ; L_BRS_($2B42)_($2B3A) OK
-Test_Platform_Collision_Bounc_3
+Invert_Direction_Y_Down_To_Up
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B42: B1 00    
-    bmi     Test_Platform_Collision_Bou_RTS ; 2B44: 30 F0    
-    eor     #$FF                            ; 2B46: 49 FF    
+    bmi     Test_RTS                        ; 2B44: 30 F0    
+
+; Invert Direction Y and store back to object
+    eor     #%11111111                      ; 2B46: 49 FF    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2B48: 91 00    
     rts                                     ; 2B4A: 60       
 ; ==========================================
@@ -4755,6 +4767,28 @@ PCT_0
 ;             sathoeusanteho
 ; ----------------------------------------------------------
 ; Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
+; ZP02 Return Codes:
+; $8F 0001_1111 Alien dl to dl corner skim
+; $8F 0001_1111 Alien dl to dr corner hit
+; $8E 0001_1110 Alien ul to ur
+; $8B 0001_1011 Alien dl to ul
+; $8A 0001_1010 Alien dl to ul
+; $89 0001_1001 Alien dl to ul
+; $88 0001_1000 Alien dl to ul
+; $88 0001_1000 Alien dr to ur
+; $87 0001_0111 Alien dr to dl
+; $86 0001_0110 Alien ul to ur corner hit
+; $83 0001_0011 Alien ul to ul
+; $83 0001_0011 Alien ur to dr
+; $82 0001_0010 Alien ul to dl
+; $81 0001_0001 Alien ul to dl
+; $81 0001_0001 Alien ur to dr
+; $80 0001_0000 Alien ur to dr
+; $80 0001_0000 Alien ul to dl
+; Bit 0:
+; Bit 1:
+; Bit 2:
+; Bit 3:
 ; L_JSR_($30B3)_($2841) OK
 ; L_JSR_($30B3)_($2B16) OK
 ; L_JSR_($30B3)_($2C6F) OK

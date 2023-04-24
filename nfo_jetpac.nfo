@@ -1370,14 +1370,27 @@ label    2B11 Wave_3_Saucer_Inc_Direction_Y
 comment  2B16
 comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change
 label    2B16 Test_Platform_Collision_Bounce
-lcomment 2B16 Remove=(Not triggered on first wave, so don't yet know)
 comment  2B1D
+deflabel 2B1E OBJECT_DIRECTION_X
 comment  2B24
+deflabel 2B25 OBJECT_DIRECTION_Y
 comment  2B2B
-label    2B2F Test_Platform_Collision_Bounc_1
-label    2B36 Test_Platform_Collision_Bou_RTS
-label    2B37 Test_Platform_Collision_Bounc_2
-label    2B42 Test_Platform_Collision_Bounc_3
+comment  2B2B Invert Direction Y Up to Down, not sure about the branch-plus RTS test?
+comment  2B2F
+comment  2B2F This code ran to invent X or Y direction.
+label    2B2F Invert_Direction_X_or_Y
+binary   2B30
+comment  2B36
+label    2B36 Test_RTS
+comment  2B37
+label    2B37 Invert_Direction
+comment  2B3C
+comment  2B42
+comment  2B42 If Direction Y is up, return
+label    2B42 Invert_Direction_Y_Down_To_Up
+binary   2B47
+comment  2B46
+comment  2B46 Invert Direction Y and store back to object
 comment  2B4B
 comment  2B4B Test if Jetman is onscreen
 label    2B4B Spawn_Rocket_Modules_Fuel_Cell
@@ -1833,6 +1846,40 @@ comment  30B3 \            satoehsaeuht
 comment  30B3 \            sathoeusanteho
 comment  30B3 ----------------------------------------------------------
 comment  30B3 Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
+comment  30B3 ZP02 Return Codes:
+
+comment  30B3 $8F 0001_1111 Alien dl to dl corner skim
+comment  30B3 $8F 0001_1111 Alien dl to dr corner hit
+
+comment  30B3 $8E 0001_1110 Alien ul to ur
+
+comment  30B3 $8B 0001_1011 Alien dl to ul
+
+comment  30B3 $8A 0001_1010 Alien dl to ul
+
+comment  30B3 $89 0001_1001 Alien dl to ul
+
+comment  30B3 $88 0001_1000 Alien dl to ul
+comment  30B3 $88 0001_1000 Alien dr to ur
+
+comment  30B3 $87 0001_0111 Alien dr to dl
+
+comment  30B3 $86 0001_0110 Alien ul to ur corner hit
+
+comment  30B3 $83 0001_0011 Alien ul to ul
+comment  30B3 $83 0001_0011 Alien ur to dr
+
+comment  30B3 $82 0001_0010 Alien ul to dl
+
+comment  30B3 $81 0001_0001 Alien ul to dl
+comment  30B3 $81 0001_0001 Alien ur to dr
+
+comment  30B3 $80 0001_0000 Alien ur to dr
+comment  30B3 $80 0001_0000 Alien ul to dl
+comment  30B3 Bit 0:
+comment  30B3 Bit 1:
+comment  30B3 Bit 2:
+comment  30B3 Bit 3:
 label    30B3 Test_Platform_Collision
 lcomment 30B5 1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
 lcomment 30B7 1st run: Y=50
