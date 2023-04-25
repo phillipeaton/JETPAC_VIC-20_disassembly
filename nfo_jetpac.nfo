@@ -1377,11 +1377,11 @@ deflabel 2B25 OBJECT_DIRECTION_Y
 comment  2B2B
 comment  2B2B Invert Direction Y Up to Down, not sure about the branch-plus RTS test?
 comment  2B2F
-comment  2B2F This code ran to invent X or Y direction.
+comment  2B2F This code ran to invert X or Y direction.
 label    2B2F Invert_Direction_X_or_Y
 binary   2B30
 comment  2B36
-label    2B36 Test_RTS
+label    2B36 Test_PCB_RTS
 comment  2B37
 label    2B37 Invert_Direction
 comment  2B3C
@@ -1827,9 +1827,11 @@ lcomment 3094 ZP_Temp_2
 lcomment 3095 P2 Score in ZP
 word     3095
 comment  309B
-label    309B PCT_0
+label    309B EOR_Then_TPC1_Or_TPCY
+binary   309c
 comment  30A1
 lcomment 30A1 Save A
+comment  30A9
 lcomment 30AC Restore A
 comment  30AD
 comment  30B3
@@ -1881,43 +1883,81 @@ comment  30B3 Bit 1:
 comment  30B3 Bit 2:
 comment  30B3 Bit 3:
 label    30B3 Test_Platform_Collision
+deflabel 30B4 OBJECT_POSITION_X
 lcomment 30B5 1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
 lcomment 30B7 1st run: Y=50
+comment  30B9
+comment  30B9 Register Y becomes OBJECT_POSITION_Y
 lcomment 30BB 1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
 lcomment 30BD 1st run: X=5f
+comment  30BF
 lcomment 30BF Set Temp4 to address of data table at 31B6
-label    30C2 Test_Platform_Collision_1
-lcomment 30C4 Set Temp1Lo=0
-lcomment 30C6 31B6: 10 40 03 50 60 01 88 30
-lcomment 30C9 1st run: 10-50=C0 i.e. -40
-lcomment 30CB 1st run: Branch taken
+comment  30C2
+comment  30C2 Initialise collision status, which becomes the subroutine return code
+label    30C2 Test_Platform_Collision_X
+comment  30C6
+comment  30C6 Load Position X of platform (indexed by Register Y) and subtract object Position X
 comment  30CD
-lcomment 30CD Save A
-lcomment 30D3 Restore A
 comment  30D4
-label    30D4 Test_Platform_Collision_2
+label    30D4 Test_Platform_Collision_1
 comment  30D8
-lcomment 30D8 Save A
-lcomment 30DE Restore A
 comment  30DF
-label    30DF Test_Platform_Collision_3
-label    30EC Test_Platform_Collision_4
-label    30FD Test_Platform_Collision_5
-label    310F Test_Platform_Collision_6
+label    30DF Test_Platform_Collision_1_Skip
+comment  30E3
+comment  30E7
+comment  30EC
+comment  30EC LOAD POSITION Y OF PLATFORM
+label    30EC Test_Platform_Collision_Y
+comment  30F4
+comment  30F8
+label    30FD Test_Platform_Collision_Y_Skip
+binary   30FE
+comment  3101
+deflabel 3103 OBJECT_TYPE_PARAM
+binary   3107
+binary   3109
+comment  310D
+binary   310E
+comment  310F
+label    310F Move_Toward_RTS
+comment  3113
 comment  3118 y reg is pointer into lookup table, 3 groups of 3
+comment  3118
 label    3118 INY_3
 lcomment 3118 3 iny's when moving from Y check to Y check
+comment  3119
 label    3119 INY_2
 lcomment 3119 2 iny's when moving from X check to X check as y already inc'd
 lcomment 311B Temp5 used as 3-2-1 countdown
-label    312D Test_Platform_Collision_7
-label    3130 Test_Platform_Collision_8
-label    3138 ORA_Temp1Lo_And_StoreTo_Temp1Lo
-label    313C Test_Platform_Collision_9
-label    313D Test_Platform_Collision10
+comment  311F
+deflabel 3120 OBJECT_POSITION_Y_PARAM
+comment  3127
+deflabel 3128 SCREEN_BOTTOM
+comment  312B
+comment  312D
+label    312D STA_Collision_Status_RTS
+comment  3130
+label    3130 CMP20_RTS
+comment  3134
+comment  3138
+label    3138 Update_Collision_Status_RTS
+binary   3139
+const    3139
+comment  313C
+label    313C TPC_RTS
+comment  313D
+label    313D PLO_CMP_1A_Move_Toward_RTS
 comment  3143
-label    3143 _31B6_To_Tmp4_03_To_Tmp5_Yto00
+label    3143 Load_Platform_Data_Table_Addr
 lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
+deflabel 3144 PLATFORM_DATA_TABLE_ADDR_LO
+comment  3147
+deflabel 3148 PLATFORM_DATA_TABLE_ADDR_HI
+comment  314B
+deflabel 314C PLATFORM_NUMBER_COUNTDOWN
+comment  314F
+comment  314F Initial index into the Platform Data Table
+comment  3152
 label    3152 Draw_Platforms
 label    3155 DP_1
 lcomment 3155 Get X value from lookup table ($10)
@@ -1945,10 +1985,13 @@ lcomment 3193 ZP0C_Col_RAM_Ptr_Lo
 label    31A2 Next_UDG_Char_Loop_Next_Char
 label    31A8 Next_UDG_Char
 comment  31B6
-comment  31B6 Platform data for 3143_Subroutine, 3 platforms: X Y #Num_middle_chars
+comment  31B6 Platform data table, 3 platforms
 const    31B6-31BE
+lcomment 31B6 X Y #Num_middle_chars
 break    31B9
+lcomment 31B9 X Y #Num_middle_chars
 break    31BC
+lcomment 31BC X Y #Num_middle_chars
 comment  31BF
 label    31BF A_Left_Right_Impact
 deflabel 31C0 JETMAN_DIRECTION_X_PARAM

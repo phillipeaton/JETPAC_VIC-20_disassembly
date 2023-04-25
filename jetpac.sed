@@ -115,6 +115,27 @@
 /; 2874/,/; 2885/s/(ZP08)                          /(ZP08_Subroutine_Addr_Lo)       /
 /; 2874/,/; 2885/s/ZP09                            /ZP09_Subroutine_Addr_Hi         /
 
+# Test_Platform_Collision
+/ZP02                            equ     $0002/a ZP02_Collision_Status           equ     $0002
+/ZP08                            equ     $0008/a ZP08_Platfm_Data_Tbl_Addr_Lo    equ     $0008
+/ZP09                            equ     $0009/a ZP08_Platfm_Data_Tbl_Addr_Hi    equ     $0009
+/ZP0A                            equ     $000A/a ZP0A_Platform_Quantity          equ     $000A
+/ZP0B                            equ     $000B/a ZP0B_CALC_FRM_PLAT_Y_OBJ_Y_DIF  equ     $000B
+/ZP0E                            equ     $000E/a ZP0E_Object_Position_X          equ     $000E
+/ZP0F                            equ     $000F/a ZP0F_Object_Position_Y          equ     $000F
+/; 309B/,/; 3151/s/ZP02                            /ZP02_Collision_Status           /
+/; 309B/,/; 3151/s/ZP08                            /ZP08_Platfm_Data_Tbl_Addr_Lo    /
+/; 309B/,/; 3151/s/(ZP08),y                        /(ZP08_Platfm_Data_Tbl_Addr_Lo),y/
+/; 309B/,/; 3151/s/ZP09                            /ZP08_Platfm_Data_Tbl_Addr_Hi    /
+/; 309B/,/; 3151/s/ZP0A                            /ZP0A_Platform_Quantity          /
+/; 309B/,/; 3151/s/ZP0B                            /ZP0B_CALC_FRM_PLAT_Y_OBJ_Y_DIF  /
+/; 309B/,/; 3151/s/ZP0E                            /ZP0E_Object_Position_X          /
+/; 309B/,/; 3151/s/ZP0F                            /ZP0F_Object_Position_Y          /
+
+
+
+
+
 
 
 
