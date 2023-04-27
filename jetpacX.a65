@@ -3374,19 +3374,22 @@ Wave_3_Saucer_Inc_Direction_Y
 Test_Platform_Collision_Bounce
     jsr     Test_Platform_Collision         ; 2B16: 20 B3 30 
     lda     ZP02                            ; 2B19: A5 02    
-    bpl     Test_PCB_RTS                    ; 2B1B: 10 19    
+    bpl     Do_RTS                          ; 2B1B: 10 19     1xxx_xxx = Collision
 
+; Collision detected, test if direction X is changing
     ldy     #OBJECT_DIRECTION_X             ; 2B1D: A0 02    
-    bit     MASK_00000100                   ; 2B1F: 2C 16 20 
+    bit     MASK_00000100                   ; 2B1F: 2C 16 20  xxxx_x1xx = Direction X change
     bne     Invert_Direction                ; 2B22: D0 13    
 
+; Test if direction Y is changing, down to up
+; Note collsion going up has neither X or Y flag triggered
     ldy     #OBJECT_DIRECTION_Y             ; 2B24: A0 04    
-    bit     MASK_00001000                   ; 2B26: 2C 17 20 
-    bne     Invert_Direction_Y_Down_To_Up   ; 2B29: D0 17    
+    bit     MASK_00001000                   ; 2B26: 2C 17 20  xxxx_1xxx - Direction Y change
+    bne     Invert_Direction_Alternate      ; 2B29: D0 17    
 
-; Invert Direction Y Up to Down, not sure about the branch-plus RTS test?
+; Test direction
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B2B: B1 00    
-    bpl     Test_PCB_RTS                    ; 2B2D: 10 07    
+    bpl     Do_RTS                          ; 2B2D: 10 07    
 
 ; This code ran to invert X or Y direction.
 ; L_BRS_($2B2F)_($2B40) OK
@@ -3400,25 +3403,25 @@ Invert_Direction_X_or_Y
 ; L_BRS_($2B36)_($2B2D) OK
 ; L_BRS_($2B36)_($2B3E) OK
 ; L_BRS_($2B36)_($2B44) OK
-Test_PCB_RTS
+Do_RTS
     rts                                     ; 2B36: 60       
 ; ==========================================
 
 ; L_BRS_($2B37)_($2B22) OK
 Invert_Direction
     bit     MASK_00000001                   ; 2B37: 2C 14 20 
-    bne     Invert_Direction_Y_Down_To_Up   ; 2B3A: D0 06    
+    bne     Invert_Direction_Alternate      ; 2B3A: D0 06    
 
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B3C: B1 00    
-    bpl     Test_PCB_RTS                    ; 2B3E: 10 F6    
+    bpl     Do_RTS                          ; 2B3E: 10 F6    
     bmi     Invert_Direction_X_or_Y         ; 2B40: 30 ED    
 
 ; If Direction Y is up, return
 ; L_BRS_($2B42)_($2B29) OK
 ; L_BRS_($2B42)_($2B3A) OK
-Invert_Direction_Y_Down_To_Up
+Invert_Direction_Alternate
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B42: B1 00    
-    bmi     Test_PCB_RTS                    ; 2B44: 30 F0    
+    bmi     Do_RTS                          ; 2B44: 30 F0    
 
 ; Invert Direction Y and store back to object
     eor     #%11111111                      ; 2B46: 49 FF    
@@ -4926,6 +4929,7 @@ Test_Platform_Collision_X
     sbc     ZP0E_Object_Position_X          ; 30C9: E5 0E    
     bcc     EOR_Then_TPC1_Or_TPCY           ; 30CB: 90 CE    
 
+; Object is to the left of the platform, set status bit 1
     tax                                     ; 30CD: AA       
     lda     #$01                            ; 30CE: A9 01    
     jsr     Update_Collision_Status_RTS     ; 30D0: 20 38 31 
@@ -4933,7 +4937,7 @@ Test_Platform_Collision_X
 
 ; L_BRS_($30D4)_($30AF) OK
 Test_Platform_Collision_1
-    cmp     #$08                            ; 30D4: C9 08    
+    cmp     #%00001000                      ; 30D4: C9 08    
     bcc     Test_Platform_Collision_1_Skip  ; 30D6: 90 07    
 
     tax                                     ; 30D8: AA       
@@ -4943,7 +4947,7 @@ Test_Platform_Collision_1
 
 ; L_BRS_($30DF)_($30D6) OK
 Test_Platform_Collision_1_Skip
-    cmp     #$10                            ; 30DF: C9 10    
+    cmp     #%00010000                      ; 30DF: C9 10    
     bcs     INY_3                           ; 30E1: B0 35    
 
     cmp     #$0C                            ; 30E3: C9 0C    
@@ -5023,7 +5027,7 @@ STA_Collision_Status_RTS
 
 ; L_BRS_($3130)_($3125) OK
 CMP20_RTS
-    cmp     #$20                            ; 3130: C9 20    
+    cmp     #%00100000                      ; 3130: C9 20    
     bcs     TPC_RTS                         ; 3132: B0 08    
 
     lda     #$80                            ; 3134: A9 80    

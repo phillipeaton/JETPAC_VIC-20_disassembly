@@ -1370,24 +1370,30 @@ label    2B11 Wave_3_Saucer_Inc_Direction_Y
 comment  2B16
 comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change
 label    2B16 Test_Platform_Collision_Bounce
+lcomment 2B1B 1xxx_xxx = Collision
 comment  2B1D
+comment  2B1D Collision detected, test if direction X is changing
 deflabel 2B1E OBJECT_DIRECTION_X
+lcomment 2B1F xxxx_x1xx = Direction X change
 comment  2B24
+comment  2B24 Test if direction Y is changing, down to up
+comment  2B24 Note collsion going up has neither X or Y flag triggered
 deflabel 2B25 OBJECT_DIRECTION_Y
+lcomment 2B26 xxxx_1xxx - Direction Y change
 comment  2B2B
-comment  2B2B Invert Direction Y Up to Down, not sure about the branch-plus RTS test?
+comment  2B2B Test direction
 comment  2B2F
 comment  2B2F This code ran to invert X or Y direction.
 label    2B2F Invert_Direction_X_or_Y
 binary   2B30
 comment  2B36
-label    2B36 Test_PCB_RTS
+label    2B36 Do_RTS
 comment  2B37
 label    2B37 Invert_Direction
 comment  2B3C
 comment  2B42
 comment  2B42 If Direction Y is up, return
-label    2B42 Invert_Direction_Y_Down_To_Up
+label    2B42 Invert_Direction_Alternate
 binary   2B47
 comment  2B46
 comment  2B46 Invert Direction Y and store back to object
@@ -1898,11 +1904,14 @@ label    30C2 Test_Platform_Collision_X
 comment  30C6
 comment  30C6 Load Position X of platform (indexed by Register Y) and subtract object Position X
 comment  30CD
+comment  30CD Object is to the left of the platform, set status bit 1
 comment  30D4
 label    30D4 Test_Platform_Collision_1
+binary   30D5
 comment  30D8
 comment  30DF
 label    30DF Test_Platform_Collision_1_Skip
+binary   30E0
 comment  30E3
 comment  30E7
 comment  30EC
@@ -1938,6 +1947,7 @@ comment  312D
 label    312D STA_Collision_Status_RTS
 comment  3130
 label    3130 CMP20_RTS
+binary   3131
 comment  3134
 comment  3138
 label    3138 Update_Collision_Status_RTS
