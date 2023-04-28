@@ -3367,7 +3367,7 @@ Wave_3_Saucer_Inc_Direction_Y
 ; 88""Yb Yb   dP Y8   8P 88 Y88 Yb      88""
 ; 88oodP  YbodP  `YbodP' 88  Y8  YboodP 888888
 
-; Test if alien has hit a platform, if yes, bounce off with direction change
+; Test if alien has hit a platform, if yes, bounce off with direction change, else return
 ; L_JSR_($2B16)_($2A67) OK
 ; L_JSR_($2B16)_($2A75) OK
 ; L_JSR_($2B16)_($2AC4) OK
@@ -3379,19 +3379,19 @@ Test_Platform_Collision_Bounce
 ; Collision detected, test if direction X is changing
     ldy     #OBJECT_DIRECTION_X             ; 2B1D: A0 02    
     bit     MASK_00000100                   ; 2B1F: 2C 16 20  xxxx_x1xx = Direction X change
-    bne     Invert_Direction                ; 2B22: D0 13    
+    bne     Invert_Direction_X              ; 2B22: D0 13    
 
-; Test if direction Y is changing, down to up
+; Test if direction Y is changing, down to up i.e. hitting top surface of platform
 ; Note collsion going up has neither X or Y flag triggered
     ldy     #OBJECT_DIRECTION_Y             ; 2B24: A0 04    
     bit     MASK_00001000                   ; 2B26: 2C 17 20  xxxx_1xxx - Direction Y change
     bne     Invert_Direction_Alternate      ; 2B29: D0 17    
 
-; Test direction
+; Test object direction Y i.e. moving downwards, return if positive, else invert direction Y
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B2B: B1 00    
     bpl     Do_RTS                          ; 2B2D: 10 07    
 
-; This code ran to invert X or Y direction.
+; Invert direction and add $03, which appears to be removed later
 ; L_BRS_($2B2F)_($2B40) OK
 Invert_Direction_X_or_Y
     eor     #%11111111                      ; 2B2F: 49 FF    
@@ -3407,23 +3407,27 @@ Do_RTS
     rts                                     ; 2B36: 60       
 ; ==========================================
 
+; Test object direction X, sometimes clips platform, passes this code but no direction X change,
+; probably the MASK_01 fails
 ; L_BRS_($2B37)_($2B22) OK
-Invert_Direction
+Invert_Direction_X
     bit     MASK_00000001                   ; 2B37: 2C 14 20 
     bne     Invert_Direction_Alternate      ; 2B3A: D0 06    
 
+; Mask wasn't set, direction X not changed object skimmed platfrom
+; Test object direction X, if object is going down, return, else, reverse direction X
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B3C: B1 00    
     bpl     Do_RTS                          ; 2B3E: 10 F6    
     bmi     Invert_Direction_X_or_Y         ; 2B40: 30 ED    
 
-; If Direction Y is up, return
+; If Direction is up or left, return
 ; L_BRS_($2B42)_($2B29) OK
 ; L_BRS_($2B42)_($2B3A) OK
 Invert_Direction_Alternate
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B42: B1 00    
     bmi     Do_RTS                          ; 2B44: 30 F0    
 
-; Invert Direction Y and store back to object
+; Object is going down or right, invert direction and store back to object
     eor     #%11111111                      ; 2B46: 49 FF    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2B48: 91 00    
     rts                                     ; 2B4A: 60       

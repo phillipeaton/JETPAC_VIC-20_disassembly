@@ -1368,7 +1368,7 @@ deflabel 2B0E DIRECTION_Y_DOWN_MAX
 comment  2B11
 label    2B11 Wave_3_Saucer_Inc_Direction_Y
 comment  2B16
-comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change
+comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change, else return
 label    2B16 Test_Platform_Collision_Bounce
 lcomment 2B1B 1xxx_xxx = Collision
 comment  2B1D
@@ -1376,27 +1376,31 @@ comment  2B1D Collision detected, test if direction X is changing
 deflabel 2B1E OBJECT_DIRECTION_X
 lcomment 2B1F xxxx_x1xx = Direction X change
 comment  2B24
-comment  2B24 Test if direction Y is changing, down to up
+comment  2B24 Test if direction Y is changing, down to up i.e. hitting top surface of platform
 comment  2B24 Note collsion going up has neither X or Y flag triggered
 deflabel 2B25 OBJECT_DIRECTION_Y
 lcomment 2B26 xxxx_1xxx - Direction Y change
 comment  2B2B
-comment  2B2B Test direction
+comment  2B2B Test object direction Y i.e. moving downwards, return if positive, else invert direction Y
 comment  2B2F
-comment  2B2F This code ran to invert X or Y direction.
+comment  2B2F Invert direction and add $03, which appears to be removed later
 label    2B2F Invert_Direction_X_or_Y
 binary   2B30
 comment  2B36
 label    2B36 Do_RTS
 comment  2B37
-label    2B37 Invert_Direction
+comment  2B37 Test object direction X, sometimes clips platform, passes this code but no direction X change,
+comment  2B37 probably the MASK_01 fails
+label    2B37 Invert_Direction_X
 comment  2B3C
+comment  2B3C Mask wasn't set, direction X not changed object skimmed platfrom
+comment  2B3C Test object direction X, if object is going down, return, else, reverse direction X
 comment  2B42
-comment  2B42 If Direction Y is up, return
+comment  2B42 If Direction is up or left, return
 label    2B42 Invert_Direction_Alternate
 binary   2B47
 comment  2B46
-comment  2B46 Invert Direction Y and store back to object
+comment  2B46 Object is going down or right, invert direction and store back to object
 comment  2B4B
 comment  2B4B Test if Jetman is onscreen
 label    2B4B Spawn_Rocket_Modules_Fuel_Cell
