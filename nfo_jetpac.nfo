@@ -1045,7 +1045,7 @@ word     286B
 const    286B
 break    286D
 comment  2874
-deflabel 2875 VALUABLE_TYPE
+deflabel 2875 OBJECT_VALUABLE_TYPE_PARAM
 binary   2879
 comment  287A
 label    2874 Animate_Valuable
@@ -1334,7 +1334,7 @@ comment  2ACC Compare alien and jetman positions, jump if alien to left of Jetma
 comment  2AD2
 comment  2AD2 Load Direction X, jump if alien is moving right
 comment  2AD7
-comment  2AD7 Test Direction X, when FC reached, Direction resets to $03
+comment  2AD7 Test Direction X, when $FC reached, Direction resets to $03
 deflabel 2AD8 DIRECTION_X_LEFT_MAX
 comment  2ADB
 comment  2ADB Alien and Jetman Position X is now equal, decrement direction
@@ -1362,7 +1362,7 @@ deflabel 2B00 DIRECTION_X_RIGHT_MAX
 comment  2B03
 label    2B03 Wave_3_Saucer_Inc_Direction_X
 comment  2B08
-comment  2B08 Alien is to the below Jetman
+comment  2B08 Alien is below Jetman
 label    2B08 Wave_3_Saucer_Alien_Below_Y
 deflabel 2B0E DIRECTION_Y_DOWN_MAX
 comment  2B11
@@ -1393,7 +1393,7 @@ comment  2B37 Test object direction X, sometimes clips platform, passes this cod
 comment  2B37 probably the MASK_01 fails
 label    2B37 Invert_Direction_X
 comment  2B3C
-comment  2B3C Mask wasn't set, direction X not changed object skimmed platfrom
+comment  2B3C Mask wasn't set, direction X not changed object skimmed platform
 comment  2B3C Test object direction X, if object is going down, return, else, reverse direction X
 comment  2B42
 comment  2B42 If Direction is up or left, return
@@ -1404,25 +1404,28 @@ comment  2B46 Object is going down or right, invert direction and store back to 
 comment  2B4B
 comment  2B4B Test if Jetman is onscreen
 label    2B4B Spawn_Rocket_Modules_Fuel_Cell
-lcomment 2B4E Zero bits 6 & 7
 binary   2B4F
-label    2B52 RTS_2B52
+comment  2B52
+label    2B52 Spawn_RMFC_RTS
 comment  2B53
 comment  2B53 Return if Jetman not only flying or standing or no rocket module/fuel onscreen
-label    2B53 Spawn_Rocket_Modules_Fuel_Ce_1
+label    2B53 Spawn_RMFC
+deflabel 2B54 NOT_FLYING_AND_NOT_STANDING
 comment  2B5C
 comment  2B5C Return if ship is built and fuelled up
+deflabel 2B60 SHIP_BUILT_AND_FUELLED_UP
 comment  2B63
 comment  2B63 Use counter to randomly spawn another Fuel Cell
 binary   2B66
 binary   2B68
 comment  2B6B
 comment  2B6B Init Rocket Part or Fuel Cell object (8 attributes)
-label    2B6D Loop_2B6D
+deflabel 2B6C NUM_OBJECT_PARAMS
+label    2B6D Loop_Init_Obj_Rocket_Or_Fuel
 comment  2B76
 comment  2B76 Spawn object at a random X position
 comment  2B7F
-label    2B7F Init_Obj_Rocket_or_Fuel_Table
+label    2B7F Init_Obj_Rocket_Or_Fuel_Table
 const    2B82
 comment  2B87
 label    2B87 Init_Obj_Valuable_Table
@@ -1432,41 +1435,47 @@ comment  2B8F
 label    2B8F Spawn_Valuables
 lcomment 2B92 Zero bits 6 & 7 i.e. 00xxxxxx
 binary   2B92
-label    2B96 RTS_2B96
+binary   2B93
+comment  2B96
+label    2B96 Spawn_V_RTS
 comment  2B97
 comment  2B97 Return if Jetman not only flying or standing or valuable onscreen
-label    2B97 Spawn_Valuables_1
+label    2B97 Spawn_V
+deflabel 2B98 NOT_FLYING_AND_NOT_STANDING
 comment  2BA0
 comment  2BA0 Use counter to randomly spawn another valuable
 binary   2BA3
 comment  2BA6
 comment  2BA6 Init Flashing Valuable object (8 attributes)
-label    2BA8 Loop_2BA8
+deflabel 2BA7 NUM_OBJECT_PARAMS
+label    2BA8 Loop_Init_Obj_Valuable
 comment  2BB1
 comment  2BB1 Spawn object at a random X position
 comment  2BB7
-comment  2BB7 Use counter to setup next object type
+comment  2BB7 Use IRQ random value to setup next object type
 binary   2BBA
 comment  2BC0
 comment  2BC0 Bit 3 wasn't set, so zero all bits apart from bit 3
 comment  2BC0 Bit 3 will make the object the gemstone which cycles through all colours
 binary   2BC1
 comment  2BC2
-comment  2BC2 Make the valuble type $2x, maybe used as an offset later?
-label    2BC2 SKIP_2BC2
+comment  2BC2 Make the valuble type $2x, used as an offset into the UDG data
+label    2BC2 Store_Valuable_Type
 binary   2BC3
 comment  2BC7
 comment  2BC7 03C0 object starts as Rocket Module Middle, then Fuel Cell
 label    2BC7 Load_ZP_Params_For_Object_03C0
-lcomment 2BCD
+lcomment 2BCD ZP00/01
 const    2BCD
 word     2BCE
 const    2BCE
+lcomment 3BCE Object Address
 comment  2BD4
-deflabel 2BD5 OBJECT_VALUABLE_TYPE
+deflabel 2BD5 OBJECT_VALUABLE_TYPE_PARAM
 comment  2BDE
 comment  2BDE Use VIC raster value to create a random X parameter for new object
 label    2BDE Get_Random_X
+binary   2BE2
 comment  2BE8
 comment  2BE8 Table of possible X positions for spawned new object
 label    2BE8 Object_X_Table
@@ -1529,6 +1538,7 @@ comment  2C92
 comment  2C92
 comment  2C92
 comment  2C92 Test if object has collided with Jetman, if not, update position
+lcomment 2C92 DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
 label    2C92 Test_Jetman_Collide
 comment  2C99
 comment  2C99 Alien has hit Jetman
