@@ -1421,6 +1421,7 @@ binary   2B68
 comment  2B6B
 comment  2B6B Init Rocket Part or Fuel Cell object (8 attributes)
 deflabel 2B6C NUM_OBJECT_PARAMS
+comment  2B6D
 label    2B6D Loop_Init_Obj_Rocket_Or_Fuel
 comment  2B76
 comment  2B76 Spawn object at a random X position
@@ -1431,16 +1432,15 @@ comment  2B87
 label    2B87 Init_Obj_Valuable_Table
 const    2B8A
 comment  2B8F
-comment  2B8F
 label    2B8F Spawn_Valuables
 lcomment 2B92 Zero bits 6 & 7 i.e. 00xxxxxx
 binary   2B92
 binary   2B93
 comment  2B96
-label    2B96 Spawn_V_RTS
+label    2B96 Spawn_Vals_RTS
 comment  2B97
 comment  2B97 Return if Jetman not only flying or standing or valuable onscreen
-label    2B97 Spawn_V
+label    2B97 Spawn_Vals
 deflabel 2B98 NOT_FLYING_AND_NOT_STANDING
 comment  2BA0
 comment  2BA0 Use counter to randomly spawn another valuable
@@ -1448,6 +1448,7 @@ binary   2BA3
 comment  2BA6
 comment  2BA6 Init Flashing Valuable object (8 attributes)
 deflabel 2BA7 NUM_OBJECT_PARAMS
+comment  2BA8
 label    2BA8 Loop_Init_Obj_Valuable
 comment  2BB1
 comment  2BB1 Spawn object at a random X position
@@ -1463,60 +1464,68 @@ comment  2BC2 Make the valuble type $2x, used as an offset into the UDG data
 label    2BC2 Store_Valuable_Type
 binary   2BC3
 comment  2BC7
-comment  2BC7 03C0 object starts as Rocket Module Middle, then Fuel Cell
-label    2BC7 Load_ZP_Params_For_Object_03C0
+comment  2BC7 $03C0 object starts as Rocket Module Middle, then becomes Fuel Cell
+label    2BC7 Load_ZP_Params_Rocket_Or_Fuel
 lcomment 2BCD ZP00/01
 const    2BCD
 word     2BCE
 const    2BCE
-lcomment 3BCE Object Address
+lcomment 2BCE Object Address
 comment  2BD4
+comment  2BD4 Object's valuable type used as an index into the UDG data
 deflabel 2BD5 OBJECT_VALUABLE_TYPE_PARAM
 comment  2BDE
 comment  2BDE Use VIC raster value to create a random X parameter for new object
-label    2BDE Get_Random_X
+label    2BDE Get_Random_Position_X
 binary   2BE2
 comment  2BE8
 comment  2BE8 Table of possible X positions for spawned new object
-label    2BE8 Object_X_Table
+label    2BE8 Object_Position_X_Table
 const    2BE8-2BF7
 break    2BE8-2BF7
 comment  2BF8
-comment  2BF8
 comment  2BF8 Store Obj_Laser_0 address in ZP_08/09 ($0388)
-comment  2BF8 Replace call with RTS at 2C64 and you can't shoot any aliens
 label    2BF8 Test_Laser_Hits_1
+deflabel 2BF9 Obj_Laser_0_Lo
+deflabel 2BFD Obj_Laser_0_Hi
 comment  2C00
 comment  2C00 Store number of lasers (4) for processing to ZP_02
+deflabel 2C01 MAX_LASERS
 comment  2C04
 comment  2C04 Store current object (not the laser) X and Y in ZP_06/07
 deflabel 2C05 OBJECT_POSITION_Y_PARAM
 lcomment 2C06 Object Y
+comment  2C0A
+comment  2C0A Register Y becomes Object Position X parameter
 lcomment 2C0B Object X
 comment  2C10
 comment  2C10 Test if laser X-coords have bit 2 set, not sure why
-label    2C10 BACK_2C10
+label    2C10 Loop_2C10
 deflabel 2C11 LASER_POSITION_X_PARAM
 lcomment 2C12 X-coord of end of laser
+comment  2C19
 lcomment 2C1A Delayed X-coord of end of laser
 comment  2C21
 comment  2C21 Test if next object is in use
-label    2C21 SKIP_2C21
+label    2C21 Test_Next_Object_Used
 comment  2C27
 comment  2C27 Test Y position???
 comment  2C31
 lcomment 2C34 Zero bits 0-2
 binary   2C35
 comment  2C3D
+binary   2C3E
 label    2C42 SKIP_2C42
 comment  2C46
 comment  2C46 Return $80 in ZP_02
 comment  2C4A
-comment  2C4A Zero bit 2 i.e. xxxxx0xx
+binary   2C4F
+comment  2C53
 comment  2C53 Increment current object address and decrement object counter
 label    2C53 Goto_Next_Obj
 comment  2C5A
 comment  2C5A Decrement object counter, return when all processed
+lcomment 2C5F
 label    2C5F Test_Laser_Hits
 comment  2C6A
 label    2C6A WAVE_0_FUZZBALL

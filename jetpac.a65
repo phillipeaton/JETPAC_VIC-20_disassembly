@@ -165,6 +165,9 @@ JETMAN_FLYING                   equ     $01
 OBJECT_DIRECTION_Y_PARAM        equ     $04
 OBJECT_DIRECTION_X_PARAM        equ     $02
 LASER_POSITION_X_PARAM          equ     $02
+MAX_LASERS                      equ     $04
+Obj_Laser_0_Hi                  equ     $03
+Obj_Laser_0_Lo                  equ     $88
 OBJECT_VALUABLE_TYPE_PARAM      equ     $06
 NUM_OBJECT_PARAMS               equ     $07
 NOT_FLYING_AND_NOT_STANDING     equ     $03
@@ -3383,6 +3386,7 @@ Spawn_RMFC
 
 ; Init Rocket Part or Fuel Cell object (8 attributes)
     ldx     #NUM_OBJECT_PARAMS              ; 2B6B: A2 07    
+
 ; L_BRS_($2B6D)_($2B74) OK
 Loop_Init_Obj_Rocket_Or_Fuel
     lda     Init_Obj_Rocket_Or_Fuel_Table,x ; 2B6D: BD 7F 2B 
@@ -3391,7 +3395,7 @@ Loop_Init_Obj_Rocket_Or_Fuel
     bpl     Loop_Init_Obj_Rocket_Or_Fuel    ; 2B74: 10 F7    
 
 ; Spawn object at a random X position
-    jsr     Get_Random_X                    ; 2B76: 20 DE 2B 
+    jsr     Get_Random_Position_X           ; 2B76: 20 DE 2B 
     sta     Obj_Rocket_Top_Or_Fuel_X        ; 2B79: 8D B9 03 
     jmp     Set_Obj_Rocket_Top_Or_Fuel_Typ  ; 2B7C: 4C E3 22 
 ; ------------------------------------------
@@ -3402,35 +3406,35 @@ Init_Obj_Rocket_Or_Fuel_Table
 Init_Obj_Valuable_Table
     fcb     $0E,$00,$00,$20,$00,$00,$00,$18 ; 2B87: 0E 00 00 20 00 00 00 18 
 
-
 ; L_JSR_($2B8F)_($2658) OK
 Spawn_Valuables
     lda     Obj_Jetman_State                ; 2B8F: AD 80 03 
     and     #%00111111                      ; 2B92: 29 3F     Zero bits 6 & 7 i.e. 00xxxxxx
-    bne     Spawn_V                         ; 2B94: D0 01    
+    bne     Spawn_Vals                      ; 2B94: D0 01    
 
 ; L_BRS_($2B96)_($2B99) OK
 ; L_BRS_($2B96)_($2B9E) OK
 ; L_BRS_($2B96)_($2BA4) OK
-Spawn_V_RTS
+Spawn_Vals_RTS
     rts                                     ; 2B96: 60       
 ; ==========================================
 
 ; Return if Jetman not only flying or standing or valuable onscreen
 ; L_BRS_($2B97)_($2B94) OK
-Spawn_V
+Spawn_Vals
     cmp     #NOT_FLYING_AND_NOT_STANDING    ; 2B97: C9 03    
-    bcs     Spawn_V_RTS                     ; 2B99: B0 FB    
+    bcs     Spawn_Vals_RTS                  ; 2B99: B0 FB    
     lda     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2B9B: AD C0 03 
-    bne     Spawn_V_RTS                     ; 2B9E: D0 F6    
+    bne     Spawn_Vals_RTS                  ; 2B9E: D0 F6    
 
 ; Use counter to randomly spawn another valuable
     lda     ZP_HW_IRQ_Counter_Lo            ; 2BA0: A5 4A    
     and     #%01111111                      ; 2BA2: 29 7F    
-    bne     Spawn_V_RTS                     ; 2BA4: D0 F0    
+    bne     Spawn_Vals_RTS                  ; 2BA4: D0 F0    
 
 ; Init Flashing Valuable object (8 attributes)
     ldx     #NUM_OBJECT_PARAMS              ; 2BA6: A2 07    
+
 ; L_BRS_($2BA8)_($2BAF) OK
 Loop_Init_Obj_Valuable
     lda     Init_Obj_Valuable_Table,x       ; 2BA8: BD 87 2B 
@@ -3439,7 +3443,7 @@ Loop_Init_Obj_Valuable
     bpl     Loop_Init_Obj_Valuable          ; 2BAF: 10 F7    
 
 ; Spawn object at a random X position
-    jsr     Get_Random_X                    ; 2BB1: 20 DE 2B 
+    jsr     Get_Random_Position_X           ; 2BB1: 20 DE 2B 
     sta     Obj_Rocket_Mid_Or_Valuable_X    ; 2BB4: 8D C1 03 
 
 ; Use IRQ random value to setup next object type
@@ -3458,16 +3462,17 @@ Store_Valuable_Type
     ora     #%00100000                      ; 2BC2: 09 20    
     sta     Obj_Rocket_Mid_Or_Valu_Type     ; 2BC4: 8D C6 03 
 
-; 03C0 object starts as Rocket Module Middle, then Fuel Cell
+; $03C0 object starts as Rocket Module Middle, then becomes Fuel Cell
 ; L_JSR_($2BC7)_($2DC5) OK
-Load_ZP_Params_For_Object_03C0
+Load_ZP_Params_Rocket_Or_Fuel
     jsr     Save_Obj_List_Ptr               ; 2BC7: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2BCA: 20 9D 25 
     fcb     $00                             ; 2BCD: 00        ZP00/01
-    fdb     $03C0                           ; 2BCE: C0 03    
+    fdb     $03C0                           ; 2BCE: C0 03     Object Address
     fcb     $FF                             ; 2BD0: FF       
     jsr     Load_Object_Type_X_Y_Colour     ; 2BD1: 20 E9 35 
 
+; Object's valuable type used as an index into the UDG data
     ldy     #OBJECT_VALUABLE_TYPE_PARAM     ; 2BD4: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2BD6: B1 00    
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2BD8: 20 5A 30 
@@ -3477,16 +3482,16 @@ Load_ZP_Params_For_Object_03C0
 ; Use VIC raster value to create a random X parameter for new object
 ; L_JSR_($2BDE)_($2B76) OK
 ; L_JSR_($2BDE)_($2BB1) OK
-Get_Random_X
+Get_Random_Position_X
     lda     VIC_R4_TV_Raster                ; 2BDE: AD 04 90 
     and     #%00001111                      ; 2BE1: 29 0F    
     tax                                     ; 2BE3: AA       
-    lda     Object_X_Table,x                ; 2BE4: BD E8 2B 
+    lda     Object_Position_X_Table,x       ; 2BE4: BD E8 2B 
     rts                                     ; 2BE7: 60       
 ; ==========================================
 
 ; Table of possible X positions for spawned new object
-Object_X_Table
+Object_Position_X_Table
     fcb     $00                             ; 2BE8: 00       
     fcb     $10                             ; 2BE9: 10       
     fcb     $18                             ; 2BEA: 18       
@@ -3518,24 +3523,24 @@ Object_X_Table
 ; 888888 88   88   o.`Y8b
 ; 88  88 88   88   8bodP'
 
-
 ; Store Obj_Laser_0 address in ZP_08/09 ($0388)
-; Replace call with RTS at 2C64 and you can't shoot any aliens
 ; L_JSR_($2BF8)_($2C64) OK
 Test_Laser_Hits_1
-    lda     #$88                            ; 2BF8: A9 88    
+    lda     #Obj_Laser_0_Lo                 ; 2BF8: A9 88    
     sta     ZP08                            ; 2BFA: 85 08    
-    lda     #$03                            ; 2BFC: A9 03    
+    lda     #Obj_Laser_0_Hi                 ; 2BFC: A9 03    
     sta     ZP09                            ; 2BFE: 85 09    
 
 ; Store number of lasers (4) for processing to ZP_02
-    lda     #$04                            ; 2C00: A9 04    
+    lda     #MAX_LASERS                     ; 2C00: A9 04    
     sta     ZP02                            ; 2C02: 85 02    
 
 ; Store current object (not the laser) X and Y in ZP_06/07
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2C04: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C06: B1 00     Object Y
     sta     ZP06                            ; 2C08: 85 06    
+
+; Register Y becomes Object Position X parameter
     dey                                     ; 2C0A: 88       
     dey                                     ; 2C0B: 88        Object X
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C0C: B1 00    
@@ -3543,11 +3548,12 @@ Test_Laser_Hits_1
 
 ; Test if laser X-coords have bit 2 set, not sure why
 ; L_BRS_($2C10)_($2C5C) OK
-BACK_2C10
+Loop_2C10
     ldy     #LASER_POSITION_X_PARAM         ; 2C10: A0 02    
     lda     (ZP08),y                        ; 2C12: B1 08     X-coord of end of laser
     bit     MASK_00000100                   ; 2C14: 2C 16 20 
-    bne     SKIP_2C21                       ; 2C17: D0 08    
+    bne     Test_Next_Object_Used           ; 2C17: D0 08    
+
     iny                                     ; 2C19: C8       
     lda     (ZP08),y                        ; 2C1A: B1 08     Delayed X-coord of end of laser
     bit     MASK_00000100                   ; 2C1C: 2C 16 20 
@@ -3555,7 +3561,7 @@ BACK_2C10
 
 ; Test if next object is in use
 ; L_BRS_($2C21)_($2C17) OK
-SKIP_2C21
+Test_Next_Object_Used
     ldy     #$00                            ; 2C21: A0 00    
     lda     (ZP08),y                        ; 2C23: B1 08    
     beq     Goto_Next_Obj                   ; 2C25: F0 2C    
@@ -3576,7 +3582,7 @@ SKIP_2C21
     sbc     ZP07                            ; 2C39: E5 07    
     bpl     SKIP_2C42                       ; 2C3B: 10 05    
 
-    eor     #$FF                            ; 2C3D: 49 FF    
+    eor     #%11111111                      ; 2C3D: 49 FF    
     clc                                     ; 2C3F: 18       
     adc     #$01                            ; 2C40: 69 01    
 ; L_BRS_($2C42)_($2C3B) OK
@@ -3588,13 +3594,13 @@ SKIP_2C42
     lda     #$80                            ; 2C46: A9 80    
     sta     ZP02                            ; 2C48: 85 02    
 
-; Zero bit 2 i.e. xxxxx0xx
     ldy     #$02                            ; 2C4A: A0 02    
     lda     (ZP08),y                        ; 2C4C: B1 08    
-    and     #$FB                            ; 2C4E: 29 FB    
+    and     #%11111011                      ; 2C4E: 29 FB    
     sta     (ZP08),y                        ; 2C50: 91 08    
     rts                                     ; 2C52: 60       
 ; ==========================================
+
 ; Increment current object address and decrement object counter
 ; L_BRS_($2C53)_($2C1F) OK
 ; L_BRS_($2C53)_($2C25) OK
@@ -3608,7 +3614,7 @@ Goto_Next_Obj
 
 ; Decrement object counter, return when all processed
     dec     ZP02                            ; 2C5A: C6 02    
-    bne     BACK_2C10                       ; 2C5C: D0 B2    
+    bne     Loop_2C10                       ; 2C5C: D0 B2    
     rts                                     ; 2C5E: 60       
 ; ==========================================
 ; L_JSR_($2C5F)_($2A5F) OK
@@ -4017,7 +4023,7 @@ Restore_Player_Objects_2
 ; ------------------------------------------
 ; L_BRS_($2DC5)_($2DB0) OK
 Restore_Player_Objects_3
-    jsr     Load_ZP_Params_For_Object_03C0  ; 2DC5: 20 C7 2B 
+    jsr     Load_ZP_Params_Rocket_Or_Fuel   ; 2DC5: 20 C7 2B 
     jmp     Restore_Player_Objects_2        ; 2DC8: 4C B5 2D 
 ; ------------------------------------------
 ; L_JSR_($2DCB)_($22D1) OK
@@ -7971,7 +7977,7 @@ Jetman_Fly_Right_0
     fcb     %01111110                       ; 3BCB: 7E       
     fcb     %01111110                       ; 3BCC: 7E       
     fcb     %00000110                       ; 3BCD: 06       
-    fcb     %00000000                       ; 3BCE: 00        Object Address
+    fcb     %00000000                       ; 3BCE: 00       
     fcb     %00000111                       ; 3BCF: 07       
     fcb     %00000111                       ; 3BD0: 07       
     fcb     %10000000                       ; 3BD1: 80       

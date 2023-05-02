@@ -115,6 +115,25 @@
 /; 2874/,/; 2885/s/(ZP08)                          /(ZP08_Subroutine_Addr_Lo)       /
 /; 2874/,/; 2885/s/ZP09                            /ZP09_Subroutine_Addr_Hi         /
 
+# Test_Laser_Hits
+/ZP02                            equ     $0002/a ZP02_Num_Lasers_Countdown       equ     $0002
+/ZP06                            equ     $0006/a ZP06_Object_Addr_Lo             equ     $0006
+/ZP07                            equ     $0007/a ZP07_Object_Addr_Hi             equ     $0007
+/ZP08                            equ     $0008/a ZP08_Object_Laser_Addr_Lo       equ     $0008
+/ZP09                            equ     $0009/a ZP09_Object_Laser_Addr_Hi       equ     $0009
+/; 2BF8/,/; 2C69/s/ZP02                            /ZP02_Num_Lasers_Countdown       /
+/; 2BF8/,/; 2C69/s/ZP06                            /ZP06_Object_Addr_Lo             /
+/; 2BF8/,/; 2C69/s/ZP07                            /ZP07_Object_Addr_Hi             /
+/; 2BF8/,/; 2C69/s/ZP08                            /ZP08_Object_Laser_Addr_Lo       /
+/; 2BF8/,/; 2C69/s/(ZP08),y                        /(ZP08_Object_Laser_Addr_Lo),y   /
+/; 2BF8/,/; 2C69/s/ZP09                            /ZP09_Object_Laser_Addr_Hi       /
+/; 2BF8/,/; 2C69/s/(ZP09),y                        /(ZP09_Object_Laser_Addr_Hi),y   /
+
+
+
+
+
+
 # Test_Platform_Collision
 /ZP02                            equ     $0002/a ZP02_Collision_Status           equ     $0002
 /ZP08                            equ     $0008/a ZP08_Platfm_Data_Tbl_Addr_Lo    equ     $0008
