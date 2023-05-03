@@ -51,7 +51,7 @@ ZP06_Laser_Old_State_Lo         equ     $0006
 ZP06_Laser_New_State_Lo         equ     $0006
 ZP06_Laser_Position_X           equ     $0006
 ZP06_Character_To_Copy          equ     $0006
-ZP06_Object_Addr_Lo             equ     $0006
+ZP06_Object_Position_X          equ     $0006
 ZP06_Object_Old_UDG_Data_Lo     equ     $0006
 ZP06_Object_UDG_Data_Addr_Lo    equ     $0006
 ZP06_Char_ROM_Data_Addr_Lo      equ     $0006
@@ -60,7 +60,7 @@ ZP06_Character_To_Display       equ     $0006
 ZP07                            equ     $0007
 ZP07_Laser_Old_State_Hi         equ     $0007
 ZP07_Laser_Length_Columns       equ     $0007
-ZP07_Object_Addr_Hi             equ     $0007
+ZP07_Object_Position_Y          equ     $0007
 ZP07_Object_Old_UDG_Data_Hi     equ     $0007
 ZP07_Object_UDG_Data_Addr_Hi    equ     $0007
 ZP07_Char_ROM_Data_Addr_Hi      equ     $0007
@@ -875,9 +875,9 @@ UDG_RAM_Zero_Bit_2
 Setup_Laser_Decay_Patterns
     jsr     Load_ZP_Parameters              ; 2202: 20 9D 25 
     fcb     $14                             ; 2205: 14        ZP14/15
-    fcb     $00,$03                         ; 2206: 00 03     Laser decay pattern
+    fcb     %00000000,%00000011             ; 2206: 00 03     Laser decay pattern
     fcb     $16                             ; 2208: 16        ZP16/17
-    fcb     $1C,$E0                         ; 2209: 1C E0     Laser decay pattern
+    fcb     %00011100,%11100000             ; 2209: 1C E0     Laser decay pattern
     fcb     $02                             ; 220B: 02        ZP02/03
     fdb     $0003                           ; 220C: 03 00     Countdown for laser params
     fcb     $FF                             ; 220E: FF       
@@ -3641,66 +3641,70 @@ Test_Laser_Hits_1
     lda     #MAX_LASERS                     ; 2C00: A9 04    
     sta     ZP02_Num_Lasers_Countdown       ; 2C02: 85 02    
 
-; Store current object (not the laser) X and Y in ZP_06/07
+; Store current object X and Y for laser hit test in ZP_06/07
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2C04: A0 03    
-    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C06: B1 00     Object Y
-    sta     ZP06_Object_Addr_Lo             ; 2C08: 85 06    
+    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C06: B1 00    
+    sta     ZP06_Object_Position_X          ; 2C08: 85 06    
 
 ; Register Y becomes Object Position X parameter
     dey                                     ; 2C0A: 88       
-    dey                                     ; 2C0B: 88        Object X
+    dey                                     ; 2C0B: 88       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C0C: B1 00    
-    sta     ZP07_Object_Addr_Hi             ; 2C0E: 85 07    
+    sta     ZP07_Object_Position_Y          ; 2C0E: 85 07    
 
-; Test if laser X-coords have bit 2 set, not sure why
+; Test if laser Position X value has bit 2 set???
 ; L_BRS_($2C10)_($2C5C) OK
-Loop_2C10
+Loop_Test_Laser_Hit
     ldy     #LASER_POSITION_X_PARAM         ; 2C10: A0 02    
-    lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C12: B1 08     X-coord of end of laser
+    lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C12: B1 08    
     bit     MASK_00000100                   ; 2C14: 2C 16 20 
-    bne     Test_Next_Object_Used           ; 2C17: D0 08    
+    bne     Test_Laser_Object_Active        ; 2C17: D0 08    
 
+; Register Y becomes Laser next Position X parameter
     iny                                     ; 2C19: C8       
-    lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C1A: B1 08     Delayed X-coord of end of laser
+    lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C1A: B1 08    
     bit     MASK_00000100                   ; 2C1C: 2C 16 20 
-    beq     Goto_Next_Obj                   ; 2C1F: F0 32    
+    beq     Goto_Next_Laser                 ; 2C1F: F0 32    
 
-; Test if next object is in use
 ; L_BRS_($2C21)_($2C17) OK
-Test_Next_Object_Used
-    ldy     #$00                            ; 2C21: A0 00    
+Test_Laser_Object_Active
+    ldy     #OBJECT_TYPE_PARAM              ; 2C21: A0 00    
     lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C23: B1 08    
-    beq     Goto_Next_Obj                   ; 2C25: F0 2C    
+    beq     Goto_Next_Laser                 ; 2C25: F0 2C    
 
-; Test Y position???
+; Register Y becomes Laser Position Y parameter
+; Compare laser and object Position Y value
     iny                                     ; 2C27: C8       
-    lda     ZP06_Object_Addr_Lo             ; 2C28: A5 06    
+    lda     ZP06_Object_Position_X          ; 2C28: A5 06    
     sec                                     ; 2C2A: 38       
     sbc     (ZP08_Object_Laser_Addr_Lo),y   ; 2C2B: F1 08    
     cmp     #$10                            ; 2C2D: C9 10    
-    bcs     Goto_Next_Obj                   ; 2C2F: B0 22    
+    bcs     Goto_Next_Laser                 ; 2C2F: B0 22    
 
+; Register Y becomes Laser Position X parameter
     iny                                     ; 2C31: C8       
     lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C32: B1 08    
-    and     #%11111000                      ; 2C34: 29 F8     Zero bits 0-2
+    and     #%11111000                      ; 2C34: 29 F8    
     sbc     #$03                            ; 2C36: E9 03    
     sec                                     ; 2C38: 38       
-    sbc     ZP07_Object_Addr_Hi             ; 2C39: E5 07    
+    sbc     ZP07_Object_Position_Y          ; 2C39: E5 07    
     bpl     SKIP_2C42                       ; 2C3B: 10 05    
 
     eor     #%11111111                      ; 2C3D: 49 FF    
     clc                                     ; 2C3F: 18       
     adc     #$01                            ; 2C40: 69 01    
+
 ; L_BRS_($2C42)_($2C3B) OK
 SKIP_2C42
     cmp     #$20                            ; 2C42: C9 20    
-    bcs     Goto_Next_Obj                   ; 2C44: B0 0D    
+    bcs     Goto_Next_Laser                 ; 2C44: B0 0D    
 
-; Return $80 in ZP_02
+; Object hit by laser, return $80 in ZP_02 (i.e. negative number)
     lda     #$80                            ; 2C46: A9 80    
     sta     ZP02_Num_Lasers_Countdown       ; 2C48: 85 02    
 
-    ldy     #$02                            ; 2C4A: A0 02    
+; Zero bit 2 of laser X parameter
+    ldy     #LASER_POSITION_X_PARAM         ; 2C4A: A0 02    
     lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C4C: B1 08    
     and     #%11111011                      ; 2C4E: 29 FB    
     sta     (ZP08_Object_Laser_Addr_Lo),y   ; 2C50: 91 08    
@@ -3712,7 +3716,7 @@ SKIP_2C42
 ; L_BRS_($2C53)_($2C25) OK
 ; L_BRS_($2C53)_($2C2F) OK
 ; L_BRS_($2C53)_($2C44) OK
-Goto_Next_Obj
+Goto_Next_Laser
     lda     ZP08_Object_Laser_Addr_Lo       ; 2C53: A5 08    
     clc                                     ; 2C55: 18       
     adc     #$08                            ; 2C56: 69 08    
@@ -3720,9 +3724,10 @@ Goto_Next_Obj
 
 ; Decrement object counter, return when all processed
     dec     ZP02_Num_Lasers_Countdown       ; 2C5A: C6 02    
-    bne     Loop_2C10                       ; 2C5C: D0 B2    
+    bne     Loop_Test_Laser_Hit             ; 2C5C: D0 B2    
     rts                                     ; 2C5E: 60       
 ; ==========================================
+
 ; L_JSR_($2C5F)_($2A5F) OK
 ; L_JSR_($2C5F)_($2A6D) OK
 ; L_JSR_($2C5F)_($2ABC) OK

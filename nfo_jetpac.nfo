@@ -309,9 +309,11 @@ comment  2202 subtracted leaving $FC, then $1C subtracted leaving $E0, the subtr
 label    2202 Setup_Laser_Decay_Patterns
 lcomment 2205 ZP14/15
 lcomment 2206 Laser decay pattern
+binary   2206-2207
 break    2206
 lcomment 2208 ZP16/17
 lcomment 2209 Laser decay pattern
+binary   2209-220A
 break    2208
 break    2209
 lcomment 220B ZP02/03
@@ -1492,40 +1494,41 @@ comment  2C00
 comment  2C00 Store number of lasers (4) for processing to ZP_02
 deflabel 2C01 MAX_LASERS
 comment  2C04
-comment  2C04 Store current object (not the laser) X and Y in ZP_06/07
+comment  2C04 Store current object X and Y for laser hit test in ZP_06/07
 deflabel 2C05 OBJECT_POSITION_Y_PARAM
-lcomment 2C06 Object Y
 comment  2C0A
 comment  2C0A Register Y becomes Object Position X parameter
-lcomment 2C0B Object X
 comment  2C10
-comment  2C10 Test if laser X-coords have bit 2 set, not sure why
-label    2C10 Loop_2C10
+comment  2C10 Test if laser Position X value has bit 2 set???
+label    2C10 Loop_Test_Laser_Hit
 deflabel 2C11 LASER_POSITION_X_PARAM
-lcomment 2C12 X-coord of end of laser
 comment  2C19
-lcomment 2C1A Delayed X-coord of end of laser
+comment  2C19 Register Y becomes Laser next Position X parameter
 comment  2C21
-comment  2C21 Test if next object is in use
-label    2C21 Test_Next_Object_Used
+label    2C21 Test_Laser_Object_Active
+deflabel 2C22 OBJECT_TYPE_PARAM
 comment  2C27
-comment  2C27 Test Y position???
+comment  2C27 Register Y becomes Laser Position Y parameter
+comment  2C27 Compare laser and object Position Y value
 comment  2C31
-lcomment 2C34 Zero bits 0-2
+comment  2C31 Register Y becomes Laser Position X parameter
 binary   2C35
 comment  2C3D
 binary   2C3E
 label    2C42 SKIP_2C42
+comment  2C42
 comment  2C46
-comment  2C46 Return $80 in ZP_02
+comment  2C46 Object hit by laser, return $80 in ZP_02 (i.e. negative number)
 comment  2C4A
+comment  2C4A Zero bit 2 of laser X parameter
+deflabel 2C4B LASER_POSITION_X_PARAM
 binary   2C4F
 comment  2C53
 comment  2C53 Increment current object address and decrement object counter
-label    2C53 Goto_Next_Obj
+label    2C53 Goto_Next_Laser
 comment  2C5A
 comment  2C5A Decrement object counter, return when all processed
-lcomment 2C5F
+comment  2C5F
 label    2C5F Test_Laser_Hits
 comment  2C6A
 label    2C6A WAVE_0_FUZZBALL
