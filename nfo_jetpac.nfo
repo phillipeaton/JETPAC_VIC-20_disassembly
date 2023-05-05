@@ -1499,24 +1499,29 @@ deflabel 2C05 OBJECT_POSITION_Y_PARAM
 comment  2C0A
 comment  2C0A Register Y becomes Object Position X parameter
 comment  2C10
-comment  2C10 Test if laser Position X value has bit 2 set???
+comment  2C10 Test if laser Position X value has bit 2 set
 label    2C10 Loop_Test_Laser_Hit
 deflabel 2C11 LASER_POSITION_X_PARAM
 comment  2C19
 comment  2C19 Register Y becomes Laser next Position X parameter
+comment  2C19 Test if laser next Position X value has bit 2 set
 comment  2C21
 label    2C21 Test_Laser_Object_Active
 deflabel 2C22 OBJECT_TYPE_PARAM
 comment  2C27
 comment  2C27 Register Y becomes Laser Position Y parameter
-comment  2C27 Compare laser and object Position Y value
+comment  2C27 Compare laser and object Position Y value, if CMP fails, return
 comment  2C31
 comment  2C31 Register Y becomes Laser Position X parameter
+comment  2C31 AND away the bottom 3 bits on Y, essentially making it a character-size column reference
+comment  2C31 Test if object is to the left or right of the Laser object
 binary   2C35
 comment  2C3D
+comment  2C3D Invert the result of he comparison
 binary   2C3E
-label    2C42 SKIP_2C42
+label    2C42 Test_Laser_And_Obj_Position_X
 comment  2C42
+comment  2C42 Compare Position X of object and later, see if they overlap and therefore the is a hit
 comment  2C46
 comment  2C46 Object hit by laser, return $80 in ZP_02 (i.e. negative number)
 comment  2C4A

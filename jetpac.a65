@@ -3546,7 +3546,7 @@ Test_Laser_Hits_1
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C0C: B1 00    
     sta     ZP07                            ; 2C0E: 85 07    
 
-; Test if laser Position X value has bit 2 set???
+; Test if laser Position X value has bit 2 set
 ; L_BRS_($2C10)_($2C5C) OK
 Loop_Test_Laser_Hit
     ldy     #LASER_POSITION_X_PARAM         ; 2C10: A0 02    
@@ -3555,6 +3555,7 @@ Loop_Test_Laser_Hit
     bne     Test_Laser_Object_Active        ; 2C17: D0 08    
 
 ; Register Y becomes Laser next Position X parameter
+; Test if laser next Position X value has bit 2 set
     iny                                     ; 2C19: C8       
     lda     (ZP08),y                        ; 2C1A: B1 08    
     bit     MASK_00000100                   ; 2C1C: 2C 16 20 
@@ -3567,7 +3568,7 @@ Test_Laser_Object_Active
     beq     Goto_Next_Laser                 ; 2C25: F0 2C    
 
 ; Register Y becomes Laser Position Y parameter
-; Compare laser and object Position Y value
+; Compare laser and object Position Y value, if CMP fails, return
     iny                                     ; 2C27: C8       
     lda     ZP06                            ; 2C28: A5 06    
     sec                                     ; 2C2A: 38       
@@ -3576,20 +3577,24 @@ Test_Laser_Object_Active
     bcs     Goto_Next_Laser                 ; 2C2F: B0 22    
 
 ; Register Y becomes Laser Position X parameter
+; AND away the bottom 3 bits on Y, essentially making it a character-size column reference
+; Test if object is to the left or right of the Laser object
     iny                                     ; 2C31: C8       
     lda     (ZP08),y                        ; 2C32: B1 08    
     and     #%11111000                      ; 2C34: 29 F8    
     sbc     #$03                            ; 2C36: E9 03    
     sec                                     ; 2C38: 38       
     sbc     ZP07                            ; 2C39: E5 07    
-    bpl     SKIP_2C42                       ; 2C3B: 10 05    
+    bpl     Test_Laser_And_Obj_Position_X   ; 2C3B: 10 05    
 
+; Invert the result of he comparison
     eor     #%11111111                      ; 2C3D: 49 FF    
     clc                                     ; 2C3F: 18       
     adc     #$01                            ; 2C40: 69 01    
 
+; Compare Position X of object and later, see if they overlap and therefore the is a hit
 ; L_BRS_($2C42)_($2C3B) OK
-SKIP_2C42
+Test_Laser_And_Obj_Position_X
     cmp     #$20                            ; 2C42: C9 20    
     bcs     Goto_Next_Laser                 ; 2C44: B0 0D    
 
