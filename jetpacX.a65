@@ -18,11 +18,13 @@ ZP_Obj_List_Ptr_Hi              equ     $0001
 ZP02                            equ     $0002
 ZP02_Laser_Param_Countdown      equ     $0002
 ZP02_Num_Lasers_Countdown       equ     $0002
+ZP02_Score_Byte_Hi              equ     $0002
 ZP02_Collision_Status           equ     $0002
 ZP02_Object_Old_Height_Index    equ     $0002
 ZP02_Num_Of_Bytes_To_Fill_Lo    equ     $0002
 ZP02_Num_Bytes_To_Display       equ     $0002
 ZP03                            equ     $0003
+ZP03_Score_Byte_Lo              equ     $0003
 ZP03_Object_Old_Height          equ     $0003
 ZP03_Object_Height_Pixels       equ     $0003
 ZP03_Num_Of_Bytes_To_Fill_Hi    equ     $0003
@@ -270,6 +272,7 @@ JETMAN_STANDING                 equ     $02
 JETMAN_FLYING                   equ     $01
 OBJECT_DIRECTION_Y_PARAM        equ     $04
 OBJECT_DIRECTION_X_PARAM        equ     $02
+OBJECT_STRUCTURE_SIZE           equ     $08
 LASER_POSITION_X_PARAM          equ     $02
 MAX_LASERS                      equ     $04
 Obj_Laser_0_Hi                  equ     $03
@@ -3683,7 +3686,7 @@ Test_Laser_Object_Active
     bcs     Goto_Next_Laser                 ; 2C2F: B0 22    
 
 ; Register Y becomes Laser Position X parameter
-; AND away the bottom 3 bits on Y, essentially making it a character-size column reference
+; Zore the bottom 3 bits of Position X, making it a character-sized column reference
 ; Test if object is to the left or right of the Laser object
     iny                                     ; 2C31: C8       
     lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C32: B1 08    
@@ -3693,12 +3696,12 @@ Test_Laser_Object_Active
     sbc     ZP07_Object_Position_X          ; 2C39: E5 07    
     bpl     Test_Laser_And_Obj_Position_X   ; 2C3B: 10 05    
 
-; Invert the result of he comparison
+; Invert the result of the comparison? Not sure...
     eor     #%11111111                      ; 2C3D: 49 FF    
     clc                                     ; 2C3F: 18       
     adc     #$01                            ; 2C40: 69 01    
 
-; Compare Position X of object and later, see if they overlap and therefore the is a hit
+; Compare Position X of object and later, see if they overlap and therefore there is a hit
 ; L_BRS_($2C42)_($2C3B) OK
 Test_Laser_And_Obj_Position_X
     cmp     #$20                            ; 2C42: C9 20    
@@ -3708,7 +3711,7 @@ Test_Laser_And_Obj_Position_X
     lda     #$80                            ; 2C46: A9 80    
     sta     ZP02_Num_Lasers_Countdown       ; 2C48: 85 02    
 
-; Zero bit 2 of laser X parameter
+; Zero bit 2 of laser X parameter, probably to diasble it later
     ldy     #LASER_POSITION_X_PARAM         ; 2C4A: A0 02    
     lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C4C: B1 08    
     and     #%11111011                      ; 2C4E: 29 FB    
@@ -3724,7 +3727,7 @@ Test_Laser_And_Obj_Position_X
 Goto_Next_Laser
     lda     ZP08_Object_Laser_Addr_Lo       ; 2C53: A5 08    
     clc                                     ; 2C55: 18       
-    adc     #$08                            ; 2C56: 69 08    
+    adc     #OBJECT_STRUCTURE_SIZE          ; 2C56: 69 08    
     sta     ZP08_Object_Laser_Addr_Lo       ; 2C58: 85 08    
 
 ; Decrement object counter, return when all processed
@@ -3770,7 +3773,7 @@ WAVE_0_FUZZBALL
     jsr     Test_Platform_Collision         ; 2C6F: 20 B3 30 
     lda     ZP02                            ; 2C72: A5 02    
     bpl     Test_Jetman_Collide             ; 2C74: 10 1C    
-    bmi     Change_Object_To_Explosion_Nxt  ; 2C76: 30 14    
+    bmi     Chg_Obj_To_Explosion_Then_Next  ; 2C76: 30 14    
 
 
 
@@ -3795,16 +3798,16 @@ Alien_Hit_Update_Score
 
 ; Get score high byte and save
     lda     Alien_Points_Lookup_Table,x     ; 2C7E: BD DB 2C 
-    sta     ZP02                            ; 2C81: 85 02    
+    sta     ZP02_Score_Byte_Hi              ; 2C81: 85 02    
     inx                                     ; 2C83: E8       
 
 ; Get score low byte and save
     lda     Alien_Points_Lookup_Table,x     ; 2C84: BD DB 2C 
-    sta     ZP03                            ; 2C87: 85 03    
+    sta     ZP03_Score_Byte_Lo              ; 2C87: 85 03    
     jsr     Update_Score                    ; 2C89: 20 63 30 
 
 ; L_BRS_($2C8C)_($2C76) OK
-Change_Object_To_Explosion_Nxt
+Chg_Obj_To_Explosion_Then_Next
     jsr     Change_Object_To_Explosion      ; 2C8C: 20 F9 28 
     jmp     GOTO_NEXT_OBJECT                ; 2C8F: 4C 1A 26 
 ; ------------------------------------------
@@ -3813,12 +3816,13 @@ Change_Object_To_Explosion_Nxt
 
 
 ; Test if object has collided with Jetman, if not, update position
+; DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
 ; L_JMP_($2C92)_($2A97) OK
 ; L_JMP_($2C92)_($2AB9) OK
 ; L_JMP_($2C92)_($2AF7) OK
 ; L_BRS_($2C92)_($2C74) OK
 Test_Jetman_Collide
-    jsr     Test_Jetman_Object_Collide      ; 2C92: 20 58 2D  DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
+    jsr     Test_Jetman_Object_Collide      ; 2C92: 20 58 2D 
     lda     ZP02                            ; 2C95: A5 02    
     bpl     Update_Object_Position          ; 2C97: 10 06    
 
@@ -3827,7 +3831,7 @@ Test_Jetman_Collide
     jmp     Alien_Hit_Update_Score          ; 2C9C: 4C 78 2C 
 ; ------------------------------------------
 
-; Get object direction/speed and use to create new X value
+; Get object Direction & Position Y and use to calculate new X value
 ; L_BRS_($2C9F)_($2C97) OK
 Update_Object_Position
     ldy     #OBJECT_DIRECTION_X_PARAM       ; 2C9F: A0 02    
@@ -3843,14 +3847,16 @@ Update_Object_Position
 ; Take care of X screen wrapping (note $f0=-16 decimal)
     cmp     #$F0                            ; 2CAB: C9 F0    
     bcs     Wrap_Object_X_Position_Left     ; 2CAD: B0 1D    
+
     cmp     #SCREEN_WIDTH_PIXELS            ; 2CAF: C9 B8    
     bcs     Wrap_Object_X_Position_Right    ; 2CB1: B0 1E    
+
 ; L_JMP_($2CB3)_($2CCE) OK
 ; L_JMP_($2CB3)_($2CD3) OK
 Update_Object_X_Position
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2CB3: 91 00    
 
-; Get object direction/speed and use to create new Y value
+; Get object Direction & Position and use to calculate new Y value
     ldy     #OBJECT_DIRECTION_Y_PARAM       ; 2CB5: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2CB7: B1 00    
     dey                                     ; 2CB9: 88       
@@ -3869,13 +3875,13 @@ Update_Object_X_Position
 
 ; L_BRS_($2CCC)_($2CAD) OK
 Wrap_Object_X_Position_Left
-    adc     #$B8                            ; 2CCC: 69 B8    
+    adc     #SCREEN_WIDTH_PIXELS            ; 2CCC: 69 B8    
     jmp     Update_Object_X_Position        ; 2CCE: 4C B3 2C 
 ; ------------------------------------------
 
 ; L_BRS_($2CD1)_($2CB1) OK
 Wrap_Object_X_Position_Right
-    adc     #$48                            ; 2CD1: 69 48    
+    adc     #_100_MINUS_SCREEN_WIDTH_PIXELS ; 2CD1: 69 48    
     jmp     Update_Object_X_Position        ; 2CD3: 4C B3 2C 
 ; ------------------------------------------
 
@@ -3899,8 +3905,10 @@ Obj_Ptr_To_Alien_0_Flsh_Ctr
     beq     Obj_Ptr_To_Alien_0_Jetman       ; 2CD8: F0 09    
     rts                                     ; 2CDA: 60       
 ; ==========================================
+
 Alien_Points_Lookup_Table
     fdb     $0025,$0035,$0045,$0055         ; 2CDB: 25 00 35 00 45 00 55 00 
+
 ; L_BRS_($2CE3)_($2CD8) OK
 Obj_Ptr_To_Alien_0_Jetman
     lda     Obj_Jetman_State                ; 2CE3: AD 80 03 
@@ -3911,6 +3919,7 @@ Obj_Ptr_To_Alien_0_Jetman
     beq     Set_Obj_List_Ptr_To_Alien_0     ; 2CEE: F0 01    
     rts                                     ; 2CF0: 60       
 ; ==========================================
+
 ; Set Object List Pointer to first alien object
 ; L_BRS_($2CF1)_($2CEA) OK
 ; L_BRS_($2CF1)_($2CEE) OK
@@ -3924,6 +3933,7 @@ Set_Obj_List_Ptr_To_Alien_0
     lda     #$06                            ; 2CF9: A9 06    
     sta     ZP02                            ; 2CFB: 85 02     Counter variable
     ldy     #$00                            ; 2CFD: A0 00    
+
 ; L_BRS_($2CFF)_($2D0C) OK
 Next_Object
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2CFF: B1 00     Get object type
@@ -3938,6 +3948,7 @@ Next_Object
     bne     Next_Object                     ; 2D0C: D0 F1    
     rts                                     ; 2D0E: 60       
 ; ==========================================
+
 ; Initiate new alien object
 ; InReg Y always 0
 ; Set type depending on current wave i.e. 0, 1, 2 or 3
@@ -3993,8 +4004,10 @@ Init_Alien_Object
 
     jmp     Display_Object_With_Setup_1     ; 2D49: 4C 01 36 
 ; ------------------------------------------
+
 Wave_Alien_Type_Lookup
     fcb     $05,$08,$07,$06                 ; 2D4C: 05 08 07 06 
+
 Wave_Alien_Colour_Lookup
     fcb     $02,$06,$03,$07                 ; 2D50: 02 06 03 07 
     fcb     $06,$07,$02,$04                 ; 2D54: 06 07 02 04 

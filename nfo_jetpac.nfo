@@ -1513,24 +1513,25 @@ comment  2C27 Register Y becomes Laser Position Y parameter
 comment  2C27 Compare laser and object Position Y value, if CMP fails, return
 comment  2C31
 comment  2C31 Register Y becomes Laser Position X parameter
-comment  2C31 AND away the bottom 3 bits on Y, essentially making it a character-size column reference
+comment  2C31 Zore the bottom 3 bits of Position X, making it a character-sized column reference
 comment  2C31 Test if object is to the left or right of the Laser object
 binary   2C35
 comment  2C3D
-comment  2C3D Invert the result of he comparison
+comment  2C3D Invert the result of the comparison? Not sure...
 binary   2C3E
 label    2C42 Test_Laser_And_Obj_Position_X
 comment  2C42
-comment  2C42 Compare Position X of object and later, see if they overlap and therefore the is a hit
+comment  2C42 Compare Position X of object and later, see if they overlap and therefore there is a hit
 comment  2C46
 comment  2C46 Object hit by laser, return $80 in ZP_02 (i.e. negative number)
 comment  2C4A
-comment  2C4A Zero bit 2 of laser X parameter
+comment  2C4A Zero bit 2 of laser X parameter, probably to diasble it later
 deflabel 2C4B LASER_POSITION_X_PARAM
 binary   2C4F
 comment  2C53
 comment  2C53 Increment current object address and decrement object counter
 label    2C53 Goto_Next_Laser
+deflabel 2C57 OBJECT_STRUCTURE_SIZE
 comment  2C5A
 comment  2C5A Decrement object counter, return when all processed
 comment  2C5F
@@ -1549,51 +1550,60 @@ comment  2C7E Get score high byte and save
 comment  2C84
 comment  2C84 Get score low byte and save
 comment  2C8C
-label    2C8C Change_Object_To_Explosion_Nxt
+label    2C8C Chg_Obj_To_Explosion_Then_Next
 comment  2C92
 comment  2C92
 comment  2C92
 comment  2C92
 comment  2C92 Test if object has collided with Jetman, if not, update position
-lcomment 2C92 DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
+comment  2C92 DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
 label    2C92 Test_Jetman_Collide
 comment  2C99
 comment  2C99 Alien has hit Jetman
 comment  2C9F
-comment  2C9F Get object direction/speed and use to create new X value
+comment  2C9F Get object Direction & Position Y and use to calculate new X value
 label    2C9F Update_Object_Position
 deflabel 2CA0 OBJECT_DIRECTION_X_PARAM
 comment  2CAB
 comment  2CAB Take care of X screen wrapping (note $f0=-16 decimal)
+comment  2CAF
 deflabel 2CB0 SCREEN_WIDTH_PIXELS
+comment  2CB3
 label    2CB3 Update_Object_X_Position
 comment  2CB5
-comment  2CB5 Get object direction/speed and use to create new Y value
+comment  2CB5 Get object Direction & Position and use to calculate new Y value
 deflabel 2CB6 OBJECT_DIRECTION_Y_PARAM
 comment  2CC3
 comment  2CCC
 label    2CCC Wrap_Object_X_Position_Left
+deflabel 2CCD SCREEN_WIDTH_PIXELS
 comment  2CD1
 label    2CD1 Wrap_Object_X_Position_Right
+deflabel 2CD2 _100_MINUS_SCREEN_WIDTH_PIXELS
 comment  2CD6
 label    2CD6 Obj_Ptr_To_Alien_0_Flsh_Ctr
+comment  2CDB
 label    2CDB Alien_Points_Lookup_Table
 word     2CDB-2CE2
 const    2CDB-2CE2
+comment  2CE3
 label    2CE3 Obj_Ptr_To_Alien_0_Jetman
 deflabel 2CE9 JETMAN_FLYING
 deflabel 2CED JETMAN_STANDING
+comment  2CF1
 comment  2CF1 Set Object List Pointer to first alien object
 label    2CF1 Set_Obj_List_Ptr_To_Alien_0
 comment  2CF9
 comment  2CF9 Setup 6 alien objects DEBUG Set 2CFA to 1 to spawn only 1 alien
 lcomment 2CFB Counter variable
+comment  2CFF
 label    2CFF Next_Object
 lcomment 2CFF Get object type
 lcomment 2D01 Object not currently used
 comment  2D03
 comment  2D03 Move pointer to next object
 lcomment 2D0A Dec object counter
+comment  2D0F
 comment  2D0F Initiate new alien object
 comment  2D0F InReg Y always 0
 comment  2D0F Set type depending on current wave i.e. 0, 1, 2 or 3
@@ -1614,7 +1624,9 @@ comment  2D3B
 comment  2D3B Set object colour randomly, lookup table has 2 colours per wave
 binary   2D3F
 comment  2D49
+comment  2D4C
 label    2D4C Wave_Alien_Type_Lookup
+comment  2D50
 label    2D50 Wave_Alien_Colour_Lookup
 break    2D54
 comment  2D58

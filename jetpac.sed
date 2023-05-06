@@ -129,6 +129,12 @@
 /; 2BF8/,/; 2C69/s/ZP09                            /ZP09_Object_Laser_Addr_Hi       /
 /; 2BF8/,/; 2C69/s/(ZP09),y                        /(ZP09_Object_Laser_Addr_Hi),y   /
 
+# Alien_Hit_Update_Score
+/ZP02                            equ     $0002/a ZP02_Score_Byte_Hi              equ     $0002
+/ZP03                            equ     $0003/a ZP03_Score_Byte_Lo              equ     $0003
+/; 2C78/,/; 2C8F/s/ZP02                            /ZP02_Score_Byte_Hi              /
+/; 2C78/,/; 2C8F/s/ZP03                            /ZP03_Score_Byte_Lo              /
+
 
 
 
