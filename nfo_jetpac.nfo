@@ -1266,17 +1266,17 @@ deflabel 2A50 OBJECT_JETMAN_DIRECTION_PARAM
 comment  2A55
 comment  2A55 Save object type and then change it to an explosion
 comment  2A5F
-label    2A5F WAVE_1_PLUSSES
+label    2A5F WAVE_1_CROSS
 comment  2A67
 comment  2A67 Alien not hit by laser, check to see if hit platform, aliens bounce off after first wave, so
 comment  2A67 update direction
-label    2A67 Wave_1_Plusses_Move
+label    2A67 Wave_1_Cross_Move
 comment  2A6D
-label    2A6D WAVE_2_SPHERES
+label    2A6D WAVE_2_SPHERE
 comment  2A75
 comment  2A75 Alien not hit by laser, check to see if hit platform, aliens bounce off after wave 0
 comment  2A75 so update direction
-label    2A75 Wave_2_Spheres_Move
+label    2A75 Wave_2_Sphere_Move
 comment  2A78
 comment  2A78 Read Y direction reversal countdown, branch if zero, else decrement countdown
 deflabel 2A79 OBJECT_DIR_Y_COUNTDOWN_PARAM
@@ -1304,25 +1304,24 @@ label    2A9E Alien_Direction_Left
 deflabel 2A9F DIRECTION_X_LEFT
 comment  2AA2
 comment  2AA2 Reset random Y direction change countdown using IRQ random number, range $10-$1F
-label    2AA2 Update_Y_Direction_Random
+label    2AA2 Update_Alien_Y_Direction_Rand
 binary   2AA5
 binary   2AA7
 comment  2AAA
-comment  2AAA Reverse Y direction up/down, randomly via IRQ
+comment  2AAA Reverse Y direction up/down, randomly via IRQ random number, bit 2
 deflabel 2AAB OBJECT_DIRECTION_Y_PARAM
 binary   2AAD
 comment  2AB2
 comment  2AB2 Invert on the direction byte
 binary   2AB3
 comment  2AB7
-label    2AB7 Store_Object_Direction_Y
+label    2AB7 Update_Alien_Direction_Y
 comment  2ABC
 label    2ABC WAVE_3_SAUCER
 comment  2AC4
 comment  2AC4 Alien not hit by laser, check to see if hit platform, aliens bounce off after wave 0 so
 comment  2AC4 update direction
 label    2AC4 Wave_3_Saucer_Move
-comment  2AC7
 comment  2AC7
 comment  2AC7 Saucers home-in on Jetman, thus below code is in four sections:
 comment  2AC7 - Two sections update X depending on whether alien is left or right of Jetman
@@ -1332,43 +1331,43 @@ deflabel 2AC8 OBJECT_POSITION_X_PARAM
 comment  2ACB
 comment  2ACB Update Y register to index Direction X
 comment  2ACC
-comment  2ACC Compare alien and jetman positions, jump if alien to left of Jetman
+comment  2ACC Compare alien and jetman positions, branch if alien to left of jetman
 comment  2AD2
-comment  2AD2 Load Direction X, jump if alien is moving right
+comment  2AD2 Load Direction X, branch if alien is moving right
 comment  2AD7
 comment  2AD7 Test Direction X, when $FC reached, Direction resets to $03
 deflabel 2AD8 DIRECTION_X_LEFT_MAX
 comment  2ADB
 comment  2ADB Alien and Jetman Position X is now equal, decrement direction
-label    2ADB Wave_3_Saucer_Dec_Direction_X
+label    2ADB Update_Alien_Direction_X_Decr
 comment  2ADD
-label    2ADD Wave_3_Saucer_Store_Directn_X
+label    2ADD Update_Alien_Direction_X_Store
 comment  2ADF
 comment  2ADF
 comment  2ADF Update Alien Direction Y, same as Update Direction X, so deliberately fewer comments
-label    2ADF Wave_3_Saucer_Update_Y
+label    2ADF Update_Alien_Position_Y
 deflabel 2AE0 OBJECT_POSITION_Y_PARAM
 comment  2AEA
-comment  2AEA Load Direction Y, jump if alien is moving down
+comment  2AEA Load Direction Y, branch if alien is moving down
 deflabel 2AF0 DIRECTION_Y_UP_MAX
 comment  2AF3
-label    2AF3 Wave_3_Saucer_Dec_Direction_Y
+label    2AF3 Update_Alien_Direction_Y_Decr
 comment  2AF5
-label    2AF5 Wave_3_Saucer_Store_Directn_Y
+label    2AF5 Update_Alien_Direction_Y_Store
 comment  2AF7
-label    2AF7 Wave_3_Saucer_EXIT
+label    2AF7 Wave_3_Saucer_Exit
 comment  2AFA
 comment  2AFA Alien is to the left of Jetman
-label    2AFA Wave_3_Saucer_Alien_Left_X
+label    2AFA Update_Alien_Direction_X
 deflabel 2B00 DIRECTION_X_RIGHT_MAX
 comment  2B03
-label    2B03 Wave_3_Saucer_Inc_Direction_X
+label    2B03 Update_Alien_Direction_X_Inc
 comment  2B08
 comment  2B08 Alien is below Jetman
-label    2B08 Wave_3_Saucer_Alien_Below_Y
+label    2B08 Update_Alien_Direction_Y_
 deflabel 2B0E DIRECTION_Y_DOWN_MAX
 comment  2B11
-label    2B11 Wave_3_Saucer_Inc_Direction_Y
+label    2B11 Update_Alien_Direction_Y_Inc
 comment  2B16
 comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change, else return
 label    2B16 Test_Platform_Collision_Bounce
