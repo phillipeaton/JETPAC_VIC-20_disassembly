@@ -1270,104 +1270,116 @@ label    2A5F WAVE_1_CROSS
 comment  2A67
 comment  2A67 Alien not hit by laser, check to see if hit platform, aliens bounce off after first wave, so
 comment  2A67 update direction
-label    2A67 Wave_1_Cross_Move
+label    2A67 Wave_1_Cross_Direction_Update
 comment  2A6D
 label    2A6D WAVE_2_SPHERE
 comment  2A75
 comment  2A75 Alien not hit by laser, check to see if hit platform, aliens bounce off after wave 0
 comment  2A75 so update direction
-label    2A75 Wave_2_Sphere_Move
+label    2A75 Wave_2_Sphere_Direction_Update
 comment  2A78
-comment  2A78 Read Y direction reversal countdown, branch if zero, else decrement countdown
+comment  2A78 Read direction Y reversal countdown, branch if zero, else decrement countdown
 deflabel 2A79 OBJECT_DIR_Y_COUNTDOWN_PARAM
 comment  2A83
 comment  2A83
 comment  2A83
 comment  2A83
 comment  2A83 Below routine common to waves 1 and 2
-label    2A83 Update_Alien_X_Y_Direction
+label    2A83 Direction_X_Y_Update
 deflabel 2A84 OBJECT_DIRECTION_X_PARAM
 deflabel 2A8A DIRECTION_X_RIGHT
 comment  2A8B
-label    2A8B Update_Alien_X_Direction
+label    2A8B Direction_X_Store_
 comment  2A8D
-comment  2A8D Update_Alien_Y_Direction
+comment  2A8D Direction_Y_Update
 deflabel 2A8E OBJECT_DIRECTION_Y_PARAM
 deflabel 2A94 DIRECTION_Y_DOWN
 comment  2A95
-label    2A95 Update_Alien_Y_Direction
+label    2A95 Direction_Y_Store_
 comment  2A9A
-label    2A9A Alien_Direction_Up
+label    2A9A Load_Direction_Y_Up
 deflabel 2A9B DIRECTION_Y_UP
 comment  2A9E
-label    2A9E Alien_Direction_Left
+label    2A9E Load_Direction_X_Left
 deflabel 2A9F DIRECTION_X_LEFT
 comment  2AA2
-comment  2AA2 Reset random Y direction change countdown using IRQ random number, range $10-$1F
-label    2AA2 Update_Alien_Y_Direction_Rand
+comment  2AA2 Reset random direction Y change countdown initial value using IRQ random number, range $10-$1F
+label    2AA2 Direction_Y_Update_Rand
 binary   2AA5
 binary   2AA7
 comment  2AAA
-comment  2AAA Reverse Y direction up/down, randomly via IRQ random number, bit 2
+comment  2AAA Reverse direction Y up/down, randomly via IRQ random number, bit 2
 deflabel 2AAB OBJECT_DIRECTION_Y_PARAM
 binary   2AAD
 comment  2AB2
 comment  2AB2 Invert on the direction byte
 binary   2AB3
 comment  2AB7
-label    2AB7 Update_Alien_Direction_Y
+label    2AB7 Direction_Y_Store_Rand
 comment  2ABC
 label    2ABC WAVE_3_SAUCER
 comment  2AC4
 comment  2AC4 Alien not hit by laser, check to see if hit platform, aliens bounce off after wave 0 so
 comment  2AC4 update direction
-label    2AC4 Wave_3_Saucer_Move
+label    2AC4 Wave_3_Saucer_Direction_Update
 comment  2AC7
 comment  2AC7 Saucers home-in on Jetman, thus below code is in four sections:
 comment  2AC7 - Two sections update X depending on whether alien is left or right of Jetman
 comment  2AC7 - Two sections update Y depending on whether alien is above or below Jetman
-comment  2AC7 Update Alien Direction X
+comment  2AC7
+comment  2AC7 Direction X Update
 deflabel 2AC8 OBJECT_POSITION_X_PARAM
 comment  2ACB
-comment  2ACB Update Y register to index Direction X
+comment  2ACB Register Y becomes offset to Object Direction X parameter
 comment  2ACC
 comment  2ACC Compare alien and jetman positions, branch if alien to left of jetman
 comment  2AD2
-comment  2AD2 Load Direction X, branch if alien is moving right
+comment  2AD2 Alien is to the right of Jetman
+comment  2AD2 Test if alien moving right, if yes, immediately decrement the direction i.e. so it moves left
 comment  2AD7
-comment  2AD7 Test Direction X, when $FC reached, Direction resets to $03
+comment  2AD7 Test Direction X, when $FC reached, movement left speed is maxed out, go straight to Y update
 deflabel 2AD8 DIRECTION_X_LEFT_MAX
 comment  2ADB
-comment  2ADB Alien and Jetman Position X is now equal, decrement direction
-label    2ADB Update_Alien_Direction_X_Decr
+comment  2ADB Decrement alien direction X i.e. so it moves left
+label    2ADB Direction_X_Decr
 comment  2ADD
-label    2ADD Update_Alien_Direction_X_Store
+comment  2ADD Store new direction X back to alien object
+label    2ADD Direction_X_Store
 comment  2ADF
 comment  2ADF
-comment  2ADF Update Alien Direction Y, same as Update Direction X, so deliberately fewer comments
-label    2ADF Update_Alien_Position_Y
+comment  2ADF Alien Direction Y Update, same logic as Direction X Update
+label    2ADF Position_Y_Update
 deflabel 2AE0 OBJECT_POSITION_Y_PARAM
+comment  2AE3
+comment  2AE3 Register Y becomes offset to Object Direction Y parameter
+comment  2AE4
+comment  2AE4 Compare alien and jetman positions, branch if alien is above jetman
 comment  2AEA
-comment  2AEA Load Direction Y, branch if alien is moving down
+comment  2AEA Alien is below Jetman
+comment  2AEA Test if alien moving down, if yes, immediately decrement the direction i.e. so it moves up
+comment  2AEF
+comment  2AEF Test Direction Y, when $FC reached, movement up speed is maxed out, exit direction update routine
 deflabel 2AF0 DIRECTION_Y_UP_MAX
 comment  2AF3
-label    2AF3 Update_Alien_Direction_Y_Decr
+comment  2AF3 Decrement alien direction Y i.e. so it moves up
+label    2AF3 Direction_Y_Decr
 comment  2AF5
-label    2AF5 Update_Alien_Direction_Y_Store
+comment  2AF5 Store new direction Y back to alien object
+label    2AF5 Direction_Y_Store
 comment  2AF7
 label    2AF7 Wave_3_Saucer_Exit
 comment  2AFA
-comment  2AFA Alien is to the left of Jetman
-label    2AFA Update_Alien_Direction_X
+comment  2AFA Alien to left of Jetman, increment alien direction X by one until max reached
+label    2AFA Direction_X_Increment
 deflabel 2B00 DIRECTION_X_RIGHT_MAX
 comment  2B03
-label    2B03 Update_Alien_Direction_X_Inc
+label    2B03 Direction_X_Inc
 comment  2B08
-comment  2B08 Alien is below Jetman
-label    2B08 Update_Alien_Direction_Y_
+comment  2B08 Alien is below Jetman, increment alien direction Y by one until max reached
+label    2B08 Direction_Y_Increment
 deflabel 2B0E DIRECTION_Y_DOWN_MAX
 comment  2B11
-label    2B11 Update_Alien_Direction_Y_Inc
+label    2B11 Direction_Y_Inc
 comment  2B16
 comment  2B16 Test if alien has hit a platform, if yes, bounce off with direction change, else return
 label    2B16 Test_Platform_Collision_Bounce
@@ -1542,7 +1554,7 @@ comment  2C6F Alien not hit by laser, test if alien hit platform, if yes explode
 comment  2C6F else test if alien hit Jetman
 comment  2C78
 comment  2C78 Alien has been hit by laser, use current player wave to create points table offset
-label    2C78 Alien_Hit_Update_Score
+label    2C78 Alien_Hit_Score_Update
 binary   2C7B
 comment  2C7E
 comment  2C7E Get score high byte and save
@@ -1556,7 +1568,8 @@ comment  2C92
 comment  2C92
 comment  2C92 Test if object has collided with Jetman, if not, update position
 comment  2C92 DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
-label    2C92 Test_Jetman_Collide
+comment  2C92 In MAME Debugger, use "fill 2C95,1,A9"
+label    2C92 Display_Object_Position_Update
 comment  2C99
 comment  2C99 Alien has hit Jetman
 comment  2C9F
@@ -1593,7 +1606,9 @@ comment  2CF1
 comment  2CF1 Set Object List Pointer to first alien object
 label    2CF1 Set_Obj_List_Ptr_To_Alien_0
 comment  2CF9
-comment  2CF9 Setup 6 alien objects DEBUG Set 2CFA to 1 to spawn only 1 alien
+comment  2CF9 Setup 6 alien objects
+comment  2CF9 DEBUG Set $2CFA to 1 to spawn only 1 alien
+comment  2CF9 In MAME Debugger, use "fill 2CFA,1,1"
 lcomment 2CFB Counter variable
 comment  2CFF
 label    2CFF Next_Object

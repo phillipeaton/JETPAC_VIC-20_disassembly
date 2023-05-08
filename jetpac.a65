@@ -3017,16 +3017,16 @@ Setup_Jetman_Explosion
 
 WAVE_1_CROSS
     jsr     Test_Laser_Hits                 ; 2A5F: 20 5F 2C 
-    bpl     Wave_1_Cross_Move               ; 2A62: 10 03    
-    jmp     Alien_Hit_Update_Score          ; 2A64: 4C 78 2C 
+    bpl     Wave_1_Cross_Direction_Update   ; 2A62: 10 03    
+    jmp     Alien_Hit_Score_Update          ; 2A64: 4C 78 2C 
 ; ------------------------------------------
 
 ; Alien not hit by laser, check to see if hit platform, aliens bounce off after first wave, so
 ; update direction
 ; L_BRS_($2A67)_($2A62) OK
-Wave_1_Cross_Move
+Wave_1_Cross_Direction_Update
     jsr     Test_Platform_Collision_Bounce  ; 2A67: 20 16 2B 
-    jmp     Update_Alien_X_Y_Direction      ; 2A6A: 4C 83 2A 
+    jmp     Direction_X_Y_Update            ; 2A6A: 4C 83 2A 
 ; ------------------------------------------
 
 
@@ -3047,20 +3047,20 @@ Wave_1_Cross_Move
 
 WAVE_2_SPHERE
     jsr     Test_Laser_Hits                 ; 2A6D: 20 5F 2C 
-    beq     Wave_2_Sphere_Move              ; 2A70: F0 03    
-    jmp     Alien_Hit_Update_Score          ; 2A72: 4C 78 2C 
+    beq     Wave_2_Sphere_Direction_Update  ; 2A70: F0 03    
+    jmp     Alien_Hit_Score_Update          ; 2A72: 4C 78 2C 
 ; ------------------------------------------
 
 ; Alien not hit by laser, check to see if hit platform, aliens bounce off after wave 0
 ; so update direction
 ; L_BRS_($2A75)_($2A70) OK
-Wave_2_Sphere_Move
+Wave_2_Sphere_Direction_Update
     jsr     Test_Platform_Collision_Bounce  ; 2A75: 20 16 2B 
 
-; Read Y direction reversal countdown, branch if zero, else decrement countdown
+; Read direction Y reversal countdown, branch if zero, else decrement countdown
     ldy     #OBJECT_DIR_Y_COUNTDOWN_PARAM   ; 2A78: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A7A: B1 00    
-    beq     Update_Alien_Y_Direction_Rand   ; 2A7C: F0 24    
+    beq     Direction_Y_Update_Rand         ; 2A7C: F0 24    
     sec                                     ; 2A7E: 38       
     sbc     #$01                            ; 2A7F: E9 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2A81: 91 00    
@@ -3070,51 +3070,51 @@ Wave_2_Sphere_Move
 
 ; Below routine common to waves 1 and 2
 ; L_JMP_($2A83)_($2A6A) OK
-Update_Alien_X_Y_Direction
+Direction_X_Y_Update
     ldy     #OBJECT_DIRECTION_X_PARAM       ; 2A83: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A85: B1 00    
-    bmi     Alien_Direction_Left            ; 2A87: 30 15    
+    bmi     Load_Direction_X_Left           ; 2A87: 30 15    
     lda     #DIRECTION_X_RIGHT              ; 2A89: A9 08    
 
 ; L_BRS_($2A8B)_($2AA0) OK
-Update_Alien_X_Direction
+Direction_X_Store_
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2A8B: 91 00    
 
-; Update_Alien_Y_Direction
+; Direction_Y_Update
     ldy     #OBJECT_DIRECTION_Y_PARAM       ; 2A8D: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2A8F: B1 00    
-    bmi     Alien_Direction_Up              ; 2A91: 30 07    
+    bmi     Load_Direction_Y_Up             ; 2A91: 30 07    
     lda     #DIRECTION_Y_DOWN               ; 2A93: A9 08    
 
 ; L_BRS_($2A95)_($2A9C) OK
-Update_Alien_Y_Direction
+Direction_Y_Store_
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2A95: 91 00    
-    jmp     Test_Jetman_Collide             ; 2A97: 4C 92 2C 
+    jmp     Display_Object_Position_Update  ; 2A97: 4C 92 2C 
 ; ------------------------------------------
 
 ; L_BRS_($2A9A)_($2A91) OK
-Alien_Direction_Up
+Load_Direction_Y_Up
     lda     #DIRECTION_Y_UP                 ; 2A9A: A9 F8    
-    bmi     Update_Alien_Y_Direction        ; 2A9C: 30 F7    
+    bmi     Direction_Y_Store_              ; 2A9C: 30 F7    
 
 ; L_BRS_($2A9E)_($2A87) OK
-Alien_Direction_Left
+Load_Direction_X_Left
     lda     #DIRECTION_X_LEFT               ; 2A9E: A9 F8    
-    bmi     Update_Alien_X_Direction        ; 2AA0: 30 E9    
+    bmi     Direction_X_Store_              ; 2AA0: 30 E9    
 
-; Reset random Y direction change countdown using IRQ random number, range $10-$1F
+; Reset random direction Y change countdown initial value using IRQ random number, range $10-$1F
 ; L_BRS_($2AA2)_($2A7C) OK
-Update_Alien_Y_Direction_Rand
+Direction_Y_Update_Rand
     lda     ZP_HW_IRQ_Random                ; 2AA2: A5 4C    
     and     #%00001111                      ; 2AA4: 29 0F    
     adc     #%00010000                      ; 2AA6: 69 10    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AA8: 91 00    
 
-; Reverse Y direction up/down, randomly via IRQ random number, bit 2
+; Reverse direction Y up/down, randomly via IRQ random number, bit 2
     ldy     #OBJECT_DIRECTION_Y_PARAM       ; 2AAA: A0 04    
     and     #%00000100                      ; 2AAC: 29 04    
     bit     ZP_HW_IRQ_Random                ; 2AAE: 24 4C    
-    bmi     Update_Alien_Direction_Y        ; 2AB0: 30 05    
+    bmi     Direction_Y_Store_Rand          ; 2AB0: 30 05    
 
 ; Invert on the direction byte
     eor     #%11111111                      ; 2AB2: 49 FF    
@@ -3122,9 +3122,9 @@ Update_Alien_Y_Direction_Rand
     adc     #$01                            ; 2AB5: 69 01    
 
 ; L_BRS_($2AB7)_($2AB0) OK
-Update_Alien_Direction_Y
+Direction_Y_Store_Rand
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AB7: 91 00    
-    jmp     Test_Jetman_Collide             ; 2AB9: 4C 92 2C 
+    jmp     Display_Object_Position_Update  ; 2AB9: 4C 92 2C 
 ; ------------------------------------------
 
 
@@ -3145,110 +3145,122 @@ Update_Alien_Direction_Y
 
 WAVE_3_SAUCER
     jsr     Test_Laser_Hits                 ; 2ABC: 20 5F 2C 
-    bpl     Wave_3_Saucer_Move              ; 2ABF: 10 03    
-    jmp     Alien_Hit_Update_Score          ; 2AC1: 4C 78 2C 
+    bpl     Wave_3_Saucer_Direction_Update  ; 2ABF: 10 03    
+    jmp     Alien_Hit_Score_Update          ; 2AC1: 4C 78 2C 
 ; ------------------------------------------
 
 ; Alien not hit by laser, check to see if hit platform, aliens bounce off after wave 0 so
 ; update direction
 ; L_BRS_($2AC4)_($2ABF) OK
-Wave_3_Saucer_Move
+Wave_3_Saucer_Direction_Update
     jsr     Test_Platform_Collision_Bounce  ; 2AC4: 20 16 2B 
 
 ; Saucers home-in on Jetman, thus below code is in four sections:
 ; - Two sections update X depending on whether alien is left or right of Jetman
 ; - Two sections update Y depending on whether alien is above or below Jetman
-; Update Alien Direction X
+
+; Direction X Update
     ldy     #OBJECT_POSITION_X_PARAM        ; 2AC7: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AC9: B1 00    
 
-; Update Y register to index Direction X
+; Register Y becomes offset to Object Direction X parameter
     iny                                     ; 2ACB: C8       
 
 ; Compare alien and jetman positions, branch if alien to left of jetman
     sec                                     ; 2ACC: 38       
     sbc     Obj_Jetman_Position_X           ; 2ACD: ED 81 03 
-    bmi     Update_Alien_Direction_X        ; 2AD0: 30 28    
+    bmi     Direction_X_Increment           ; 2AD0: 30 28    
 
-; Load Direction X, branch if alien is moving right
+; Alien is to the right of Jetman
+; Test if alien moving right, if yes, immediately decrement the direction i.e. so it moves left
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AD2: B1 00    
     sec                                     ; 2AD4: 38       
-    bpl     Update_Alien_Direction_X_Decr   ; 2AD5: 10 04    
+    bpl     Direction_X_Decr                ; 2AD5: 10 04    
 
-; Test Direction X, when $FC reached, Direction resets to $03
+; Test Direction X, when $FC reached, movement left speed is maxed out, go straight to Y update
     cmp     #DIRECTION_X_LEFT_MAX           ; 2AD7: C9 FC    
-    bcc     Update_Alien_Position_Y         ; 2AD9: 90 04    
+    bcc     Position_Y_Update               ; 2AD9: 90 04    
 
-; Alien and Jetman Position X is now equal, decrement direction
+; Decrement alien direction X i.e. so it moves left
 ; L_BRS_($2ADB)_($2AD5) OK
-Update_Alien_Direction_X_Decr
+Direction_X_Decr
     sbc     #$01                            ; 2ADB: E9 01    
 
+; Store new direction X back to alien object
 ; L_JMP_($2ADD)_($2B05) OK
-Update_Alien_Direction_X_Store
+Direction_X_Store
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2ADD: 91 00    
 
 
-; Update Alien Direction Y, same as Update Direction X, so deliberately fewer comments
+; Alien Direction Y Update, same logic as Direction X Update
 ; L_BRS_($2ADF)_($2AD9) OK
 ; L_BRS_($2ADF)_($2B01) OK
-Update_Alien_Position_Y
+Position_Y_Update
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2ADF: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AE1: B1 00    
+
+; Register Y becomes offset to Object Direction Y parameter
     iny                                     ; 2AE3: C8       
+
+; Compare alien and jetman positions, branch if alien is above jetman
     sec                                     ; 2AE4: 38       
     sbc     Obj_Jetman_Position_Y           ; 2AE5: ED 83 03 
-    bmi     Update_Alien_Direction_Y_       ; 2AE8: 30 1E    
+    bmi     Direction_Y_Increment           ; 2AE8: 30 1E    
 
-; Load Direction Y, branch if alien is moving down
+; Alien is below Jetman
+; Test if alien moving down, if yes, immediately decrement the direction i.e. so it moves up
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AEA: B1 00    
     sec                                     ; 2AEC: 38       
-    bpl     Update_Alien_Direction_Y_Decr   ; 2AED: 10 04    
+    bpl     Direction_Y_Decr                ; 2AED: 10 04    
+
+; Test Direction Y, when $FC reached, movement up speed is maxed out, exit direction update routine
     cmp     #DIRECTION_Y_UP_MAX             ; 2AEF: C9 FC    
     bcc     Wave_3_Saucer_Exit              ; 2AF1: 90 04    
 
+; Decrement alien direction Y i.e. so it moves up
 ; L_BRS_($2AF3)_($2AED) OK
-Update_Alien_Direction_Y_Decr
+Direction_Y_Decr
     sbc     #$01                            ; 2AF3: E9 01    
 
+; Store new direction Y back to alien object
 ; L_JMP_($2AF5)_($2B13) OK
-Update_Alien_Direction_Y_Store
+Direction_Y_Store
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AF5: 91 00    
 
 ; L_BRS_($2AF7)_($2AF1) OK
 ; L_BRS_($2AF7)_($2B0F) OK
 Wave_3_Saucer_Exit
-    jmp     Test_Jetman_Collide             ; 2AF7: 4C 92 2C 
+    jmp     Display_Object_Position_Update  ; 2AF7: 4C 92 2C 
 ; ------------------------------------------
 
-; Alien is to the left of Jetman
+; Alien to left of Jetman, increment alien direction X by one until max reached
 ; L_BRS_($2AFA)_($2AD0) OK
-Update_Alien_Direction_X
+Direction_X_Increment
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2AFA: B1 00    
     clc                                     ; 2AFC: 18       
-    bmi     Update_Alien_Direction_X_Inc    ; 2AFD: 30 04    
+    bmi     Direction_X_Inc                 ; 2AFD: 30 04    
     cmp     #DIRECTION_X_RIGHT_MAX          ; 2AFF: C9 04    
-    bcs     Update_Alien_Position_Y         ; 2B01: B0 DC    
+    bcs     Position_Y_Update               ; 2B01: B0 DC    
 
 ; L_BRS_($2B03)_($2AFD) OK
-Update_Alien_Direction_X_Inc
+Direction_X_Inc
     adc     #$01                            ; 2B03: 69 01    
-    jmp     Update_Alien_Direction_X_Store  ; 2B05: 4C DD 2A 
+    jmp     Direction_X_Store               ; 2B05: 4C DD 2A 
 ; ------------------------------------------
 
-; Alien is below Jetman
+; Alien is below Jetman, increment alien direction Y by one until max reached
 ; L_BRS_($2B08)_($2AE8) OK
-Update_Alien_Direction_Y_
+Direction_Y_Increment
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2B08: B1 00    
     clc                                     ; 2B0A: 18       
-    bmi     Update_Alien_Direction_Y_Inc    ; 2B0B: 30 04    
+    bmi     Direction_Y_Inc                 ; 2B0B: 30 04    
     cmp     #DIRECTION_Y_DOWN_MAX           ; 2B0D: C9 04    
     bcs     Wave_3_Saucer_Exit              ; 2B0F: B0 E6    
 
 ; L_BRS_($2B11)_($2B0B) OK
-Update_Alien_Direction_Y_Inc
+Direction_Y_Inc
     adc     #$01                            ; 2B11: 69 01    
-    jmp     Update_Alien_Direction_Y_Store  ; 2B13: 4C F5 2A 
+    jmp     Direction_Y_Store               ; 2B13: 4C F5 2A 
 ; ------------------------------------------
 
 
@@ -3657,13 +3669,13 @@ Test_Laser_Hits
 
 WAVE_0_FUZZBALL
     jsr     Test_Laser_Hits                 ; 2C6A: 20 5F 2C 
-    bmi     Alien_Hit_Update_Score          ; 2C6D: 30 09    
+    bmi     Alien_Hit_Score_Update          ; 2C6D: 30 09    
 
 ; Alien not hit by laser, test if alien hit platform, if yes explode,
 ; else test if alien hit Jetman
     jsr     Test_Platform_Collision         ; 2C6F: 20 B3 30 
     lda     ZP02                            ; 2C72: A5 02    
-    bpl     Test_Jetman_Collide             ; 2C74: 10 1C    
+    bpl     Display_Object_Position_Update  ; 2C74: 10 1C    
     bmi     Chg_Obj_To_Explosion_Then_Next  ; 2C76: 30 14    
 
 
@@ -3681,7 +3693,7 @@ WAVE_0_FUZZBALL
 ; L_JMP_($2C78)_($2AC1) OK
 ; L_BRS_($2C78)_($2C6D) OK
 ; L_JMP_($2C78)_($2C9C) OK
-Alien_Hit_Update_Score
+Alien_Hit_Score_Update
     lda     ZP_Wave_Active_Player           ; 2C78: A5 59    
     and     #%00000011                      ; 2C7A: 29 03    
     asl     a                               ; 2C7C: 0A       
@@ -3708,18 +3720,19 @@ Chg_Obj_To_Explosion_Then_Next
 
 ; Test if object has collided with Jetman, if not, update position
 ; DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
+; In MAME Debugger, use "fill 2C95,1,A9"
 ; L_JMP_($2C92)_($2A97) OK
 ; L_JMP_($2C92)_($2AB9) OK
 ; L_JMP_($2C92)_($2AF7) OK
 ; L_BRS_($2C92)_($2C74) OK
-Test_Jetman_Collide
+Display_Object_Position_Update
     jsr     Test_Jetman_Object_Collide      ; 2C92: 20 58 2D 
     lda     ZP02                            ; 2C95: A5 02    
     bpl     Update_Object_Position          ; 2C97: 10 06    
 
 ; Alien has hit Jetman
     jsr     Setup_Jetman_Explosion          ; 2C99: 20 45 2A 
-    jmp     Alien_Hit_Update_Score          ; 2C9C: 4C 78 2C 
+    jmp     Alien_Hit_Score_Update          ; 2C9C: 4C 78 2C 
 ; ------------------------------------------
 
 ; Get object Direction & Position Y and use to calculate new X value
@@ -3820,7 +3833,9 @@ Set_Obj_List_Ptr_To_Alien_0
     lda     #$03                            ; 2CF5: A9 03    
     sta     ZP_Obj_List_Ptr_Hi              ; 2CF7: 85 01    
 
-; Setup 6 alien objects DEBUG Set 2CFA to 1 to spawn only 1 alien
+; Setup 6 alien objects
+; DEBUG Set $2CFA to 1 to spawn only 1 alien
+; In MAME Debugger, use "fill 2CFA,1,1"
     lda     #$06                            ; 2CF9: A9 06    
     sta     ZP02                            ; 2CFB: 85 02     Counter variable
     ldy     #$00                            ; 2CFD: A0 00    
