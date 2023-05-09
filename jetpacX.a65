@@ -19,6 +19,8 @@ ZP02                            equ     $0002
 ZP02_Laser_Param_Countdown      equ     $0002
 ZP02_Num_Lasers_Countdown       equ     $0002
 ZP02_Score_Byte_Hi              equ     $0002
+ZP02_Num_Aliens_Countdown       equ     $0002
+ZP02_Colour_Random_0_or_1       equ     $0002
 ZP02_Collision_Status           equ     $0002
 ZP02_Object_Old_Height_Index    equ     $0002
 ZP02_Num_Of_Bytes_To_Fill_Lo    equ     $0002
@@ -268,15 +270,27 @@ FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
 OBJECT_POS_Y_WHEN_LANDED_PARAM  equ     $06
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
+COLOUR_PURPLE                   equ     $04
+COLOUR_RED                      equ     $02
+COLOUR_YELLOW                   equ     $07
+COLOUR_BLUE                     equ     $06
+COLOUR_CYAN                     equ     $03
+WAVE_1_CROSS_                   equ     $06
+WAVE_2_SPHERE_                  equ     $07
+WAVE_3_SAUCER_                  equ     $08
+WAVE_0_FUZZBALL_                equ     $05
+OBJECT_STRUCTURE_SIZE           equ     $08
+NUM_ALIENS_MAX                  equ     $06
+OBJ_ALIEN_0_HI                  equ     $03
+OBJ_ALIEN_0_LO                  equ     $C8
 JETMAN_STANDING                 equ     $02
 JETMAN_FLYING                   equ     $01
 OBJECT_DIRECTION_Y_PARAM        equ     $04
 OBJECT_DIRECTION_X_PARAM        equ     $02
-OBJECT_STRUCTURE_SIZE           equ     $08
 LASER_POSITION_X_PARAM          equ     $02
 MAX_LASERS                      equ     $04
-Obj_Laser_0_Hi                  equ     $03
-Obj_Laser_0_Lo                  equ     $88
+OBJ_LASER_0_HI                  equ     $03
+OBJ_LASER_0_LO                  equ     $88
 OBJECT_VALUABLE_TYPE_PARAM      equ     $06
 NUM_OBJECT_PARAMS               equ     $07
 NOT_FLYING_AND_NOT_STANDING     equ     $03
@@ -297,13 +311,9 @@ OBJECT_JETMAN_DIRECTION_PARAM   equ     $02
 OBJECT_TYPE_PARAM_SAVED         equ     $06
 EXPLOSION_ANIMATION_FRAMES      equ     $07
 EXPLOSION_ANIMATION_FRAME       equ     $04
-COLOUR_BLUE                     equ     $06
 COLOUR_WHITE                    equ     $01
 OBJECT_TYPE_EXPLOSION           equ     $03
-COLOUR_CYAN                     equ     $03
 COLOUR_BLACK                    equ     $00
-COLOUR_YELLOW                   equ     $07
-COLOUR_RED                      equ     $02
 FLAME_SPACE_AVAILABLE           equ     $AF
 OBJECT_TYPE_ROCKET_ASCEND       equ     $0A
 WORD_SIZE                       equ     $02
@@ -319,11 +329,9 @@ LASER_TYPE_PARAM                equ     $00
 LASER_POSITION_X                equ     $02
 LASER_LENGTH_PARAM              equ     $06
 LASER_POSITION_Y                equ     $01
-COLOUR_PURPLE                   equ     $04
 LASER_POSITION_X_PARAMS         equ     $03
 LASER_GUN_HEIGHT_OFFSET         equ     $0D
 MASK_JETMAN_DIRECTION           equ     %10000000
-MAX_LASER_SHOTS                 equ     $04
 SCREEN_ROWS                     equ     $0B
 SCREEN_COLUMNS                  equ     $17
 
@@ -598,7 +606,7 @@ Init_Laser_Objects_Init
     fcb     $FF                             ; 20F6: FF       
 
 ; Loop through the four possible Laser shots, branch if any are zero, i.e. first shot setup
-    ldx     #MAX_LASER_SHOTS                ; 20F7: A2 04    
+    ldx     #MAX_LASERS                     ; 20F7: A2 04    
     ldy     #LASER_TYPE_PARAM               ; 20F9: A0 00    
 
 ; L_BRS_($20FB)_($210D) OK
@@ -1990,7 +1998,7 @@ Main_Loop_Continue
 ; Test if score flash time is zero, if yes, reset next object pointer and spawn setup objects
 ; L_BRS_($2652)_($2649) OK
 Test_Score_Flash_Time_At_Zero
-    jsr     Obj_Ptr_To_Alien_0_Flsh_Ctr     ; 2652: 20 D6 2C 
+    jsr     Init_Alien_Objects_Flash_Cntdn  ; 2652: 20 D6 2C 
 
 ; L_BRS_($2655)_($2650) OK
 Spawn_Objects
@@ -3646,9 +3654,9 @@ Object_Position_X_Table
 ; Store Obj_Laser_0 address in ZP_08/09 ($0388)
 ; L_JSR_($2BF8)_($2C64) OK
 Test_Laser_Hits_1
-    lda     #Obj_Laser_0_Lo                 ; 2BF8: A9 88    
+    lda     #OBJ_LASER_0_LO                 ; 2BF8: A9 88    
     sta     ZP08_Object_Laser_Addr_Lo       ; 2BFA: 85 08    
-    lda     #Obj_Laser_0_Hi                 ; 2BFC: A9 03    
+    lda     #OBJ_LASER_0_HI                 ; 2BFC: A9 03    
     sta     ZP09_Object_Laser_Addr_Hi       ; 2BFE: 85 09    
 
 ; Store number of lasers (4) for processing to ZP_02
@@ -3826,7 +3834,7 @@ Chg_Obj_To_Explosion_Then_Next
 
 
 
-; Test if object has collided with Jetman, if not, update position
+; Test if object has collided with Jetman, if not, update position and display object
 ; DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
 ; In MAME Debugger, use "fill 2C95,1,A9"
 ; L_JMP_($2C92)_($2A97) OK
@@ -3848,6 +3856,8 @@ Display_Object_Position_Update
 Update_Object_Position
     ldy     #OBJECT_DIRECTION_X_PARAM       ; 2C9F: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2CA1: B1 00    
+
+; Register Y becomes offset to Object Position X parameter
     dey                                     ; 2CA3: 88       
     pha                                     ; 2CA4: 48       
     rol     a                               ; 2CA5: 2A       
@@ -3871,6 +3881,8 @@ Update_Object_X_Position
 ; Get object Direction & Position and use to calculate new Y value
     ldy     #OBJECT_DIRECTION_Y_PARAM       ; 2CB5: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2CB7: B1 00    
+
+; Register Y becomes offset to Object Position Y parameter
     dey                                     ; 2CB9: 88       
     pha                                     ; 2CBA: 48       
     rol     a                               ; 2CBB: 2A       
@@ -3911,107 +3923,112 @@ Wrap_Object_X_Position_Right
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 ;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
+; Wait until start of wave flashing score countdown has reached zero
 ; L_JSR_($2CD6)_($2652) OK
-Obj_Ptr_To_Alien_0_Flsh_Ctr
+Init_Alien_Objects_Flash_Cntdn
     lda     ZP_Flash_Score_Countdown        ; 2CD6: A5 5D    
-    beq     Obj_Ptr_To_Alien_0_Jetman       ; 2CD8: F0 09    
+    beq     Test_Jetman_Displayed           ; 2CD8: F0 09    
     rts                                     ; 2CDA: 60       
 ; ==========================================
 
 Alien_Points_Lookup_Table
     fdb     $0025,$0035,$0045,$0055         ; 2CDB: 25 00 35 00 45 00 55 00 
 
+; Test to see if Jetman is being displayed yet, return if not
 ; L_BRS_($2CE3)_($2CD8) OK
-Obj_Ptr_To_Alien_0_Jetman
+Test_Jetman_Displayed
     lda     Obj_Jetman_State                ; 2CE3: AD 80 03 
-    and     #$3F                            ; 2CE6: 29 3F    
+    and     #%00111111                      ; 2CE6: 29 3F    
     cmp     #JETMAN_FLYING                  ; 2CE8: C9 01    
-    beq     Set_Obj_List_Ptr_To_Alien_0     ; 2CEA: F0 05    
+    beq     Init_Alien_Object_Next          ; 2CEA: F0 05    
     cmp     #JETMAN_STANDING                ; 2CEC: C9 02    
-    beq     Set_Obj_List_Ptr_To_Alien_0     ; 2CEE: F0 01    
+    beq     Init_Alien_Object_Next          ; 2CEE: F0 01    
     rts                                     ; 2CF0: 60       
 ; ==========================================
 
 ; Set Object List Pointer to first alien object
 ; L_BRS_($2CF1)_($2CEA) OK
 ; L_BRS_($2CF1)_($2CEE) OK
-Set_Obj_List_Ptr_To_Alien_0
-    lda     #$C8                            ; 2CF1: A9 C8    
+Init_Alien_Object_Next
+    lda     #OBJ_ALIEN_0_LO                 ; 2CF1: A9 C8    
     sta     ZP_Obj_List_Ptr_Lo              ; 2CF3: 85 00    
-    lda     #$03                            ; 2CF5: A9 03    
+    lda     #OBJ_ALIEN_0_HI                 ; 2CF5: A9 03    
     sta     ZP_Obj_List_Ptr_Hi              ; 2CF7: 85 01    
 
-; Setup 6 alien objects
+; Setup next alien objects, to a maximum of 6
 ; DEBUG Set $2CFA to 1 to spawn only 1 alien
 ; In MAME Debugger, use "fill 2CFA,1,1"
-    lda     #$06                            ; 2CF9: A9 06    
-    sta     ZP02                            ; 2CFB: 85 02     Counter variable
-    ldy     #$00                            ; 2CFD: A0 00    
+    lda     #NUM_ALIENS_MAX                 ; 2CF9: A9 06    
+    sta     ZP02_Num_Aliens_Countdown       ; 2CFB: 85 02    
+    ldy     #OBJECT_TYPE_PARAM              ; 2CFD: A0 00    
 
+; Test if alien object is currently used, if not initiate it
 ; L_BRS_($2CFF)_($2D0C) OK
-Next_Object
-    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2CFF: B1 00     Get object type
-    beq     Init_Alien_Object               ; 2D01: F0 0C     Object not currently used
+Loop_Next_Object
+    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2CFF: B1 00    
+    beq     Init_Alien_Object               ; 2D01: F0 0C    
 
-; Move pointer to next object
+; Alien object is used, so move pointer to next object
     lda     ZP_Obj_List_Ptr_Lo              ; 2D03: A5 00    
     clc                                     ; 2D05: 18       
-    adc     #$08                            ; 2D06: 69 08    
+    adc     #OBJECT_STRUCTURE_SIZE          ; 2D06: 69 08    
     sta     ZP_Obj_List_Ptr_Lo              ; 2D08: 85 00    
-    dec     ZP02                            ; 2D0A: C6 02     Dec object counter
-    bne     Next_Object                     ; 2D0C: D0 F1    
+
+; Decrement alien countdown, return when it reaches zero
+    dec     ZP02_Num_Aliens_Countdown       ; 2D0A: C6 02    
+    bne     Loop_Next_Object                ; 2D0C: D0 F1    
     rts                                     ; 2D0E: 60       
 ; ==========================================
 
 ; Initiate new alien object
-; InReg Y always 0
-; Set type depending on current wave i.e. 0, 1, 2 or 3
+; Incoming Register Y always 0
+; Set alien object type depending on current wave i.e. 0, 1, 2 or 3
 ; L_BRS_($2D0F)_($2D01) OK
 Init_Alien_Object
     lda     ZP_Wave_Active_Player           ; 2D0F: A5 59    
-    and     #$03                            ; 2D11: 29 03     Zero bits 2-7
-    tax                                     ; 2D13: AA        Save current wave
+    and     #%00000011                      ; 2D11: 29 03    
+    tax                                     ; 2D13: AA       
     lda     Wave_Alien_Type_Lookup,x        ; 2D14: BD 4C 2D 
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2D17: 91 00    
 
-; Set initial X position to 1
+; Set initial object Position X to 1
     tya                                     ; 2D19: 98       
     iny                                     ; 2D1A: C8       
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2D1B: 91 00    
 
-; Set initial direction randomly using IRQ counter
+; Register Y becomes Direction X, initiate randomly using IRQ counter
     iny                                     ; 2D1D: C8       
     lda     ZP_HW_IRQ_Random                ; 2D1E: A5 4C    
     tax                                     ; 2D20: AA       
-    and     #$10                            ; 2D21: 29 10    
+    and     #%00010000                      ; 2D21: 29 10    
     sec                                     ; 2D23: 38       
-    sbc     #$08                            ; 2D24: E9 08    
+    sbc     #%00001000                      ; 2D24: E9 08    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2D26: 91 00    
 
-; Set initial Y position randomly using IRQ already in X
+; Register Y becomes Position Y, initiate randomly using IRQ counter already in X
     iny                                     ; 2D28: C8       
     txa                                     ; 2D29: 8A       
-    and     #$7F                            ; 2D2A: 29 7F    
-    adc     #$28                            ; 2D2C: 69 28    
+    and     #%01111111                      ; 2D2A: 29 7F    
+    adc     #%00101000                      ; 2D2C: 69 28    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2D2E: 91 00    
 
-; Set diagonal movement randomly or not
+; Register Y becomes Direction Y, set diagonal movement or not randomly
     iny                                     ; 2D30: C8       
-    and     #$02                            ; 2D31: 29 02    
+    and     #%00000010                      ; 2D31: 29 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2D33: 91 00    
 
-; Set object colour randomly, store 0 or 1 in ZP_02
+; Register Y becomes object Colour, store 0 or 1 in ZP02
     iny                                     ; 2D35: C8       
     txa                                     ; 2D36: 8A       
-    and     #$01                            ; 2D37: 29 01    
-    sta     ZP02                            ; 2D39: 85 02    
+    and     #%00000001                      ; 2D37: 29 01    
+    sta     ZP02_Colour_Random_0_or_1       ; 2D39: 85 02    
 
 ; Set object colour randomly, lookup table has 2 colours per wave
     lda     ZP_Wave_Active_Player           ; 2D3B: A5 59    
     asl     a                               ; 2D3D: 0A       
     and     #%00000110                      ; 2D3E: 29 06    
     clc                                     ; 2D40: 18       
-    adc     ZP02                            ; 2D41: 65 02    
+    adc     ZP02_Colour_Random_0_or_1       ; 2D41: 65 02    
     tax                                     ; 2D43: AA       
     lda     Wave_Alien_Colour_Lookup,x      ; 2D44: BD 50 2D 
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2D47: 91 00    
@@ -4020,11 +4037,16 @@ Init_Alien_Object
 ; ------------------------------------------
 
 Wave_Alien_Type_Lookup
-    fcb     $05,$08,$07,$06                 ; 2D4C: 05 08 07 06 
+    fcb     WAVE_0_FUZZBALL_                ; 2D4C: 05       
+    fcb     WAVE_3_SAUCER_                  ; 2D4D: 08       
+    fcb     WAVE_2_SPHERE_                  ; 2D4E: 07       
+    fcb     WAVE_1_CROSS_                   ; 2D4F: 06       
 
 Wave_Alien_Colour_Lookup
-    fcb     $02,$06,$03,$07                 ; 2D50: 02 06 03 07 
-    fcb     $06,$07,$02,$04                 ; 2D54: 06 07 02 04 
+    fcb     COLOUR_RED,COLOUR_BLUE          ; 2D50: 02 06    
+    fcb     COLOUR_CYAN,COLOUR_YELLOW       ; 2D52: 03 07    
+    fcb     COLOUR_BLUE,COLOUR_YELLOW       ; 2D54: 06 07    
+    fcb     COLOUR_RED,COLOUR_PURPLE        ; 2D56: 02 04    
 
 
 

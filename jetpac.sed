@@ -135,6 +135,13 @@
 /; 2C78/,/; 2C8F/s/ZP02                            /ZP02_Score_Byte_Hi              /
 /; 2C78/,/; 2C8F/s/ZP03                            /ZP03_Score_Byte_Lo              /
 
+# Init_Alien_Object_Next
+/ZP02                            equ     $0002/a ZP02_Num_Aliens_Countdown       equ     $0002
+/; 2CF1/,/; 2D0E/s/ZP02                            /ZP02_Num_Aliens_Countdown       /
+
+#Init_Alien_Object
+/ZP02                            equ     $0002/a ZP02_Colour_Random_0_or_1       equ     $0002
+/; 2D0F/,/; 2D49/s/ZP02                            /ZP02_Colour_Random_0_or_1       /
 
 
 

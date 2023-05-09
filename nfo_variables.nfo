@@ -120,10 +120,10 @@ label    0388 Obj_Laser_0
 ; Byte 00/08= object type:
 ;        03 = Explosion->00
 ;        04 = Rocket_Part/Fuel
-;        05 = Wave 0 Fuzzballs
-;        06 = Wave 3 Saucers
-;        07 = Wave 2 Spheres
-;        08 = Wave 1 Plusses
+;        05 = Wave 0 Fuzzball
+;        06 = Wave 3 Saucer
+;        07 = Wave 2 Sphere
+;        08 = Wave 1 Cross
 ;        09 = Rocket Bottom Part
 ;        0A = Rocket Ascend
 ;        0B = Rocket Descend
