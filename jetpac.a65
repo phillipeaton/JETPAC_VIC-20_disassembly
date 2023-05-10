@@ -160,6 +160,14 @@ FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
 OBJECT_POS_Y_WHEN_LANDED_PARAM  equ     $06
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
+OBJECT_TYPE_VALUABLE            equ     $0E
+HITBOX_Y_ABOVE                  equ     $12
+COLLISION                       equ     $80
+HITBOX_Y_BELOW                  equ     $0C
+HITBOX_X                        equ     $0C
+NO_COLLISION                    equ     $00
+JETMAN_STANDING                 equ     $02
+JETMAN_FLYING                   equ     $01
 COLOUR_PURPLE                   equ     $04
 COLOUR_RED                      equ     $02
 COLOUR_YELLOW                   equ     $07
@@ -173,8 +181,6 @@ OBJECT_STRUCTURE_SIZE           equ     $08
 NUM_ALIENS_MAX                  equ     $06
 OBJ_ALIEN_0_HI                  equ     $03
 OBJ_ALIEN_0_LO                  equ     $C8
-JETMAN_STANDING                 equ     $02
-JETMAN_FLYING                   equ     $01
 OBJECT_DIRECTION_Y_PARAM        equ     $04
 OBJECT_DIRECTION_X_PARAM        equ     $02
 LASER_POSITION_X_PARAM          equ     $02
@@ -3971,67 +3977,84 @@ Wave_Alien_Colour_Lookup
 ; L_JSR_($2D58)_($2FA4) OK
 Test_Jetman_Object_Collide
     lda     ZP_Flash_Score_Countdown        ; 2D58: A5 5D    
-    bne     Test_Jetman_Obj_Collide_1       ; 2D5A: D0 0D    
+    bne     Set_No_Collision_And_Return     ; 2D5A: D0 0D    
+
+; Test to see if Jetman is being displayed yet, set No_Collision and return if not
     lda     Obj_Jetman_State                ; 2D5C: AD 80 03 
-    and     #$3F                            ; 2D5F: 29 3F    
-    cmp     #$01                            ; 2D61: C9 01     Jetman flying?
-    beq     Test_Jetman_Obj_Collide_2       ; 2D63: F0 09     Yes, branch
-    cmp     #$02                            ; 2D65: C9 02     Jetman standing?
-    beq     Test_Jetman_Obj_Collide_2       ; 2D67: F0 05     Yes, branch
+    and     #%00111111                      ; 2D5F: 29 3F    
+    cmp     #JETMAN_FLYING                  ; 2D61: C9 01    
+    beq     Compare_Obj_Jetman_Position_X   ; 2D63: F0 09    
+    cmp     #JETMAN_STANDING                ; 2D65: C9 02    
+    beq     Compare_Obj_Jetman_Position_X   ; 2D67: F0 05     Yes, branch
 
 ; L_BRS_($2D69)_($2D5A) OK
-Test_Jetman_Obj_Collide_1
-    lda     #$00                            ; 2D69: A9 00     If Flashing Score, no collision
+Set_No_Collision_And_Return
+    lda     #NO_COLLISION                   ; 2D69: A9 00    
     sta     ZP02                            ; 2D6B: 85 02    
     rts                                     ; 2D6D: 60       
 ; ==========================================
 
+; Start with default No Collision
 ; L_BRS_($2D6E)_($2D63) OK
 ; L_BRS_($2D6E)_($2D67) OK
-Test_Jetman_Obj_Collide_2
-    ldy     #$00                            ; 2D6E: A0 00     Default No Collision unless tests work out
-    sty     ZP02                            ; 2D70: 84 02     Reset variable
+Compare_Obj_Jetman_Position_X
+    ldy     #NO_COLLISION                   ; 2D6E: A0 00    
+    sty     ZP02                            ; 2D70: 84 02    
 
-    iny                                     ; 2D72: C8        Y=1
+; Register Y becomes offset to objects Position X, compare to Jetman's Position X and
+; branch if object is to the left of Jetman
+    iny                                     ; 2D72: C8       
     lda     Obj_Jetman_Position_X           ; 2D73: AD 81 03 
     sec                                     ; 2D76: 38       
-    sbc     (ZP_Obj_List_Ptr_Lo),y          ; 2D77: F1 00     Compare objects X-coord vs Jetman's
-    bpl     Test_Jetman_Obj_Collide_3       ; 2D79: 10 05    
+    sbc     (ZP_Obj_List_Ptr_Lo),y          ; 2D77: F1 00    
+    bpl     Test_Collision_Position_X       ; 2D79: 10 05    
+
+; Perform an Absolute on the result of the Position X comparison
     clc                                     ; 2D7B: 18       
     eor     #$FF                            ; 2D7C: 49 FF    
     adc     #$01                            ; 2D7E: 69 01    
 
 ; L_BRS_($2D80)_($2D79) OK
-Test_Jetman_Obj_Collide_3
-    cmp     #$0C                            ; 2D80: C9 0C    
-    bcs     Test_Jetman_Obj_Collide_RTS     ; 2D82: B0 17     Carry Set? Yes, Return
+Test_Collision_Position_X
+    cmp     #HITBOX_X                       ; 2D80: C9 0C    
+    bcs     No_Collision_Return             ; 2D82: B0 17    
 
-    iny                                     ; 2D84: C8        Y=2
-    iny                                     ; 2D85: C8        Y=3
+; Compare_Obj_Jetman_Position_Y
+; Register Y becomes offset to objects Position Y, compare to Jetman's Position Y and
+; branch if object is above Jetman
+    iny                                     ; 2D84: C8       
+    iny                                     ; 2D85: C8       
     lda     Obj_Jetman_Position_Y           ; 2D86: AD 83 03 
     sec                                     ; 2D89: 38       
-    sbc     (ZP_Obj_List_Ptr_Lo),y          ; 2D8A: F1 00     Compare objects Y-coord vs Jetman's
-    bpl     Test_Jetman_Obj_Collide_5       ; 2D8C: 10 0E    
+    sbc     (ZP_Obj_List_Ptr_Lo),y          ; 2D8A: F1 00    
+    bpl     Test_Collision_Position_Y       ; 2D8C: 10 0E    
+
+; Perform an Absolute on the result of the Position Y comparison
     clc                                     ; 2D8E: 18       
     eor     #$FF                            ; 2D8F: 49 FF    
     adc     #$01                            ; 2D91: 69 01    
 
-    cmp     #$0C                            ; 2D93: C9 0C    
-; L_JMP_($2D95)_($2D9E) OK
-Test_Jetman_Obj_Collide_4
-    bcs     Test_Jetman_Obj_Collide_RTS     ; 2D95: B0 04     Carry Set? Yes, return
+; Test_Collision_Position_Y, note different collision range for above ($12) and below ($0C)
+    cmp     #HITBOX_Y_BELOW                 ; 2D93: C9 0C    
 
-    lda     #$80                            ; 2D97: A9 80     Set ZP_01_Lo = $80 and return
+; L_JMP_($2D95)_($2D9E) OK
+Set_Compare_Result_And_Return
+    bcs     No_Collision_Return             ; 2D95: B0 04    
+
+    lda     #COLLISION                      ; 2D97: A9 80    
     sta     ZP02                            ; 2D99: 85 02    
+
 ; L_BRS_($2D9B)_($2D82) OK
 ; L_BRS_($2D9B)_($2D95) OK
-Test_Jetman_Obj_Collide_RTS
+No_Collision_Return
     rts                                     ; 2D9B: 60       
 ; ==========================================
+
+; Test_Collision_Position_Y, note different collision range for above ($12) and below ($0C)
 ; L_BRS_($2D9C)_($2D8C) OK
-Test_Jetman_Obj_Collide_5
-    cmp     #$12                            ; 2D9C: C9 12    
-    jmp     Test_Jetman_Obj_Collide_4       ; 2D9E: 4C 95 2D 
+Test_Collision_Position_Y
+    cmp     #HITBOX_Y_ABOVE                 ; 2D9C: C9 12    
+    jmp     Set_Compare_Result_And_Return   ; 2D9E: 4C 95 2D 
 ; ------------------------------------------
 
 
@@ -4053,39 +4076,49 @@ Test_Jetman_Obj_Collide_5
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 ;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
+; YOU ARE HERE########################################################################
 ; L_JSR_($2DA1)_($22DD) OK
 Restore_Player_Objects
     lda     Obj_Rocket_Top_Or_Fuel_Type     ; 2DA1: AD B8 03 
     beq     Restore_Player_Objects_1        ; 2DA4: F0 03    
+
     jsr     Set_Obj_Rocket_Top_Or_Fuel_Typ  ; 2DA6: 20 E3 22 
+
 ; L_BRS_($2DA9)_($2DA4) OK
 Restore_Player_Objects_1
     lda     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2DA9: AD C0 03 
     beq     Restore_Player_Objects_2        ; 2DAC: F0 07    
-    cmp     #$0E                            ; 2DAE: C9 0E    
+
+    cmp     #OBJECT_TYPE_VALUABLE           ; 2DAE: C9 0E    
     beq     Restore_Player_Objects_3        ; 2DB0: F0 13    
+
     jsr     Set_Obj_Rocket_Mid_Or_Valu_Typ  ; 2DB2: 20 F2 22 
+
 ; L_BRS_($2DB5)_($2DAC) OK
 ; L_JMP_($2DB5)_($2DC8) OK
 Restore_Player_Objects_2
     jsr     Save_Obj_List_Ptr               ; 2DB5: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2DB8: 20 9D 25 
-    fcb     $00                             ; 2DBB: 00       
-    fdb     Obj_Rocket                      ; 2DBC: B0 03    
+    fcb     $00                             ; 2DBB: 00        ZP00/01
+    fdb     Obj_Rocket                      ; 2DBC: B0 03     Object Address
     fcb     $FF                             ; 2DBE: FF       
+
     jsr     Restore_Player_Objects_4        ; 2DBF: 20 CB 2D 
     jmp     Restore_Obj_List_Ptr            ; 2DC2: 4C F0 28 
 ; ------------------------------------------
+
 ; L_BRS_($2DC5)_($2DB0) OK
 Restore_Player_Objects_3
     jsr     Load_ZP_Params_Rocket_Or_Fuel   ; 2DC5: 20 C7 2B 
     jmp     Restore_Player_Objects_2        ; 2DC8: 4C B5 2D 
 ; ------------------------------------------
+
 ; L_JSR_($2DCB)_($22D1) OK
 ; L_JSR_($2DCB)_($2DBF) OK
 Restore_Player_Objects_4
     jsr     Set_Object_UDG_Colour           ; 2DCB: 20 DD 2D 
     jsr     Load_Object_Type_X_Y_Colour     ; 2DCE: 20 E9 35 
+
 ; L_BRS_($2DD1)_($2DDA) OK
 Loop_Restore_Player_Objects
     jsr     Restore_Player_Objects_6        ; 2DD1: 20 E8 2D 
@@ -4094,16 +4127,19 @@ Loop_Restore_Player_Objects
     bne     Loop_Restore_Player_Objects     ; 2DDA: D0 F5    
     rts                                     ; 2DDC: 60       
 ; ==========================================
+
 ; L_JSR_($2DDD)_($2DCB) OK
 ; L_JSR_($2DDD)_($2EB2) OK
 Set_Object_UDG_Colour
     ldy     #$04                            ; 2DDD: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2DDF: B1 00    
     sta     ZP_Ship_UDG_Addr_Colour?        ; 2DE1: 85 1F    
+
     lda     #$00                            ; 2DE3: A9 00    
     sta     ZP_Ship_UDG_Addr_Offset         ; 2DE5: 85 1E    
     rts                                     ; 2DE7: 60       
 ; ==========================================
+
 ; L_JSR_($2DE8)_($2DD1) OK
 ; L_JSR_($2DE8)_($2EB5) OK
 Restore_Player_Objects_6
@@ -4122,6 +4158,7 @@ Restore_Player_Objects_6
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2DF9: 20 E5 2F 
     jmp     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2DFC: 4C 8D 37 
 ; ------------------------------------------
+
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
 Dec_Saved_Obj_List_Params_by_10
@@ -4129,14 +4166,17 @@ Dec_Saved_Obj_List_Params_by_10
     sec                                     ; 2E01: 38       
     sbc     #$10                            ; 2E02: E9 10    
     sta     ZP19                            ; 2E04: 85 19    
+
     lda     ZP11                            ; 2E06: A5 11    
     sec                                     ; 2E08: 38       
     sbc     #$10                            ; 2E09: E9 10    
     sta     ZP11                            ; 2E0B: 85 11    
+
     lda     ZP_Ship_UDG_Addr_Offset         ; 2E0D: A5 1E    
     clc                                     ; 2E0F: 18       
     adc     #$04                            ; 2E10: 69 04    
     sta     ZP_Ship_UDG_Addr_Offset         ; 2E12: 85 1E    
+
     dec     ZP_Ship_UDG_Addr_Colour?        ; 2E14: C6 1F    
     rts                                     ; 2E16: 60       
 ; ==========================================

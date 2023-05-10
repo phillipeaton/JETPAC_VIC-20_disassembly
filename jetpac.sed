@@ -143,6 +143,11 @@
 /ZP02                            equ     $0002/a ZP02_Colour_Random_0_or_1       equ     $0002
 /; 2D0F/,/; 2D49/s/ZP02                            /ZP02_Colour_Random_0_or_1       /
 
+# Test_Jetman_Object_Collide
+/ZP02                            equ     $0002/a ZP02_Jetman_Collision_Status    equ     $0002
+/; 2D58/,/; 2D9E/s/ZP02                            /ZP02_Jetman_Collision_Status    /
+
+
 
 
 

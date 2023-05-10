@@ -1684,48 +1684,81 @@ comment  2D58 \        Obj_Jetman_Looks = Status of Jetman
 comment  2D58 EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
 comment  2D58 ----------------------------------------------------------
 label    2D58 Test_Jetman_Object_Collide
-lcomment 2D61 Jetman flying?
-lcomment 2D63 Yes, branch
-lcomment 2D65 Jetman standing?
+comment  2D5C
+comment  2D5C Test to see if Jetman is being displayed yet, set No_Collision and return if not
+binary   2D60
+deflabel 2D62 JETMAN_FLYING
+deflabel 2D66 JETMAN_STANDING
 lcomment 2D67 Yes, branch
 comment  2D69
-label    2D69 Test_Jetman_Obj_Collide_1
-lcomment 2D69 If Flashing Score, no collision
+label    2D69 Set_No_Collision_And_Return
+deflabel 2D6A NO_COLLISION
 comment  2D6E
-label    2D6E Test_Jetman_Obj_Collide_2
-lcomment 2D6E Default No Collision unless tests work out
-lcomment 2D70 Reset variable
+label    2D6E Compare_Obj_Jetman_Position_X
+comment  2D6E Start with default No Collision
+deflabel 2D6F NO_COLLISION
 comment  2D72
-lcomment 2D72 Y=1
-lcomment 2D77 Compare objects X-coord vs Jetman's
+comment  2D72 Register Y becomes offset to objects Position X, compare to Jetman's Position X and
+comment  2D72 branch if object is to the left of Jetman
+comment  2D7B
+comment  2D7B Perform an Absolute on the result of the Position X comparison
 comment  2D80
-label    2D80 Test_Jetman_Obj_Collide_3
-lcomment 2D82 Carry Set? Yes, Return
+label    2D80 Test_Collision_Position_X
+deflabel 2D81 HITBOX_X
 comment  2D84
-lcomment 2D84 Y=2
-lcomment 2D85 Y=3
-lcomment 2D8A Compare objects Y-coord vs Jetman's
+comment  2D84 Compare_Obj_Jetman_Position_Y
+comment  2D84 Register Y becomes offset to objects Position Y, compare to Jetman's Position Y and
+comment  2D84 branch if object is above Jetman
+comment  2D8E
+comment  2D8E Perform an Absolute on the result of the Position Y comparison
 comment  2D93
-label    2D95 Test_Jetman_Obj_Collide_4
-lcomment 2D95 Carry Set? Yes, return
+comment  2D93 Test_Collision_Position_Y, note different collision range for above ($12) and below ($0C)
+deflabel 2D94 HITBOX_Y_BELOW
+comment  2D95
+label    2D95 Set_Compare_Result_And_Return
 comment  2D97
-lcomment 2D97 Set ZP_01_Lo = $80 and return
-label    2D9B Test_Jetman_Obj_Collide_RTS
-label    2D9C Test_Jetman_Obj_Collide_5
+comment  2D9B
+deflabel 2D98 COLLISION
+label    2D9B No_Collision_Return
+comment  2D9C
+comment  2D9C Test_Collision_Position_Y, note different collision range for above ($12) and below ($0C)
+label    2D9C Test_Collision_Position_Y
+deflabel 2D9D HITBOX_Y_ABOVE
 comment  2DA1
+comment  2DA1 YOU ARE HERE########################################################################
 label    2DA1 Restore_Player_Objects
+comment  2DA6
+comment  2DA9
 label    2DA9 Restore_Player_Objects_1
+comment  2DAE
+deflabel 2DAF OBJECT_TYPE_VALUABLE
+comment  2DB2
+comment  2DB5
 label    2DB5 Restore_Player_Objects_2
+lcomment 2DBB ZP00/01
+lcomment 2DBC Object Address
 word     2DBC
+comment  2DBF
+comment  2DC5
 label    2DC5 Restore_Player_Objects_3
+comment  2DCB
 label    2DCB Restore_Player_Objects_4
+comment  2DD1
 label    2DD1 Loop_Restore_Player_Objects
+comment  2DDD
 label    2DDD Set_Object_UDG_Colour
+comment  2DE3
+comment  2DE8
 label    2DE8 Restore_Player_Objects_6
 lcomment 2DEC Current wave modulus 4
+binary   2DEC
 comment  2DF1
 comment  2DF9
+comment  2DFF
 label    2DFF Dec_Saved_Obj_List_Params_by_10
+comment  2E06
+comment  2E0D
+comment  2E14
 comment  2E17
 comment  2E17 Aliens keep moving also
 label    2E17 ROCKET_ASCEND
