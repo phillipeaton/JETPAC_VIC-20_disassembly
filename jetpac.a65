@@ -88,7 +88,7 @@ Obj_Sound_Laser                 equ     $03AD
 Obj_Sound_Laser_Timer           equ     $03AE
 Obj_Rocket                      equ     $03B0
 Obj_Rocket_X                    equ     $03B1
-Obj_Rocket_Fuel_Lvl             equ     $03B2
+Obj_Rocket_Fuel_Level           equ     $03B2
 Obj_Rocket_Y                    equ     $03B3
 Obj_Rocket_Parts_Fuel_Counter   equ     $03B4
 Obj_Rocket_Top_Or_Fuel_Type     equ     $03B8
@@ -158,8 +158,16 @@ OBJECT_PARAM                    equ     $06
 LIFECYCLE_STATE                 equ     $04
 FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
 OBJECT_POS_Y_WHEN_LANDED_PARAM  equ     $06
+OBJECT_ROCKET_POSITION_Y_PARAM  equ     $03
+OBJECT_ROCKET_POSITION_X_PARAM  equ     $01
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
+OBJECT_ROCKET_FUEL_LEVEL        equ     $02
+OBJECT_ROCKET_LANDED            equ     $09
+ROCKET_BOT_POSITION_Y           equ     $AF
+ROCKET_BOT_POSITION_Y_PARAM     equ     $03
+OBJECT_ROCKET_DESCEND           equ     $0B
+ROCKET_BOT_AT_SCREEN_TOP        equ     $30
 OBJECT_TYPE_VALUABLE            equ     $0E
 HITBOX_Y_ABOVE                  equ     $12
 COLLISION                       equ     $80
@@ -1001,7 +1009,7 @@ Draw_Platforms_Init_Sound
 
 ; L_BRS_($22D1)_($22C1) OK
 Restore_Player_Objs_Init_Sound
-    jsr     Restore_Player_Objects_4        ; 22D1: 20 CB 2D 
+    jsr     Set_Load_Obj_Type_X_Y_Colour    ; 22D1: 20 CB 2D 
     jmp     Draw_Platforms_Init_Sound       ; 22D4: 4C CB 22 
 ; ------------------------------------------
 
@@ -3398,7 +3406,7 @@ Spawn_RMFC
     bne     Spawn_RMFC_RTS                  ; 2B5A: D0 F6    
 
 ; Return if ship is built and fuelled up
-    lda     Obj_Rocket_Fuel_Lvl             ; 2B5C: AD B2 03 
+    lda     Obj_Rocket_Fuel_Level           ; 2B5C: AD B2 03 
     cmp     #SHIP_BUILT_AND_FUELLED_UP      ; 2B5F: C9 06    
     bcs     Spawn_RMFC_RTS                  ; 2B61: B0 EF    
 
@@ -4076,7 +4084,7 @@ Test_Collision_Position_Y
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 ;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
-; YOU ARE HERE########################################################################
+; This set of routies needs more work ######################################################
 ; L_JSR_($2DA1)_($22DD) OK
 Restore_Player_Objects
     lda     Obj_Rocket_Top_Or_Fuel_Type     ; 2DA1: AD B8 03 
@@ -4087,41 +4095,41 @@ Restore_Player_Objects
 ; L_BRS_($2DA9)_($2DA4) OK
 Restore_Player_Objects_1
     lda     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2DA9: AD C0 03 
-    beq     Restore_Player_Objects_2        ; 2DAC: F0 07    
+    beq     Set_Obj_List_Ptr_To_Rocket      ; 2DAC: F0 07    
 
     cmp     #OBJECT_TYPE_VALUABLE           ; 2DAE: C9 0E    
-    beq     Restore_Player_Objects_3        ; 2DB0: F0 13    
+    beq     Load_Params_Rocket_Or_Fuel      ; 2DB0: F0 13    
 
     jsr     Set_Obj_Rocket_Mid_Or_Valu_Typ  ; 2DB2: 20 F2 22 
 
 ; L_BRS_($2DB5)_($2DAC) OK
 ; L_JMP_($2DB5)_($2DC8) OK
-Restore_Player_Objects_2
+Set_Obj_List_Ptr_To_Rocket
     jsr     Save_Obj_List_Ptr               ; 2DB5: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2DB8: 20 9D 25 
     fcb     $00                             ; 2DBB: 00        ZP00/01
     fdb     Obj_Rocket                      ; 2DBC: B0 03     Object Address
     fcb     $FF                             ; 2DBE: FF       
 
-    jsr     Restore_Player_Objects_4        ; 2DBF: 20 CB 2D 
+    jsr     Set_Load_Obj_Type_X_Y_Colour    ; 2DBF: 20 CB 2D 
     jmp     Restore_Obj_List_Ptr            ; 2DC2: 4C F0 28 
 ; ------------------------------------------
 
 ; L_BRS_($2DC5)_($2DB0) OK
-Restore_Player_Objects_3
+Load_Params_Rocket_Or_Fuel
     jsr     Load_ZP_Params_Rocket_Or_Fuel   ; 2DC5: 20 C7 2B 
-    jmp     Restore_Player_Objects_2        ; 2DC8: 4C B5 2D 
+    jmp     Set_Obj_List_Ptr_To_Rocket      ; 2DC8: 4C B5 2D 
 ; ------------------------------------------
 
 ; L_JSR_($2DCB)_($22D1) OK
 ; L_JSR_($2DCB)_($2DBF) OK
-Restore_Player_Objects_4
+Set_Load_Obj_Type_X_Y_Colour
     jsr     Set_Object_UDG_Colour           ; 2DCB: 20 DD 2D 
     jsr     Load_Object_Type_X_Y_Colour     ; 2DCE: 20 E9 35 
 
 ; L_BRS_($2DD1)_($2DDA) OK
 Loop_Restore_Player_Objects
-    jsr     Restore_Player_Objects_6        ; 2DD1: 20 E8 2D 
+    jsr     Restore_Player_Ship             ; 2DD1: 20 E8 2D 
     jsr     Display_Object_With_Setup_2     ; 2DD4: 20 04 36 
     jsr     Dec_Saved_Obj_List_Params_by_10 ; 2DD7: 20 FF 2D 
     bne     Loop_Restore_Player_Objects     ; 2DDA: D0 F5    
@@ -4140,13 +4148,14 @@ Set_Object_UDG_Colour
     rts                                     ; 2DE7: 60       
 ; ==========================================
 
+; Current wave modulus 4
 ; L_JSR_($2DE8)_($2DD1) OK
 ; L_JSR_($2DE8)_($2EB5) OK
-Restore_Player_Objects_6
+Restore_Player_Ship
     lda     ZP_Wave_Active_Player           ; 2DE8: A5 59    
     lsr     a                               ; 2DEA: 4A       
     lsr     a                               ; 2DEB: 4A       
-    and     #$03                            ; 2DEC: 29 03     Current wave modulus 4
+    and     #%00000011                      ; 2DEC: 29 03    
     ora     ZP_Ship_UDG_Addr_Offset         ; 2DEE: 05 1E    
     asl     a                               ; 2DF0: 0A       
 
@@ -4159,6 +4168,8 @@ Restore_Player_Objects_6
     jmp     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2DFC: 4C 8D 37 
 ; ------------------------------------------
 
+; 19 was AF, postion of Jetman or Rocket base module?
+; 11 handled in same way as 19
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
 Dec_Saved_Obj_List_Params_by_10
@@ -4200,13 +4211,17 @@ Dec_Saved_Obj_List_Params_by_10
 ; Aliens keep moving also
 ROCKET_ASCEND
     jsr     Load_Object_Type_X_Y            ; 2E17: 20 D7 35 
-    ldy     #$03                            ; 2E1A: A0 03     Object height offset
-    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E1C: B1 00     Load object height i.e. Rocket
-    cmp     #$30                            ; 2E1E: C9 30     Object hit top yet
-    bcc     Rocket_At_Top                   ; 2E20: 90 12     Yes, branch
+
+; Test if Rocket hit top of screen yet, if yes branch
+    ldy     #ROCKET_BOT_POSITION_Y_PARAM    ; 2E1A: A0 03    
+    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E1C: B1 00    
+    cmp     #ROCKET_BOT_AT_SCREEN_TOP       ; 2E1E: C9 30    
+    bcc     Rocket_At_Top                   ; 2E20: 90 12    
+
+; Calculate and store new height i.e one pixel up screen
     sec                                     ; 2E22: 38       
-    sbc     #$01                            ; 2E23: E9 01     Calculate new height
-    sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E25: 91 00     Store new height i.e one pixel up
+    sbc     #$01                            ; 2E23: E9 01    
+    sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E25: 91 00    
 
 ; Trigger rocket flight sound
     lda     #$04                            ; 2E27: A9 04    
@@ -4214,21 +4229,29 @@ ROCKET_ASCEND
     lda     #$02                            ; 2E2C: A9 02    
     sta     Obj_Sound_Noise_Timer           ; 2E2E: 8D AC 03 
 
-    jmp     Rocket_Fuelled_Up               ; 2E31: 4C AC 2E 
+    jmp     Rocket_Not_Fuelled_Up           ; 2E31: 4C AC 2E 
 ; ------------------------------------------
+
 ; L_BRS_($2E34)_($2E20) OK
 Rocket_At_Top
     inc     ZP_Wave_Active_Player           ; 2E34: E6 59    
     jsr     Reset_Objects_And_Aliens        ; 2E36: 20 C9 28 
-    ldy     #$00                            ; 2E39: A0 00    
-    lda     #$0B                            ; 2E3B: A9 0B    
+
+; Transition rocket object type from ascend to descend
+    ldy     #OBJECT_TYPE_PARAM              ; 2E39: A0 00    
+    lda     #OBJECT_ROCKET_DESCEND          ; 2E3B: A9 0B    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E3D: 91 00    
+
+; Zero the rocket's fuel level
     tya                                     ; 2E3F: 98       
-    ldy     #$02                            ; 2E40: A0 02    
+    ldy     #OBJECT_ROCKET_FUEL_LEVEL       ; 2E40: A0 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E42: 91 00    
+
+; Turn off the flame animation
     jsr     Reset_Level_Add_Extra_Life      ; 2E44: 20 BA 22 
     lda     #$00                            ; 2E47: A9 00    
     sta     ZP_Rocket_Flame_State           ; 2E49: 85 26    
+
     jmp     GOTO_NEXT_OBJECT                ; 2E4B: 4C 1A 26 
 ; ------------------------------------------
 
@@ -4248,7 +4271,6 @@ Rocket_At_Top
 ; 8888Y"  888888 8bodP'  YboodP 888888 88  Y8 8888Y"
 ; #########################################################################################
 
-; Flames stop a little way before bottom
 ROCKET_DESCEND
     jsr     Load_Object_Type_X_Y            ; 2E4E: 20 D7 35 
 
@@ -4259,20 +4281,23 @@ ROCKET_DESCEND
     sta     Obj_Sound_Noise_Timer           ; 2E58: 8D AC 03 
 
 ; Move object Y position down 1 pixel, stopping at bottom i.e. $AF
-    ldy     #$03                            ; 2E5B: A0 03     03 = Height of object
+    ldy     #ROCKET_BOT_POSITION_Y_PARAM    ; 2E5B: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E5D: B1 00    
     clc                                     ; 2E5F: 18       
     adc     #$01                            ; 2E60: 69 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E62: 91 00    
-    cmp     #$AF                            ; 2E64: C9 AF     Hit bottom of playarea
-    bcc     Rocket_Fuelled_Up               ; 2E66: 90 44    
 
-; Set current object type to a crash
-    ldy     #$00                            ; 2E68: A0 00    
-    lda     #$09                            ; 2E6A: A9 09    
+; Test if rocket has lander
+    cmp     #ROCKET_BOT_POSITION_Y          ; 2E64: C9 AF    
+    bcc     Rocket_Not_Fuelled_Up           ; 2E66: 90 44    
+
+; Set current object type to regular rocket bottom part
+    ldy     #OBJECT_TYPE_PARAM              ; 2E68: A0 00    
+    lda     #OBJECT_ROCKET_LANDED           ; 2E6A: A9 09    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E6C: 91 00    
     jsr     Init_Next_Jetman_Lives_Scores   ; 2E6E: 20 5B 23 
-    jmp     Rocket_Fuelled_Up               ; 2E71: 4C AC 2E 
+
+    jmp     Rocket_Not_Fuelled_Up           ; 2E71: 4C AC 2E 
 ; ------------------------------------------
 
 
@@ -4296,39 +4321,44 @@ ROCKET_DESCEND
 ; 88 YY 88  YbodP  8888Y"  `YbodP' 88ood8 888888
 ; #########################################################################################
 
-; This always seems to be a test for Jetman collide with Rocket
+; Test if Jetman collided with Rocket
 ROCKET_BOTTOM_MODULE
     jsr     Load_Object_Type_X_Y            ; 2E74: 20 D7 35 
-    jsr     Test_Jetman_Object_Collide      ; 2E77: 20 58 2D  Jetman collided with rocket?
-    lda     ZP02                            ; 2E7A: A5 02     Set by collision test
-    bpl     Rocket_Fuelled_Up               ; 2E7C: 10 2E     Collision? If no, branch
+    jsr     Test_Jetman_Object_Collide      ; 2E77: 20 58 2D 
+    lda     ZP02                            ; 2E7A: A5 02    
+    bpl     Rocket_Not_Fuelled_Up           ; 2E7C: 10 2E    
 
-; Collision occured, handle it
-    ldy     #$02                            ; 2E7E: A0 02    
-    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E80: B1 00     Get number of fuel cells delivered into rocket
-    cmp     #FUELLED_UP                     ; 2E82: C9 06     Rocket fully fueled up?
-    bcc     Rocket_Fuelled_Up               ; 2E84: 90 26     No, branch
+; Jetman collided with Rocket, test if fully fulled up
+    ldy     #OBJECT_ROCKET_FUEL_LEVEL       ; 2E7E: A0 02    
+    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E80: B1 00    
+    cmp     #FUELLED_UP                     ; 2E82: C9 06    
+    bcc     Rocket_Not_Fuelled_Up           ; 2E84: 90 26    
 
-; Set Rocket object to Ascend
+; Rocket fuelled up, set Rocket object type to Ascend
     lda     #ROCKET_ASCENDING               ; 2E86: A9 0A    
-    ldy     #$00                            ; 2E88: A0 00    
+    ldy     #OBJECT_TYPE_PARAM              ; 2E88: A0 00    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E8A: 91 00    
     jsr     Save_Obj_List_Ptr               ; 2E8C: 20 E7 28 
 
-; Don't display Jetman next time? Also zeroes Jetman X coord.
+; Load current objects list painter to the Jetman object
     jsr     Load_ZP_Parameters              ; 2E8F: 20 9D 25 
     fcb     $00                             ; 2E92: 00       
     fdb     Obj_Jetman_State                ; 2E93: 80 03    
     fcb     $FF                             ; 2E95: FF       
 
+; Load Jetman object paraments and display on screen
     jsr     Load_Object_Type_X_Y_Colour     ; 2E96: 20 E9 35 
     jsr     Display_Object_With_Setup_1     ; 2E99: 20 01 36 
 
+; Set Jetman not standing and not flying i.e. not visible
     lda     #$00                            ; 2E9C: A9 00    
     sta     Obj_Jetman_State                ; 2E9E: 8D 80 03 
+
+; Increment number of lives, gets decremented again on next level start
     jsr     Restore_Obj_List_Ptr            ; 2EA1: 20 F0 28 
     inc     ZP_Num_Lives_Active_Player      ; 2EA4: E6 5A    
     jsr     Display_Player_1_Lives          ; 2EA6: 20 73 23 
+
     jmp     GOTO_NEXT_OBJECT                ; 2EA9: 4C 1A 26 
 ; ------------------------------------------
 
@@ -4346,95 +4376,118 @@ ROCKET_BOTTOM_MODULE
 ; 88""   Y8   8P 88""   88  .o 88  .o 88""    8I  dY     Y8   8P 88"""
 ; 88     `YbodP' 888888 88ood8 88ood8 888888 8888Y"      `YbodP' 88
 
+; YOU ARE HERE############################################################
 ; L_JMP_($2EAC)_($2E31) OK
 ; L_BRS_($2EAC)_($2E66) OK
 ; L_JMP_($2EAC)_($2E71) OK
 ; L_BRS_($2EAC)_($2E7C) OK
 ; L_BRS_($2EAC)_($2E84) OK
-Rocket_Fuelled_Up
+Rocket_Not_Fuelled_Up
     jsr     Load_Object_Type_X_Y_Colour     ; 2EAC: 20 E9 35 
     jsr     Display_Rocket_Flame            ; 2EAF: 20 AA 27 
     jsr     Set_Object_UDG_Colour           ; 2EB2: 20 DD 2D 
+
 ; L_BRS_($2EB5)_($2EBE) OK
-Rocket_Fuelled_Up_1
-    jsr     Restore_Player_Objects_6        ; 2EB5: 20 E8 2D 
+Loop_Rocket_Not_Fuelled_Up_
+    jsr     Restore_Player_Ship             ; 2EB5: 20 E8 2D 
     jsr     Display_Object                  ; 2EB8: 20 4C 36 
     jsr     Dec_Saved_Obj_List_Params_by_10 ; 2EBB: 20 FF 2D 
-    bne     Rocket_Fuelled_Up_1             ; 2EBE: D0 F5    
+    bne     Loop_Rocket_Not_Fuelled_Up_     ; 2EBE: D0 F5    
 
     lda     ZP_HW_IRQ_Counter_Lo            ; 2EC0: A5 4A    
     lsr     a                               ; 2EC2: 4A       
     lsr     a                               ; 2EC3: 4A       
     and     #$04                            ; 2EC4: 29 04    
-    bne     Rocket_Fuelled_Up_2             ; 2EC6: D0 02    
+    bne     Rocket_Not_Fuelled_Up_2         ; 2EC6: D0 02    
+
     lda     #$01                            ; 2EC8: A9 01    
 ; L_BRS_($2ECA)_($2EC6) OK
-Rocket_Fuelled_Up_2
+Rocket_Not_Fuelled_Up_2
     sta     ZP1B                            ; 2ECA: 85 1B    
+
     ldy     #$04                            ; 2ECC: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ECE: B1 00    
     sta     ZP02                            ; 2ED0: 85 02    
+
     cmp     #$03                            ; 2ED2: C9 03    
-    bcc     Rocket_Fuelled_Up_3             ; 2ED4: 90 27    
+    bcc     Set_ZP1B_To_01_Then_NEXT_OBJ    ; 2ED4: 90 27    
+
     ldy     #$02                            ; 2ED6: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ED8: B1 00    
     lsr     a                               ; 2EDA: 4A       
     sta     ZP13                            ; 2EDB: 85 13    
-    beq     Rocket_Fuelled_Up_3             ; 2EDD: F0 1E    
+
+    beq     Set_ZP1B_To_01_Then_NEXT_OBJ    ; 2EDD: F0 1E    
+
     cmp     #$03                            ; 2EDF: C9 03    
-    bcs     Rocket_Fuelled_Up_4             ; 2EE1: B0 1E    
+    bcs     Rocket_Not_Fuelled_Up_NEXT      ; 2EE1: B0 1E    
+
     sta     ZP02                            ; 2EE3: 85 02    
+
     lda     #$04                            ; 2EE5: A9 04    
     sta     ZP1B                            ; 2EE7: 85 1B    
-    jsr     Rocket_Fuelled_Up_5             ; 2EE9: 20 07 2F 
+
+    jsr     Rocket_Not_Fuelled_Up_5         ; 2EE9: 20 07 2F 
+
     lda     #$03                            ; 2EEC: A9 03    
     sec                                     ; 2EEE: 38       
     sbc     ZP13                            ; 2EEF: E5 13    
     sta     ZP02                            ; 2EF1: 85 02    
+
     lda     #$01                            ; 2EF3: A9 01    
     sta     ZP1B                            ; 2EF5: 85 1B    
-    jsr     Rocket_Fuelled_Up_6             ; 2EF7: 20 16 2F 
+
+    jsr     Loop_Rocket_Not_Fuelled_Up      ; 2EF7: 20 16 2F 
     jmp     GOTO_NEXT_OBJECT                ; 2EFA: 4C 1A 26 
 ; ------------------------------------------
+
 ; L_BRS_($2EFD)_($2ED4) OK
 ; L_BRS_($2EFD)_($2EDD) OK
-Rocket_Fuelled_Up_3
+Set_ZP1B_To_01_Then_NEXT_OBJ
     lda     #$01                            ; 2EFD: A9 01    
     sta     ZP1B                            ; 2EFF: 85 1B    
+
 ; L_BRS_($2F01)_($2EE1) OK
-Rocket_Fuelled_Up_4
-    jsr     Rocket_Fuelled_Up_5             ; 2F01: 20 07 2F 
+Rocket_Not_Fuelled_Up_NEXT
+    jsr     Rocket_Not_Fuelled_Up_5         ; 2F01: 20 07 2F 
     jmp     GOTO_NEXT_OBJECT                ; 2F04: 4C 1A 26 
 ; ------------------------------------------
+
 ; L_JSR_($2F07)_($2EE9) OK
 ; L_JSR_($2F07)_($2F01) OK
-Rocket_Fuelled_Up_5
-    ldy     #$01                            ; 2F07: A0 01    
+Rocket_Not_Fuelled_Up_5
+    ldy     #OBJECT_ROCKET_POSITION_X_PARAM ; 2F07: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F09: B1 00    
     sta     ZP04                            ; 2F0B: 85 04    
 
-    ldy     #$03                            ; 2F0D: A0 03    
+    ldy     #OBJECT_ROCKET_POSITION_Y_PARAM ; 2F0D: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F0F: B1 00    
     sta     ZP05                            ; 2F11: 85 05    
 
     jsr     Setup_Colour_RAM_Ptr            ; 2F13: 20 F7 34 
+
 ; L_JSR_($2F16)_($2EF7) OK
 ; L_BRS_($2F16)_($2F2E) OK
-Rocket_Fuelled_Up_6
+Loop_Rocket_Not_Fuelled_Up
     ldy     #$00                            ; 2F16: A0 00    
     lda     ZP1B                            ; 2F18: A5 1B    
     sta     (ZP0C),y                        ; 2F1A: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+
     iny                                     ; 2F1C: C8       
     sta     (ZP0C),y                        ; 2F1D: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+
     lda     ZP0C                            ; 2F1F: A5 0C     ZP0C_Col_RAM_Ptr_Lo
     sec                                     ; 2F21: 38       
     sbc     #$17                            ; 2F22: E9 17    
     sta     ZP0C                            ; 2F24: 85 0C     ZP0C_Col_RAM_Ptr_Lo
+
     lda     ZP0D                            ; 2F26: A5 0D     ZP0D_Col_RAM_Ptr_Hi
     sbc     #$00                            ; 2F28: E9 00    
     sta     ZP0D                            ; 2F2A: 85 0D     ZP0D_Col_RAM_Ptr_Hi
+
     dec     ZP02                            ; 2F2C: C6 02    
-    bne     Rocket_Fuelled_Up_6             ; 2F2E: D0 E6    
+    bne     Loop_Rocket_Not_Fuelled_Up      ; 2F2E: D0 E6    
+
     rts                                     ; 2F30: 60       
 ; ==========================================
 
@@ -4522,7 +4575,7 @@ Fuel_Dropped
     bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F7D: 90 33    
 
 ; Fuel cell has landed, increment the counter
-    inc     Obj_Rocket_Fuel_Lvl             ; 2F7F: EE B2 03 
+    inc     Obj_Rocket_Fuel_Level           ; 2F7F: EE B2 03 
     jsr     Load_Object_Type_X_Y_Colour     ; 2F82: 20 E9 35 
     jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 2F85: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2F88: 20 5A 30 

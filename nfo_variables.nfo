@@ -146,7 +146,7 @@ label    03AE Obj_Sound_Laser_Timer
                              ; 03B0  09 70 00 AF 01 00 00 1C
 label    03B0 Obj_Rocket     ; Type = 09, 0A when ascending, 0B when decending
 label    03B1 Obj_Rocket_X
-label    03B2 Obj_Rocket_Fuel_Lvl ; Number of fuel cells, 6=full
+label    03B2 Obj_Rocket_Fuel_Level ; Number of fuel cells, 6=full
 label    03B3 Obj_Rocket_Y
 label    03B4 Obj_Rocket_Parts_Fuel_Counter
 ;label   03B5 Obj_Rocket_5

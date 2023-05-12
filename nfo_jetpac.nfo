@@ -1725,7 +1725,7 @@ comment  2D9C Test_Collision_Position_Y, note different collision range for abov
 label    2D9C Test_Collision_Position_Y
 deflabel 2D9D HITBOX_Y_ABOVE
 comment  2DA1
-comment  2DA1 YOU ARE HERE########################################################################
+comment  2DA1 This set of routies needs more work ######################################################
 label    2DA1 Restore_Player_Objects
 comment  2DA6
 comment  2DA9
@@ -1734,27 +1734,29 @@ comment  2DAE
 deflabel 2DAF OBJECT_TYPE_VALUABLE
 comment  2DB2
 comment  2DB5
-label    2DB5 Restore_Player_Objects_2
+label    2DB5 Set_Obj_List_Ptr_To_Rocket
 lcomment 2DBB ZP00/01
 lcomment 2DBC Object Address
 word     2DBC
 comment  2DBF
 comment  2DC5
-label    2DC5 Restore_Player_Objects_3
+label    2DC5 Load_Params_Rocket_Or_Fuel
 comment  2DCB
-label    2DCB Restore_Player_Objects_4
+label    2DCB Set_Load_Obj_Type_X_Y_Colour
 comment  2DD1
 label    2DD1 Loop_Restore_Player_Objects
 comment  2DDD
 label    2DDD Set_Object_UDG_Colour
 comment  2DE3
 comment  2DE8
-label    2DE8 Restore_Player_Objects_6
-lcomment 2DEC Current wave modulus 4
-binary   2DEC
+comment  2DE8 Current wave modulus 4
+label    2DE8 Restore_Player_Ship
+binary   2DED
 comment  2DF1
 comment  2DF9
 comment  2DFF
+comment  2DFF 19 was AF, postion of Jetman or Rocket base module?
+comment  2DFF 11 handled in same way as 19
 label    2DFF Dec_Saved_Obj_List_Params_by_10
 comment  2E06
 comment  2E0D
@@ -1762,64 +1764,107 @@ comment  2E14
 comment  2E17
 comment  2E17 Aliens keep moving also
 label    2E17 ROCKET_ASCEND
-lcomment 2E1A Object height offset
-lcomment 2E1C Load object height i.e. Rocket
-lcomment 2E1E Object hit top yet
-lcomment 2E20 Yes, branch
-lcomment 2E23 Calculate new height
-lcomment 2E25 Store new height i.e one pixel up
+comment  2E1A
+comment  2E1A Test if Rocket hit top of screen yet, if yes branch
+deflabel 2E1B ROCKET_BOT_POSITION_Y_PARAM
+deflabel 2E1F ROCKET_BOT_AT_SCREEN_TOP
+comment  2E22
+comment  2E22 Calculate and store new height i.e one pixel up screen
 comment  2E27
 comment  2E27 Trigger rocket flight sound
 comment  2E31
+comment  2E34
 label    2E34 Rocket_At_Top
+comment  2E39
+comment  2E39 Transition rocket object type from ascend to descend
+deflabel 2E3A OBJECT_TYPE_PARAM
+deflabel 2E3C OBJECT_ROCKET_DESCEND
+comment  2E3F
+comment  2E3F Zero the rocket's fuel level
+deflabel 2E41 OBJECT_ROCKET_FUEL_LEVEL
+comment  2E44
+comment  2E44 Turn off the flame animation
+deflabel 2E47
+deflabel 2E47
+comment  2E4B
 comment  2E4E
-comment  2E4E Flames stop a little way before bottom
 label    2E4E ROCKET_DESCEND
 comment  2E51
 comment  2E51 Trigger rocket flight sound
 comment  2E5B
 comment  2E5B Move object Y position down 1 pixel, stopping at bottom i.e. $AF
-lcomment 2E5B 03 = Height of object
-lcomment 2E64 Hit bottom of playarea
+deflabel 2E5C ROCKET_BOT_POSITION_Y_PARAM
+comment  2E64
+comment  2E64 Test if rocket has lander
+deflabel 2E65 ROCKET_BOT_POSITION_Y
 comment  2E68
-comment  2E68 Set current object type to a crash
+comment  2E68 Set current object type to regular rocket bottom part
+deflabel 2E69 OBJECT_TYPE_PARAM
+deflabel 2E6B OBJECT_ROCKET_LANDED
+comment  2E71
 comment  2E74
-comment  2E74 This always seems to be a test for Jetman collide with Rocket
+comment  2E74 Test if Jetman collided with Rocket
 label    2E74 ROCKET_BOTTOM_MODULE
-lcomment 2E77 Jetman collided with rocket?
-lcomment 2E7A Set by collision test
-lcomment 2E7C Collision? If no, branch
 comment  2E7E
-comment  2E7E Collision occured, handle it
-lcomment 2E80 Get number of fuel cells delivered into rocket
-lcomment 2E82 Rocket fully fueled up?
+comment  2E7E Jetman collided with Rocket, test if fully fulled up
+deflabel 2E7F OBJECT_ROCKET_FUEL_LEVEL
 deflabel 2E83 FUELLED_UP
-lcomment 2E84 No, branch
 comment  2E86
-comment  2E86 Set Rocket object to Ascend
+comment  2E86 Rocket fuelled up, set Rocket object type to Ascend
 deflabel 2E87 ROCKET_ASCENDING
+deflabel 2E89 OBJECT_TYPE_PARAM
 comment  2E8F
-comment  2E8F Don't display Jetman next time? Also zeroes Jetman X coord.
+comment  2E8F Load current objects list painter to the Jetman object
 word     2E93
 comment  2E96
+comment  2E96 Load Jetman object paraments and display on screen
 comment  2E9C
+comment  2E9C Set Jetman not standing and not flying i.e. not visible
+comment  2EA1
+comment  2EA1 Increment number of lives, gets decremented again on next level start
+comment  2EA9
 comment  2EAC
-label    2EAC Rocket_Fuelled_Up
-label    2EB5 Rocket_Fuelled_Up_1
+label    2EAC Rocket_Not_Fuelled_Up
+comment  2EB5
+label    2EB5 Loop_Rocket_Not_Fuelled_Up_
 comment  2EC0
-label    2ECA Rocket_Fuelled_Up_2
-label    2EFD Rocket_Fuelled_Up_3
-label    2F01 Rocket_Fuelled_Up_4
-label    2F07 Rocket_Fuelled_Up_5
+comment  2EC8
+comment  2EAC YOU ARE HERE############################################################
+label    2ECA Rocket_Not_Fuelled_Up_2
+comment  2ECC
+comment  2ED2
+comment  2ED6
+comment  2EDD
+comment  2EDF
+comment  2EE3
+comment  2EE5
+comment  2EE9
+comment  2EEC
+comment  2EF3
+comment  2EF7
+comment  2EFD
+label    2EFD Set_ZP1B_To_01_Then_NEXT_OBJ
+comment  2F01
+label    2F01 Rocket_Not_Fuelled_Up_NEXT
+comment  2F07
+label    2F07 Rocket_Not_Fuelled_Up_5
+deflabel 2F08 OBJECT_ROCKET_POSITION_X_PARAM
 comment  2F0D
+deflabel 2F0E OBJECT_ROCKET_POSITION_Y_PARAM
 comment  2F13
-label    2F16 Rocket_Fuelled_Up_6
+comment  2F16
+label    2F16 Loop_Rocket_Not_Fuelled_Up
 lcomment 2F1A ZP0C_Col_RAM_Ptr_Lo
+comment  2F1C
 lcomment 2F1D ZP0C_Col_RAM_Ptr_Lo
+comment  2F1F
 lcomment 2F1F ZP0C_Col_RAM_Ptr_Lo
 lcomment 2F24 ZP0C_Col_RAM_Ptr_Lo
+comment  2F26
 lcomment 2F26 ZP0D_Col_RAM_Ptr_Hi
 lcomment 2F2A ZP0D_Col_RAM_Ptr_Hi
+comment  2F2C
+comment  2F30
 comment  2F31
 comment  2F31 Test if rocket part has landed, $08=middle part, $10=top part
 comment  2F31 $18=Fuel (?!)
