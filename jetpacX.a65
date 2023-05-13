@@ -98,6 +98,7 @@ ZP0C_Object_New_UDG_RAM_Lo      equ     $000C
 ZP0C_Object_UDG_RAM_Addr_Lo     equ     $000C
 ZP0C_Colour_RAM_Addr_Lo         equ     $000C
 ZP0D                            equ     $000D
+ZP0D_Colour_RAM_Tile_Addr_Lo    equ     $000D
 ZP0D_Object_New_UDG_RAM_Hi      equ     $000D
 ZP0D_Object_UDG_RAM_Addr_Hi     equ     $000D
 ZP0D_Colour_RAM_Addr_Hi         equ     $000D
@@ -269,8 +270,13 @@ OBJECT_PARAM                    equ     $06
 LIFECYCLE_STATE                 equ     $04
 FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
 OBJECT_POS_Y_WHEN_LANDED_PARAM  equ     $06
+COLUMN_INDEX                    equ     $00
 OBJECT_ROCKET_POSITION_Y_PARAM  equ     $03
 OBJECT_ROCKET_POSITION_X_PARAM  equ     $01
+COLOUR_WHITE                    equ     $01
+COLOUR_PURPLE                   equ     $04
+OBJ_ROCKET_Y???                 equ     $02
+OBJ_RCKT_PARTS_FUEL_CTR_PARAM   equ     $04
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
 OBJECT_ROCKET_FUEL_LEVEL        equ     $02
@@ -287,7 +293,6 @@ HITBOX_X                        equ     $0C
 NO_COLLISION                    equ     $00
 JETMAN_STANDING                 equ     $02
 JETMAN_FLYING                   equ     $01
-COLOUR_PURPLE                   equ     $04
 COLOUR_RED                      equ     $02
 COLOUR_YELLOW                   equ     $07
 COLOUR_BLUE                     equ     $06
@@ -326,7 +331,6 @@ OBJECT_JETMAN_DIRECTION_PARAM   equ     $02
 OBJECT_TYPE_PARAM_SAVED         equ     $06
 EXPLOSION_ANIMATION_FRAMES      equ     $07
 EXPLOSION_ANIMATION_FRAME       equ     $04
-COLOUR_WHITE                    equ     $01
 OBJECT_TYPE_EXPLOSION           equ     $03
 COLOUR_BLACK                    equ     $00
 FLAME_SPACE_AVAILABLE           equ     $AF
@@ -4340,7 +4344,7 @@ ROCKET_ASCEND
     lda     #$02                            ; 2E2C: A9 02    
     sta     Obj_Sound_Noise_Timer           ; 2E2E: 8D AC 03 
 
-    jmp     Rocket_Not_Fuelled_Up           ; 2E31: 4C AC 2E 
+    jmp     Display_Rocket                  ; 2E31: 4C AC 2E 
 ; ------------------------------------------
 
 ; L_BRS_($2E34)_($2E20) OK
@@ -4398,9 +4402,9 @@ ROCKET_DESCEND
     adc     #$01                            ; 2E60: 69 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E62: 91 00    
 
-; Test if rocket has lander
+; Test if rocket has landed
     cmp     #ROCKET_BOT_POSITION_Y          ; 2E64: C9 AF    
-    bcc     Rocket_Not_Fuelled_Up           ; 2E66: 90 44    
+    bcc     Display_Rocket                  ; 2E66: 90 44    
 
 ; Set current object type to regular rocket bottom part
     ldy     #OBJECT_TYPE_PARAM              ; 2E68: A0 00    
@@ -4408,7 +4412,7 @@ ROCKET_DESCEND
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E6C: 91 00    
     jsr     Init_Next_Jetman_Lives_Scores   ; 2E6E: 20 5B 23 
 
-    jmp     Rocket_Not_Fuelled_Up           ; 2E71: 4C AC 2E 
+    jmp     Display_Rocket                  ; 2E71: 4C AC 2E 
 ; ------------------------------------------
 
 
@@ -4437,13 +4441,13 @@ ROCKET_BOTTOM_MODULE
     jsr     Load_Object_Type_X_Y            ; 2E74: 20 D7 35 
     jsr     Test_Jetman_Object_Collide      ; 2E77: 20 58 2D 
     lda     ZP02                            ; 2E7A: A5 02    
-    bpl     Rocket_Not_Fuelled_Up           ; 2E7C: 10 2E    
+    bpl     Display_Rocket                  ; 2E7C: 10 2E    
 
 ; Jetman collided with Rocket, test if fully fulled up
     ldy     #OBJECT_ROCKET_FUEL_LEVEL       ; 2E7E: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E80: B1 00    
     cmp     #FUELLED_UP                     ; 2E82: C9 06    
-    bcc     Rocket_Not_Fuelled_Up           ; 2E84: 90 26    
+    bcc     Display_Rocket                  ; 2E84: 90 26    
 
 ; Rocket fuelled up, set Rocket object type to Ascend
     lda     #ROCKET_ASCENDING               ; 2E86: A9 0A    
@@ -4493,37 +4497,37 @@ ROCKET_BOTTOM_MODULE
 ; L_JMP_($2EAC)_($2E71) OK
 ; L_BRS_($2EAC)_($2E7C) OK
 ; L_BRS_($2EAC)_($2E84) OK
-Rocket_Not_Fuelled_Up
+Display_Rocket
     jsr     Load_Object_Type_X_Y_Colour     ; 2EAC: 20 E9 35 
     jsr     Display_Rocket_Flame            ; 2EAF: 20 AA 27 
     jsr     Set_Object_UDG_Colour           ; 2EB2: 20 DD 2D 
 
 ; L_BRS_($2EB5)_($2EBE) OK
-Loop_Rocket_Not_Fuelled_Up_
+Loop_Display_Rocket_Parts
     jsr     Restore_Player_Ship             ; 2EB5: 20 E8 2D 
     jsr     Display_Object                  ; 2EB8: 20 4C 36 
     jsr     Dec_Saved_Obj_List_Params_by_10 ; 2EBB: 20 FF 2D 
-    bne     Loop_Rocket_Not_Fuelled_Up_     ; 2EBE: D0 F5    
+    bne     Loop_Display_Rocket_Parts       ; 2EBE: D0 F5    
 
     lda     ZP_HW_IRQ_Counter_Lo            ; 2EC0: A5 4A    
     lsr     a                               ; 2EC2: 4A       
     lsr     a                               ; 2EC3: 4A       
-    and     #$04                            ; 2EC4: 29 04    
-    bne     Rocket_Not_Fuelled_Up_2         ; 2EC6: D0 02    
+    and     #%00000100                      ; 2EC4: 29 04     COLOUR_PURPLE???
+    bne     Display_Rocket_2                ; 2EC6: D0 02    
 
-    lda     #$01                            ; 2EC8: A9 01    
+    lda     #COLOUR_WHITE                   ; 2EC8: A9 01    
 ; L_BRS_($2ECA)_($2EC6) OK
-Rocket_Not_Fuelled_Up_2
-    sta     ZP1B                            ; 2ECA: 85 1B    
+Display_Rocket_2
+    sta     ZP1B_Object_Colour              ; 2ECA: 85 1B    
 
-    ldy     #$04                            ; 2ECC: A0 04    
+    ldy     #OBJ_RCKT_PARTS_FUEL_CTR_PARAM  ; 2ECC: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ECE: B1 00    
     sta     ZP02                            ; 2ED0: 85 02    
 
     cmp     #$03                            ; 2ED2: C9 03    
     bcc     Set_ZP1B_To_01_Then_NEXT_OBJ    ; 2ED4: 90 27    
 
-    ldy     #$02                            ; 2ED6: A0 02    
+    ldy     #OBJ_ROCKET_Y???                ; 2ED6: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ED8: B1 00    
     lsr     a                               ; 2EDA: 4A       
     sta     ZP13                            ; 2EDB: 85 13    
@@ -4531,42 +4535,42 @@ Rocket_Not_Fuelled_Up_2
     beq     Set_ZP1B_To_01_Then_NEXT_OBJ    ; 2EDD: F0 1E    
 
     cmp     #$03                            ; 2EDF: C9 03    
-    bcs     Rocket_Not_Fuelled_Up_NEXT      ; 2EE1: B0 1E    
+    bcs     Display_Rocket_NEXT             ; 2EE1: B0 1E    
 
     sta     ZP02                            ; 2EE3: 85 02    
 
-    lda     #$04                            ; 2EE5: A9 04    
-    sta     ZP1B                            ; 2EE7: 85 1B    
+    lda     #COLOUR_PURPLE                  ; 2EE5: A9 04    
+    sta     ZP1B_Object_Colour              ; 2EE7: 85 1B    
 
-    jsr     Rocket_Not_Fuelled_Up_5         ; 2EE9: 20 07 2F 
+    jsr     Display_Rocket_5                ; 2EE9: 20 07 2F 
 
     lda     #$03                            ; 2EEC: A9 03    
     sec                                     ; 2EEE: 38       
     sbc     ZP13                            ; 2EEF: E5 13    
     sta     ZP02                            ; 2EF1: 85 02    
 
-    lda     #$01                            ; 2EF3: A9 01    
-    sta     ZP1B                            ; 2EF5: 85 1B    
+    lda     #COLOUR_WHITE                   ; 2EF3: A9 01    
+    sta     ZP1B_Object_Colour              ; 2EF5: 85 1B    
 
-    jsr     Loop_Rocket_Not_Fuelled_Up      ; 2EF7: 20 16 2F 
+    jsr     Colourize_Rocket                ; 2EF7: 20 16 2F 
     jmp     GOTO_NEXT_OBJECT                ; 2EFA: 4C 1A 26 
 ; ------------------------------------------
 
 ; L_BRS_($2EFD)_($2ED4) OK
 ; L_BRS_($2EFD)_($2EDD) OK
 Set_ZP1B_To_01_Then_NEXT_OBJ
-    lda     #$01                            ; 2EFD: A9 01    
-    sta     ZP1B                            ; 2EFF: 85 1B    
+    lda     #COLOUR_WHITE                   ; 2EFD: A9 01    
+    sta     ZP1B_Object_Colour              ; 2EFF: 85 1B    
 
 ; L_BRS_($2F01)_($2EE1) OK
-Rocket_Not_Fuelled_Up_NEXT
-    jsr     Rocket_Not_Fuelled_Up_5         ; 2F01: 20 07 2F 
+Display_Rocket_NEXT
+    jsr     Display_Rocket_5                ; 2F01: 20 07 2F 
     jmp     GOTO_NEXT_OBJECT                ; 2F04: 4C 1A 26 
 ; ------------------------------------------
 
 ; L_JSR_($2F07)_($2EE9) OK
 ; L_JSR_($2F07)_($2F01) OK
-Rocket_Not_Fuelled_Up_5
+Display_Rocket_5
     ldy     #OBJECT_ROCKET_POSITION_X_PARAM ; 2F07: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F09: B1 00    
     sta     ZP04                            ; 2F0B: 85 04    
@@ -4579,25 +4583,31 @@ Rocket_Not_Fuelled_Up_5
 
 ; L_JSR_($2F16)_($2EF7) OK
 ; L_BRS_($2F16)_($2F2E) OK
-Loop_Rocket_Not_Fuelled_Up
-    ldy     #$00                            ; 2F16: A0 00    
-    lda     ZP1B                            ; 2F18: A5 1B    
-    sta     (ZP0C),y                        ; 2F1A: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+Colourize_Rocket
+    ldy     #COLUMN_INDEX                   ; 2F16: A0 00    
 
+; ZP02 contains number of rows to paint
+; ZP1B contains colour to paint with, $01 = white
+    lda     ZP1B_Object_Colour              ; 2F18: A5 1B    
+    sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 2F1A: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+
+; Move to next horizantal colour tile
     iny                                     ; 2F1C: C8       
-    sta     (ZP0C),y                        ; 2F1D: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 2F1D: 91 0C     ZP0C_Col_RAM_Ptr_Lo
 
-    lda     ZP0C                            ; 2F1F: A5 0C     ZP0C_Col_RAM_Ptr_Lo
+; Move up one row of colour tiles, 16-bit address lo-byte
+    lda     ZP0C_Colour_RAM_Tile_Addr_Lo    ; 2F1F: A5 0C     ZP0C_Col_RAM_Ptr_Lo
     sec                                     ; 2F21: 38       
-    sbc     #$17                            ; 2F22: E9 17    
-    sta     ZP0C                            ; 2F24: 85 0C     ZP0C_Col_RAM_Ptr_Lo
+    sbc     #SCREEN_WIDTH_COLUMNS           ; 2F22: E9 17    
+    sta     ZP0C_Colour_RAM_Tile_Addr_Lo    ; 2F24: 85 0C     ZP0C_Col_RAM_Ptr_Lo
 
-    lda     ZP0D                            ; 2F26: A5 0D     ZP0D_Col_RAM_Ptr_Hi
+; 16-bit address hi-byte
+    lda     ZP0D_Colour_RAM_Tile_Addr_Lo    ; 2F26: A5 0D     ZP0D_Col_RAM_Ptr_Hi
     sbc     #$00                            ; 2F28: E9 00    
-    sta     ZP0D                            ; 2F2A: 85 0D     ZP0D_Col_RAM_Ptr_Hi
+    sta     ZP0D_Colour_RAM_Tile_Addr_Lo    ; 2F2A: 85 0D     ZP0D_Col_RAM_Ptr_Hi
 
     dec     ZP02                            ; 2F2C: C6 02    
-    bne     Loop_Rocket_Not_Fuelled_Up      ; 2F2E: D0 E6    
+    bne     Colourize_Rocket                ; 2F2E: D0 E6    
 
     rts                                     ; 2F30: 60       
 ; ==========================================

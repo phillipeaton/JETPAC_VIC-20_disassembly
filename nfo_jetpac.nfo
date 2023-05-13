@@ -1795,7 +1795,7 @@ comment  2E5B
 comment  2E5B Move object Y position down 1 pixel, stopping at bottom i.e. $AF
 deflabel 2E5C ROCKET_BOT_POSITION_Y_PARAM
 comment  2E64
-comment  2E64 Test if rocket has lander
+comment  2E64 Test if rocket has landed
 deflabel 2E65 ROCKET_BOT_POSITION_Y
 comment  2E68
 comment  2E68 Set current object type to regular rocket bottom part
@@ -1824,43 +1824,59 @@ comment  2EA1
 comment  2EA1 Increment number of lives, gets decremented again on next level start
 comment  2EA9
 comment  2EAC
-label    2EAC Rocket_Not_Fuelled_Up
+label    2EAC Display_Rocket
 comment  2EB5
-label    2EB5 Loop_Rocket_Not_Fuelled_Up_
+label    2EB5 Loop_Display_Rocket_Parts
 comment  2EC0
+binary   2EC5
 comment  2EC8
+deflabel 2ECD OBJ_RCKT_PARTS_FUEL_CTR_PARAM
 comment  2EAC YOU ARE HERE############################################################
-label    2ECA Rocket_Not_Fuelled_Up_2
+lcomment 2EC4 COLOUR_PURPLE???
+deflabel 2EC9 COLOUR_WHITE
+label    2ECA Display_Rocket_2
 comment  2ECC
 comment  2ED2
 comment  2ED6
+deflabel 2ED7 OBJ_ROCKET_Y???
 comment  2EDD
 comment  2EDF
 comment  2EE3
 comment  2EE5
+deflabel 2EE6 COLOUR_PURPLE
 comment  2EE9
 comment  2EEC
 comment  2EF3
+deflabel 2EF4 COLOUR_WHITE
 comment  2EF7
 comment  2EFD
+deflabel 2EFE COLOUR_WHITE
 label    2EFD Set_ZP1B_To_01_Then_NEXT_OBJ
 comment  2F01
-label    2F01 Rocket_Not_Fuelled_Up_NEXT
+label    2F01 Display_Rocket_NEXT
 comment  2F07
-label    2F07 Rocket_Not_Fuelled_Up_5
+label    2F07 Display_Rocket_5
 deflabel 2F08 OBJECT_ROCKET_POSITION_X_PARAM
 comment  2F0D
 deflabel 2F0E OBJECT_ROCKET_POSITION_Y_PARAM
 comment  2F13
 comment  2F16
-label    2F16 Loop_Rocket_Not_Fuelled_Up
+deflabel 2F17 COLUMN_INDEX
+comment  2F18
+comment  2F18 ZP02 contains number of rows to paint
+comment  2F18 ZP1B contains colour to paint with, $01 = white
+label    2F16 Colourize_Rocket
 lcomment 2F1A ZP0C_Col_RAM_Ptr_Lo
 comment  2F1C
+comment  2F1C Move to next horizantal colour tile
 lcomment 2F1D ZP0C_Col_RAM_Ptr_Lo
 comment  2F1F
+comment  2F1F Move up one row of colour tiles, 16-bit address lo-byte
 lcomment 2F1F ZP0C_Col_RAM_Ptr_Lo
+deflabel 2F23 SCREEN_WIDTH_COLUMNS
 lcomment 2F24 ZP0C_Col_RAM_Ptr_Lo
 comment  2F26
+comment  2F26 16-bit address hi-byte
 lcomment 2F26 ZP0D_Col_RAM_Ptr_Hi
 lcomment 2F2A ZP0D_Col_RAM_Ptr_Hi
 comment  2F2C

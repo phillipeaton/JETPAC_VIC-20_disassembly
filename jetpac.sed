@@ -139,13 +139,23 @@
 /ZP02                            equ     $0002/a ZP02_Num_Aliens_Countdown       equ     $0002
 /; 2CF1/,/; 2D0E/s/ZP02                            /ZP02_Num_Aliens_Countdown       /
 
-#Init_Alien_Object
+# Init_Alien_Object
 /ZP02                            equ     $0002/a ZP02_Colour_Random_0_or_1       equ     $0002
 /; 2D0F/,/; 2D49/s/ZP02                            /ZP02_Colour_Random_0_or_1       /
 
 # Test_Jetman_Object_Collide
 /ZP02                            equ     $0002/a ZP02_Jetman_Collision_Status    equ     $0002
 /; 2D58/,/; 2D9E/s/ZP02                            /ZP02_Jetman_Collision_Status    /
+
+# Colourize_Rocket
+#/ZP0C                            equ     $000C/a ZP0C_Colour_RAM_Tile_Addr_Lo    equ     $000C
+/ZP0D                            equ     $000D/a ZP0D_Colour_RAM_Tile_Addr_Lo    equ     $000D
+#/ZP1B                            equ     $001B/a ZP1B_Object_Colour              equ     $001B
+/; 2EAC/,/; 2F30/s/ZP0C                            /ZP0C_Colour_RAM_Tile_Addr_Lo    /
+/; 2EAC/,/; 2F30/s/(ZP0C),y                        /(ZP0C_Colour_RAM_Tile_Addr_Lo),y/
+/; 2EAC/,/; 2F30/s/ZP0D                            /ZP0D_Colour_RAM_Tile_Addr_Lo    /
+/; 2EAC/,/; 2F30/s/ZP1B                            /ZP1B_Object_Colour              /
+
 
 
 
