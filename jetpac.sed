@@ -148,12 +148,20 @@
 /; 2D58/,/; 2D9E/s/ZP02                            /ZP02_Jetman_Collision_Status    /
 
 # Colourize_Rocket
+/ZP02                            equ     $0002/a ZP02_Rocket_Parts_Count         equ     $0002
+/ZP04                            equ     $0004/a ZP04_Colour_Tile_Position_X     equ     $0004
+/ZP05                            equ     $0005/a ZP05_Colour_Tile_Position_Y     equ     $0005
 #/ZP0C                            equ     $000C/a ZP0C_Colour_RAM_Tile_Addr_Lo    equ     $000C
 /ZP0D                            equ     $000D/a ZP0D_Colour_RAM_Tile_Addr_Lo    equ     $000D
+/ZP13                            equ     $0013/a ZP13_Rocket_Fuel_Level_Half     equ     $0013
 #/ZP1B                            equ     $001B/a ZP1B_Object_Colour              equ     $001B
+/; 2EAC/,/; 2F30/s/ZP02                            /ZP02_Rocket_Parts_Count         /
+/; 2EAC/,/; 2F30/s/ZP04                            /ZP04_Colour_Tile_Position_X     /
+/; 2EAC/,/; 2F30/s/ZP05                            /ZP05_Colour_Tile_Position_Y     /
 /; 2EAC/,/; 2F30/s/ZP0C                            /ZP0C_Colour_RAM_Tile_Addr_Lo    /
 /; 2EAC/,/; 2F30/s/(ZP0C),y                        /(ZP0C_Colour_RAM_Tile_Addr_Lo),y/
 /; 2EAC/,/; 2F30/s/ZP0D                            /ZP0D_Colour_RAM_Tile_Addr_Lo    /
+/; 2EAC/,/; 2F30/s/ZP13                            /ZP13_Rocket_Fuel_Level_Half     /
 /; 2EAC/,/; 2F30/s/ZP1B                            /ZP1B_Object_Colour              /
 
 

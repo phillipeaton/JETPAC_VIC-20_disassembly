@@ -90,7 +90,7 @@ Obj_Rocket                      equ     $03B0
 Obj_Rocket_X                    equ     $03B1
 Obj_Rocket_Fuel_Level           equ     $03B2
 Obj_Rocket_Y                    equ     $03B3
-Obj_Rocket_Parts_Fuel_Counter   equ     $03B4
+Obj_Rocket_Parts_Counter        equ     $03B4
 Obj_Rocket_Top_Or_Fuel_Type     equ     $03B8
 Obj_Rocket_Top_Or_Fuel_X        equ     $03B9
 Obj_Rocket_Top_Or_Fuel_Status   equ     $03BC
@@ -163,8 +163,8 @@ OBJECT_ROCKET_POSITION_Y_PARAM  equ     $03
 OBJECT_ROCKET_POSITION_X_PARAM  equ     $01
 COLOUR_WHITE                    equ     $01
 COLOUR_PURPLE                   equ     $04
-OBJ_ROCKET_Y???                 equ     $02
-OBJ_RCKT_PARTS_FUEL_CTR_PARAM   equ     $04
+OBJ_ROCKET_FUEL_LEVEL           equ     $02
+OBJ_ROCKET_PARTS_COUNTER_PARAM  equ     $04
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
 OBJECT_ROCKET_FUEL_LEVEL        equ     $02
@@ -4132,9 +4132,9 @@ Set_Load_Obj_Type_X_Y_Colour
 
 ; L_BRS_($2DD1)_($2DDA) OK
 Loop_Restore_Player_Objects
-    jsr     Restore_Player_Ship             ; 2DD1: 20 E8 2D 
+    jsr     Restore_Player_Rocket           ; 2DD1: 20 E8 2D 
     jsr     Display_Object_With_Setup_2     ; 2DD4: 20 04 36 
-    jsr     Dec_Saved_Obj_List_Params_by_10 ; 2DD7: 20 FF 2D 
+    jsr     Decrement_Rocket_Position_Y     ; 2DD7: 20 FF 2D 
     bne     Loop_Restore_Player_Objects     ; 2DDA: D0 F5    
     rts                                     ; 2DDC: 60       
 ; ==========================================
@@ -4154,7 +4154,7 @@ Set_Object_UDG_Colour
 ; Current wave modulus 4
 ; L_JSR_($2DE8)_($2DD1) OK
 ; L_JSR_($2DE8)_($2EB5) OK
-Restore_Player_Ship
+Restore_Player_Rocket
     lda     ZP_Wave_Active_Player           ; 2DE8: A5 59    
     lsr     a                               ; 2DEA: 4A       
     lsr     a                               ; 2DEB: 4A       
@@ -4173,9 +4173,10 @@ Restore_Player_Ship
 
 ; 19 was AF, postion of Jetman or Rocket base module?
 ; 11 handled in same way as 19
+; WOULD APPEAR ZP19 is generally object address position Y, assumedly
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
-Dec_Saved_Obj_List_Params_by_10
+Decrement_Rocket_Position_Y
     lda     ZP19                            ; 2DFF: A5 19    
     sec                                     ; 2E01: 38       
     sbc     #$10                            ; 2E02: E9 10    
@@ -4369,17 +4370,16 @@ ROCKET_BOTTOM_MODULE
 
 
 
+; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
+;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
+;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
+; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
+
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
 ; 88  Yb  YbodP   YboodP 88  Yb 888888   88
 
-; 888888 88   88 888888 88     88     888888 8888b.      88   88 88""Yb
-; 88__   88   88 88__   88     88     88__    8I  Yb     88   88 88__dP
-; 88""   Y8   8P 88""   88  .o 88  .o 88""    8I  dY     Y8   8P 88"""
-; 88     `YbodP' 888888 88ood8 88ood8 888888 8888Y"      `YbodP' 88
-
-; YOU ARE HERE############################################################
 ; L_JMP_($2EAC)_($2E31) OK
 ; L_BRS_($2EAC)_($2E66) OK
 ; L_JMP_($2EAC)_($2E71) OK
@@ -4392,46 +4392,60 @@ Display_Rocket
 
 ; L_BRS_($2EB5)_($2EBE) OK
 Loop_Display_Rocket_Parts
-    jsr     Restore_Player_Ship             ; 2EB5: 20 E8 2D 
+    jsr     Restore_Player_Rocket           ; 2EB5: 20 E8 2D 
     jsr     Display_Object                  ; 2EB8: 20 4C 36 
-    jsr     Dec_Saved_Obj_List_Params_by_10 ; 2EBB: 20 FF 2D 
+    jsr     Decrement_Rocket_Position_Y     ; 2EBB: 20 FF 2D 
     bne     Loop_Display_Rocket_Parts       ; 2EBE: D0 F5    
 
+; Bit 4 of counter used to flash rocket between white or purple colour
+; The 2xLSR changes Register A to be %0100, which is also the purple colour code
     lda     ZP_HW_IRQ_Counter_Lo            ; 2EC0: A5 4A    
     lsr     a                               ; 2EC2: 4A       
     lsr     a                               ; 2EC3: 4A       
-    and     #%00000100                      ; 2EC4: 29 04     COLOUR_PURPLE???
-    bne     Display_Rocket_2                ; 2EC6: D0 02    
+    and     #%00000100                      ; 2EC4: 29 04    
+    bne     Store_Rocket_Colour             ; 2EC6: D0 02    
 
+; Counter not %0100, so set to white instead of purple
     lda     #COLOUR_WHITE                   ; 2EC8: A9 01    
+
 ; L_BRS_($2ECA)_($2EC6) OK
-Display_Rocket_2
+Store_Rocket_Colour
     sta     ZP1B                            ; 2ECA: 85 1B    
 
-    ldy     #OBJ_RCKT_PARTS_FUEL_CTR_PARAM  ; 2ECC: A0 04    
+; Load rocket parts count, can be either 1/2/3 depending on base/Base+Mid/Base+Mid+Top built
+    ldy     #OBJ_ROCKET_PARTS_COUNTER_PARAM ; 2ECC: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ECE: B1 00    
     sta     ZP02                            ; 2ED0: 85 02    
 
+; If rocket not yet built, colourize what's built with white
     cmp     #$03                            ; 2ED2: C9 03    
-    bcc     Set_ZP1B_To_01_Then_NEXT_OBJ    ; 2ED4: 90 27    
+    bcc     Colourize_Rocket_White          ; 2ED4: 90 27    
 
-    ldy     #OBJ_ROCKET_Y???                ; 2ED6: A0 02    
+; Rocket is fully built i.e. Base+Mid+Top
+; Fuel Level ranges from 0 to 6, divide by 2 and store
+    ldy     #OBJ_ROCKET_FUEL_LEVEL          ; 2ED6: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ED8: B1 00    
     lsr     a                               ; 2EDA: 4A       
     sta     ZP13                            ; 2EDB: 85 13    
 
-    beq     Set_ZP1B_To_01_Then_NEXT_OBJ    ; 2EDD: F0 1E    
+; If no fuel to display yet, colourize it all with white
+    beq     Colourize_Rocket_White          ; 2EDD: F0 1E    
 
+; Fuel to display is 6/2=3, i.e. fully fuelled, flash rocket in with current colour purple/white
     cmp     #$03                            ; 2EDF: C9 03    
-    bcs     Display_Rocket_NEXT             ; 2EE1: B0 1E    
+    bcs     Colourize_Rocket_NEXT           ; 2EE1: B0 1E    
 
+; Fuel to display is less than 6/2=3, store fuel level/2
+; Base or base+mid to be coloured purple
     sta     ZP02                            ; 2EE3: 85 02    
 
     lda     #COLOUR_PURPLE                  ; 2EE5: A9 04    
     sta     ZP1B                            ; 2EE7: 85 1B    
 
-    jsr     Display_Rocket_5                ; 2EE9: 20 07 2F 
+    jsr     Colourize_Rocket_Setup_RAM_Ptr  ; 2EE9: 20 07 2F 
 
+; Calculate number of rocket parts remaining to be coloured white i.e. not base or base+mid
+; by subtracting from 3 and store number of rows to colour to Rocket_Parts_Count
     lda     #$03                            ; 2EEC: A9 03    
     sec                                     ; 2EEE: 38       
     sbc     ZP13                            ; 2EEF: E5 13    
@@ -4446,19 +4460,19 @@ Display_Rocket_2
 
 ; L_BRS_($2EFD)_($2ED4) OK
 ; L_BRS_($2EFD)_($2EDD) OK
-Set_ZP1B_To_01_Then_NEXT_OBJ
+Colourize_Rocket_White
     lda     #COLOUR_WHITE                   ; 2EFD: A9 01    
     sta     ZP1B                            ; 2EFF: 85 1B    
 
 ; L_BRS_($2F01)_($2EE1) OK
-Display_Rocket_NEXT
-    jsr     Display_Rocket_5                ; 2F01: 20 07 2F 
+Colourize_Rocket_NEXT
+    jsr     Colourize_Rocket_Setup_RAM_Ptr  ; 2F01: 20 07 2F 
     jmp     GOTO_NEXT_OBJECT                ; 2F04: 4C 1A 26 
 ; ------------------------------------------
 
 ; L_JSR_($2F07)_($2EE9) OK
 ; L_JSR_($2F07)_($2F01) OK
-Display_Rocket_5
+Colourize_Rocket_Setup_RAM_Ptr
     ldy     #OBJECT_ROCKET_POSITION_X_PARAM ; 2F07: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F09: B1 00    
     sta     ZP04                            ; 2F0B: 85 04    
@@ -4477,22 +4491,22 @@ Colourize_Rocket
 ; ZP02 contains number of rows to paint
 ; ZP1B contains colour to paint with, $01 = white
     lda     ZP1B                            ; 2F18: A5 1B    
-    sta     (ZP0C),y                        ; 2F1A: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 2F1A: 91 0C    
 
 ; Move to next horizantal colour tile
     iny                                     ; 2F1C: C8       
-    sta     (ZP0C),y                        ; 2F1D: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 2F1D: 91 0C    
 
 ; Move up one row of colour tiles, 16-bit address lo-byte
-    lda     ZP0C                            ; 2F1F: A5 0C     ZP0C_Col_RAM_Ptr_Lo
+    lda     ZP0C                            ; 2F1F: A5 0C    
     sec                                     ; 2F21: 38       
     sbc     #SCREEN_WIDTH_COLUMNS           ; 2F22: E9 17    
-    sta     ZP0C                            ; 2F24: 85 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     ZP0C                            ; 2F24: 85 0C    
 
 ; 16-bit address hi-byte
-    lda     ZP0D                            ; 2F26: A5 0D     ZP0D_Col_RAM_Ptr_Hi
+    lda     ZP0D                            ; 2F26: A5 0D    
     sbc     #$00                            ; 2F28: E9 00    
-    sta     ZP0D                            ; 2F2A: 85 0D     ZP0D_Col_RAM_Ptr_Hi
+    sta     ZP0D                            ; 2F2A: 85 0D    
 
     dec     ZP02                            ; 2F2C: C6 02    
     bne     Colourize_Rocket                ; 2F2E: D0 E6    
@@ -4515,6 +4529,8 @@ Colourize_Rocket
 ; Yb   dP 88"Yb      88""   Y8   8P 88""   88  .o
 ;  YbodP  88  Yb     88     `YbodP' 888888 88ood8
 ; #########################################################################################
+
+; YOU ARE HERE############################################################
 
 ; Test if rocket part has landed, $08=middle part, $10=top part
 ; $18=Fuel (?!)
@@ -4543,7 +4559,7 @@ Rocket_Part_Or_Fuel_Dropped
     jsr     Load_Rocket_or_Fuel_UDGs        ; 2F4B: 20 54 30 
 
 ; Multiply rocket direction(???) by $10 and store
-    lda     Obj_Rocket_Parts_Fuel_Counter   ; 2F4E: AD B4 03 
+    lda     Obj_Rocket_Parts_Counter        ; 2F4E: AD B4 03 
     asl     a                               ; 2F51: 0A       
     asl     a                               ; 2F52: 0A       
     asl     a                               ; 2F53: 0A       
@@ -4557,7 +4573,7 @@ Rocket_Part_Or_Fuel_Dropped
     sbc     ZP13                            ; 2F5B: E5 13    
     sta     ZP19                            ; 2F5D: 85 19    
     jsr     Load_Rocket_or_Fuel_UDGs_1      ; 2F5F: 20 57 30 
-    inc     Obj_Rocket_Parts_Fuel_Counter   ; 2F62: EE B4 03 
+    inc     Obj_Rocket_Parts_Counter        ; 2F62: EE B4 03 
 
 ; Turn Rocket Middle Section object off in list
 ; L_JMP_($2F65)_($2871) OK

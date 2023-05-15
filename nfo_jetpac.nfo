@@ -1750,14 +1750,15 @@ label    2DDD Set_Object_UDG_Colour
 comment  2DE3
 comment  2DE8
 comment  2DE8 Current wave modulus 4
-label    2DE8 Restore_Player_Ship
+label    2DE8 Restore_Player_Rocket
 binary   2DED
 comment  2DF1
 comment  2DF9
 comment  2DFF
 comment  2DFF 19 was AF, postion of Jetman or Rocket base module?
 comment  2DFF 11 handled in same way as 19
-label    2DFF Dec_Saved_Obj_List_Params_by_10
+comment  2DFF WOULD APPEAR ZP19 is generally object address position Y, assumedly
+label    2DFF Decrement_Rocket_Position_Y
 comment  2E06
 comment  2E0D
 comment  2E14
@@ -1830,32 +1831,44 @@ label    2EB5 Loop_Display_Rocket_Parts
 comment  2EC0
 binary   2EC5
 comment  2EC8
-deflabel 2ECD OBJ_RCKT_PARTS_FUEL_CTR_PARAM
-comment  2EAC YOU ARE HERE############################################################
-lcomment 2EC4 COLOUR_PURPLE???
+deflabel 2ECD OBJ_ROCKET_PARTS_COUNTER_PARAM
+comment  2EC0 Bit 4 of counter used to flash rocket between white or purple colour
+comment  2EC0 The 2xLSR changes Register A to be %0100, which is also the purple colour code
+comment  2EC8 Counter not %0100, so set to white instead of purple
 deflabel 2EC9 COLOUR_WHITE
-label    2ECA Display_Rocket_2
+comment  2ECA
+label    2ECA Store_Rocket_Colour
 comment  2ECC
+comment  2ECC Load rocket parts count, can be either 1/2/3 depending on base/Base+Mid/Base+Mid+Top built
 comment  2ED2
+comment  2ED2 If rocket not yet built, colourize what's built with white
 comment  2ED6
-deflabel 2ED7 OBJ_ROCKET_Y???
+comment  2ED6 Rocket is fully built i.e. Base+Mid+Top
+comment  2ED6 Fuel Level ranges from 0 to 6, divide by 2 and store
+deflabel 2ED7 OBJ_ROCKET_FUEL_LEVEL
 comment  2EDD
+comment  2EDD If no fuel to display yet, colourize it all with white
 comment  2EDF
+comment  2EDF Fuel to display is 6/2=3, i.e. fully fuelled, flash rocket in with current colour purple/white
 comment  2EE3
+comment  2EE3 Fuel to display is less than 6/2=3, store fuel level/2
+comment  2EE3 Base or base+mid to be coloured purple
 comment  2EE5
 deflabel 2EE6 COLOUR_PURPLE
 comment  2EE9
 comment  2EEC
+comment  2EEC Calculate number of rocket parts remaining to be coloured white i.e. not base or base+mid
+comment  2EEC by subtracting from 3 and store number of rows to colour to Rocket_Parts_Count
 comment  2EF3
 deflabel 2EF4 COLOUR_WHITE
 comment  2EF7
 comment  2EFD
 deflabel 2EFE COLOUR_WHITE
-label    2EFD Set_ZP1B_To_01_Then_NEXT_OBJ
+label    2EFD Colourize_Rocket_White
 comment  2F01
-label    2F01 Display_Rocket_NEXT
+label    2F01 Colourize_Rocket_NEXT
 comment  2F07
-label    2F07 Display_Rocket_5
+label    2F07 Colourize_Rocket_Setup_RAM_Ptr
 deflabel 2F08 OBJECT_ROCKET_POSITION_X_PARAM
 comment  2F0D
 deflabel 2F0E OBJECT_ROCKET_POSITION_Y_PARAM
@@ -1866,21 +1879,17 @@ comment  2F18
 comment  2F18 ZP02 contains number of rows to paint
 comment  2F18 ZP1B contains colour to paint with, $01 = white
 label    2F16 Colourize_Rocket
-lcomment 2F1A ZP0C_Col_RAM_Ptr_Lo
 comment  2F1C
 comment  2F1C Move to next horizantal colour tile
-lcomment 2F1D ZP0C_Col_RAM_Ptr_Lo
 comment  2F1F
 comment  2F1F Move up one row of colour tiles, 16-bit address lo-byte
-lcomment 2F1F ZP0C_Col_RAM_Ptr_Lo
 deflabel 2F23 SCREEN_WIDTH_COLUMNS
-lcomment 2F24 ZP0C_Col_RAM_Ptr_Lo
 comment  2F26
 comment  2F26 16-bit address hi-byte
-lcomment 2F26 ZP0D_Col_RAM_Ptr_Hi
-lcomment 2F2A ZP0D_Col_RAM_Ptr_Hi
 comment  2F2C
 comment  2F30
+comment  2F31
+comment  2F31 YOU ARE HERE############################################################
 comment  2F31
 comment  2F31 Test if rocket part has landed, $08=middle part, $10=top part
 comment  2F31 $18=Fuel (?!)
