@@ -1868,6 +1868,7 @@ label    2EFD Colourize_Rocket_White
 comment  2F01
 label    2F01 Colourize_Rocket_NEXT
 comment  2F07
+comment  2F07 Setup the Colour RAM address where the rocket is and then colourize it
 label    2F07 Colourize_Rocket_Setup_RAM_Ptr
 deflabel 2F08 OBJECT_ROCKET_POSITION_X_PARAM
 comment  2F0D
@@ -1889,10 +1890,7 @@ comment  2F26 16-bit address hi-byte
 comment  2F2C
 comment  2F30
 comment  2F31
-comment  2F31 YOU ARE HERE############################################################
-comment  2F31
-comment  2F31 Test if rocket part has landed, $08=middle part, $10=top part
-comment  2F31 $18=Fuel (?!)
+comment  2F31 Test if rocket part has landed, $08=Middle, $10=Top, $18=Fuel
 label    2F31 Rocket_Part_Or_Fuel_Dropped
 deflabel 2F32 OBJECT_POS_Y_WHEN_LANDED_PARAM
 comment  2F39
@@ -1907,17 +1905,19 @@ comment  2F43 Note, using direct addressing, not using Y offset
 lcomment 2F46 Set bit 0
 binary   2F47
 comment  2F4E
-comment  2F4E Multiply rocket direction(???) by $10 and store
+comment  2F4E Calculate Position Y offset when object lands based on how many rocket pieces have
+comment  2F4E previosuly landed ($10 when rocket middle landed, $20 for top section landed)
 comment  2F57
-comment  2F57 Subtract ZP13 ($10 when rocket middle landed, $20 for top section landed) from
-comment  2F57 Rocket Part Bottom Y position and store in Obj_Y_Position_2
+comment  2F57 Calculate object landed Position Y and store
+comment  2F5F
 comment  2F65
-comment  2F65 Turn Rocket Middle Section object off in list
+comment  2F65 Turn Rocket Middle Section object off in object list
 label    2F65 Disable_Object_In_List
 comment  2F6A
 comment  2F6A Trigger sound for valuable pickup and rocket part/fuel cell
 comment  2F6A landing on rocket base
 comment  2F74
+comment  2F77
 label    2F77 Fuel_Dropped
 deflabel 2F78 OBJECT_POSITION_Y_PARAM
 deflabel 2F7C FUEL_POSITION_Y_WHEN_LANDED
@@ -1939,26 +1939,32 @@ label    2F8E ROCKET_PART_OR_FUEL
 comment  2F91
 comment  2F91 Test status of the rocket part or fuel cell object
 comment  2F91 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
-deflabel 2F92 LIFECYCLE_STATE
+deflabel 2F92 OBJ_LIFECYCLE_STATE
+comment  2F9A
+comment  2F9F
 comment  2FA4
-comment  2FA4 Test if Jetman has collided with a rocket part or fuel cell?
+comment  2FA4 Test if Jetman has collided with a rocket part or fuel cell, branch if yes
 comment  2FAB
-comment  2FAB Test if rocket part or fuel cell has landed on a platform
+comment  2FAB No Jetman collision, test if rocket part or fuel cell has landed on a platform, branch if yes
 comment  2FAB Rocket top part only falls when middle part deposited
-comment  2FAB DEBUG NOP the JSR and rocket part or fuel keeps falling
 comment  2FB2
-comment  2FB2 Move object down by 2 pixels, make Y an odd number
+comment  2FB2 Move object down by 2 pixels, make Position Y an odd number
 label    2FB2 Rocket_Part_Or_Fuel_Move_Down
 deflabel 2FB3 OBJECT_POSITION_Y_PARAM
 comment  2FBD
-comment  2FBD Load current object attributes into ZP variables and object index into A
+comment  2FBD Load current object attributes into ZP variables and object index into Register A
 label    2FBD Setup_Object_Addr_Rocket_Fuel
 comment  2FC3
 comment  2FC3 Using index into object data, get addr of object data to A and Y and setup into ZP
 label    2FC3 Setup_Object_Addr
 comment  2FCB
 comment  2FCB Do it again to setup the object dimensions
+comment  2FD1
+
 comment  2FDA
+comment  2FDA YOU ARE HERE############################################################
+comment  2FDA
+
 comment  2FDA Return object's UDG data address offset for Rocket Middle Section/Fuel
 comment  2FDA depending on which of the four levels (or multiple of) the player is currently on
 label    2FDA Get_Obj_UDG_Data_Addr_Ship_Lvl

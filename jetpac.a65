@@ -155,7 +155,7 @@ PLATFORM_DATA_TABLE_ADDR_HI     equ     $31
 PLATFORM_DATA_TABLE_ADDR_LO     equ     $B6
 OBJECT_POSITION_X               equ     $01
 OBJECT_PARAM                    equ     $06
-LIFECYCLE_STATE                 equ     $04
+OBJ_LIFECYCLE_STATE             equ     $04
 FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
 OBJECT_POS_Y_WHEN_LANDED_PARAM  equ     $06
 COLUMN_INDEX                    equ     $00
@@ -4470,6 +4470,7 @@ Colourize_Rocket_NEXT
     jmp     GOTO_NEXT_OBJECT                ; 2F04: 4C 1A 26 
 ; ------------------------------------------
 
+; Setup the Colour RAM address where the rocket is and then colourize it
 ; L_JSR_($2F07)_($2EE9) OK
 ; L_JSR_($2F07)_($2F01) OK
 Colourize_Rocket_Setup_RAM_Ptr
@@ -4530,10 +4531,7 @@ Colourize_Rocket
 ;  YbodP  88  Yb     88     `YbodP' 888888 88ood8
 ; #########################################################################################
 
-; YOU ARE HERE############################################################
-
-; Test if rocket part has landed, $08=middle part, $10=top part
-; $18=Fuel (?!)
+; Test if rocket part has landed, $08=Middle, $10=Top, $18=Fuel
 ; L_BRS_($2F31)_($2F98) OK
 Rocket_Part_Or_Fuel_Dropped
     ldy     #OBJECT_POS_Y_WHEN_LANDED_PARAM ; 2F31: A0 06    
@@ -4558,7 +4556,8 @@ Rocket_Part_Or_Fuel_Dropped
     sta     Obj_Rocket_Top_Or_Fuel_Status   ; 2F48: 8D BC 03 
     jsr     Load_Rocket_or_Fuel_UDGs        ; 2F4B: 20 54 30 
 
-; Multiply rocket direction(???) by $10 and store
+; Calculate Position Y offset when object lands based on how many rocket pieces have
+; previosuly landed ($10 when rocket middle landed, $20 for top section landed)
     lda     Obj_Rocket_Parts_Counter        ; 2F4E: AD B4 03 
     asl     a                               ; 2F51: 0A       
     asl     a                               ; 2F52: 0A       
@@ -4566,16 +4565,16 @@ Rocket_Part_Or_Fuel_Dropped
     asl     a                               ; 2F54: 0A       
     sta     ZP13                            ; 2F55: 85 13    
 
-; Subtract ZP13 ($10 when rocket middle landed, $20 for top section landed) from
-; Rocket Part Bottom Y position and store in Obj_Y_Position_2
+; Calculate object landed Position Y and store
     lda     Obj_Rocket_Y                    ; 2F57: AD B3 03 
     sec                                     ; 2F5A: 38       
     sbc     ZP13                            ; 2F5B: E5 13    
     sta     ZP19                            ; 2F5D: 85 19    
+
     jsr     Load_Rocket_or_Fuel_UDGs_1      ; 2F5F: 20 57 30 
     inc     Obj_Rocket_Parts_Counter        ; 2F62: EE B4 03 
 
-; Turn Rocket Middle Section object off in list
+; Turn Rocket Middle Section object off in object list
 ; L_JMP_($2F65)_($2871) OK
 ; L_JMP_($2F65)_($2F8B) OK
 Disable_Object_In_List
@@ -4592,6 +4591,7 @@ Disable_Object_In_List
 
     jmp     GOTO_NEXT_OBJECT                ; 2F74: 4C 1A 26 
 ; ------------------------------------------
+
 ; L_BRS_($2F77)_($2F37) OK
 Fuel_Dropped
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2F77: A0 03    
@@ -4623,28 +4623,29 @@ ROCKET_PART_OR_FUEL
 
 ; Test status of the rocket part or fuel cell object
 ; 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
-    ldy     #LIFECYCLE_STATE                ; 2F91: A0 04    
+    ldy     #OBJ_LIFECYCLE_STATE            ; 2F91: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F93: B1 00    
     bit     MASK_00000100                   ; 2F95: 2C 16 20 
     bne     Rocket_Part_Or_Fuel_Dropped     ; 2F98: D0 97    
+
     bit     MASK_00000010                   ; 2F9A: 2C 15 20 
     bne     Copy_Jetman_XY_To_Object        ; 2F9D: D0 7F    
+
     bit     MASK_00000001                   ; 2F9F: 2C 14 20 
     beq     Setup_Object_Addr_Rocket_Fuel   ; 2FA2: F0 19    
 
-; Test if Jetman has collided with a rocket part or fuel cell?
+; Test if Jetman has collided with a rocket part or fuel cell, branch if yes
     jsr     Test_Jetman_Object_Collide      ; 2FA4: 20 58 2D 
     lda     ZP02                            ; 2FA7: A5 02    
     bmi     Jetman_Collide_Rocket_Fuel      ; 2FA9: 30 43    
 
-; Test if rocket part or fuel cell has landed on a platform
+; No Jetman collision, test if rocket part or fuel cell has landed on a platform, branch if yes
 ; Rocket top part only falls when middle part deposited
-; DEBUG NOP the JSR and rocket part or fuel keeps falling
     jsr     Test_Platform_Collision         ; 2FAB: 20 B3 30 
     lda     ZP02                            ; 2FAE: A5 02    
     bmi     Setup_Object_Addr_Rocket_Fuel   ; 2FB0: 30 0B    
 
-; Move object down by 2 pixels, make Y an odd number
+; Move object down by 2 pixels, make Position Y an odd number
 ; L_BRS_($2FB2)_($2F41) OK
 ; L_BRS_($2FB2)_($2F7D) OK
 Rocket_Part_Or_Fuel_Move_Down
@@ -4655,7 +4656,7 @@ Rocket_Part_Or_Fuel_Move_Down
     ora     #$01                            ; 2FB9: 09 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2FBB: 91 00    
 
-; Load current object attributes into ZP variables and object index into A
+; Load current object attributes into ZP variables and object index into Register A
 ; L_BRS_($2FBD)_($2FA2) OK
 ; L_BRS_($2FBD)_($2FB0) OK
 ; L_JMP_($2FBD)_($301B) OK
@@ -4675,6 +4676,7 @@ Setup_Object_Addr
 ; Do it again to setup the object dimensions
     jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2FCB: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2FCE: 20 8D 37 
+
     jsr     Display_Object                  ; 2FD1: 20 4C 36 
     jsr     Colourize_Object                ; 2FD4: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2FD7: 4C 1A 26 
@@ -4698,6 +4700,8 @@ Setup_Object_Addr
 ; `Ybo." 88  88 88 88__dP     88__   88   88 88__   88          Yb  dP    dPYb   88
 ; o.`Y8b 888888 88 88"""      88""   Y8   8P 88""   88  .o       YbdP    dP__Yb  88  .o
 ; 8bodP' 88  88 88 88         88     `YbodP' 888888 88ood8        YP    dP""""Yb 88ood8
+
+; YOU ARE HERE############################################################
 
 ; Return object's UDG data address offset for Rocket Middle Section/Fuel
 ; depending on which of the four levels (or multiple of) the player is currently on

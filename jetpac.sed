@@ -164,6 +164,14 @@
 /; 2EAC/,/; 2F30/s/ZP13                            /ZP13_Rocket_Fuel_Level_Half     /
 /; 2EAC/,/; 2F30/s/ZP1B                            /ZP1B_Object_Colour              /
 
+# Rocket_Part_Or_Fuel_Dropped
+/ZP13                            equ     $0013/a ZP13_Obj_Landed_Posn_Y_Offset   equ     $0013
+/ZP19                            equ     $0019/a ZP19_Obj_Landed_Position_Y      equ     $0019
+/; 2F31/,/; 2F8B/s/ZP13                            /ZP13_Obj_Landed_Posn_Y_Offset   /
+/; 2F31/,/; 2F8B/s/ZP19                            /ZP19_Obj_Landed_Position_Y      /
+
+
+
 
 
 
