@@ -1890,9 +1890,9 @@ comment  2F26 16-bit address hi-byte
 comment  2F2C
 comment  2F30
 comment  2F31
-comment  2F31 Test if rocket part has landed, $08=Middle, $10=Top, $18=Fuel
+comment  2F31 Test if rocket part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
 label    2F31 Rocket_Part_Or_Fuel_Dropped
-deflabel 2F32 OBJECT_POS_Y_WHEN_LANDED_PARAM
+deflabel 2F32 OBJECT_OBJ_UDG_DATA_OFFSET
 comment  2F39
 comment  2F39 Rocket part dropped, add current Y postion to landed Y position
 comment  2F39 and test to see if object has hit the ground
@@ -1960,39 +1960,50 @@ label    2FC3 Setup_Object_Addr
 comment  2FCB
 comment  2FCB Do it again to setup the object dimensions
 comment  2FD1
-
 comment  2FDA
-comment  2FDA YOU ARE HERE############################################################
-comment  2FDA
-
 comment  2FDA Return object's UDG data address offset for Rocket Middle Section/Fuel
 comment  2FDA depending on which of the four levels (or multiple of) the player is currently on
-label    2FDA Get_Obj_UDG_Data_Addr_Ship_Lvl
+label    2FDA Load_Obj_UDG_Data_Addr_Ship_Wv
 comment  2FDC
-comment  2FDC Calculate and return object's UDG data address offset based on A e.g. player wave
-comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat
-label    2FDC Get_Obj_UDG_Data_Addr_Ship_A
+comment  2FDC Calculate and update object's UDG data address offset in Register A based on player wave.
+comment  2FDC First ship is for levels 0-3, second ship for levels 4-7 then repeat.
+comment  2FDC UDG data address consists of two parts, large offset $0/8/10/18 for ship top/mid/bott/fuel
+comment  2FDC plus small offset of $0/2/4/6 calculated below to select between models of ship.
+comment  2FDC VIC version has only two, but there appears to be slots for two more like in the ZX Spectrum,
+comment  2FDC but should be easy to add the ships on with 16K RAM.
+label    2FDC Load_Obj_UDG_Data_Addr_Ship
 binary   2FDE
-deflabel 2FE0 OBJECT_PARAM
+deflabel 2FE0 OBJECT_UDG_DATA_INDEX_PARAM
 comment  2FE5
 comment  2FE5 Using A as offset, Load A and Y with address of Ship, Fuel or Valuable UDG data
-label    2FE5 Get_Obj_UDG_Data_Addr_S_F_V
+label    2FE5 Load_Obj_UDG_Data_Addr_S_F_V
 comment  2FEE
 comment  2FEE At point when Jetman picks up Rocket or Fuel module
 label    2FEE Jetman_Collide_Rocket_Fuel
-lcomment 2FF1 Diag attrib? Not sure...
-lcomment 2FF5 Zero all bits except bit 1 i.e. 000000x0
+binary   2FF6
 comment  2FF9
 comment  2FF9 Jetman pickup Rocket Module / Fuel Cell = 100 points
+lcomment 2FFC ZP02/03
+deflabel 2FF2 OBJECT_STATUS_PARAM
+deflabel 2FF6 OBJECT_STATUS_PICKED_UP
+lcomment 2FFD 100 Points
 word     2FFD
 const    2FFD
 comment  3003
 comment  3003 Trigger collision pickup sound
-lcomment 3005 Flame object X pos??
-lcomment 300A Flame object direction?
 comment  300D
-lcomment 3012 Store current Jetman object X pos into current object?
-lcomment 3019 Store current Jetman object Y pos into current object?
+comment  300D Store current Jetman Position X into current picked-up object
+deflabel 300E JETMAN_POSITION_X_PARAM
+comment  3014
+comment  3014 Store current Jetman Position Y into current picked-up object
+deflabel 3015 JETMAN_POSITION_Y_PARAM
+comment  301B
+comment  301E
+
+comment  301E
+comment  301E YOU ARE HERE ######################################################################
+comment  301E
+
 label    301E Copy_Jetman_XY_To_Object
 comment  3028
 comment  302F

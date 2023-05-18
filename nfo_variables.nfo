@@ -163,7 +163,7 @@ label    03BC Obj_Rocket_Top_Or_Fuel_Status ; Rocket part Ready for pick-up/pick
                                             ; xxxx_xx1x = Picked-up by Jetman
                                             ; xxxx_x1xx = Dropping
 ;label   03BD Obj_Rocket_Top_Or_Fuel_5
-;label   03BE Obj_Rocket_Top_Or_Fuel_6 ; Height when rocket part/fuel cell has landed
+;label   03BE Obj_Rocket_Top_Or_Fuel_6 ; OBJECT_UDG_DATA_INDEX_PARAM
 ;label   03BF Obj_Rocket_Top_Or_Fuel_7
 
 ; Rocket Part Middle, then a valuable e.g. 03C0  0E 58 00 5E 00 03 28 18
@@ -173,7 +173,7 @@ label    03C1 Obj_Rocket_Mid_Or_Valuable_X
 ;label   03C3 Obj_Rocket_Mid_Or_Valuable_Y
 label    03C4 Obj_Rocket_Mid_Or_Valu_Status
 ;label   03C5 Obj_Rocket_Mid_Or_Valu_Colour
-label    03C6 Obj_Rocket_Mid_Or_Valu_Type
+label    03C6 Obj_Rocket_Mid_Or_Valu_UDG_Idx   ; OBJECT_UDG_DATA_INDEX_PARAM
 label    03C7 Obj_Rocket_Mid_Or_Valuable_7
 
 

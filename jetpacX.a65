@@ -215,7 +215,7 @@ Obj_Rocket_Top_Or_Fuel_Status   equ     $03BC
 Obj_Rocket_Mid_Or_Valuable_Typ  equ     $03C0
 Obj_Rocket_Mid_Or_Valuable_X    equ     $03C1
 Obj_Rocket_Mid_Or_Valu_Status   equ     $03C4
-Obj_Rocket_Mid_Or_Valu_Type     equ     $03C6
+Obj_Rocket_Mid_Or_Valu_UDG_Idx  equ     $03C6
 Obj_Alien_0_0                   equ     $03C8
 UDG_RAM                         equ     $1000
 Player_1_Score_UDG_RAM_Addr     equ     $1008
@@ -272,10 +272,12 @@ PLATFORM_NUMBER_COUNTDOWN       equ     $03
 PLATFORM_DATA_TABLE_ADDR_HI     equ     $31
 PLATFORM_DATA_TABLE_ADDR_LO     equ     $B6
 OBJECT_POSITION_X               equ     $01
-OBJECT_PARAM                    equ     $06
+OBJECT_STATUS_PICKED_UP         equ     %00000010
+OBJECT_STATUS_PARAM             equ     $04
+OBJECT_UDG_DATA_INDEX_PARAM     equ     $06
 OBJ_LIFECYCLE_STATE             equ     $04
 FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
-OBJECT_POS_Y_WHEN_LANDED_PARAM  equ     $06
+OBJECT_OBJ_UDG_DATA_OFFSET      equ     $06
 COLUMN_INDEX                    equ     $00
 OBJECT_ROCKET_POSITION_Y_PARAM  equ     $03
 OBJECT_ROCKET_POSITION_X_PARAM  equ     $01
@@ -1209,7 +1211,7 @@ Loop_Reset_Objects
     pha                                     ; 231B: 48       
 
     jsr     Load_Object_Type_X_Y_Colour     ; 231C: 20 E9 35 
-    jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 231F: 20 DA 2F 
+    jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 231F: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2322: 20 5A 30 
 
 ; Move 16-bit address pointer to next object i.e. 8 bytes ahead
@@ -2637,8 +2639,8 @@ Valuable_Landed
 
 ; Object has been picked-up, remove from screen. S F V = Ship Fuel Valuable
     lda     #$00                            ; 2859: A9 00    
-    jsr     Get_Obj_UDG_Data_Addr_Ship_A    ; 285B: 20 DC 2F 
-    jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 285E: 20 E5 2F 
+    jsr     Load_Obj_UDG_Data_Addr_Ship     ; 285B: 20 DC 2F 
+    jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 285E: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2861: 20 8D 37 
     jsr     Display_Object_With_Setup_4     ; 2864: 20 10 36 
 
@@ -3613,7 +3615,7 @@ Loop_Init_Obj_Valuable
 ; L_BRS_($2BC2)_($2BBE) OK
 Store_Valuable_Type
     ora     #%00100000                      ; 2BC2: 09 20    
-    sta     Obj_Rocket_Mid_Or_Valu_Type     ; 2BC4: 8D C6 03 
+    sta     Obj_Rocket_Mid_Or_Valu_UDG_Idx  ; 2BC4: 8D C6 03 
 
 ; $03C0 object starts as Rocket Module Middle, then becomes Fuel Cell
 ; L_JSR_($2BC7)_($2DC5) OK
@@ -4281,11 +4283,11 @@ Restore_Player_Rocket
     asl     a                               ; 2DF0: 0A       
 
     pha                                     ; 2DF1: 48       
-    jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2DF2: 20 E5 2F 
+    jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 2DF2: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 2DF5: 20 3D 37 
     pla                                     ; 2DF8: 68       
 
-    jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2DF9: 20 E5 2F 
+    jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 2DF9: 20 E5 2F 
     jmp     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2DFC: 4C 8D 37 
 ; ------------------------------------------
 
@@ -4649,10 +4651,10 @@ Colourize_Rocket
 ;  YbodP  88  Yb     88     `YbodP' 888888 88ood8
 ; #########################################################################################
 
-; Test if rocket part has landed, $08=Middle, $10=Top, $18=Fuel
+; Test if rocket part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
 ; L_BRS_($2F31)_($2F98) OK
 Rocket_Part_Or_Fuel_Dropped
-    ldy     #OBJECT_POS_Y_WHEN_LANDED_PARAM ; 2F31: A0 06    
+    ldy     #OBJECT_OBJ_UDG_DATA_OFFSET     ; 2F31: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F33: B1 00    
     cmp     #$18                            ; 2F35: C9 18    
     beq     Fuel_Dropped                    ; 2F37: F0 3E    
@@ -4720,7 +4722,7 @@ Fuel_Dropped
 ; Fuel cell has landed, increment the counter
     inc     Obj_Rocket_Fuel_Level           ; 2F7F: EE B2 03 
     jsr     Load_Object_Type_X_Y_Colour     ; 2F82: 20 E9 35 
-    jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 2F85: 20 DA 2F 
+    jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 2F85: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2F88: 20 5A 30 
     jmp     Disable_Object_In_List          ; 2F8B: 4C 65 2F 
 ; ------------------------------------------
@@ -4781,18 +4783,18 @@ Rocket_Part_Or_Fuel_Move_Down
 ; L_JMP_($2FBD)_($3051) OK
 Setup_Object_Addr_Rocket_Fuel
     jsr     Load_Object_Type_X_Y_Colour     ; 2FBD: 20 E9 35 
-    jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 2FC0: 20 DA 2F 
+    jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 2FC0: 20 DA 2F 
 
 ; Using index into object data, get addr of object data to A and Y and setup into ZP
 ; L_JMP_($2FC3)_($289C) OK
 Setup_Object_Addr
     pha                                     ; 2FC3: 48       
-    jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2FC4: 20 E5 2F 
+    jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 2FC4: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 2FC7: 20 3D 37 
     pla                                     ; 2FCA: 68       
 
 ; Do it again to setup the object dimensions
-    jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 2FCB: 20 E5 2F 
+    jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 2FCB: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2FCE: 20 8D 37 
 
     jsr     Display_Object                  ; 2FD1: 20 4C 36 
@@ -4819,24 +4821,26 @@ Setup_Object_Addr
 ; o.`Y8b 888888 88 88"""      88""   Y8   8P 88""   88  .o       YbdP    dP__Yb  88  .o
 ; 8bodP' 88  88 88 88         88     `YbodP' 888888 88ood8        YP    dP""""Yb 88ood8
 
-; YOU ARE HERE############################################################
-
 ; Return object's UDG data address offset for Rocket Middle Section/Fuel
 ; depending on which of the four levels (or multiple of) the player is currently on
 ; L_JSR_($2FDA)_($231F) OK
 ; L_JSR_($2FDA)_($2F85) OK
 ; L_JSR_($2FDA)_($2FC0) OK
 ; L_JSR_($2FDA)_($3057) OK
-Get_Obj_UDG_Data_Addr_Ship_Lvl
+Load_Obj_UDG_Data_Addr_Ship_Wv
     lda     ZP_Wave_Active_Player           ; 2FDA: A5 59    
 
-; Calculate and return object's UDG data address offset based on A e.g. player wave
-; First ship is for levels 0-3, second ship for levels 4-7 then repeat
+; Calculate and update object's UDG data address offset in Register A based on player wave.
+; First ship is for levels 0-3, second ship for levels 4-7 then repeat.
+; UDG data address consists of two parts, large offset $0/8/10/18 for ship top/mid/bott/fuel
+; plus small offset of $0/2/4/6 calculated below to select between models of ship.
+; VIC version has only two, but there appears to be slots for two more like in the ZX Spectrum,
+; but should be easy to add the ships on with 16K RAM.
 ; L_JSR_($2FDC)_($285B) OK
-Get_Obj_UDG_Data_Addr_Ship_A
+Load_Obj_UDG_Data_Addr_Ship
     lsr     a                               ; 2FDC: 4A       
     and     #%00000110                      ; 2FDD: 29 06    
-    ldy     #OBJECT_PARAM                   ; 2FDF: A0 06    
+    ldy     #OBJECT_UDG_DATA_INDEX_PARAM    ; 2FDF: A0 06    
     clc                                     ; 2FE1: 18       
     adc     (ZP_Obj_List_Ptr_Lo),y          ; 2FE2: 71 00    
     rts                                     ; 2FE4: 60       
@@ -4849,7 +4853,7 @@ Get_Obj_UDG_Data_Addr_Ship_A
 ; L_JSR_($2FE5)_($2FC4) OK
 ; L_JSR_($2FE5)_($2FCB) OK
 ; L_JSR_($2FE5)_($305A) OK
-Get_Obj_UDG_Data_Addr_S_F_V
+Load_Obj_UDG_Data_Addr_S_F_V
     tax                                     ; 2FE5: AA       
     lda     UDG_Data_Ship_Fuel_Valuables,x  ; 2FE6: BD 87 3C 
     tay                                     ; 2FE9: A8       
@@ -4880,32 +4884,40 @@ Get_Obj_UDG_Data_Addr_S_F_V
 ; L_BRS_($2FEE)_($2FA9) OK
 Jetman_Collide_Rocket_Fuel
     jsr     Load_Object_Type_X_Y            ; 2FEE: 20 D7 35 
-    ldy     #$04                            ; 2FF1: A0 04     Diag attrib? Not sure...
+    ldy     #OBJECT_STATUS_PARAM            ; 2FF1: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2FF3: B1 00    
-    ora     #$02                            ; 2FF5: 09 02     Zero all bits except bit 1 i.e. 000000x0
+    ora     #OBJECT_STATUS_PICKED_UP        ; 2FF5: 09 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2FF7: 91 00    
 
 ; Jetman pickup Rocket Module / Fuel Cell = 100 points
     jsr     Load_ZP_Parameters              ; 2FF9: 20 9D 25 
-    fcb     $02                             ; 2FFC: 02       
-    fdb     $0100                           ; 2FFD: 00 01    
+    fcb     $02                             ; 2FFC: 02        ZP02/03
+    fdb     $0100                           ; 2FFD: 00 01     100 Points
     fcb     $FF                             ; 2FFF: FF       
     jsr     Update_Score                    ; 3000: 20 63 30 
 
 ; Trigger collision pickup sound
     lda     #$01                            ; 3003: A9 01    
-    sta     Obj_Sound_Collision             ; 3005: 8D A9 03  Flame object X pos??
+    sta     Obj_Sound_Collision             ; 3005: 8D A9 03 
     lda     #$10                            ; 3008: A9 10    
-    sta     Obj_Sound_Collision_Timer       ; 300A: 8D AA 03  Flame object direction?
+    sta     Obj_Sound_Collision_Timer       ; 300A: 8D AA 03 
 
-    ldy     #$01                            ; 300D: A0 01    
+; Store current Jetman Position X into current picked-up object
+    ldy     #JETMAN_POSITION_X_PARAM        ; 300D: A0 01    
     lda     Obj_Jetman_Position_X           ; 300F: AD 81 03 
-    sta     (ZP_Obj_List_Ptr_Lo),y          ; 3012: 91 00     Store current Jetman object X pos into current object?
-    ldy     #$03                            ; 3014: A0 03    
+    sta     (ZP_Obj_List_Ptr_Lo),y          ; 3012: 91 00    
+
+; Store current Jetman Position Y into current picked-up object
+    ldy     #JETMAN_POSITION_Y_PARAM        ; 3014: A0 03    
     lda     Obj_Jetman_Position_Y           ; 3016: AD 83 03 
-    sta     (ZP_Obj_List_Ptr_Lo),y          ; 3019: 91 00     Store current Jetman object Y pos into current object?
+    sta     (ZP_Obj_List_Ptr_Lo),y          ; 3019: 91 00    
+
     jmp     Setup_Object_Addr_Rocket_Fuel   ; 301B: 4C BD 2F 
 ; ------------------------------------------
+
+
+; YOU ARE HERE ######################################################################
+
 ; L_BRS_($301E)_($2F9D) OK
 Copy_Jetman_XY_To_Object
     ldy     #$01                            ; 301E: A0 01    
@@ -4950,12 +4962,12 @@ Load_Rocket_or_Fuel_UDGs
     jsr     Load_Object_Type_X_Y_Colour     ; 3054: 20 E9 35 
 ; L_JSR_($3057)_($2F5F) OK
 Load_Rocket_or_Fuel_UDGs_1
-    jsr     Get_Obj_UDG_Data_Addr_Ship_Lvl  ; 3057: 20 DA 2F 
+    jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 3057: 20 DA 2F 
 ; L_JSR_($305A)_($2322) OK
 ; L_JSR_($305A)_($2BD8) OK
 ; L_JSR_($305A)_($2F88) OK
 Load_Rocket_or_Fuel_UDGs_2
-    jsr     Get_Obj_UDG_Data_Addr_S_F_V     ; 305A: 20 E5 2F 
+    jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 305A: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 305D: 20 3D 37 
     jmp     Display_Object_With_Setup_2     ; 3060: 4C 04 36 
 ; ------------------------------------------
