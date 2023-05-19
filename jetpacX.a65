@@ -204,11 +204,11 @@ Obj_Sound_Noise                 equ     $03AB
 Obj_Sound_Noise_Timer           equ     $03AC
 Obj_Sound_Laser                 equ     $03AD
 Obj_Sound_Laser_Timer           equ     $03AE
-Obj_Rocket                      equ     $03B0
-Obj_Rocket_X                    equ     $03B1
-Obj_Rocket_Fuel_Level           equ     $03B2
-Obj_Rocket_Y                    equ     $03B3
-Obj_Rocket_Parts_Counter        equ     $03B4
+Obj_Rocket_Base                 equ     $03B0
+Obj_Rocket_Base_X               equ     $03B1
+Obj_Rocket_Base_Fuel_Level      equ     $03B2
+Obj_Rocket_Base_Y               equ     $03B3
+Obj_Rocket_Base_Parts_Counter   equ     $03B4
 Obj_Rocket_Top_Or_Fuel_Type     equ     $03B8
 Obj_Rocket_Top_Or_Fuel_X        equ     $03B9
 Obj_Rocket_Top_Or_Fuel_Status   equ     $03BC
@@ -271,11 +271,12 @@ JETMAN_POSITION_X_PARAM         equ     $01
 PLATFORM_NUMBER_COUNTDOWN       equ     $03
 PLATFORM_DATA_TABLE_ADDR_HI     equ     $31
 PLATFORM_DATA_TABLE_ADDR_LO     equ     $B6
-OBJECT_POSITION_X               equ     $01
+OBJECT_POSITION_X_PARAM         equ     $01
+OBJ_PICKUP_DROPPED_STATE        equ     $04
+OBJECT_OVER_SHIP_HITBOX_X       equ     $06
 OBJECT_STATUS_PICKED_UP         equ     %00000010
 OBJECT_STATUS_PARAM             equ     $04
 OBJECT_UDG_DATA_INDEX_PARAM     equ     $06
-OBJ_LIFECYCLE_STATE             equ     $04
 FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
 OBJECT_OBJ_UDG_DATA_OFFSET      equ     $06
 COLUMN_INDEX                    equ     $00
@@ -297,7 +298,7 @@ OBJECT_TYPE_VALUABLE            equ     $0E
 HITBOX_Y_ABOVE                  equ     $12
 COLLISION                       equ     $80
 HITBOX_Y_BELOW                  equ     $0C
-HITBOX_X                        equ     $0C
+COLLISION_HITBOX_X              equ     $0C
 NO_COLLISION                    equ     $00
 JETMAN_STANDING                 equ     $02
 JETMAN_FLYING                   equ     $01
@@ -329,7 +330,6 @@ DIRECTION_Y_DOWN_MAX            equ     $04
 DIRECTION_X_RIGHT_MAX           equ     $04
 DIRECTION_Y_UP_MAX              equ     $FC
 DIRECTION_X_LEFT_MAX            equ     $FC
-OBJECT_POSITION_X_PARAM         equ     $01
 DIRECTION_X_LEFT                equ     $F8
 DIRECTION_Y_UP                  equ     $F8
 DIRECTION_Y_DOWN                equ     $08
@@ -1186,7 +1186,7 @@ Reset_Rocket_Obj_Params
 ; L_BRS_($2301)_($2308) OK
 Loop_Reset_Rocket_Obj_Params
     lda     Init_Rocket_Objs_Param_Table,x  ; 2301: BD 3B 23 
-    sta     Obj_Rocket,x                    ; 2304: 9D B0 03 
+    sta     Obj_Rocket_Base,x               ; 2304: 9D B0 03 
     dex                                     ; 2307: CA       
     bpl     Loop_Reset_Rocket_Obj_Params    ; 2308: 10 F7    
     rts                                     ; 230A: 60       
@@ -1433,11 +1433,11 @@ Swap_Player
 
 ; L_BRS_($2406)_($2413) OK
 Loop_Swap_Rocket_Object
-    lda     Obj_Rocket,x                    ; 2406: BD B0 03 
+    lda     Obj_Rocket_Base,x               ; 2406: BD B0 03 
 
     pha                                     ; 2409: 48       
     lda     ZP_Obj_Rocket_Saved,x           ; 240A: B5 28    
-    sta     Obj_Rocket,x                    ; 240C: 9D B0 03 
+    sta     Obj_Rocket_Base,x               ; 240C: 9D B0 03 
     pla                                     ; 240F: 68       
 
     sta     ZP_Obj_Rocket_Saved,x           ; 2410: 95 28    
@@ -2297,7 +2297,7 @@ Rocket_Flight
     beq     Sound_Done_Reset_Object_Param   ; 2738: F0 D0    
 
 ; Utilise rocket object height to manipulate noise sound channel
-    lda     Obj_Rocket_Y                    ; 273A: AD B3 03 
+    lda     Obj_Rocket_Base_Y               ; 273A: AD B3 03 
     lsr     a                               ; 273D: 4A       
     eor     #%11111110                      ; 273E: 49 FE    
     jmp     Enable_Oscillator_Channel       ; 2740: 4C 05 27 
@@ -3529,7 +3529,7 @@ Spawn_RMFC
     bne     Spawn_RMFC_RTS                  ; 2B5A: D0 F6    
 
 ; Return if ship is built and fuelled up
-    lda     Obj_Rocket_Fuel_Level           ; 2B5C: AD B2 03 
+    lda     Obj_Rocket_Base_Fuel_Level      ; 2B5C: AD B2 03 
     cmp     #SHIP_BUILT_AND_FUELLED_UP      ; 2B5F: C9 06    
     bcs     Spawn_RMFC_RTS                  ; 2B61: B0 EF    
 
@@ -4147,7 +4147,7 @@ Compare_Obj_Jetman_Position_X
 
 ; L_BRS_($2D80)_($2D79) OK
 Test_Collision_Position_X
-    cmp     #HITBOX_X                       ; 2D80: C9 0C    
+    cmp     #COLLISION_HITBOX_X             ; 2D80: C9 0C    
     bcs     No_Collision_Return             ; 2D82: B0 17    
 
 ; Compare_Obj_Jetman_Position_Y
@@ -4231,7 +4231,7 @@ Set_Obj_List_Ptr_To_Rocket
     jsr     Save_Obj_List_Ptr               ; 2DB5: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2DB8: 20 9D 25 
     fcb     $00                             ; 2DBB: 00        ZP00/01
-    fdb     Obj_Rocket                      ; 2DBC: B0 03     Object Address
+    fdb     Obj_Rocket_Base                 ; 2DBC: B0 03     Object Address
     fcb     $FF                             ; 2DBE: FF       
 
     jsr     Set_Load_Obj_Type_X_Y_Colour    ; 2DBF: 20 CB 2D 
@@ -4674,11 +4674,11 @@ Rocket_Part_Or_Fuel_Dropped
     lda     Obj_Rocket_Top_Or_Fuel_Status   ; 2F43: AD BC 03 
     ora     #%00000001                      ; 2F46: 09 01     Set bit 0
     sta     Obj_Rocket_Top_Or_Fuel_Status   ; 2F48: 8D BC 03 
-    jsr     Load_Rocket_or_Fuel_UDGs        ; 2F4B: 20 54 30 
+    jsr     Load_Obj_Type_X_Y_Colour_       ; 2F4B: 20 54 30 
 
 ; Calculate Position Y offset when object lands based on how many rocket pieces have
 ; previosuly landed ($10 when rocket middle landed, $20 for top section landed)
-    lda     Obj_Rocket_Parts_Counter        ; 2F4E: AD B4 03 
+    lda     Obj_Rocket_Base_Parts_Counter   ; 2F4E: AD B4 03 
     asl     a                               ; 2F51: 0A       
     asl     a                               ; 2F52: 0A       
     asl     a                               ; 2F53: 0A       
@@ -4686,13 +4686,13 @@ Rocket_Part_Or_Fuel_Dropped
     sta     ZP13_Obj_Landed_Posn_Y_Offset   ; 2F55: 85 13    
 
 ; Calculate object landed Position Y and store
-    lda     Obj_Rocket_Y                    ; 2F57: AD B3 03 
+    lda     Obj_Rocket_Base_Y               ; 2F57: AD B3 03 
     sec                                     ; 2F5A: 38       
     sbc     ZP13_Obj_Landed_Posn_Y_Offset   ; 2F5B: E5 13    
     sta     ZP19_Obj_Landed_Position_Y      ; 2F5D: 85 19    
 
-    jsr     Load_Rocket_or_Fuel_UDGs_1      ; 2F5F: 20 57 30 
-    inc     Obj_Rocket_Parts_Counter        ; 2F62: EE B4 03 
+    jsr     Load_Obj_UDG_Data_Addr_Ship_    ; 2F5F: 20 57 30 
+    inc     Obj_Rocket_Base_Parts_Counter   ; 2F62: EE B4 03 
 
 ; Turn Rocket Middle Section object off in object list
 ; L_JMP_($2F65)_($2871) OK
@@ -4720,7 +4720,7 @@ Fuel_Dropped
     bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F7D: 90 33    
 
 ; Fuel cell has landed, increment the counter
-    inc     Obj_Rocket_Fuel_Level           ; 2F7F: EE B2 03 
+    inc     Obj_Rocket_Base_Fuel_Level      ; 2F7F: EE B2 03 
     jsr     Load_Object_Type_X_Y_Colour     ; 2F82: 20 E9 35 
     jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 2F85: 20 DA 2F 
     jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2F88: 20 5A 30 
@@ -4743,7 +4743,7 @@ ROCKET_PART_OR_FUEL
 
 ; Test status of the rocket part or fuel cell object
 ; 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
-    ldy     #OBJ_LIFECYCLE_STATE            ; 2F91: A0 04    
+    ldy     #OBJ_PICKUP_DROPPED_STATE       ; 2F91: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F93: B1 00    
     bit     MASK_00000100                   ; 2F95: 2C 16 20 
     bne     Rocket_Part_Or_Fuel_Dropped     ; 2F98: D0 97    
@@ -4915,54 +4915,68 @@ Jetman_Collide_Rocket_Fuel
     jmp     Setup_Object_Addr_Rocket_Fuel   ; 301B: 4C BD 2F 
 ; ------------------------------------------
 
-
-; YOU ARE HERE ######################################################################
-
+; Copy Position X from Jetman to object, plus a 4 pixel offset
 ; L_BRS_($301E)_($2F9D) OK
 Copy_Jetman_XY_To_Object
-    ldy     #$01                            ; 301E: A0 01    
+    ldy     #OBJECT_POSITION_X_PARAM        ; 301E: A0 01    
     lda     Obj_Jetman_Position_X           ; 3020: AD 81 03 
     clc                                     ; 3023: 18       
     adc     #$04                            ; 3024: 69 04    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 3026: 91 00    
 
+; Register Y becomes Position Y parameter, now copy Position Y from Jetman to object
     iny                                     ; 3028: C8       
     iny                                     ; 3029: C8       
     lda     Obj_Jetman_Position_Y           ; 302A: AD 83 03 
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 302D: 91 00    
 
+; Register Y becomes Position X parameter, test X distance between Jetman and ship and
+; branch if Jetman is to the left of the ship
     dey                                     ; 302F: 88       
     dey                                     ; 3030: 88       
-    lda     Obj_Rocket_X                    ; 3031: AD B1 03 
+    lda     Obj_Rocket_Base_X               ; 3031: AD B1 03 
     sec                                     ; 3034: 38       
     sbc     (ZP_Obj_List_Ptr_Lo),y          ; 3035: F1 00    
-    bpl     Copy_Jetman_XY_To_Object_0      ; 3037: 10 05    
+    bpl     Test_Jetman_Above_Ship          ; 3037: 10 05    
+
+; Jetman to the right of the ship, perform an Absolute on the result of the Position X comparison
     eor     #$FF                            ; 3039: 49 FF    
     clc                                     ; 303B: 18       
     adc     #$01                            ; 303C: 69 01    
-; L_BRS_($303E)_($3037) OK
-Copy_Jetman_XY_To_Object_0
-    cmp     #$06                            ; 303E: C9 06    
-    bcs     Copy_Jetman_XY_To_Object_1      ; 3040: B0 0F    
 
-    ldy     #$04                            ; 3042: A0 04    
+; If Jetman is above ship then drop ship part/fuel cell
+; L_BRS_($303E)_($3037) OK
+Test_Jetman_Above_Ship
+    cmp     #OBJECT_OVER_SHIP_HITBOX_X      ; 303E: C9 06    
+    bcs     JMP_Setup_Obj_Addr_Rocket_Fuel  ; 3040: B0 0F    
+
+; Jetman is above ship, set picked-up object state to Dropped/Lander
+    ldy     #OBJ_PICKUP_DROPPED_STATE       ; 3042: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3044: B1 00    
-    ora     #$04                            ; 3046: 09 04    
+    ora     #%00000100                      ; 3046: 09 04    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 3048: 91 00    
 
-    lda     Obj_Rocket_X                    ; 304A: AD B1 03 
-    ldy     #$01                            ; 304D: A0 01    
+; Set the dropped object's Position X to the same as the rocket base, so they line up on-screen
+    lda     Obj_Rocket_Base_X               ; 304A: AD B1 03 
+    ldy     #OBJECT_POSITION_X_PARAM        ; 304D: A0 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 304F: 91 00    
+
 ; L_BRS_($3051)_($3040) OK
-Copy_Jetman_XY_To_Object_1
+JMP_Setup_Obj_Addr_Rocket_Fuel
     jmp     Setup_Object_Addr_Rocket_Fuel   ; 3051: 4C BD 2F 
 ; ------------------------------------------
+
+; YOU ARE HERE ######################################################################
+
+
 ; L_JSR_($3054)_($2F4B) OK
-Load_Rocket_or_Fuel_UDGs
+Load_Obj_Type_X_Y_Colour_
     jsr     Load_Object_Type_X_Y_Colour     ; 3054: 20 E9 35 
+
 ; L_JSR_($3057)_($2F5F) OK
-Load_Rocket_or_Fuel_UDGs_1
+Load_Obj_UDG_Data_Addr_Ship_
     jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 3057: 20 DA 2F 
+
 ; L_JSR_($305A)_($2322) OK
 ; L_JSR_($305A)_($2BD8) OK
 ; L_JSR_($305A)_($2F88) OK
@@ -5124,7 +5138,7 @@ EOR_Then_TPC1_Or_TPCY
 ; L_JSR_($30B3)_($327B) OK
 ; L_JSR_($30B3)_($3370) OK
 Test_Platform_Collision
-    ldy     #OBJECT_POSITION_X              ; 30B3: A0 01    
+    ldy     #OBJECT_POSITION_X_PARAM        ; 30B3: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 30B5: B1 00     1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
     sta     ZP0E_Object_Position_X          ; 30B7: 85 0E     1st run: Y=50
 

@@ -1704,7 +1704,7 @@ comment  2D7B
 comment  2D7B Perform an Absolute on the result of the Position X comparison
 comment  2D80
 label    2D80 Test_Collision_Position_X
-deflabel 2D81 HITBOX_X
+deflabel 2D81 COLLISION_HITBOX_X
 comment  2D84
 comment  2D84 Compare_Obj_Jetman_Position_Y
 comment  2D84 Register Y becomes offset to objects Position Y, compare to Jetman's Position Y and
@@ -1939,7 +1939,7 @@ label    2F8E ROCKET_PART_OR_FUEL
 comment  2F91
 comment  2F91 Test status of the rocket part or fuel cell object
 comment  2F91 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
-deflabel 2F92 OBJ_LIFECYCLE_STATE
+deflabel 2F92 OBJ_PICKUP_DROPPED_STATE
 comment  2F9A
 comment  2F9F
 comment  2FA4
@@ -1999,20 +1999,39 @@ comment  3014 Store current Jetman Position Y into current picked-up object
 deflabel 3015 JETMAN_POSITION_Y_PARAM
 comment  301B
 comment  301E
-
-comment  301E
-comment  301E YOU ARE HERE ######################################################################
-comment  301E
-
+comment  301E Copy Position X from Jetman to object, plus a 4 pixel offset
 label    301E Copy_Jetman_XY_To_Object
+deflabel 301F OBJECT_POSITION_X_PARAM
 comment  3028
+comment  3028 Register Y becomes Position Y parameter, now copy Position Y from Jetman to object
 comment  302F
-label    303E Copy_Jetman_XY_To_Object_0
+comment  302F Register Y becomes Position X parameter, test X distance between Jetman and ship and
+comment  302F branch if Jetman is to the left of the ship
+comment  3039
+comment  3039 Jetman to the right of the ship, perform an Absolute on the result of the Position X comparison
+comment  303E
+comment  303E If Jetman is above ship then drop ship part/fuel cell
+label    303E Test_Jetman_Above_Ship
+deflabel 303F OBJECT_OVER_SHIP_HITBOX_X
 comment  3042
+comment  3042 Jetman is above ship, set picked-up object state to Dropped/Lander
+deflabel 3043 OBJ_PICKUP_DROPPED_STATE
+binary   3047
 comment  304A
-label    3051 Copy_Jetman_XY_To_Object_1
-label    3054 Load_Rocket_or_Fuel_UDGs
-label    3057 Load_Rocket_or_Fuel_UDGs_1
+comment  304A Set the dropped object's Position X to the same as the rocket base, so they line up on-screen
+deflabel 304E OBJECT_POSITION_X_PARAM
+comment  3051
+label    3051 JMP_Setup_Obj_Addr_Rocket_Fuel
+
+comment  3054
+comment  3054 YOU ARE HERE ######################################################################
+comment  3054
+
+comment  3054
+label    3054 Load_Obj_Type_X_Y_Colour_
+comment  3057
+label    3057 Load_Obj_UDG_Data_Addr_Ship_
+comment  305A
 label    305A Load_Rocket_or_Fuel_UDGs_2
 comment  3063
 label    3063 Update_Score
@@ -2097,7 +2116,7 @@ comment  30B3 Bit 1:
 comment  30B3 Bit 2:
 comment  30B3 Bit 3:
 label    30B3 Test_Platform_Collision
-deflabel 30B4 OBJECT_POSITION_X
+deflabel 30B4 OBJECT_POSITION_X_PARAM
 lcomment 30B5 1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
 lcomment 30B7 1st run: Y=50
 comment  30B9
