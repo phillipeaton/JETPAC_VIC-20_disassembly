@@ -170,7 +170,13 @@
 /; 2F31/,/; 2F8B/s/ZP13                            /ZP13_Obj_Landed_Posn_Y_Offset   /
 /; 2F31/,/; 2F8B/s/ZP19                            /ZP19_Obj_Landed_Position_Y      /
 
-
+# Update_Score
+/ZP02                            equ     $0002/a ZP02_Score_Byte_Hi              equ     $0002
+/ZP03                            equ     $0003/a ZP03_Score_Byte_Lo              equ     $0003
+/ZP06                            equ     $0006/a ZP06_Player_Score_Add           equ     $0006
+/; 3063/,/; 3098/s/ZP02                            /ZP02_Score_Byte_Hi              /
+/; 3063/,/; 3098/s/ZP03                            /ZP03_Score_Byte_Lo              /
+/; 3063/,/; 3098/s/(ZP06),y                        /(ZP06_Player_Score_Addr),y      /
 
 
 

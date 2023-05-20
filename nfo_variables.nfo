@@ -65,7 +65,7 @@ label      4A ZP_HW_IRQ_Counter_Lo           ;
 label      4B ZP_HW_IRQ_Counter_Hi           ;
 label      4C ZP_HW_IRQ_Random               ;
 
-label      51-53 ZP_Score_Player_1           ; 3 bytes (Hi Score is stored where?)
+label      51-53 ZP_Score_Player_1           ; 3 bytes
 label      54-56 ZP_Score_Player_2           ; 3 bytes
 label      57 ZP_Reverse_And_Colour_Data     ; Used to flash game options & 1UP+score at player start
 label      58 ZP_Flash_Countup               ;

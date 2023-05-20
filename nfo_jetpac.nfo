@@ -2014,7 +2014,7 @@ comment  303E If Jetman is above ship then drop ship part/fuel cell
 label    303E Test_Jetman_Above_Ship
 deflabel 303F OBJECT_OVER_SHIP_HITBOX_X
 comment  3042
-comment  3042 Jetman is above ship, set picked-up object state to Dropped/Lander
+comment  3042 Jetman is above ship, set picked-up object state to Dropped/Landed
 deflabel 3043 OBJ_PICKUP_DROPPED_STATE
 binary   3047
 comment  304A
@@ -2022,51 +2022,47 @@ comment  304A Set the dropped object's Position X to the same as the rocket base
 deflabel 304E OBJECT_POSITION_X_PARAM
 comment  3051
 label    3051 JMP_Setup_Obj_Addr_Rocket_Fuel
-
 comment  3054
-comment  3054 YOU ARE HERE ######################################################################
-comment  3054
-
-comment  3054
-label    3054 Load_Obj_Type_X_Y_Colour_
+label    3054 Disp_Obj_Ship_Or_Fuel_Setup_2
 comment  3057
-label    3057 Load_Obj_UDG_Data_Addr_Ship_
+label    3057 Disp_Obj_Ship_Or_Fuel_Setup_1
 comment  305A
-label    305A Load_Rocket_or_Fuel_UDGs_2
+label    305A Display_Object_Ship_Or_Fuel
 comment  3063
 label    3063 Update_Score
-lcomment 3065 If P2, setup P2 Score instead of P1 and then return after the param setup below
 comment  3067
-comment  3067 Read ZP Params P1 Score
-lcomment 306A ZP_03_Lo
-lcomment 306B P1 Score in ZP
+comment  3067 Read ZP Params Player 1 Score
+lcomment 306A ZP06
+lcomment 306B Player 1 Score in ZP
 word     306B
 comment  306E
-label    306E Add_3_Digit_BCD_To_Score
-lcomment 306E 3 digits
+label    306E Add_BCD_Digits_To_Score
+deflabel 306F THREE_DIGITS_COUNTDOWN
 comment  3070
-comment  3070 Add units
-lcomment 3070 Set Decimal Mode
+comment  3070 Add units, sed sets CPU Decimal mode
 comment  3078
 comment  3078 Add tens
 comment  307F
-comment  307F Add hundreds
-lcomment 3086 Clear Decimal Mode
+comment  307F Add hundreds, cld clears CPU Decimal mode
 comment  3087
-lcomment 3087 Decide if working with P1 or P2
-label    308e Display_P2_Score_JMP
-label    3091 Read_ZP_Params_P2_Score
-lcomment 3094 ZP_Temp_2
-lcomment 3095 P2 Score in ZP
+comment  3087 Display the updated score for the active player
+comment  308E
+label    308E JMP_Display_Player_2_Score
+comment  3091
+label    3091 Read_ZP_Params_Player_2_Score
+lcomment 3094 ZP06
+lcomment 3095 Player 2 Score in ZP
 word     3095
+
+comment  309B
+comment  309B YOU ARE HERE ######################################################################
+comment  309B
+
 comment  309B
 label    309B EOR_Then_TPC1_Or_TPCY
 binary   309c
-comment  30A1
-lcomment 30A1 Save A
+comment  309F
 comment  30A9
-lcomment 30AC Restore A
-comment  30AD
 comment  30B3
 comment  30B3 ----------------------------------------------------------
 comment  30B3 Platform Collision Test

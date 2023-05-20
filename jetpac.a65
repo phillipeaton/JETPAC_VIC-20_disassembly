@@ -154,6 +154,7 @@ PLATFORM_NUMBER_COUNTDOWN       equ     $03
 PLATFORM_DATA_TABLE_ADDR_HI     equ     $31
 PLATFORM_DATA_TABLE_ADDR_LO     equ     $B6
 OBJECT_POSITION_X_PARAM         equ     $01
+THREE_DIGITS_COUNTDOWN          equ     $02
 OBJ_PICKUP_DROPPED_STATE        equ     $04
 OBJECT_OVER_SHIP_HITBOX_X       equ     $06
 OBJECT_STATUS_PICKED_UP         equ     %00000010
@@ -1094,7 +1095,7 @@ Loop_Reset_Objects
 
     jsr     Load_Object_Type_X_Y_Colour     ; 231C: 20 E9 35 
     jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 231F: 20 DA 2F 
-    jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2322: 20 5A 30 
+    jsr     Display_Object_Ship_Or_Fuel     ; 2322: 20 5A 30 
 
 ; Move 16-bit address pointer to next object i.e. 8 bytes ahead
     lda     ZP_Obj_List_Ptr_Lo              ; 2325: A5 00    
@@ -3512,7 +3513,7 @@ Load_ZP_Params_Rocket_Or_Fuel
 ; Object's valuable type used as an index into the UDG data
     ldy     #OBJECT_VALUABLE_TYPE_PARAM     ; 2BD4: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2BD6: B1 00    
-    jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2BD8: 20 5A 30 
+    jsr     Display_Object_Ship_Or_Fuel     ; 2BD8: 20 5A 30 
     jmp     Restore_Obj_List_Ptr            ; 2BDB: 4C F0 28 
 ; ------------------------------------------
 
@@ -4556,7 +4557,7 @@ Rocket_Part_Or_Fuel_Dropped
     lda     Obj_Rocket_Top_Or_Fuel_Status   ; 2F43: AD BC 03 
     ora     #%00000001                      ; 2F46: 09 01     Set bit 0
     sta     Obj_Rocket_Top_Or_Fuel_Status   ; 2F48: 8D BC 03 
-    jsr     Load_Obj_Type_X_Y_Colour_       ; 2F4B: 20 54 30 
+    jsr     Disp_Obj_Ship_Or_Fuel_Setup_2   ; 2F4B: 20 54 30 
 
 ; Calculate Position Y offset when object lands based on how many rocket pieces have
 ; previosuly landed ($10 when rocket middle landed, $20 for top section landed)
@@ -4573,7 +4574,7 @@ Rocket_Part_Or_Fuel_Dropped
     sbc     ZP13                            ; 2F5B: E5 13    
     sta     ZP19                            ; 2F5D: 85 19    
 
-    jsr     Load_Obj_UDG_Data_Addr_Ship_    ; 2F5F: 20 57 30 
+    jsr     Disp_Obj_Ship_Or_Fuel_Setup_1   ; 2F5F: 20 57 30 
     inc     Obj_Rocket_Base_Parts_Counter   ; 2F62: EE B4 03 
 
 ; Turn Rocket Middle Section object off in object list
@@ -4605,7 +4606,7 @@ Fuel_Dropped
     inc     Obj_Rocket_Base_Fuel_Level      ; 2F7F: EE B2 03 
     jsr     Load_Object_Type_X_Y_Colour     ; 2F82: 20 E9 35 
     jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 2F85: 20 DA 2F 
-    jsr     Load_Rocket_or_Fuel_UDGs_2      ; 2F88: 20 5A 30 
+    jsr     Display_Object_Ship_Or_Fuel     ; 2F88: 20 5A 30 
     jmp     Disable_Object_In_List          ; 2F8B: 4C 65 2F 
 ; ------------------------------------------
 ; On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
@@ -4797,6 +4798,20 @@ Jetman_Collide_Rocket_Fuel
     jmp     Setup_Object_Addr_Rocket_Fuel   ; 301B: 4C BD 2F 
 ; ------------------------------------------
 
+
+
+
+
+;  dP""b8  dP"Yb  88""Yb Yb  dP      88888 888888 888888 8b    d8    db    88b 88
+; dP   `" dP   Yb 88__dP  YbdP          88 88__     88   88b  d88   dPYb   88Yb88
+; Yb      Yb   dP 88"""    8P       o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
+;  YboodP  YbodP  88      dP        "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
+; \
+; Yb  dP Yb  dP     888888  dP"Yb       dP"Yb  88""Yb  88888 888888  dP""b8 888888
+;  YbdP   YbdP        88   dP   Yb     dP   Yb 88__dP     88 88__   dP   `"   88
+;  dPYb    8P         88   Yb   dP     Yb   dP 88""Yb o.  88 88""   Yb        88
+; dP  Yb  dP          88    YbodP       YbodP  88oodP "bodP' 888888  YboodP   88
+
 ; Copy Position X from Jetman to object, plus a 4 pixel offset
 ; L_BRS_($301E)_($2F9D) OK
 Copy_Jetman_XY_To_Object
@@ -4832,7 +4847,7 @@ Test_Jetman_Above_Ship
     cmp     #OBJECT_OVER_SHIP_HITBOX_X      ; 303E: C9 06    
     bcs     JMP_Setup_Obj_Addr_Rocket_Fuel  ; 3040: B0 0F    
 
-; Jetman is above ship, set picked-up object state to Dropped/Lander
+; Jetman is above ship, set picked-up object state to Dropped/Landed
     ldy     #OBJ_PICKUP_DROPPED_STATE       ; 3042: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3044: B1 00    
     ora     #%00000100                      ; 3046: 09 04    
@@ -4848,21 +4863,18 @@ JMP_Setup_Obj_Addr_Rocket_Fuel
     jmp     Setup_Object_Addr_Rocket_Fuel   ; 3051: 4C BD 2F 
 ; ------------------------------------------
 
-; YOU ARE HERE ######################################################################
-
-
 ; L_JSR_($3054)_($2F4B) OK
-Load_Obj_Type_X_Y_Colour_
+Disp_Obj_Ship_Or_Fuel_Setup_2
     jsr     Load_Object_Type_X_Y_Colour     ; 3054: 20 E9 35 
 
 ; L_JSR_($3057)_($2F5F) OK
-Load_Obj_UDG_Data_Addr_Ship_
+Disp_Obj_Ship_Or_Fuel_Setup_1
     jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 3057: 20 DA 2F 
 
 ; L_JSR_($305A)_($2322) OK
 ; L_JSR_($305A)_($2BD8) OK
 ; L_JSR_($305A)_($2F88) OK
-Load_Rocket_or_Fuel_UDGs_2
+Display_Object_Ship_Or_Fuel
     jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 305A: 20 E5 2F 
     jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 305D: 20 3D 37 
     jmp     Display_Object_With_Setup_2     ; 3060: 4C 04 36 
@@ -4887,20 +4899,20 @@ Load_Rocket_or_Fuel_UDGs_2
 ; L_JSR_($3063)_($3000) OK
 Update_Score
     lda     ZP_Active_Player                ; 3063: A5 5E    
-    bne     Read_ZP_Params_P2_Score         ; 3065: D0 2A     If P2, setup P2 Score instead of P1 and then return after the param setup below
+    bne     Read_ZP_Params_Player_2_Score   ; 3065: D0 2A    
 
-; Read ZP Params P1 Score
+; Read ZP Params Player 1 Score
     jsr     Load_ZP_Parameters              ; 3067: 20 9D 25 
-    fcb     $06                             ; 306A: 06        ZP_03_Lo
-    fdb     ZP_Score_Player_1               ; 306B: 51 00     P1 Score in ZP
+    fcb     $06                             ; 306A: 06        ZP06
+    fdb     ZP_Score_Player_1               ; 306B: 51 00     Player 1 Score in ZP
     fcb     $FF                             ; 306D: FF       
 
 ; L_JMP_($306E)_($3098) OK
-Add_3_Digit_BCD_To_Score
-    ldy     #$02                            ; 306E: A0 02     3 digits
+Add_BCD_Digits_To_Score
+    ldy     #THREE_DIGITS_COUNTDOWN         ; 306E: A0 02    
 
-; Add units
-    sed                                     ; 3070: F8        Set Decimal Mode
+; Add units, sed sets CPU Decimal mode
+    sed                                     ; 3070: F8       
     lda     (ZP06),y                        ; 3071: B1 06    
     clc                                     ; 3073: 18       
     adc     ZP02                            ; 3074: 65 02    
@@ -4912,28 +4924,31 @@ Add_3_Digit_BCD_To_Score
     adc     ZP03                            ; 307B: 65 03    
     sta     (ZP06),y                        ; 307D: 91 06    
 
-; Add hundreds
+; Add hundreds, cld clears CPU Decimal mode
     dey                                     ; 307F: 88       
     lda     (ZP06),y                        ; 3080: B1 06    
     adc     #$00                            ; 3082: 69 00    
     sta     (ZP06),y                        ; 3084: 91 06    
-    cld                                     ; 3086: D8        Clear Decimal Mode
+    cld                                     ; 3086: D8       
 
-    lda     ZP_Active_Player                ; 3087: A5 5E     Decide if working with P1 or P2
-    bne     Display_P2_Score_JMP            ; 3089: D0 03    
+; Display the updated score for the active player
+    lda     ZP_Active_Player                ; 3087: A5 5E    
+    bne     JMP_Display_Player_2_Score      ; 3089: D0 03    
     jmp     Display_Player_1_Score          ; 308B: 4C 71 24 
 ; ------------------------------------------
+
 ; L_BRS_($308E)_($3089) OK
-Display_P2_Score_JMP
+JMP_Display_Player_2_Score
     jmp     Display_Player_2_Score          ; 308E: 4C 81 24 
 ; ------------------------------------------
+
 ; L_BRS_($3091)_($3065) OK
-Read_ZP_Params_P2_Score
+Read_ZP_Params_Player_2_Score
     jsr     Load_ZP_Parameters              ; 3091: 20 9D 25 
-    fcb     $06                             ; 3094: 06        ZP_Temp_2
-    fdb     ZP_Score_Player_2               ; 3095: 54 00     P2 Score in ZP
+    fcb     $06                             ; 3094: 06        ZP06
+    fdb     ZP_Score_Player_2               ; 3095: 54 00     Player 2 Score in ZP
     fcb     $FF                             ; 3097: FF       
-    jmp     Add_3_Digit_BCD_To_Score        ; 3098: 4C 6E 30 
+    jmp     Add_BCD_Digits_To_Score         ; 3098: 4C 6E 30 
 ; ------------------------------------------
 
 
@@ -4955,14 +4970,17 @@ Read_ZP_Params_P2_Score
 ;   88   88""   o.`Y8b   88
 ;   88   888888 8bodP'   88
 
+; YOU ARE HERE ######################################################################
+
+
 ; L_BRS_($309B)_($30CB) OK
 EOR_Then_TPC1_Or_TPCY
     eor     #%11111111                      ; 309B: 49 FF    
     adc     #$01                            ; 309D: 69 01    
+
     iny                                     ; 309F: C8       
     iny                                     ; 30A0: C8       
-
-    tax                                     ; 30A1: AA        Save A
+    tax                                     ; 30A1: AA       
     lda     (ZP08),y                        ; 30A2: B1 08    
     asl     a                               ; 30A4: 0A       
     asl     a                               ; 30A5: 0A       
@@ -4972,8 +4990,7 @@ EOR_Then_TPC1_Or_TPCY
     dey                                     ; 30A9: 88       
     dey                                     ; 30AA: 88       
     sec                                     ; 30AB: 38       
-    txa                                     ; 30AC: 8A        Restore A
-
+    txa                                     ; 30AC: 8A       
     sbc     ZP0B                            ; 30AD: E5 0B    
     bcs     Test_Platform_Collision_1       ; 30AF: B0 23    
     bcc     Test_Platform_Collision_Y       ; 30B1: 90 39    
