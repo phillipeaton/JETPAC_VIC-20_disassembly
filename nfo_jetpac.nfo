@@ -59,7 +59,7 @@ comment  2044 Set VIA outputs for keyboard scan
 lcomment 2046 Data I/O register (User port & RS-232) i.e. not used
 lcomment 2049 Data I/O register (Keybd col scan, Cassette, Joy)
 comment  204C
-comment  204C Setup IRQ interrupt vector to service routine at $25E0
+comment  204C Setup IRQ interrupt vector to service routine at $25E0 #########################################
 comment  2056
 comment  2056 Reset the VIC registers
 lcomment 2056 16 registers
@@ -2055,131 +2055,158 @@ lcomment 3095 Player 2 Score in ZP
 word     3095
 
 comment  309B
-comment  309B YOU ARE HERE ######################################################################
+comment  309B NEEDS MORE WORK ######################################################################
 comment  309B
 
 comment  309B
-label    309B EOR_Then_TPC1_Or_TPCY
-binary   309c
+comment  309B Perform Absolute on Register A containing Distance X of object from left side of first platform
+label    309B TPC_Test_Platform_Size_X
+binary   309C
 comment  309F
+comment  309F Register Y becomes 2, used to point to the number of characters in the middle of a platform
+comment  30A1
+comment  30A1 Store Register A onto stack for later (Distance X of object from left side of first platform)
+comment  30A2
+comment  30A2 Load number of characters in the middle of a platform and multiply 8, e.g. L & R platforms
+comment  30A2 have 3 blocks thus Reg A becomes $18 and store to ZP0B
 comment  30A9
+comment  30A9 Register Y becomes 0
+comment  30AB
+comment  30AB Restore Register A (Distance X of object from left side of first platform) and subtract
+comment  30AB from Reg A distance from obj to left side of platform
+lcomment 30AF Object is much further right than the platform
 comment  30B3
-comment  30B3 ----------------------------------------------------------
-comment  30B3 Platform Collision Test
-comment  30B3 ----------------------------------------------------------
-comment  30B3 FUNCTION  : setsoe
-comment  30B3 \            snethuoistn
-comment  30B3 \            ethonshu.
-comment  30B3 CALLED BY :
-comment  30B3 CALLS     : Nothing
-comment  30B3 ARGUMENTS : ZP_xxxx
-comment  30B3 \            satoehsaeuht
-comment  30B3 \            sathoeusanteho
-comment  30B3 ----------------------------------------------------------
-comment  30B3 Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
-comment  30B3 ZP02 Return Codes:
-
-comment  30B3 $8F 0001_1111 Alien dl to dl corner skim
-comment  30B3 $8F 0001_1111 Alien dl to dr corner hit
-
-comment  30B3 $8E 0001_1110 Alien ul to ur
-
-comment  30B3 $8B 0001_1011 Alien dl to ul
-
-comment  30B3 $8A 0001_1010 Alien dl to ul
-
-comment  30B3 $89 0001_1001 Alien dl to ul
-
-comment  30B3 $88 0001_1000 Alien dl to ul
-comment  30B3 $88 0001_1000 Alien dr to ur
-
-comment  30B3 $87 0001_0111 Alien dr to dl
-
-comment  30B3 $86 0001_0110 Alien ul to ur corner hit
-
-comment  30B3 $83 0001_0011 Alien ul to ul
-comment  30B3 $83 0001_0011 Alien ur to dr
-
-comment  30B3 $82 0001_0010 Alien ul to dl
-
-comment  30B3 $81 0001_0001 Alien ul to dl
-comment  30B3 $81 0001_0001 Alien ur to dr
-
-comment  30B3 $80 0001_0000 Alien ur to dr
-comment  30B3 $80 0001_0000 Alien ul to dl
-comment  30B3 Bit 0:
-comment  30B3 Bit 1:
-comment  30B3 Bit 2:
-comment  30B3 Bit 3:
+comment  30B3 Load object Position X and Y into working variables
+; comment  30B3 ----------------------------------------------------------
+; comment  30B3 Platform Collision Test
+; comment  30B3 ----------------------------------------------------------
+; comment  30B3 FUNCTION  : setsoe
+; comment  30B3 \            snethuoistn
+; comment  30B3 \            ethonshu.
+; comment  30B3 CALLED BY :
+; comment  30B3 CALLS     : Nothing
+; comment  30B3 ARGUMENTS : ZP_xxxx
+; comment  30B3 \            satoehsaeuht
+; comment  30B3 \            sathoeusanteho
+; comment  30B3 ----------------------------------------------------------
+; comment  30B3 Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
+; comment  30B3 ZP02 Return Codes:
+;
+; comment  30B3 $8F 0001_1111 Alien dl to dl corner skim
+; comment  30B3 $8F 0001_1111 Alien dl to dr corner hit
+;
+; comment  30B3 $8E 0001_1110 Alien ul to ur
+;
+; comment  30B3 $8B 0001_1011 Alien dl to ul
+;
+; comment  30B3 $8A 0001_1010 Alien dl to ul
+;
+; comment  30B3 $89 0001_1001 Alien dl to ul
+;
+; comment  30B3 $88 0001_1000 Alien dl to ul
+; comment  30B3 $88 0001_1000 Alien dr to ur
+;
+; comment  30B3 $87 0001_0111 Alien dr to dl
+;
+; comment  30B3 $86 0001_0110 Alien ul to ur corner hit
+;
+; comment  30B3 $83 0001_0011 Alien ul to ul
+; comment  30B3 $83 0001_0011 Alien ur to dr
+;
+; comment  30B3 $82 0001_0010 Alien ul to dl
+;
+; comment  30B3 $81 0001_0001 Alien ul to dl
+; comment  30B3 $81 0001_0001 Alien ur to dr
+;
+; comment  30B3 $80 0001_0000 Alien ur to dr
+; comment  30B3 $80 0001_0000 Alien ul to dl
+; comment  30B3 Bit 0:
+; comment  30B3 Bit 1:
+; comment  30B3 Bit 2:
+; comment  30B3 Bit 3:
 label    30B3 Test_Platform_Collision
 deflabel 30B4 OBJECT_POSITION_X_PARAM
-lcomment 30B5 1st run: Points to 03C0+1 Rocket Middle Section horizontal position = $50 i.e. #10 characters across
-lcomment 30B7 1st run: Y=50
 comment  30B9
-comment  30B9 Register Y becomes OBJECT_POSITION_Y
-lcomment 30BB 1st run: Points to 03C0+3 Rocket Middle Section vertical   position = $5F i.e. on middle platform
-lcomment 30BD 1st run: X=5f
+comment  30B9 Register Y becomes OBJECT_POSITION_Y_PARAM
 comment  30BF
-lcomment 30BF Set Temp4 to address of data table at 31B6
 comment  30C2
 comment  30C2 Initialise collision status, which becomes the subroutine return code
-label    30C2 Test_Platform_Collision_X
+label    30C2 TPC_Test_Platform_Collision_X
 comment  30C6
-comment  30C6 Load Position X of platform (indexed by Register Y) and subtract object Position X
+comment  30C6 Load Position X of platform (leftmost edge, indexed by Register Y) and subtract object Position X
 comment  30CD
 comment  30CD Object is to the left of the platform, set status bit 1
+comment  30CD Register A contains the distance between object X and the left side of the left platform
 comment  30D4
-label    30D4 Test_Platform_Collision_1
-binary   30D5
+comment  30D4 Register A contains the distance between object X and the left side of the left platform
+label    30D4 TPC_Test_Obj_Pfm_Dist_Over_8
 comment  30D8
+comment  30D8 Distance X is greater than #08
 comment  30DF
-label    30DF Test_Platform_Collision_1_Skip
-binary   30E0
+comment  30DF Register A contains the distance between object X and the left side of the left platform
+comment  30DF Test if obj is $10 pixels left of platform, if yes, no Y check needed, test next platform
+label    30DF TPC_Test_Obj_Past_Right_Of_Pfm
 comment  30E3
+comment  30E3 Test object is $0C or less pixels to left of platform, if yes, Y check needed
+comment  30E3 Triggered When a wave 0 alien position X moves to either side of a platfrom, but no overlap
 comment  30E7
+comment  30E7 Object is greater than $0C pixels to left of platform, set bit 2, Y check needed
 comment  30EC
-comment  30EC LOAD POSITION Y OF PLATFORM
-label    30EC Test_Platform_Collision_Y
+comment  30EC Register Y becomes Platform Y position address in Data Table i.e. parameter 01 or 04 or 07.
+comment  30EC Subtract object Position Y from platform Position Y
+label    30EC TPC_Test_Platform_Collision_Y
 comment  30F4
+comment  30F4 Object is above platform, test if > 4 pixels above platform, branch if yes
 comment  30F8
-label    30FD Test_Platform_Collision_Y_Skip
+comment  30F8 Set collision flag bit 7
+comment  30FD
+comment  30FD Object is below platform
+label    30FD TPC_Test_Platform_Colli_Y_Skip
 binary   30FE
 comment  3101
+comment  3101 Test if object is Jetman flying
 deflabel 3103 OBJECT_TYPE_PARAM
 binary   3107
 binary   3109
-comment  310D
+comment  310C
+comment  310C Jetman is flying
 binary   310E
 comment  310F
-label    310F Move_Toward_RTS
+label    310F TPC_Move_Toward_RTS
 comment  3113
+comment  3113 Set collision flag bit 7
 comment  3118 y reg is pointer into lookup table, 3 groups of 3
 comment  3118
-label    3118 INY_3
-lcomment 3118 3 iny's when moving from Y check to Y check
+label    3118 TPC_Next_Platform_Data_Inc
 comment  3119
-label    3119 INY_2
-lcomment 3119 2 iny's when moving from X check to X check as y already inc'd
-lcomment 311B Temp5 used as 3-2-1 countdown
+label    3119 TPC_Test_All_Platforms_Tested
 comment  311F
+comment  311F Test if object is one pixel from the bottom of screen
 deflabel 3120 OBJECT_POSITION_Y_PARAM
+deflabel 3124 SCREEN_BOTTOM_1UP
 comment  3127
 deflabel 3128 SCREEN_BOTTOM
 comment  312B
 comment  312D
-label    312D STA_Collision_Status_RTS
+label    312D TPC_STA_Collision_Status_RTS
 comment  3130
-label    3130 CMP20_RTS
+label    3130 TPC_Test_Object_20_Lines_Bott
 binary   3131
 comment  3134
 comment  3138
-label    3138 Update_Collision_Status_RTS
-binary   3139
+label    3138 TPC_Set_Collision_Status
 const    3139
 comment  313C
 label    313C TPC_RTS
 comment  313D
-label    313D PLO_CMP_1A_Move_Toward_RTS
+comment  313D Jetman is standing (i.e. not flying)
+label    313D TPC_Test???_Jetman_Standing
+binary   313F
+
+comment  3143
+comment  3143 YOU ARE HERE ######################################################################
+comment  3143
+
 comment  3143
 label    3143 Load_Platform_Data_Table_Addr
 lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
@@ -2192,7 +2219,8 @@ comment  314F
 comment  314F Initial index into the Platform Data Table
 comment  3152
 label    3152 Draw_Platforms
-label    3155 DP_1
+comment  3155
+label    3155 Loop_Draw_Platfrom
 lcomment 3155 Get X value from lookup table ($10)
 lcomment 3157 \ and store
 comment  3159
@@ -2204,19 +2232,32 @@ lcomment 3161 \ and store
 comment  3163
 comment  316B
 comment  316B Load Temp_3 with addr of left end platform UDG char
+deflabel 316C PLATFORM_UDG_DATA_ADDR_LO
+deflabel 3170 PLATFORM_UDG_DATA_ADDR_HI
 comment  3173
 comment  3173 Copy left end platform UDG char to RAM, bytes 9 per column
+deflabel 3174 PLATFORM_HEIGHT_PIXELS
 comment  3178
 comment  3178 Copy middle platform and right end UDG chars to RAM, 9 bytes per column
+comment  317B
 label    317B Loop_Next_Char
+deflabel 317C PLATFORM_HEIGHT_PIXELS
 comment  3180
 comment  3186
 comment  3186 Set the colour mapping for the platforms to Green
+comment  318F
 deflabel 3192 COLOUR_GREEN
-label    3193 DP_2
+comment  3193
+label    3193 Loop_Colorize_Platfrom_Green
 lcomment 3193 ZP0C_Col_RAM_Ptr_Lo
+comment  3195
+comment  319A
+comment  31A2
 label    31A2 Next_UDG_Char_Loop_Next_Char
+comment  31A8
 label    31A8 Next_UDG_Char
+deflabel 31AC PLATFORM_HEIGHT_PIXELS_TOTAL
+comment  31AF
 comment  31B6
 comment  31B6 Platform data table, 3 platforms
 const    31B6-31BE
@@ -3077,7 +3118,8 @@ comment  3C87 $3C87 = Jetman_Fly_Right_3, it's referenced after the end of the o
 comment  3C87
 label    3C87 UDG_Data_Ship_Fuel_Valuables
 label    3C88 UDG_Data_Ship_Fuel_Valuables+1
-lcomment 3C9F Multiple entries for UDG objects indexing based on player wave
+lcomment 3C9F Multiple entries for UDG objects
+lcomment 3CA1 indexing based on player wave
 label    3E46 Alien_Ship_1
 label    3E61 Alien_Ship_2
 label    3E78 Alien_Fuzz_1
@@ -3098,6 +3140,10 @@ label    3DCA Gemstone
 label    3DE3 Plutonium
 label    3E00 Isotope
 label    3E15 Mineral
+lcomment 3E15 Also, Platform_Left
+label    3E1F Platform_Middle
+label    3E29 Platform_Right
+lcomment 3E33 Platform_Right_End
 label    3F74 Explosion_UDG_RAM_Addr_Frame_1
 label    3F9B Explosion_UDG_RAM_Addr_Frame_2
 label    3FB2 Explosion_UDG_RAM_Addr_Frame_3
