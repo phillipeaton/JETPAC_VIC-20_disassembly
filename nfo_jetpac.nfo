@@ -2148,7 +2148,7 @@ comment  30DF Test if obj is $10 pixels left of platform, if yes, no Y check nee
 label    30DF TPC_Test_Obj_Past_Right_Of_Pfm
 comment  30E3
 comment  30E3 Test object is $0C or less pixels to left of platform, if yes, Y check needed
-comment  30E3 Triggered When a wave 0 alien position X moves to either side of a platfrom, but no overlap
+comment  30E3 Triggered When a wave 0 alien position X moves to either side of a platform, but no overlap
 comment  30E7
 comment  30E7 Object is greater than $0C pixels to left of platform, set bit 2, Y check needed
 comment  30EC
@@ -2209,36 +2209,33 @@ comment  3143
 
 comment  3143
 label    3143 Load_Platform_Data_Table_Addr
-lcomment 3143 Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
+comment  3143 Load platform data table address ($31B6) and number of platforms (3) to Zero Page variables
 deflabel 3144 PLATFORM_DATA_TABLE_ADDR_LO
 comment  3147
 deflabel 3148 PLATFORM_DATA_TABLE_ADDR_HI
 comment  314B
-deflabel 314C PLATFORM_NUMBER_COUNTDOWN
+deflabel 314C PLATFORM_QUANTITY
 comment  314F
 comment  314F Initial index into the Platform Data Table
 comment  3152
 label    3152 Draw_Platforms
 comment  3155
-label    3155 Loop_Draw_Platfrom
-lcomment 3155 Get X value from lookup table ($10)
-lcomment 3157 \ and store
+comment  3155 Load X, Y and Platform Width in characters, into Zero Page variables, y starts as 0, 3 or 6
+label    3155 Loop_Draw_Platform
 comment  3159
-lcomment 315A Get Y value from lookup table ($40)
-lcomment 315C \ and store
 comment  315E
-lcomment 315F Get ??? value from lookup table ($03)
-lcomment 3161 \ and store
 comment  3163
+comment  3163 Store platform data table index into variable for next time round
 comment  316B
-comment  316B Load Temp_3 with addr of left end platform UDG char
+comment  316B Load zero page variables with addr of left end platform UDG char
 deflabel 316C PLATFORM_UDG_DATA_ADDR_LO
+comment  316F
 deflabel 3170 PLATFORM_UDG_DATA_ADDR_HI
 comment  3173
-comment  3173 Copy left end platform UDG char to RAM, bytes 9 per column
+comment  3173 Copy platform left end UDG char to RAM, bytes 9 per column
 deflabel 3174 PLATFORM_HEIGHT_PIXELS
 comment  3178
-comment  3178 Copy middle platform and right end UDG chars to RAM, 9 bytes per column
+comment  3178 Copy platform middle and right end UDG chars to RAM, 9 bytes per column
 comment  317B
 label    317B Loop_Next_Char
 deflabel 317C PLATFORM_HEIGHT_PIXELS
@@ -2248,7 +2245,7 @@ comment  3186 Set the colour mapping for the platforms to Green
 comment  318F
 deflabel 3192 COLOUR_GREEN
 comment  3193
-label    3193 Loop_Colorize_Platfrom_Green
+label    3193 Loop_Colorize_Platform_Green
 lcomment 3193 ZP0C_Col_RAM_Ptr_Lo
 comment  3195
 comment  319A

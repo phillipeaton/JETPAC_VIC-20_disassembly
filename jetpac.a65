@@ -154,7 +154,7 @@ PLATFORM_HEIGHT_PIXELS_TOTAL    equ     $0A
 PLATFORM_HEIGHT_PIXELS          equ     $09
 PLATFORM_UDG_DATA_ADDR_HI       equ     $3E
 PLATFORM_UDG_DATA_ADDR_LO       equ     $15
-PLATFORM_NUMBER_COUNTDOWN       equ     $03
+PLATFORM_QUANTITY               equ     $03
 PLATFORM_DATA_TABLE_ADDR_HI     equ     $31
 PLATFORM_DATA_TABLE_ADDR_LO     equ     $B6
 SCREEN_BOTTOM_1UP               equ     $AE
@@ -5070,7 +5070,7 @@ TPC_Test_Obj_Past_Right_Of_Pfm
     bcs     TPC_Next_Platform_Data_Inc      ; 30E1: B0 35    
 
 ; Test object is $0C or less pixels to left of platform, if yes, Y check needed
-; Triggered When a wave 0 alien position X moves to either side of a platfrom, but no overlap
+; Triggered When a wave 0 alien position X moves to either side of a platform, but no overlap
     cmp     #$0C                            ; 30E3: C9 0C    
     bcc     TPC_Test_Platform_Collision_Y   ; 30E5: 90 05    
 
@@ -5203,16 +5203,17 @@ TPC_Test???_Jetman_Standing
 ; YOU ARE HERE ######################################################################
 
 
+; Load platform data table address ($31B6) and number of platforms (3) to Zero Page variables
 ; L_JSR_($3143)_($30BF) OK
 ; L_JSR_($3143)_($3152) OK
 Load_Platform_Data_Table_Addr
-    lda     #PLATFORM_DATA_TABLE_ADDR_LO    ; 3143: A9 B6     Loads address to data from $31B6 i.e. 10 40 03 50 60 01 88 30 03
+    lda     #PLATFORM_DATA_TABLE_ADDR_LO    ; 3143: A9 B6    
     sta     ZP08                            ; 3145: 85 08    
 
     lda     #PLATFORM_DATA_TABLE_ADDR_HI    ; 3147: A9 31    
     sta     ZP09                            ; 3149: 85 09    
 
-    lda     #PLATFORM_NUMBER_COUNTDOWN      ; 314B: A9 03    
+    lda     #PLATFORM_QUANTITY              ; 314B: A9 03    
     sta     ZP0A                            ; 314D: 85 0A    
 
 ; Initial index into the Platform Data Table
@@ -5224,34 +5225,37 @@ Load_Platform_Data_Table_Addr
 Draw_Platforms
     jsr     Load_Platform_Data_Table_Addr   ; 3152: 20 43 31 
 
+; Load X, Y and Platform Width in characters, into Zero Page variables, y starts as 0, 3 or 6
 ; L_BRS_($3155)_($319F) OK
-Loop_Draw_Platfrom
-    lda     (ZP08),y                        ; 3155: B1 08     Get X value from lookup table ($10)
-    sta     ZP04                            ; 3157: 85 04      and store
+Loop_Draw_Platform
+    lda     (ZP08),y                        ; 3155: B1 08    
+    sta     ZP04                            ; 3157: 85 04    
 
     iny                                     ; 3159: C8       
-    lda     (ZP08),y                        ; 315A: B1 08     Get Y value from lookup table ($40)
-    sta     ZP05                            ; 315C: 85 05      and store
+    lda     (ZP08),y                        ; 315A: B1 08    
+    sta     ZP05                            ; 315C: 85 05    
 
     iny                                     ; 315E: C8       
-    lda     (ZP08),y                        ; 315F: B1 08     Get ??? value from lookup table ($03)
-    sta     ZP0B                            ; 3161: 85 0B      and store
+    lda     (ZP08),y                        ; 315F: B1 08    
+    sta     ZP0B                            ; 3161: 85 0B    
 
+; Store platform data table index into variable for next time round
     sty     ZP03                            ; 3163: 84 03    
     jsr     Setup_Colour_RAM_Ptr            ; 3165: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 3168: 20 1D 35 
 
-; Load Temp_3 with addr of left end platform UDG char
+; Load zero page variables with addr of left end platform UDG char
     lda     #PLATFORM_UDG_DATA_ADDR_LO      ; 316B: A9 15    
     sta     ZP06                            ; 316D: 85 06    
+
     lda     #PLATFORM_UDG_DATA_ADDR_HI      ; 316F: A9 3E    
     sta     ZP07                            ; 3171: 85 07    
 
-; Copy left end platform UDG char to RAM, bytes 9 per column
+; Copy platform left end UDG char to RAM, bytes 9 per column
     ldy     #PLATFORM_HEIGHT_PIXELS         ; 3173: A0 09    
     jsr     Copy_Char_To_UDG_RAM            ; 3175: 20 B6 35 
 
-; Copy middle platform and right end UDG chars to RAM, 9 bytes per column
+; Copy platform middle and right end UDG chars to RAM, 9 bytes per column
     jsr     Next_UDG_Char                   ; 3178: 20 A8 31 
 
 ; L_BRS_($317B)_($3184) OK
@@ -5275,17 +5279,17 @@ Loop_Next_Char
     lda     #COLOUR_GREEN                   ; 3191: A9 05    
 
 ; L_BRS_($3193)_($3198) OK
-Loop_Colorize_Platfrom_Green
+Loop_Colorize_Platform_Green
     sta     (ZP0C),y                        ; 3193: 91 0C     ZP0C_Col_RAM_Ptr_Lo
 
     iny                                     ; 3195: C8       
     dec     ZP0B                            ; 3196: C6 0B    
-    bpl     Loop_Colorize_Platfrom_Green    ; 3198: 10 F9    
+    bpl     Loop_Colorize_Platform_Green    ; 3198: 10 F9    
 
     ldy     ZP03                            ; 319A: A4 03    
     iny                                     ; 319C: C8       
     dec     ZP0A                            ; 319D: C6 0A    
-    bne     Loop_Draw_Platfrom              ; 319F: D0 B4    
+    bne     Loop_Draw_Platform              ; 319F: D0 B4    
     rts                                     ; 31A1: 60       
 ; ==========================================
 

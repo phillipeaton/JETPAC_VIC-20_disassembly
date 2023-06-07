@@ -178,9 +178,9 @@
 /; 3063/,/; 3098/s/ZP03                            /ZP03_Score_Byte_Lo              /
 /; 3063/,/; 3098/s/(ZP06),y                        /(ZP06_Player_Score_Addr),y      /
 
-# Test_Platform_Collision / Draw Platfroms
+# Test_Platform_Collision / Draw Platforms
 /ZP02                            equ     $0002/a ZP02_Collision_Status           equ     $0002
-/ZP03                            equ     $0003/a ZP03_Platfrom_Data_Table_Index  equ     $0003
+/ZP03                            equ     $0003/a ZP03_Platform_Data_Table_Index  equ     $0003
 /ZP04                            equ     $0004/a ZP04_Platform_Position_X        equ     $0004
 /ZP05                            equ     $0005/a ZP05_Platform_Position_Y        equ     $0005
 /ZP06                            equ     $0006/a ZP06_Platform_UDG_Data_Addr_Lo  equ     $0006
@@ -194,7 +194,7 @@
 /ZP0E                            equ     $000E/a ZP0E_Object_Position_X          equ     $000E
 /ZP0F                            equ     $000F/a ZP0F_Object_Position_Y          equ     $000F
 /; 309B/,/; 31B5/s/ZP02                            /ZP02_Collision_Status           /
-/; 309B/,/; 31B5/s/ZP03                            /ZP03_Platfrom_Data_Table_Index  /
+/; 309B/,/; 31B5/s/ZP03                            /ZP03_Platform_Data_Table_Index  /
 /; 309B/,/; 31B5/s/ZP04                            /ZP04_Platform_Position_X        /
 /; 309B/,/; 31B5/s/ZP05                            /ZP05_Platform_Position_Y        /
 /; 309B/,/; 31B5/s/ZP06                            /ZP06_Platform_UDG_Data_Addr_Lo  /
