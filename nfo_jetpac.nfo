@@ -2220,43 +2220,52 @@ comment  314F Initial index into the Platform Data Table
 comment  3152
 label    3152 Draw_Platforms
 comment  3155
-comment  3155 Load X, Y and Platform Width in characters, into Zero Page variables, y starts as 0, 3 or 6
+comment  3155 Load X, Y and Platform Width in columns into Zero Page variables
+comment  3155 Register Y index starts as 0, 3 or 6
 label    3155 Loop_Draw_Platform
 comment  3159
 comment  315E
 comment  3163
-comment  3163 Store platform data table index into variable for next time round
+comment  3163 Store platform data table index into variable for next platform
 comment  316B
-comment  316B Load zero page variables with addr of left end platform UDG char
+comment  316B Load zero page variables with addr of leftmost platform UDG object data
 deflabel 316C PLATFORM_UDG_DATA_ADDR_LO
 comment  316F
 deflabel 3170 PLATFORM_UDG_DATA_ADDR_HI
 comment  3173
-comment  3173 Copy platform left end UDG char to RAM, bytes 9 per column
+comment  3173 Copy platform leftmost UDG object data to RAM, bytes 9 per column i.e. UDG is 9 pixels high
 deflabel 3174 PLATFORM_HEIGHT_PIXELS
 comment  3178
-comment  3178 Copy platform middle and right end UDG chars to RAM, 9 bytes per column
 comment  317B
+comment  317B Copy platform middle and rightmost UDG chars to RAM, 9 bytes per column i.e. UDG is 9 pixels high
 label    317B Loop_Next_Char
 deflabel 317C PLATFORM_HEIGHT_PIXELS
 comment  3180
+comment  3180 Test width of platform counter, when zero, move UDG Data pointer to the rightmost
+comment  3180 platform object, otherwise just display the current middle platform UDG object data again
 comment  3186
-comment  3186 Set the colour mapping for the platforms to Green
+comment  3186 Increment the index into the platform data table and store platform width columns+1 into ZP08
 comment  318F
+comment  318F Initialise colourization data
 deflabel 3192 COLOUR_GREEN
 comment  3193
+comment  3193 Colourize the first platform object data column, then loop round the other data object columns
+comment  3193 plus a further column for the rightmost platfrom object data column
 label    3193 Loop_Colorize_Platform_Green
-lcomment 3193 ZP0C_Col_RAM_Ptr_Lo
 comment  3195
 comment  319A
+comment  319A Get index into the platform data table and increment whlist in Register A
+comment  319D
+comment  319D Test if all platform have been drawn yet, loop if not
 comment  31A2
 label    31A2 Next_UDG_Char_Loop_Next_Char
 comment  31A8
+comment  31A8 16-bit increment of Platform UDG data address
 label    31A8 Next_UDG_Char
 deflabel 31AC PLATFORM_HEIGHT_PIXELS_TOTAL
 comment  31AF
 comment  31B6
-comment  31B6 Platform data table, 3 platforms
+comment  31B6 Platform data table, 3 platforms, X coord, Y coord, #Number of platform middle columns
 const    31B6-31BE
 lcomment 31B6 X Y #Num_middle_chars
 break    31B9

@@ -5225,7 +5225,8 @@ Load_Platform_Data_Table_Addr
 Draw_Platforms
     jsr     Load_Platform_Data_Table_Addr   ; 3152: 20 43 31 
 
-; Load X, Y and Platform Width in characters, into Zero Page variables, y starts as 0, 3 or 6
+; Load X, Y and Platform Width in columns into Zero Page variables
+; Register Y index starts as 0, 3 or 6
 ; L_BRS_($3155)_($319F) OK
 Loop_Draw_Platform
     lda     (ZP08),y                        ; 3155: B1 08    
@@ -5239,55 +5240,63 @@ Loop_Draw_Platform
     lda     (ZP08),y                        ; 315F: B1 08    
     sta     ZP0B                            ; 3161: 85 0B    
 
-; Store platform data table index into variable for next time round
+; Store platform data table index into variable for next platform
     sty     ZP03                            ; 3163: 84 03    
     jsr     Setup_Colour_RAM_Ptr            ; 3165: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 3168: 20 1D 35 
 
-; Load zero page variables with addr of left end platform UDG char
+; Load zero page variables with addr of leftmost platform UDG object data
     lda     #PLATFORM_UDG_DATA_ADDR_LO      ; 316B: A9 15    
     sta     ZP06                            ; 316D: 85 06    
 
     lda     #PLATFORM_UDG_DATA_ADDR_HI      ; 316F: A9 3E    
     sta     ZP07                            ; 3171: 85 07    
 
-; Copy platform left end UDG char to RAM, bytes 9 per column
+; Copy platform leftmost UDG object data to RAM, bytes 9 per column i.e. UDG is 9 pixels high
     ldy     #PLATFORM_HEIGHT_PIXELS         ; 3173: A0 09    
     jsr     Copy_Char_To_UDG_RAM            ; 3175: 20 B6 35 
 
-; Copy platform middle and right end UDG chars to RAM, 9 bytes per column
     jsr     Next_UDG_Char                   ; 3178: 20 A8 31 
 
+; Copy platform middle and rightmost UDG chars to RAM, 9 bytes per column i.e. UDG is 9 pixels high
 ; L_BRS_($317B)_($3184) OK
 ; L_JMP_($317B)_($31A5) OK
 Loop_Next_Char
     ldy     #PLATFORM_HEIGHT_PIXELS         ; 317B: A0 09    
     jsr     Copy_Char_To_UDG_RAM            ; 317D: 20 B6 35 
 
+; Test width of platform counter, when zero, move UDG Data pointer to the rightmost
+; platform object, otherwise just display the current middle platform UDG object data again
     dec     ZP0B                            ; 3180: C6 0B    
     beq     Next_UDG_Char_Loop_Next_Char    ; 3182: F0 1E    
     bpl     Loop_Next_Char                  ; 3184: 10 F5    
 
-; Set the colour mapping for the platforms to Green
+; Increment the index into the platform data table and store platform width columns+1 into ZP08
     ldy     ZP03                            ; 3186: A4 03    
     lda     (ZP08),y                        ; 3188: B1 08    
     clc                                     ; 318A: 18       
     adc     #$01                            ; 318B: 69 01    
     sta     ZP0B                            ; 318D: 85 0B    
 
+; Initialise colourization data
     ldy     #$00                            ; 318F: A0 00    
     lda     #COLOUR_GREEN                   ; 3191: A9 05    
 
+; Colourize the first platform object data column, then loop round the other data object columns
+; plus a further column for the rightmost platfrom object data column
 ; L_BRS_($3193)_($3198) OK
 Loop_Colorize_Platform_Green
-    sta     (ZP0C),y                        ; 3193: 91 0C     ZP0C_Col_RAM_Ptr_Lo
+    sta     (ZP0C),y                        ; 3193: 91 0C    
 
     iny                                     ; 3195: C8       
     dec     ZP0B                            ; 3196: C6 0B    
     bpl     Loop_Colorize_Platform_Green    ; 3198: 10 F9    
 
+; Get index into the platform data table and increment whlist in Register A
     ldy     ZP03                            ; 319A: A4 03    
     iny                                     ; 319C: C8       
+
+; Test if all platform have been drawn yet, loop if not
     dec     ZP0A                            ; 319D: C6 0A    
     bne     Loop_Draw_Platform              ; 319F: D0 B4    
     rts                                     ; 31A1: 60       
@@ -5299,6 +5308,7 @@ Next_UDG_Char_Loop_Next_Char
     jmp     Loop_Next_Char                  ; 31A5: 4C 7B 31 
 ; ------------------------------------------
 
+; 16-bit increment of Platform UDG data address
 ; L_JSR_($31A8)_($3178) OK
 ; L_JSR_($31A8)_($31A2) OK
 Next_UDG_Char
@@ -5313,7 +5323,7 @@ Next_UDG_Char
     rts                                     ; 31B5: 60       
 ; ==========================================
 
-; Platform data table, 3 platforms
+; Platform data table, 3 platforms, X coord, Y coord, #Number of platform middle columns
     fcb     $10,$40,$03                     ; 31B6: 10 40 03  X Y #Num_middle_chars
     fcb     $50,$60,$01                     ; 31B9: 50 60 01  X Y #Num_middle_chars
     fcb     $88,$30,$03                     ; 31BC: 88 30 03  X Y #Num_middle_chars

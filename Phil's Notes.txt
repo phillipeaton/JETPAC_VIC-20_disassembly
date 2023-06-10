@@ -157,3 +157,6 @@ If colour > 7 used, you just get wrong characters displayed
 When colour is 0, it's invisible against the black background
 
 End fo string has top bit set to denote end. But is it the top 4 bits? See STR_GAME_OVER_PLAYER_1.
+
+-------------
+Change Display to Draw
