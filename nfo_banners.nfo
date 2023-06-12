@@ -39,15 +39,15 @@ comment  332C
 comment  332C
 comment  332C
 comment  332C #########################################################################################
-comment  332C \88""Yb 888888    db    8888b.
-comment  332C \88__dP 88__     dPYb    8I  Yb
-comment  332C \88"Yb  88""    dP__Yb   8I  dY
-comment  332C \88  Yb 888888 dP""""Yb 8888Y"
+comment  332C \ 88888 888888 888888 8b    d8    db    88b 88
+comment  332C \    88 88__     88   88b  d88   dPYb   88Yb88
+comment  332C \o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
+comment  332C \"bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
 comment  332C
-comment  332C \ dP""b8  dP"Yb  88b 88 888888 88""Yb  dP"Yb  88     .dP"Y8
-comment  332C \dP   `" dP   Yb 88Yb88   88   88__dP dP   Yb 88     `Ybo."
-comment  332C \Yb      Yb   dP 88 Y88   88   88"Yb  Yb   dP 88  .o o.`Y8b
-comment  332C \ YboodP  YbodP  88  Y8   88   88  Yb  YbodP  88ood8 8bodP'
+comment  332C \.dP"Y8 888888    db    88b 88 8888b.  88 88b 88  dP""b8
+comment  332C \`Ybo."   88     dPYb   88Yb88  8I  Yb 88 88Yb88 dP   `"
+comment  332C \o.`Y8b   88    dP__Yb  88 Y88  8I  dY 88 88 Y88 Yb  "88
+comment  332C \8bodP'   88   dP""""Yb 88  Y8 8888Y"  88 88  Y8  YboodP
 comment  332C #########################################################################################
 ;
 comment  28F9

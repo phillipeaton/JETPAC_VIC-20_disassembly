@@ -140,6 +140,7 @@ SCREEN_HEIGHT_PIXELS            equ     $B0
 OBJECT_COLOUR_PARAM             equ     $05
 OBJECT_POSITION_Y_PARAM         equ     $03
 OBJECT_TYPE_PARAM               equ     $00
+PETSCII_OFFSET                  equ     $70
 NUM_PIXEL_OF_LINES_TO_REVERSE   equ     $0F
 NUM_OF_COLUMNS_TO_REVERSE       equ     $06
 JETMAN_STATE_PARAM              equ     $00
@@ -2005,7 +2006,7 @@ Restore_Saved_Obj_Ptr_And_CLI
 Subroutine_List
     fdb     GOTO_NEXT_OBJECT                ; 268C: 1A 26     00
     fdb     JETMAN_FLYING_                  ; 268E: 73 32     01
-    fdb     READ_CONTROLS                   ; 2690: 4D 33     02
+    fdb     JETMAN_STANDING_                ; 2690: 4D 33     02
     fdb     ANIMATE_EXPLOSIONS              ; 2692: 34 29     03
     fdb     ROCKET_PART_OR_FUEL             ; 2694: 8E 2F     04
     fdb     WAVE_0_FUZZBALL                 ; 2696: 6A 2C     05
@@ -5200,9 +5201,6 @@ TPC_Test???_Jetman_Standing
 ; 88"""  88  .o  dP__Yb    88   88""   Yb   dP 88"Yb  88YbdP88 o.`Y8b
 ; 88     88ood8 dP""""Yb   88   88      YbodP  88  Yb 88 YY 88 8bodP'
 
-; YOU ARE HERE ######################################################################
-
-
 ; Load platform data table address ($31B6) and number of platforms (3) to Zero Page variables
 ; L_JSR_($3143)_($30BF) OK
 ; L_JSR_($3143)_($3152) OK
@@ -5343,6 +5341,8 @@ Next_UDG_Char
 ; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
 ; "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
 ; #########################################################################################
+
+; NOT COMPLETE YET ######################################################################
 
 ; L_BRS_($31BF)_($3203) OK
 A_Left_Right_Impact
@@ -5712,16 +5712,19 @@ D_Set_Jetman_Standing
 
 
 ; #########################################################################################
-; 88""Yb 888888    db    8888b.
-; 88__dP 88__     dPYb    8I  Yb
-; 88"Yb  88""    dP__Yb   8I  dY
-; 88  Yb 888888 dP""""Yb 8888Y"
+;  88888 888888 888888 8b    d8    db    88b 88
+;     88 88__     88   88b  d88   dPYb   88Yb88
+; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
+; "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
 
-;  dP""b8  dP"Yb  88b 88 888888 88""Yb  dP"Yb  88     .dP"Y8
-; dP   `" dP   Yb 88Yb88   88   88__dP dP   Yb 88     `Ybo."
-; Yb      Yb   dP 88 Y88   88   88"Yb  Yb   dP 88  .o o.`Y8b
-;  YboodP  YbodP  88  Y8   88   88  Yb  YbodP  88ood8 8bodP'
+; .dP"Y8 888888    db    88b 88 8888b.  88 88b 88  dP""b8
+; `Ybo."   88     dPYb   88Yb88  8I  Yb 88 88Yb88 dP   `"
+; o.`Y8b   88    dP__Yb  88 Y88  8I  dY 88 88 Y88 Yb  "88
+; 8bodP'   88   dP""""Yb 88  Y8 8888Y"  88 88  Y8  YboodP
 ; #########################################################################################
+
+; NEEDS MORE WORK ######################################################################
+
 
 ; L_BRS_($332C)_($3381) OK
 Set_Jetman_Facing_Right
@@ -5741,6 +5744,7 @@ Set_Jetman_Facing_Left
     jmp     Update_JM_Direction_Position_X  ; 333F: 4C 9F 33 
 ; ------------------------------------------
 
+; When Jetman goes off left edge of screen, move to rightmost screen pixel co-ord i.e. $B8
 ; L_BRS_($3342)_($33A9) OK
 Jetman_Wrap_Left_To_Right
     clc                                     ; 3342: 18       
@@ -5748,22 +5752,23 @@ Jetman_Wrap_Left_To_Right
     jmp     Store_Jetman_New_Position_X     ; 3345: 4C AF 33 
 ; ------------------------------------------
 
+; When Jetman goes off right edge of screen i.e. past $B8, add $48 to screen pixel co-ord making $0
 ; L_BRS_($3348)_($33AD) OK
 Jetman_Wrap_Right_To_Left
     adc     #_100_MINUS_SCREEN_WIDTH_PIXELS ; 3348: 69 48    
     jmp     Store_Jetman_New_Position_X     ; 334A: 4C AF 33 
 ; ------------------------------------------
 
-READ_CONTROLS
+JETMAN_STANDING_
     lda     ZP_Flash_Score_Countdown        ; 334D: A5 5D    
-    beq     Read_Controls_1                 ; 334F: F0 19    
+    beq     Do_Jetman_Standing              ; 334F: F0 19    
 
 ; At start of each life, flash active player score before wave begins, until counter reaches zero
     jsr     Flash_Score                     ; 3351: 20 65 34 
     dec     ZP_Flash_Score_Countdown        ; 3354: C6 5D    
-    bne     Flash_Display_Score_JMP         ; 3356: D0 0F    
+    bne     JMP_Goto_Next_Object            ; 3356: D0 0F    
 
-; Display Jetman, colour jetman and display scores
+; Score flashing finished, display Jetman, colourize Jetman and display scores
     jsr     Display_Object_With_Setup_1     ; 3358: 20 01 36 
     jsr     Colourize_Object                ; 335B: 20 1F 38 
     jsr     Display_1UP_HI_2UP_Text         ; 335E: 20 25 24 
@@ -5771,15 +5776,15 @@ READ_CONTROLS
     jsr     Display_Player_2_Score          ; 3364: 20 81 24 
 
 ; L_BRS_($3367)_($3356) OK
-Flash_Display_Score_JMP
+JMP_Goto_Next_Object
     jmp     GOTO_NEXT_OBJECT                ; 3367: 4C 1A 26 
 ; ------------------------------------------
 
 ; L_BRS_($336A)_($334F) OK
-Read_Controls_1
+Do_Jetman_Standing
     jsr     Load_Object_Type_X_Y            ; 336A: 20 D7 35 
     jsr     Read_Keyboard_Joystick          ; 336D: 20 F7 33 
-    jsr     Test_Platform_Collision         ; 3370: 20 B3 30  Remove=Jetman+pickup flies/walks jiggle when standing on a platform
+    jsr     Test_Platform_Collision         ; 3370: 20 B3 30 
     lda     ZP02                            ; 3373: A5 02    
     bmi     Set_Jetman_Facing_Direction     ; 3375: 30 06    
 
@@ -5843,6 +5848,7 @@ Update_JM_Direction_Position_X
     adc     (ZP_Obj_List_Ptr_Lo),y          ; 33A5: 71 00    
     cmp     #$F0                            ; 33A7: C9 F0    
     bcs     Jetman_Wrap_Left_To_Right       ; 33A9: B0 97    
+
     cmp     #SCREEN_WIDTH_PIXELS            ; 33AB: C9 B8    
     bcs     Jetman_Wrap_Right_To_Left       ; 33AD: B0 99    
 
@@ -5850,6 +5856,7 @@ Update_JM_Direction_Position_X
 ; L_JMP_($33AF)_($334A) OK
 Store_Jetman_New_Position_X
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 33AF: 91 00    
+
     lda     ZP_Jetman_Action                ; 33B1: A5 1C    
     and     #%00010000                      ; 33B3: 29 10     Test for direction Up
     beq     Update_JM_Direction_Position_Y  ; 33B5: F0 03     Yes, branch
@@ -6028,20 +6035,20 @@ Read_Keyboard_Down
 ; L_JSR_($3465)_($3351) OK
 Flash_Score
     lda     ZP_Active_Player                ; 3465: A5 5E    
-    bne     Load_UDG_RAM_Addr_For_P2        ; 3467: D0 31    
+    bne     Load_UDG_RAM_Addr_Player_2      ; 3467: D0 31    
     jsr     Load_ZP_Parameters              ; 3469: 20 9D 25 
     fcb     $04                             ; 346C: 04        ZP04
     fcb     $00,$00                         ; 346D: 00 00     X Y position in pixels
     fcb     $FF                             ; 346F: FF       
 
 ; L_JMP_($3470)_($34A1) OK
-Flash_Score_1
+Flash_Score_Start
     jsr     Convert_XY_to_UDG_RAM_Addr      ; 3470: 20 1D 35 
 
 ; Test IRQ counter, only continue once in 8 calls
     lda     ZP_HW_IRQ_Counter_Lo            ; 3473: A5 4A    
-    and     #%00000111                      ; 3475: 29 07    
-    bne     Flash_Score_RTS                 ; 3477: D0 20    
+    and     #%00000111                      ; 3475: 29 07     Zero bits 3-7 0000_0xxx
+    bne     RTS_Flash_Score                 ; 3477: D0 20    
 
     ldx     #NUM_OF_COLUMNS_TO_REVERSE      ; 3479: A2 06    
 
@@ -6062,7 +6069,7 @@ Loop_Reverse_UDG_Pixel_Line
 
 ; All columns reversed? If yes, return
     dex                                     ; 3486: CA       
-    beq     Flash_Score_RTS                 ; 3487: F0 10    
+    beq     RTS_Flash_Score                 ; 3487: F0 10    
 
 ; Move to next column by adding a columns-worth ($B0 #176) of pixel lines to 16-bit UDG RAM Address
     lda     ZP04                            ; 3489: A5 04    
@@ -6079,17 +6086,17 @@ Loop_Reverse_UDG_Pixel_Line
 
 ; L_BRS_($3499)_($3477) OK
 ; L_BRS_($3499)_($3487) OK
-Flash_Score_RTS
+RTS_Flash_Score
     rts                                     ; 3499: 60       
 ; ==========================================
 
 ; L_BRS_($349A)_($3467) OK
-Load_UDG_RAM_Addr_For_P2
+Load_UDG_RAM_Addr_Player_2
     jsr     Load_ZP_Parameters              ; 349A: 20 9D 25 
     fcb     $04                             ; 349D: 04        ZP04
     fcb     $80,$00                         ; 349E: 80 00     X Y position in pixels
     fcb     $FF                             ; 34A0: FF       
-    jmp     Flash_Score_1                   ; 34A1: 4C 70 34 
+    jmp     Flash_Score_Start               ; 34A1: 4C 70 34 
 ; ------------------------------------------
 
 
@@ -6124,46 +6131,49 @@ Load_UDG_RAM_Addr_For_P2
 ; L_BRS_($34A4)_($34C9) OK
 Display_BCD_Bytes
     ldy     #$00                            ; 34A4: A0 00    
-    lda     (ZP0E),y                        ; 34A6: B1 0E     A = 12 BCD i.e. First score byte
 
-; Divide by $10 to isolate first digit
+; Load the first score byte e.g. A = 12 BCD i.e. First score byte of 12 34 56
+    lda     (ZP0E),y                        ; 34A6: B1 0E    
+
+; Divide by $10 to isolate first digit e.g. 12 becomes 01
     lsr     a                               ; 34A8: 4A       
     lsr     a                               ; 34A9: 4A       
     lsr     a                               ; 34AA: 4A       
-    lsr     a                               ; 34AB: 4A        12 has become 01
+    lsr     a                               ; 34AB: 4A       
 
-; Add $70, $40 gets subtracted in display routine, making 01 into a PETSCII "1"
+; Add $70, $40 gets subtracted in display routine, thus making 01 into a PETSCII "1"
     clc                                     ; 34AC: 18       
-    adc     #$70                            ; 34AD: 69 70    
+    adc     #PETSCII_OFFSET                 ; 34AD: 69 70    
     sta     ZP06                            ; 34AF: 85 06    
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 34B1: 20 95 35 
 
 ; Load first score byte again to display second score character
     ldy     #$00                            ; 34B4: A0 00    
-    lda     (ZP0E),y                        ; 34B6: B1 0E     A = 12 BCD i.e. First score byte
+    lda     (ZP0E),y                        ; 34B6: B1 0E    
 
-; Zero top 4 bits to isolate second digit
-    and     #%00001111                      ; 34B8: 29 0F     12 becomes 02
+; Zero top 4 bits to isolate second digit e.g. 12 becomes 02
+    and     #%00001111                      ; 34B8: 29 0F    
 
-; Add $70, $40 gets subtracted in display routine, making 02 into a PETSCII "2"
-    adc     #$70                            ; 34BA: 69 70    
+; Add $70, $40 gets subtracted in display routine, thus making 02 into a PETSCII "2"
+    adc     #PETSCII_OFFSET                 ; 34BA: 69 70    
     sta     ZP06                            ; 34BC: 85 06    
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 34BE: 20 95 35 
 
 ; Increment addres pointer to next score byte
     inc     ZP0E                            ; 34C1: E6 0E    
-    bne     No_Increment_Hi_Byte            ; 34C3: D0 02     Looks like a BUG, should inc ZP0F,
-    inc     ZP07                            ; 34C5: E6 07     but in JETPAC it'll never happen
+    bne     Test_All_Bytes_Displayed        ; 34C3: D0 02    
 
+; Looks like a BUG, should inc ZP0F, but in JETPAC it'll never happen
+    inc     ZP07                            ; 34C5: E6 07    
+
+; Test all score bytes displayed, if not, loop back
 ; L_BRS_($34C7)_($34C3) OK
-No_Increment_Hi_Byte
+Test_All_Bytes_Displayed
     dec     ZP02                            ; 34C7: C6 02    
     bne     Display_BCD_Bytes               ; 34C9: D0 D9    
     rts                                     ; 34CB: 60       
 ; ==========================================
 
-; ----------------------------------------------------------
-; NOT SURE WHAT THIS IS YET
 ; ----------------------------------------------------------
 ; FUNCTION  :
 ; CALLED BY :
@@ -6175,6 +6185,9 @@ No_Increment_Hi_Byte
 ; ZP_UDG_RAM_Y   = 08 A8 or 08 20
 ; ZP_Addr_From   = 70 80 or 28 80
 ; ----------------------------------------------------------
+
+; YOU ARE HERE #########################################################################
+
 ; L_JSR_($34CC)_($2445) OK
 ; L_JSR_($34CC)_($24D4) OK
 ; L_JSR_($34CC)_($24E1) OK

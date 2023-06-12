@@ -2202,11 +2202,6 @@ comment  313D
 comment  313D Jetman is standing (i.e. not flying)
 label    313D TPC_Test???_Jetman_Standing
 binary   313F
-
-comment  3143
-comment  3143 YOU ARE HERE ######################################################################
-comment  3143
-
 comment  3143
 label    3143 Load_Platform_Data_Table_Addr
 comment  3143 Load platform data table address ($31B6) and number of platforms (3) to Zero Page variables
@@ -2273,6 +2268,8 @@ lcomment 31B9 X Y #Num_middle_chars
 break    31BC
 lcomment 31BC X Y #Num_middle_chars
 comment  31BF
+comment  31BF NOT COMPLETE YET ######################################################################
+comment  31BF
 label    31BF A_Left_Right_Impact
 deflabel 31C0 JETMAN_DIRECTION_X_PARAM
 comment  31C7
@@ -2321,6 +2318,11 @@ label    3218 M_Flying_Up_Impact_Bounce
 label    3224 SKIP_3224
 comment  3228
 label    3228 N_Flying_Left
+
+comment  332C
+comment  332C NEEDS MORE WORK ######################################################################
+comment  332C
+
 comment  3230
 comment  323E
 label    323E S_Flying_Right
@@ -2399,22 +2401,23 @@ label    3337 Set_Jetman_Facing_Left
 lcomment 3339 Set bit 7
 binary   333A
 comment  3342
+comment  3342 When Jetman goes off left edge of screen, move to rightmost screen pixel co-ord i.e. $B8
 label    3342 Jetman_Wrap_Left_To_Right
 deflabel 3344 SCREEN_WIDTH_PIXELS
 comment  3348
+comment  3348 When Jetman goes off right edge of screen i.e. past $B8, add $48 to screen pixel co-ord making $0
 label    3348 Jetman_Wrap_Right_To_Left
 deflabel 3349 _100_MINUS_SCREEN_WIDTH_PIXELS
 comment  334D
-label    334D READ_CONTROLS
+label    334D JETMAN_STANDING_
 comment  3351
 comment  3351 At start of each life, flash active player score before wave begins, until counter reaches zero
 comment  3358
-comment  3358 Display Jetman, colour jetman and display scores
+comment  3358 Score flashing finished, display Jetman, colourize Jetman and display scores
 comment  3367
-label    3367 Flash_Display_Score_JMP
+label    3367 JMP_Goto_Next_Object
 comment  336A
-label    336A Read_Controls_1
-lcomment 3370 Remove=Jetman+pickup flies/walks jiggle when standing on a platform
+label    336A Do_Jetman_Standing
 comment  3377
 comment  3377 Jetman has walked off edge of platform, test if Position Y is negative, which
 comment  3377 only appears to be the case when Jetman is below all the platforms
@@ -2445,9 +2448,11 @@ label    339F Update_JM_Direction_Position_X
 deflabel 33A0 JETMAN_DIRECTION_X_PARAM
 comment  33A3
 comment  33A3 Y becomes JETMAN_POSITION_X_PARAM
+comment  33AB
 deflabel 33AC SCREEN_WIDTH_PIXELS
 comment  33AF
 label    33AF Store_Jetman_New_Position_X
+comment  33B1
 lcomment 33B3 Test for direction Up
 binary   33B4
 lcomment 33B5 Yes, branch
@@ -2552,9 +2557,10 @@ lcomment 346D X Y position in pixels
 const    346D
 break    346F
 comment  3470
-label    3470 Flash_Score_1
+label    3470 Flash_Score_Start
 comment  3473
 comment  3473 Test IRQ counter, only continue once in 8 calls
+lcomment 3475 Zero bits 3-7 0000_0xxx
 binary   3476
 comment  3479
 deflabel 347A NUM_OF_COLUMNS_TO_REVERSE
@@ -2575,9 +2581,9 @@ deflabel 348D SCREEN_HEIGHT_PIXELS
 comment  3490
 comment  3496
 comment  3499
-label    3499 Flash_Score_RTS
+label    3499 RTS_Flash_Score
 comment  349A
-label    349A Load_UDG_RAM_Addr_For_P2
+label    349A Load_UDG_RAM_Addr_Player_2
 lcomment 349D ZP04
 lcomment 349E X Y position in pixels
 const    349E
@@ -2596,30 +2602,29 @@ comment  34A4 \            ZP_Temp_1                 = BCD byte counter i.e. num
 comment  34A4 ----------------------------------------------------------
 comment  34A4 Example for score of 12 34 56 at ZP51-53
 label    34A4 Display_BCD_Bytes
-lcomment 34A6 A = 12 BCD i.e. First score byte
+comment  34A6
+comment  34A6 Load the first score byte e.g. A = 12 BCD i.e. First score byte of 12 34 56
 comment  34A8
-comment  34A8 Divide by $10 to isolate first digit
-lcomment 34AB 12 has become 01
+comment  34A8 Divide by $10 to isolate first digit e.g. 12 becomes 01
 comment  34AC
-comment  34AC Add $70, $40 gets subtracted in display routine, making 01 into a PETSCII "1"
+comment  34AC Add $70, $40 gets subtracted in display routine, thus making 01 into a PETSCII "1"
+deflabel 34AE PETSCII_OFFSET
 comment  34B4
 comment  34B4 Load first score byte again to display second score character
-lcomment 34B6 A = 12 BCD i.e. First score byte
 comment  34B8
-comment  34B8 Zero top 4 bits to isolate second digit
-lcomment 34B8 12 becomes 02
+comment  34B8 Zero top 4 bits to isolate second digit e.g. 12 becomes 02
 binary   34B9
 comment  34BA
-comment  34BA Add $70, $40 gets subtracted in display routine, making 02 into a PETSCII "2"
+comment  34BA Add $70, $40 gets subtracted in display routine, thus making 02 into a PETSCII "2"
+deflabel 34BB PETSCII_OFFSET
 comment  34C1
 comment  34C1 Increment addres pointer to next score byte
-lcomment 34C3 Looks like a BUG, should inc ZP0F,
-lcomment 34C5 but in JETPAC it'll never happen
+comment  34C5
+comment  34C5 Looks like a BUG, should inc ZP0F, but in JETPAC it'll never happen
 comment  34C7
-label    34C7 No_Increment_Hi_Byte
+comment  34C7 Test all score bytes displayed, if not, loop back
+label    34C7 Test_All_Bytes_Displayed
 comment  34CC
-comment  34CC ----------------------------------------------------------
-comment  34CC NOT SURE WHAT THIS IS YET
 comment  34CC ----------------------------------------------------------
 comment  34CC FUNCTION  :
 comment  34CC CALLED BY :
@@ -2631,6 +2636,11 @@ comment  34CC ZP_UDG_RAM_X   = 08 A8 or 08 20
 comment  34CC ZP_UDG_RAM_Y   = 08 A8 or 08 20
 comment  34CC ZP_Addr_From   = 70 80 or 28 80
 comment  34CC ----------------------------------------------------------
+
+comment  34CC
+comment  34CC YOU ARE HERE #########################################################################
+comment  34CC
+
 label    34CC Display_String_With_Setup
 label    34D2
 comment  34D2
