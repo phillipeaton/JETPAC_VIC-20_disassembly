@@ -43,7 +43,6 @@ ZP04_Object_UDG_RAM_Addr_Lo     equ     $0004
 ZP04_Platform_Position_X        equ     $0004
 ZP04_Position_X                 equ     $0004
 ZP04_UDG_RAM_Addr_Lo            equ     $0004
-ZP04_X_Coordinate               equ     $0004
 ZP05                            equ     $0005
 ZP05_Addr_To_Fill_Hi            equ     $0005
 ZP05_Colour_Tile_Position_Y     equ     $0005
@@ -55,7 +54,6 @@ ZP05_Object_UDG_RAM_Addr_Hi     equ     $0005
 ZP05_Platform_Position_Y        equ     $0005
 ZP05_Position_Y                 equ     $0005
 ZP05_UDG_RAM_Addr_Hi            equ     $0005
-ZP05_Y_Coordinate               equ     $0005
 ZP06                            equ     $0006
 ZP06_Char_ROM_Data_Addr_Lo      equ     $0006
 ZP06_Character_To_Copy          equ     $0006
@@ -264,6 +262,8 @@ SCREEN_HEIGHT_PIXELS            equ     $B0
 OBJECT_COLOUR_PARAM             equ     $05
 OBJECT_POSITION_Y_PARAM         equ     $03
 OBJECT_TYPE_PARAM               equ     $00
+CHARACTER_ROM_START_HI_BYTE     equ     $80
+COLOUR_RAM_START_HI_BYTE        equ     $96
 PETSCII_OFFSET                  equ     $70
 NUM_PIXEL_OF_LINES_TO_REVERSE   equ     $0F
 NUM_OF_COLUMNS_TO_REVERSE       equ     $06
@@ -849,8 +849,8 @@ DISPLAY_LASERS
     bit     MASK_00000100                   ; 21B6: 2C 16 20 
     beq     Setup_Laser_Decay_Patterns      ; 21B9: F0 47    
 
-    jsr     Setup_Colour_RAM_Ptr            ; 21BB: 20 F7 34 
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 21BE: 20 1D 35 
+    jsr     Setup_Colour_RAM_Address        ; 21BB: 20 F7 34 
+    jsr     Convert_XY_to_UDG_RAM_Address   ; 21BE: 20 1D 35 
 
 ; Test if firing left or right
     lda     ZP06_Laser_Position_X           ; 21C1: A5 06    
@@ -1021,7 +1021,7 @@ Account_For_Wraparound
     tya                                     ; 226C: 98       
     pha                                     ; 226D: 48       
 
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 226E: 20 1D 35 
+    jsr     Convert_XY_to_UDG_RAM_Address   ; 226E: 20 1D 35 
     jsr     Cascade_Laser_Pattern_Data      ; 2271: 20 8B 22 
 
 ; Apply laser decay pattern onto screen
@@ -1678,8 +1678,8 @@ Loop_Display_Game_Select
     lda     Fn_And_SP_Row_Offsets,x         ; 24F5: BD 1F 25 
     sta     ZP05_Position_Y                 ; 24F8: 85 05    
 
-    jsr     Setup_Colour_RAM_Ptr            ; 24FA: 20 F7 34 
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 24FD: 20 1D 35 
+    jsr     Setup_Colour_RAM_Address        ; 24FA: 20 F7 34 
+    jsr     Convert_XY_to_UDG_RAM_Address   ; 24FD: 20 1D 35 
 
 ; Setup and call string display routine
     ldy     #$00                            ; 2500: A0 00    
@@ -2551,7 +2551,7 @@ Display_Rocket_Flame_On_Screen
     lda     ZP19_Object_Flame_Position_Y    ; 27FB: A5 19    
     sta     ZP05_Object_Position_Y          ; 27FD: 85 05    
 
-    jsr     Setup_Colour_RAM_Ptr            ; 27FF: 20 F7 34 
+    jsr     Setup_Colour_RAM_Address        ; 27FF: 20 F7 34 
     lda     #COLOUR_RED                     ; 2802: A9 02    
     ldy     #$00                            ; 2804: A0 00    
     sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 2806: 91 0C    
@@ -4615,7 +4615,7 @@ Colourize_Rocket_Setup_RAM_Ptr
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F0F: B1 00    
     sta     ZP05_Colour_Tile_Position_Y     ; 2F11: 85 05    
 
-    jsr     Setup_Colour_RAM_Ptr            ; 2F13: 20 F7 34 
+    jsr     Setup_Colour_RAM_Address        ; 2F13: 20 F7 34 
 
 ; L_JSR_($2F16)_($2EF7) OK
 ; L_BRS_($2F16)_($2F2E) OK
@@ -5364,8 +5364,8 @@ Loop_Draw_Platform
 
 ; Store platform data table index into variable for next platform
     sty     ZP03_Platform_Data_Table_Index  ; 3163: 84 03    
-    jsr     Setup_Colour_RAM_Ptr            ; 3165: 20 F7 34 
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 3168: 20 1D 35 
+    jsr     Setup_Colour_RAM_Address        ; 3165: 20 F7 34 
+    jsr     Convert_XY_to_UDG_RAM_Address   ; 3168: 20 1D 35 
 
 ; Load zero page variables with addr of leftmost platform UDG object data
     lda     #PLATFORM_UDG_DATA_ADDR_LO      ; 316B: A9 15    
@@ -5455,15 +5455,15 @@ Next_UDG_Char
 
 
 ; #########################################################################################
-; 88   88 88""Yb 8888b.     db    888888 888888
-; 88   88 88__dP  8I  Yb   dPYb     88   88__
-; Y8   8P 88"""   8I  dY  dP__Yb    88   88""
-; `YbodP' 88     8888Y"  dP""""Yb   88   888888
-
 ;  88888 888888 888888 8b    d8    db    88b 88
 ;     88 88__     88   88b  d88   dPYb   88Yb88
 ; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
 ; "bodP' 888888   88   88 YY 88 dP""""Yb 88  Y8
+
+; 888888 88     Yb  dP 88 88b 88  dP""b8
+; 88__   88      YbdP  88 88Yb88 dP   `"
+; 88""   88  .o   8P   88 88 Y88 Yb  "88
+; 88     88ood8  dP    88 88  Y8  YboodP
 ; #########################################################################################
 
 ; NOT COMPLETE YET ######################################################################
@@ -6167,7 +6167,7 @@ Flash_Score
 
 ; L_JMP_($3470)_($34A1) OK
 Flash_Score_Start
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 3470: 20 1D 35 
+    jsr     Convert_XY_to_UDG_RAM_Address   ; 3470: 20 1D 35 
 
 ; Test IRQ counter, only continue once in 8 calls
     lda     ZP_HW_IRQ_Counter_Lo            ; 3473: A5 4A    
@@ -6317,50 +6317,50 @@ Test_All_Bytes_Displayed
 ; L_JSR_($34CC)_($24E1) OK
 ; L_JSR_($34CC)_($29F8) OK
 Display_String_With_Setup
-    jsr     Setup_Colour_RAM_Ptr            ; 34CC: 20 F7 34 
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 34CF: 20 1D 35 
+    jsr     Setup_Colour_RAM_Address        ; 34CC: 20 F7 34 
+    jsr     Convert_XY_to_UDG_RAM_Address   ; 34CF: 20 1D 35 
 
 ; Get string first byte header data, contains colour data and reverse flag
     ldy     #$00                            ; 34D2: A0 00    
     lda     (ZP0E_String_Addr_Lo),y         ; 34D4: B1 0E    
 
 ; Write a string of data to the screen, header byte includes reverse flag and colour attribute
-; Save colour data and reverse flag to X
+; Save colour data and reverse flag to Register X
 ; L_JSR_($34D6)_($2506) OK
 ; L_JMP_($34D6)_($34E0) OK
 Display_String
     tax                                     ; 34D6: AA       
 
-; Get character to display and test if bit 7 is set, which signifys end of string
+; Get character to display and test if bit 7 is set, which signifies end of string
     iny                                     ; 34D7: C8       
     lda     (ZP0E_String_Addr_Lo),y         ; 34D8: B1 0E    
     asl     a                               ; 34DA: 0A       
 
-; If final character then (branch, display, RTS) else (JSR, display, next char)
+; If end of string then branch/display/RTS else JSR/display/next_char
     bcs     Display_Character               ; 34DB: B0 06    
     jsr     Display_Character               ; 34DD: 20 E3 34 
     jmp     Display_String                  ; 34E0: 4C D6 34 
 ; ------------------------------------------
 
-; Restore character value after testing for end of string, excluding reverse bit
+; Restore character value after testing for end of string, excluding end of string marker bit
 ; L_BRS_($34E3)_($34DB) OK
 ; L_JSR_($34E3)_($34DD) OK
 Display_Character
     lsr     a                               ; 34E3: 4A       
     sta     ZP06_Character_To_Display       ; 34E4: 85 06    
 
-; Setup character display colour
+; Setup character display colour and reverse bit
     txa                                     ; 34E6: 8A       
     sta     ZP_Reverse_And_Colour_Data      ; 34E7: 85 57    
 
-; Display character on screen, saving Y and restoring afterwards
+; Display character on screen, saving Register Y and restoring afterwards
     tya                                     ; 34E9: 98       
     pha                                     ; 34EA: 48       
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 34EB: 20 95 35 
     pla                                     ; 34EE: 68       
     tay                                     ; 34EF: A8       
 
-; Colourize the character just written
+; Colourize the character just displayed
     lda     ZP_Reverse_And_Colour_Data      ; 34F0: A5 57    
     dey                                     ; 34F2: 88       
     sta     (ZP0C_Colour_RAM_Addr_Lo),y     ; 34F3: 91 0C    
@@ -6372,15 +6372,15 @@ Display_Character
 
 
 
-; .dP"Y8 888888 888888 88   88 88""Yb      dP""b8  dP"Yb  88      dP"Yb  88""Yb
-; `Ybo." 88__     88   88   88 88__dP     dP   `" dP   Yb 88     dP   Yb 88__dP
-; o.`Y8b 88""     88   Y8   8P 88"""      Yb      Yb   dP 88  .o Yb   dP 88"Yb
-; 8bodP' 888888   88   `YbodP' 88          YboodP  YbodP  88ood8  YbodP  88  Yb
+; .dP"Y8 888888 888888 88   88 88""Yb      dP""b8  dP"Yb  88      dP"Yb  88   88 88""Yb
+; `Ybo." 88__     88   88   88 88__dP     dP   `" dP   Yb 88     dP   Yb 88   88 88__dP
+; o.`Y8b 88""     88   Y8   8P 88"""      Yb      Yb   dP 88  .o Yb   dP Y8   8P 88"Yb
+; 8bodP' 888888   88   `YbodP' 88          YboodP  YbodP  88ood8  YbodP  `YbodP' 88  Yb
 
-; 88""Yb    db    8b    d8     88""Yb 888888 88""Yb
-; 88__dP   dPYb   88b  d88     88__dP   88   88__dP
-; 88"Yb   dP__Yb  88YbdP88     88"""    88   88"Yb
-; 88  Yb dP""""Yb 88 YY 88     88       88   88  Yb
+; 88""Yb    db    8b    d8        db    8888b.  8888b.  88""Yb 888888 .dP"Y8 .dP"Y8
+; 88__dP   dPYb   88b  d88       dPYb    8I  Yb  8I  Yb 88__dP 88__   `Ybo." `Ybo."
+; 88"Yb   dP__Yb  88YbdP88      dP__Yb   8I  dY  8I  dY 88"Yb  88""   o.`Y8b o.`Y8b
+; 88  Yb dP""""Yb 88 YY 88     dP""""Yb 8888Y"  8888Y"  88  Yb 888888 8bodP' 8bodP'
 
 ; Example for "F7 JOYSTICK" start position
 ; Convert X=$18 pixels from left, Y=$68 pixels from top, to Colour RAM Address $968D
@@ -6391,37 +6391,37 @@ Display_Character
 ; L_JSR_($34F7)_($3165) OK
 ; L_JSR_($34F7)_($34CC) OK
 ; L_JSR_($34F7)_($3827) OK
-Setup_Colour_RAM_Ptr
-    lda     ZP04_X_Coordinate               ; 34F7: A5 04     ZP04 = $18
+Setup_Colour_RAM_Address
+    lda     ZP04_Position_X                 ; 34F7: A5 04     ZP04 = %0001_1000 = $18
 
 ; Divide X by 8 to get initial address Lo-byte
     lsr     a                               ; 34F9: 4A       
     lsr     a                               ; 34FA: 4A       
     lsr     a                               ; 34FB: 4A       
-    sta     ZP0C_Colour_RAM_Addr_Lo         ; 34FC: 85 0C     ZP0C = $03
+    sta     ZP0C_Colour_RAM_Addr_Lo         ; 34FC: 85 0C     ZP0C = %0000_0011 = $03
 
 ; Divide Y by $10 and use as index into Colour RAM Row Offsets i.e. 9600, 9617, 962e etc.
 ; to get address Hi-byte. Divided by $10 because there are 16 Y-pixels per Colour RAM tile.
-    lda     ZP05_Y_Coordinate               ; 34FE: A5 05     ZP05 = $68
+    lda     ZP05_Position_Y                 ; 34FE: A5 05     ZP05 = %0110_1000 = $68
     lsr     a                               ; 3500: 4A       
     lsr     a                               ; 3501: 4A       
     lsr     a                               ; 3502: 4A       
-    lsr     a                               ; 3503: 4A        ZP05 = $06
+    lsr     a                               ; 3503: 4A        ZP05 = %0000_0110 = $06
     tax                                     ; 3504: AA       
 
 ; Load from column offset table and add in the inital address Lo-byte
-    lda     Colour_RAM_Row_Offsets,x        ; 3505: BD 12 35  A = $8A
+    lda     Colour_RAM_Row_Offset_Table,x   ; 3505: BD 12 35  A = $8A
     clc                                     ; 3508: 18       
     adc     ZP0C_Colour_RAM_Addr_Lo         ; 3509: 65 0C    
     sta     ZP0C_Colour_RAM_Addr_Lo         ; 350B: 85 0C     ZP0C = $8D
 
 ; Add $9600 to address in ZP0D/0C to become $968D i.e. "F7 JOYSTICK" start position
-    lda     #$96                            ; 350D: A9 96    
+    lda     #COLOUR_RAM_START_HI_BYTE       ; 350D: A9 96    
     sta     ZP0D_Colour_RAM_Addr_Hi         ; 350F: 85 0D     ZP0D/0C = $968D
     rts                                     ; 3511: 60       
 ; ==========================================
 
-Colour_RAM_Row_Offsets
+Colour_RAM_Row_Offset_Table
     fcb     $00,$17,$2E,$45,$5C,$73,$8A,$A1 ; 3512: 00 17 2E 45 5C 73 8A A1 
     fcb     $B8,$CF,$E6                     ; 351A: B8 CF E6 
 
@@ -6439,10 +6439,10 @@ Colour_RAM_Row_Offsets
 ;   88   Yb   dP     Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88
 ;   88    YbodP      `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88
 
-;    db    8888b.  8888b.  88""Yb
-;   dPYb    8I  Yb  8I  Yb 88__dP
-;  dP__Yb   8I  dY  8I  dY 88"Yb
-; dP""""Yb 8888Y"  8888Y"  88  Yb
+;    db    8888b.  8888b.  88""Yb 888888 .dP"Y8 .dP"Y8
+;   dPYb    8I  Yb  8I  Yb 88__dP 88__   `Ybo." `Ybo."
+;  dP__Yb   8I  dY  8I  dY 88"Yb  88""   o.`Y8b o.`Y8b
+; dP""""Yb 8888Y"  8888Y"  88  Yb 888888 8bodP' 8bodP'
 
 ; Example for "F7 JOYSTICK" start position
 ; Convert X=$18 pixels from left, Y=$68 pixels from top, to UDG RAM Address $1278
@@ -6454,22 +6454,22 @@ Colour_RAM_Row_Offsets
 ; L_JSR_($351D)_($34CF) OK
 ; L_JSR_($351D)_($375D) OK
 ; L_JSR_($351D)_($37AB) OK
-Convert_XY_to_UDG_RAM_Addr
-    lda     ZP05_Y_Coordinate               ; 351D: A5 05     ZP05 = $68
+Convert_XY_to_UDG_RAM_Address
+    lda     ZP05_Position_Y                 ; 351D: A5 05     ZP05 = %0110_1000 = $68
     tay                                     ; 351F: A8       
 
 ; Divide X by 8 to get address Lo-byte
-    lda     ZP04_X_Coordinate               ; 3520: A5 04     ZP04 = $18
+    lda     ZP04_Position_X                 ; 3520: A5 04     ZP04 = %0001_1000 = $18
     lsr     a                               ; 3522: 4A       
     lsr     a                               ; 3523: 4A       
-    lsr     a                               ; 3524: 4A        ZP04 = $03
+    lsr     a                               ; 3524: 4A        ZP04 = %0000_0011 = $03
     tax                                     ; 3525: AA       
 
 ; Load from column offset table
-    lda     UDG_RAM_Column_Offsets,x        ; 3526: BD 45 35  A = $21
-    sta     ZP04_X_Coordinate               ; 3529: 85 04    
+    lda     UDG_RAM_Column_Offset_Table,x   ; 3526: BD 45 35  A = $21
+    sta     ZP04_Position_X                 ; 3529: 85 04    
     lda     #$00                            ; 352B: A9 00    
-    sta     ZP05_Y_Coordinate               ; 352D: 85 05     ZP05/04 = $0021
+    sta     ZP05_Position_Y                 ; 352D: 85 05     ZP05/04 = $0021
 
 ; Rotate 16-bit address left by 4 bits
     ldx     #$04                            ; 352F: A2 04    
@@ -6480,8 +6480,8 @@ Loop_Rotate
     dex                                     ; 3535: CA       
     bne     Loop_Rotate                     ; 3536: D0 F9     ZP05/04 $0021 > $0210
 
-; Add stashed Y = $68 to address in ZP05/04
-    tya                                     ; 3538: 98       
+; Add Register Y saved earlier to address in ZP05/04
+    tya                                     ; 3538: 98        Register A becomes $68
     clc                                     ; 3539: 18       
     adc     ZP04_UDG_RAM_Addr_Lo            ; 353A: 65 04    
     sta     ZP04_UDG_RAM_Addr_Lo            ; 353C: 85 04     ZP05/04 = $0278
@@ -6493,8 +6493,8 @@ Loop_Rotate
     rts                                     ; 3544: 60       
 ; ==========================================
 
-; Bytes are middle two numbers in UDG RAM addr starting at $1000 e.g. $10B0, $1160 etc
-UDG_RAM_Column_Offsets
+; Bytes are middle two numbers in UDG RAM addr starting at $1000 e.g. $10B0, $1160 etc.
+UDG_RAM_Column_Offset_Table
     fcb     $00,$0B,$16,$21,$2C,$37,$42,$4D ; 3545: 00 0B 16 21 2C 37 42 4D 
     fcb     $58,$63,$6E,$79,$84,$8F,$9A,$A5 ; 354D: 58 63 6E 79 84 8F 9A A5 
     fcb     $B0,$BB,$C6,$D1,$DC,$E7,$F2     ; 3555: B0 BB C6 D1 DC E7 F2 
@@ -6538,11 +6538,13 @@ Reset_UDG_RAM
 ; L_JMP_($3579)_($3569) OK
 Fill_RAM
     ldy     #$00                            ; 3579: A0 00    
+
 ; L_BRS_($357B)_($358A) OK
 ; L_BRS_($357B)_($3592) OK
 Loop_Fill_RAM
     lda     ZP06_Fill_Data_Byte             ; 357B: A5 06    
     sta     (ZP04_Addr_To_Fill_Lo),y        ; 357D: 91 04    
+
     iny                                     ; 357F: C8       
     bne     No_Inc_Addr_Hi                  ; 3580: D0 02    
     inc     ZP05_Addr_To_Fill_Hi            ; 3582: E6 05    
@@ -6586,8 +6588,8 @@ No_Inc_Addr_Hi
 ;             ??? BROKEN COMMENTS Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
 ;             ??? BROKEN COMMENTS Addr_To gets updated as part of this routine.
 ; ----------------------------------------------------------
-; Character to copy stored in ZP06, create Character ROM address in ZP06/06 for this
-; value and copy 8 data bytes from at that address to UDG RAM address stored in ZP04/05
+; Character to copy stored in ZP06, create Character ROM address in ZP07/06 for this
+; value and copy 8 data bytes from that address to UDG RAM address stored in ZP05/04
 ; Example: Display "1" using $71 in ZP06
 ; L_JSR_($3595)_($2393) OK
 ; L_JSR_($3595)_($23AC) OK
@@ -6599,7 +6601,7 @@ Copy_Char_To_UDG_RAM_Setup
     lda     #$00                            ; 3595: A9 00     Clear address hi-byte
     sta     ZP07_Char_ROM_Data_Addr_Hi      ; 3597: 85 07     ZP07/06 = $0071
 
-; Character to display in ZP06, "1" = $71
+; Exapmle character to display in ZP06, "1" = $71
 ; $31st Character ROM character is "1" so subtract $40
     lda     ZP06_Char_ROM_Data_Addr_Lo      ; 3599: A5 06    
     sec                                     ; 359B: 38       
@@ -6608,6 +6610,7 @@ Copy_Char_To_UDG_RAM_Setup
 
 ; 8 bytes per UDG RAM character definition, so multiply by 8 using four 16 bit ROLs
     ldx     #$03                            ; 35A0: A2 03    
+
 ; L_BRS_($35A2)_($35A8) OK
 Loop_Multiply_by_8
     clc                                     ; 35A2: 18       
@@ -6618,7 +6621,7 @@ Loop_Multiply_by_8
 
 ; Add $8000 Character ROM offset to address, $8188 is Character ROM address for character "1"
     lda     ZP07_Char_ROM_Data_Addr_Hi      ; 35AA: A5 07    
-    adc     #$80                            ; 35AC: 69 80    
+    adc     #CHARACTER_ROM_START_HI_BYTE    ; 35AC: 69 80    
     sta     ZP07_Char_ROM_Data_Addr_Hi      ; 35AE: 85 07     ZP07/06 = $8188
 
 ; Copy 8 bytes to display a complete character
@@ -6626,6 +6629,7 @@ Loop_Multiply_by_8
     ldy     #$07                            ; 35B0: A0 07    
     lda     ZP_Reverse_And_Colour_Data      ; 35B2: A5 57    
     bmi     Copy_Char_To_UDG_RAM_Reversed   ; 35B4: 30 15    
+
 ; L_JMP_($35B6)_($239F) OK
 ; L_JSR_($35B6)_($3175) OK
 ; L_JSR_($35B6)_($317D) OK
@@ -6633,6 +6637,7 @@ Loop_Multiply_by_8
 Copy_Char_To_UDG_RAM
     lda     (ZP06_Char_ROM_Data_Addr_Lo),y  ; 35B6: B1 06    
     sta     (ZP04_UDG_RAM_Addr_Lo),y        ; 35B8: 91 04    
+
     dey                                     ; 35BA: 88       
     bpl     Copy_Char_To_UDG_RAM            ; 35BB: 10 F9    
 
@@ -6657,6 +6662,7 @@ Copy_Char_To_UDG_RAM_Reversed
     lda     (ZP06_Char_ROM_Data_Addr_Lo),y  ; 35CB: B1 06    
     eor     #$FF                            ; 35CD: 49 FF    
     sta     (ZP04_UDG_RAM_Addr_Lo),y        ; 35CF: 91 04    
+
     dey                                     ; 35D1: 88       
     bpl     Copy_Char_To_UDG_RAM_Reversed   ; 35D2: 10 F7    
     jmp     Next_Column                     ; 35D4: 4C BD 35 
@@ -6676,10 +6682,10 @@ Copy_Char_To_UDG_RAM_Reversed
 ;   88     8P   88"""  88""        dPYb        8P
 ;   88    dP    88     888888     dP  Yb      dP
 
-;  dP      dP""b8  dP"Yb  88      dP"Yb  88""Yb     Yb
-; dP      dP   `" dP   Yb 88     dP   Yb 88__dP      Yb
-; Yb      Yb      Yb   dP 88  .o Yb   dP 88"Yb       dP
-;  Yb      YboodP  YbodP  88ood8  YbodP  88  Yb     dP
+;  dP""b8  dP"Yb  88      dP"Yb  88   88 88""Yb
+; dP   `" dP   Yb 88     dP   Yb 88   88 88__dP
+; Yb      Yb   dP 88  .o Yb   dP Y8   8P 88"Yb
+;  YboodP  YbodP  88ood8  YbodP  `YbodP' 88  Yb
 
 ; L_JSR_($35D7)_($283E) OK
 ; L_JSR_($35D7)_($2C61) OK
@@ -7141,7 +7147,7 @@ Load_Obj_UDG_RAM_Addr_Size_V
 No_X_Wrap_
     sta     ZP04_Object_Position_X          ; 3759: 85 04    
     sta     ZP18_Object_Position_X          ; 375B: 85 18    
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 375D: 20 1D 35 
+    jsr     Convert_XY_to_UDG_RAM_Address   ; 375D: 20 1D 35 
 
 ; ZP04/05 are now an address instead of X and Y coordinates.
 ; Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
@@ -7237,7 +7243,7 @@ Load_Obj_UDG_RAM_Addr_Size_JM
 ; L_BRS_($37A9)_($37A4) OK
 No_X_Wrap
     sta     ZP04_Object_Position_X          ; 37A9: 85 04     ZP04=X=$50 ZP05=Y=$5F
-    jsr     Convert_XY_to_UDG_RAM_Addr      ; 37AB: 20 1D 35  ZP05/04=$173F i.e. rocket middle
+    jsr     Convert_XY_to_UDG_RAM_Address   ; 37AB: 20 1D 35  ZP05/04=$173F i.e. rocket middle
                                             ; section start position
 
 ; ZP04/05 are now an address instead of X and Y coordinates.
@@ -7422,7 +7428,7 @@ Colourize_Object
     sta     ZP05                            ; 3825: 85 05    
 
 ; Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
-    jsr     Setup_Colour_RAM_Ptr            ; 3827: 20 F7 34 
+    jsr     Setup_Colour_RAM_Address        ; 3827: 20 F7 34 
 
 ; Divide object height by $10 then add $02, so always update colour on at least two vertical tiles
 ; e.g. Jetman=$18->$03, Rocket_Top=$10->$03, Fuzz_Alien=$0A->$02

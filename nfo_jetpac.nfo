@@ -2636,65 +2636,61 @@ comment  34CC ZP_UDG_RAM_X   = 08 A8 or 08 20
 comment  34CC ZP_UDG_RAM_Y   = 08 A8 or 08 20
 comment  34CC ZP_Addr_From   = 70 80 or 28 80
 comment  34CC ----------------------------------------------------------
-
-comment  34CC
-comment  34CC YOU ARE HERE #########################################################################
-comment  34CC
-
 label    34CC Display_String_With_Setup
 label    34D2
 comment  34D2
 comment  34D2 Get string first byte header data, contains colour data and reverse flag
 comment  34D6
 comment  34D6 Write a string of data to the screen, header byte includes reverse flag and colour attribute
-comment  34D6 Save colour data and reverse flag to X
+comment  34D6 Save colour data and reverse flag to Register X
 label    34D6 Display_String
 comment  34D7
-comment  34D7 Get character to display and test if bit 7 is set, which signifys end of string
+comment  34D7 Get character to display and test if bit 7 is set, which signifies end of string
 comment  34DB
-comment  34DB If final character then (branch, display, RTS) else (JSR, display, next char)
+comment  34DB If end of string then branch/display/RTS else JSR/display/next_char
 comment  34E3
-comment  34E3 Restore character value after testing for end of string, excluding reverse bit
+comment  34E3 Restore character value after testing for end of string, excluding end of string marker bit
 label    34E3 Display_Character
 comment  34E6
-comment  34E6 Setup character display colour
+comment  34E6 Setup character display colour and reverse bit
 comment  34E9
-comment  34E9 Display character on screen, saving Y and restoring afterwards
+comment  34E9 Display character on screen, saving Register Y and restoring afterwards
 comment  34F0
-comment  34F0 Colourize the character just written
+comment  34F0 Colourize the character just displayed
 comment  34F7
 comment  34F7 Example for "F7 JOYSTICK" start position
 comment  34F7 Convert X=$18 pixels from left, Y=$68 pixels from top, to Colour RAM Address $968D
-label    34F7 Setup_Colour_RAM_Ptr
-lcomment 34F7 ZP04 = $18
+label    34F7 Setup_Colour_RAM_Address
+lcomment 34F7 ZP04 = %0001_1000 = $18
 comment  34F9
 comment  34F9 Divide X by 8 to get initial address Lo-byte
-lcomment 34FC ZP0C = $03
+lcomment 34FC ZP0C = %0000_0011 = $03
 comment  34FE
 comment  34FE Divide Y by $10 and use as index into Colour RAM Row Offsets i.e. 9600, 9617, 962e etc.
 comment  34FE to get address Hi-byte. Divided by $10 because there are 16 Y-pixels per Colour RAM tile.
-lcomment 34FE ZP05 = $68
-lcomment 3503 ZP05 = $06
+lcomment 34FE ZP05 = %0110_1000 = $68
+lcomment 3503 ZP05 = %0000_0110 = $06
 comment  3505
 comment  3505 Load from column offset table and add in the inital address Lo-byte
 lcomment 3505 A = $8A
 lcomment 350B ZP0C = $8D
 comment  350D
 comment  350D Add $9600 to address in ZP0D/0C to become $968D i.e. "F7 JOYSTICK" start position
+deflabel 350E COLOUR_RAM_START_HI_BYTE
 lcomment 350F ZP0D/0C = $968D
 comment  3512
-label    3512 Colour_RAM_Row_Offsets
+label    3512 Colour_RAM_Row_Offset_Table
 const    3512-351C
 comment  351D
 comment  351D Example for "F7 JOYSTICK" start position
 comment  351D Convert X=$18 pixels from left, Y=$68 pixels from top, to UDG RAM Address $1278
-label    351D Convert_XY_to_UDG_RAM_Addr
-lcomment 351D ZP05 = $68
+label    351D Convert_XY_to_UDG_RAM_Address
+lcomment 351D ZP05 = %0110_1000 = $68
 lcomment 351F
 comment  3520
 comment  3520 Divide X by 8 to get address Lo-byte
-lcomment 3520 ZP04 = $18
-lcomment 3524 ZP04 = $03
+lcomment 3520 ZP04 = %0001_1000 = $18
+lcomment 3524 ZP04 = %0000_0011 = $03
 comment  3526
 comment  3526 Load from column offset table
 lcomment 3526 A = $21
@@ -2704,14 +2700,15 @@ comment  352F Rotate 16-bit address left by 4 bits
 label    3531 Loop_Rotate
 lcomment 3536 ZP05/04 $0021 > $0210
 comment  3538
-comment  3538 Add stashed Y = $68 to address in ZP05/04
+comment  3538 Add Register Y saved earlier to address in ZP05/04
+lcomment 3538 Register A becomes $68
 lcomment 353C ZP05/04 = $0278
 comment  353E
 comment  353E Add $1000 to address in ZP05/04 to become $1278 i.e. "F7 JOYSTICK" start position
 lcomment 3542 ZP05/04 = $1278
-label    3545 UDG_RAM_Column_Offsets
+label    3545 UDG_RAM_Column_Offset_Table
 comment  3545
-comment  3545 Bytes are middle two numbers in UDG RAM addr starting at $1000 e.g. $10B0, $1160 etc
+comment  3545 Bytes are middle two numbers in UDG RAM addr starting at $1000 e.g. $10B0, $1160 etc.
 const    3545-3557
 comment  355C
 comment  355C Fill 11 rows x 23 columns = 253 bytes = $FD bytes i.e. Colour_RAM $9600 to $96FC
@@ -2746,7 +2743,9 @@ break    3578
 comment  3579
 comment  3579 Fill ZP02/03 number of bytes of RAM starting at address ZP02/03 with data in ZP06
 label    3579 Fill_RAM
+comment  357B
 label    357B Loop_Fill_RAM
+comment  357F
 comment  3584
 label    3584 No_Inc_Addr_Hi
 comment  358C
@@ -2763,28 +2762,32 @@ comment  3595 ARGUMENTS : ??? = Loaded with character to copy e.g. $71 for "1"
 comment  3595 \            ??? BROKEN COMMENTS Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
 comment  3595 \            ??? BROKEN COMMENTS Addr_To gets updated as part of this routine.
 comment  3595 ----------------------------------------------------------
-comment  3595 Character to copy stored in ZP06, create Character ROM address in ZP06/06 for this
-comment  3595 value and copy 8 data bytes from at that address to UDG RAM address stored in ZP04/05
+comment  3595 Character to copy stored in ZP06, create Character ROM address in ZP07/06 for this
+comment  3595 value and copy 8 data bytes from that address to UDG RAM address stored in ZP05/04
 comment  3595 Example: Display "1" using $71 in ZP06
 label    3595 Copy_Char_To_UDG_RAM_Setup
 lcomment 3595 Clear address hi-byte
 lcomment 3597 ZP07/06 = $0071
 comment  3599
-comment  3599 Character to display in ZP06, "1" = $71
+comment  3599 Exapmle character to display in ZP06, "1" = $71
 comment  3599 $31st Character ROM character is "1" so subtract $40
 lcomment 359E ZP07/06 = $0031
 comment  35A0
 comment  35A0 8 bytes per UDG RAM character definition, so multiply by 8 using four 16 bit ROLs
+comment  35A2
 label    35A2 Loop_Multiply_by_8
 lcomment 35A5 ZP07/06 progression:
 lcomment 35A7 $0031 > $0062 > $00C4 > $0188
 comment  35AA
 comment  35AA Add $8000 Character ROM offset to address, $8188 is Character ROM address for character "1"
+deflabel 35AD CHARACTER_ROM_START_HI_BYTE
 lcomment 35AE ZP07/06 = $8188
 comment  35B0
 comment  35B0 Copy 8 bytes to display a complete character
 comment  35B0 Displayed character can be normal or reversed, e.g. for score or selected game options
+comment  35B6
 label    35B6 Copy_Char_To_UDG_RAM
+comment  35BA
 comment  35BD
 comment  35BD Move 16-bit UDG RAM address to the next-right column, $B0=176=number of vertical pixels
 label    35BD Next_Column
@@ -2793,6 +2796,7 @@ comment  35C4
 comment  35CB
 comment  35CB Copy 8 bytes to display a complete character, EOR reverses the byte displayed
 label    35CB Copy_Char_To_UDG_RAM_Reversed
+comment  35D1
 comment  35D7
 label    35D7 Load_Object_Type_X_Y
 deflabel 35D8 OBJECT_TYPE_PARAM
@@ -2807,6 +2811,11 @@ deflabel 35F5 OBJECT_POSITION_Y_PARAM
 comment  35FA
 deflabel 35FB OBJECT_COLOUR_PARAM
 comment  3601
+
+comment  34CC
+comment  34CC YOU ARE HERE #########################################################################
+comment  34CC
+
 label    3601 Display_Object_With_Setup_1
 comment  3604
 label    3604 Display_Object_With_Setup_2

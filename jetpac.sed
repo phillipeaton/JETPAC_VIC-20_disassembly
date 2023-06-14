@@ -28,7 +28,6 @@
 /ZP04                            equ     $0004/a ZP04_Platform_Position_X        equ     $0004
 /ZP04                            equ     $0004/a ZP04_Position_X                 equ     $0004
 /ZP04                            equ     $0004/a ZP04_UDG_RAM_Addr_Lo            equ     $0004
-/ZP04                            equ     $0004/a ZP04_X_Coordinate               equ     $0004
 /ZP05                            equ     $0005/a ZP05_Addr_To_Fill_Hi            equ     $0005
 /ZP05                            equ     $0005/a ZP05_Colour_Tile_Position_Y     equ     $0005
 /ZP05                            equ     $0005/a ZP05_Laser_Position_Y           equ     $0005
@@ -39,7 +38,6 @@
 /ZP05                            equ     $0005/a ZP05_Platform_Position_Y        equ     $0005
 /ZP05                            equ     $0005/a ZP05_Position_Y                 equ     $0005
 /ZP05                            equ     $0005/a ZP05_UDG_RAM_Addr_Hi            equ     $0005
-/ZP05                            equ     $0005/a ZP05_Y_Coordinate               equ     $0005
 /ZP06                            equ     $0006/a ZP06_Char_ROM_Data_Addr_Lo      equ     $0006
 /ZP06                            equ     $0006/a ZP06_Character_To_Copy          equ     $0006
 /ZP06                            equ     $0006/a ZP06_Character_To_Display       equ     $0006
@@ -390,14 +388,14 @@
 /; 3579/,/; 3594/s/ZP06                            /ZP06_Fill_Data_Byte             /
 
 # Convert_XY_to_UDG_RAM_Addr
-/; 351D/,/; 352F/s/ZP04                            /ZP04_X_Coordinate               /
-/; 351D/,/; 352F/s/ZP05                            /ZP05_Y_Coordinate               /
+/; 351D/,/; 352F/s/ZP04                            /ZP04_Position_X                 /
+/; 351D/,/; 352F/s/ZP05                            /ZP05_Position_Y                 /
 /; 3531/,/; 3544/s/ZP04                            /ZP04_UDG_RAM_Addr_Lo            /
 /; 3531/,/; 3544/s/ZP05                            /ZP05_UDG_RAM_Addr_Hi            /
 
 # Setup_Colour_RAM_Ptr
-/; 34F7/,/; 3511/s/ZP04                            /ZP04_X_Coordinate               /
-/; 34F7/,/; 3511/s/ZP05                            /ZP05_Y_Coordinate               /
+/; 34F7/,/; 3511/s/ZP04                            /ZP04_Position_X                 /
+/; 34F7/,/; 3511/s/ZP05                            /ZP05_Position_Y                 /
 /; 34F7/,/; 3511/s/ZP0C                            /ZP0C_Colour_RAM_Addr_Lo         /
 /; 34F7/,/; 3511/s/ZP0D                            /ZP0D_Colour_RAM_Addr_Hi         /
 
