@@ -46,7 +46,7 @@ comment  201D ----------------------------------------------------------
 comment  201D Starts here
 comment  201D ----------------------------------------------------------
 lcomment 201D Disable Interrupts
-lcomment 201E Reset stack pointer
+lcomment 201E Reset stack address pointer
 lcomment 2021 Clear Decimal flag
 comment  2022
 comment  2022 Setup NMI interrupt vector to service routine at $201C
@@ -447,7 +447,7 @@ comment  2318
 comment  2318 Reset rocket top, middle and bottom
 comment  231C
 comment  2325
-comment  2325 Move 16-bit address pointer to next object i.e. 8 bytes ahead
+comment  2325 Move 16-bit object address pointer to next object i.e. 8 bytes ahead
 comment  232C
 comment  2332
 comment  2334
@@ -766,7 +766,7 @@ comment  2606 Enable Interrupts (Clear Interrupt Disable)
 comment  2607
 label    2607 Main_Loop
 comment  2609
-comment  2609 Load Object Type into A from object table, multiply by two for address jump table index use
+comment  2609 Load object Type into A from object table, multiply by two for address jump table index use
 comment  260C
 comment  260C Setup subroutine address from jump table + index and indirect jmp to it
 comment  261A
@@ -783,7 +783,7 @@ comment  2626 $100 x $02 x (2+3 cycles) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0
 comment  262A
 label    262A Loop_Delay_0A00_Cycles
 comment  2630
-comment  2630 Increment Object Pointer to next Obj i.e. by adding 8 bytes
+comment  2630 Increment Object address pointer to next Obj i.e. by adding 8 bytes
 label    2630 Inc_Object_List_Ptr
 comment  2637
 comment  2637 If interrupt had occurred, set Jetman object next, it has higher priority
@@ -800,7 +800,7 @@ comment  264B
 comment  264B Test TV Raster counter, spawn object ever eight attepts i.e. when data = xxxx_x111
 binary   264F
 comment  2652
-comment  2652 Test if score flash time is zero, if yes, reset next object pointer and spawn setup objects
+comment  2652 Test if score flash time is zero, if yes, reset next obj address pointer and spawn setup objects
 label    2652 Test_Score_Flash_Time_At_Zero
 comment  2655
 label    2655 Spawn_Objects
@@ -814,7 +814,7 @@ comment  265E ----------------------------------------------------------
 label    265E Reset_VIA2_Timer
 comment  2669
 comment  2669 Disable Interrupts (Set Interupt Disable)
-comment  2669 Save current object list pointer and set Jetman to be the next object
+comment  2669 Save current object address pointer and set Jetman to be the next object
 label    2669 SEI_Obj_Ptr_To_Jetman
 comment  266A
 comment  266E
@@ -1106,7 +1106,7 @@ comment  28DE Init all Alien objects
 comment  28E0
 label    28E0 Loop_Reset_Objects_Aliens
 comment  28E7
-comment  28E7 General save and restore of object list pointer, not used as part of interrupt handler
+comment  28E7 General save and restore of object address pointer, not used as part of interrupt handler
 label    28E7 Save_Obj_List_Ptr
 comment  28F0
 label    28F0 Restore_Obj_List_Ptr
@@ -1610,7 +1610,7 @@ binary   2CE7
 deflabel 2CE9 JETMAN_FLYING
 deflabel 2CED JETMAN_STANDING
 comment  2CF1
-comment  2CF1 Set Object List Pointer to first alien object
+comment  2CF1 Set Object list address pointer to first alien object
 label    2CF1 Init_Alien_Object_Next
 deflabel 2CF2 OBJ_ALIEN_0_LO
 deflabel 2CF6 OBJ_ALIEN_0_HI
@@ -1624,7 +1624,7 @@ comment  2CFF
 comment  2CFF Test if alien object is currently used, if not initiate it
 label    2CFF Loop_Next_Object
 comment  2D03
-comment  2D03 Alien object is used, so move pointer to next object
+comment  2D03 Alien object is used, so move object address pointer to next object
 deflabel 2D07 OBJECT_STRUCTURE_SIZE
 comment  2D0A
 comment  2D0A Decrement alien countdown, return when it reaches zero
@@ -2175,7 +2175,7 @@ comment  310F
 label    310F TPC_Move_Toward_RTS
 comment  3113
 comment  3113 Set collision flag bit 7
-comment  3118 y reg is pointer into lookup table, 3 groups of 3
+comment  3118 Register Y is address pointer into lookup table, 3 groups of 3
 comment  3118
 label    3118 TPC_Next_Platform_Data_Inc
 comment  3119
@@ -2236,7 +2236,7 @@ comment  317B Copy platform middle and rightmost UDG chars to RAM, 9 bytes per c
 label    317B Loop_Next_Char
 deflabel 317C PLATFORM_HEIGHT_PIXELS
 comment  3180
-comment  3180 Test width of platform counter, when zero, move UDG Data pointer to the rightmost
+comment  3180 Test width of platform counter, when zero, move UDG Data address pointer to the rightmost
 comment  3180 platform object, otherwise just display the current middle platform UDG object data again
 comment  3186
 comment  3186 Increment the index into the platform data table and store platform width columns+1 into ZP08
@@ -2811,24 +2811,19 @@ deflabel 35F5 OBJECT_POSITION_Y_PARAM
 comment  35FA
 deflabel 35FB OBJECT_COLOUR_PARAM
 comment  3601
-
-comment  34CC
-comment  34CC YOU ARE HERE #########################################################################
-comment  34CC
-
-label    3601 Display_Object_With_Setup_1
+label    3601 Display_Object_Old_Setup_Load
 comment  3604
-label    3604 Display_Object_With_Setup_2
+label    3604 Display_Object_Old_Setup
 comment  360D
-label    360D Display_Object_With_Setup_3
+label    360D Display_Object_New_Setup_Load
 comment  3610
-label    3610 Display_Object_With_Setup_4
+label    3610 Display_Object_New_Setup
 comment  3619
 comment  3619 When object is moving down the screen, the number of pixels it has moved down by will result
 comment  3619 in a number of pixel lines at the top of the object that need to be EXOR'd to erase them
 comment  3619 Initial EOR/CLC/ADC performs an ABS on old/new object Y position delta for use as loop index
 label    3619 Erase_Object_Moving_Downward
-comment  361E Note code from 361E & 3663 is basically the same until Erase_Draw, but
+comment  361E Note code from $361E & $3663 is basically the same until Erase_Draw, but
 comment  361E using old and new object parameters
 comment  3622
 comment  3622 Set X to number of Y pixel-lines to erase only i.e. don't draw over the erase for this object
@@ -2840,16 +2835,17 @@ comment  362D
 comment  362D Erase old object data bytes from UDG data to screen RAM by EXORing
 comment  362D ZP09 index decrements from $FF, ZP0E holds address of old UDG object data,
 comment  362D ZP0C holds address of object data on screen to be written to
+comment  362F
 label    362F Loop_Erase_Down
 comment  3635
-comment  3635 Decrement pointer into UDG data and the loop index
+comment  3635 Decrement address pointer into UDG data and the loop index
 comment  3639
 comment  3639 Restore the number of pixel lines to erased and store to ZP13, then subtract it from
 comment  3639 ZP09, the updated address offset for erase/draw the first/next part of the new object
 comment  363C
 comment  3643
 comment  3646
-label    3646 Display_Object_With_Setup
+label    3646 Display_Object_Load
 comment  364C
 label    364C Display_Object
 comment  364E ZP08 and ZP09 used as index into UDG RAM for old object and new object data
@@ -2875,9 +2871,10 @@ comment  3672
 comment  3672 Erase old object data bytes from UDG data to screen RAM by EXORing
 comment  3672 ZP08 index decrements from $FF, ZP06 holds address of old UDG object data,
 comment  3672 ZP04 holds address of object data on screen to be written to
+comment  3674
 label    3674 Loop_Erase_Up
 comment  367A
-comment  367A Decrement pointer into UDG data and the loop index
+comment  367A Decrement address pointer into UDG data and the loop index
 comment  367E
 comment  367E Restore the number of pixel lines to erased and store to ZP13, then subtract it from
 comment  367E ZP08, the updated address offset for erase/draw the first/next part of the new object
@@ -2909,16 +2906,20 @@ comment  36B5
 comment  36B5 Move UDG data 16-bit address pointer to the object data for the next column
 comment  36BC
 comment  36C2
-comment  36C2 Move UDG RAM pointer to next vertical column
+comment  36C2 Move UDG RAM address pointer to next vertical column
 deflabel 36C6 SCREEN_HEIGHT_PIXELS
 comment  36C9
 comment  36CF
 comment  36CF Test for full-screen wrap, $1ED1 is $FF less than the first byte past
 comment  36CF UDG RAM (last byte = $1FCF)
+deflabel 36D3 UDG_RAM_END_ADDR_MINUS_FE_LO
+deflabel 36D7 UDG_RAM_END_ADDR_MINUS_FE_HI
 comment  36DA
 comment  36DA Handle full-screen wrap, $0FD0 is number of bytes used to define the full
 comment  36DA UDG RAM. i.e. $16 x $17 x 8=$FD0
+deflabel 36DE UDG_RAM_NUM_BYTES_LO
 comment  36E1
+deflabel 36E4 UDG_RAM_NUM_BYTES_HI
 comment  36E7
 comment  36E7 Test if new object fully drawn, if not, move to the next vertical column to draw
 label    36E7 Next_Object_New_Update_Params
@@ -2927,14 +2928,19 @@ comment  36ED
 comment  36ED Move UDG data 16-bit address pointer to the object data for the next column
 comment  36F4
 comment  36FA
-comment  36FA Move UDG RAM pointer to next vertical column
+comment  36FA Move UDG RAM address pointer to next vertical column
 deflabel 36FE SCREEN_HEIGHT_PIXELS
 comment  3701
 comment  3707
 comment  3707 Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
+deflabel 370B UDG_RAM_END_ADDR_MINUS_FE_LO
+deflabel 370F UDG_RAM_END_ADDR_MINUS_FE_HI
 comment  3712
-comment  3712 Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM. i.e. $16 x $17 x 8=$FD0
+comment  3712 Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM,
+comment  3712 i.e. $16 x $17 x 8=$FD0
+deflabel 3716 UDG_RAM_NUM_BYTES_LO
 comment  3719
+deflabel 371C UDG_RAM_NUM_BYTES_HI
 comment  371F
 label    371F JMP_Display_Object
 comment  3722
@@ -2948,7 +2954,7 @@ label    3734 JMP_Next_Obj_New_Update_Params
 comment  3737
 label    3737 Load_Obj_UDG_RAM_Addr_Size_V_1
 comment  373D
-comment  373D Store object UDG Addr from Y and A into ZP0E & 0F, minus $100
+comment  373D Store object UDG Addr from Registers Y and A into ZP0E & 0F, minus $100
 comment  373D Valuables, Platforms etc.
 label    373D Load_Obj_UDG_RAM_Addr_Size_V
 comment  3743
@@ -2958,22 +2964,32 @@ comment  374B Convert object position XY pixel coordinates to UDG RAM address, m
 comment  374B Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
 comment  374B will move object into next UDG RAM column.
 deflabel 3753 SCREEN_WIDTH_PIXELS
+comment  3756
 deflabel 3758 SCREEN_WIDTH_PIXELS
+comment  3759
 label    3759 No_X_Wrap_
 comment  3760
 comment  3760 ZP04/05 are now an address instead of X and Y coordinates.
 comment  3760 Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
 deflabel 3764 UDG_DATA_HEIGHT_PIXELS_OFFSET
+comment  3767
 comment  376D
 comment  376D Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
 deflabel 376E UDG_DATA_WIDTH_BYTES_OFFSET
 comment  3775
 comment  3775 Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
 comment  377C
-comment  377C Subtract $03 from 16-bit object UDG Data addrress, i.e. so address
+comment  377C Subtract $03 from 16-bit object UDG Data address, i.e. so address
 comment  377C avoids the object dimension bytes
 deflabel 3780 UDG_DATA_BITMAP_OFFSET
 comment  3783
+
+
+comment  3737
+comment  3737 YOU ARE HERE #########################################################################
+comment  3737
+
+
 comment  378A
 label    378A Load_Obj_UDG_RAM_Addr_Size_JM1
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
@@ -2991,7 +3007,9 @@ comment  379B Loads screen-wrap byte from current UDG Data animation frame, it's
 comment  379B will move object into next UDG RAM column.
 lcomment 3799 ZP04=X=$50 ZP05=Y=$5F
 deflabel 37A3 SCREEN_WIDTH_PIXELS
+comment  37A6
 deflabel 37A8 SCREEN_WIDTH_PIXELS
+comment  37A9
 label    37A9 No_X_Wrap
 lcomment 37A9 ZP04=X=$50 ZP05=Y=$5F
 lcomment 37AB ZP05/04=$173F i.e. rocket middle
@@ -3000,13 +3018,14 @@ comment  37AE
 comment  37AE ZP04/05 are now an address instead of X and Y coordinates.
 comment  37AE Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
 deflabel 37B2 UDG_DATA_HEIGHT_PIXELS_OFFSET
+comment  37B5
 comment  37BB
 comment  37BB Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
 deflabel 37BC UDG_DATA_WIDTH_BYTES_OFFSET
 comment  37C1
 comment  37C1 Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
 comment  37C6
-comment  37C6 Subtract $03 from 16-bit object UDG Data addrress, i.e. so address
+comment  37C6 Subtract $03 from 16-bit object UDG Data address, i.e. so address
 comment  37C6 avoids the object dimension bytes
 deflabel 37CA UDG_DATA_BITMAP_OFFSET
 comment  37CD
@@ -3027,7 +3046,7 @@ comment  37E0
 comment  37E0 Add $20 offset, which takes us to the start of the Alien UDG data, past Jetman UDG data
 comment  37E6
 comment  37E6 Alternate entry point to routine using different ZP vars for object Position and Type
-label    37E6 Get_Obj_UDG_Data_Addr_JM_Ali_1
+label    37E6 Get_Obj_UDG_Data_Addr_JMan_Etc
 lcomment 37E8 Zero bits
 bin      37E9
 comment  37ED
@@ -3070,7 +3089,7 @@ comment  3815
 comment  3815 Get address of UDG Data for Jetman or Alien objects and return in A and Y registers
 comment  3815 Bits 1 & 2 of object's X position used to select UDG animation frame.
 comment  3815 Animations have 2 or 4 frames and are minimum 2 pixels apart so bit 0 not used.
-label    3815 Get_Obj_UDG_Data_Addr_JM_Ali_2
+label    3815 Get_Obj_UDG_Data_Addr_Vals_Etc
 lcomment 3817 Reset bits 0 & 3-7
 binary   3818
 comment  381F
