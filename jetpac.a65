@@ -6989,14 +6989,17 @@ JMP_Next_Obj_New_Update_Params
 ; o.`Y8b 88  dP   88""         YbdP
 ; 8bodP' 88 d8888 888888        YP
 
-
 ; YOU ARE HERE #########################################################################
+
+; BOTH ROUTINES USED FOR OBJECTS, probayl JUST FOR DIFFERENT FRAMES, TO BE TESTED
+
+; Code used for Jetman, Ship Top/Mid/Base, Fuel, Valuables
 
 ; L_JSR_($3737)_($3601) OK
 ; L_JSR_($3737)_($3646) OK
 Load_Obj_UDG_RAM_Addr_Size_V_1
     jsr     Load_Object_Type_X_Y_Colour     ; 3737: 20 E9 35 
-    jsr     Get_Obj_UDG_Data_Addr_Vals_Etc  ; 373A: 20 15 38 
+    jsr     Get_Obj_UDG_Data_Addr_Frame_1   ; 373A: 20 15 38 
 
 ; Store object UDG Addr from Registers Y and A into ZP0E & 0F, minus $100
 ; Valuables, Platforms etc.
@@ -7094,7 +7097,7 @@ No_X_Wrap_
 ; L_JSR_($378A)_($360D) OK
 ; L_JSR_($378A)_($3649) OK
 Load_Obj_UDG_RAM_Addr_Size_JM1
-    jsr     Get_Obj_UDG_Data_Addr_JMan_Etc  ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
+    jsr     Get_Obj_UDG_Data_Addr_Frame_2   ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
 
 ; Store object UDG Addr from Y and A into ZP06 & 07, minus $100
 ; Jetman, Rocket Modules, Aliens
@@ -7184,6 +7187,7 @@ No_X_Wrap
 ;  8I  dY  dP__Yb    88    dP__Yb       dP__Yb   8I  dY  8I  dY 88"Yb
 ; 8888Y"  dP""""Yb   88   dP""""Yb     dP""""Yb 8888Y"  8888Y"  88  Yb
 
+; Two different entry points, for different animation frames, only used for Jetman and Aliens.
 ; Aliens Types: 05=Fuzzball, 06=Saucer, 07=Ball, 08=Cross
 ; All Aliens have only 2 animation states
 ; InReg: A=Object Type (Alien), X=Animation Frame
@@ -7209,12 +7213,12 @@ Get_Obj_UDG_Data_Addr_Alien
 ; Add $20 offset, which takes us to the start of the Alien UDG data, past Jetman UDG data
     clc                                     ; 37E0: 18       
     adc     #$20                            ; 37E1: 69 20    
-    jmp     Get_Obj_UDG_Data_Addr_Calc      ; 37E3: 4C 07 38 
+    jmp     Get_Obj_UDG_Data_Addr_Store     ; 37E3: 4C 07 38 
 ; ------------------------------------------
 
 ; Alternate entry point to routine using different ZP vars for object Position and Type
 ; L_JSR_($37E6)_($378A) OK
-Get_Obj_UDG_Data_Addr_JMan_Etc
+Get_Obj_UDG_Data_Addr_Frame_2
     lda     ZP10                            ; 37E6: A5 10    
     and     #%00000110                      ; 37E8: 29 06     Zero bits
     tax                                     ; 37EA: AA       
@@ -7228,7 +7232,7 @@ Get_Obj_UDG_Data_Addr_JMan_Etc
 ; InReg: A=Object Type (Jetman), X=Animation Frame
 ; OutReg: A=UDG Addr Hi, Y=UDG Addr Lo
 ; L_JMP_($37ED)_($381C) OK
-Get_Obj_UDG_Data_Addr_JM_Alien
+Get_Obj_UDG_Data_Addr
     tay                                     ; 37ED: A8       
 
 ; Jetman uses only bit 7 (direction he's facing) and bits 0 & 1 (standing/flying).
@@ -7240,7 +7244,7 @@ Get_Obj_UDG_Data_Addr_JM_Alien
 
 ; Object is Jetman, test state, is he looking Left or Right?
     bit     MASK_10000000                   ; 37F5: 2C 1B 20 
-    beq     Get_Obj_UDG_Data_Addr_Calc_JM   ; 37F8: F0 06    
+    beq     Get_Obj_UDG_Data_Addr_JM_Calc   ; 37F8: F0 06    
 
 ; Jetman is looking left, set bit 3 in X, which adds $08 to the UDG data address, meaning
 ; that it will point to the Jetman facing Left UDG data addresses instead of facing Right.
@@ -7254,7 +7258,7 @@ Get_Obj_UDG_Data_Addr_JM_Alien
 ; This effectively adds $10 to the calculated UDG data address when Jetman is Standing,
 ; meaning it points to the Jetman Standing data addresses instead of Jetman Flying.
 ; L_BRS_($3800)_($37F8) OK
-Get_Obj_UDG_Data_Addr_Calc_JM
+Get_Obj_UDG_Data_Addr_JM_Calc
     sec                                     ; 3800: 38       
     sbc     #$01                            ; 3801: E9 01    
     asl     a                               ; 3803: 0A       
@@ -7264,7 +7268,7 @@ Get_Obj_UDG_Data_Addr_Calc_JM
 
 ; OR A and X together to produce full UDG data table offset
 ; L_JMP_($3807)_($37E3) OK
-Get_Obj_UDG_Data_Addr_Calc
+Get_Obj_UDG_Data_Addr_Store
     sta     ZP13                            ; 3807: 85 13    
     txa                                     ; 3809: 8A       
     ora     ZP13                            ; 380A: 05 13    
@@ -7281,12 +7285,12 @@ Get_Obj_UDG_Data_Addr_Calc
 ; Bits 1 & 2 of object's X position used to select UDG animation frame.
 ; Animations have 2 or 4 frames and are minimum 2 pixels apart so bit 0 not used.
 ; L_JSR_($3815)_($373A) OK
-Get_Obj_UDG_Data_Addr_Vals_Etc
+Get_Obj_UDG_Data_Addr_Frame_1
     lda     ZP18                            ; 3815: A5 18    
     and     #%00000110                      ; 3817: 29 06     Reset bits 0 & 3-7
     tax                                     ; 3819: AA       
     lda     ZP1A                            ; 381A: A5 1A    
-    jmp     Get_Obj_UDG_Data_Addr_JM_Alien  ; 381C: 4C ED 37 
+    jmp     Get_Obj_UDG_Data_Addr           ; 381C: 4C ED 37 
 
 
 
@@ -7302,6 +7306,7 @@ Get_Obj_UDG_Data_Addr_Vals_Etc
 ; Yb   dP 88""Yb o.  88 88""   Yb        88
 ;  YbodP  88oodP "bodP' 888888  YboodP   88
 
+; Colorize all object sprites i.e. Jetman, Aliens, Rocket Top/Middle/Base, Fuel, Valuables
 ; L_JSR_($381F)_($2961) OK
 ; L_JSR_($381F)_($2CC6) OK
 ; L_JSR_($381F)_($2FD4) OK
@@ -7333,6 +7338,7 @@ Colourize_Object
     lda     ZP16                            ; 3835: A5 16    
     sta     ZP0A                            ; 3837: 85 0A    
     inc     ZP0A                            ; 3839: E6 0A    
+
 ; L_BRS_($383B)_($385C) OK
 Loop_Y
     ldx     ZP0A                            ; 383B: A6 0A    
@@ -7343,7 +7349,7 @@ Loop_Y
 ; L_BRS_($383F)_($384D) OK
 Loop_X
     lda     (ZP0C),y                        ; 383F: B1 0C    
-    and     #%00000111                      ; 3841: 29 07     Zero bits 3-7
+    and     #%00000111                      ; 3841: 29 07    
     cmp     #COLOUR_GREEN                   ; 3843: C9 05    
     beq     Green_Ignored                   ; 3845: F0 04    
 

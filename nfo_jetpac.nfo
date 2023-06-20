@@ -2951,6 +2951,16 @@ comment  372D
 comment  372D Test if both old and new object heights are the same, if yes, return
 comment  3734
 label    3734 JMP_Next_Obj_New_Update_Params
+
+
+comment  3737
+comment  3737 YOU ARE HERE #########################################################################
+comment  3737
+comment  3737 BOTH ROUTINES USED FOR OBJECTS, probayl JUST FOR DIFFERENT FRAMES, TO BE TESTED
+comment  3737
+
+
+comment  3737 Code used for Jetman, Ship Top/Mid/Base, Fuel, Valuables
 comment  3737
 label    3737 Load_Obj_UDG_RAM_Addr_Size_V_1
 comment  373D
@@ -2983,13 +2993,6 @@ comment  377C Subtract $03 from 16-bit object UDG Data address, i.e. so address
 comment  377C avoids the object dimension bytes
 deflabel 3780 UDG_DATA_BITMAP_OFFSET
 comment  3783
-
-
-comment  3737
-comment  3737 YOU ARE HERE #########################################################################
-comment  3737
-
-
 comment  378A
 label    378A Load_Obj_UDG_RAM_Addr_Size_JM1
 lcomment 378A Returns UDG Addr Lo in Y, Hi in A
@@ -3030,6 +3033,7 @@ comment  37C6 avoids the object dimension bytes
 deflabel 37CA UDG_DATA_BITMAP_OFFSET
 comment  37CD
 comment  37D4
+comment  37D4 Two different entry points, for different animation frames, only used for Jetman and Aliens.
 comment  37D4 Aliens Types: 05=Fuzzball, 06=Saucer, 07=Ball, 08=Cross
 comment  37D4 All Aliens have only 2 animation states
 comment  37D4 InReg: A=Object Type (Alien), X=Animation Frame
@@ -3046,7 +3050,7 @@ comment  37E0
 comment  37E0 Add $20 offset, which takes us to the start of the Alien UDG data, past Jetman UDG data
 comment  37E6
 comment  37E6 Alternate entry point to routine using different ZP vars for object Position and Type
-label    37E6 Get_Obj_UDG_Data_Addr_JMan_Etc
+label    37E6 Get_Obj_UDG_Data_Addr_Frame_2
 lcomment 37E8 Zero bits
 bin      37E9
 comment  37ED
@@ -3057,7 +3061,7 @@ comment  37ED This routine uses bit 7 of the Jetman Object Type to select Right 
 comment  37ED select Flying or Standing, when creating an offset in register X.
 comment  37ED InReg: A=Object Type (Jetman), X=Animation Frame
 comment  37ED OutReg: A=UDG Addr Hi, Y=UDG Addr Lo
-label    37ED Get_Obj_UDG_Data_Addr_JM_Alien
+label    37ED Get_Obj_UDG_Data_Addr
 comment  37EE
 comment  37EE Jetman uses only bit 7 (direction he's facing) and bits 0 & 1 (standing/flying).
 comment  37EE If other bits are used, object must be an Alien.
@@ -3077,10 +3081,10 @@ comment  3800
 comment  3800 A contains Jetman State, bit 7 is Direction-faced. SEC & SBC prepare ASLs to move bit 7 to bit 3
 comment  3800 This effectively adds $10 to the calculated UDG data address when Jetman is Standing,
 comment  3800 meaning it points to the Jetman Standing data addresses instead of Jetman Flying.
-label    3800 Get_Obj_UDG_Data_Addr_Calc_JM
+label    3800 Get_Obj_UDG_Data_Addr_JM_Calc
 comment  3807
 comment  3807 OR A and X together to produce full UDG data table offset
-label    3807 Get_Obj_UDG_Data_Addr_Calc
+label    3807 Get_Obj_UDG_Data_Addr_Store
 comment  380D
 comment  380D Using X just set, get index into the Object UDG table
 lcomment 380D Address lo byte into Y
@@ -3089,10 +3093,11 @@ comment  3815
 comment  3815 Get address of UDG Data for Jetman or Alien objects and return in A and Y registers
 comment  3815 Bits 1 & 2 of object's X position used to select UDG animation frame.
 comment  3815 Animations have 2 or 4 frames and are minimum 2 pixels apart so bit 0 not used.
-label    3815 Get_Obj_UDG_Data_Addr_Vals_Etc
+label    3815 Get_Obj_UDG_Data_Addr_Frame_1
 lcomment 3817 Reset bits 0 & 3-7
 binary   3818
 comment  381F
+comment  381F Colorize all object sprites i.e. Jetman, Aliens, Rocket Top/Middle/Base, Fuel, Valuables
 label    381F Colourize_Object
 comment  3827
 comment  3827 Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
@@ -3103,12 +3108,12 @@ comment  3833
 comment  3833 Use ZP0B as outer loop for vertical tile rows
 comment  3835
 comment  3835 Use ZP0A as inner loop for horizontal tile columns
+comment  383B
 label    383B Loop_Y
 comment  383F
 comment  383F Read colour from RAM and if it's green i.e. colour of the platforms, skip the colour change
 comment  383F else write the updated colour to the colour RAM
 label    383F Loop_X
-lcomment 3841 Zero bits 3-7
 binary   3842
 deflabel 3844 COLOUR_GREEN
 comment  3847
