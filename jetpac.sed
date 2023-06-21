@@ -103,6 +103,7 @@
 /ZP13                            equ     $0013/a ZP13_Obj_Landed_Posn_Y_Offset   equ     $0013
 /ZP13                            equ     $0013/a ZP13_Object_Lines_To_Erase      equ     $0013
 /ZP13                            equ     $0013/a ZP13_Rocket_Fuel_Level_Half     equ     $0013
+/ZP13                            equ     $0013/a ZP13_Temp                       equ     $0013
 /ZP14                            equ     $0014/a ZP14_Laser_Decay_Patten_Data_0  equ     $0014
 /ZP14                            equ     $0014/a ZP14_Object_Old_Width_Bytes     equ     $0014
 /ZP14                            equ     $0014/a ZP14_Object_Width_Bytes         equ     $0014
@@ -314,6 +315,7 @@
 # Get_Obj_UDG_Data_Addr_JM_Alien
 /; 37D4/,/; 381C/s/ZP10                            /ZP10_Object_Position_X          /
 /; 37D4/,/; 381C/s/ZP12                            /ZP12_Object_Type                /
+/; 37D4/,/; 381C/s/ZP13                            /ZP13_Temp                       /
 /; 37D4/,/; 381C/s/ZP18                            /ZP18_Object_Position_X          /
 /; 37D4/,/; 381C/s/ZP1A                            /ZP1A_Object_Type                /
 

@@ -133,6 +133,7 @@ ZP13_Laser_Position_Y           equ     $0013
 ZP13_Obj_Landed_Posn_Y_Offset   equ     $0013
 ZP13_Object_Lines_To_Erase      equ     $0013
 ZP13_Rocket_Fuel_Level_Half     equ     $0013
+ZP13_Temp                       equ     $0013
 ZP14                            equ     $0014
 ZP14_Laser_Decay_Patten_Data_0  equ     $0014
 ZP14_Object_Old_Width_Bytes     equ     $0014
@@ -2530,7 +2531,7 @@ Display_Rocket_Flame_Asc_Desc
     sec                                     ; 27D5: 38       
     sbc     #$01                            ; 27D6: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27D8: 20 2E 28 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27DB: 20 8D 37 
+    jsr     Load_Obj_New_UDG_RAM_Addr_Size  ; 27DB: 20 8D 37 
     jsr     Display_Object_New_Setup        ; 27DE: 20 10 36 
 
 ; L_BRS_($27E1)_($27CD) OK
@@ -2538,14 +2539,14 @@ Display_Rocket_Flame_On_Screen
     lda     ZP_Rocket_Flame_UDG_Toggle      ; 27E1: A5 27    
     pha                                     ; 27E3: 48       
     jsr     Get_Flame_UDG_Addr              ; 27E4: 20 2E 28 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 27E7: 20 3D 37 
+    jsr     Load_Obj_Old_UDG_RAM_Addr_Size  ; 27E7: 20 3D 37 
 
 ; Load the correct Flame UDG address and display the flame
     pla                                     ; 27EA: 68       
     sec                                     ; 27EB: 38       
     sbc     #$01                            ; 27EC: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27EE: 20 2E 28 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 27F1: 20 8D 37 
+    jsr     Load_Obj_New_UDG_RAM_Addr_Size  ; 27F1: 20 8D 37 
     jsr     Display_Object                  ; 27F4: 20 4C 36 
 
 ; Set the flame colour tile to red, uses two tiles
@@ -2592,7 +2593,7 @@ Display_Flame
     sec                                     ; 281F: 38       
     sbc     #$01                            ; 2820: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 2822: 20 2E 28 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2825: 20 8D 37 
+    jsr     Load_Obj_New_UDG_RAM_Addr_Size  ; 2825: 20 8D 37 
     jsr     Display_Object_New_Setup        ; 2828: 20 10 36 
     jmp     Restore_And_RTS                 ; 282B: 4C 0B 28 
 ; ------------------------------------------
@@ -2658,7 +2659,7 @@ Valuable_Landed
     lda     #$00                            ; 2859: A9 00    
     jsr     Load_Obj_UDG_Data_Addr_Ship     ; 285B: 20 DC 2F 
     jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 285E: 20 E5 2F 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2861: 20 8D 37 
+    jsr     Load_Obj_New_UDG_RAM_Addr_Size  ; 2861: 20 8D 37 
     jsr     Display_Object_New_Setup        ; 2864: 20 10 36 
 
 ; Jetman pickup valuable = 250 points, then remove from object list
@@ -2944,7 +2945,7 @@ Test_Explosion_Animation_Done
     lda     Explosion_UDG_RAM_Addr_Table+1,x ; 2958: BD 68 29 
 
 ; Update the explosion on screen
-    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 295B: 20 3D 37 
+    jsr     Load_Obj_Old_UDG_RAM_Addr_Size  ; 295B: 20 3D 37 
     jsr     Display_Object_Old_Setup        ; 295E: 20 04 36 
     jsr     Colourize_Object                ; 2961: 20 1F 38 
     jmp     GOTO_NEXT_OBJECT                ; 2964: 4C 1A 26 
@@ -4301,15 +4302,15 @@ Restore_Player_Rocket
 
     pha                                     ; 2DF1: 48       
     jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 2DF2: 20 E5 2F 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 2DF5: 20 3D 37 
+    jsr     Load_Obj_Old_UDG_RAM_Addr_Size  ; 2DF5: 20 3D 37 
     pla                                     ; 2DF8: 68       
 
     jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 2DF9: 20 E5 2F 
-    jmp     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2DFC: 4C 8D 37 
+    jmp     Load_Obj_New_UDG_RAM_Addr_Size  ; 2DFC: 4C 8D 37 
 ; ------------------------------------------
 
-; 19 was AF, postion of Jetman or Rocket base module?
-; 11 handled in same way as 19
+; 19 was AF, postion of Jetman or Rocket base module? #####################################
+; 11 handled in same way as 19#############################################################
 ; WOULD APPEAR ZP19 is generally object address position Y, assumedly
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
@@ -4807,12 +4808,12 @@ Setup_Object_Addr_Rocket_Fuel
 Setup_Object_Addr
     pha                                     ; 2FC3: 48       
     jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 2FC4: 20 E5 2F 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 2FC7: 20 3D 37 
+    jsr     Load_Obj_Old_UDG_RAM_Addr_Size  ; 2FC7: 20 3D 37 
     pla                                     ; 2FCA: 68       
 
 ; Do it again to setup the object dimensions
     jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 2FCB: 20 E5 2F 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_JM   ; 2FCE: 20 8D 37 
+    jsr     Load_Obj_New_UDG_RAM_Addr_Size  ; 2FCE: 20 8D 37 
 
     jsr     Display_Object                  ; 2FD1: 20 4C 36 
     jsr     Colourize_Object                ; 2FD4: 20 1F 38 
@@ -5010,7 +5011,7 @@ Disp_Obj_Ship_Or_Fuel_Setup_1
 ; L_JSR_($305A)_($2F88) OK
 Display_Object_Ship_Or_Fuel
     jsr     Load_Obj_UDG_Data_Addr_S_F_V    ; 305A: 20 E5 2F 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_V    ; 305D: 20 3D 37 
+    jsr     Load_Obj_Old_UDG_RAM_Addr_Size  ; 305D: 20 3D 37 
     jmp     Display_Object_Old_Setup        ; 3060: 4C 04 36 
 ; ------------------------------------------
 
@@ -6759,7 +6760,7 @@ Load_Object_Type_X_Y_Colour
 ; L_JSR_($3601)_($2E99) OK
 ; L_JSR_($3601)_($3358) OK
 Display_Object_Old_Setup_Load
-    jsr     Load_Obj_UDG_RAM_Addr_Size_V_1  ; 3601: 20 37 37 
+    jsr     Load_Obj_Old_UDG_RAM_Addr_Siz_  ; 3601: 20 37 37 
 
 ; L_JSR_($3604)_($295E) OK
 ; L_JSR_($3604)_($2DD4) OK
@@ -6773,7 +6774,7 @@ Display_Object_Old_Setup
 
 ; L_JSR_($360D)_($28F9) OK
 Display_Object_New_Setup_Load
-    jsr     Load_Obj_UDG_RAM_Addr_Size_JM1  ; 360D: 20 8A 37 
+    jsr     Load_Obj_New_UDG_RAM_Addr_Siz_  ; 360D: 20 8A 37 
 
 ; L_JSR_($3610)_($27DE) OK
 ; L_JSR_($3610)_($2828) OK
@@ -6843,8 +6844,8 @@ Loop_Erase_Down
 ; L_JSR_($3646)_($2CC3) OK
 ; L_JSR_($3646)_($32F9) OK
 Display_Object_Load
-    jsr     Load_Obj_UDG_RAM_Addr_Size_V_1  ; 3646: 20 37 37 
-    jsr     Load_Obj_UDG_RAM_Addr_Size_JM1  ; 3649: 20 8A 37 
+    jsr     Load_Obj_Old_UDG_RAM_Addr_Siz_  ; 3646: 20 37 37 
+    jsr     Load_Obj_New_UDG_RAM_Addr_Siz_  ; 3649: 20 8A 37 
 
 ; L_JSR_($364C)_($27F4) OK
 ; L_JSR_($364C)_($2EB8) OK
@@ -7096,41 +7097,34 @@ JMP_Next_Obj_New_Update_Params
 
 
 
-; 88      dP"Yb     db    8888b.       dP"Yb  88""Yb  88888
-; 88     dP   Yb   dPYb    8I  Yb     dP   Yb 88__dP     88
-; 88  .o Yb   dP  dP__Yb   8I  dY     Yb   dP 88""Yb o.  88
-; 88ood8  YbodP  dP""""Yb 8888Y"       YbodP  88oodP "bodP'
+; 88      dP"Yb     db    8888b.       dP"Yb  88""Yb  88888      dP"Yb  88     8888b.
+; 88     dP   Yb   dPYb    8I  Yb     dP   Yb 88__dP     88     dP   Yb 88      8I  Yb
+; 88  .o Yb   dP  dP__Yb   8I  dY     Yb   dP 88""Yb o.  88     Yb   dP 88  .o  8I  dY
+; 88ood8  YbodP  dP""""Yb 8888Y"       YbodP  88oodP "bodP'      YbodP  88ood8 8888Y"
 
 ; 88   88 8888b.   dP""b8     88""Yb    db    8b    d8        db    8888b.  8888b.  88""Yb
 ; 88   88  8I  Yb dP   `"     88__dP   dPYb   88b  d88       dPYb    8I  Yb  8I  Yb 88__dP
 ; Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88      dP__Yb   8I  dY  8I  dY 88"Yb
 ; `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88     dP""""Yb 8888Y"  8888Y"  88  Yb
 
-; .dP"Y8 88 8888P 888888     Yb    dP
-; `Ybo." 88   dP  88__        Yb  dP
-; o.`Y8b 88  dP   88""         YbdP
-; 8bodP' 88 d8888 888888        YP
-
-; YOU ARE HERE #########################################################################
-
-; BOTH ROUTINES USED FOR OBJECTS, probayl JUST FOR DIFFERENT FRAMES, TO BE TESTED
-
+; .dP"Y8 88 8888P 888888
+; `Ybo." 88   dP  88__
+; o.`Y8b 88  dP   88""
+; 8bodP' 88 d8888 888888
 ; Code used for Jetman, Ship Top/Mid/Base, Fuel, Valuables
-
 ; L_JSR_($3737)_($3601) OK
 ; L_JSR_($3737)_($3646) OK
-Load_Obj_UDG_RAM_Addr_Size_V_1
+Load_Obj_Old_UDG_RAM_Addr_Siz_
     jsr     Load_Object_Type_X_Y_Colour     ; 3737: 20 E9 35 
-    jsr     Get_Obj_UDG_Data_Addr_Frame_1   ; 373A: 20 15 38 
+    jsr     Get_Obj_New_UDG_Data_Addr       ; 373A: 20 15 38 
 
-; Store object UDG Addr from Registers Y and A into ZP0E & 0F, minus $100
-; Valuables, Platforms etc.
+; Store object UDG Data Addr in Registers Y and A into ZP0E & 0F, minus $100
 ; L_JSR_($373D)_($27E7) OK
 ; L_JSR_($373D)_($295B) OK
 ; L_JSR_($373D)_($2DF5) OK
 ; L_JSR_($373D)_($2FC7) OK
 ; L_JSR_($373D)_($305D) OK
-Load_Obj_UDG_RAM_Addr_Size_V
+Load_Obj_Old_UDG_RAM_Addr_Size
     sty     ZP0E_Object_UDG_Data_Addr_Lo    ; 373D: 84 0E    
     tay                                     ; 373F: A8       
     dey                                     ; 3740: 88       
@@ -7201,36 +7195,36 @@ No_X_Wrap_
 
 
 
-; 88      dP"Yb     db    8888b.       dP"Yb  88""Yb  88888
-; 88     dP   Yb   dPYb    8I  Yb     dP   Yb 88__dP     88
-; 88  .o Yb   dP  dP__Yb   8I  dY     Yb   dP 88""Yb o.  88
-; 88ood8  YbodP  dP""""Yb 8888Y"       YbodP  88oodP "bodP'
+; 88      dP"Yb     db    8888b.       dP"Yb  88""Yb  88888     88b 88 888888 Yb        dP
+; 88     dP   Yb   dPYb    8I  Yb     dP   Yb 88__dP     88     88Yb88 88__    Yb  db  dP
+; 88  .o Yb   dP  dP__Yb   8I  dY     Yb   dP 88""Yb o.  88     88 Y88 88""     YbdPYbdP
+; 88ood8  YbodP  dP""""Yb 8888Y"       YbodP  88oodP "bodP'     88  Y8 888888    YP  YP
 
 ; 88   88 8888b.   dP""b8     88""Yb    db    8b    d8        db    8888b.  8888b.  88""Yb
 ; 88   88  8I  Yb dP   `"     88__dP   dPYb   88b  d88       dPYb    8I  Yb  8I  Yb 88__dP
 ; Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88      dP__Yb   8I  dY  8I  dY 88"Yb
 ; `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88     dP""""Yb 8888Y"  8888Y"  88  Yb
 
-; .dP"Y8 88 8888P 888888      88888 8b    d8
-; `Ybo." 88   dP  88__           88 88b  d88
-; o.`Y8b 88  dP   88""       o.  88 88YbdP88
-; 8bodP' 88 d8888 888888     "bodP' 88 YY 88
+; .dP"Y8 88 8888P 888888
+; `Ybo." 88   dP  88__
+; o.`Y8b 88  dP   88""
+; 8bodP' 88 d8888 888888
 
+; Code used for Jetman, Ship Top/Mid/Base, Fuel, Valuables
 ; L_JSR_($378A)_($360D) OK
 ; L_JSR_($378A)_($3649) OK
-Load_Obj_UDG_RAM_Addr_Size_JM1
-    jsr     Get_Obj_UDG_Data_Addr_Frame_2   ; 378A: 20 E6 37  Returns UDG Addr Lo in Y, Hi in A
+Load_Obj_New_UDG_RAM_Addr_Siz_
+    jsr     Get_Obj_Old_UDG_Data_Addr       ; 378A: 20 E6 37 
 
-; Store object UDG Addr from Y and A into ZP06 & 07, minus $100
-; Jetman, Rocket Modules, Aliens
-; Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
+; Example Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
+; Store object UDG Data Addr in Registers Y and A into ZP06 & 07, minus $100
 ; L_JSR_($378D)_($27DB) OK
 ; L_JSR_($378D)_($27F1) OK
 ; L_JSR_($378D)_($2825) OK
 ; L_JSR_($378D)_($2861) OK
 ; L_JMP_($378D)_($2DFC) OK
 ; L_JSR_($378D)_($2FCE) OK
-Load_Obj_UDG_RAM_Addr_Size_JM
+Load_Obj_New_UDG_RAM_Addr_Size
     sty     ZP06_Object_UDG_Data_Addr_Lo    ; 378D: 84 06    
     tay                                     ; 378F: A8       
     dey                                     ; 3790: 88       
@@ -7238,9 +7232,9 @@ Load_Obj_UDG_RAM_Addr_Size_JM
 
 ; Store object position in ZP04 & 05
     lda     ZP10_Object_Position_X          ; 3793: A5 10    
-    sta     ZP04_Object_Position_X          ; 3795: 85 04    
+    sta     ZP04_Object_Position_X          ; 3795: 85 04     ZP04=X=$50
     lda     ZP11_Object_Position_Y          ; 3797: A5 11    
-    sta     ZP05_Object_Position_Y          ; 3799: 85 05     ZP04=X=$50 ZP05=Y=$5F
+    sta     ZP05_Object_Position_Y          ; 3799: 85 05     ZP05=Y=$5F
 
 ; Convert object position XY pixel coordinates to UDG RAM address, managing X axis wrap.
 ; Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
@@ -7259,7 +7253,7 @@ Load_Obj_UDG_RAM_Addr_Size_JM
 No_X_Wrap
     sta     ZP04_Object_Position_X          ; 37A9: 85 04     ZP04=X=$50 ZP05=Y=$5F
     jsr     Convert_XY_to_UDG_RAM_Address   ; 37AB: 20 1D 35  ZP05/04=$173F i.e. rocket middle
-                                            ; section start position
+                                            ; section start position on middle platform
 
 ; ZP04/05 are now an address instead of X and Y coordinates.
 ; Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
@@ -7321,7 +7315,7 @@ Get_Obj_UDG_Data_Addr_Alien
 
 ; Convert object's screen X position to 0 or 2 byte animation frame data offset & put back into X
     lsr     a                               ; 37D6: 4A       
-    and     #%00000010                      ; 37D7: 29 02     Zero bits 0 & 2-7
+    and     #%00000010                      ; 37D7: 29 02    
     tax                                     ; 37D9: AA       
     pla                                     ; 37DA: 68       
 
@@ -7335,14 +7329,14 @@ Get_Obj_UDG_Data_Addr_Alien
 ; Add $20 offset, which takes us to the start of the Alien UDG data, past Jetman UDG data
     clc                                     ; 37E0: 18       
     adc     #$20                            ; 37E1: 69 20    
-    jmp     Get_Obj_UDG_Data_Addr_Store     ; 37E3: 4C 07 38 
+    jmp     Calc_UDG_Data_Table_Index       ; 37E3: 4C 07 38 
 ; ------------------------------------------
 
 ; Alternate entry point to routine using different ZP vars for object Position and Type
 ; L_JSR_($37E6)_($378A) OK
-Get_Obj_UDG_Data_Addr_Frame_2
+Get_Obj_Old_UDG_Data_Addr
     lda     ZP10_Object_Position_X          ; 37E6: A5 10    
-    and     #%00000110                      ; 37E8: 29 06     Zero bits
+    and     #%00000110                      ; 37E8: 29 06    
     tax                                     ; 37EA: AA       
     lda     ZP12_Object_Type                ; 37EB: A5 12    
 
@@ -7359,28 +7353,29 @@ Get_Obj_UDG_Data_Addr
 
 ; Jetman uses only bit 7 (direction he's facing) and bits 0 & 1 (standing/flying).
 ; If other bits are used, object must be an Alien.
-    and     #%00111111                      ; 37EE: 29 3F     Zero bits 6 & 7
-    cmp     #%00000011                      ; 37F0: C9 03     Test bits 0 & 1
+    and     #%00111111                      ; 37EE: 29 3F    
+    cmp     #%00000011                      ; 37F0: C9 03    
     bcs     Get_Obj_UDG_Data_Addr_Alien     ; 37F2: B0 E0     Carry Set if A >= compared value
     tya                                     ; 37F4: 98       
 
 ; Object is Jetman, test state, is he looking Left or Right?
     bit     MASK_10000000                   ; 37F5: 2C 1B 20 
-    beq     Get_Obj_UDG_Data_Addr_JM_Calc   ; 37F8: F0 06    
+    beq     Adjust_For_Jetman_Standing      ; 37F8: F0 06    
 
 ; Jetman is looking left, set bit 3 in X, which adds $08 to the UDG data address, meaning
 ; that it will point to the Jetman facing Left UDG data addresses instead of facing Right.
     pha                                     ; 37FA: 48       
     txa                                     ; 37FB: 8A       
-    ora     #%00001000                      ; 37FC: 09 08     Set bit 3
+    ora     #%00001000                      ; 37FC: 09 08    
     tax                                     ; 37FE: AA       
     pla                                     ; 37FF: 68       
 
-; A contains Jetman State, bit 7 is Direction-faced. SEC & SBC prepare ASLs to move bit 7 to bit 3
+; Register A contains Jetman State, bit 7 is Direction-faced.
+; SEC & SBC prepare ASLs to move bit 7 to bit 3 using wraparound.
 ; This effectively adds $10 to the calculated UDG data address when Jetman is Standing,
 ; meaning it points to the Jetman Standing data addresses instead of Jetman Flying.
 ; L_BRS_($3800)_($37F8) OK
-Get_Obj_UDG_Data_Addr_JM_Calc
+Adjust_For_Jetman_Standing
     sec                                     ; 3800: 38       
     sbc     #$01                            ; 3801: E9 01    
     asl     a                               ; 3803: 0A       
@@ -7390,16 +7385,16 @@ Get_Obj_UDG_Data_Addr_JM_Calc
 
 ; OR A and X together to produce full UDG data table offset
 ; L_JMP_($3807)_($37E3) OK
-Get_Obj_UDG_Data_Addr_Store
-    sta     ZP13                            ; 3807: 85 13    
+Calc_UDG_Data_Table_Index
+    sta     ZP13_Temp                       ; 3807: 85 13    
     txa                                     ; 3809: 8A       
-    ora     ZP13                            ; 380A: 05 13    
+    ora     ZP13_Temp                       ; 380A: 05 13    
     tax                                     ; 380C: AA       
 
-; Using X just set, get index into the Object UDG table
-    lda     UDG_Data_Jetman_Aliens,x        ; 380D: BD 5F 38  Address lo byte into Y
+; Using X just set, get index into the Object UDG table, address lo-byte into Y, hi-byte into A
+    lda     UDG_Data_Jetman_Aliens,x        ; 380D: BD 5F 38 
     tay                                     ; 3810: A8       
-    lda     UDG_Data_Jetman_Aliens+1,x      ; 3811: BD 60 38  Address hi byte into A
+    lda     UDG_Data_Jetman_Aliens+1,x      ; 3811: BD 60 38 
     rts                                     ; 3814: 60       
 ; ==========================================
 
@@ -7407,9 +7402,9 @@ Get_Obj_UDG_Data_Addr_Store
 ; Bits 1 & 2 of object's X position used to select UDG animation frame.
 ; Animations have 2 or 4 frames and are minimum 2 pixels apart so bit 0 not used.
 ; L_JSR_($3815)_($373A) OK
-Get_Obj_UDG_Data_Addr_Frame_1
+Get_Obj_New_UDG_Data_Addr
     lda     ZP18_Object_Position_X          ; 3815: A5 18    
-    and     #%00000110                      ; 3817: 29 06     Reset bits 0 & 3-7
+    and     #%00000110                      ; 3817: 29 06    
     tax                                     ; 3819: AA       
     lda     ZP1A_Object_Type                ; 381A: A5 1A    
     jmp     Get_Obj_UDG_Data_Addr           ; 381C: 4C ED 37 

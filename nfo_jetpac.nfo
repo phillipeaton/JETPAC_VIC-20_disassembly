@@ -1755,8 +1755,8 @@ binary   2DED
 comment  2DF1
 comment  2DF9
 comment  2DFF
-comment  2DFF 19 was AF, postion of Jetman or Rocket base module?
-comment  2DFF 11 handled in same way as 19
+comment  2DFF 19 was AF, postion of Jetman or Rocket base module? #####################################
+comment  2DFF 11 handled in same way as 19#############################################################
 comment  2DFF WOULD APPEAR ZP19 is generally object address position Y, assumedly
 label    2DFF Decrement_Rocket_Position_Y
 comment  2E06
@@ -2951,22 +2951,11 @@ comment  372D
 comment  372D Test if both old and new object heights are the same, if yes, return
 comment  3734
 label    3734 JMP_Next_Obj_New_Update_Params
-
-
-comment  3737
-comment  3737 YOU ARE HERE #########################################################################
-comment  3737
-comment  3737 BOTH ROUTINES USED FOR OBJECTS, probayl JUST FOR DIFFERENT FRAMES, TO BE TESTED
-comment  3737
-
-
 comment  3737 Code used for Jetman, Ship Top/Mid/Base, Fuel, Valuables
-comment  3737
-label    3737 Load_Obj_UDG_RAM_Addr_Size_V_1
+label    3737 Load_Obj_Old_UDG_RAM_Addr_Siz_
 comment  373D
-comment  373D Store object UDG Addr from Registers Y and A into ZP0E & 0F, minus $100
-comment  373D Valuables, Platforms etc.
-label    373D Load_Obj_UDG_RAM_Addr_Size_V
+comment  373D Store object UDG Data Addr in Registers Y and A into ZP0E & 0F, minus $100
+label    373D Load_Obj_Old_UDG_RAM_Addr_Size
 comment  3743
 comment  3743 Store object position in ZP04 & 05
 comment  374B
@@ -2994,21 +2983,21 @@ comment  377C avoids the object dimension bytes
 deflabel 3780 UDG_DATA_BITMAP_OFFSET
 comment  3783
 comment  378A
-label    378A Load_Obj_UDG_RAM_Addr_Size_JM1
-lcomment 378A Returns UDG Addr Lo in Y, Hi in A
+comment  378A Code used for Jetman, Ship Top/Mid/Base, Fuel, Valuables
+label    378A Load_Obj_New_UDG_RAM_Addr_Siz_
 comment  378D
-comment  378D Store object UDG Addr from Y and A into ZP06 & 07, minus $100
-comment  378D Jetman, Rocket Modules, Aliens
-comment  378D Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
-label    378D Load_Obj_UDG_RAM_Addr_Size_JM
+comment  378D Example Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
+comment  378D Store object UDG Data Addr in Registers Y and A into ZP06 & 07, minus $100
+label    378D Load_Obj_New_UDG_RAM_Addr_Size
 lcomment 3791 ZP07/06=$3BF7
 comment  3793
 comment  3793 Store object position in ZP04 & 05
+lcomment 3795 ZP04=X=$50
+lcomment 3799 ZP05=Y=$5F
 comment  379B
 comment  379B Convert object position XY pixel coordinates to UDG RAM address, managing X axis wrap.
 comment  379B Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
 comment  379B will move object into next UDG RAM column.
-lcomment 3799 ZP04=X=$50 ZP05=Y=$5F
 deflabel 37A3 SCREEN_WIDTH_PIXELS
 comment  37A6
 deflabel 37A8 SCREEN_WIDTH_PIXELS
@@ -3016,7 +3005,7 @@ comment  37A9
 label    37A9 No_X_Wrap
 lcomment 37A9 ZP04=X=$50 ZP05=Y=$5F
 lcomment 37AB ZP05/04=$173F i.e. rocket middle
-lcomment 37AB section start position
+lcomment 37AB section start position on middle platform
 comment  37AE
 comment  37AE ZP04/05 are now an address instead of X and Y coordinates.
 comment  37AE Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
@@ -3041,7 +3030,6 @@ comment  37D4 OutReg: A=UDG Addr Hi, Y=UDG Addr Lo
 label    37D4 Get_Obj_UDG_Data_Addr_Alien
 comment  37D6
 comment  37D6 Convert object's screen X position to 0 or 2 byte animation frame data offset & put back into X
-lcomment 37D7 Zero bits 0 & 2-7
 binary   37D8
 comment  37DB
 comment  37DB Transform Object Types 5/6/7/8 to 2/3/4/5, then multiply by 4 to get the frame data offset offset
@@ -3050,8 +3038,7 @@ comment  37E0
 comment  37E0 Add $20 offset, which takes us to the start of the Alien UDG data, past Jetman UDG data
 comment  37E6
 comment  37E6 Alternate entry point to routine using different ZP vars for object Position and Type
-label    37E6 Get_Obj_UDG_Data_Addr_Frame_2
-lcomment 37E8 Zero bits
+label    37E6 Get_Obj_Old_UDG_Data_Addr
 bin      37E9
 comment  37ED
 comment  37ED When object is Jetman, Object Type represents State i.e. Flying/Standing, Facing Left/Right, Frame.
@@ -3065,9 +3052,7 @@ label    37ED Get_Obj_UDG_Data_Addr
 comment  37EE
 comment  37EE Jetman uses only bit 7 (direction he's facing) and bits 0 & 1 (standing/flying).
 comment  37EE If other bits are used, object must be an Alien.
-lcomment 37EE Zero bits 6 & 7
 binary   37EF
-lcomment 37f0 Test bits 0 & 1
 binary   37F1
 lcomment 37F2 Carry Set if A >= compared value
 comment  37F5
@@ -3075,26 +3060,23 @@ comment  37F5 Object is Jetman, test state, is he looking Left or Right?
 comment  37FA
 comment  37FA Jetman is looking left, set bit 3 in X, which adds $08 to the UDG data address, meaning
 comment  37FA that it will point to the Jetman facing Left UDG data addresses instead of facing Right.
-lcomment 37FC Set bit 3
 binary   37Fd
 comment  3800
-comment  3800 A contains Jetman State, bit 7 is Direction-faced. SEC & SBC prepare ASLs to move bit 7 to bit 3
+comment  3800 Register A contains Jetman State, bit 7 is Direction-faced.
+comment  3800 SEC & SBC prepare ASLs to move bit 7 to bit 3 using wraparound.
 comment  3800 This effectively adds $10 to the calculated UDG data address when Jetman is Standing,
 comment  3800 meaning it points to the Jetman Standing data addresses instead of Jetman Flying.
-label    3800 Get_Obj_UDG_Data_Addr_JM_Calc
+label    3800 Adjust_For_Jetman_Standing
 comment  3807
 comment  3807 OR A and X together to produce full UDG data table offset
-label    3807 Get_Obj_UDG_Data_Addr_Store
+label    3807 Calc_UDG_Data_Table_Index
 comment  380D
-comment  380D Using X just set, get index into the Object UDG table
-lcomment 380D Address lo byte into Y
-lcomment 3811 Address hi byte into A
+comment  380D Using X just set, get index into the Object UDG table, address lo-byte into Y, hi-byte into A
 comment  3815
 comment  3815 Get address of UDG Data for Jetman or Alien objects and return in A and Y registers
 comment  3815 Bits 1 & 2 of object's X position used to select UDG animation frame.
 comment  3815 Animations have 2 or 4 frames and are minimum 2 pixels apart so bit 0 not used.
-label    3815 Get_Obj_UDG_Data_Addr_Frame_1
-lcomment 3817 Reset bits 0 & 3-7
+label    3815 Get_Obj_New_UDG_Data_Addr
 binary   3818
 comment  381F
 comment  381F Colorize all object sprites i.e. Jetman, Aliens, Rocket Top/Middle/Base, Fuel, Valuables

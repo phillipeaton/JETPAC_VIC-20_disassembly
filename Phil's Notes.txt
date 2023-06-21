@@ -159,4 +159,7 @@ When colour is 0, it's invisible against the black background
 End fo string has top bit set to denote end. But is it the top 4 bits? See STR_GAME_OVER_PLAYER_1.
 
 -------------
-Describe what an Object is
+Describe what an Object is i.e. a sprite, sound etc.
+Point out that AND zero's bits, OR sets them. (Remove Zeros/Resets/Sets comments).
+Object position is bottom left of sprite.
+Loading of Infiltrator comments and comment at start of code come from different nfo files, so layout can be a bit funny.
