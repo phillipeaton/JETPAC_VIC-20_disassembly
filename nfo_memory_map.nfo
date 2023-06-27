@@ -29,11 +29,11 @@ label 030E      Y_register
 label 030F      P_register
 
 ; OS_Data vectors - For standard BASIC system?
-label 0314 Hardware_IRQ_Lo
-label 0315 Hardware_IRQ_Hi
+label 0314 IRQ_Interrupt_Vector_Lo
+label 0315 IRQ_Interrupt_Vector_Hi
 ;label 0316-0317 Break_Int_Vector
-label 0318 NMI_Int_Vector_Lo
-label 0319 NMI_Int_Vector_Hi
+label 0318 NMI_Interrupt_Vector_Lo
+label 0319 NMI_Interrupt_Vector_Hi
 ;label 031A-031B Open_Vector
 ;label 031C-031D Close_Vector
 ;label 031E-031F Set-Input_Vector

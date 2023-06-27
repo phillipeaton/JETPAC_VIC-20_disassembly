@@ -2,10 +2,10 @@
 ; Loaded: binary file "jetpac_2000-3fff.bin"
 ; Loaded: Info file "nfo_include.nfo"
 
-; ----------------------------------------------------------
-;  This is the reverse-engineered source code for the
-;  game 'JETPAC' written by Ultimate Play The Game.
-; ----------------------------------------------------------
+; ----------------------------------------------------
+; This is the reverse-engineered source code for the
+; game 'JETPAC' written by Ultimate Play The Game.
+; ----------------------------------------------------
 
 
 ;****************************************************
@@ -71,10 +71,10 @@ ZP_Active_Player                equ     $005E
 ZP_Subroutine_Addr_Lo           equ     $005F
 ZP_Subroutine_Addr_Hi           equ     $0060
 Screen_RAM                      equ     $0200
-Hardware_IRQ_Lo                 equ     $0314
-Hardware_IRQ_Hi                 equ     $0315
-NMI_Int_Vector_Lo               equ     $0318
-NMI_Int_Vector_Hi               equ     $0319
+IRQ_Interrupt_Vector_Lo         equ     $0314
+IRQ_Interrupt_Vector_Hi         equ     $0315
+NMI_Interrupt_Vector_Lo         equ     $0318
+NMI_Interrupt_Vector_Hi         equ     $0319
 Obj_Jetman_State                equ     $0380
 Obj_Jetman_Position_X           equ     $0381
 Obj_Jetman_Position_Y           equ     $0383
@@ -253,9 +253,12 @@ LASER_LENGTH_PARAM              equ     $06
 LASER_POSITION_Y                equ     $01
 LASER_POSITION_X_PARAMS         equ     $03
 LASER_GUN_HEIGHT_OFFSET         equ     $0D
-MASK_JETMAN_DIRECTION           equ     %10000000
 SCREEN_ROWS                     equ     $0B
 SCREEN_COLUMNS                  equ     $17
+IRQ_Interrupt_Handler_Addr_Hi   equ     $25
+IRQ_Interrupt_Handler_Addr_Lo   equ     $E0
+NMI_Interrupt_Handler_Addr_Hi   equ     $20
+NMI_Interrupt_Handler_Addr_Lo   equ     $1C
 
 ;****************************************************
 ; Program's Code Areas
@@ -264,28 +267,29 @@ SCREEN_COLUMNS                  equ     $17
 
     org     $2000
 
+; Probably unused data leftover from the start-up code relocation, $201D is program start point
     fdb     $201D,$201D                     ; 2000: 1D 20 1D 20 
 
-; Initial value table for VIC setup 16 bytes
-VIC_Init_Tab
+; Initial value table for VIC setup 16 bytes, see "Mapping the VIC 1984 COMPUTE" book.
+VIC_Init_Table
     fcb     $0B                             ; 2004: 0B        VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
-    fcb     $26                             ; 2005: 26        VIC_R1_V_Ctr
-    fcb     $97                             ; 2006: 97        VIC_R2_Num_Cols
-    fcb     $17                             ; 2007: 17        VIC_R3_Num_Rows
-    fcb     $00                             ; 2008: 00        VIC_R4_TV_Raster
-    fcb     $8C                             ; 2009: 8C        VIC_R5_CM_Start
-    fcb     $00                             ; 200A: 00        VIC_R6_H_LightP
-    fcb     $00                             ; 200B: 00        VIC_R7_V_LightP
-    fcb     $00                             ; 200C: 00        VIC_R8_Paddle_X
-    fcb     $00                             ; 200D: 00        VIC_R9_Paddle_Y
-    fcb     $00                             ; 200E: 00        VIC_RA_Frq_Osc1
-    fcb     $00                             ; 200F: 00        VIC_RB_Frq_Osc2
-    fcb     $00                             ; 2010: 00        VIC_RC_Frq_Osc3
-    fcb     $00                             ; 2011: 00        VIC_RD_Frq_Noise
-    fcb     $00                             ; 2012: 00        VIC_RE_Vol_Colour
-    fcb     $08                             ; 2013: 08        VIC_RF_BckBdrCol
+    fcb     $26                             ; 2005: 26        VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
+    fcb     $97                             ; 2006: 97        VIC_R1_V_Ctr     Vertical TV picture origin.
+    fcb     $17                             ; 2007: 17        VIC_R2_Num_Cols  Number of columns displayed, part of screen map address.
+    fcb     $00                             ; 2008: 00        VIC_R3_Num_Rows  Number of character lines displayed, part of raster location.
+    fcb     $8C                             ; 2009: 8C        VIC_R4_TV_Raster Raster beam location bits 8-1.
+    fcb     $00                             ; 200A: 00        VIC_R5_CM_Start  Screen map and character map addresses.
+    fcb     $00                             ; 200B: 00        VIC_R6_H_LightP  Light pen horizontal screen location.
+    fcb     $00                             ; 200C: 00        VIC_R7_V_LightP  Light pen vertical screen location.
+    fcb     $00                             ; 200D: 00        VIC_R8_Paddle_X  Potentiometer X/Paddle X value.
+    fcb     $00                             ; 200E: 00        VIC_R9_Paddle_Y  Potentiometer Y/Paddle Y value.
+    fcb     $00                             ; 200F: 00        VIC_RA_Frq_Osc1  Relative frequency of sound oscillator 1 (bass).
+    fcb     $00                             ; 2010: 00        VIC_RB_Frq_Osc2  Relative frequency of sound oscillator 2 (alto).
+    fcb     $00                             ; 2011: 00        VIC_RC_Frq_Osc3  Relative frequency of sound oscillator 3 (soprano).
+    fcb     $00                             ; 2012: 00        VIC_RD_Frq_Noise Relative frequency of sound oscillator 4 (noise).
+    fcb     $08                             ; 2013: 08        VIC_RE_Vol_Color Sound volume and auxiliary color.
 
-; Quick lookup for BIT instruction
+; Quick mask lookup for BIT instruction
 MASK_00000001
     fcb     %00000001                       ; 2014: 01       
 MASK_00000010
@@ -303,54 +307,56 @@ MASK_01000000
 MASK_10000000
     fcb     %10000000                       ; 201B: 80       
 
-; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+; Empty NMI Interrupt Handler, simply returns from interrupt
 NMI_Interrupt_Hardler
     rti                                     ; 201C: 40       
-; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; Starts here
-; ----------------------------------------------------------
-    sei                                     ; 201D: 78        Disable Interrupts
-    ldx     #$FF                            ; 201E: A2 FF     Reset stack address pointer
+; ----------------------------------------------------
+; Disable Interrupts, reset stack address pointer, clear Decimal flag
+    sei                                     ; 201D: 78       
+    ldx     #$FF                            ; 201E: A2 FF    
     txs                                     ; 2020: 9A       
-    cld                                     ; 2021: D8        Clear Decimal flag
+    cld                                     ; 2021: D8       
 
 ; Setup NMI interrupt vector to service routine at $201C
-    lda     #$1C                            ; 2022: A9 1C    
-    sta     NMI_Int_Vector_Lo               ; 2024: 8D 18 03 
-    lda     #$20                            ; 2027: A9 20    
-    sta     NMI_Int_Vector_Hi               ; 2029: 8D 19 03 
+    lda     #NMI_Interrupt_Handler_Addr_Lo  ; 2022: A9 1C    
+    sta     NMI_Interrupt_Vector_Lo         ; 2024: 8D 18 03 
+    lda     #NMI_Interrupt_Handler_Addr_Hi  ; 2027: A9 20    
+    sta     NMI_Interrupt_Vector_Hi         ; 2029: 8D 19 03 
 
     jsr     Erase_Hi_Score_Game_Settings    ; 202C: 20 6F 27 
     jsr     Erase_ZP_RAM                    ; 202F: 20 5B 27 
 
 ; Setup I/O data direction and interrupt enables
-    lda     #$00                            ; 2032: A9 00    
+    lda     #%00000000                      ; 2032: A9 00    
     sta     VIA1_DDR_A                      ; 2034: 8D 13 91 
-    lda     #$80                            ; 2037: A9 80    
+    lda     #%10000000                      ; 2037: A9 80    
     sta     VIA1_Int_Enable                 ; 2039: 8D 1E 91 
-    lda     #$C0                            ; 203C: A9 C0    
+    lda     #%11000000                      ; 203C: A9 C0    
     sta     VIA2_Int_Enable                 ; 203E: 8D 2E 91 
 
     jsr     Reset_VIA2_Timer                ; 2041: 20 5E 26 
 
 ; Set VIA outputs for keyboard scan
-    lda     #$40                            ; 2044: A9 40    
+    lda     #%01000000                      ; 2044: A9 40    
     sta     VIA1_Port_B                     ; 2046: 8D 10 91  Data I/O register (User port & RS-232) i.e. not used
-    sta     VIA2_Port_B                     ; 2049: 8D 20 91  Data I/O register (Keybd col scan, Cassette, Joy)
+    sta     VIA2_Port_B                     ; 2049: 8D 20 91  Data I/O register (Keybd col scan, Cassette, Joystick)
 
-; Setup IRQ interrupt vector to service routine at $25E0 #########################################
-    lda     #$E0                            ; 204C: A9 E0    
-    sta     Hardware_IRQ_Lo                 ; 204E: 8D 14 03 
-    lda     #$25                            ; 2051: A9 25    
-    sta     Hardware_IRQ_Hi                 ; 2053: 8D 15 03 
+; Setup IRQ interrupt vector to service routine at $25E0
+    lda     #IRQ_Interrupt_Handler_Addr_Lo  ; 204C: A9 E0    
+    sta     IRQ_Interrupt_Vector_Lo         ; 204E: 8D 14 03 
+    lda     #IRQ_Interrupt_Handler_Addr_Hi  ; 2051: A9 25    
+    sta     IRQ_Interrupt_Vector_Hi         ; 2053: 8D 15 03 
 
 ; Reset the VIC registers
     ldx     #$0F                            ; 2056: A2 0F     16 registers
 ; L_BRS_($2058)_($205F) OK
 Reset_VIC
-    lda     VIC_Init_Tab,x                  ; 2058: BD 04 20 
+    lda     VIC_Init_Table,x                ; 2058: BD 04 20 
     sta     VIC_R0_H_Ctr,x                  ; 205B: 9D 00 90 
     dex                                     ; 205E: CA       
     bpl     Reset_VIC                       ; 205F: 10 F7    
@@ -369,12 +375,17 @@ Reset_VIC
 ; 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA
 ; 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
 ; 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
+
     ldx     #$00                            ; 2061: A2 00    
     txa                                     ; 2063: 8A       
+
+; Initialise Screen RAM outer loop
 ; L_BRS_($2064)_($2077) OK
-ISR_Cols
+ISR_Columns
     ldy     #SCREEN_COLUMNS                 ; 2064: A0 17    
     pha                                     ; 2066: 48       
+
+; Initialise Screen RAM inner loop
 ; L_BRS_($2067)_($206F) OK
 ISR_Rows
     sta     Screen_RAM,x                    ; 2067: 9D 00 02 
@@ -383,11 +394,12 @@ ISR_Rows
     inx                                     ; 206D: E8       
     dey                                     ; 206E: 88       
     bne     ISR_Rows                        ; 206F: D0 F6    
+
     pla                                     ; 2071: 68       
     clc                                     ; 2072: 18       
     adc     #$01                            ; 2073: 69 01    
     cmp     #SCREEN_ROWS                    ; 2075: C9 0B    
-    bne     ISR_Cols                        ; 2077: D0 EB    
+    bne     ISR_Columns                     ; 2077: D0 EB    
 
 ; L_JMP_($2079)_($2994) OK
 ; L_JMP_($2079)_($299A) OK
@@ -398,10 +410,10 @@ Reset_Game_Select
     lda     #$01                            ; 207C: A9 01    
     ldx     #$05                            ; 207E: A2 05    
 ; L_BRS_($2080)_($2083) OK
-RGS_Flash
+Loop_Init_Option_Text
     sta     ZP_Game_Select_F1_Flash,x       ; 2080: 95 45    
     dex                                     ; 2082: CA       
-    bpl     RGS_Flash                       ; 2083: 10 FB    
+    bpl     Loop_Init_Option_Text           ; 2083: 10 FB    
 
 ; Setup volume and colour
     lda     #$0F                            ; 2085: A9 0F    
@@ -420,56 +432,56 @@ RGS_Flash
 ; Yb  "88  dP__Yb  88YbdP88 88""       o.`Y8b 88""   88  .o 88""   Yb        88
 ;  YboodP dP""""Yb 88 YY 88 888888     8bodP' 888888 88ood8 888888  YboodP   88
 
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; Game Select Loop
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; L_BRS_($208F)_($20E1) OK
 Game_Select
     inc     ZP_Flash_Countup                ; 208F: E6 58    
-    lda     #$00                            ; 2091: A9 00    
+    lda     #%00000000                      ; 2091: A9 00    
     sta     VIA2_DDR_B                      ; 2093: 8D 22 91  Set Port B all bits to input
-    lda     #$FF                            ; 2096: A9 FF    
+    lda     #%11111111                      ; 2096: A9 FF    
     sta     VIA2_DDR_A                      ; 2098: 8D 23 91  Set Port A all bits to output
 
-    lda     #$7F                            ; 209B: A9 7F     Select keyboard column to read
-    sta     VIA2_Port_A                     ; 209D: 8D 21 91   (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
+    lda     #%01111111                      ; 209B: A9 7F     Select keyboard column to read
+    sta     VIA2_Port_A                     ; 209D: 8D 21 91  (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
     ldx     Game_Settings                   ; 20A0: AE D3 1F  Whilst giving keyboard data time to settle?
     lda     VIA2_Port_B                     ; 20A3: AD 20 91  Read keyboard column
     sta     ZP13                            ; 20A6: 85 13     Store keyboard data
 
 ; Test F-Keys pressed or Space to start game
-    lda     #$10                            ; 20A8: A9 10    
+    lda     #%00010000                      ; 20A8: A9 10    
     bit     ZP13                            ; 20AA: 24 13     F1 pressed? (1 Player)
     bne     Test_F3                         ; 20AC: D0 04     No, skip
     txa                                     ; 20AE: 8A       
-    and     #$02                            ; 20AF: 29 02     Reset Bit0 = 1 Player
+    and     #%00000010                      ; 20AF: 29 02     Reset Bit 0 = 1 Player
     tax                                     ; 20B1: AA       
 
 ; L_BRS_($20B2)_($20AC) OK
 Test_F3
-    lda     #$20                            ; 20B2: A9 20    
+    lda     #%00100000                      ; 20B2: A9 20    
     bit     ZP13                            ; 20B4: 24 13     F3 pressed? (2 Player)
     bne     Test_F5                         ; 20B6: D0 04     No, skip
     txa                                     ; 20B8: 8A       
-    ora     #$01                            ; 20B9: 09 01     Set Bit0 = 2 Player
+    ora     #%00000001                      ; 20B9: 09 01     Set Bit 0 = 2 Player
     tax                                     ; 20BB: AA       
 
 ; L_BRS_($20BC)_($20B6) OK
 Test_F5
-    lda     #$40                            ; 20BC: A9 40    
+    lda     #%01000000                      ; 20BC: A9 40    
     bit     ZP13                            ; 20BE: 24 13     F5 pressed? (Keyboard)
     bne     Test_F7                         ; 20C0: D0 04     No, skip
     txa                                     ; 20C2: 8A       
-    and     #$01                            ; 20C3: 29 01     Reset Bit1 = Keyboard controls
+    and     #%00000001                      ; 20C3: 29 01     Reset Bit 1 = Keyboard controls
     tax                                     ; 20C5: AA       
 
 ; L_BRS_($20C6)_($20C0) OK
 Test_F7
-    lda     #$80                            ; 20C6: A9 80    
+    lda     #%10000000                      ; 20C6: A9 80    
     bit     ZP13                            ; 20C8: 24 13     F7 pressed? (Joystick)
     bne     Test_Space                      ; 20CA: D0 04     No, skip
     txa                                     ; 20CC: 8A       
-    ora     #$02                            ; 20CD: 09 02     Set Bit1 = Joystick controls
+    ora     #%00000010                      ; 20CD: 09 02     Set Bit 1 = Joystick controls
     tax                                     ; 20CF: AA       
 
 ; Store options, update display and test for game start
@@ -479,12 +491,13 @@ Test_Space
     sta     Game_Settings                   ; 20D1: 8D D3 1F  0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
     jsr     Display_Game_Select             ; 20D4: 20 B9 24 
 
-    lda     #$FE                            ; 20D7: A9 FE    
-    sta     VIA2_Port_A                     ; 20D9: 8D 21 91  Select keyboard column to read
-    lda     VIA2_Port_B                     ; 20DC: AD 20 91   (2/Q/CBM/Space/Stop/Ctrl/Left/1)
-    and     #$10                            ; 20DF: 29 10     Space Pressed?
+    lda     #%11111110                      ; 20D7: A9 FE     Select keyboard column to read
+    sta     VIA2_Port_A                     ; 20D9: 8D 21 91  (2/Q/CBM/Space/Stop/Ctrl/Left/1)
+    lda     VIA2_Port_B                     ; 20DC: AD 20 91  Read keyboard column
+    and     #%00010000                      ; 20DF: 29 10     Space Pressed?
     bne     Game_Select                     ; 20E1: D0 AC     No, check for settings again
 
+; Space was pressed, now start the game
     jsr     Reset_Screen_Display_Scores     ; 20E3: 20 16 24 
     jmp     Game_Start                      ; 20E6: 4C D1 25 
 ; ------------------------------------------
@@ -503,25 +516,17 @@ Test_Space
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 ;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
-; ----------------------------------------------------------
-; FUNCTION  : Init_Laser_Objects
-; CALLED BY :
-; CALLS     : Nothing
-; ARGUMENTS : sentiseutn
-;             etinseut
-;             setniseutn
-; ----------------------------------------------------------
 ; Initialise laser objects once every four calls based on IRQ counter if fire pressed
 ; L_JSR_($20E9)_($3306) OK
 Init_Laser_Objects
     lda     ZP_HW_IRQ_Counter_Lo            ; 20E9: A5 4A    
     and     #$03                            ; 20EB: 29 03    
-    beq     Init_Laser_Objects_Init         ; 20ED: F0 01    
+    beq     Do_Init_Laser_Objects           ; 20ED: F0 01    
     rts                                     ; 20EF: 60       
 ; ==========================================
 
 ; L_BRS_($20F0)_($20ED) OK
-Init_Laser_Objects_Init
+Do_Init_Laser_Objects
     jsr     Load_ZP_Parameters              ; 20F0: 20 9D 25 
     fcb     $06                             ; 20F3: 06        ZP06/07
     fdb     Obj_Laser_0                     ; 20F4: 88 03    
@@ -558,22 +563,22 @@ Init_Laser_Object
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2110: B1 00    
     tax                                     ; 2112: AA       
 
-; Mask for Jetman facing left/right bit and store to variable
-    and     #MASK_JETMAN_DIRECTION          ; 2113: 29 80     Zero bits 0-6 x000_0000
-    ora     #%00010000                      ; 2115: 09 10     Set bit 4 x001_0000
+; Mask for Jetman facing left/right bit 7, set bit 4 and store to variable
+    and     #%10000000                      ; 2113: 29 80    
+    ora     #%00010000                      ; 2115: 09 10    
     sta     (ZP06),y                        ; 2117: 91 06    
 
-; Get Jetman Position X, manipulate bottom 3 bits and store to ZP08
+; Get Jetman Position X, manipulate bottom 3 bits and store to variable
     iny                                     ; 2119: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 211A: B1 00    
-    and     #%11111000                      ; 211C: 29 F8     Zero bits 0-3 xxxx_x000
-    ora     #%00000101                      ; 211E: 09 05     Set bits 0 & 2 xxxx_x101
+    and     #%11111000                      ; 211C: 29 F8    
+    ora     #%00000101                      ; 211E: 09 05    
     sta     ZP08                            ; 2120: 85 08    
 
-; Test again Jetman facing left/right
+; Test again Jetman facing left/right bit 7
     txa                                     ; 2122: 8A       
-    and     #MASK_JETMAN_DIRECTION          ; 2123: 29 80    
-    beq     Laser_Jetman_Facing_Right       ; 2125: F0 4C    
+    and     #%10000000                      ; 2123: 29 80    
+    beq     Jetman_Facing_Right             ; 2125: F0 4C    
 
 ; Jetman facing left
     lda     ZP08                            ; 2127: A5 08    
@@ -586,7 +591,7 @@ Init_Laser_Object
 Init_Laser_Object_Params
     sta     ZP08                            ; 212F: 85 08    
 
-; Get Jetman Position Y, subtract some pixels to get to gun nozzle height and store to laser object
+; Get Jetman Position Y, subtract some pixels to get gun nozzle height and store to laser object
     iny                                     ; 2131: C8       
     iny                                     ; 2132: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2133: B1 00    
@@ -616,9 +621,9 @@ Loop_Init_Laser
 ; range 0100_0000 to 0111_1000 i.e. $40-$78
     iny                                     ; 214B: C8       
     lda     ZP_HW_IRQ_Random                ; 214C: A5 4C    
-    and     #%00111000                      ; 214E: 29 38     Zero bits 7,6,2-0 00xx_x000
+    and     #%00111000                      ; 214E: 29 38    
     clc                                     ; 2150: 18       
-    adc     #%01000000                      ; 2151: 69 40     Set bit 6 01xx_xx000
+    adc     #%01000000                      ; 2151: 69 40    
     sta     (ZP06),y                        ; 2153: 91 06    
 
 ; Load a random laser colour value 0-7 using IRQ counter
@@ -646,9 +651,9 @@ Laser_Colour_Table
 
 ; Test if Jetman Position X is facing right at the start of a tile
 ; L_BRS_($2173)_($2125) OK
-Laser_Jetman_Facing_Right
+Jetman_Facing_Right
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2173: B1 00    
-    and     #%00000111                      ; 2175: 29 07     Zero bits 3-7 0000_0xxx
+    and     #%00000111                      ; 2175: 29 07    
     beq     Add_To_Laser_Start_Position_X   ; 2177: F0 14    
 
 ; Add to the laser start Position X $18 pixels to avoid drawing laser over Jetman on screen
@@ -659,7 +664,7 @@ Laser_Jetman_Facing_Right
 ; Test for X coordinate screen wraparound
 ; L_JMP_($217E)_($2192) OK
 Laser_Jetman_Facing_Right_Wrap
-    and     #%11111110                      ; 217E: 29 FE     Zero bit 0 xxxx_xxx0
+    and     #%11111110                      ; 217E: 29 FE    
     cmp     #SCREEN_WIDTH_PIXELS            ; 2180: C9 B8    
     bcs     Wrap_Laser_Shot_Position_X      ; 2182: B0 03    
     jmp     Init_Laser_Object_Params        ; 2184: 4C 2F 21 
@@ -686,7 +691,7 @@ Add_To_Laser_Start_Position_X
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
 ;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
 ;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
@@ -696,12 +701,15 @@ Add_To_Laser_Start_Position_X
 ; 88       dPYb   `Ybo." 88__   88__dP `Ybo."
 ; 88  .o  dP__Yb  o.`Y8b 88""   88"Yb  o.`Y8b
 ; 88ood8 dP""""Yb 8bodP' 888888 88  Yb 8bodP'
-; #########################################################################################
+; #################################################################################################
+
+; YOU ARE HERE ########################################################################
+
 
 ; L_BRS_($2195)_($21C7) OK
-Add_08
+Add_08_Handle_Wrap_Get_Y_Coord
     adc     #$08                            ; 2195: 69 08    
-    jmp     Handle_Wrap_And_Get_Y_Cooord    ; 2197: 4C CB 21 
+    jmp     Handle_Wrap_Get_Y_Cooord        ; 2197: 4C CB 21 
 ; ------------------------------------------
 
 DISPLAY_LASERS
@@ -740,11 +748,11 @@ DISPLAY_LASERS
     clc                                     ; 21C6: 18       
 
 ; Add 8 if firing left or -8 if firing right ($F8 is -8)
-    beq     Add_08                          ; 21C7: F0 CC    
+    beq     Add_08_Handle_Wrap_Get_Y_Coord  ; 21C7: F0 CC    
     adc     #$F8                            ; 21C9: 69 F8    
 
 ; L_JMP_($21CB)_($2197) OK
-Handle_Wrap_And_Get_Y_Cooord
+Handle_Wrap_Get_Y_Cooord
     jsr     Laser_Wrap                      ; 21CB: 20 98 22 
     tax                                     ; 21CE: AA        Save A
     ldy     #LASER_POSITION_Y               ; 21CF: A0 01    
@@ -775,7 +783,7 @@ Save_Laser_Position_X
 
 ; Load current tile colour, check it's not green, jump if it is
     lda     (ZP0C),y                        ; 21E5: B1 0C    
-    and     #%00001111                      ; 21E7: 29 0F     Zero top 4 bits 0000_xxxx
+    and     #%00001111                      ; 21E7: 29 0F    
     cmp     #COLOUR_GREEN                   ; 21E9: C9 05    
     beq     Reduce_Laser_Length_Countdown   ; 21EB: F0 04    
 
@@ -791,14 +799,14 @@ Reduce_Laser_Length_Countdown
     sta     ZP07                            ; 21F6: 85 07    
 
 ; Test if laser length is > 7, if yes branch
-    and     #%11111000                      ; 21F8: 29 F8     Zero bottom 3 bits xxxx_x000
+    and     #%11111000                      ; 21F8: 29 F8    
     bne     Setup_Laser_Decay_Patterns      ; 21FA: D0 06    
 
 ; Probably turns of further display of laser beam
 ; L_BRS_($21FC)_($21DA) OK
 UDG_RAM_Zero_Bit_2
     lda     ZP06                            ; 21FC: A5 06    
-    and     #%11111011                      ; 21FE: 29 FB     Zero bit 2 xxxx_x0xx
+    and     #%11111011                      ; 21FE: 29 FB    
     sta     ZP06                            ; 2200: 85 06    
 
 ; Loads ZP 14/15/16/17 with laser decay pattern, initial laser is a line of $FF's then $03
@@ -823,7 +831,7 @@ Iterate_Laser_Params_2_3_4_5
     iny                                     ; 2211: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2212: B1 00    
     eor     ZP06                            ; 2214: 45 06    
-    and     #%11111000                      ; 2216: 29 F8     Zero bottom 3 bits xxxx_x000
+    and     #%11111000                      ; 2216: 29 F8    
     bne     Process_Laser_Shot              ; 2218: D0 0F    
 
 ; Test if all possible laser parameters processed
@@ -849,19 +857,19 @@ Process_Laser_Shot
 ; Decrements length and test for exit condition
     dec     ZP07                            ; 2230: C6 07    
     lda     ZP07                            ; 2232: A5 07    
-    and     #%00000111                      ; 2234: 29 07     Zero bits 3-7 0000_0xxx
+    and     #%00000111                      ; 2234: 29 07    
     bne     Update_Obj_Params_And_Exit      ; 2236: D0 10    
 
 ; Use IRQ counter to add some randomness to laser decay length patterns
     lda     ZP_HW_IRQ_Random                ; 2238: A5 4C    
-    and     #%00000011                      ; 223A: 29 03     Zero bits 2-7 0000_00xx
-    ora     #%00000100                      ; 223C: 09 04     Set bit 2 0000_01xx
+    and     #%00000011                      ; 223A: 29 03    
+    ora     #%00000100                      ; 223C: 09 04    
     ora     ZP07                            ; 223E: 05 07    
     sta     ZP07                            ; 2240: 85 07    
 
 ; Register Y is 3 or 4 or 5 or 5 at this point, thus setting bit in laser x-coords
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2242: B1 00    
-    ora     #%00000100                      ; 2244: 09 04     Set bit 2 xxxx_x1xx
+    ora     #%00000100                      ; 2244: 09 04    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2246: 91 00    
 
 ; L_BRS_($2248)_($2236) OK
@@ -887,7 +895,8 @@ Update_Laser_Position_X
     bit     MASK_00000001                   ; 225B: 2C 14 20 
 
 ; Add 8 if firing left or -8 if firing right ($F8 is -8)
-    beq     ADC_08_                         ; 225E: F0 25    
+    beq     ADC_08_Account_For_Wraparound   ; 225E: F0 25    
+
     clc                                     ; 2260: 18       
     adc     #$F8                            ; 2261: 69 F8    
 
@@ -921,7 +930,7 @@ Account_For_Wraparound
 ; ------------------------------------------
 
 ; L_BRS_($2285)_($225E) OK
-ADC_08_
+ADC_08_Account_For_Wraparound
     clc                                     ; 2285: 18       
     adc     #$08                            ; 2286: 69 08    
     jmp     Account_For_Wraparound          ; 2288: 4C 63 22 
@@ -945,9 +954,10 @@ Cascade_Laser_Pattern_Data
 ; L_JSR_($2298)_($2263) OK
 Laser_Wrap
     pha                                     ; 2298: 48       
-    and     #%11111000                      ; 2299: 29 F8     Zero bits 0-2 xxxx_x000
+    and     #%11111000                      ; 2299: 29 F8    
     cmp     #SCREEN_WIDTH_PIXELS            ; 229B: C9 B8    
     bcs     Laser_Wrap_Left_To_Right        ; 229D: B0 02    
+
     pla                                     ; 229F: 68       
     rts                                     ; 22A0: 60       
 ; ==========================================
@@ -968,8 +978,8 @@ Laser_Wrap_Left_To_Right
 
 ; Change X position from e.g. $FD to $B5, where $B8 is screen width in pixels
     pla                                     ; 22AE: 68       
-    and     #%00000111                      ; 22AF: 29 07     Zero bits 3-7 0000_0xxx
-    ora     #%10110000                      ; 22B1: 09 B0     Set bits 7,5,4 1011_0xxx
+    and     #%00000111                      ; 22AF: 29 07    
+    ora     #%10110000                      ; 22B1: 09 B0    
     rts                                     ; 22B3: 60       
 ; ==========================================
 
@@ -980,7 +990,7 @@ Laser_Wrap_Right_To_Left
 
 ; Change X position to become left side of screen (between 0 and 7)
     pla                                     ; 22B6: 68       
-    and     #%00000111                      ; 22B7: 29 07     Zero bits 3-7 0000_0xxx
+    and     #%00000111                      ; 22B7: 29 07    
     rts                                     ; 22B9: 60       
 ; ==========================================
 
@@ -1010,7 +1020,7 @@ Reset_Level_Add_Extra_Life
 
 ; When wave number ends in %11, add extra life e.g. 4th wave, 8th wave etc.
     lda     ZP_Wave_Active_Player           ; 22BD: A5 59    
-    and     #%00000011                      ; 22BF: 29 03     Reset bits 2-7 0000_00xx
+    and     #%00000011                      ; 22BF: 29 03    
     bne     Restore_Player_Objs_Init_Sound  ; 22C1: D0 0E    
 
 ; Add extra life
@@ -1749,7 +1759,7 @@ Game_Start
     jmp     Main_Loop_Init                  ; 25DD: 4C FA 25 
 ; ------------------------------------------
 
-; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 Hardware_Interrupt_Handler
     lda     #$01                            ; 25E0: A9 01    
 
@@ -1777,7 +1787,7 @@ Restore_Registers_And_RTI
     tax                                     ; 25F7: AA       
     pla                                     ; 25F8: 68       
     rti                                     ; 25F9: 40       
-; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
 
@@ -1788,9 +1798,9 @@ Restore_Registers_And_RTI
 ; 88YbdP88  dP__Yb  88 88 Y88     88  .o Yb   dP Yb   dP 88"""
 ; 88 YY 88 dP""""Yb 88 88  Y8     88ood8  YbodP   YbodP  88
 
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; Game Main Loop
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; L_JMP_($25FA)_($25DD) OK
 ; L_JMP_($25FA)_($265B) OK
 Main_Loop_Init
@@ -1828,7 +1838,7 @@ Main_Loop
 
 
 
-; #########################################################################################
+; #################################################################################################
 ;  dP""b8  dP"Yb  888888  dP"Yb      88b 88 888888 Yb  dP 888888
 ; dP   `" dP   Yb   88   dP   Yb     88Yb88 88__    YbdP    88
 ; Yb  "88 Yb   dP   88   Yb   dP     88 Y88 88""    dPYb    88
@@ -1838,7 +1848,7 @@ Main_Loop
 ; dP   Yb 88__dP     88 88__   dP   `"   88
 ; Yb   dP 88""Yb o.  88 88""   Yb        88
 ;  YbodP  88oodP "bodP' 888888  YboodP   88
-; #########################################################################################
+; #################################################################################################
 
 ; L_JMP_($261A)_($2226) OK
 ; L_JMP_($261A)_($2254) OK
@@ -1943,12 +1953,12 @@ Spawn_Objects
 ; 88"Yb  88""   88  .o  dP__Yb    88   88""    8I  dY      dP
 ; 88  Yb 888888 88ood8 dP""""Yb   88   888888 8888Y"      dP
 
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; VIA2 timer interrupts used to update Jetman movement
 ; $4FD7 / 1.108Mhz = 54.2Hz interrupt. Screen is 184 pixels
 ; wide. At one pixel walking movement per interrupt, Jetman
 ; should get across the screen in about 3.5 seconds.
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; L_JSR_($265E)_($2041) OK
 ; L_JSR_($265E)_($25E4) OK
 Reset_VIA2_Timer
@@ -2057,12 +2067,12 @@ Init_Sound_Object_Table
 
 
 
-; #########################################################################################
+; #################################################################################################
 ;  .dP"Y8  dP"Yb  88   88 88b 88 8888b.      88   88 88""Yb 8888b.     db    888888 888888
 ;  `Ybo." dP   Yb 88   88 88Yb88  8I  Yb     88   88 88__dP  8I  Yb   dPYb     88   88__
 ;  o.`Y8b Yb   dP Y8   8P 88 Y88  8I  dY     Y8   8P 88"""   8I  dY  dP__Yb    88   88""
 ;  8bodP'  YbodP  `YbodP' 88  Y8 8888Y"      `YbodP' 88     8888Y"  dP""""Yb   88   888888
-; #########################################################################################
+; #################################################################################################
 
 ; Read and play sound channel data from the Sound object
 SOUND_UPDATE
@@ -2505,12 +2515,12 @@ Ptr_Rocket_Flame_Frame_1_Hi
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; Yb    dP    db    88     88   88    db    88""Yb 88     888888 .dP"Y8
 ;  Yb  dP    dPYb   88     88   88   dPYb   88__dP 88     88__   `Ybo."
 ;   YbdP    dP__Yb  88  .o Y8   8P  dP__Yb  88""Yb 88  .o 88""   o.`Y8b
 ;    YP    dP""""Yb 88ood8 `YbodP' dP""""Yb 88oodP 88ood8 888888 8bodP'
-; #########################################################################################
+; #################################################################################################
 
 ; Remove "Test_Platform_Collision"=Gems all fall through platforms and floor, reentering at top
 VALUABLES
@@ -2722,12 +2732,12 @@ Restore_Obj_List_Ptr
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; 888888 Yb  dP 88""Yb 88      dP"Yb  .dP"Y8 88  dP"Yb  88b 88 .dP"Y8
 ; 88__    YbdP  88__dP 88     dP   Yb `Ybo." 88 dP   Yb 88Yb88 `Ybo."
 ; 88""    dPYb  88"""  88  .o Yb   dP o.`Y8b 88 Yb   dP 88 Y88 o.`Y8b
 ; 888888 dP  Yb 88     88ood8  YbodP  8bodP' 88  YbodP  88  Y8 8bodP'
-; #########################################################################################
+; #################################################################################################
 
 ; L_JSR_($28F9)_($2C8C) OK
 Change_Object_To_Explosion
@@ -2742,8 +2752,8 @@ Change_Object_To_Explosion
 ; The AND and OR probably for jetman object
     ldy     #OBJECT_TYPE_PARAM              ; 2902: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2904: B1 00    
-    and     #%11000000                      ; 2906: 29 C0     Zero bits 0-5 xx000000
-    ora     #%00000011                      ; 2908: 09 03     Set bits 0-1 xx000011
+    and     #%11000000                      ; 2906: 29 C0    
+    ora     #%00000011                      ; 2908: 09 03    
 
 ; L_JSR_($290A)_($2A59) OK
 Set_Object_Type_To_Explosion
@@ -2762,11 +2772,11 @@ Set_Object_Type_To_Explosion
 
 ; Change explosion object colour based on IRQ random generator
     lda     ZP_HW_IRQ_Random                ; 2919: A5 4C    
-    and     #%00000111                      ; 291B: 29 07     Zero bits 3-8 00000xxx
+    and     #%00000111                      ; 291B: 29 07    
     bne     Test_New_Colour_Is_Green        ; 291D: D0 02    
 
 ; Colour is black, bump it to white by incrementing
-    ora     #COLOUR_WHITE                   ; 291F: 09 01     Set bit 0 xxxxxxx1
+    ora     #COLOUR_WHITE                   ; 291F: 09 01    
 
 ; L_BRS_($2921)_($291D) OK
 Test_New_Colour_Is_Green
@@ -3041,7 +3051,7 @@ Setup_Jetman_Explosion
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; Yb        dP    db    Yb    dP 888888       .d
 ;  Yb  db  dP    dPYb    Yb  dP  88__       .d88
 ;   YbdPYbdP    dP__Yb    YbdP   88""         88
@@ -3051,7 +3061,7 @@ Setup_Jetman_Explosion
 ; dP   `" 88__dP dP   Yb `Ybo." `Ybo."
 ; Yb      88"Yb  Yb   dP o.`Y8b o.`Y8b
 ;  YboodP 88  Yb  YbodP  8bodP' 8bodP'
-; #########################################################################################
+; #################################################################################################
 
 WAVE_1_CROSS
     jsr     Test_Laser_Hits                 ; 2A5F: 20 5F 2C 
@@ -3071,7 +3081,7 @@ Wave_1_Cross_Direction_Update
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; Yb        dP    db    Yb    dP 888888     oP"Yb.
 ;  Yb  db  dP    dPYb    Yb  dP  88__       "' dP'
 ;   YbdPYbdP    dP__Yb    YbdP   88""         dP'
@@ -3081,7 +3091,7 @@ Wave_1_Cross_Direction_Update
 ; `Ybo." 88__dP 88  88 88__   88__dP 88__
 ; o.`Y8b 88"""  888888 88""   88"Yb  88""
 ; 8bodP' 88     88  88 888888 88  Yb 888888
-; #########################################################################################
+; #################################################################################################
 
 WAVE_2_SPHERE
     jsr     Test_Laser_Hits                 ; 2A6D: 20 5F 2C 
@@ -3169,7 +3179,7 @@ Direction_Y_Store_Rand
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; Yb        dP    db    Yb    dP 888888     88888
 ;  Yb  db  dP    dPYb    Yb  dP  88__         .dP
 ;   YbdPYbdP    dP__Yb    YbdP   88""       o `Yb
@@ -3179,7 +3189,7 @@ Direction_Y_Store_Rand
 ; `Ybo."   dPYb   88   88 dP   `" 88__   88__dP
 ; o.`Y8b  dP__Yb  Y8   8P Yb      88""   88"Yb
 ; 8bodP' dP""""Yb `YbodP'  YboodP 888888 88  Yb
-; #########################################################################################
+; #################################################################################################
 
 WAVE_3_SAUCER
     jsr     Test_Laser_Hits                 ; 2ABC: 20 5F 2C 
@@ -3459,7 +3469,7 @@ Init_Obj_Valuable_Table
 ; L_JSR_($2B8F)_($2658) OK
 Spawn_Valuables
     lda     Obj_Jetman_State                ; 2B8F: AD 80 03 
-    and     #%00111111                      ; 2B92: 29 3F     Zero bits 6 & 7 i.e. 00xxxxxx
+    and     #%00111111                      ; 2B92: 29 3F    
     bne     Spawn_Vals                      ; 2B94: D0 01    
 
 ; L_BRS_($2B96)_($2B99) OK
@@ -3693,7 +3703,7 @@ Test_Laser_Hits
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; Yb        dP    db    Yb    dP 888888      dP"Yb
 ;  Yb  db  dP    dPYb    Yb  dP  88__       dP   Yb
 ;   YbdPYbdP    dP__Yb    YbdP   88""       Yb   dP
@@ -3703,7 +3713,7 @@ Test_Laser_Hits
 ; 88__   88   88   dP    dP  88__dP   dPYb   88     88
 ; 88""   Y8   8P  dP    dP   88""Yb  dP__Yb  88  .o 88  .o
 ; 88     `YbodP' d8888 d8888 88oodP dP""""Yb 88ood8 88ood8
-; #########################################################################################
+; #################################################################################################
 
 WAVE_0_FUZZBALL
     jsr     Test_Laser_Hits                 ; 2C6A: 20 5F 2C 
@@ -3989,14 +3999,14 @@ Wave_Alien_Colour_Lookup
 ; Yb      Yb   dP 88  .o 88  .o 88  8I  dY 88""
 ;  YboodP  YbodP  88ood8 88ood8 88 8888Y"  888888
 
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; FUNCTION : Tests if Jetman and the current object have
 ;            overlapped i.e. collided. Object can be rocket
 ;            part, fuel cell, gem or alien.
 ; ENTRY : ZP_Obj_List_Ptr = Current Object
 ;         Obj_Jetman_Looks = Status of Jetman
 ; EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; L_JSR_($2D58)_($2854) OK
 ; L_JSR_($2D58)_($2C92) OK
 ; L_JSR_($2D58)_($2E77) OK
@@ -4215,7 +4225,7 @@ Decrement_Rocket_Position_Y
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
@@ -4225,7 +4235,7 @@ Decrement_Rocket_Position_Y
 ;   dPYb   `Ybo." dP   `" 88__   88Yb88  8I  Yb
 ;  dP__Yb  o.`Y8b Yb      88""   88 Y88  8I  dY
 ; dP""""Yb 8bodP'  YboodP 888888 88  Y8 8888Y"
-; #########################################################################################
+; #################################################################################################
 
 ; Aliens keep moving also
 ROCKET_ASCEND
@@ -4278,7 +4288,7 @@ Rocket_At_Top
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
@@ -4288,7 +4298,7 @@ Rocket_At_Top
 ;  8I  Yb 88__   `Ybo." dP   `" 88__   88Yb88  8I  Yb
 ;  8I  dY 88""   o.`Y8b Yb      88""   88 Y88  8I  dY
 ; 8888Y"  888888 8bodP'  YboodP 888888 88  Y8 8888Y"
-; #########################################################################################
+; #################################################################################################
 
 ROCKET_DESCEND
     jsr     Load_Object_Type_X_Y            ; 2E4E: 20 D7 35 
@@ -4323,7 +4333,7 @@ ROCKET_DESCEND
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
@@ -4338,7 +4348,7 @@ ROCKET_DESCEND
 ; 88b  d88 dP   Yb  8I  Yb 88   88 88     88__
 ; 88YbdP88 Yb   dP  8I  dY Y8   8P 88  .o 88""
 ; 88 YY 88  YbodP  8888Y"  `YbodP' 88ood8 888888
-; #########################################################################################
+; #################################################################################################
 
 ; Test if Jetman collided with Rocket
 ROCKET_BOTTOM_MODULE
@@ -4534,7 +4544,7 @@ Colourize_Rocket
 
 
 
-; #########################################################################################
+; #################################################################################################
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888     88""Yb    db    88""Yb 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88       88__dP   dPYb   88__dP   88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88       88"""   dP__Yb  88"Yb    88
@@ -4544,7 +4554,7 @@ Colourize_Rocket
 ; dP   Yb 88__dP     88__   88   88 88__   88
 ; Yb   dP 88"Yb      88""   Y8   8P 88""   88  .o
 ;  YbodP  88  Yb     88     `YbodP' 888888 88ood8
-; #########################################################################################
+; #################################################################################################
 
 ; Test if rocket part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
 ; L_BRS_($2F31)_($2F98) OK
@@ -4567,7 +4577,7 @@ Rocket_Part_Or_Fuel_Dropped
 ; status = not dropping and not picked-up by Jetman
 ; Note, using direct addressing, not using Y offset
     lda     Obj_Rocket_Top_Or_Fuel_Status   ; 2F43: AD BC 03 
-    ora     #%00000001                      ; 2F46: 09 01     Set bit 0
+    ora     #%00000001                      ; 2F46: 09 01    
     sta     Obj_Rocket_Top_Or_Fuel_Status   ; 2F48: 8D BC 03 
     jsr     Disp_Obj_Ship_Or_Fuel_Setup_2   ; 2F4B: 20 54 30 
 
@@ -5336,7 +5346,7 @@ Next_UDG_Char
 
 
 
-; #########################################################################################
+; #################################################################################################
 ;  88888 888888 888888 8b    d8    db    88b 88
 ;     88 88__     88   88b  d88   dPYb   88Yb88
 ; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
@@ -5346,7 +5356,7 @@ Next_UDG_Char
 ; 88__   88      YbdP  88 88Yb88 dP   `"
 ; 88""   88  .o   8P   88 88 Y88 Yb  "88
 ; 88     88ood8  dP    88 88  Y8  YboodP
-; #########################################################################################
+; #################################################################################################
 
 ; NOT COMPLETE YET ######################################################################
 
@@ -5717,7 +5727,7 @@ D_Set_Jetman_Standing
 
 
 
-; #########################################################################################
+; #################################################################################################
 ;  88888 888888 888888 8b    d8    db    88b 88
 ;     88 88__     88   88b  d88   dPYb   88Yb88
 ; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
@@ -5727,7 +5737,7 @@ D_Set_Jetman_Standing
 ; `Ybo."   88     dPYb   88Yb88  8I  Yb 88 88Yb88 dP   `"
 ; o.`Y8b   88    dP__Yb  88 Y88  8I  dY 88 88 Y88 Yb  "88
 ; 8bodP'   88   dP""""Yb 88  Y8 8888Y"  88 88  Y8  YboodP
-; #########################################################################################
+; #################################################################################################
 
 ; NEEDS MORE WORK ######################################################################
 
@@ -5735,7 +5745,7 @@ D_Set_Jetman_Standing
 ; L_BRS_($332C)_($3381) OK
 Set_Jetman_Facing_Right
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 332C: B1 00    
-    and     #%01111111                      ; 332E: 29 7F     Zero bit 7
+    and     #%01111111                      ; 332E: 29 7F    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 3330: 91 00    
     lda     #$01                            ; 3332: A9 01    
     jmp     Update_JM_Direction_Position_X  ; 3334: 4C 9F 33 
@@ -5744,7 +5754,7 @@ Set_Jetman_Facing_Right
 ; L_BRS_($3337)_($3383) OK
 Set_Jetman_Facing_Left
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3337: B1 00    
-    ora     #%10000000                      ; 3339: 09 80     Set bit 7
+    ora     #%10000000                      ; 3339: 09 80    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 333B: 91 00    
     lda     #$FF                            ; 333D: A9 FF    
     jmp     Update_JM_Direction_Position_X  ; 333F: 4C 9F 33 
@@ -6053,7 +6063,7 @@ Flash_Score_Start
 
 ; Test IRQ counter, only continue once in 8 calls
     lda     ZP_HW_IRQ_Counter_Lo            ; 3473: A5 4A    
-    and     #%00000111                      ; 3475: 29 07     Zero bits 3-7 0000_0xxx
+    and     #%00000111                      ; 3475: 29 07    
     bne     RTS_Flash_Score                 ; 3477: D0 20    
 
     ldx     #NUM_OF_COLUMNS_TO_REVERSE      ; 3479: A2 06    
@@ -6119,9 +6129,9 @@ Load_UDG_RAM_Addr_Player_2
 ; 88""Yb   8P     88   88""   o.`Y8b
 ; 88oodP  dP      88   888888 8bodP'
 
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; Display_BCD_Bytes
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; FUNCTION  : Display
 ;             Scores
 ; CALLED BY :
@@ -6129,7 +6139,7 @@ Load_UDG_RAM_Addr_Player_2
 ; ARGUMENTS : ZP_UDG_RAM_X ZP_UDG_RAM_Y = UDG array absolute position to display score at
 ;             ZP_Ptr_To_Str             = Players score in ZP as BCD e.g. 12 34 56
 ;             ZP_Temp_1                 = BCD byte counter i.e. number of bytes to display
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; Example for score of 12 34 56 at ZP51-53
 ; L_JMP_($34A4)_($247E) OK
 ; L_JMP_($34A4)_($248E) OK
@@ -6180,7 +6190,7 @@ Test_All_Bytes_Displayed
     rts                                     ; 34CB: 60       
 ; ==========================================
 
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; FUNCTION  :
 ; CALLED BY :
 ; CALLS     :
@@ -6190,7 +6200,7 @@ Test_All_Bytes_Displayed
 ; ZP_UDG_RAM_X   = 08 A8 or 08 20
 ; ZP_UDG_RAM_Y   = 08 A8 or 08 20
 ; ZP_Addr_From   = 70 80 or 28 80
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; L_JSR_($34CC)_($2445) OK
 ; L_JSR_($34CC)_($24D4) OK
 ; L_JSR_($34CC)_($24E1) OK
@@ -6455,9 +6465,9 @@ No_Inc_Addr_Hi
 ;   88   Yb   dP     Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88
 ;   88    YbodP      `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88
 
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; Copy Character ROM Character to User-Defined Graphics Memory
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; FUNCTION  : Copy an 8 byte Character ROM character to the
 ;             Used-Defined Graphics RAM e.g. to display a
 ;             text string or score.
@@ -6466,7 +6476,7 @@ No_Inc_Addr_Hi
 ; ARGUMENTS : ??? = Loaded with character to copy e.g. $71 for "1"
 ;             ??? BROKEN COMMENTS Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
 ;             ??? BROKEN COMMENTS Addr_To gets updated as part of this routine.
-; ----------------------------------------------------------
+; ----------------------------------------------------
 ; Character to copy stored in ZP06, create Character ROM address in ZP07/06 for this
 ; value and copy 8 data bytes from that address to UDG RAM address stored in ZP05/04
 ; Example: Display "1" using $71 in ZP06

@@ -1,34 +1,40 @@
-insert ; ----------------------------------------------------------
-insert ;  This is the reverse-engineered source code for the
-insert ;  game 'JETPAC' written by Ultimate Play The Game.
-insert ; ----------------------------------------------------------
+comment  2195
+comment  2195 YOU ARE HERE ########################################################################
+comment  2195
+
+
+insert ; ----------------------------------------------------
+insert ; This is the reverse-engineered source code for the
+insert ; game 'JETPAC' written by Ultimate Play The Game.
+insert ; ----------------------------------------------------
 insert
 ;
 ; Start of disassembly instructions
+comment  2000 Probably unused data leftover from the start-up code relocation, $201D is program start point
 word     2000-2003
 comment  2004
-comment  2004 Initial value table for VIC setup 16 bytes
-label    2004 VIC_Init_Tab
-lcomment 2004 VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
+comment  2004 Initial value table for VIC setup 16 bytes, see "Mapping the VIC 1984 COMPUTE" book.
+label    2004 VIC_Init_Table
 const    2004-201B
 break    2004-2013
-lcomment 2005 VIC_R1_V_Ctr
-lcomment 2006 VIC_R2_Num_Cols
-lcomment 2007 VIC_R3_Num_Rows
-lcomment 2008 VIC_R4_TV_Raster
-lcomment 2009 VIC_R5_CM_Start
-lcomment 200A VIC_R6_H_LightP
-lcomment 200B VIC_R7_V_LightP
-lcomment 200C VIC_R8_Paddle_X
-lcomment 200D VIC_R9_Paddle_Y
-lcomment 200E VIC_RA_Frq_Osc1
-lcomment 200F VIC_RB_Frq_Osc2
-lcomment 2010 VIC_RC_Frq_Osc3
-lcomment 2011 VIC_RD_Frq_Noise
-lcomment 2012 VIC_RE_Vol_Colour
-lcomment 2013 VIC_RF_BckBdrCol
+lcomment 2004 VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
+lcomment 2005 VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
+lcomment 2006 VIC_R1_V_Ctr     Vertical TV picture origin.
+lcomment 2007 VIC_R2_Num_Cols  Number of columns displayed, part of screen map address.
+lcomment 2008 VIC_R3_Num_Rows  Number of character lines displayed, part of raster location.
+lcomment 2009 VIC_R4_TV_Raster Raster beam location bits 8-1.
+lcomment 200A VIC_R5_CM_Start  Screen map and character map addresses.
+lcomment 200B VIC_R6_H_LightP  Light pen horizontal screen location.
+lcomment 200C VIC_R7_V_LightP  Light pen vertical screen location.
+lcomment 200D VIC_R8_Paddle_X  Potentiometer X/Paddle X value.
+lcomment 200E VIC_R9_Paddle_Y  Potentiometer Y/Paddle Y value.
+lcomment 200F VIC_RA_Frq_Osc1  Relative frequency of sound oscillator 1 (bass).
+lcomment 2010 VIC_RB_Frq_Osc2  Relative frequency of sound oscillator 2 (alto).
+lcomment 2011 VIC_RC_Frq_Osc3  Relative frequency of sound oscillator 3 (soprano).
+lcomment 2012 VIC_RD_Frq_Noise Relative frequency of sound oscillator 4 (noise).
+lcomment 2013 VIC_RE_Vol_Color Sound volume and auxiliary color.
 comment  2014
-comment  2014 Quick lookup for BIT instruction
+comment  2014 Quick mask lookup for BIT instruction
 label    2014 MASK_00000001
 binary   2014-201B
 label    2015 MASK_00000010
@@ -39,27 +45,34 @@ label    2019 MASK_00100000
 label    201A MASK_01000000
 label    201B MASK_10000000
 comment  201C
-comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+comment  201C Empty NMI Interrupt Handler, simply returns from interrupt
 used     201C NMI_Interrupt_Hardler
 comment  201D
-comment  201D ----------------------------------------------------------
+comment  201D ----------------------------------------------------
 comment  201D Starts here
-comment  201D ----------------------------------------------------------
-lcomment 201D Disable Interrupts
-lcomment 201E Reset stack address pointer
-lcomment 2021 Clear Decimal flag
+comment  201D ----------------------------------------------------
+comment  201D Disable Interrupts, reset stack address pointer, clear Decimal flag
 comment  2022
 comment  2022 Setup NMI interrupt vector to service routine at $201C
+deflabel 2023 NMI_Interrupt_Handler_Addr_Lo
+deflabel 2028 NMI_Interrupt_Handler_Addr_Hi
 comment  202C
 comment  2032
 comment  2032 Setup I/O data direction and interrupt enables
+binary   2033
+binary   2038
+binary   203d
 comment  2041
 comment  2044
 comment  2044 Set VIA outputs for keyboard scan
+binary   2045
 lcomment 2046 Data I/O register (User port & RS-232) i.e. not used
-lcomment 2049 Data I/O register (Keybd col scan, Cassette, Joy)
+lcomment 2049 Data I/O register (Keybd col scan, Cassette, Joystick)
 comment  204C
-comment  204C Setup IRQ interrupt vector to service routine at $25E0 #########################################
+comment  204C Setup IRQ interrupt vector to service routine at $25E0
+deflabel 204D IRQ_Interrupt_Handler_Addr_Lo
+deflabel 2052 IRQ_Interrupt_Handler_Addr_Hi
 comment  2056
 comment  2056 Reset the VIC registers
 lcomment 2056 16 registers
@@ -79,77 +92,90 @@ comment  2061 02A1  07 12 1D 28 33 3E 49 54 5F 6A 75 80 8B 96 A1 AC B7 C2 CD D8 
 comment  2061 02B8  08 13 1E 29 34 3F 4A 55 60 6B 76 81 8C 97 A2 AD B8 C3 CE D9 E4 EF FA
 comment  2061 02CF  09 14 1F 2A 35 40 4B 56 61 6C 77 82 8D 98 A3 AE B9 C4 CF DA E5 F0 FB
 comment  2061 02E6  0A 15 20 2B 36 41 4C 57 62 6D 78 83 8E 99 A4 AF BA C5 D0 DB E6 F1 FC
-label    2064 ISR_Cols
+comment  2061
+comment  2064
+comment  2064 Initialise Screen RAM outer loop
+label    2064 ISR_Columns
 deflabel 2065 SCREEN_COLUMNS
+comment  2067
+comment  2067 Initialise Screen RAM inner loop
 label    2067 ISR_Rows
 deflabel 206C SCREEN_ROWS
+comment  2071
 deflabel 2076 SCREEN_ROWS
 comment  2079
 label    2079 Reset_Game_Select
 comment  207C
 comment  207C Reset game selection flashing highlights
-label    2080 RGS_Flash
+label    2080 Loop_Init_Option_Text
 comment  2085
 comment  2085 Setup volume and colour
 comment  208A
 comment  208A Disable sound object
 comment  208F
-comment  208F ----------------------------------------------------------
+comment  208F ----------------------------------------------------
 comment  208F Game Select Loop
-comment  208F ----------------------------------------------------------
+comment  208F ----------------------------------------------------
 label    208F Game_Select
+binary   2092
 lcomment 2093 Set Port B all bits to input
+binary   2097
 lcomment 2098 Set Port A all bits to output
 comment  209B
 lcomment 209B Select keyboard column to read
-lcomment 209D \ (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
+binary   209C
+lcomment 209D (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
 lcomment 20A0 Whilst giving keyboard data time to settle?
 lcomment 20A3 Read keyboard column
 lcomment 20A6 Store keyboard data
 comment  20A8
 comment  20A8 Test F-Keys pressed or Space to start game
+binary   20A9
 lcomment 20AA F1 pressed? (1 Player)
 lcomment 20AC No, skip
-lcomment 20AF Reset Bit0 = 1 Player
+lcomment 20AF Reset Bit 0 = 1 Player
+binary   20B0
 comment  20B2
 label    20B2 Test_F3
+binary   20B3
 lcomment 20B4 F3 pressed? (2 Player)
 lcomment 20B6 No, skip
-lcomment 20B9 Set Bit0 = 2 Player
+lcomment 20B9 Set Bit 0 = 2 Player
+binary   20BA
 comment  20BC
 label    20BC Test_F5
+binary   20BD
 lcomment 20BE F5 pressed? (Keyboard)
 lcomment 20C0 No, skip
-lcomment 20C3 Reset Bit1 = Keyboard controls
+lcomment 20C3 Reset Bit 1 = Keyboard controls
+binary   20C4
 comment  20C6
 label    20C6 Test_F7
+binary   20C7
 lcomment 20C8 F7 pressed? (Joystick)
 lcomment 20CA No, skip
-lcomment 20CD Set Bit1 = Joystick controls
+lcomment 20CD Set Bit 1 = Joystick controls
+binary   20CE
 comment  20D0
 comment  20D0 Store options, update display and test for game start
 label    20D0 Test_Space
 lcomment 20D0 Save game settings
 lcomment 20D1 0=1P+Kbd, 1=2P+Kbd, 2=1P+Jsk, 3=2P+Jsk
 comment  20D7
-lcomment 20D9 Select keyboard column to read
-lcomment 20DC \ (2/Q/CBM/Space/Stop/Ctrl/Left/1)
+binary   20D8
+lcomment 20D7 Select keyboard column to read
+lcomment 20D9 (2/Q/CBM/Space/Stop/Ctrl/Left/1)
+lcomment 20DC Read keyboard column
 lcomment 20DF Space Pressed?
+binary   20E0
 lcomment 20E1 No, check for settings again
 comment  20E3
+comment  20E3 Space was pressed, now start the game
 comment  20E9
-comment  20E9 ----------------------------------------------------------
-comment  20E9 FUNCTION  : Init_Laser_Objects
-comment  20E9 CALLED BY :
-comment  20E9 CALLS     : Nothing
-comment  20E9 ARGUMENTS : sentiseutn
-comment  20E9 \            etinseut
-comment  20E9 \            setniseutn
-comment  20E9 ----------------------------------------------------------
 comment  20E9 Initialise laser objects once every four calls based on IRQ counter if fire pressed
 label    20E9 Init_Laser_Objects
 comment  20F0
-label    20F0 Init_Laser_Objects_Init
+label    20F0 Do_Init_Laser_Objects
 const    20F3
 lcomment 20F3 ZP06/07
 lcomment 20F4
@@ -170,27 +196,22 @@ comment  2110
 comment  2110 Get Jetman state attrib i.e. fly/no-fly and facing left/right
 label    2110 Init_Laser_Object
 comment  2113
-comment  2113 Mask for Jetman facing left/right bit and store to variable
-lcomment 2113 Zero bits 0-6 x000_0000
-deflabel 2114 MASK_JETMAN_DIRECTION
-lcomment 2115 Set bit 4 x001_0000
+comment  2113 Mask for Jetman facing left/right bit 7, set bit 4 and store to variable
+binary   2114
 binary   2116
 comment  2119
-comment  2119 Get Jetman Position X, manipulate bottom 3 bits and store to ZP08
-lcomment 211C Zero bits 0-3 xxxx_x000
+comment  2119 Get Jetman Position X, manipulate bottom 3 bits and store to variable
 binary   211D
-lcomment 211E Set bits 0 & 2 xxxx_x101
 binary   211F
 comment  2122
-comment  2122 Test again Jetman facing left/right
-deflabel 2124 MASK_JETMAN_DIRECTION
+comment  2122 Test again Jetman facing left/right bit 7
 binary   2124
 comment  2127
 comment  2127 Jetman facing left
 label    212F Init_Laser_Object_Params
 comment  212F
 comment  2131
-comment  2131 Get Jetman Position Y, subtract some pixels to get to gun nozzle height and store to laser object
+comment  2131 Get Jetman Position Y, subtract some pixels to get gun nozzle height and store to laser object
 deflabel 2137 LASER_GUN_HEIGHT_OFFSET
 comment  213C
 comment  213C Fill Laser object parameters 2-5 with copies of X start position, but with bit 2 ANDed out
@@ -203,9 +224,7 @@ comment  2148
 comment  214B
 comment  214B Set laser shot beam length parameter 6 randomly using IRQ counter,
 comment  214B range 0100_0000 to 0111_1000 i.e. $40-$78
-lcomment 214E Zero bits 7,6,2-0 00xx_x000
 binary   214F
-lcomment 2151 Set bit 6 01xx_xx000
 binary   2152
 comment  2155
 comment  2155 Load a random laser colour value 0-7 using IRQ counter
@@ -226,15 +245,13 @@ deflabel 2171 COLOUR_CYAN
 deflabel 2172 COLOUR_YELLOW
 comment  2173
 comment  2173 Test if Jetman Position X is facing right at the start of a tile
-label    2173 Laser_Jetman_Facing_Right
-lcomment 2175 Zero bits 3-7 0000_0xxx
+label    2173 Jetman_Facing_Right
 binary   2176
 comment  2179
 comment  2179 Add to the laser start Position X $18 pixels to avoid drawing laser over Jetman on screen
 label    217E Laser_Jetman_Facing_Right_Wrap
 comment  217E
 comment  217E Test for X coordinate screen wraparound
-lcomment 217E Zero bit 0 xxxx_xxx0
 binary   217F
 deflabel 2181 SCREEN_WIDTH_PIXELS
 label    2187 Wrap_Laser_Shot_Position_X
@@ -245,7 +262,7 @@ label    218D Add_To_Laser_Start_Position_X
 comment  218D
 comment  218D Add to the laser start Position X $10 pixels to avoid drawing laser over Jetman on screen
 comment  2195
-label    2195 Add_08
+label    2195 Add_08_Handle_Wrap_Get_Y_Coord
 comment  219A
 label    219A DISPLAY_LASERS
 deflabel 219B LASER_LENGTH_PARAM
@@ -267,7 +284,7 @@ comment  21C1 Test if firing left or right
 comment  21C7
 comment  21C7 Add 8 if firing left or -8 if firing right ($F8 is -8)
 comment  21CB
-label    21CB Handle_Wrap_And_Get_Y_Cooord
+label    21CB Handle_Wrap_Get_Y_Cooord
 lcomment 21CE Save A
 deflabel 21D0 LASER_POSITION_Y
 comment  21D3
@@ -287,7 +304,6 @@ comment  21DF Reverse the displayed 8-bit byte on-screen
 binary   21E2
 comment  21E5
 comment  21E5 Load current tile colour, check it's not green, jump if it is
-lcomment 21E7 Zero top 4 bits 0000_xxxx
 binary   21E8
 deflabel 21EA COLOUR_GREEN
 comment  21ED
@@ -296,12 +312,10 @@ comment  21F1
 label    21F1 Reduce_Laser_Length_Countdown
 comment  21F8
 comment  21F8 Test if laser length is > 7, if yes branch
-lcomment 21F8 Zero bottom 3 bits xxxx_x000
 binary   21F9
 label    21FC UDG_RAM_Zero_Bit_2
 comment  21FC
 comment  21FC Probably turns of further display of laser beam
-lcomment 21FE Zero bit 2 xxxx_x0xx
 binary   21FF
 comment  2202
 comment  2202 Loads ZP 14/15/16/17 with laser decay pattern, initial laser is a line of $FF's then $03
@@ -326,7 +340,6 @@ break    220E
 comment  220F
 comment  220F Iterate through each of the laser shots that could be active for display
 label    2211 Iterate_Laser_Params_2_3_4_5
-lcomment 2216 Zero bottom 3 bits xxxx_x000
 binary   2217
 comment  221A
 comment  221A Test if all possible laser parameters processed
@@ -339,17 +352,13 @@ comment  2229 Get one of the four laser object paramenters, test if bit 2 is set
 label    2229 Process_Laser_Shot
 comment  2230
 comment  2230 Decrements length and test for exit condition
-lcomment 2234 Zero bits 3-7 0000_0xxx
 binary   2235
 comment  2238
 comment  2238 Use IRQ counter to add some randomness to laser decay length patterns
-lcomment 223A Zero bits 2-7 0000_00xx
 binary   223B
-lcomment 223C Set bit 2 0000_01xx
 binary   223D
 comment  2242
 comment  2242 Register Y is 3 or 4 or 5 or 5 at this point, thus setting bit in laser x-coords
-lcomment 2244 Set bit 2 xxxx_x1xx
 binary   2245
 comment  2248
 label    2248 Update_Obj_Params_And_Exit
@@ -363,6 +372,7 @@ comment  2257 and increment/decrement by 8 depending on firing left or right
 label    2257 Update_Laser_Position_X
 comment  225E
 comment  225E Add 8 if firing left or -8 if firing right ($F8 is -8)
+comment  2260
 comment  2263
 label    2263 Account_For_Wraparound
 comment  2268
@@ -373,16 +383,16 @@ comment  2274
 comment  2274 Apply laser decay pattern onto screen
 comment  227C
 comment  227E
-label    2285 ADC_08_
+label    2285 ADC_08_Account_For_Wraparound
 label    228B Cascade_Laser_Pattern_Data
 comment  228B
 comment  2285
 comment  2298
 comment  2298 Looks like it's doing some checks on the X coord, e.g. laser wraparound
 label    2298 Laser_Wrap
-lcomment 2299 Zero bits 0-2 xxxx_x000
 binary   229A
 deflabel 229C SCREEN_WIDTH_PIXELS
+comment  229F
 label    22A1 Laser_Wrap_Left_To_Right
 comment  22A1
 comment  22A3
@@ -391,21 +401,17 @@ deflabel 22A4 LASER_TYPE_PARAM
 comment  22AC
 comment  22AE
 comment  22AE Change X position from e.g. $FD to $B5, where $B8 is screen width in pixels
-lcomment 22AF Zero bits 3-7 0000_0xxx
 binary   22B0
-lcomment 22B1 Set bits 7,5,4 1011_0xxx
 binary   22B2
 comment  22B4
 label    22B4 Laser_Wrap_Right_To_Left
 comment  22B6
 comment  22B6 Change X position to become left side of screen (between 0 and 7)
-lcomment 22B7 Zero bits 3-7 0000_0xxx
 binary   22B8
 comment  22BA
 label    22BA Reset_Level_Add_Extra_Life
 comment  22BD
 comment  22BD When wave number ends in %11, add extra life e.g. 4th wave, 8th wave etc.
-lcomment 22BF Reset bits 2-7 0000_00xx
 binary   22C0
 comment  22C3
 comment  22C3 Add extra life
@@ -742,7 +748,7 @@ label    25D0 Inc_Param_Addr_RTS
 comment  25D1
 label    25D1 Game_Start
 comment  25E0
-comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 used     25E0 Hardware_Interrupt_Handler
 comment  25E2
 comment  25E2 Set IRQ Occured flag, used to prioritise Jetman object handling in main loop
@@ -755,9 +761,9 @@ comment  25EE Increment 16-bit counter
 comment  25F4
 label    25F4 Restore_Registers_And_RTI
 comment  25FA
-comment  25FA ----------------------------------------------------------
+comment  25FA ----------------------------------------------------
 comment  25FA Game Main Loop
-comment  25FA ----------------------------------------------------------
+comment  25FA ----------------------------------------------------
 label    25FA Main_Loop_Init
 comment  25FE
 comment  25FE Reset object list index to $03B0 i.e. Rocket Ascend/Decend
@@ -805,12 +811,12 @@ label    2652 Test_Score_Flash_Time_At_Zero
 comment  2655
 label    2655 Spawn_Objects
 comment  265E
-comment  265E ----------------------------------------------------------
+comment  265E ----------------------------------------------------
 comment  265E VIA2 timer interrupts used to update Jetman movement
 comment  265E $4FD7 / 1.108Mhz = 54.2Hz interrupt. Screen is 184 pixels
 comment  265E wide. At one pixel walking movement per interrupt, Jetman
 comment  265E should get across the screen in about 3.5 seconds.
-comment  265E ----------------------------------------------------------
+comment  265E ----------------------------------------------------
 label    265E Reset_VIA2_Timer
 comment  2669
 comment  2669 Disable Interrupts (Set Interupt Disable)
@@ -1119,9 +1125,7 @@ comment  2902
 comment  2902 Get object type, zero middle four bits, preserve bits 6 and 7, set bits 1 & 2
 comment  2902 The AND and OR probably for jetman object
 deflabel 2903 OBJECT_TYPE_PARAM
-lcomment 2906 Zero bits 0-5 xx000000
 binary   2907
-lcomment 2908 Set bits 0-1 xx000011
 binary   2909
 comment  290A
 label    290A Set_Object_Type_To_Explosion
@@ -1135,9 +1139,7 @@ comment  2914 Use parameter as animation frame counter, now reset it
 deflabel 2916 EXPLOSION_ANIMATION_FRAME
 comment  2919
 comment  2919 Change explosion object colour based on IRQ random generator
-lcomment 291B Zero bits 3-8 00000xxx
 binary   291C
-lcomment 291F Set bit 0 xxxxxxx1
 comment  291F
 comment  291F Colour is black, bump it to white by incrementing
 deflabel 2920 COLOUR_WHITE
@@ -1446,7 +1448,6 @@ label    2B87 Init_Obj_Valuable_Table
 const    2B8A
 comment  2B8F
 label    2B8F Spawn_Valuables
-lcomment 2B92 Zero bits 6 & 7 i.e. 00xxxxxx
 binary   2B92
 binary   2B93
 comment  2B96
@@ -1675,14 +1676,14 @@ deflabel 2D55 COLOUR_YELLOW
 deflabel 2D56 COLOUR_RED
 deflabel 2D57 COLOUR_PURPLE
 comment  2D58
-comment  2D58 ----------------------------------------------------------
+comment  2D58 ----------------------------------------------------
 comment  2D58 FUNCTION : Tests if Jetman and the current object have
 comment  2D58 \           overlapped i.e. collided. Object can be rocket
 comment  2D58 \           part, fuel cell, gem or alien.
 comment  2D58 ENTRY : ZP_Obj_List_Ptr = Current Object
 comment  2D58 \        Obj_Jetman_Looks = Status of Jetman
 comment  2D58 EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
-comment  2D58 ----------------------------------------------------------
+comment  2D58 ----------------------------------------------------
 label    2D58 Test_Jetman_Object_Collide
 comment  2D5C
 comment  2D5C Test to see if Jetman is being displayed yet, set No_Collision and return if not
@@ -1902,7 +1903,6 @@ comment  2F43
 comment  2F43 Rocket part landed, activate next object i.e. set
 comment  2F43 status = not dropping and not picked-up by Jetman
 comment  2F43 Note, using direct addressing, not using Y offset
-lcomment 2F46 Set bit 0
 binary   2F47
 comment  2F4E
 comment  2F4E Calculate Position Y offset when object lands based on how many rocket pieces have
@@ -2077,9 +2077,9 @@ comment  30AB from Reg A distance from obj to left side of platform
 lcomment 30AF Object is much further right than the platform
 comment  30B3
 comment  30B3 Load object Position X and Y into working variables
-; comment  30B3 ----------------------------------------------------------
+; comment  30B3 ----------------------------------------------------
 ; comment  30B3 Platform Collision Test
-; comment  30B3 ----------------------------------------------------------
+; comment  30B3 ----------------------------------------------------
 ; comment  30B3 FUNCTION  : setsoe
 ; comment  30B3 \            snethuoistn
 ; comment  30B3 \            ethonshu.
@@ -2088,7 +2088,7 @@ comment  30B3 Load object Position X and Y into working variables
 ; comment  30B3 ARGUMENTS : ZP_xxxx
 ; comment  30B3 \            satoehsaeuht
 ; comment  30B3 \            sathoeusanteho
-; comment  30B3 ----------------------------------------------------------
+; comment  30B3 ----------------------------------------------------
 ; comment  30B3 Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
 ; comment  30B3 ZP02 Return Codes:
 ;
@@ -2318,11 +2318,9 @@ label    3218 M_Flying_Up_Impact_Bounce
 label    3224 SKIP_3224
 comment  3228
 label    3228 N_Flying_Left
-
 comment  332C
 comment  332C NEEDS MORE WORK ######################################################################
 comment  332C
-
 comment  3230
 comment  323E
 label    323E S_Flying_Right
@@ -2394,11 +2392,9 @@ comment  3325 ROL saves bit 7 (facing direction), LDA #$04 sets bit 2, ROR resto
 comment  3325 bit 2 to bit 1 i.e. Jetman action is now Standing
 comment  332C
 label    332C Set_Jetman_Facing_Right
-lcomment 332E Zero bit 7
 binary   332F
 comment  3337
 label    3337 Set_Jetman_Facing_Left
-lcomment 3339 Set bit 7
 binary   333A
 comment  3342
 comment  3342 When Jetman goes off left edge of screen, move to rightmost screen pixel co-ord i.e. $B8
@@ -2560,7 +2556,6 @@ comment  3470
 label    3470 Flash_Score_Start
 comment  3473
 comment  3473 Test IRQ counter, only continue once in 8 calls
-lcomment 3475 Zero bits 3-7 0000_0xxx
 binary   3476
 comment  3479
 deflabel 347A NUM_OF_COLUMNS_TO_REVERSE
@@ -2589,9 +2584,9 @@ lcomment 349E X Y position in pixels
 const    349E
 break    34A0
 comment  34A4
-comment  34A4 ----------------------------------------------------------
+comment  34A4 ----------------------------------------------------
 comment  34A4 Display_BCD_Bytes
-comment  34A4 ----------------------------------------------------------
+comment  34A4 ----------------------------------------------------
 comment  34A4 FUNCTION  : Display
 comment  34A4 \            Scores
 comment  34A4 CALLED BY :
@@ -2599,7 +2594,7 @@ comment  34A4 CALLS     :
 comment  34A4 ARGUMENTS : ZP_UDG_RAM_X ZP_UDG_RAM_Y = UDG array absolute position to display score at
 comment  34A4 \            ZP_Ptr_To_Str             = Players score in ZP as BCD e.g. 12 34 56
 comment  34A4 \            ZP_Temp_1                 = BCD byte counter i.e. number of bytes to display
-comment  34A4 ----------------------------------------------------------
+comment  34A4 ----------------------------------------------------
 comment  34A4 Example for score of 12 34 56 at ZP51-53
 label    34A4 Display_BCD_Bytes
 comment  34A6
@@ -2625,7 +2620,7 @@ comment  34C7
 comment  34C7 Test all score bytes displayed, if not, loop back
 label    34C7 Test_All_Bytes_Displayed
 comment  34CC
-comment  34CC ----------------------------------------------------------
+comment  34CC ----------------------------------------------------
 comment  34CC FUNCTION  :
 comment  34CC CALLED BY :
 comment  34CC CALLS     :
@@ -2635,7 +2630,7 @@ comment  34CC ZP_ColourRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
 comment  34CC ZP_UDG_RAM_X   = 08 A8 or 08 20
 comment  34CC ZP_UDG_RAM_Y   = 08 A8 or 08 20
 comment  34CC ZP_Addr_From   = 70 80 or 28 80
-comment  34CC ----------------------------------------------------------
+comment  34CC ----------------------------------------------------
 label    34CC Display_String_With_Setup
 label    34D2
 comment  34D2
@@ -2750,9 +2745,9 @@ comment  3584
 label    3584 No_Inc_Addr_Hi
 comment  358C
 comment  3595
-comment  3595 ----------------------------------------------------------
+comment  3595 ----------------------------------------------------
 comment  3595 Copy Character ROM Character to User-Defined Graphics Memory
-comment  3595 ----------------------------------------------------------
+comment  3595 ----------------------------------------------------
 comment  3595 FUNCTION  : Copy an 8 byte Character ROM character to the
 comment  3595 \            Used-Defined Graphics RAM e.g. to display a
 comment  3595 \            text string or score.
@@ -2761,7 +2756,7 @@ comment  3595 CALLS     : Nothing
 comment  3595 ARGUMENTS : ??? = Loaded with character to copy e.g. $71 for "1"
 comment  3595 \            ??? BROKEN COMMENTS Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
 comment  3595 \            ??? BROKEN COMMENTS Addr_To gets updated as part of this routine.
-comment  3595 ----------------------------------------------------------
+comment  3595 ----------------------------------------------------
 comment  3595 Character to copy stored in ZP06, create Character ROM address in ZP07/06 for this
 comment  3595 value and copy 8 data bytes from that address to UDG RAM address stored in ZP05/04
 comment  3595 Example: Display "1" using $71 in ZP06

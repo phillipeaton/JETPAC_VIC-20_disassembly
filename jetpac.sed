@@ -104,6 +104,7 @@
 /ZP13                            equ     $0013/a ZP13_Object_Lines_To_Erase      equ     $0013
 /ZP13                            equ     $0013/a ZP13_Rocket_Fuel_Level_Half     equ     $0013
 /ZP13                            equ     $0013/a ZP13_Temp                       equ     $0013
+/ZP13                            equ     $0013/a ZP13_Keyboard_Data              equ     $0013
 /ZP14                            equ     $0014/a ZP14_Laser_Decay_Patten_Data_0  equ     $0014
 /ZP14                            equ     $0014/a ZP14_Object_Old_Width_Bytes     equ     $0014
 /ZP14                            equ     $0014/a ZP14_Object_Width_Bytes         equ     $0014
@@ -126,6 +127,9 @@
 /ZP1B                            equ     $001B/a ZP1B_Laser_Colour               equ     $001B
 /ZP1B                            equ     $001B/a ZP1B_Object_Colour              equ     $001B
 /ZP_Obj_List_Ptr_Lo              equ     $0000/a ZP00_Hi_Score_Addr              equ     $0000
+
+# Game Select
+/; 208F/,/; 20E6/s/ZP13                            /ZP13_Keyboard_Data              /
 
 # Init_Laser_Objects
 /; 20E9/,/; 210F/s/ZP06                            /ZP06_Laser_Old_State_Lo         /
