@@ -441,28 +441,24 @@ comment  22E3
 label    22E3 Set_Obj_Rocket_Top_Or_Fuel_Typ
 lcomment 22E9 ZP00/01
 word     22EA
-label    22ED Reset_Object
+label    22ED Init_Object
 break    22ED
 comment  22ED
 comment  22F2
 label    22F2 Set_Obj_Rocket_Mid_Or_Valu_Typ
 word     22F9
-label    22FF Reset_Rocket_Obj_Params
-comment  22FF
-comment  22FF
-comment  22FF
-comment  22FF
 comment  22FF
 comment  22FF Init rocket top, middle and bottom object parameters (i.e. 3 x 8 bytes) from static data table
-label    2301 Loop_Reset_Rocket_Obj_Params
+label    22FF Init_Rocket_Obj_Params
+label    2301 Loop_Init_Rocket_Obj_Params
 comment  2301
-label    230B Reset_Rocket_Obj_Params_Init
+label    230B Init_Rocket_Obj_Params_Init
 comment  230B
 word     2315
-label    231A Loop_Reset_Objects
+label    231A Loop_Init_Objects
 comment  231A
 comment  2318
-comment  2318 Reset rocket top, middle and bottom
+comment  2318 Init rocket top, middle and bottom
 comment  231C
 comment  2325
 comment  2325 Move 16-bit object address pointer to next object i.e. 8 bytes ahead
@@ -496,7 +492,7 @@ comment  235D
 comment  2366
 comment  2366 Test if two player game, if yes, give $FF time between players for switchover instead of $7F
 binary   236A
-label    236F LDA_7F_Return
+label    236F Set_Countdown_Dec_Num_Lives
 comment  236F
 comment  2373
 label    2373 Display_Player_1_Lives
@@ -553,11 +549,7 @@ lcomment 23CC \..####..
 lcomment 23CD \..####..
 lcomment 23CE \.##..##.
 comment  23CF
-label    23CF LDA_7F
-comment  23D4
-comment  23D4
-comment  23D4
-comment  23D4
+label    23CF LDA_7F_Set_Cntdn_Dec_Num_Lives
 comment  23D4
 comment  23D4 Set Active Player, initial lives for both players and Rocket object parameters
 label    23D4 Setup_Player_Lives

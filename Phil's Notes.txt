@@ -164,3 +164,5 @@ Point out that AND zero's bits, OR sets them. (Remove Zeros/Resets/Sets comments
 Object position is bottom left of sprite.
 Loading of Infiltrator comments and comment at start of code come from different nfo files, so layout can be a bit funny.
 Comments at the start of a work sit above branch labels...can this be fixed?
+Change Rocket to ship
+Banners with ============== above and below signify calls from Main Loop
