@@ -2,11 +2,13 @@
 ; Loaded: binary file "jetpac_2000-3fff.bin"
 ; Loaded: Info file "nfo_include.nfo"
 
-; ----------------------------------------------------
-; This is the reverse-engineered source code for the
-; game 'JETPAC' written by Ultimate Play The Game.
-; ----------------------------------------------------
-
+; --------------------------------------------------------------------------------------------
+; JET PAC for the Commodore VIC-20 + 8K Memory Expansion
+; Copyright 1982 ULTIMATE PLAY THE GAME / Ashby Computers & Graphics Ltd.
+; --------------------------------------------------------------------------------------------
+; Disassembly and reverse engineering by Phillip Eaton 2022-2023.
+; https://github.com/phillipeaton/JETPAC_VIC-20_disassembly
+; --------------------------------------------------------------------------------------------
 
 ;****************************************************
 ; Used Labels
@@ -394,24 +396,46 @@ NMI_Interrupt_Handler_Addr_Lo   equ     $1C
 ; Probably unused data leftover from the start-up code relocation, $201D is program start point
     fdb     $201D,$201D                     ; 2000: 1D 20 1D 20 
 
-; Initial value table for VIC setup 16 bytes, see "Mapping the VIC 1984 COMPUTE" book.
+; Initial value table for VIC setup 16 bytes, see "Mapping the VIC 1984 COMPUTE" book
+
+; Screen Map RAM Location
+; -----------------------
+; VIC_R2_Num_Cols Bit 7 (A=1) and VIC_R5_CM_Start Bits 7654 (BBBB=1000=$8) form part of a
+; a 14-bit address that signifies the start of the Screen Map RAM: BB_BBA0_0000_0000
+; Using the values in the Init Table: 10_0010_0000_0000 NOTE: R5 bit 7 is inverted by the VIC
+; Thus Screen Map RAM starts at $0200
+
+; Colour Map RAM Location
+; -----------------------
+; VIC_R2_Num_Cols Bit 7 (A=1) signifies Colour Map RAM starts at $9600
+
+; Character Map RAM Location
+; --------------------------
+; VIC_R5_CM_Start Bits 4321 (CCCC = 1100 = $C) signifies Character Map RAM starts at $1000
+
+; Screen Size Rows x Columns
+; --------------------------
+; VIC_R2_Num_Cols Bits 6543210 set number of columns = _001_0111 = $17 = 23 decimal
+; VIC_R3_Num_Rows Bits 654321  set number of rows    = _001_011_ = $0B = 11 decimal
+; NOTE: VIC_R3_Num_Rows Bit 0=1 sets character matrices to 8x16 pixels
+
 VIC_Init_Table
-    fcb     $0B                             ; 2004: 0B        VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
-    fcb     $26                             ; 2005: 26        VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
-    fcb     $97                             ; 2006: 97        VIC_R1_V_Ctr     Vertical TV picture origin.
-    fcb     $17                             ; 2007: 17        VIC_R2_Num_Cols  Number of columns displayed, part of screen map address.
-    fcb     $00                             ; 2008: 00        VIC_R3_Num_Rows  Number of character lines displayed, part of raster location.
-    fcb     $8C                             ; 2009: 8C        VIC_R4_TV_Raster Raster beam location bits 8-1.
-    fcb     $00                             ; 200A: 00        VIC_R5_CM_Start  Screen map and character map addresses.
-    fcb     $00                             ; 200B: 00        VIC_R6_H_LightP  Light pen horizontal screen location.
-    fcb     $00                             ; 200C: 00        VIC_R7_V_LightP  Light pen vertical screen location.
-    fcb     $00                             ; 200D: 00        VIC_R8_Paddle_X  Potentiometer X/Paddle X value.
-    fcb     $00                             ; 200E: 00        VIC_R9_Paddle_Y  Potentiometer Y/Paddle Y value.
-    fcb     $00                             ; 200F: 00        VIC_RA_Frq_Osc1  Relative frequency of sound oscillator 1 (bass).
-    fcb     $00                             ; 2010: 00        VIC_RB_Frq_Osc2  Relative frequency of sound oscillator 2 (alto).
-    fcb     $00                             ; 2011: 00        VIC_RC_Frq_Osc3  Relative frequency of sound oscillator 3 (soprano).
-    fcb     $00                             ; 2012: 00        VIC_RD_Frq_Noise Relative frequency of sound oscillator 4 (noise).
-    fcb     $08                             ; 2013: 08        VIC_RE_Vol_Color Sound volume and auxiliary color.
+    fcb     $0B                             ; 2004: 0B        VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.Left edge of TV picture and interlace switch.
+    fcb     $26                             ; 2005: 26        VIC_R1_V_Ctr     Vertical TV picture origin.
+    fcb     $97                             ; 2006: 97        VIC_R2_Num_Cols  Number of columns displayed, part of screen map address.
+    fcb     $17                             ; 2007: 17        VIC_R3_Num_Rows  Number of character lines displayed, part of raster location.
+    fcb     $00                             ; 2008: 00        VIC_R4_TV_Raster Raster beam location bits 8-1.
+    fcb     $8C                             ; 2009: 8C        VIC_R5_CM_Start  Screen map and character map addresses.
+    fcb     $00                             ; 200A: 00        VIC_R6_H_LightP  Light pen horizontal screen location.
+    fcb     $00                             ; 200B: 00        VIC_R7_V_LightP  Light pen vertical screen location.
+    fcb     $00                             ; 200C: 00        VIC_R8_Paddle_X  Potentiometer X/Paddle X value.
+    fcb     $00                             ; 200D: 00        VIC_R9_Paddle_Y  Potentiometer Y/Paddle Y value.
+    fcb     $00                             ; 200E: 00        VIC_RA_Frq_Osc1  Relative frequency of sound oscillator 1 (bass).
+    fcb     $00                             ; 200F: 00        VIC_RB_Frq_Osc2  Relative frequency of sound oscillator 2 (alto).
+    fcb     $00                             ; 2010: 00        VIC_RC_Frq_Osc3  Relative frequency of sound oscillator 3 (soprano).
+    fcb     $00                             ; 2011: 00        VIC_RD_Frq_Noise Relative frequency of sound oscillator 4 (noise).
+    fcb     $00                             ; 2012: 00        VIC_RE_Vol_Color Sound volume and auxiliary color.
+    fcb     $08                             ; 2013: 08        VIC_RF_BckBdrCol Background color, border color, inverse color switch.
 
 ; Quick mask lookup for BIT instruction
 MASK_00000001
@@ -431,15 +455,15 @@ MASK_01000000
 MASK_10000000
     fcb     %10000000                       ; 201B: 80       
 
-; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 ; Empty NMI Interrupt Handler, simply returns from interrupt
 NMI_Interrupt_Hardler
     rti                                     ; 201C: 40       
-; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-; ----------------------------------------------------
-; Starts here
-; ----------------------------------------------------
+; --------------------------------------------------------------------------------------------
+; Program Start
+; --------------------------------------------------------------------------------------------
 ; Disable Interrupts, reset stack address pointer, clear Decimal flag
     sei                                     ; 201D: 78       
     ldx     #$FF                            ; 201E: A2 FF    
@@ -556,9 +580,6 @@ Loop_Init_Option_Text
 ; Yb  "88  dP__Yb  88YbdP88 88""       o.`Y8b 88""   88  .o 88""   Yb        88
 ;  YboodP dP""""Yb 88 YY 88 888888     8bodP' 888888 88ood8 888888  YboodP   88
 
-; ----------------------------------------------------
-; Game Select Loop
-; ----------------------------------------------------
 ; L_BRS_($208F)_($20E1) OK
 Game_Select
     inc     ZP_Flash_Countup                ; 208F: E6 58    
@@ -815,7 +836,7 @@ Add_To_Laser_Start_Position_X
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
 ;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
 ;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
@@ -825,10 +846,7 @@ Add_To_Laser_Start_Position_X
 ; 88       dPYb   `Ybo." 88__   88__dP `Ybo."
 ; 88  .o  dP__Yb  o.`Y8b 88""   88"Yb  o.`Y8b
 ; 88ood8 dP""""Yb 8bodP' 888888 88  Yb 8bodP'
-; #################################################################################################
-
-; YOU ARE HERE ########################################################################
-
+; ############################################################################################
 
 ; L_BRS_($2195)_($21C7) OK
 Add_08_Handle_Wrap_Get_Y_Coord
@@ -1176,6 +1194,16 @@ Reset_Level
 
 
 
+
+; .dP"Y8 888888 888888      dP"Yb  88""Yb  88888
+; `Ybo." 88__     88       dP   Yb 88__dP     88
+; o.`Y8b 88""     88       Yb   dP 88""Yb o.  88
+; 8bodP' 888888   88        YbodP  88oodP "bodP'
+
+; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888     888888 Yb  dP 88""Yb 888888
+; 88__dP dP   Yb dP   `" 88odP  88__     88         88    YbdP  88__dP 88__
+; 88"Yb  Yb   dP Yb      88"Yb  88""     88         88     8P   88"""  88""
+; 88  Yb  YbodP   YboodP 88  Yb 888888   88         88    dP    88     888888
 
 ; L_JMP_($22E3)_($2B7C) OK
 ; L_JSR_($22E3)_($2DA6) OK
@@ -1911,7 +1939,7 @@ Restore_Registers_And_RTI
     tax                                     ; 25F7: AA       
     pla                                     ; 25F8: 68       
     rti                                     ; 25F9: 40       
-; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 
 
@@ -1962,7 +1990,7 @@ Main_Loop
 
 
 
-; #################################################################################################
+; ############################################################################################
 ;  dP""b8  dP"Yb  888888  dP"Yb      88b 88 888888 Yb  dP 888888
 ; dP   `" dP   Yb   88   dP   Yb     88Yb88 88__    YbdP    88
 ; Yb  "88 Yb   dP   88   Yb   dP     88 Y88 88""    dPYb    88
@@ -1972,7 +2000,7 @@ Main_Loop
 ; dP   Yb 88__dP     88 88__   dP   `"   88
 ; Yb   dP 88""Yb o.  88 88""   Yb        88
 ;  YbodP  88oodP "bodP' 888888  YboodP   88
-; #################################################################################################
+; ############################################################################################
 
 ; L_JMP_($261A)_($2226) OK
 ; L_JMP_($261A)_($2254) OK
@@ -2191,12 +2219,12 @@ Init_Sound_Object_Table
 
 
 
-; #################################################################################################
+; ############################################################################################
 ;  .dP"Y8  dP"Yb  88   88 88b 88 8888b.      88   88 88""Yb 8888b.     db    888888 888888
 ;  `Ybo." dP   Yb 88   88 88Yb88  8I  Yb     88   88 88__dP  8I  Yb   dPYb     88   88__
 ;  o.`Y8b Yb   dP Y8   8P 88 Y88  8I  dY     Y8   8P 88"""   8I  dY  dP__Yb    88   88""
 ;  8bodP'  YbodP  `YbodP' 88  Y8 8888Y"      `YbodP' 88     8888Y"  dP""""Yb   88   888888
-; #################################################################################################
+; ############################################################################################
 
 ; Read and play sound channel data from the Sound object
 SOUND_UPDATE
@@ -2639,12 +2667,12 @@ Ptr_Rocket_Flame_Frame_1_Hi
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; Yb    dP    db    88     88   88    db    88""Yb 88     888888 .dP"Y8
 ;  Yb  dP    dPYb   88     88   88   dPYb   88__dP 88     88__   `Ybo."
 ;   YbdP    dP__Yb  88  .o Y8   8P  dP__Yb  88""Yb 88  .o 88""   o.`Y8b
 ;    YP    dP""""Yb 88ood8 `YbodP' dP""""Yb 88oodP 88ood8 888888 8bodP'
-; #################################################################################################
+; ############################################################################################
 
 ; Remove "Test_Platform_Collision"=Gems all fall through platforms and floor, reentering at top
 VALUABLES
@@ -2856,12 +2884,12 @@ Restore_Obj_List_Ptr
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; 888888 Yb  dP 88""Yb 88      dP"Yb  .dP"Y8 88  dP"Yb  88b 88 .dP"Y8
 ; 88__    YbdP  88__dP 88     dP   Yb `Ybo." 88 dP   Yb 88Yb88 `Ybo."
 ; 88""    dPYb  88"""  88  .o Yb   dP o.`Y8b 88 Yb   dP 88 Y88 o.`Y8b
 ; 888888 dP  Yb 88     88ood8  YbodP  8bodP' 88  YbodP  88  Y8 8bodP'
-; #################################################################################################
+; ############################################################################################
 
 ; L_JSR_($28F9)_($2C8C) OK
 Change_Object_To_Explosion
@@ -3175,7 +3203,7 @@ Setup_Jetman_Explosion
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; Yb        dP    db    Yb    dP 888888       .d
 ;  Yb  db  dP    dPYb    Yb  dP  88__       .d88
 ;   YbdPYbdP    dP__Yb    YbdP   88""         88
@@ -3185,7 +3213,7 @@ Setup_Jetman_Explosion
 ; dP   `" 88__dP dP   Yb `Ybo." `Ybo."
 ; Yb      88"Yb  Yb   dP o.`Y8b o.`Y8b
 ;  YboodP 88  Yb  YbodP  8bodP' 8bodP'
-; #################################################################################################
+; ############################################################################################
 
 WAVE_1_CROSS
     jsr     Test_Laser_Hits                 ; 2A5F: 20 5F 2C 
@@ -3205,7 +3233,7 @@ Wave_1_Cross_Direction_Update
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; Yb        dP    db    Yb    dP 888888     oP"Yb.
 ;  Yb  db  dP    dPYb    Yb  dP  88__       "' dP'
 ;   YbdPYbdP    dP__Yb    YbdP   88""         dP'
@@ -3215,7 +3243,7 @@ Wave_1_Cross_Direction_Update
 ; `Ybo." 88__dP 88  88 88__   88__dP 88__
 ; o.`Y8b 88"""  888888 88""   88"Yb  88""
 ; 8bodP' 88     88  88 888888 88  Yb 888888
-; #################################################################################################
+; ############################################################################################
 
 WAVE_2_SPHERE
     jsr     Test_Laser_Hits                 ; 2A6D: 20 5F 2C 
@@ -3303,7 +3331,7 @@ Direction_Y_Store_Rand
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; Yb        dP    db    Yb    dP 888888     88888
 ;  Yb  db  dP    dPYb    Yb  dP  88__         .dP
 ;   YbdPYbdP    dP__Yb    YbdP   88""       o `Yb
@@ -3313,7 +3341,7 @@ Direction_Y_Store_Rand
 ; `Ybo."   dPYb   88   88 dP   `" 88__   88__dP
 ; o.`Y8b  dP__Yb  Y8   8P Yb      88""   88"Yb
 ; 8bodP' dP""""Yb `YbodP'  YboodP 888888 88  Yb
-; #################################################################################################
+; ############################################################################################
 
 WAVE_3_SAUCER
     jsr     Test_Laser_Hits                 ; 2ABC: 20 5F 2C 
@@ -3827,7 +3855,7 @@ Test_Laser_Hits
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; Yb        dP    db    Yb    dP 888888      dP"Yb
 ;  Yb  db  dP    dPYb    Yb  dP  88__       dP   Yb
 ;   YbdPYbdP    dP__Yb    YbdP   88""       Yb   dP
@@ -3837,7 +3865,7 @@ Test_Laser_Hits
 ; 88__   88   88   dP    dP  88__dP   dPYb   88     88
 ; 88""   Y8   8P  dP    dP   88""Yb  dP__Yb  88  .o 88  .o
 ; 88     `YbodP' d8888 d8888 88oodP dP""""Yb 88ood8 88ood8
-; #################################################################################################
+; ############################################################################################
 
 WAVE_0_FUZZBALL
     jsr     Test_Laser_Hits                 ; 2C6A: 20 5F 2C 
@@ -4349,7 +4377,7 @@ Decrement_Rocket_Position_Y
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
@@ -4359,7 +4387,7 @@ Decrement_Rocket_Position_Y
 ;   dPYb   `Ybo." dP   `" 88__   88Yb88  8I  Yb
 ;  dP__Yb  o.`Y8b Yb      88""   88 Y88  8I  dY
 ; dP""""Yb 8bodP'  YboodP 888888 88  Y8 8888Y"
-; #################################################################################################
+; ############################################################################################
 
 ; Aliens keep moving also
 ROCKET_ASCEND
@@ -4412,7 +4440,7 @@ Rocket_At_Top
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
@@ -4422,7 +4450,7 @@ Rocket_At_Top
 ;  8I  Yb 88__   `Ybo." dP   `" 88__   88Yb88  8I  Yb
 ;  8I  dY 88""   o.`Y8b Yb      88""   88 Y88  8I  dY
 ; 8888Y"  888888 8bodP'  YboodP 888888 88  Y8 8888Y"
-; #################################################################################################
+; ############################################################################################
 
 ROCKET_DESCEND
     jsr     Load_Object_Type_X_Y            ; 2E4E: 20 D7 35 
@@ -4457,7 +4485,7 @@ ROCKET_DESCEND
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88
@@ -4472,7 +4500,7 @@ ROCKET_DESCEND
 ; 88b  d88 dP   Yb  8I  Yb 88   88 88     88__
 ; 88YbdP88 Yb   dP  8I  dY Y8   8P 88  .o 88""
 ; 88 YY 88  YbodP  8888Y"  `YbodP' 88ood8 888888
-; #################################################################################################
+; ############################################################################################
 
 ; Test if Jetman collided with Rocket
 ROCKET_BOTTOM_MODULE
@@ -4668,7 +4696,7 @@ Colourize_Rocket
 
 
 
-; #################################################################################################
+; ############################################################################################
 ; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888     88""Yb    db    88""Yb 888888
 ; 88__dP dP   Yb dP   `" 88odP  88__     88       88__dP   dPYb   88__dP   88
 ; 88"Yb  Yb   dP Yb      88"Yb  88""     88       88"""   dP__Yb  88"Yb    88
@@ -4678,7 +4706,7 @@ Colourize_Rocket
 ; dP   Yb 88__dP     88__   88   88 88__   88
 ; Yb   dP 88"Yb      88""   Y8   8P 88""   88  .o
 ;  YbodP  88  Yb     88     `YbodP' 888888 88ood8
-; #################################################################################################
+; ############################################################################################
 
 ; Test if rocket part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
 ; L_BRS_($2F31)_($2F98) OK
@@ -5470,7 +5498,7 @@ Next_UDG_Char
 
 
 
-; #################################################################################################
+; ############################################################################################
 ;  88888 888888 888888 8b    d8    db    88b 88
 ;     88 88__     88   88b  d88   dPYb   88Yb88
 ; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
@@ -5480,7 +5508,7 @@ Next_UDG_Char
 ; 88__   88      YbdP  88 88Yb88 dP   `"
 ; 88""   88  .o   8P   88 88 Y88 Yb  "88
 ; 88     88ood8  dP    88 88  Y8  YboodP
-; #################################################################################################
+; ############################################################################################
 
 ; NOT COMPLETE YET ######################################################################
 
@@ -5851,7 +5879,7 @@ D_Set_Jetman_Standing
 
 
 
-; #################################################################################################
+; ############################################################################################
 ;  88888 888888 888888 8b    d8    db    88b 88
 ;     88 88__     88   88b  d88   dPYb   88Yb88
 ; o.  88 88""     88   88YbdP88  dP__Yb  88 Y88
@@ -5861,7 +5889,7 @@ D_Set_Jetman_Standing
 ; `Ybo."   88     dPYb   88Yb88  8I  Yb 88 88Yb88 dP   `"
 ; o.`Y8b   88    dP__Yb  88 Y88  8I  dY 88 88 Y88 Yb  "88
 ; 8bodP'   88   dP""""Yb 88  Y8 8888Y"  88 88  Y8  YboodP
-; #################################################################################################
+; ############################################################################################
 
 ; NEEDS MORE WORK ######################################################################
 

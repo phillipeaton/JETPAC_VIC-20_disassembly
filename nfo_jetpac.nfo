@@ -1,38 +1,57 @@
-comment  2195
-comment  2195 YOU ARE HERE ########################################################################
-comment  2195
-
-
-insert ; ----------------------------------------------------
-insert ; This is the reverse-engineered source code for the
-insert ; game 'JETPAC' written by Ultimate Play The Game.
-insert ; ----------------------------------------------------
-insert
+insert ; --------------------------------------------------------------------------------------------
+insert ; JET PAC for the Commodore VIC-20 + 8K Memory Expansion
+insert ; Copyright 1982 ULTIMATE PLAY THE GAME / Ashby Computers & Graphics Ltd.
+insert ; --------------------------------------------------------------------------------------------
+insert ; Disassembly and reverse engineering by Phillip Eaton 2022-2023.
+insert ; https://github.com/phillipeaton/JETPAC_VIC-20_disassembly
+insert ; --------------------------------------------------------------------------------------------
 ;
 ; Start of disassembly instructions
 comment  2000 Probably unused data leftover from the start-up code relocation, $201D is program start point
 word     2000-2003
 comment  2004
-comment  2004 Initial value table for VIC setup 16 bytes, see "Mapping the VIC 1984 COMPUTE" book.
+comment  2004 Initial value table for VIC setup 16 bytes, see "Mapping the VIC 1984 COMPUTE" book
+comment  2004
+comment  2004 Screen Map RAM Location
+comment  2004 -----------------------
+comment  2004 VIC_R2_Num_Cols Bit 7 (A=1) and VIC_R5_CM_Start Bits 7654 (BBBB=1000=$8) form part of a
+comment  2004 a 14-bit address that signifies the start of the Screen Map RAM: BB_BBA0_0000_0000
+comment  2004 Using the values in the Init Table: 10_0010_0000_0000 NOTE: R5 bit 7 is inverted by the VIC
+comment  2004 Thus Screen Map RAM starts at $0200
+comment  2004
+comment  2004 Colour Map RAM Location
+comment  2004 -----------------------
+comment  2004 VIC_R2_Num_Cols Bit 7 (A=1) signifies Colour Map RAM starts at $9600
+comment  2004
+comment  2004 Character Map RAM Location
+comment  2004 --------------------------
+comment  2004 VIC_R5_CM_Start Bits 4321 (CCCC = 1100 = $C) signifies Character Map RAM starts at $1000
+comment  2004
+comment  2004 Screen Size Rows x Columns
+comment  2004 --------------------------
+comment  2004 VIC_R2_Num_Cols Bits 6543210 set number of columns = _001_0111 = $17 = 23 decimal
+comment  2004 VIC_R3_Num_Rows Bits 654321  set number of rows    = _001_011_ = $0B = 11 decimal
+comment  2004 NOTE: VIC_R3_Num_Rows Bit 0=1 sets character matrices to 8x16 pixels
+comment  2004
 label    2004 VIC_Init_Table
 const    2004-201B
 break    2004-2013
-lcomment 2004 VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
-lcomment 2005 VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.
-lcomment 2006 VIC_R1_V_Ctr     Vertical TV picture origin.
-lcomment 2007 VIC_R2_Num_Cols  Number of columns displayed, part of screen map address.
-lcomment 2008 VIC_R3_Num_Rows  Number of character lines displayed, part of raster location.
-lcomment 2009 VIC_R4_TV_Raster Raster beam location bits 8-1.
-lcomment 200A VIC_R5_CM_Start  Screen map and character map addresses.
-lcomment 200B VIC_R6_H_LightP  Light pen horizontal screen location.
-lcomment 200C VIC_R7_V_LightP  Light pen vertical screen location.
-lcomment 200D VIC_R8_Paddle_X  Potentiometer X/Paddle X value.
-lcomment 200E VIC_R9_Paddle_Y  Potentiometer Y/Paddle Y value.
-lcomment 200F VIC_RA_Frq_Osc1  Relative frequency of sound oscillator 1 (bass).
-lcomment 2010 VIC_RB_Frq_Osc2  Relative frequency of sound oscillator 2 (alto).
-lcomment 2011 VIC_RC_Frq_Osc3  Relative frequency of sound oscillator 3 (soprano).
-lcomment 2012 VIC_RD_Frq_Noise Relative frequency of sound oscillator 4 (noise).
-lcomment 2013 VIC_RE_Vol_Color Sound volume and auxiliary color.
+lcomment 2004 VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.Left edge of TV picture and interlace switch.
+lcomment 2005 VIC_R1_V_Ctr     Vertical TV picture origin.
+lcomment 2006 VIC_R2_Num_Cols  Number of columns displayed, part of screen map address.
+lcomment 2007 VIC_R3_Num_Rows  Number of character lines displayed, part of raster location.
+lcomment 2008 VIC_R4_TV_Raster Raster beam location bits 8-1.
+lcomment 2009 VIC_R5_CM_Start  Screen map and character map addresses.
+lcomment 200A VIC_R6_H_LightP  Light pen horizontal screen location.
+lcomment 200B VIC_R7_V_LightP  Light pen vertical screen location.
+lcomment 200C VIC_R8_Paddle_X  Potentiometer X/Paddle X value.
+lcomment 200D VIC_R9_Paddle_Y  Potentiometer Y/Paddle Y value.
+lcomment 200E VIC_RA_Frq_Osc1  Relative frequency of sound oscillator 1 (bass).
+lcomment 200F VIC_RB_Frq_Osc2  Relative frequency of sound oscillator 2 (alto).
+lcomment 2010 VIC_RC_Frq_Osc3  Relative frequency of sound oscillator 3 (soprano).
+lcomment 2011 VIC_RD_Frq_Noise Relative frequency of sound oscillator 4 (noise).
+lcomment 2012 VIC_RE_Vol_Color Sound volume and auxiliary color.
+lcomment 2013 VIC_RF_BckBdrCol Background color, border color, inverse color switch.
 comment  2014
 comment  2014 Quick mask lookup for BIT instruction
 label    2014 MASK_00000001
@@ -45,13 +64,13 @@ label    2019 MASK_00100000
 label    201A MASK_01000000
 label    201B MASK_10000000
 comment  201C
-comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 comment  201C Empty NMI Interrupt Handler, simply returns from interrupt
 used     201C NMI_Interrupt_Hardler
 comment  201D
-comment  201D ----------------------------------------------------
-comment  201D Starts here
-comment  201D ----------------------------------------------------
+comment  201D --------------------------------------------------------------------------------------------
+comment  201D Program Start
+comment  201D --------------------------------------------------------------------------------------------
 comment  201D Disable Interrupts, reset stack address pointer, clear Decimal flag
 comment  2022
 comment  2022 Setup NMI interrupt vector to service routine at $201C
@@ -113,9 +132,6 @@ comment  2085 Setup volume and colour
 comment  208A
 comment  208A Disable sound object
 comment  208F
-comment  208F ----------------------------------------------------
-comment  208F Game Select Loop
-comment  208F ----------------------------------------------------
 label    208F Game_Select
 binary   2092
 lcomment 2093 Set Port B all bits to input
@@ -421,10 +437,6 @@ comment  22D1
 label    22D1 Restore_Player_Objs_Init_Sound
 comment  22D7
 label    22D7 Reset_Level
-comment  22E3
-comment  22E3
-comment  22E3
-comment  22E3
 comment  22E3
 label    22E3 Set_Obj_Rocket_Top_Or_Fuel_Typ
 lcomment 22E9 ZP00/01
