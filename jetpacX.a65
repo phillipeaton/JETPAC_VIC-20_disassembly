@@ -169,7 +169,7 @@ ZP1B_Object_Colour              equ     $001B
 ZP_Jetman_Action                equ     $001C
 ZP_Ship_UDG_Addr_Offset         equ     $001E
 ZP_Ship_UDG_Addr_Colour?        equ     $001F
-ZP_HW_IRQ_Occurred              equ     $0020
+ZP_IRQ_Occurred                 equ     $0020
 ZP_Alien_Spawn_Counter          equ     $0021
 ZP_Obj_List_Ptr_Save_IRQ_Lo     equ     $0022
 ZP_Obj_List_Ptr_Save_IRQ_Hi     equ     $0023
@@ -181,9 +181,9 @@ ZP_Obj_Rocket_Saved             equ     $0028
 ZP_Param_Addr_Lo                equ     $0040
 ZP_Param_Addr_Hi                equ     $0041
 ZP_Game_Select_F1_Flash         equ     $0045
-ZP_HW_IRQ_Counter_Lo            equ     $004A
-ZP_HW_IRQ_Counter_Hi            equ     $004B
-ZP_HW_IRQ_Random                equ     $004C
+ZP_IRQ_Counter_Lo               equ     $004A
+ZP_IRQ_Counter_Hi               equ     $004B
+ZP_IRQ_Random                   equ     $004C
 ZP_Score_Player_1               equ     $0051
 ZP_Score_Player_2               equ     $0054
 ZP_Reverse_And_Colour_Data      equ     $0057
@@ -461,9 +461,15 @@ NMI_Interrupt_Hardler
     rti                                     ; 201C: 40       
 ; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-; --------------------------------------------------------------------------------------------
-; Program Start
-; --------------------------------------------------------------------------------------------
+
+
+
+
+; 88""Yb 88""Yb  dP"Yb   dP""b8 88""Yb    db    8b    d8     .dP"Y8 888888    db    88""Yb 888888
+; 88__dP 88__dP dP   Yb dP   `" 88__dP   dPYb   88b  d88     `Ybo."   88     dPYb   88__dP   88
+; 88"""  88"Yb  Yb   dP Yb  "88 88"Yb   dP__Yb  88YbdP88     o.`Y8b   88    dP__Yb  88"Yb    88
+; 88     88  Yb  YbodP   YboodP 88  Yb dP""""Yb 88 YY 88     8bodP'   88   dP""""Yb 88  Yb   88
+
 ; Disable Interrupts, reset stack address pointer, clear Decimal flag
     sei                                     ; 201D: 78       
     ldx     #$FF                            ; 201E: A2 FF    
@@ -664,7 +670,7 @@ Test_Space
 ; Initialise laser objects once every four calls based on IRQ counter if fire pressed
 ; L_JSR_($20E9)_($3306) OK
 Init_Laser_Objects
-    lda     ZP_HW_IRQ_Counter_Lo            ; 20E9: A5 4A    
+    lda     ZP_IRQ_Counter_Lo               ; 20E9: A5 4A    
     and     #$03                            ; 20EB: 29 03    
     beq     Do_Init_Laser_Objects           ; 20ED: F0 01    
     rts                                     ; 20EF: 60       
@@ -765,7 +771,7 @@ Loop_Init_Laser
 ; Set laser shot beam length parameter 6 randomly using IRQ counter,
 ; range 0100_0000 to 0111_1000 i.e. $40-$78
     iny                                     ; 214B: C8       
-    lda     ZP_HW_IRQ_Random                ; 214C: A5 4C    
+    lda     ZP_IRQ_Random                   ; 214C: A5 4C    
     and     #%00111000                      ; 214E: 29 38    
     clc                                     ; 2150: 18       
     adc     #%01000000                      ; 2151: 69 40    
@@ -773,7 +779,7 @@ Loop_Init_Laser
 
 ; Load a random laser colour value 0-7 using IRQ counter
     iny                                     ; 2155: C8       
-    lda     ZP_HW_IRQ_Random                ; 2156: A5 4C    
+    lda     ZP_IRQ_Random                   ; 2156: A5 4C    
     and     #%00000111                      ; 2158: 29 07    
     tax                                     ; 215A: AA       
     lda     Laser_Colour_Table,x            ; 215B: BD 6B 21 
@@ -1003,7 +1009,7 @@ Process_Laser_Shot
     bne     Update_Obj_Params_And_Exit      ; 2236: D0 10    
 
 ; Use IRQ counter to add some randomness to laser decay length patterns
-    lda     ZP_HW_IRQ_Random                ; 2238: A5 4C    
+    lda     ZP_IRQ_Random                   ; 2238: A5 4C    
     and     #%00000011                      ; 223A: 29 03    
     ora     #%00000100                      ; 223C: 09 04    
     ora     ZP07_Laser_Length_Columns       ; 223E: 05 07    
@@ -1210,7 +1216,7 @@ Set_Obj_Rocket_Top_Or_Fuel_Typ
     fcb     $FF                             ; 22EC: FF       
 
 ; L_JMP_($22ED)_($22FC) OK
-Init_Object
+Init_Objects
     ldx     #$01                            ; 22ED: A2 01    
     jmp     Loop_Init_Objects               ; 22EF: 4C 1A 23 
 ; ------------------------------------------
@@ -1222,7 +1228,7 @@ Set_Obj_Rocket_Mid_Or_Valu_Typ
     fcb     $00                             ; 22F8: 00       
     fdb     Obj_Rocket_Mid_Or_Valuable_Typ  ; 22F9: C0 03    
     fcb     $FF                             ; 22FB: FF       
-    jmp     Init_Object                     ; 22FC: 4C ED 22 
+    jmp     Init_Objects                    ; 22FC: 4C ED 22 
 ; ------------------------------------------
 
 ; Init rocket top, middle and bottom object parameters (i.e. 3 x 8 bytes) from static data table
@@ -1527,10 +1533,15 @@ Loop_Swap_Rocket_Object
 ; 88 88 Y88 88   88       o.`Y8b Yb      88"Yb  88""   88""   88 Y88
 ; 88 88  Y8 88   88       8bodP'  YboodP 88  Yb 888888 888888 88  Y8
 
-; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP     .dP"Y8  dP""b8  dP"Yb  88""Yb 888888 .dP"Y8
-;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP      `Ybo." dP   `" dP   Yb 88__dP 88__   `Ybo."
-;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P       o.`Y8b Yb      Yb   dP 88"Yb  88""   o.`Y8b
-; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP        8bodP'  YboodP  YbodP  88  Yb 888888 8bodP'
+; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
+;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
+;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
+; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
+
+; .dP"Y8  dP""b8  dP"Yb  88""Yb 888888 .dP"Y8
+; `Ybo." dP   `" dP   Yb 88__dP 88__   `Ybo."
+; o.`Y8b Yb      Yb   dP 88"Yb  88""   o.`Y8b
+; 8bodP'  YboodP  YbodP  88  Yb 888888 8bodP'
 
 ; L_JSR_($2416)_($2079) OK
 ; L_JSR_($2416)_($20E3) OK
@@ -1669,10 +1680,10 @@ Display_High_Score
 ; L_JSR_($24A1)_($24C0) OK
 ; L_JSR_($24A1)_($24C7) OK
 Game_Select_Flash
-    jsr     Game_Select_Flash_1             ; 24A1: 20 A4 24 
+    jsr     Do_Game_Select_Flash            ; 24A1: 20 A4 24 
 
 ; L_JSR_($24A4)_($24A1) OK
-Game_Select_Flash_1
+Do_Game_Select_Flash
     pha                                     ; 24A4: 48       
 
 ; Test setting flag, if set, this is the unselcted option, skip the countup/invert part
@@ -1940,25 +1951,25 @@ Game_Start
     jmp     Main_Loop_Init                  ; 25DD: 4C FA 25 
 ; ------------------------------------------
 
-; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-Hardware_Interrupt_Handler
+; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+IRQ_Interrupt_Handler
     lda     #$01                            ; 25E0: A9 01    
 
 ; Set IRQ Occured flag, used to prioritise Jetman object handling in main loop
-    sta     ZP_HW_IRQ_Occurred              ; 25E2: 85 20    
+    sta     ZP_IRQ_Occurred                 ; 25E2: 85 20    
 
 ; Reset VIA2 timer, which directly regulates Jetman's update speed
     jsr     Reset_VIA2_Timer                ; 25E4: 20 5E 26 
 
 ; Use TV Raster value as a pseudo-random number generator
     lda     VIC_R4_TV_Raster                ; 25E7: AD 04 90 
-    adc     ZP_HW_IRQ_Random                ; 25EA: 65 4C    
-    sta     ZP_HW_IRQ_Random                ; 25EC: 85 4C    
+    adc     ZP_IRQ_Random                   ; 25EA: 65 4C    
+    sta     ZP_IRQ_Random                   ; 25EC: 85 4C    
 
 ; Increment 16-bit counter
-    inc     ZP_HW_IRQ_Counter_Lo            ; 25EE: E6 4A    
+    inc     ZP_IRQ_Counter_Lo               ; 25EE: E6 4A    
     bne     Restore_Registers_And_RTI       ; 25F0: D0 02    
-    inc     ZP_HW_IRQ_Counter_Hi            ; 25F2: E6 4B    
+    inc     ZP_IRQ_Counter_Hi               ; 25F2: E6 4B    
 
 ; L_BRS_($25F4)_($25F0) OK
 Restore_Registers_And_RTI
@@ -1979,9 +1990,6 @@ Restore_Registers_And_RTI
 ; 88YbdP88  dP__Yb  88 88 Y88     88  .o Yb   dP Yb   dP 88"""
 ; 88 YY 88 dP""""Yb 88 88  Y8     88ood8  YbodP   YbodP  88
 
-; ----------------------------------------------------
-; Game Main Loop
-; ----------------------------------------------------
 ; L_JMP_($25FA)_($25DD) OK
 ; L_JMP_($25FA)_($265B) OK
 Main_Loop_Init
@@ -2008,9 +2016,9 @@ Main_Loop
 
 ; Setup subroutine address from jump table + index and indirect jmp to it
     tay                                     ; 260C: A8       
-    lda     Subroutine_List,y               ; 260D: B9 8C 26 
+    lda     Object_Handler_Jump_Table,y     ; 260D: B9 8C 26 
     sta     ZP_Subroutine_Addr_Lo           ; 2610: 85 5F    
-    lda     Subroutine_List+1,y             ; 2612: B9 8D 26 
+    lda     Object_Handler_Jump_Table+1,y   ; 2612: B9 8D 26 
     sta     ZP_Subroutine_Addr_Hi           ; 2615: 85 60    
     jmp     (ZP_Subroutine_Addr_Lo)         ; 2617: 6C 5F 00 
 ; ------------------------------------------
@@ -2083,7 +2091,7 @@ Inc_Object_List_Ptr
     sta     ZP_Obj_List_Ptr_Lo              ; 2635: 85 00    
 
 ; If interrupt had occurred, set Jetman object next, it has higher priority
-    lda     ZP_HW_IRQ_Occurred              ; 2637: A5 20    
+    lda     ZP_IRQ_Occurred                 ; 2637: A5 20    
     bne     SEI_Obj_Ptr_To_Jetman           ; 2639: D0 2E    
 
 ; Test if current object is Jetman, a laser beam, the sound object or zero, branch if not
@@ -2091,7 +2099,7 @@ Inc_Object_List_Ptr
 Main_Loop_Continue
     lda     ZP_Obj_List_Ptr_Lo              ; 263B: A5 00    
     cmp     #OBJECT_ROCKET_ADDRESS          ; 263D: C9 B0    
-    beq     Restore_Saved_Obj_Ptr_And_CLI   ; 263F: F0 3F    
+    beq     Restore_Saved_Obj_Ptr_CLI       ; 263F: F0 3F    
 
 ; Current object is Jetman, a laser beam or the sound object
 ; Test if current object addres lo-byte is zero, i.e. starting at beginning of list, branch if not
@@ -2124,15 +2132,15 @@ Spawn_Objects
 
 
 
-;  dP     88 88b 88 888888 888888 88""Yb 88""Yb 88   88 88""Yb 888888
-; dP      88 88Yb88   88   88__   88__dP 88__dP 88   88 88__dP   88
-; Yb      88 88 Y88   88   88""   88"Yb  88"Yb  Y8   8P 88"""    88
-;  Yb     88 88  Y8   88   888888 88  Yb 88  Yb `YbodP' 88       88
+; 88 88b 88 888888 888888 88""Yb 88""Yb 88   88 88""Yb 888888
+; 88 88Yb88   88   88__   88__dP 88__dP 88   88 88__dP   88
+; 88 88 Y88   88   88""   88"Yb  88"Yb  Y8   8P 88"""    88
+; 88 88  Y8   88   888888 88  Yb 88  Yb `YbodP' 88       88
 
-; 88""Yb 888888 88        db    888888 888888 8888b.      Yb
-; 88__dP 88__   88       dPYb     88   88__    8I  Yb      Yb
-; 88"Yb  88""   88  .o  dP__Yb    88   88""    8I  dY      dP
-; 88  Yb 888888 88ood8 dP""""Yb   88   888888 8888Y"      dP
+; 88  88    db    88b 88 8888b.  88     888888 88""Yb
+; 88  88   dPYb   88Yb88  8I  Yb 88     88__   88__dP
+; 888888  dP__Yb  88 Y88  8I  dY 88  .o 88""   88"Yb
+; 88  88 dP""""Yb 88  Y8 8888Y"  88ood8 888888 88  Yb
 
 ; ----------------------------------------------------
 ; VIA2 timer interrupts used to update Jetman movement
@@ -2157,7 +2165,7 @@ SEI_Obj_Ptr_To_Jetman
     sei                                     ; 2669: 78       
 
     lda     #$00                            ; 266A: A9 00    
-    sta     ZP_HW_IRQ_Occurred              ; 266C: 85 20    
+    sta     ZP_IRQ_Occurred                 ; 266C: 85 20    
 
 ; Save the current object list ptr and load up the Jetman object parameters
     lda     ZP_Obj_List_Ptr_Lo              ; 266E: A5 00    
@@ -2175,7 +2183,7 @@ SEI_Obj_Ptr_To_Jetman
 
 
 ; L_BRS_($2680)_($263F) OK
-Restore_Saved_Obj_Ptr_And_CLI
+Restore_Saved_Obj_Ptr_CLI
     lda     ZP_Obj_List_Ptr_Save_IRQ_Lo     ; 2680: A5 22    
     sta     ZP_Obj_List_Ptr_Lo              ; 2682: 85 00    
     lda     ZP_Obj_List_Ptr_Save_IRQ_Hi     ; 2684: A5 23    
@@ -2190,34 +2198,45 @@ Restore_Saved_Obj_Ptr_And_CLI
 
 
 
-; .dP"Y8 88   88 88""Yb 88""Yb  dP"Yb  88   88 888888 88 88b 88 888888
-; `Ybo." 88   88 88__dP 88__dP dP   Yb 88   88   88   88 88Yb88 88__
-; o.`Y8b Y8   8P 88""Yb 88"Yb  Yb   dP Y8   8P   88   88 88 Y88 88""
-; 8bodP' `YbodP' 88oodP 88  Yb  YbodP  `YbodP'   88   88 88  Y8 888888
+;  dP"Yb  88""Yb  88888 888888  dP""b8 888888
+; dP   Yb 88__dP     88 88__   dP   `"   88
+; Yb   dP 88""Yb o.  88 88""   Yb        88
+;  YbodP  88oodP "bodP' 888888  YboodP   88
 
-; 88     88 .dP"Y8 888888
-; 88     88 `Ybo."   88
-; 88  .o 88 o.`Y8b   88
-; 88ood8 88 8bodP'   88
+; 88  88    db    88b 88 8888b.  88     888888 88""Yb .dP"Y8
+; 88  88   dPYb   88Yb88  8I  Yb 88     88__   88__dP `Ybo."
+; 888888  dP__Yb  88 Y88  8I  dY 88  .o 88""   88"Yb  o.`Y8b
+; 88  88 dP""""Yb 88  Y8 8888Y"  88ood8 888888 88  Yb 8bodP'
 
-Subroutine_List
+Object_Handler_Jump_Table
     fdb     GOTO_NEXT_OBJECT                ; 268C: 1A 26     00
-    fdb     JETMAN_FLYING_                  ; 268E: 73 32     01
-    fdb     JETMAN_STANDING_                ; 2690: 4D 33     02
-    fdb     ANIMATE_EXPLOSIONS              ; 2692: 34 29     03
-    fdb     ROCKET_PART_OR_FUEL             ; 2694: 8E 2F     04
-    fdb     WAVE_0_FUZZBALL                 ; 2696: 6A 2C     05
-    fdb     WAVE_3_SAUCER                   ; 2698: BC 2A     06
-    fdb     WAVE_2_SPHERE                   ; 269A: 6D 2A     07
-    fdb     WAVE_1_CROSS                    ; 269C: 5F 2A     08
-    fdb     ROCKET_BOTTOM_MODULE            ; 269E: 74 2E     09
-    fdb     ROCKET_ASCEND                   ; 26A0: 17 2E     0A
-    fdb     ROCKET_DESCEND                  ; 26A2: 4E 2E     0B
-    fdb     SOUND_UPDATE                    ; 26A4: CD 26     0C
-    fdb     GOTO_NEXT_OBJECT                ; 26A6: 1A 26     0D
-    fdb     VALUABLES                       ; 26A8: 3E 28     0E
-    fdb     GOTO_NEXT_OBJECT                ; 26AA: 1A 26     0F
-    fdb     DISPLAY_LASERS                  ; 26AC: 9A 21     10
+    fdb     JETMAN_FLYING_                  ; 268E: 73 32     Obj 01
+    fdb     JETMAN_STANDING_                ; 2690: 4D 33     Obj 02
+    fdb     ANIMATE_EXPLOSIONS              ; 2692: 34 29     Obj 03
+    fdb     ROCKET_PART_OR_FUEL             ; 2694: 8E 2F     Obj 04
+    fdb     WAVE_0_FUZZBALL                 ; 2696: 6A 2C     Obj 05
+    fdb     WAVE_3_SAUCER                   ; 2698: BC 2A     Obj 06
+    fdb     WAVE_2_SPHERE                   ; 269A: 6D 2A     Obj 07
+    fdb     WAVE_1_CROSS                    ; 269C: 5F 2A     Obj 08
+    fdb     ROCKET_BASE_MODULE              ; 269E: 74 2E     Obj 09
+    fdb     ROCKET_ASCEND                   ; 26A0: 17 2E     Obj 0A
+    fdb     ROCKET_DESCEND                  ; 26A2: 4E 2E     Obj 0B
+    fdb     SOUND_UPDATE                    ; 26A4: CD 26     Obj 0C
+    fdb     GOTO_NEXT_OBJECT                ; 26A6: 1A 26     Obj 0D
+    fdb     VALUABLES                       ; 26A8: 3E 28     Obj 0E
+    fdb     GOTO_NEXT_OBJECT                ; 26AA: 1A 26     Obj 0F
+    fdb     DISPLAY_LASERS                  ; 26AC: 9A 21     Obj 10
+
+
+
+
+
+; ############################################################################################
+;  .dP"Y8  dP"Yb  88   88 88b 88 8888b.      88   88 88""Yb 8888b.     db    888888 888888
+;  `Ybo." dP   Yb 88   88 88Yb88  8I  Yb     88   88 88__dP  8I  Yb   dPYb     88   88__
+;  o.`Y8b Yb   dP Y8   8P 88 Y88  8I  dY     Y8   8P 88"""   8I  dY  dP__Yb    88   88""
+;  8bodP'  YbodP  `YbodP' 88  Y8 8888Y"      `YbodP' 88     8888Y"  dP""""Yb   88   888888
+; ############################################################################################
 
 ; Init sound object parameters (i.e. 8 bytes) from static data table
 ; L_JMP_($26AE)_($22CE) OK
@@ -2244,17 +2263,6 @@ Init_Sound_Object_Table
     fcb     $00,$00,$00,$00                 ; 26C9: 00 00 00 00 
 ; ==========================================
 
-
-
-
-
-; ############################################################################################
-;  .dP"Y8  dP"Yb  88   88 88b 88 8888b.      88   88 88""Yb 8888b.     db    888888 888888
-;  `Ybo." dP   Yb 88   88 88Yb88  8I  Yb     88   88 88__dP  8I  Yb   dPYb     88   88__
-;  o.`Y8b Yb   dP Y8   8P 88 Y88  8I  dY     Y8   8P 88"""   8I  dY  dP__Yb    88   88""
-;  8bodP'  YbodP  `YbodP' 88  Y8 8888Y"      `YbodP' 88     8888Y"  dP""""Yb   88   888888
-; ############################################################################################
-
 ; Read and play sound channel data from the Sound object
 SOUND_UPDATE
     lda     #$01                            ; 26CD: A9 01    
@@ -2269,9 +2277,9 @@ Loop_Sound_Update
     tax                                     ; 26D6: AA       
 
 ; Jump to Sound player using Register X as jump table index
-    lda     Subroutine_Sound_Jump_Table,x   ; 26D7: BD 43 27 
+    lda     Sound_Object_Jump_Table,x       ; 26D7: BD 43 27 
     sta     ZP08_Subroutine_Addr_Lo         ; 26DA: 85 08    
-    lda     Subroutine_Sound_Jump_Table+1,x ; 26DC: BD 44 27 
+    lda     Sound_Object_Jump_Table+1,x     ; 26DC: BD 44 27 
     sta     ZP09_Subroutine_Addr_Hi         ; 26DF: 85 09    
     jmp     (ZP08_Subroutine_Addr_Lo)       ; 26E1: 6C 08 00 
 ; ------------------------------------------
@@ -2389,7 +2397,7 @@ Rocket_Flight
     jmp     Enable_Oscillator_Channel       ; 2740: 4C 05 27 
 ; ------------------------------------------
 
-Subroutine_Sound_Jump_Table
+Sound_Object_Jump_Table
     fdb     Goto_Next_Sound                 ; 2743: E4 26     00
     fdb     Rocket_Part_or_Fuel_Cell_Pickup ; 2745: FE 26     01
     fdb     Valuable_Pkup_Rocket_Part_Land  ; 2747: 1C 27     02
@@ -2676,20 +2684,20 @@ Get_Flame_UDG_Addr
     lsr     a                               ; 282E: 4A       
     and     #%00000010                      ; 282F: 29 02    
     tax                                     ; 2831: AA       
-    lda     Ptr_Rocket_Flame_Frame_0_Lo,x   ; 2832: BD 3A 28 
+    lda     Rocket_Flame_Frame_0_Addr_Lo,x  ; 2832: BD 3A 28 
     tay                                     ; 2835: A8       
-    lda     Ptr_Rocket_Flame_Frame_0_Hi,x   ; 2836: BD 3B 28 
+    lda     Rocket_Flame_Frame_0_Addr_Hi,x  ; 2836: BD 3B 28 
     rts                                     ; 2839: 60       
 ; ==========================================
 
 ; Flame animation is produced by toggling between two animation frames
-Ptr_Rocket_Flame_Frame_0_Lo
+Rocket_Flame_Frame_0_Addr_Lo
     fcb     $D5                             ; 283A: D5       
-Ptr_Rocket_Flame_Frame_0_Hi
+Rocket_Flame_Frame_0_Addr_Hi
     fcb     $3F                             ; 283B: 3F       
-Ptr_Rocket_Flame_Frame_1_Lo
+Rocket_Flame_Frame_1_Addr_Lo
     fcb     $F8                             ; 283C: F8       
-Ptr_Rocket_Flame_Frame_1_Hi
+Rocket_Flame_Frame_1_Addr_Hi
     fcb     $3F                             ; 283D: 3F       
 
 
@@ -2747,14 +2755,14 @@ Animate_Valuable
 
 ; Use valuable type to index into subroutine list and jump to subroutine
     tax                                     ; 287A: AA       
-    lda     Subroutine_List_Valuables,x     ; 287B: BD 88 28 
+    lda     Valuable_Handler_Jump_Table,x   ; 287B: BD 88 28 
     sta     ZP08_Subroutine_Addr_Lo         ; 287E: 85 08    
 
-    lda     Subroutine_List_Valuables+1,x   ; 2880: BD 89 28 
+    lda     Valuable_Handler_Jump_Table+1,x ; 2880: BD 89 28 
     sta     ZP09_Subroutine_Addr_Hi         ; 2883: 85 09    
     jmp     (ZP08_Subroutine_Addr_Lo)       ; 2885: 6C 08 00 
 
-Subroutine_List_Valuables
+Valuable_Handler_Jump_Table
     fdb     Valuable_Gold_Bar               ; 2888: 92 28    
     fdb     Valuable_Plutonium              ; 288A: A4 28    
     fdb     Valuable_Plutonium              ; 288C: A4 28    
@@ -2785,7 +2793,7 @@ Valuable_Mineral
 
 ; Use IRQ counter to toggle object colour between black and cyan
 Valuable_Plutonium
-    lda     ZP_HW_IRQ_Counter_Lo            ; 28A4: A5 4A    
+    lda     ZP_IRQ_Counter_Lo               ; 28A4: A5 4A    
     and     #%00011111                      ; 28A6: 29 1F    
     cmp     #%00011000                      ; 28A8: C9 18    
     bcs     Valuable_Plutonium_Set_Colour   ; 28AA: B0 05    
@@ -2802,7 +2810,7 @@ Valuable_Plutonium_Set_Colour
 
 ; Use IRQ counter to cycle through colours, two LSRs quadruple the time between changes
 Valuable_Gemstone
-    lda     ZP_HW_IRQ_Counter_Lo            ; 28B6: A5 4A    
+    lda     ZP_IRQ_Counter_Lo               ; 28B6: A5 4A    
     lsr     a                               ; 28B8: 4A       
     lsr     a                               ; 28B9: 4A       
     and     #%00000111                      ; 28BA: 29 07    
@@ -2914,6 +2922,11 @@ Restore_Obj_List_Ptr
 
 
 ; ############################################################################################
+;    db    88b 88 88 8b    d8    db    888888 888888
+;   dPYb   88Yb88 88 88b  d88   dPYb     88   88__
+;  dP__Yb  88 Y88 88 88YbdP88  dP__Yb    88   88""
+; dP""""Yb 88  Y8 88 88 YY 88 dP""""Yb   88   888888
+
 ; 888888 Yb  dP 88""Yb 88      dP"Yb  .dP"Y8 88  dP"Yb  88b 88 .dP"Y8
 ; 88__    YbdP  88__dP 88     dP   Yb `Ybo." 88 dP   Yb 88Yb88 `Ybo."
 ; 88""    dPYb  88"""  88  .o Yb   dP o.`Y8b 88 Yb   dP 88 Y88 o.`Y8b
@@ -2952,7 +2965,7 @@ Set_Object_Type_To_Explosion
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2917: 91 00    
 
 ; Change explosion object colour based on IRQ random generator
-    lda     ZP_HW_IRQ_Random                ; 2919: A5 4C    
+    lda     ZP_IRQ_Random                   ; 2919: A5 4C    
     and     #%00000111                      ; 291B: 29 07    
     bne     Test_New_Colour_Is_Green        ; 291D: D0 02    
 
@@ -2988,7 +3001,7 @@ ANIMATE_EXPLOSIONS
 ; Param 02 of alien object is always set to zero, for Jetman is always set to one
     ldy     #$02                            ; 2939: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 293B: B1 00    
-    and     ZP_HW_IRQ_Counter_Lo            ; 293D: 25 4A    
+    and     ZP_IRQ_Counter_Lo               ; 293D: 25 4A    
     bne     Test_Explosion_Animation_Done   ; 293F: D0 09    
 
 ; Increment explosion animation frame count
@@ -3334,7 +3347,7 @@ Load_Direction_X_Left
 ; Reset random direction Y change countdown initial value using IRQ random number, range $10-$1F
 ; L_BRS_($2AA2)_($2A7C) OK
 Direction_Y_Update_Rand
-    lda     ZP_HW_IRQ_Random                ; 2AA2: A5 4C    
+    lda     ZP_IRQ_Random                   ; 2AA2: A5 4C    
     and     #%00001111                      ; 2AA4: 29 0F    
     adc     #%00010000                      ; 2AA6: 69 10    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2AA8: 91 00    
@@ -3342,7 +3355,7 @@ Direction_Y_Update_Rand
 ; Reverse direction Y up/down, randomly via IRQ random number, bit 2
     ldy     #OBJECT_DIRECTION_Y_PARAM       ; 2AAA: A0 04    
     and     #%00000100                      ; 2AAC: 29 04    
-    bit     ZP_HW_IRQ_Random                ; 2AAE: 24 4C    
+    bit     ZP_IRQ_Random                   ; 2AAE: 24 4C    
     bmi     Direction_Y_Store_Rand          ; 2AB0: 30 05    
 
 ; Invert on the direction byte
@@ -3620,7 +3633,7 @@ Spawn_RMFC
     bcs     Spawn_RMFC_RTS                  ; 2B61: B0 EF    
 
 ; Use counter to randomly spawn another Fuel Cell
-    lda     ZP_HW_IRQ_Counter_Lo            ; 2B63: A5 4A    
+    lda     ZP_IRQ_Counter_Lo               ; 2B63: A5 4A    
     eor     #%11111111                      ; 2B65: 49 FF    
     and     #%00001111                      ; 2B67: 29 0F    
     bne     Spawn_RMFC_RTS                  ; 2B69: D0 E7    
@@ -3669,7 +3682,7 @@ Spawn_Vals
     bne     Spawn_Vals_RTS                  ; 2B9E: D0 F6    
 
 ; Use counter to randomly spawn another valuable
-    lda     ZP_HW_IRQ_Counter_Lo            ; 2BA0: A5 4A    
+    lda     ZP_IRQ_Counter_Lo               ; 2BA0: A5 4A    
     and     #%01111111                      ; 2BA2: 29 7F    
     bne     Spawn_Vals_RTS                  ; 2BA4: D0 F0    
 
@@ -3688,7 +3701,7 @@ Loop_Init_Obj_Valuable
     sta     Obj_Rocket_Mid_Or_Valuable_X    ; 2BB4: 8D C1 03 
 
 ; Use IRQ random value to setup next object type
-    lda     ZP_HW_IRQ_Random                ; 2BB7: A5 4C    
+    lda     ZP_IRQ_Random                   ; 2BB7: A5 4C    
     and     #%00001110                      ; 2BB9: 29 0E    
     bit     MASK_00001000                   ; 2BBB: 2C 17 20 
     beq     Store_Valuable_Type             ; 2BBE: F0 02    
@@ -3944,9 +3957,6 @@ Chg_Obj_To_Explosion_Then_Next
     jmp     GOTO_NEXT_OBJECT                ; 2C8F: 4C 1A 26 
 ; ------------------------------------------
 
-
-
-
 ; Test if object has collided with Jetman, if not, update position and display object
 ; DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
 ; In MAME Debugger, use "fill 2C95,1,A9"
@@ -4111,7 +4121,7 @@ Init_Alien_Object
 
 ; Register Y becomes Direction X, initiate randomly using IRQ counter
     iny                                     ; 2D1D: C8       
-    lda     ZP_HW_IRQ_Random                ; 2D1E: A5 4C    
+    lda     ZP_IRQ_Random                   ; 2D1E: A5 4C    
     tax                                     ; 2D20: AA       
     and     #%00010000                      ; 2D21: 29 10    
     sec                                     ; 2D23: 38       
@@ -4532,7 +4542,7 @@ ROCKET_DESCEND
 ; ############################################################################################
 
 ; Test if Jetman collided with Rocket
-ROCKET_BOTTOM_MODULE
+ROCKET_BASE_MODULE
     jsr     Load_Object_Type_X_Y            ; 2E74: 20 D7 35 
     jsr     Test_Jetman_Object_Collide      ; 2E77: 20 58 2D 
     lda     ZP02_Collision_Status           ; 2E7A: A5 02    
@@ -4605,7 +4615,7 @@ Loop_Display_Rocket_Parts
 
 ; Bit 4 of counter used to flash rocket between white or purple colour
 ; The 2xLSR changes Register A to be %0100, which is also the purple colour code
-    lda     ZP_HW_IRQ_Counter_Lo            ; 2EC0: A5 4A    
+    lda     ZP_IRQ_Counter_Lo               ; 2EC0: A5 4A    
     lsr     a                               ; 2EC2: 4A       
     lsr     a                               ; 2EC3: 4A       
     and     #%00000100                      ; 2EC4: 29 04    
@@ -5743,7 +5753,7 @@ P_Update_Jetman_Position_X
     bvc     N_Flying_Left                   ; 328F: 50 97    
 
     tax                                     ; 3291: AA       
-    lda     ZP_HW_IRQ_Counter_Lo            ; 3292: A5 4A    
+    lda     ZP_IRQ_Counter_Lo               ; 3292: A5 4A    
     and     #%00000001                      ; 3294: 29 01    
     beq     P_TXA_Jump_R                    ; 3296: F0 D7    
     txa                                     ; 3298: 8A       
@@ -6243,7 +6253,7 @@ Flash_Score_Start
     jsr     Convert_XY_to_UDG_RAM_Address   ; 3470: 20 1D 35 
 
 ; Test IRQ counter, only continue once in 8 calls
-    lda     ZP_HW_IRQ_Counter_Lo            ; 3473: A5 4A    
+    lda     ZP_IRQ_Counter_Lo               ; 3473: A5 4A    
     and     #%00000111                      ; 3475: 29 07    
     bne     RTS_Flash_Score                 ; 3477: D0 20    
 
@@ -7179,6 +7189,7 @@ JMP_Next_Obj_New_Update_Params
 ; `Ybo." 88   dP  88__
 ; o.`Y8b 88  dP   88""
 ; 8bodP' 88 d8888 888888
+
 ; Code used for Jetman, Ship Top/Mid/Base, Fuel, Valuables
 ; L_JSR_($3737)_($3601) OK
 ; L_JSR_($3737)_($3646) OK

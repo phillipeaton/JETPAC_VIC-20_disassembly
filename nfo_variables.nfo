@@ -44,7 +44,7 @@ label      1C ZP_Jetman_Action               ; FF=none, x7=shooting, Bx=left, 7x
 
 label      1E ZP_Ship_UDG_Addr_Offset        ;
 label      1F ZP_Ship_UDG_Addr_Colour?       ;
-label      20 ZP_HW_IRQ_Occurred             ;
+label      20 ZP_IRQ_Occurred                ;
 label      21 ZP_Alien_Spawn_Counter         ; When reaches $04, Alien spawns, incremented by Explosions and Lasers
 label      22 ZP_Obj_List_Ptr_Save_IRQ_Lo    ;
 label      23 ZP_Obj_List_Ptr_Save_IRQ_Hi    ;
@@ -61,9 +61,9 @@ label      46 ZP_Game_Select_F3_Flash        ; "
 label      47 ZP_Game_Select_F5_Flash        ; "
 label      48 ZP_Game_Select_F7_Flash        ; "
 label      49 ZP_Game_Select_Start_Game      ; No Inverse Video, Bit 0 Display On/Off
-label      4A ZP_HW_IRQ_Counter_Lo           ;
-label      4B ZP_HW_IRQ_Counter_Hi           ;
-label      4C ZP_HW_IRQ_Random               ;
+label      4A ZP_IRQ_Counter_Lo              ;
+label      4B ZP_IRQ_Counter_Hi              ;
+label      4C ZP_IRQ_Random                  ;
 
 label      51-53 ZP_Score_Player_1           ; 3 bytes
 label      54-56 ZP_Score_Player_2           ; 3 bytes

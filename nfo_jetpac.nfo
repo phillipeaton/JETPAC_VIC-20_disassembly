@@ -68,9 +68,6 @@ comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 comment  201C Empty NMI Interrupt Handler, simply returns from interrupt
 used     201C NMI_Interrupt_Hardler
 comment  201D
-comment  201D --------------------------------------------------------------------------------------------
-comment  201D Program Start
-comment  201D --------------------------------------------------------------------------------------------
 comment  201D Disable Interrupts, reset stack address pointer, clear Decimal flag
 comment  2022
 comment  2022 Setup NMI interrupt vector to service routine at $201C
@@ -441,7 +438,7 @@ comment  22E3
 label    22E3 Set_Obj_Rocket_Top_Or_Fuel_Typ
 lcomment 22E9 ZP00/01
 word     22EA
-label    22ED Init_Object
+label    22ED Init_Objects
 break    22ED
 comment  22ED
 comment  22F2
@@ -648,7 +645,7 @@ comment  24A1 Update the selected option flashing text status i.e. option select
 comment  24A1 Register A enters with bit 0 set as Players 1 or 2, or Joystick or Keyboard
 comment  24A1 Register X enters as 0 or 2, which is an index into the Game Select Fn Key status
 comment  24A1 Code runs twice, first with JSR/RTS, then with normal run though, ending with RTS
-label    24A4 Game_Select_Flash_1
+label    24A4 Do_Game_Select_Flash
 comment  24A4
 comment  24A5
 comment  24A5 Test setting flag, if set, this is the unselcted option, skip the countup/invert part
@@ -752,8 +749,8 @@ label    25D0 Inc_Param_Addr_RTS
 comment  25D1
 label    25D1 Game_Start
 comment  25E0
-comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-used     25E0 Hardware_Interrupt_Handler
+comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+used     25E0 IRQ_Interrupt_Handler
 comment  25E2
 comment  25E2 Set IRQ Occured flag, used to prioritise Jetman object handling in main loop
 comment  25E4
@@ -765,9 +762,6 @@ comment  25EE Increment 16-bit counter
 comment  25F4
 label    25F4 Restore_Registers_And_RTI
 comment  25FA
-comment  25FA ----------------------------------------------------
-comment  25FA Game Main Loop
-comment  25FA ----------------------------------------------------
 label    25FA Main_Loop_Init
 comment  25FE
 comment  25FE Reset object list index to $03B0 i.e. Rocket Ascend/Decend
@@ -836,30 +830,30 @@ const    2679
 word     267A
 comment  2680
 comment  2680
-label    2680 Restore_Saved_Obj_Ptr_And_CLI
+label    2680 Restore_Saved_Obj_Ptr_CLI
 comment  2688
 comment  2688 Enable Interrupts (Clear Disable Interrupts)
 comment  268C
-label    268C Subroutine_List
+label    268C Object_Handler_Jump_Table
 lcomment 268C 00
 word     268C-26AD
-label    268D Subroutine_List+1
-lcomment 268E 01
-lcomment 2690 02
-lcomment 2692 03
-lcomment 2694 04
-lcomment 2696 05
-lcomment 2698 06
-lcomment 269A 07
-lcomment 269C 08
-lcomment 269E 09
-lcomment 26A0 0A
-lcomment 26A2 0B
-lcomment 26A4 0C
-lcomment 26A6 0D
-lcomment 26A8 0E
-lcomment 26AA 0F
-lcomment 26AC 10
+label    268D Object_Handler_Jump_Table+1
+lcomment 268E Obj 01
+lcomment 2690 Obj 02
+lcomment 2692 Obj 03
+lcomment 2694 Obj 04
+lcomment 2696 Obj 05
+lcomment 2698 Obj 06
+lcomment 269A Obj 07
+lcomment 269C Obj 08
+lcomment 269E Obj 09
+lcomment 26A0 Obj 0A
+lcomment 26A2 Obj 0B
+lcomment 26A4 Obj 0C
+lcomment 26A6 Obj 0D
+lcomment 26A8 Obj 0E
+lcomment 26AA Obj 0F
+lcomment 26AC Obj 10
 comment  26AE
 comment  26AE Init sound object parameters (i.e. 8 bytes) from static data table
 label    26AE Initialize_Sound_Object
@@ -924,10 +918,10 @@ comment  273A
 comment  273A Utilise rocket object height to manipulate noise sound channel
 binary   273F
 comment  2743
-label    2743 Subroutine_Sound_Jump_Table
+label    2743 Sound_Object_Jump_Table
 lcomment 2743 00
 word     2743-274D
-label    2744 Subroutine_Sound_Jump_Table+1
+label    2744 Sound_Object_Jump_Table+1
 lcomment 2745 01
 lcomment 2747 02
 lcomment 2749 03
@@ -1035,11 +1029,11 @@ label    282E Get_Flame_UDG_Addr
 binary   2830
 comment  283A
 comment  283A Flame animation is produced by toggling between two animation frames
-label    283A Ptr_Rocket_Flame_Frame_0_Lo
+label    283A Rocket_Flame_Frame_0_Addr_Lo
 const    283A-283d
-label    283B Ptr_Rocket_Flame_Frame_0_Hi
-label    283C Ptr_Rocket_Flame_Frame_1_Lo
-label    283D Ptr_Rocket_Flame_Frame_1_Hi
+label    283B Rocket_Flame_Frame_0_Addr_Hi
+label    283C Rocket_Flame_Frame_1_Addr_Lo
+label    283D Rocket_Flame_Frame_1_Addr_Hi
 comment  283E
 comment  283E Remove "Test_Platform_Collision"=Gems all fall through platforms and floor, reentering at top
 label    283E VALUABLES
@@ -1064,10 +1058,10 @@ label    2874 Animate_Valuable
 comment  287A Use valuable type to index into subroutine list and jump to subroutine
 comment  2880
 comment  2888
-label    2888 Subroutine_List_Valuables
+label    2888 Valuable_Handler_Jump_Table
 word     2888-2891
 break    2888-2891
-label    2889 Subroutine_List_Valuables+1
+label    2889 Valuable_Handler_Jump_Table+1
 comment  2892
 label    2892 Valuable_Gold_Bar
 deflabel 2893 COLOUR_YELLOW
@@ -1568,9 +1562,6 @@ comment  2C84 Get score low byte and save
 comment  2C8C
 label    2C8C Chg_Obj_To_Explosion_Then_Next
 comment  2C92
-comment  2C92
-comment  2C92
-comment  2C92
 comment  2C92 Test if object has collided with Jetman, if not, update position and display object
 comment  2C92 DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
 comment  2C92 In MAME Debugger, use "fill 2C95,1,A9"
@@ -1810,7 +1801,7 @@ deflabel 2E6B OBJECT_ROCKET_LANDED
 comment  2E71
 comment  2E74
 comment  2E74 Test if Jetman collided with Rocket
-label    2E74 ROCKET_BOTTOM_MODULE
+label    2E74 ROCKET_BASE_MODULE
 comment  2E7E
 comment  2E7E Jetman collided with Rocket, test if fully fulled up
 deflabel 2E7F OBJECT_ROCKET_FUEL_LEVEL
@@ -2950,6 +2941,7 @@ comment  372D
 comment  372D Test if both old and new object heights are the same, if yes, return
 comment  3734
 label    3734 JMP_Next_Obj_New_Update_Params
+comment  3737
 comment  3737 Code used for Jetman, Ship Top/Mid/Base, Fuel, Valuables
 label    3737 Load_Obj_Old_UDG_RAM_Addr_Siz_
 comment  373D

@@ -166,3 +166,7 @@ Loading of Infiltrator comments and comment at start of code come from different
 Comments at the start of a work sit above branch labels...can this be fixed?
 Change Rocket to ship
 Banners with ============== above and below signify calls from Main Loop
+Labels in CAPS are called from Main Loop
+Rocket ship shortened to Ship where space limited
+General idea is that the code documents itself
+Variables and labels often reversed for clarity
