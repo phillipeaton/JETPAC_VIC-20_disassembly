@@ -156,7 +156,7 @@ First byte of a String definition contains reverse (bit 7) and colour informatio
 If colour > 7 used, you just get wrong characters displayed
 When colour is 0, it's invisible against the black background
 
-End fo string has top bit set to denote end. But is it the top 4 bits? See STR_GAME_OVER_PLAYER_1.
+End of string has top bit set to denote end. But is it the top 4 bits? See STR_GAME_OVER_PLAYER_1.
 
 -------------
 Describe what an Object is i.e. a sprite, sound etc.
@@ -165,8 +165,20 @@ Object position is bottom left of sprite.
 Loading of Infiltrator comments and comment at start of code come from different nfo files, so layout can be a bit funny.
 Comments at the start of a work sit above branch labels...can this be fixed?
 Change Rocket to ship
-Banners with ============== above and below signify calls from Main Loop
+Banners with ============== above and below signify calls from Main Loop,
 Labels in CAPS are called from Main Loop
 Rocket ship shortened to Ship where space limited
 General idea is that the code documents itself
 Variables and labels often reversed for clarity
+Many main subroutines enter in the middle and sometimes jupm to code before hand, maybe to use short jumps
+-----------
+What's left?
+- ???
+- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+- "ZP_Ship_UDG_Addr_Colour?"
+- SKIP_31D7
+- DISPLAY_LASERS
+- Restore_Player_Objects
+- Platform_Collision_Test
+- JETMAN_FLYING
+- JETMAN_STANDING

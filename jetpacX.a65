@@ -293,28 +293,27 @@ PLATFORM_DATA_TABLE_ADDR_LO     equ     $B6
 SCREEN_BOTTOM_1UP               equ     $AE
 OBJECT_POSITION_X_PARAM         equ     $01
 THREE_DIGITS_COUNTDOWN          equ     $02
-OBJ_PICKUP_DROPPED_STATE        equ     $04
+OBJECT_PICKUP_DROPPED_STATE     equ     $04
 OBJECT_OVER_SHIP_HITBOX_X       equ     $06
 OBJECT_STATUS_PICKED_UP         equ     %00000010
 OBJECT_STATUS_PARAM             equ     $04
 OBJECT_UDG_DATA_INDEX_PARAM     equ     $06
 FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
-OBJECT_OBJ_UDG_DATA_OFFSET      equ     $06
+OBJECT_UDG_DATA_OFFSET          equ     $06
 COLUMN_INDEX                    equ     $00
 OBJECT_ROCKET_POSITION_Y_PARAM  equ     $03
 OBJECT_ROCKET_POSITION_X_PARAM  equ     $01
 COLOUR_WHITE                    equ     $01
 COLOUR_PURPLE                   equ     $04
-OBJ_ROCKET_FUEL_LEVEL           equ     $02
+OBJECT_ROCKET_FUEL_LEVEL        equ     $02
 OBJ_ROCKET_PARTS_COUNTER_PARAM  equ     $04
 ROCKET_ASCENDING                equ     $0A
 FUELLED_UP                      equ     $06
-OBJECT_ROCKET_FUEL_LEVEL        equ     $02
 OBJECT_ROCKET_LANDED            equ     $09
-ROCKET_BOT_POSITION_Y           equ     $AF
-ROCKET_BOT_POSITION_Y_PARAM     equ     $03
+ROCKET_BASE_POSITION_Y          equ     $AF
+ROCKET_BASE_POSITION_Y_PARAM    equ     $03
 OBJECT_ROCKET_DESCEND           equ     $0B
-ROCKET_BOT_AT_SCREEN_TOP        equ     $30
+ROCKET_BASE_AT_SCREEN_TOP       equ     $30
 OBJECT_TYPE_VALUABLE            equ     $0E
 HITBOX_Y_ABOVE                  equ     $12
 COLLISION                       equ     $80
@@ -333,14 +332,14 @@ WAVE_3_SAUCER_                  equ     $08
 WAVE_0_FUZZBALL_                equ     $05
 OBJECT_STRUCTURE_SIZE           equ     $08
 NUM_ALIENS_MAX                  equ     $06
-OBJ_ALIEN_0_HI                  equ     $03
-OBJ_ALIEN_0_LO                  equ     $C8
+OBJECT_ALIEN_0_HI               equ     $03
+OBJECT_ALIEN_0_LO               equ     $C8
 OBJECT_DIRECTION_Y_PARAM        equ     $04
 OBJECT_DIRECTION_X_PARAM        equ     $02
 LASER_POSITION_X_PARAM          equ     $02
 MAX_LASERS                      equ     $04
-OBJ_LASER_0_HI                  equ     $03
-OBJ_LASER_0_LO                  equ     $88
+OBJECT_LASER_0_HI               equ     $03
+OBJECT_LASER_0_LO               equ     $88
 OBJECT_VALUABLE_TYPE_PARAM      equ     $06
 NUM_OBJECT_PARAMS               equ     $07
 NOT_FLYING_AND_NOT_STANDING     equ     $03
@@ -381,10 +380,10 @@ LASER_POSITION_X_PARAMS         equ     $03
 LASER_GUN_HEIGHT_OFFSET         equ     $0D
 SCREEN_ROWS                     equ     $0B
 SCREEN_COLUMNS                  equ     $17
-IRQ_Interrupt_Handler_Addr_Hi   equ     $25
-IRQ_Interrupt_Handler_Addr_Lo   equ     $E0
-NMI_Interrupt_Handler_Addr_Hi   equ     $20
-NMI_Interrupt_Handler_Addr_Lo   equ     $1C
+IRQ_INTERRUPT_HANDLER_ADDR_HI   equ     $25
+IRQ_INTERRUPT_HANDLER_ADDR_LO   equ     $E0
+NMI_INTERRUPT_HANDLER_ADDR_HI   equ     $20
+NMI_INTERRUPT_HANDLER_ADDR_LO   equ     $1C
 
 ;****************************************************
 ; Program's Code Areas
@@ -465,10 +464,15 @@ NMI_Interrupt_Hardler
 
 
 
-; 88""Yb 88""Yb  dP"Yb   dP""b8 88""Yb    db    8b    d8     .dP"Y8 888888    db    88""Yb 888888
-; 88__dP 88__dP dP   Yb dP   `" 88__dP   dPYb   88b  d88     `Ybo."   88     dPYb   88__dP   88
-; 88"""  88"Yb  Yb   dP Yb  "88 88"Yb   dP__Yb  88YbdP88     o.`Y8b   88    dP__Yb  88"Yb    88
-; 88     88  Yb  YbodP   YboodP 88  Yb dP""""Yb 88 YY 88     8bodP'   88   dP""""Yb 88  Yb   88
+; 88""Yb 88""Yb  dP"Yb   dP""b8 88""Yb    db    8b    d8
+; 88__dP 88__dP dP   Yb dP   `" 88__dP   dPYb   88b  d88
+; 88"""  88"Yb  Yb   dP Yb  "88 88"Yb   dP__Yb  88YbdP88
+; 88     88  Yb  YbodP   YboodP 88  Yb dP""""Yb 88 YY 88
+
+; .dP"Y8 888888    db    88""Yb 888888
+; `Ybo."   88     dPYb   88__dP   88
+; o.`Y8b   88    dP__Yb  88"Yb    88
+; 8bodP'   88   dP""""Yb 88  Yb   88
 
 ; Disable Interrupts, reset stack address pointer, clear Decimal flag
     sei                                     ; 201D: 78       
@@ -477,9 +481,9 @@ NMI_Interrupt_Hardler
     cld                                     ; 2021: D8       
 
 ; Setup NMI interrupt vector to service routine at $201C
-    lda     #NMI_Interrupt_Handler_Addr_Lo  ; 2022: A9 1C    
+    lda     #NMI_INTERRUPT_HANDLER_ADDR_LO  ; 2022: A9 1C    
     sta     NMI_Interrupt_Vector_Lo         ; 2024: 8D 18 03 
-    lda     #NMI_Interrupt_Handler_Addr_Hi  ; 2027: A9 20    
+    lda     #NMI_INTERRUPT_HANDLER_ADDR_HI  ; 2027: A9 20    
     sta     NMI_Interrupt_Vector_Hi         ; 2029: 8D 19 03 
 
     jsr     Erase_Hi_Score_Game_Settings    ; 202C: 20 6F 27 
@@ -501,9 +505,9 @@ NMI_Interrupt_Hardler
     sta     VIA2_Port_B                     ; 2049: 8D 20 91  Data I/O register (Keybd col scan, Cassette, Joystick)
 
 ; Setup IRQ interrupt vector to service routine at $25E0
-    lda     #IRQ_Interrupt_Handler_Addr_Lo  ; 204C: A9 E0    
+    lda     #IRQ_INTERRUPT_HANDLER_ADDR_LO  ; 204C: A9 E0    
     sta     IRQ_Interrupt_Vector_Lo         ; 204E: 8D 14 03 
-    lda     #IRQ_Interrupt_Handler_Addr_Hi  ; 2051: A9 25    
+    lda     #IRQ_INTERRUPT_HANDLER_ADDR_HI  ; 2051: A9 25    
     sta     IRQ_Interrupt_Vector_Hi         ; 2053: 8D 15 03 
 
 ; Reset the VIC registers
@@ -854,6 +858,7 @@ Add_To_Laser_Start_Position_X
 ; 88ood8 dP""""Yb 8bodP' 888888 88  Yb 8bodP'
 ; ############################################################################################
 
+; NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ; L_BRS_($2195)_($21C7) OK
 Add_08_Handle_Wrap_Get_Y_Coord
     adc     #$08                            ; 2195: 69 08    
@@ -1208,7 +1213,7 @@ Reset_Level
 
 ; L_JMP_($22E3)_($2B7C) OK
 ; L_JSR_($22E3)_($2DA6) OK
-Set_Obj_Rocket_Top_Or_Fuel_Typ
+Init_Obj_Rockt_Top_Or_Fuel_Typ
     jsr     Save_Obj_List_Ptr               ; 22E3: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22E6: 20 9D 25 
     fcb     $00                             ; 22E9: 00        ZP00/01
@@ -1222,7 +1227,7 @@ Init_Objects
 ; ------------------------------------------
 
 ; L_JSR_($22F2)_($2DB2) OK
-Set_Obj_Rocket_Mid_Or_Valu_Typ
+Init_Obj_Rockt_Mid_Or_Valu_Typ
     jsr     Save_Obj_List_Ptr               ; 22F2: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22F5: 20 9D 25 
     fcb     $00                             ; 22F8: 00       
@@ -1231,7 +1236,7 @@ Set_Obj_Rocket_Mid_Or_Valu_Typ
     jmp     Init_Objects                    ; 22FC: 4C ED 22 
 ; ------------------------------------------
 
-; Init rocket top, middle and bottom object parameters (i.e. 3 x 8 bytes) from static data table
+; Init rocket top, middle and base object parameters (i.e. 3 x 8 bytes) from static data table
 ; L_JSR_($22FF)_($230B) OK
 ; L_JSR_($22FF)_($23DE) OK
 Init_Rocket_Obj_Params
@@ -1255,7 +1260,7 @@ Init_Rocket_Obj_Params_Init
     fdb     Init_Rocket_Objs_Param_Table    ; 2315: 3B 23    
     fcb     $FF                             ; 2317: FF       
 
-; Init rocket top, middle and bottom
+; Init rocket top, middle and base
     ldx     #$03                            ; 2318: A2 03    
 
 ; L_JMP_($231A)_($22EF) OK
@@ -1289,7 +1294,7 @@ Loop_Init_Objects
 ; ==========================================
 
 Init_Rocket_Objs_Param_Table
-    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Rocket Bottom Section, Posn_X, ?, Posn_Y
+    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Rocket Base Section, Posn_X, ?, Posn_Y
     fcb     $01,$00,$00,$1C                 ; 233F: 01 00 00 1C  $01=Pickup Status, ?, Height on Landing, ?
 
     fcb     $04,$20,$00,$3F                 ; 2343: 04 20 00 3F  $04=Rocket Top Section
@@ -1470,8 +1475,8 @@ Loop_Setup_Player_Lives
     sta     ZP_Num_Lives_Active_Player      ; 23DC: 85 5A    
 
     jsr     Init_Rocket_Obj_Params          ; 23DE: 20 FF 22 
-
     jsr     Swap_Player_And_Obj_Rocket      ; 23E1: 20 F5 23 
+
     dey                                     ; 23E4: 88       
     bne     Loop_Setup_Player_Lives         ; 23E5: D0 EF    
 
@@ -1566,20 +1571,20 @@ Display_1UP_HI_2UP_Text
 Loop_Display_1UP_HI_2UP_Text
     lda     STR_1UP_HI_2UP,x                ; 2429: BD 65 24 
     sta     ZP04_Position_X                 ; 242C: 85 04    
-    inx                                     ; 242E: E8       
 
+    inx                                     ; 242E: E8       
     lda     STR_1UP_HI_2UP,x                ; 242F: BD 65 24 
     sta     ZP05_Position_Y                 ; 2432: 85 05    
-    inx                                     ; 2434: E8       
 
+    inx                                     ; 2434: E8       
     lda     STR_1UP_HI_2UP,x                ; 2435: BD 65 24 
     sta     ZP0E_String_Addr_Lo             ; 2438: 85 0E    
-    inx                                     ; 243A: E8       
 
+    inx                                     ; 243A: E8       
     lda     STR_1UP_HI_2UP,x                ; 243B: BD 65 24 
     sta     ZP0F_String_Addr_Hi             ; 243E: 85 0F    
-    inx                                     ; 2440: E8       
 
+    inx                                     ; 2440: E8       
     txa                                     ; 2441: 8A       
     pha                                     ; 2442: 48       
     tya                                     ; 2443: 98       
@@ -2711,7 +2716,8 @@ Rocket_Flame_Frame_1_Addr_Hi
 ;    YP    dP""""Yb 88ood8 `YbodP' dP""""Yb 88oodP 88ood8 888888 8bodP'
 ; ############################################################################################
 
-; Remove "Test_Platform_Collision"=Gems all fall through platforms and floor, reentering at top
+; Replace "Test_Platform_Collision" with nops and gems all fall
+; through platforms and floor, reentering at top
 VALUABLES
     jsr     Load_Object_Type_X_Y            ; 283E: 20 D7 35 
     jsr     Test_Platform_Collision         ; 2841: 20 B3 30 
@@ -3169,8 +3175,8 @@ Display_Game_Over_Player_1_2
 
 ; Wait a few seconds when Game Over is displayed on screen
 ; Delay loop $100^2 x ($100-$F8=$08) x (5+3=$08) = $400,000
-;                                            = 4,194,304 cycles @ 1.108MHz PAL
-;                                            = 3.785 Seconds
+;                                                = 4,194,304 cycles @ 1.108MHz PAL
+;                                                = 3.785 Seconds
 ; L_BRS_($2A05)_($2A07) OK
 ; L_BRS_($2A05)_($2A0B) OK
 ; L_BRS_($2A05)_($2A0F) OK
@@ -3651,7 +3657,7 @@ Loop_Init_Obj_Rocket_Or_Fuel
 ; Spawn object at a random X position
     jsr     Get_Random_Position_X           ; 2B76: 20 DE 2B 
     sta     Obj_Rocket_Top_Or_Fuel_X        ; 2B79: 8D B9 03 
-    jmp     Set_Obj_Rocket_Top_Or_Fuel_Typ  ; 2B7C: 4C E3 22 
+    jmp     Init_Obj_Rockt_Top_Or_Fuel_Typ  ; 2B7C: 4C E3 22 
 ; ------------------------------------------
 
 Init_Obj_Rocket_Or_Fuel_Table
@@ -3716,13 +3722,13 @@ Store_Valuable_Type
     ora     #%00100000                      ; 2BC2: 09 20    
     sta     Obj_Rocket_Mid_Or_Valu_UDG_Idx  ; 2BC4: 8D C6 03 
 
-; $03C0 object starts as Rocket Module Middle, then becomes Fuel Cell
+; $03C0 object starts as Rocket Module Middle, then becomes Valuable
 ; L_JSR_($2BC7)_($2DC5) OK
-Load_ZP_Params_Rocket_Or_Fuel
+Load_ZP_Params_Rocket_Or_Val
     jsr     Save_Obj_List_Ptr               ; 2BC7: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2BCA: 20 9D 25 
     fcb     $00                             ; 2BCD: 00        ZP00/01
-    fdb     $03C0                           ; 2BCE: C0 03     Object Address
+    fdb     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2BCE: C0 03     Object Address
     fcb     $FF                             ; 2BD0: FF       
     jsr     Load_Object_Type_X_Y_Colour     ; 2BD1: 20 E9 35 
 
@@ -3780,9 +3786,9 @@ Object_Position_X_Table
 ; Store Obj_Laser_0 address in ZP_08/09 ($0388)
 ; L_JSR_($2BF8)_($2C64) OK
 Test_Laser_Hits_1
-    lda     #OBJ_LASER_0_LO                 ; 2BF8: A9 88    
+    lda     #OBJECT_LASER_0_LO              ; 2BF8: A9 88    
     sta     ZP08_Object_Laser_Addr_Lo       ; 2BFA: 85 08    
-    lda     #OBJ_LASER_0_HI                 ; 2BFC: A9 03    
+    lda     #OBJECT_LASER_0_HI              ; 2BFC: A9 03    
     sta     ZP09_Object_Laser_Addr_Hi       ; 2BFE: 85 09    
 
 ; Store number of lasers (4) for processing to ZP_02
@@ -3831,7 +3837,7 @@ Test_Laser_Object_Active
     bcs     Goto_Next_Laser                 ; 2C2F: B0 22    
 
 ; Register Y becomes Laser Position X parameter
-; Zore the bottom 3 bits of Position X, making it a character-sized column reference
+; Store the bottom 3 bits of Position X, making it a character-sized column reference
 ; Test if object is to the left or right of the Laser object
     iny                                     ; 2C31: C8       
     lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C32: B1 08    
@@ -4073,9 +4079,9 @@ Test_Jetman_Displayed
 ; L_BRS_($2CF1)_($2CEA) OK
 ; L_BRS_($2CF1)_($2CEE) OK
 Init_Alien_Object_Next
-    lda     #OBJ_ALIEN_0_LO                 ; 2CF1: A9 C8    
+    lda     #OBJECT_ALIEN_0_LO              ; 2CF1: A9 C8    
     sta     ZP_Obj_List_Ptr_Lo              ; 2CF3: 85 00    
-    lda     #OBJ_ALIEN_0_HI                 ; 2CF5: A9 03    
+    lda     #OBJECT_ALIEN_0_HI              ; 2CF5: A9 03    
     sta     ZP_Obj_List_Ptr_Hi              ; 2CF7: 85 01    
 
 ; Setup next alien objects, to a maximum of 6
@@ -4303,23 +4309,26 @@ Test_Collision_Position_Y
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 ;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
-; This set of routies needs more work ######################################################
+; Test if Rocket Top or Fuel object is inactive, if yes, skip initialization
 ; L_JSR_($2DA1)_($22DD) OK
 Restore_Player_Objects
     lda     Obj_Rocket_Top_Or_Fuel_Type     ; 2DA1: AD B8 03 
     beq     Restore_Player_Objects_1        ; 2DA4: F0 03    
 
-    jsr     Set_Obj_Rocket_Top_Or_Fuel_Typ  ; 2DA6: 20 E3 22 
+    jsr     Init_Obj_Rockt_Top_Or_Fuel_Typ  ; 2DA6: 20 E3 22 
 
+; Test if Rocket Middle or Valuable object is inactive, if yes, skip valuable test
 ; L_BRS_($2DA9)_($2DA4) OK
 Restore_Player_Objects_1
     lda     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2DA9: AD C0 03 
     beq     Set_Obj_List_Ptr_To_Rocket      ; 2DAC: F0 07    
 
+; Object is active, test if object is a Valuable, if yes, restore it
     cmp     #OBJECT_TYPE_VALUABLE           ; 2DAE: C9 0E    
-    beq     Load_Params_Rocket_Or_Fuel      ; 2DB0: F0 13    
+    beq     Load_Params_Rocket_Or_Valuable  ; 2DB0: F0 13    
 
-    jsr     Set_Obj_Rocket_Mid_Or_Valu_Typ  ; 2DB2: 20 F2 22 
+; Object is not a valuable, initialize it
+    jsr     Init_Obj_Rockt_Mid_Or_Valu_Typ  ; 2DB2: 20 F2 22 
 
 ; L_BRS_($2DB5)_($2DAC) OK
 ; L_JMP_($2DB5)_($2DC8) OK
@@ -4335,8 +4344,8 @@ Set_Obj_List_Ptr_To_Rocket
 ; ------------------------------------------
 
 ; L_BRS_($2DC5)_($2DB0) OK
-Load_Params_Rocket_Or_Fuel
-    jsr     Load_ZP_Params_Rocket_Or_Fuel   ; 2DC5: 20 C7 2B 
+Load_Params_Rocket_Or_Valuable
+    jsr     Load_ZP_Params_Rocket_Or_Val    ; 2DC5: 20 C7 2B 
     jmp     Set_Obj_List_Ptr_To_Rocket      ; 2DC8: 4C B5 2D 
 ; ------------------------------------------
 
@@ -4387,8 +4396,8 @@ Restore_Player_Rocket
     jmp     Load_Obj_New_UDG_RAM_Addr_Size  ; 2DFC: 4C 8D 37 
 ; ------------------------------------------
 
-; 19 was AF, postion of Jetman or Rocket base module? #####################################
-; 11 handled in same way as 19#############################################################
+; 19 was AF, postion of Jetman or Rocket base module? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+; 11 handled in same way as 19 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ; WOULD APPEAR ZP19 is generally object address position Y, assumedly
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
@@ -4433,9 +4442,9 @@ ROCKET_ASCEND
     jsr     Load_Object_Type_X_Y            ; 2E17: 20 D7 35 
 
 ; Test if Rocket hit top of screen yet, if yes branch
-    ldy     #ROCKET_BOT_POSITION_Y_PARAM    ; 2E1A: A0 03    
+    ldy     #ROCKET_BASE_POSITION_Y_PARAM   ; 2E1A: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E1C: B1 00    
-    cmp     #ROCKET_BOT_AT_SCREEN_TOP       ; 2E1E: C9 30    
+    cmp     #ROCKET_BASE_AT_SCREEN_TOP      ; 2E1E: C9 30    
     bcc     Rocket_At_Top                   ; 2E20: 90 12    
 
 ; Calculate and store new height i.e one pixel up screen
@@ -4501,17 +4510,17 @@ ROCKET_DESCEND
     sta     Obj_Sound_Noise_Timer           ; 2E58: 8D AC 03 
 
 ; Move object Y position down 1 pixel, stopping at bottom i.e. $AF
-    ldy     #ROCKET_BOT_POSITION_Y_PARAM    ; 2E5B: A0 03    
+    ldy     #ROCKET_BASE_POSITION_Y_PARAM   ; 2E5B: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E5D: B1 00    
     clc                                     ; 2E5F: 18       
     adc     #$01                            ; 2E60: 69 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E62: 91 00    
 
 ; Test if rocket has landed
-    cmp     #ROCKET_BOT_POSITION_Y          ; 2E64: C9 AF    
+    cmp     #ROCKET_BASE_POSITION_Y         ; 2E64: C9 AF    
     bcc     Display_Rocket                  ; 2E66: 90 44    
 
-; Set current object type to regular rocket bottom part
+; Set current object type to regular rocket base part
     ldy     #OBJECT_TYPE_PARAM              ; 2E68: A0 00    
     lda     #OBJECT_ROCKET_LANDED           ; 2E6A: A9 09    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E6C: 91 00    
@@ -4639,7 +4648,7 @@ Store_Rocket_Colour
 
 ; Rocket is fully built i.e. Base+Mid+Top
 ; Fuel Level ranges from 0 to 6, divide by 2 and store
-    ldy     #OBJ_ROCKET_FUEL_LEVEL          ; 2ED6: A0 02    
+    ldy     #OBJECT_ROCKET_FUEL_LEVEL       ; 2ED6: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ED8: B1 00    
     lsr     a                               ; 2EDA: 4A       
     sta     ZP13_Rocket_Fuel_Level_Half     ; 2EDB: 85 13    
@@ -4750,7 +4759,7 @@ Colourize_Rocket
 ; Test if rocket part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
 ; L_BRS_($2F31)_($2F98) OK
 Rocket_Part_Or_Fuel_Dropped
-    ldy     #OBJECT_OBJ_UDG_DATA_OFFSET     ; 2F31: A0 06    
+    ldy     #OBJECT_UDG_DATA_OFFSET         ; 2F31: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F33: B1 00    
     cmp     #$18                            ; 2F35: C9 18    
     beq     Fuel_Dropped                    ; 2F37: F0 3E    
@@ -4839,7 +4848,7 @@ ROCKET_PART_OR_FUEL
 
 ; Test status of the rocket part or fuel cell object
 ; 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
-    ldy     #OBJ_PICKUP_DROPPED_STATE       ; 2F91: A0 04    
+    ldy     #OBJECT_PICKUP_DROPPED_STATE    ; 2F91: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F93: B1 00    
     bit     MASK_00000100                   ; 2F95: 2C 16 20 
     bne     Rocket_Part_Or_Fuel_Dropped     ; 2F98: D0 97    
@@ -5061,7 +5070,7 @@ Test_Jetman_Above_Ship
     bcs     JMP_Setup_Obj_Addr_Rocket_Fuel  ; 3040: B0 0F    
 
 ; Jetman is above ship, set picked-up object state to Dropped/Landed
-    ldy     #OBJ_PICKUP_DROPPED_STATE       ; 3042: A0 04    
+    ldy     #OBJECT_PICKUP_DROPPED_STATE    ; 3042: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3044: B1 00    
     ora     #%00000100                      ; 3046: 09 04    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 3048: 91 00    
@@ -5183,7 +5192,7 @@ Read_ZP_Params_Player_2_Score
 ;   88   88""   o.`Y8b   88
 ;   88   888888 8bodP'   88
 
-; NEEDS MORE WORK ######################################################################
+; NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
 ; Perform Absolute on Register A containing Distance X of object from left side of first platform
@@ -5549,7 +5558,7 @@ Next_UDG_Char
 ; 88     88ood8  dP    88 88  Y8  YboodP
 ; ############################################################################################
 
-; NOT COMPLETE YET ######################################################################
+; NOT COMPLETE YET @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 ; L_BRS_($31BF)_($3203) OK
 A_Left_Right_Impact
@@ -5930,7 +5939,7 @@ D_Set_Jetman_Standing
 ; 8bodP'   88   dP""""Yb 88  Y8 8888Y"  88 88  Y8  YboodP
 ; ############################################################################################
 
-; NEEDS MORE WORK ######################################################################
+; NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
 ; L_BRS_($332C)_($3381) OK
@@ -8647,9 +8656,9 @@ Jetman_Fly_Right_2
 
 UDG_Data_Ship_Fuel_Valuables
     fdb     $3CD4                           ; 3C87: D4 3C    
-    fdb     Ship_2_Bott                     ; 3C89: 3D 3D    
-    fdb     Ship_1_Bott                     ; 3C8B: D4 3C    
-    fdb     Ship_2_Bott                     ; 3C8D: 3D 3D    
+    fdb     Ship_2_Base                     ; 3C89: 3D 3D    
+    fdb     Ship_1_Base                     ; 3C8B: D4 3C    
+    fdb     Ship_2_Base                     ; 3C8D: 3D 3D    
     fdb     Ship_1_Mid                      ; 3C8F: F7 3C    
     fdb     Ship_2_Mid                      ; 3C91: 60 3D    
     fdb     Ship_1_Mid                      ; 3C93: F7 3C    
@@ -8702,7 +8711,7 @@ UDG_Data_Ship_Fuel_Valuables
     fcb     %00010000                       ; 3CD1: 10       
     fcb     %00000001                       ; 3CD2: 01       
     fcb     %00000000                       ; 3CD3: 00       
-Ship_1_Bott
+Ship_1_Base
     fcb     %00010000                       ; 3CD4: 10       
     fcb     %11110000                       ; 3CD5: F0       
     fcb     %10110000                       ; 3CD6: B0       
@@ -8810,7 +8819,7 @@ Ship_1_Top
     fcb     %00010000                       ; 3D3A: 10       
     fcb     %00000001                       ; 3D3B: 01       
     fcb     %00000000                       ; 3D3C: 00       
-Ship_2_Bott
+Ship_2_Base
     fcb     %01011010                       ; 3D3D: 5A       
     fcb     %01011010                       ; 3D3E: 5A       
     fcb     %01010010                       ; 3D3F: 52       

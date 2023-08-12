@@ -7,6 +7,7 @@ insert ; https://github.com/phillipeaton/JETPAC_VIC-20_disassembly
 insert ; --------------------------------------------------------------------------------------------
 ;
 ; Start of disassembly instructions
+;
 comment  2000 Probably unused data leftover from the start-up code relocation, $201D is program start point
 word     2000-2003
 comment  2004
@@ -71,8 +72,8 @@ comment  201D
 comment  201D Disable Interrupts, reset stack address pointer, clear Decimal flag
 comment  2022
 comment  2022 Setup NMI interrupt vector to service routine at $201C
-deflabel 2023 NMI_Interrupt_Handler_Addr_Lo
-deflabel 2028 NMI_Interrupt_Handler_Addr_Hi
+deflabel 2023 NMI_INTERRUPT_HANDLER_ADDR_LO
+deflabel 2028 NMI_INTERRUPT_HANDLER_ADDR_HI
 comment  202C
 comment  2032
 comment  2032 Setup I/O data direction and interrupt enables
@@ -87,8 +88,8 @@ lcomment 2046 Data I/O register (User port & RS-232) i.e. not used
 lcomment 2049 Data I/O register (Keybd col scan, Cassette, Joystick)
 comment  204C
 comment  204C Setup IRQ interrupt vector to service routine at $25E0
-deflabel 204D IRQ_Interrupt_Handler_Addr_Lo
-deflabel 2052 IRQ_Interrupt_Handler_Addr_Hi
+deflabel 204D IRQ_INTERRUPT_HANDLER_ADDR_LO
+deflabel 2052 IRQ_INTERRUPT_HANDLER_ADDR_HI
 comment  2056
 comment  2056 Reset the VIC registers
 lcomment 2056 16 registers
@@ -275,6 +276,7 @@ label    218D Add_To_Laser_Start_Position_X
 comment  218D
 comment  218D Add to the laser start Position X $10 pixels to avoid drawing laser over Jetman on screen
 comment  2195
+comment  2195 NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 label    2195 Add_08_Handle_Wrap_Get_Y_Coord
 comment  219A
 label    219A DISPLAY_LASERS
@@ -435,17 +437,17 @@ label    22D1 Restore_Player_Objs_Init_Sound
 comment  22D7
 label    22D7 Reset_Level
 comment  22E3
-label    22E3 Set_Obj_Rocket_Top_Or_Fuel_Typ
+label    22E3 Init_Obj_Rockt_Top_Or_Fuel_Typ
 lcomment 22E9 ZP00/01
 word     22EA
 label    22ED Init_Objects
 break    22ED
 comment  22ED
 comment  22F2
-label    22F2 Set_Obj_Rocket_Mid_Or_Valu_Typ
+label    22F2 Init_Obj_Rockt_Mid_Or_Valu_Typ
 word     22F9
 comment  22FF
-comment  22FF Init rocket top, middle and bottom object parameters (i.e. 3 x 8 bytes) from static data table
+comment  22FF Init rocket top, middle and base object parameters (i.e. 3 x 8 bytes) from static data table
 label    22FF Init_Rocket_Obj_Params
 label    2301 Loop_Init_Rocket_Obj_Params
 comment  2301
@@ -455,7 +457,7 @@ word     2315
 label    231A Loop_Init_Objects
 comment  231A
 comment  2318
-comment  2318 Init rocket top, middle and bottom
+comment  2318 Init rocket top, middle and base
 comment  231C
 comment  2325
 comment  2325 Move 16-bit object address pointer to next object i.e. 8 bytes ahead
@@ -464,7 +466,7 @@ comment  2332
 comment  2334
 comment  2337
 label    233B Init_Rocket_Objs_Param_Table
-lcomment 233B $09=Rocket Bottom Section, Posn_X, ?, Posn_Y
+lcomment 233B $09=Rocket Base Section, Posn_X, ?, Posn_Y
 const    233B-235A
 comment  233B
 lcomment 233F $01=Pickup Status, ?, Height on Landing, ?
@@ -556,7 +558,7 @@ deflabel 23D7 PLAYER_1
 comment  23DA
 deflabel 23DB LIVES_INITIAL_PLAYER_1
 comment  23DE
-comment  23E1
+comment  23E4
 comment  23E7
 deflabel 23E8 LIVES_INITIAL_PLAYER_2
 comment  23EB
@@ -582,10 +584,10 @@ comment  2425 Three strings to display across top of screen, 1UP, HI and 2UP
 label    2425 Display_1UP_HI_2UP_Text
 label    2429 Loop_Display_1UP_HI_2UP_Text
 comment  2429
-comment  242F
-comment  2435
-comment  243B
-comment  2441
+comment  242E
+comment  2434
+comment  243A
+comment  2440
 comment  244C
 label    2450 STR_1UP
 comment  2450
@@ -670,7 +672,6 @@ label    24B9 Display_Game_Select
 binary   24BF
 comment  24C3
 comment  24C3 Set selected game options for Joystick or Keyboard (Game_Settings bit 1)
-
 comment  24CA
 lcomment 24CD ZP04/05
 lcomment 24CE X Y
@@ -1035,7 +1036,8 @@ label    283B Rocket_Flame_Frame_0_Addr_Hi
 label    283C Rocket_Flame_Frame_1_Addr_Lo
 label    283D Rocket_Flame_Frame_1_Addr_Hi
 comment  283E
-comment  283E Remove "Test_Platform_Collision"=Gems all fall through platforms and floor, reentering at top
+comment  283E Replace "Test_Platform_Collision" with nops and gems all fall
+comment  283E through platforms and floor, reentering at top
 label    283E VALUABLES
 comment  2848
 comment  2848 Move valuable Y position down screen by 2 pixels
@@ -1237,8 +1239,8 @@ const    2A02
 comment  2A05
 comment  2A05 Wait a few seconds when Game Over is displayed on screen
 comment  2A05 Delay loop $100^2 x ($100-$F8=$08) x (5+3=$08) = $400,000
-comment  2A05 \                                           = 4,194,304 cycles @ 1.108MHz PAL
-comment  2A05 \                                           = 3.785 Seconds
+comment  2A05 \                                               = 4,194,304 cycles @ 1.108MHz PAL
+comment  2A05 \                                               = 3.785 Seconds
 label    2A05 Delay_Loop_Game_Over
 lcomment 2A05 5 cycles
 lcomment 2A07 3 cycles when taken, 2 when not taken
@@ -1476,12 +1478,11 @@ comment  2BC2 Make the valuble type $2x, used as an offset into the UDG data
 label    2BC2 Store_Valuable_Type
 binary   2BC3
 comment  2BC7
-comment  2BC7 $03C0 object starts as Rocket Module Middle, then becomes Fuel Cell
-label    2BC7 Load_ZP_Params_Rocket_Or_Fuel
+comment  2BC7 $03C0 object starts as Rocket Module Middle, then becomes Valuable
+label    2BC7 Load_ZP_Params_Rocket_Or_Val
 lcomment 2BCD ZP00/01
 const    2BCD
 word     2BCE
-const    2BCE
 lcomment 2BCE Object Address
 comment  2BD4
 comment  2BD4 Object's valuable type used as an index into the UDG data
@@ -1498,8 +1499,8 @@ break    2BE8-2BF7
 comment  2BF8
 comment  2BF8 Store Obj_Laser_0 address in ZP_08/09 ($0388)
 label    2BF8 Test_Laser_Hits_1
-deflabel 2BF9 OBJ_LASER_0_LO
-deflabel 2BFD OBJ_LASER_0_HI
+deflabel 2BF9 OBJECT_LASER_0_LO
+deflabel 2BFD OBJECT_LASER_0_HI
 comment  2C00
 comment  2C00 Store number of lasers (4) for processing to ZP_02
 deflabel 2C01 MAX_LASERS
@@ -1523,7 +1524,7 @@ comment  2C27 Register Y becomes Laser Position Y parameter
 comment  2C27 Compare laser and object Position Y value, if CMP fails, return
 comment  2C31
 comment  2C31 Register Y becomes Laser Position X parameter
-comment  2C31 Zore the bottom 3 bits of Position X, making it a character-sized column reference
+comment  2C31 Store the bottom 3 bits of Position X, making it a character-sized column reference
 comment  2C31 Test if object is to the left or right of the Laser object
 binary   2C35
 comment  2C3D
@@ -1608,8 +1609,8 @@ deflabel 2CED JETMAN_STANDING
 comment  2CF1
 comment  2CF1 Set Object list address pointer to first alien object
 label    2CF1 Init_Alien_Object_Next
-deflabel 2CF2 OBJ_ALIEN_0_LO
-deflabel 2CF6 OBJ_ALIEN_0_HI
+deflabel 2CF2 OBJECT_ALIEN_0_LO
+deflabel 2CF6 OBJECT_ALIEN_0_HI
 comment  2CF9
 comment  2CF9 Setup next alien objects, to a maximum of 6
 comment  2CF9 DEBUG Set $2CFA to 1 to spawn only 1 alien
@@ -1721,14 +1722,17 @@ comment  2D9C Test_Collision_Position_Y, note different collision range for abov
 label    2D9C Test_Collision_Position_Y
 deflabel 2D9D HITBOX_Y_ABOVE
 comment  2DA1
-comment  2DA1 This set of routies needs more work ######################################################
+comment  2DA1 Test if Rocket Top or Fuel object is inactive, if yes, skip initialization
 label    2DA1 Restore_Player_Objects
 comment  2DA6
 comment  2DA9
+comment  2DA9 Test if Rocket Middle or Valuable object is inactive, if yes, skip valuable test
 label    2DA9 Restore_Player_Objects_1
 comment  2DAE
+comment  2DAE Object is active, test if object is a Valuable, if yes, restore it
 deflabel 2DAF OBJECT_TYPE_VALUABLE
 comment  2DB2
+comment  2DB2 Object is not a valuable, initialize it
 comment  2DB5
 label    2DB5 Set_Obj_List_Ptr_To_Rocket
 lcomment 2DBB ZP00/01
@@ -1736,7 +1740,7 @@ lcomment 2DBC Object Address
 word     2DBC
 comment  2DBF
 comment  2DC5
-label    2DC5 Load_Params_Rocket_Or_Fuel
+label    2DC5 Load_Params_Rocket_Or_Valuable
 comment  2DCB
 label    2DCB Set_Load_Obj_Type_X_Y_Colour
 comment  2DD1
@@ -1751,8 +1755,8 @@ binary   2DED
 comment  2DF1
 comment  2DF9
 comment  2DFF
-comment  2DFF 19 was AF, postion of Jetman or Rocket base module? #####################################
-comment  2DFF 11 handled in same way as 19#############################################################
+comment  2DFF 19 was AF, postion of Jetman or Rocket base module? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+comment  2DFF 11 handled in same way as 19 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 comment  2DFF WOULD APPEAR ZP19 is generally object address position Y, assumedly
 label    2DFF Decrement_Rocket_Position_Y
 comment  2E06
@@ -1763,8 +1767,8 @@ comment  2E17 Aliens keep moving also
 label    2E17 ROCKET_ASCEND
 comment  2E1A
 comment  2E1A Test if Rocket hit top of screen yet, if yes branch
-deflabel 2E1B ROCKET_BOT_POSITION_Y_PARAM
-deflabel 2E1F ROCKET_BOT_AT_SCREEN_TOP
+deflabel 2E1B ROCKET_BASE_POSITION_Y_PARAM
+deflabel 2E1F ROCKET_BASE_AT_SCREEN_TOP
 comment  2E22
 comment  2E22 Calculate and store new height i.e one pixel up screen
 comment  2E27
@@ -1790,12 +1794,12 @@ comment  2E51
 comment  2E51 Trigger rocket flight sound
 comment  2E5B
 comment  2E5B Move object Y position down 1 pixel, stopping at bottom i.e. $AF
-deflabel 2E5C ROCKET_BOT_POSITION_Y_PARAM
+deflabel 2E5C ROCKET_BASE_POSITION_Y_PARAM
 comment  2E64
 comment  2E64 Test if rocket has landed
-deflabel 2E65 ROCKET_BOT_POSITION_Y
+deflabel 2E65 ROCKET_BASE_POSITION_Y
 comment  2E68
-comment  2E68 Set current object type to regular rocket bottom part
+comment  2E68 Set current object type to regular rocket base part
 deflabel 2E69 OBJECT_TYPE_PARAM
 deflabel 2E6B OBJECT_ROCKET_LANDED
 comment  2E71
@@ -1841,7 +1845,7 @@ comment  2ED2 If rocket not yet built, colourize what's built with white
 comment  2ED6
 comment  2ED6 Rocket is fully built i.e. Base+Mid+Top
 comment  2ED6 Fuel Level ranges from 0 to 6, divide by 2 and store
-deflabel 2ED7 OBJ_ROCKET_FUEL_LEVEL
+deflabel 2ED7 OBJECT_ROCKET_FUEL_LEVEL
 comment  2EDD
 comment  2EDD If no fuel to display yet, colourize it all with white
 comment  2EDF
@@ -1888,7 +1892,7 @@ comment  2F30
 comment  2F31
 comment  2F31 Test if rocket part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
 label    2F31 Rocket_Part_Or_Fuel_Dropped
-deflabel 2F32 OBJECT_OBJ_UDG_DATA_OFFSET
+deflabel 2F32 OBJECT_UDG_DATA_OFFSET
 comment  2F39
 comment  2F39 Rocket part dropped, add current Y postion to landed Y position
 comment  2F39 and test to see if object has hit the ground
@@ -1934,7 +1938,7 @@ label    2F8E ROCKET_PART_OR_FUEL
 comment  2F91
 comment  2F91 Test status of the rocket part or fuel cell object
 comment  2F91 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
-deflabel 2F92 OBJ_PICKUP_DROPPED_STATE
+deflabel 2F92 OBJECT_PICKUP_DROPPED_STATE
 comment  2F9A
 comment  2F9F
 comment  2FA4
@@ -2010,7 +2014,7 @@ label    303E Test_Jetman_Above_Ship
 deflabel 303F OBJECT_OVER_SHIP_HITBOX_X
 comment  3042
 comment  3042 Jetman is above ship, set picked-up object state to Dropped/Landed
-deflabel 3043 OBJ_PICKUP_DROPPED_STATE
+deflabel 3043 OBJECT_PICKUP_DROPPED_STATE
 binary   3047
 comment  304A
 comment  304A Set the dropped object's Position X to the same as the rocket base, so they line up on-screen
@@ -2050,7 +2054,7 @@ lcomment 3095 Player 2 Score in ZP
 word     3095
 
 comment  309B
-comment  309B NEEDS MORE WORK ######################################################################
+comment  309B NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 comment  309B
 
 comment  309B
@@ -2263,7 +2267,7 @@ lcomment 31B9 X Y #Num_middle_chars
 break    31BC
 lcomment 31BC X Y #Num_middle_chars
 comment  31BF
-comment  31BF NOT COMPLETE YET ######################################################################
+comment  31BF NOT COMPLETE YET @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 comment  31BF
 label    31BF A_Left_Right_Impact
 deflabel 31C0 JETMAN_DIRECTION_X_PARAM
@@ -2314,7 +2318,7 @@ label    3224 SKIP_3224
 comment  3228
 label    3228 N_Flying_Left
 comment  332C
-comment  332C NEEDS MORE WORK ######################################################################
+comment  332C NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 comment  332C
 comment  3230
 comment  323E
@@ -3150,10 +3154,10 @@ label    3EB8 Alien_Bubble_1
 label    3EEB Alien_Bubble_2
 label    3F0E Alien_Cross_1
 label    3F41 Alien_Cross_2
-label    3CD4 Ship_1_Bott
+label    3CD4 Ship_1_Base
 label    3CF7 Ship_1_Mid
 label    3D1A Ship_1_Top
-label    3D3D Ship_2_Bott
+label    3D3D Ship_2_Base
 label    3D60 Ship_2_Mid
 label    3D83 Ship_2_Top
 label    3D9C Fuel_Cell
