@@ -43,16 +43,16 @@ label      1C ZP_Jetman_Action               ; FF=none, x7=shooting, Bx=left, 7x
                                              ; 0111 xxxx = Walk right
 
 label      1E ZP_Ship_UDG_Addr_Offset        ;
-label      1F ZP_Ship_UDG_Addr_Colour?       ;
+label      1F ZP_Ship_Parts_Counter          ;
 label      20 ZP_IRQ_Occurred                ;
 label      21 ZP_Alien_Spawn_Counter         ; When reaches $04, Alien spawns, incremented by Explosions and Lasers
 label      22 ZP_Obj_List_Ptr_Save_IRQ_Lo    ;
 label      23 ZP_Obj_List_Ptr_Save_IRQ_Hi    ;
 label      24 ZP_Obj_List_Ptr_Save_Lo        ;
 label      25 ZP_Obj_List_Ptr_Save_Hi        ;
-label      26 ZP_Rocket_Flame_State          ; Turns off at take-off and landing
-label      27 ZP_Rocket_Flame_UDG_Toggle     ; Counts up throughout the flight, used for flame animation
-label      0028-0039 ZP_Obj_Rocket_Saved     ;
+label      26 ZP_Ship_Flame_State            ; Turns off at take-off and landing
+label      27 ZP_Ship_Flame_UDG_Toggle       ; Counts up throughout the flight, used for flame animation
+label      0028-0039 ZP_Obj_Ship_Saved       ;
 label      40 ZP_Param_Addr_Lo               ;
 label      41 ZP_Param_Addr_Hi               ;
 
@@ -119,14 +119,14 @@ label    0388 Obj_Laser_0
 
 ; Byte 00/08= object type:
 ;        03 = Explosion->00
-;        04 = Rocket_Part/Fuel
+;        04 = Ship_Part/Fuel
 ;        05 = Wave 0 Fuzzball
 ;        06 = Wave 3 Saucer
 ;        07 = Wave 2 Sphere
 ;        08 = Wave 1 Cross
-;        09 = Rocket Bottom Part
-;        0A = Rocket Ascend
-;        0B = Rocket Descend
+;        09 = Ship Bottom Part
+;        0A = Ship Ascend
+;        0B = Ship Descend
 ;        0C = Sound
 ;        0D = ???
 ;        0E = Valuable
@@ -144,37 +144,37 @@ label    03AE Obj_Sound_Laser_Timer
 ;label   03AF Obj_Sound_7 ; Not used
                              ;        0  1  2  3  4  5  6  7
                              ; 03B0  09 70 00 AF 01 00 00 1C
-label    03B0 Obj_Rocket_Base     ; Type = 09, 0A when ascending, 0B when decending
-label    03B1 Obj_Rocket_Base_X
-label    03B2 Obj_Rocket_Base_Fuel_Level ; Number of fuel cells, 0=empty, 6=full
-label    03B3 Obj_Rocket_Base_Y
-label    03B4 Obj_Rocket_Base_Parts_Counter ; 1=Base only, 2=Base+Mid, 3=Base+Mid+Top
-;label   03B5 Obj_Rocket_5
-;label   03B6 Obj_Rocket_6
-;label   03B7 Obj_Rocket_7
+label    03B0 Obj_Ship_Base     ; Type = 09, 0A when ascending, 0B when decending
+label    03B1 Obj_Ship_Base_X
+label    03B2 Obj_Ship_Base_Fuel_Level ; Number of fuel cells, 0=empty, 6=full
+label    03B3 Obj_Ship_Base_Y
+label    03B4 Obj_Ship_Base_Parts_Counter ; 1=Base only, 2=Base+Mid, 3=Base+Mid+Top
+;label   03B5 Obj_Ship_5
+;label   03B6 Obj_Ship_6
+;label   03B7 Obj_Ship_7
 
-; Rocket Part Top (RPT), then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
-label    03B8 Obj_Rocket_Top_Or_Fuel_Type ; Type = 04 when active, else 00
-label    03B9 Obj_Rocket_Top_Or_Fuel_X
-;label   03BA Obj_Rocket_Top_Or_Fuel_2
-;label   03BB Obj_Rocket_Top_Or_Fuel_Y
-label    03BC Obj_Rocket_Top_Or_Fuel_Status ; Rocket part Ready for pick-up/picked-up/Dropping
+; Ship Part Top (RPT), then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
+label    03B8 Obj_Ship_Top_Or_Fuel_Type ; Type = 04 when active, else 00
+label    03B9 Obj_Ship_Top_Or_Fuel_X
+;label   03BA Obj_Ship_Top_Or_Fuel_2
+;label   03BB Obj_Ship_Top_Or_Fuel_Y
+label    03BC Obj_Ship_Top_Or_Fuel_Status ; Ship part Ready for pick-up/picked-up/Dropping
                                             ; xxxx_xxx1 = Landed/Stationary
                                             ; xxxx_xx1x = Picked-up by Jetman
                                             ; xxxx_x1xx = Dropping
-;label   03BD Obj_Rocket_Top_Or_Fuel_5
-;label   03BE Obj_Rocket_Top_Or_Fuel_6 ; OBJECT_UDG_DATA_INDEX_PARAM
-;label   03BF Obj_Rocket_Top_Or_Fuel_7
+;label   03BD Obj_Ship_Top_Or_Fuel_5
+;label   03BE Obj_Ship_Top_Or_Fuel_6 ; OBJECT_UDG_DATA_INDEX_PARAM
+;label   03BF Obj_Ship_Top_Or_Fuel_7
 
-; Rocket Part Middle, then a valuable e.g. 03C0  0E 58 00 5E 00 03 28 18
-label    03C0 Obj_Rocket_Mid_Or_Valuable_Typ ;
-label    03C1 Obj_Rocket_Mid_Or_Valuable_X
-;label   03C2 Obj_Rocket_Mid_Or_Valuable_2
-;label   03C3 Obj_Rocket_Mid_Or_Valuable_Y
-label    03C4 Obj_Rocket_Mid_Or_Valu_Status
-;label   03C5 Obj_Rocket_Mid_Or_Valu_Colour
-label    03C6 Obj_Rocket_Mid_Or_Valu_UDG_Idx   ; OBJECT_UDG_DATA_INDEX_PARAM
-label    03C7 Obj_Rocket_Mid_Or_Valuable_7
+; Ship Part Middle, then a valuable e.g. 03C0  0E 58 00 5E 00 03 28 18
+label    03C0 Obj_Ship_Mid_Or_Valuable_Typ ;
+label    03C1 Obj_Ship_Mid_Or_Valuable_X
+;label   03C2 Obj_Ship_Mid_Or_Valuable_2
+;label   03C3 Obj_Ship_Mid_Or_Valuable_Y
+label    03C4 Obj_Ship_Mid_Or_Valu_Status
+;label   03C5 Obj_Ship_Mid_Or_Valu_Colour
+label    03C6 Obj_Ship_Mid_Or_Valu_UDG_Idx   ; OBJECT_UDG_DATA_INDEX_PARAM
+label    03C7 Obj_Ship_Mid_Or_Valuable_7
 
 
 ; Byte 00/08= object type

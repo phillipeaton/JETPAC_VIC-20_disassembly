@@ -11,7 +11,7 @@
 /ZP02                            equ     $0002/a ZP02_Num_Lasers_Countdown       equ     $0002
 /ZP02                            equ     $0002/a ZP02_Num_Of_Bytes_To_Fill_Lo    equ     $0002
 /ZP02                            equ     $0002/a ZP02_Object_Old_Height_Index    equ     $0002
-/ZP02                            equ     $0002/a ZP02_Rocket_Parts_Count         equ     $0002
+/ZP02                            equ     $0002/a ZP02_Ship_Parts_Count           equ     $0002
 /ZP02                            equ     $0002/a ZP02_Score_Byte_Hi              equ     $0002
 /ZP03                            equ     $0003/a ZP03_Num_Of_Bytes_To_Fill_Hi    equ     $0003
 /ZP03                            equ     $0003/a ZP03_Object_Height_Pixels       equ     $0003
@@ -102,7 +102,7 @@
 /ZP13                            equ     $0013/a ZP13_Laser_Position_Y           equ     $0013
 /ZP13                            equ     $0013/a ZP13_Obj_Landed_Posn_Y_Offset   equ     $0013
 /ZP13                            equ     $0013/a ZP13_Object_Lines_To_Erase      equ     $0013
-/ZP13                            equ     $0013/a ZP13_Rocket_Fuel_Level_Half     equ     $0013
+/ZP13                            equ     $0013/a ZP13_Ship_Fuel_Level_Half       equ     $0013
 /ZP13                            equ     $0013/a ZP13_Temp                       equ     $0013
 /ZP13                            equ     $0013/a ZP13_Keyboard_Data              equ     $0013
 /ZP14                            equ     $0014/a ZP14_Laser_Decay_Patten_Data_0  equ     $0014
@@ -119,7 +119,7 @@
 /ZP17                            equ     $0017/a ZP17_Object_Size_Y_Pixels       equ     $0017
 /ZP18                            equ     $0018/a ZP18_Object_Flame_Position_X    equ     $0018
 /ZP18                            equ     $0018/a ZP18_Object_Position_X          equ     $0018
-/ZP19                            equ     $0019/a ZP19_Obj_Landed_Position_Y      equ     $0019
+/ZP19                            equ     $0019/a ZP19_Object_Landed_Position_Y   equ     $0019
 /ZP19                            equ     $0019/a ZP19_Object_Flame_Position_Y    equ     $0019
 /ZP19                            equ     $0019/a ZP19_Object_New_Position_Y      equ     $0019
 /ZP19                            equ     $0019/a ZP19_Object_Position_Y          equ     $0019
@@ -191,7 +191,7 @@
 /; 277A/,/; 27A9/s/(ZP_Obj_List_Ptr_Lo),y          /(ZP00_Hi_Score_Addr),y          /
 /; 277A/,/; 27A9/s/(ZP08),y                        /(ZP08_Player_Score_Addr),y      /
 
-# Display_Rocket_Flame
+# Display_Ship_Flame
 /; 27AA/,/; 2839/s/ZP04                            /ZP04_Object_Position_X          /
 /; 27AA/,/; 2839/s/ZP05                            /ZP05_Object_Position_Y          /
 /; 27AA/,/; 2839/s/(ZP0C),y                        /(ZP0C_Colour_RAM_Tile_Addr_Lo),y/
@@ -236,25 +236,29 @@
 # Test_Jetman_Object_Collide
 /; 2D58/,/; 2D9E/s/ZP02                            /ZP02_Collision_Status           /
 
-# ROCKET_BOTTOM_MODULE
+# Decrement_Ship_Position_
+/; 2DFF/,/; 2E16/s/ZP11                            /ZP11_Object_Old_Position_Y      /
+/; 2DFF/,/; 2E16/s/ZP19                            /ZP19_Object_New_Position_Y      /
+
+# SHIP_BOTTOM_MODULE
 /; 2E7A/,/; 2E7C/s/ZP02                            /ZP02_Collision_Status           /
 
-# Colourize_Rocket
-/; 2EAC/,/; 2F30/s/ZP02                            /ZP02_Rocket_Parts_Count         /
+# Colourize_Ship
+/; 2EAC/,/; 2F30/s/ZP02                            /ZP02_Ship_Parts_Count           /
 /; 2EAC/,/; 2F30/s/ZP04                            /ZP04_Colour_Tile_Position_X     /
 /; 2EAC/,/; 2F30/s/ZP05                            /ZP05_Colour_Tile_Position_Y     /
 /; 2EAC/,/; 2F30/s/ZP0C                            /ZP0C_Colour_RAM_Tile_Addr_Lo    /
 /; 2EAC/,/; 2F30/s/(ZP0C),y                        /(ZP0C_Colour_RAM_Tile_Addr_Lo),y/
 /; 2EAC/,/; 2F30/s/ZP0D                            /ZP0D_Colour_RAM_Tile_Addr_Lo    /
-/; 2EAC/,/; 2F30/s/ZP13                            /ZP13_Rocket_Fuel_Level_Half     /
+/; 2EAC/,/; 2F30/s/ZP13                            /ZP13_Ship_Fuel_Level_Half       /
 /; 2EAC/,/; 2F30/s/ZP1B                            /ZP1B_Object_Colour              /
 
-# Rocket_Part_Or_Fuel_Dropped
+# Ship_Part_Or_Fuel_Dropped
 /; 2F31/,/; 2F8B/s/ZP13                            /ZP13_Obj_Landed_Posn_Y_Offset   /
-/; 2F31/,/; 2F8B/s/ZP19                            /ZP19_Obj_Landed_Position_Y      /
+/; 2F31/,/; 2F8B/s/ZP19                            /ZP19_Object_Landed_Position_Y   /
 /; 2E7A/,/; 2E7C/s/ZP02                            /ZP02_Collision_Status           /
 
-# ROCKET_PART_OR_FUEL
+# SHIP_PART_OR_FUEL
 /; 2FA7/,/; 2FB0/s/ZP02                            /ZP02_Collision_Status           /
 
 # Update_Score

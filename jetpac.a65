@@ -44,16 +44,16 @@ ZP1A                            equ     $001A
 ZP1B                            equ     $001B
 ZP_Jetman_Action                equ     $001C
 ZP_Ship_UDG_Addr_Offset         equ     $001E
-ZP_Ship_UDG_Addr_Colour?        equ     $001F
+ZP_Ship_Parts_Counter           equ     $001F
 ZP_IRQ_Occurred                 equ     $0020
 ZP_Alien_Spawn_Counter          equ     $0021
 ZP_Obj_List_Ptr_Save_IRQ_Lo     equ     $0022
 ZP_Obj_List_Ptr_Save_IRQ_Hi     equ     $0023
 ZP_Obj_List_Ptr_Save_Lo         equ     $0024
 ZP_Obj_List_Ptr_Save_Hi         equ     $0025
-ZP_Rocket_Flame_State           equ     $0026
-ZP_Rocket_Flame_UDG_Toggle      equ     $0027
-ZP_Obj_Rocket_Saved             equ     $0028
+ZP_Ship_Flame_State             equ     $0026
+ZP_Ship_Flame_UDG_Toggle        equ     $0027
+ZP_Obj_Ship_Saved               equ     $0028
 ZP_Param_Addr_Lo                equ     $0040
 ZP_Param_Addr_Hi                equ     $0041
 ZP_Game_Select_F1_Flash         equ     $0045
@@ -88,18 +88,18 @@ Obj_Sound_Noise                 equ     $03AB
 Obj_Sound_Noise_Timer           equ     $03AC
 Obj_Sound_Laser                 equ     $03AD
 Obj_Sound_Laser_Timer           equ     $03AE
-Obj_Rocket_Base                 equ     $03B0
-Obj_Rocket_Base_X               equ     $03B1
-Obj_Rocket_Base_Fuel_Level      equ     $03B2
-Obj_Rocket_Base_Y               equ     $03B3
-Obj_Rocket_Base_Parts_Counter   equ     $03B4
-Obj_Rocket_Top_Or_Fuel_Type     equ     $03B8
-Obj_Rocket_Top_Or_Fuel_X        equ     $03B9
-Obj_Rocket_Top_Or_Fuel_Status   equ     $03BC
-Obj_Rocket_Mid_Or_Valuable_Typ  equ     $03C0
-Obj_Rocket_Mid_Or_Valuable_X    equ     $03C1
-Obj_Rocket_Mid_Or_Valu_Status   equ     $03C4
-Obj_Rocket_Mid_Or_Valu_UDG_Idx  equ     $03C6
+Obj_Ship_Base                   equ     $03B0
+Obj_Ship_Base_X                 equ     $03B1
+Obj_Ship_Base_Fuel_Level        equ     $03B2
+Obj_Ship_Base_Y                 equ     $03B3
+Obj_Ship_Base_Parts_Counter     equ     $03B4
+Obj_Ship_Top_Or_Fuel_Type       equ     $03B8
+Obj_Ship_Top_Or_Fuel_X          equ     $03B9
+Obj_Ship_Top_Or_Fuel_Status     equ     $03BC
+Obj_Ship_Mid_Or_Valuable_Typ    equ     $03C0
+Obj_Ship_Mid_Or_Valuable_X      equ     $03C1
+Obj_Ship_Mid_Or_Valu_Status     equ     $03C4
+Obj_Ship_Mid_Or_Valu_UDG_Idx    equ     $03C6
 Obj_Alien_0_0                   equ     $03C8
 UDG_RAM                         equ     $1000
 Player_1_Score_UDG_RAM_Addr     equ     $1008
@@ -177,19 +177,19 @@ OBJECT_UDG_DATA_INDEX_PARAM     equ     $06
 FUEL_POSITION_Y_WHEN_LANDED     equ     $A8
 OBJECT_UDG_DATA_OFFSET          equ     $06
 COLUMN_INDEX                    equ     $00
-OBJECT_ROCKET_POSITION_Y_PARAM  equ     $03
-OBJECT_ROCKET_POSITION_X_PARAM  equ     $01
+OBJECT_SHIP_POSITION_Y_PARAM    equ     $03
+OBJECT_SHIP_POSITION_X_PARAM    equ     $01
 COLOUR_WHITE                    equ     $01
 COLOUR_PURPLE                   equ     $04
-OBJECT_ROCKET_FUEL_LEVEL        equ     $02
-OBJ_ROCKET_PARTS_COUNTER_PARAM  equ     $04
-ROCKET_ASCENDING                equ     $0A
+OBJECT_SHIP_FUEL_LEVEL          equ     $02
+OBJ_SHIP_PARTS_COUNTER_PARAM    equ     $04
+SHIP_ASCENDING                  equ     $0A
 FUELLED_UP                      equ     $06
-OBJECT_ROCKET_LANDED            equ     $09
-ROCKET_BASE_POSITION_Y          equ     $AF
-ROCKET_BASE_POSITION_Y_PARAM    equ     $03
-OBJECT_ROCKET_DESCEND           equ     $0B
-ROCKET_BASE_AT_SCREEN_TOP       equ     $30
+OBJECT_SHIP_LANDED              equ     $09
+SHIP_BASE_POSITION_Y            equ     $AF
+SHIP_BASE_POSITION_Y_PARAM      equ     $03
+OBJECT_SHIP_DESCEND             equ     $0B
+SHIP_BASE_AT_SCREEN_TOP         equ     $30
 OBJECT_TYPE_VALUABLE            equ     $0E
 HITBOX_Y_ABOVE                  equ     $12
 COLLISION                       equ     $80
@@ -238,9 +238,9 @@ EXPLOSION_ANIMATION_FRAME       equ     $04
 OBJECT_TYPE_EXPLOSION           equ     $03
 COLOUR_BLACK                    equ     $00
 FLAME_SPACE_AVAILABLE           equ     $AF
-OBJECT_TYPE_ROCKET_ASCEND       equ     $0A
+OBJECT_TYPE_SHIP_ASCEND         equ     $0A
 WORD_SIZE                       equ     $02
-OBJECT_ROCKET_ADDRESS           equ     $B0
+OBJECT_SHIP_ADDRESS             equ     $B0
 OPTION_TEXT_ROWS                equ     $05
 TEXT_POSITION_X                 equ     $18
 LIVES_INITIAL_PLAYER_2          equ     $05
@@ -791,12 +791,12 @@ Handle_Wrap_Get_Y_Cooord
     dey                                     ; 21D3: 88       
 
 ; Laser Position Y in accumulator, test if laser shot positions near bottom of screen
-; i.e. at or below height of fully-built rocket, branch if it is near the bottom
+; i.e. at or below height of fully-built ship, branch if it is near the bottom
     cmp     #%10000000                      ; 21D4: C9 80    
     bcs     Save_Laser_Position_X           ; 21D6: B0 04    
 
 ; Test if laser address in UDG RAM is empty, jump if not empty
-; This stops you firing through objects when laser is above the top of the fully-built rocket
+; This stops you firing through objects when laser is above the top of the fully-built ship
     lda     (ZP04),y                        ; 21D8: B1 04    
     bne     UDG_RAM_Zero_Bit_2              ; 21DA: D0 20    
 
@@ -1053,7 +1053,7 @@ Reset_Level_Add_Extra_Life
     bne     Restore_Player_Objs_Init_Sound  ; 22C1: D0 0E    
 
 ; Add extra life
-    jsr     Init_Rocket_Obj_Params_Init     ; 22C3: 20 0B 23 
+    jsr     Init_Ship_Obj_Params_Init       ; 22C3: 20 0B 23 
     inc     ZP_Num_Lives_Active_Player      ; 22C6: E6 5A    
     jsr     Init_Next_Jetman_Lives_Scores   ; 22C8: 20 5B 23 
 
@@ -1093,7 +1093,7 @@ Init_Obj_Rockt_Top_Or_Fuel_Typ
     jsr     Save_Obj_List_Ptr               ; 22E3: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22E6: 20 9D 25 
     fcb     $00                             ; 22E9: 00        ZP00/01
-    fdb     Obj_Rocket_Top_Or_Fuel_Type     ; 22EA: B8 03    
+    fdb     Obj_Ship_Top_Or_Fuel_Type       ; 22EA: B8 03    
     fcb     $FF                             ; 22EC: FF       
 
 ; L_JMP_($22ED)_($22FC) OK
@@ -1107,36 +1107,36 @@ Init_Obj_Rockt_Mid_Or_Valu_Typ
     jsr     Save_Obj_List_Ptr               ; 22F2: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22F5: 20 9D 25 
     fcb     $00                             ; 22F8: 00       
-    fdb     Obj_Rocket_Mid_Or_Valuable_Typ  ; 22F9: C0 03    
+    fdb     Obj_Ship_Mid_Or_Valuable_Typ    ; 22F9: C0 03    
     fcb     $FF                             ; 22FB: FF       
     jmp     Init_Objects                    ; 22FC: 4C ED 22 
 ; ------------------------------------------
 
-; Init rocket top, middle and base object parameters (i.e. 3 x 8 bytes) from static data table
+; Init ship top, middle and base object parameters (i.e. 3 x 8 bytes) from static data table
 ; L_JSR_($22FF)_($230B) OK
 ; L_JSR_($22FF)_($23DE) OK
-Init_Rocket_Obj_Params
+Init_Ship_Obj_Params
     ldx     #$17                            ; 22FF: A2 17    
 
 ; L_BRS_($2301)_($2308) OK
-Loop_Init_Rocket_Obj_Params
-    lda     Init_Rocket_Objs_Param_Table,x  ; 2301: BD 3B 23 
-    sta     Obj_Rocket_Base,x               ; 2304: 9D B0 03 
+Loop_Init_Ship_Obj_Params
+    lda     Init_Ship_Objs_Param_Table,x    ; 2301: BD 3B 23 
+    sta     Obj_Ship_Base,x                 ; 2304: 9D B0 03 
     dex                                     ; 2307: CA       
-    bpl     Loop_Init_Rocket_Obj_Params     ; 2308: 10 F7    
+    bpl     Loop_Init_Ship_Obj_Params       ; 2308: 10 F7    
     rts                                     ; 230A: 60       
 ; ==========================================
 
 ; L_JSR_($230B)_($22C3) OK
-Init_Rocket_Obj_Params_Init
-    jsr     Init_Rocket_Obj_Params          ; 230B: 20 FF 22 
+Init_Ship_Obj_Params_Init
+    jsr     Init_Ship_Obj_Params            ; 230B: 20 FF 22 
     jsr     Save_Obj_List_Ptr               ; 230E: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2311: 20 9D 25 
     fcb     $00                             ; 2314: 00       
-    fdb     Init_Rocket_Objs_Param_Table    ; 2315: 3B 23    
+    fdb     Init_Ship_Objs_Param_Table      ; 2315: 3B 23    
     fcb     $FF                             ; 2317: FF       
 
-; Init rocket top, middle and base
+; Init ship top, middle and base
     ldx     #$03                            ; 2318: A2 03    
 
 ; L_JMP_($231A)_($22EF) OK
@@ -1169,14 +1169,14 @@ Loop_Init_Objects
     rts                                     ; 233A: 60       
 ; ==========================================
 
-Init_Rocket_Objs_Param_Table
-    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Rocket Base Section, Posn_X, ?, Posn_Y
+Init_Ship_Objs_Param_Table
+    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Ship Base Section, Posn_X, ?, Posn_Y
     fcb     $01,$00,$00,$1C                 ; 233F: 01 00 00 1C  $01=Pickup Status, ?, Height on Landing, ?
 
-    fcb     $04,$20,$00,$3F                 ; 2343: 04 20 00 3F  $04=Rocket Top Section
+    fcb     $04,$20,$00,$3F                 ; 2343: 04 20 00 3F  $04=Ship Top Section
     fcb     $00,$01,$10,$18                 ; 2347: 00 01 10 18 
 
-    fcb     $04,$50,$00,$5F                 ; 234B: 04 50 00 5F  $04=Rocket Middle Section
+    fcb     $04,$50,$00,$5F                 ; 234B: 04 50 00 5F  $04=Ship Middle Section
     fcb     $01,$01,$08,$18                 ; 234F: 01 01 08 18 
 
 
@@ -1337,7 +1337,7 @@ LDA_7F_Set_Cntdn_Dec_Num_Lives
 ; 88  .o 88   YbdP   88""   o.`Y8b     Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 ; 88ood8 88    YP    888888 8bodP'      YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
-; Set Active Player, initial lives for both players and Rocket object parameters
+; Set Active Player, initial lives for both players and ship object parameters
 ; L_JSR_($23D4)_($25D7) OK
 Setup_Player_Lives
     ldy     #$02                            ; 23D4: A0 02    
@@ -1350,8 +1350,8 @@ Loop_Setup_Player_Lives
     lda     #LIVES_INITIAL_PLAYER_1         ; 23DA: A9 04    
     sta     ZP_Num_Lives_Active_Player      ; 23DC: 85 5A    
 
-    jsr     Init_Rocket_Obj_Params          ; 23DE: 20 FF 22 
-    jsr     Swap_Player_And_Obj_Rocket      ; 23E1: 20 F5 23 
+    jsr     Init_Ship_Obj_Params            ; 23DE: 20 FF 22 
+    jsr     Swap_Player_And_Obj_Ship        ; 23E1: 20 F5 23 
 
     dey                                     ; 23E4: 88       
     bne     Loop_Setup_Player_Lives         ; 23E5: D0 EF    
@@ -1370,10 +1370,10 @@ Setup_Player_Lives_RTS
     rts                                     ; 23F4: 60       
 ; ==========================================
 
-; When active player changes, swap current active/inactive player wave and rocket object data
+; When active player changes, swap current active/inactive player wave and ship object data
 ; L_JSR_($23F5)_($23E1) OK
 ; L_JSR_($23F5)_($29DB) OK
-Swap_Player_And_Obj_Rocket
+Swap_Player_And_Obj_Ship
     ldx     #$01                            ; 23F5: A2 01    
 ; L_BRS_($23F7)_($2402) OK
 Swap_Player
@@ -1391,17 +1391,17 @@ Swap_Player
     ldx     #$17                            ; 2404: A2 17    
 
 ; L_BRS_($2406)_($2413) OK
-Loop_Swap_Rocket_Object
-    lda     Obj_Rocket_Base,x               ; 2406: BD B0 03 
+Loop_Swap_Ship_Object
+    lda     Obj_Ship_Base,x                 ; 2406: BD B0 03 
 
     pha                                     ; 2409: 48       
-    lda     ZP_Obj_Rocket_Saved,x           ; 240A: B5 28    
-    sta     Obj_Rocket_Base,x               ; 240C: 9D B0 03 
+    lda     ZP_Obj_Ship_Saved,x             ; 240A: B5 28    
+    sta     Obj_Ship_Base,x                 ; 240C: 9D B0 03 
     pla                                     ; 240F: 68       
 
-    sta     ZP_Obj_Rocket_Saved,x           ; 2410: 95 28    
+    sta     ZP_Obj_Ship_Saved,x             ; 2410: 95 28    
     dex                                     ; 2412: CA       
-    bpl     Loop_Swap_Rocket_Object         ; 2413: 10 F1    
+    bpl     Loop_Swap_Ship_Object           ; 2413: 10 F1    
     rts                                     ; 2415: 60       
 ; ==========================================
 
@@ -1877,7 +1877,7 @@ Main_Loop_Init
     lda     #$00                            ; 25FA: A9 00    
     sta     ZP_Alien_Spawn_Counter          ; 25FC: 85 21    
 
-; Reset object list index to $03B0 i.e. Rocket Ascend/Decend
+; Reset object list index to $03B0 i.e. Ship Ascend/Decend
     lda     #$B0                            ; 25FE: A9 B0    
     sta     ZP_Obj_List_Ptr_Lo              ; 2600: 85 00    
     lda     #$03                            ; 2602: A9 03    
@@ -1945,10 +1945,10 @@ GOTO_NEXT_OBJECT
 
 ; Test if current object address is Jetman, a laser beam, the sound object or zero, branch if yes
     lda     ZP_Obj_List_Ptr_Lo              ; 2620: A5 00    
-    cmp     #OBJECT_ROCKET_ADDRESS          ; 2622: C9 B0    
+    cmp     #OBJECT_SHIP_ADDRESS            ; 2622: C9 B0    
     bcc     Inc_Object_List_Ptr             ; 2624: 90 0A    
 
-; Current object is a rocket part or an Alien
+; Current object is a ship part or an Alien
 ; Delay loop, adjusting Register Y from $02 to $0F makes aliens move ~40% slower across screen
 ; $100 x $02 x (2+3 cycles) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds
     ldy     #$02                            ; 2626: A0 02    
@@ -1979,7 +1979,7 @@ Inc_Object_List_Ptr
 ; L_JMP_($263B)_($2689) OK
 Main_Loop_Continue
     lda     ZP_Obj_List_Ptr_Lo              ; 263B: A5 00    
-    cmp     #OBJECT_ROCKET_ADDRESS          ; 263D: C9 B0    
+    cmp     #OBJECT_SHIP_ADDRESS            ; 263D: C9 B0    
     beq     Restore_Saved_Obj_Ptr_CLI       ; 263F: F0 3F    
 
 ; Current object is Jetman, a laser beam or the sound object
@@ -2004,7 +2004,7 @@ Test_Score_Flash_Time_At_Zero
 
 ; L_BRS_($2655)_($2650) OK
 Spawn_Objects
-    jsr     Spawn_Rocket_Modules_Fuel_Cell  ; 2655: 20 4B 2B 
+    jsr     Spawn_Ship_Modules_Fuel_Cell    ; 2655: 20 4B 2B 
     jsr     Spawn_Valuables                 ; 2658: 20 8F 2B 
     jmp     Main_Loop_Init                  ; 265B: 4C FA 25 
 ; ------------------------------------------
@@ -2094,14 +2094,14 @@ Object_Handler_Jump_Table
     fdb     JETMAN_FLYING_                  ; 268E: 73 32     Obj 01
     fdb     JETMAN_STANDING_                ; 2690: 4D 33     Obj 02
     fdb     ANIMATE_EXPLOSIONS              ; 2692: 34 29     Obj 03
-    fdb     ROCKET_PART_OR_FUEL             ; 2694: 8E 2F     Obj 04
+    fdb     SHIP_PART_OR_FUEL               ; 2694: 8E 2F     Obj 04
     fdb     WAVE_0_FUZZBALL                 ; 2696: 6A 2C     Obj 05
     fdb     WAVE_3_SAUCER                   ; 2698: BC 2A     Obj 06
     fdb     WAVE_2_SPHERE                   ; 269A: 6D 2A     Obj 07
     fdb     WAVE_1_CROSS                    ; 269C: 5F 2A     Obj 08
-    fdb     ROCKET_BASE_MODULE              ; 269E: 74 2E     Obj 09
-    fdb     ROCKET_ASCEND                   ; 26A0: 17 2E     Obj 0A
-    fdb     ROCKET_DESCEND                  ; 26A2: 4E 2E     Obj 0B
+    fdb     SHIP_BASE_MODULE                ; 269E: 74 2E     Obj 09
+    fdb     SHIP_ASCEND                     ; 26A0: 17 2E     Obj 0A
+    fdb     SHIP_DESCEND                    ; 26A2: 4E 2E     Obj 0B
     fdb     SOUND_UPDATE                    ; 26A4: CD 26     Obj 0C
     fdb     GOTO_NEXT_OBJECT                ; 26A6: 1A 26     Obj 0D
     fdb     VALUABLES                       ; 26A8: 3E 28     Obj 0E
@@ -2200,7 +2200,7 @@ Decrement_Oscillator_Timer
     rts                                     ; 26FD: 60       
 ; ==========================================
 
-Rocket_Part_or_Fuel_Cell_Pickup
+Ship_Part_or_Fuel_Cell_Pickup
     jsr     Decrement_Oscillator_Timer      ; 26FE: 20 F2 26 
     beq     Sound_Done_Reset_Object_Param   ; 2701: F0 07    
 
@@ -2244,7 +2244,7 @@ Output_Sound
     jmp     Goto_Next_Sound                 ; 2719: 4C E4 26 
 ; ------------------------------------------
 
-Valuable_Pkup_Rocket_Part_Land
+Valuable_Pkup_Ship_Part_Land
     jsr     Decrement_Oscillator_Timer      ; 271C: 20 F2 26 
     beq     Sound_Done_Reset_Object_Param   ; 271F: F0 E9    
 
@@ -2267,12 +2267,12 @@ Laser_Beam_Active
     jmp     Enable_Oscillator_Channel       ; 2732: 4C 05 27 
 ; ------------------------------------------
 
-Rocket_Flight
+Ship_Flight
     jsr     Decrement_Oscillator_Timer      ; 2735: 20 F2 26 
     beq     Sound_Done_Reset_Object_Param   ; 2738: F0 D0    
 
-; Utilise rocket object height to manipulate noise sound channel
-    lda     Obj_Rocket_Base_Y               ; 273A: AD B3 03 
+; Utilise ship object height to manipulate noise sound channel
+    lda     Obj_Ship_Base_Y                 ; 273A: AD B3 03 
     lsr     a                               ; 273D: 4A       
     eor     #%11111110                      ; 273E: 49 FE    
     jmp     Enable_Oscillator_Channel       ; 2740: 4C 05 27 
@@ -2280,10 +2280,10 @@ Rocket_Flight
 
 Sound_Object_Jump_Table
     fdb     Goto_Next_Sound                 ; 2743: E4 26     00
-    fdb     Rocket_Part_or_Fuel_Cell_Pickup ; 2745: FE 26     01
-    fdb     Valuable_Pkup_Rocket_Part_Land  ; 2747: 1C 27     02
+    fdb     Ship_Part_or_Fuel_Cell_Pickup   ; 2745: FE 26     01
+    fdb     Valuable_Pkup_Ship_Part_Land    ; 2747: 1C 27     02
     fdb     Laser_Beam_Active               ; 2749: 27 27     03
-    fdb     Rocket_Flight                   ; 274B: 35 27     04
+    fdb     Ship_Flight                     ; 274B: 35 27     04
     fdb     Collision_Explosion             ; 274D: 4F 27     05
 
 Collision_Explosion
@@ -2427,15 +2427,10 @@ Loop_Copy_Player_To_Hi_Score
 
 
 
-; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
-;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
-;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
-; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
-
-; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-; 88__dP dP   Yb dP   `" 88odP  88__     88
-; 88"Yb  Yb   dP Yb      88"Yb  88""     88
-; 88  Yb  YbodP   YboodP 88  Yb 888888   88
+; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP     .dP"Y8 88  88 88 88""Yb
+;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP      `Ybo." 88  88 88 88__dP
+;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P       o.`Y8b 888888 88 88"""
+; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP        8bodP' 88  88 88 88
 
 ; 888888 88        db    8b    d8 888888
 ; 88__   88       dPYb   88b  d88 88__
@@ -2443,19 +2438,19 @@ Loop_Copy_Player_To_Hi_Score
 ; 88     88ood8 dP""""Yb 88 YY 88 888888
 
 ; L_JSR_($27AA)_($2EAF) OK
-Display_Rocket_Flame
+Display_Ship_Flame
     ldy     #OBJECT_TYPE_PARAM              ; 27AA: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 27AC: B1 00    
-    cmp     #OBJECT_TYPE_ROCKET_ASCEND      ; 27AE: C9 0A    
+    cmp     #OBJECT_TYPE_SHIP_ASCEND        ; 27AE: C9 0A    
 
 ; Carry set if memory less than value in Register A, meaning branch on Ascend and Decend
-    bcs     Display_Rocket_Flame_Asc_Desc   ; 27B0: B0 01    
+    bcs     Display_Ship_Flame_Asc_Desc     ; 27B0: B0 01    
     rts                                     ; 27B2: 60       
 ; ==========================================
 
 ; L_BRS_($27B3)_($27B0) OK
-Display_Rocket_Flame_Asc_Desc
-    inc     ZP_Rocket_Flame_UDG_Toggle      ; 27B3: E6 27    
+Display_Ship_Flame_Asc_Desc
+    inc     ZP_Ship_Flame_UDG_Toggle        ; 27B3: E6 27    
 
     lda     ZP11                            ; 27B5: A5 11    
     pha                                     ; 27B7: 48       
@@ -2473,18 +2468,18 @@ Display_Rocket_Flame_Asc_Desc
 ; once, after that, both branches fail. Descend is similar.
     cmp     #FLAME_SPACE_AVAILABLE          ; 27C5: C9 AF    
     beq     Display_Flame                   ; 27C7: F0 50    
-    bcs     Set_Rocket_Flame_Status_Off     ; 27C9: B0 47    
+    bcs     Set_Ship_Flame_Status_Off       ; 27C9: B0 47    
 
-; Rocket flame should now be on, if yes, display it
-    lda     ZP_Rocket_Flame_State           ; 27CB: A5 26    
-    bne     Display_Rocket_Flame_On_Screen  ; 27CD: D0 12    
+; Ship flame should now be on, if yes, display it
+    lda     ZP_Ship_Flame_State             ; 27CB: A5 26    
+    bne     Display_Ship_Flame_On_Screen    ; 27CD: D0 12    
 
 ; If flame not yet on, i.e. first time round, turn the flame status on
     lda     #$01                            ; 27CF: A9 01    
-    sta     ZP_Rocket_Flame_State           ; 27D1: 85 26    
+    sta     ZP_Ship_Flame_State             ; 27D1: 85 26    
 
 ; Load the correct Flame UDG address and display the flame
-    lda     ZP_Rocket_Flame_UDG_Toggle      ; 27D3: A5 27    
+    lda     ZP_Ship_Flame_UDG_Toggle        ; 27D3: A5 27    
     sec                                     ; 27D5: 38       
     sbc     #$01                            ; 27D6: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 27D8: 20 2E 28 
@@ -2492,8 +2487,8 @@ Display_Rocket_Flame_Asc_Desc
     jsr     Display_Object_New_Setup        ; 27DE: 20 10 36 
 
 ; L_BRS_($27E1)_($27CD) OK
-Display_Rocket_Flame_On_Screen
-    lda     ZP_Rocket_Flame_UDG_Toggle      ; 27E1: A5 27    
+Display_Ship_Flame_On_Screen
+    lda     ZP_Ship_Flame_UDG_Toggle        ; 27E1: A5 27    
     pha                                     ; 27E3: 48       
     jsr     Get_Flame_UDG_Addr              ; 27E4: 20 2E 28 
     jsr     Load_Obj_Old_UDG_RAM_Addr_Size  ; 27E7: 20 3D 37 
@@ -2534,19 +2529,19 @@ Restore_And_RTS
 ; ==========================================
 
 ; L_BRS_($2812)_($27C9) OK
-Set_Rocket_Flame_Status_Off
+Set_Ship_Flame_Status_Off
     lda     #$00                            ; 2812: A9 00    
-    sta     ZP_Rocket_Flame_State           ; 2814: 85 26    
+    sta     ZP_Ship_Flame_State             ; 2814: 85 26    
     jmp     Restore_And_RTS                 ; 2816: 4C 0B 28 
 ; ------------------------------------------
 
 ; Display flame if flame state is on, else return
 ; L_BRS_($2819)_($27C7) OK
 Display_Flame
-    lda     ZP_Rocket_Flame_State           ; 2819: A5 26    
+    lda     ZP_Ship_Flame_State             ; 2819: A5 26    
     beq     Restore_And_RTS                 ; 281B: F0 EE    
 
-    lda     ZP_Rocket_Flame_UDG_Toggle      ; 281D: A5 27    
+    lda     ZP_Ship_Flame_UDG_Toggle        ; 281D: A5 27    
     sec                                     ; 281F: 38       
     sbc     #$01                            ; 2820: E9 01    
     jsr     Get_Flame_UDG_Addr              ; 2822: 20 2E 28 
@@ -2565,20 +2560,20 @@ Get_Flame_UDG_Addr
     lsr     a                               ; 282E: 4A       
     and     #%00000010                      ; 282F: 29 02    
     tax                                     ; 2831: AA       
-    lda     Rocket_Flame_Frame_0_Addr_Lo,x  ; 2832: BD 3A 28 
+    lda     Ship_Flame_Frame_0_Addr_Lo,x    ; 2832: BD 3A 28 
     tay                                     ; 2835: A8       
-    lda     Rocket_Flame_Frame_0_Addr_Hi,x  ; 2836: BD 3B 28 
+    lda     Ship_Flame_Frame_0_Addr_Hi,x    ; 2836: BD 3B 28 
     rts                                     ; 2839: 60       
 ; ==========================================
 
 ; Flame animation is produced by toggling between two animation frames
-Rocket_Flame_Frame_0_Addr_Lo
+Ship_Flame_Frame_0_Addr_Lo
     fcb     $D5                             ; 283A: D5       
-Rocket_Flame_Frame_0_Addr_Hi
+Ship_Flame_Frame_0_Addr_Hi
     fcb     $3F                             ; 283B: 3F       
-Rocket_Flame_Frame_1_Addr_Lo
+Ship_Flame_Frame_1_Addr_Lo
     fcb     $F8                             ; 283C: F8       
-Rocket_Flame_Frame_1_Addr_Hi
+Ship_Flame_Frame_1_Addr_Hi
     fcb     $3F                             ; 283D: 3F       
 
 
@@ -2719,7 +2714,7 @@ Valuable_Gemstone_Set_Colour
 ; 88"Yb  88""   o.`Y8b 88""     88       Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 ; 88  Yb 888888 8bodP' 888888   88        YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
-; Reset rocket parts/fuel/valuables and alien objects, $47 is 9 objects data
+; Reset ship parts/fuel/valuables and alien objects, $47 is 9 objects data
 ; L_JSR_($28C9)_($2E36) OK
 Reset_Objects_And_Aliens
     ldx     #$47                            ; 28C9: A2 47    
@@ -2727,13 +2722,13 @@ Reset_Objects_And_Aliens
 
 ; L_BRS_($28CD)_($28D1) OK
 Loop_Reset_Objects_And_Aliens
-    sta     Obj_Rocket_Top_Or_Fuel_Type,x   ; 28CD: 9D B8 03 
+    sta     Obj_Ship_Top_Or_Fuel_Type,x     ; 28CD: 9D B8 03 
     dex                                     ; 28D0: CA       
     bpl     Loop_Reset_Objects_And_Aliens   ; 28D1: 10 FA    
     rts                                     ; 28D3: 60       
 ; ==========================================
 
-; Reset Jetman, Lasers, Sounds, Rocket and Aliens, $2F is 6 objects data
+; Reset Jetman, Lasers, Sounds, Ship and Aliens, $2F is 6 objects data
 ; L_JSR_($28D4)_($29A8) OK
 Reset_Objects_Multiple
     ldx     #$2F                            ; 28D4: A2 2F    
@@ -2976,14 +2971,14 @@ Reset_Objects_Test_Game_Over
     jsr     Reset_Objects_Multiple          ; 29A8: 20 D4 28 
 
 ; Unset "Picked-up by Jetman"
-    lda     Obj_Rocket_Top_Or_Fuel_Status   ; 29AB: AD BC 03 
+    lda     Obj_Ship_Top_Or_Fuel_Status     ; 29AB: AD BC 03 
     and     #%11111101                      ; 29AE: 29 FD    
-    sta     Obj_Rocket_Top_Or_Fuel_Status   ; 29B0: 8D BC 03 
+    sta     Obj_Ship_Top_Or_Fuel_Status     ; 29B0: 8D BC 03 
 
 ; Unset "Picked-up by Jetman"
-    lda     Obj_Rocket_Mid_Or_Valu_Status   ; 29B3: AD C4 03 
+    lda     Obj_Ship_Mid_Or_Valu_Status     ; 29B3: AD C4 03 
     and     #%11111101                      ; 29B6: 29 FD    
-    sta     Obj_Rocket_Mid_Or_Valu_Status   ; 29B8: 8D C4 03 
+    sta     Obj_Ship_Mid_Or_Valu_Status     ; 29B8: 8D C4 03 
 
 ; Test if 1 or 2 Player Game, branch if 2 Player
     lda     Game_Settings                   ; 29BB: AD D3 1F 
@@ -3015,7 +3010,7 @@ Test_Game_Over_Inactive_Player
 
 ; L_BRS_($29DB)_($29D6) OK
 Swap_Active_Player_And_Objects
-    jsr     Swap_Player_And_Obj_Rocket      ; 29DB: 20 F5 23 
+    jsr     Swap_Player_And_Obj_Ship        ; 29DB: 20 F5 23 
     lda     ZP_Active_Player                ; 29DE: A5 5E    
     eor     #%11111111                      ; 29E0: 49 FF    
     sta     ZP_Active_Player                ; 29E2: 85 5E    
@@ -3488,7 +3483,7 @@ Invert_Direction_Alternate
 
 ; Test if Jetman is onscreen
 ; L_JSR_($2B4B)_($2655) OK
-Spawn_Rocket_Modules_Fuel_Cell
+Spawn_Ship_Modules_Fuel_Cell
     lda     Obj_Jetman_State                ; 2B4B: AD 80 03 
     and     #%00111111                      ; 2B4E: 29 3F    
     bne     Spawn_RMFC                      ; 2B50: D0 01    
@@ -3501,16 +3496,16 @@ Spawn_RMFC_RTS
     rts                                     ; 2B52: 60       
 ; ==========================================
 
-; Return if Jetman not only flying or standing or no rocket module/fuel onscreen
+; Return if Jetman not only flying or standing or no ship module/fuel onscreen
 ; L_BRS_($2B53)_($2B50) OK
 Spawn_RMFC
     cmp     #NOT_FLYING_AND_NOT_STANDING    ; 2B53: C9 03    
     bcs     Spawn_RMFC_RTS                  ; 2B55: B0 FB    
-    lda     Obj_Rocket_Top_Or_Fuel_Type     ; 2B57: AD B8 03 
+    lda     Obj_Ship_Top_Or_Fuel_Type       ; 2B57: AD B8 03 
     bne     Spawn_RMFC_RTS                  ; 2B5A: D0 F6    
 
 ; Return if ship is built and fuelled up
-    lda     Obj_Rocket_Base_Fuel_Level      ; 2B5C: AD B2 03 
+    lda     Obj_Ship_Base_Fuel_Level        ; 2B5C: AD B2 03 
     cmp     #SHIP_BUILT_AND_FUELLED_UP      ; 2B5F: C9 06    
     bcs     Spawn_RMFC_RTS                  ; 2B61: B0 EF    
 
@@ -3520,23 +3515,23 @@ Spawn_RMFC
     and     #%00001111                      ; 2B67: 29 0F    
     bne     Spawn_RMFC_RTS                  ; 2B69: D0 E7    
 
-; Init Rocket Part or Fuel Cell object (8 attributes)
+; Init Ship Part or Fuel Cell object (8 attributes)
     ldx     #NUM_OBJECT_PARAMS              ; 2B6B: A2 07    
 
 ; L_BRS_($2B6D)_($2B74) OK
-Loop_Init_Obj_Rocket_Or_Fuel
-    lda     Init_Obj_Rocket_Or_Fuel_Table,x ; 2B6D: BD 7F 2B 
-    sta     Obj_Rocket_Top_Or_Fuel_Type,x   ; 2B70: 9D B8 03 
+Loop_Init_Obj_Ship_Or_Fuel
+    lda     Init_Obj_Ship_Or_Fuel_Table,x   ; 2B6D: BD 7F 2B 
+    sta     Obj_Ship_Top_Or_Fuel_Type,x     ; 2B70: 9D B8 03 
     dex                                     ; 2B73: CA       
-    bpl     Loop_Init_Obj_Rocket_Or_Fuel    ; 2B74: 10 F7    
+    bpl     Loop_Init_Obj_Ship_Or_Fuel      ; 2B74: 10 F7    
 
 ; Spawn object at a random X position
     jsr     Get_Random_Position_X           ; 2B76: 20 DE 2B 
-    sta     Obj_Rocket_Top_Or_Fuel_X        ; 2B79: 8D B9 03 
+    sta     Obj_Ship_Top_Or_Fuel_X          ; 2B79: 8D B9 03 
     jmp     Init_Obj_Rockt_Top_Or_Fuel_Typ  ; 2B7C: 4C E3 22 
 ; ------------------------------------------
 
-Init_Obj_Rocket_Or_Fuel_Table
+Init_Obj_Ship_Or_Fuel_Table
     fcb     $04,$00,$00,$20,$01,$04,$18,$18 ; 2B7F: 04 00 00 20 01 04 18 18 
 
 Init_Obj_Valuable_Table
@@ -3560,7 +3555,7 @@ Spawn_Vals_RTS
 Spawn_Vals
     cmp     #NOT_FLYING_AND_NOT_STANDING    ; 2B97: C9 03    
     bcs     Spawn_Vals_RTS                  ; 2B99: B0 FB    
-    lda     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2B9B: AD C0 03 
+    lda     Obj_Ship_Mid_Or_Valuable_Typ    ; 2B9B: AD C0 03 
     bne     Spawn_Vals_RTS                  ; 2B9E: D0 F6    
 
 ; Use counter to randomly spawn another valuable
@@ -3574,13 +3569,13 @@ Spawn_Vals
 ; L_BRS_($2BA8)_($2BAF) OK
 Loop_Init_Obj_Valuable
     lda     Init_Obj_Valuable_Table,x       ; 2BA8: BD 87 2B 
-    sta     Obj_Rocket_Mid_Or_Valuable_Typ,x ; 2BAB: 9D C0 03 
+    sta     Obj_Ship_Mid_Or_Valuable_Typ,x  ; 2BAB: 9D C0 03 
     dex                                     ; 2BAE: CA       
     bpl     Loop_Init_Obj_Valuable          ; 2BAF: 10 F7    
 
 ; Spawn object at a random X position
     jsr     Get_Random_Position_X           ; 2BB1: 20 DE 2B 
-    sta     Obj_Rocket_Mid_Or_Valuable_X    ; 2BB4: 8D C1 03 
+    sta     Obj_Ship_Mid_Or_Valuable_X      ; 2BB4: 8D C1 03 
 
 ; Use IRQ random value to setup next object type
     lda     ZP_IRQ_Random                   ; 2BB7: A5 4C    
@@ -3596,15 +3591,15 @@ Loop_Init_Obj_Valuable
 ; L_BRS_($2BC2)_($2BBE) OK
 Store_Valuable_Type
     ora     #%00100000                      ; 2BC2: 09 20    
-    sta     Obj_Rocket_Mid_Or_Valu_UDG_Idx  ; 2BC4: 8D C6 03 
+    sta     Obj_Ship_Mid_Or_Valu_UDG_Idx    ; 2BC4: 8D C6 03 
 
-; $03C0 object starts as Rocket Module Middle, then becomes Valuable
+; $03C0 object starts as Ship Module Middle, then becomes Valuable
 ; L_JSR_($2BC7)_($2DC5) OK
-Load_ZP_Params_Rocket_Or_Val
+Load_ZP_Params_Ship_Or_Val
     jsr     Save_Obj_List_Ptr               ; 2BC7: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2BCA: 20 9D 25 
     fcb     $00                             ; 2BCD: 00        ZP00/01
-    fdb     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2BCE: C0 03     Object Address
+    fdb     Obj_Ship_Mid_Or_Valuable_Typ    ; 2BCE: C0 03     Object Address
     fcb     $FF                             ; 2BD0: FF       
     jsr     Load_Object_Type_X_Y_Colour     ; 2BD1: 20 E9 35 
 
@@ -4074,7 +4069,7 @@ Wave_Alien_Colour_Lookup
 
 ; ----------------------------------------------------
 ; FUNCTION : Tests if Jetman and the current object have
-;            overlapped i.e. collided. Object can be rocket
+;            overlapped i.e. collided. Object can be ship
 ;            part, fuel cell, gem or alien.
 ; ENTRY : ZP_Obj_List_Ptr = Current Object
 ;         Obj_Jetman_Looks = Status of Jetman
@@ -4185,34 +4180,34 @@ Test_Collision_Position_Y
 ; Yb   dP 88""Yb o.  88 88""   Yb        88   o.`Y8b
 ;  YbodP  88oodP "bodP' 888888  YboodP   88   8bodP'
 
-; Test if Rocket Top or Fuel object is inactive, if yes, skip initialization
+; Test if Ship Top or Fuel object is inactive, if yes, skip initialization
 ; L_JSR_($2DA1)_($22DD) OK
 Restore_Player_Objects
-    lda     Obj_Rocket_Top_Or_Fuel_Type     ; 2DA1: AD B8 03 
+    lda     Obj_Ship_Top_Or_Fuel_Type       ; 2DA1: AD B8 03 
     beq     Restore_Player_Objects_1        ; 2DA4: F0 03    
 
     jsr     Init_Obj_Rockt_Top_Or_Fuel_Typ  ; 2DA6: 20 E3 22 
 
-; Test if Rocket Middle or Valuable object is inactive, if yes, skip valuable test
+; Test if Ship Middle or Valuable object is inactive, if yes, skip valuable test
 ; L_BRS_($2DA9)_($2DA4) OK
 Restore_Player_Objects_1
-    lda     Obj_Rocket_Mid_Or_Valuable_Typ  ; 2DA9: AD C0 03 
-    beq     Set_Obj_List_Ptr_To_Rocket      ; 2DAC: F0 07    
+    lda     Obj_Ship_Mid_Or_Valuable_Typ    ; 2DA9: AD C0 03 
+    beq     Set_Obj_List_Ptr_To_Ship        ; 2DAC: F0 07    
 
 ; Object is active, test if object is a Valuable, if yes, restore it
     cmp     #OBJECT_TYPE_VALUABLE           ; 2DAE: C9 0E    
-    beq     Load_Params_Rocket_Or_Valuable  ; 2DB0: F0 13    
+    beq     Load_Params_Ship_Or_Valuable    ; 2DB0: F0 13    
 
 ; Object is not a valuable, initialize it
     jsr     Init_Obj_Rockt_Mid_Or_Valu_Typ  ; 2DB2: 20 F2 22 
 
 ; L_BRS_($2DB5)_($2DAC) OK
 ; L_JMP_($2DB5)_($2DC8) OK
-Set_Obj_List_Ptr_To_Rocket
+Set_Obj_List_Ptr_To_Ship
     jsr     Save_Obj_List_Ptr               ; 2DB5: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 2DB8: 20 9D 25 
     fcb     $00                             ; 2DBB: 00        ZP00/01
-    fdb     Obj_Rocket_Base                 ; 2DBC: B0 03     Object Address
+    fdb     Obj_Ship_Base                   ; 2DBC: B0 03     Object Address
     fcb     $FF                             ; 2DBE: FF       
 
     jsr     Set_Load_Obj_Type_X_Y_Colour    ; 2DBF: 20 CB 2D 
@@ -4220,9 +4215,9 @@ Set_Obj_List_Ptr_To_Rocket
 ; ------------------------------------------
 
 ; L_BRS_($2DC5)_($2DB0) OK
-Load_Params_Rocket_Or_Valuable
-    jsr     Load_ZP_Params_Rocket_Or_Val    ; 2DC5: 20 C7 2B 
-    jmp     Set_Obj_List_Ptr_To_Rocket      ; 2DC8: 4C B5 2D 
+Load_Params_Ship_Or_Valuable
+    jsr     Load_ZP_Params_Ship_Or_Val      ; 2DC5: 20 C7 2B 
+    jmp     Set_Obj_List_Ptr_To_Ship        ; 2DC8: 4C B5 2D 
 ; ------------------------------------------
 
 ; L_JSR_($2DCB)_($22D1) OK
@@ -4233,9 +4228,9 @@ Set_Load_Obj_Type_X_Y_Colour
 
 ; L_BRS_($2DD1)_($2DDA) OK
 Loop_Restore_Player_Objects
-    jsr     Restore_Player_Rocket           ; 2DD1: 20 E8 2D 
+    jsr     Restore_Player_Ship             ; 2DD1: 20 E8 2D 
     jsr     Display_Object_Old_Setup        ; 2DD4: 20 04 36 
-    jsr     Decrement_Rocket_Position_Y     ; 2DD7: 20 FF 2D 
+    jsr     Decrement_Ship_Position_Y_Etc   ; 2DD7: 20 FF 2D 
     bne     Loop_Restore_Player_Objects     ; 2DDA: D0 F5    
     rts                                     ; 2DDC: 60       
 ; ==========================================
@@ -4245,17 +4240,17 @@ Loop_Restore_Player_Objects
 Set_Object_UDG_Colour
     ldy     #$04                            ; 2DDD: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2DDF: B1 00    
-    sta     ZP_Ship_UDG_Addr_Colour?        ; 2DE1: 85 1F    
+    sta     ZP_Ship_Parts_Counter           ; 2DE1: 85 1F    
 
     lda     #$00                            ; 2DE3: A9 00    
     sta     ZP_Ship_UDG_Addr_Offset         ; 2DE5: 85 1E    
     rts                                     ; 2DE7: 60       
 ; ==========================================
 
-; Current wave modulus 4
+; Active player's current wave modulus 4 to get ship graphics
 ; L_JSR_($2DE8)_($2DD1) OK
 ; L_JSR_($2DE8)_($2EB5) OK
-Restore_Player_Rocket
+Restore_Player_Ship
     lda     ZP_Wave_Active_Player           ; 2DE8: A5 59    
     lsr     a                               ; 2DEA: 4A       
     lsr     a                               ; 2DEB: 4A       
@@ -4272,12 +4267,9 @@ Restore_Player_Rocket
     jmp     Load_Obj_New_UDG_RAM_Addr_Size  ; 2DFC: 4C 8D 37 
 ; ------------------------------------------
 
-; 19 was AF, postion of Jetman or Rocket base module? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-; 11 handled in same way as 19 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-; WOULD APPEAR ZP19 is generally object address position Y, assumedly
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
-Decrement_Rocket_Position_Y
+Decrement_Ship_Position_Y_Etc
     lda     ZP19                            ; 2DFF: A5 19    
     sec                                     ; 2E01: 38       
     sbc     #$10                            ; 2E02: E9 10    
@@ -4293,7 +4285,7 @@ Decrement_Rocket_Position_Y
     adc     #$04                            ; 2E10: 69 04    
     sta     ZP_Ship_UDG_Addr_Offset         ; 2E12: 85 1E    
 
-    dec     ZP_Ship_UDG_Addr_Colour?        ; 2E14: C6 1F    
+    dec     ZP_Ship_Parts_Counter           ; 2E14: C6 1F    
     rts                                     ; 2E16: 60       
 ; ==========================================
 
@@ -4302,60 +4294,55 @@ Decrement_Rocket_Position_Y
 
 
 ; ############################################################################################
-; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-; 88__dP dP   Yb dP   `" 88odP  88__     88
-; 88"Yb  Yb   dP Yb      88"Yb  88""     88
-; 88  Yb  YbodP   YboodP 88  Yb 888888   88
-
-;    db    .dP"Y8  dP""b8 888888 88b 88 8888b.
-;   dPYb   `Ybo." dP   `" 88__   88Yb88  8I  Yb
-;  dP__Yb  o.`Y8b Yb      88""   88 Y88  8I  dY
-; dP""""Yb 8bodP'  YboodP 888888 88  Y8 8888Y"
+; .dP"Y8 88  88 88 88""Yb        db    .dP"Y8  dP""b8 888888 88b 88 8888b.
+; `Ybo." 88  88 88 88__dP       dPYb   `Ybo." dP   `" 88__   88Yb88  8I  Yb
+; o.`Y8b 888888 88 88"""       dP__Yb  o.`Y8b Yb      88""   88 Y88  8I  dY
+; 8bodP' 88  88 88 88         dP""""Yb 8bodP'  YboodP 888888 88  Y8 8888Y"
 ; ############################################################################################
 
 ; Aliens keep moving also
-ROCKET_ASCEND
+SHIP_ASCEND
     jsr     Load_Object_Type_X_Y            ; 2E17: 20 D7 35 
 
-; Test if Rocket hit top of screen yet, if yes branch
-    ldy     #ROCKET_BASE_POSITION_Y_PARAM   ; 2E1A: A0 03    
+; Test if Ship hit top of screen yet, if yes branch
+    ldy     #SHIP_BASE_POSITION_Y_PARAM     ; 2E1A: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E1C: B1 00    
-    cmp     #ROCKET_BASE_AT_SCREEN_TOP      ; 2E1E: C9 30    
-    bcc     Rocket_At_Top                   ; 2E20: 90 12    
+    cmp     #SHIP_BASE_AT_SCREEN_TOP        ; 2E1E: C9 30    
+    bcc     Ship_At_Top                     ; 2E20: 90 12    
 
 ; Calculate and store new height i.e one pixel up screen
     sec                                     ; 2E22: 38       
     sbc     #$01                            ; 2E23: E9 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E25: 91 00    
 
-; Trigger rocket flight sound
+; Trigger ship flight sound
     lda     #$04                            ; 2E27: A9 04    
     sta     Obj_Sound_Noise                 ; 2E29: 8D AB 03 
     lda     #$02                            ; 2E2C: A9 02    
     sta     Obj_Sound_Noise_Timer           ; 2E2E: 8D AC 03 
 
-    jmp     Display_Rocket                  ; 2E31: 4C AC 2E 
+    jmp     Display_Ship                    ; 2E31: 4C AC 2E 
 ; ------------------------------------------
 
 ; L_BRS_($2E34)_($2E20) OK
-Rocket_At_Top
+Ship_At_Top
     inc     ZP_Wave_Active_Player           ; 2E34: E6 59    
     jsr     Reset_Objects_And_Aliens        ; 2E36: 20 C9 28 
 
-; Transition rocket object type from ascend to descend
+; Transition ship object type from ascend to descend
     ldy     #OBJECT_TYPE_PARAM              ; 2E39: A0 00    
-    lda     #OBJECT_ROCKET_DESCEND          ; 2E3B: A9 0B    
+    lda     #OBJECT_SHIP_DESCEND            ; 2E3B: A9 0B    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E3D: 91 00    
 
-; Zero the rocket's fuel level
+; Zero the ship's fuel level
     tya                                     ; 2E3F: 98       
-    ldy     #OBJECT_ROCKET_FUEL_LEVEL       ; 2E40: A0 02    
+    ldy     #OBJECT_SHIP_FUEL_LEVEL         ; 2E40: A0 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E42: 91 00    
 
 ; Turn off the flame animation
     jsr     Reset_Level_Add_Extra_Life      ; 2E44: 20 BA 22 
     lda     #$00                            ; 2E47: A9 00    
-    sta     ZP_Rocket_Flame_State           ; 2E49: 85 26    
+    sta     ZP_Ship_Flame_State             ; 2E49: 85 26    
 
     jmp     GOTO_NEXT_OBJECT                ; 2E4B: 4C 1A 26 
 ; ------------------------------------------
@@ -4365,44 +4352,39 @@ Rocket_At_Top
 
 
 ; ############################################################################################
-; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-; 88__dP dP   Yb dP   `" 88odP  88__     88
-; 88"Yb  Yb   dP Yb      88"Yb  88""     88
-; 88  Yb  YbodP   YboodP 88  Yb 888888   88
-
-; 8888b.  888888 .dP"Y8  dP""b8 888888 88b 88 8888b.
-;  8I  Yb 88__   `Ybo." dP   `" 88__   88Yb88  8I  Yb
-;  8I  dY 88""   o.`Y8b Yb      88""   88 Y88  8I  dY
-; 8888Y"  888888 8bodP'  YboodP 888888 88  Y8 8888Y"
+; .dP"Y8 88  88 88 88""Yb     8888b.  888888 .dP"Y8  dP""b8 888888 88b 88 8888b.
+; `Ybo." 88  88 88 88__dP      8I  Yb 88__   `Ybo." dP   `" 88__   88Yb88  8I  Yb
+; o.`Y8b 888888 88 88"""       8I  dY 88""   o.`Y8b Yb      88""   88 Y88  8I  dY
+; 8bodP' 88  88 88 88         8888Y"  888888 8bodP'  YboodP 888888 88  Y8 8888Y"
 ; ############################################################################################
 
-ROCKET_DESCEND
+SHIP_DESCEND
     jsr     Load_Object_Type_X_Y            ; 2E4E: 20 D7 35 
 
-; Trigger rocket flight sound
+; Trigger ship flight sound
     lda     #$04                            ; 2E51: A9 04    
     sta     Obj_Sound_Noise                 ; 2E53: 8D AB 03 
     lda     #$02                            ; 2E56: A9 02    
     sta     Obj_Sound_Noise_Timer           ; 2E58: 8D AC 03 
 
 ; Move object Y position down 1 pixel, stopping at bottom i.e. $AF
-    ldy     #ROCKET_BASE_POSITION_Y_PARAM   ; 2E5B: A0 03    
+    ldy     #SHIP_BASE_POSITION_Y_PARAM     ; 2E5B: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E5D: B1 00    
     clc                                     ; 2E5F: 18       
     adc     #$01                            ; 2E60: 69 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E62: 91 00    
 
-; Test if rocket has landed
-    cmp     #ROCKET_BASE_POSITION_Y         ; 2E64: C9 AF    
-    bcc     Display_Rocket                  ; 2E66: 90 44    
+; Test if ship has landed
+    cmp     #SHIP_BASE_POSITION_Y           ; 2E64: C9 AF    
+    bcc     Display_Ship                    ; 2E66: 90 44    
 
-; Set current object type to regular rocket base part
+; Set current object type to regular ship base part
     ldy     #OBJECT_TYPE_PARAM              ; 2E68: A0 00    
-    lda     #OBJECT_ROCKET_LANDED           ; 2E6A: A9 09    
+    lda     #OBJECT_SHIP_LANDED             ; 2E6A: A9 09    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E6C: 91 00    
     jsr     Init_Next_Jetman_Lives_Scores   ; 2E6E: 20 5B 23 
 
-    jmp     Display_Rocket                  ; 2E71: 4C AC 2E 
+    jmp     Display_Ship                    ; 2E71: 4C AC 2E 
 ; ------------------------------------------
 
 
@@ -4410,15 +4392,10 @@ ROCKET_DESCEND
 
 
 ; ############################################################################################
-; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-; 88__dP dP   Yb dP   `" 88odP  88__     88
-; 88"Yb  Yb   dP Yb      88"Yb  88""     88
-; 88  Yb  YbodP   YboodP 88  Yb 888888   88
-
-; 88""Yb  dP"Yb  888888 888888  dP"Yb  8b    d8
-; 88__dP dP   Yb   88     88   dP   Yb 88b  d88
-; 88""Yb Yb   dP   88     88   Yb   dP 88YbdP88
-; 88oodP  YbodP    88     88    YbodP  88 YY 88
+; .dP"Y8 88  88 88 88""Yb      88""Yb  dP"Yb  888888 888888  dP"Yb  8b    d8
+; `Ybo." 88  88 88 88__dP      88__dP dP   Yb   88     88   dP   Yb 88b  d88
+; o.`Y8b 888888 88 88"""       88""Yb Yb   dP   88     88   Yb   dP 88YbdP88
+; 8bodP' 88  88 88 88          88oodP  YbodP    88     88    YbodP  88 YY 88
 
 ; 8b    d8  dP"Yb  8888b.  88   88 88     888888
 ; 88b  d88 dP   Yb  8I  Yb 88   88 88     88__
@@ -4426,21 +4403,21 @@ ROCKET_DESCEND
 ; 88 YY 88  YbodP  8888Y"  `YbodP' 88ood8 888888
 ; ############################################################################################
 
-; Test if Jetman collided with Rocket
-ROCKET_BASE_MODULE
+; Test if Jetman collided with ship
+SHIP_BASE_MODULE
     jsr     Load_Object_Type_X_Y            ; 2E74: 20 D7 35 
     jsr     Test_Jetman_Object_Collide      ; 2E77: 20 58 2D 
     lda     ZP02                            ; 2E7A: A5 02    
-    bpl     Display_Rocket                  ; 2E7C: 10 2E    
+    bpl     Display_Ship                    ; 2E7C: 10 2E    
 
-; Jetman collided with Rocket, test if fully fulled up
-    ldy     #OBJECT_ROCKET_FUEL_LEVEL       ; 2E7E: A0 02    
+; Jetman collided with stip, test if fully fulled up
+    ldy     #OBJECT_SHIP_FUEL_LEVEL         ; 2E7E: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E80: B1 00    
     cmp     #FUELLED_UP                     ; 2E82: C9 06    
-    bcc     Display_Rocket                  ; 2E84: 90 26    
+    bcc     Display_Ship                    ; 2E84: 90 26    
 
-; Rocket fuelled up, set Rocket object type to Ascend
-    lda     #ROCKET_ASCENDING               ; 2E86: A9 0A    
+; Ship fuelled up, set Ship object type to Ascend
+    lda     #SHIP_ASCENDING                 ; 2E86: A9 0A    
     ldy     #OBJECT_TYPE_PARAM              ; 2E88: A0 00    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2E8A: 91 00    
     jsr     Save_Obj_List_Ptr               ; 2E8C: 20 E7 28 
@@ -4471,70 +4448,65 @@ ROCKET_BASE_MODULE
 
 
 
-; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
-;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
-;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
-; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
-
-; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-; 88__dP dP   Yb dP   `" 88odP  88__     88
-; 88"Yb  Yb   dP Yb      88"Yb  88""     88
-; 88  Yb  YbodP   YboodP 88  Yb 888888   88
+; 8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP     .dP"Y8 88  88 88 88""Yb
+;  8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP      `Ybo." 88  88 88 88__dP
+;  8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P       o.`Y8b 888888 88 88"""
+; 8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP        8bodP' 88  88 88 88
 
 ; L_JMP_($2EAC)_($2E31) OK
 ; L_BRS_($2EAC)_($2E66) OK
 ; L_JMP_($2EAC)_($2E71) OK
 ; L_BRS_($2EAC)_($2E7C) OK
 ; L_BRS_($2EAC)_($2E84) OK
-Display_Rocket
+Display_Ship
     jsr     Load_Object_Type_X_Y_Colour     ; 2EAC: 20 E9 35 
-    jsr     Display_Rocket_Flame            ; 2EAF: 20 AA 27 
+    jsr     Display_Ship_Flame              ; 2EAF: 20 AA 27 
     jsr     Set_Object_UDG_Colour           ; 2EB2: 20 DD 2D 
 
 ; L_BRS_($2EB5)_($2EBE) OK
-Loop_Display_Rocket_Parts
-    jsr     Restore_Player_Rocket           ; 2EB5: 20 E8 2D 
+Loop_Display_Ship_Parts
+    jsr     Restore_Player_Ship             ; 2EB5: 20 E8 2D 
     jsr     Display_Object                  ; 2EB8: 20 4C 36 
-    jsr     Decrement_Rocket_Position_Y     ; 2EBB: 20 FF 2D 
-    bne     Loop_Display_Rocket_Parts       ; 2EBE: D0 F5    
+    jsr     Decrement_Ship_Position_Y_Etc   ; 2EBB: 20 FF 2D 
+    bne     Loop_Display_Ship_Parts         ; 2EBE: D0 F5    
 
-; Bit 4 of counter used to flash rocket between white or purple colour
+; Bit 4 of counter used to flash ship between white or purple colour
 ; The 2xLSR changes Register A to be %0100, which is also the purple colour code
     lda     ZP_IRQ_Counter_Lo               ; 2EC0: A5 4A    
     lsr     a                               ; 2EC2: 4A       
     lsr     a                               ; 2EC3: 4A       
     and     #%00000100                      ; 2EC4: 29 04    
-    bne     Store_Rocket_Colour             ; 2EC6: D0 02    
+    bne     Store_Ship_Colour               ; 2EC6: D0 02    
 
 ; Counter not %0100, so set to white instead of purple
     lda     #COLOUR_WHITE                   ; 2EC8: A9 01    
 
 ; L_BRS_($2ECA)_($2EC6) OK
-Store_Rocket_Colour
+Store_Ship_Colour
     sta     ZP1B                            ; 2ECA: 85 1B    
 
-; Load rocket parts count, can be either 1/2/3 depending on base/Base+Mid/Base+Mid+Top built
-    ldy     #OBJ_ROCKET_PARTS_COUNTER_PARAM ; 2ECC: A0 04    
+; Load ship parts count, can be either 1/2/3 depending on base/Base+Mid/Base+Mid+Top built
+    ldy     #OBJ_SHIP_PARTS_COUNTER_PARAM   ; 2ECC: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ECE: B1 00    
     sta     ZP02                            ; 2ED0: 85 02    
 
-; If rocket not yet built, colourize what's built with white
+; If ship not yet built, colourize what's built with white
     cmp     #$03                            ; 2ED2: C9 03    
-    bcc     Colourize_Rocket_White          ; 2ED4: 90 27    
+    bcc     Colourize_Ship_White            ; 2ED4: 90 27    
 
-; Rocket is fully built i.e. Base+Mid+Top
+; Ship is fully built i.e. Base+Mid+Top
 ; Fuel Level ranges from 0 to 6, divide by 2 and store
-    ldy     #OBJECT_ROCKET_FUEL_LEVEL       ; 2ED6: A0 02    
+    ldy     #OBJECT_SHIP_FUEL_LEVEL         ; 2ED6: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ED8: B1 00    
     lsr     a                               ; 2EDA: 4A       
     sta     ZP13                            ; 2EDB: 85 13    
 
 ; If no fuel to display yet, colourize it all with white
-    beq     Colourize_Rocket_White          ; 2EDD: F0 1E    
+    beq     Colourize_Ship_White            ; 2EDD: F0 1E    
 
-; Fuel to display is 6/2=3, i.e. fully fuelled, flash rocket in with current colour purple/white
+; Fuel to display is 6/2=3, i.e. fully fuelled, flash ship in with current colour purple/white
     cmp     #$03                            ; 2EDF: C9 03    
-    bcs     Colourize_Rocket_NEXT           ; 2EE1: B0 1E    
+    bcs     Colourize_Ship_NEXT             ; 2EE1: B0 1E    
 
 ; Fuel to display is less than 6/2=3, store fuel level/2
 ; Base or base+mid to be coloured purple
@@ -4543,10 +4515,10 @@ Store_Rocket_Colour
     lda     #COLOUR_PURPLE                  ; 2EE5: A9 04    
     sta     ZP1B                            ; 2EE7: 85 1B    
 
-    jsr     Colourize_Rocket_Setup_RAM_Ptr  ; 2EE9: 20 07 2F 
+    jsr     Colourize_Ship_Setup_RAM_Ptr    ; 2EE9: 20 07 2F 
 
-; Calculate number of rocket parts remaining to be coloured white i.e. not base or base+mid
-; by subtracting from 3 and store number of rows to colour to Rocket_Parts_Count
+; Calculate number of ship parts remaining to be coloured white i.e. not base or base+mid
+; by subtracting from 3 and store number of rows to colour to Ship_Parts_Count
     lda     #$03                            ; 2EEC: A9 03    
     sec                                     ; 2EEE: 38       
     sbc     ZP13                            ; 2EEF: E5 13    
@@ -4555,31 +4527,31 @@ Store_Rocket_Colour
     lda     #COLOUR_WHITE                   ; 2EF3: A9 01    
     sta     ZP1B                            ; 2EF5: 85 1B    
 
-    jsr     Colourize_Rocket                ; 2EF7: 20 16 2F 
+    jsr     Colourize_Ship                  ; 2EF7: 20 16 2F 
     jmp     GOTO_NEXT_OBJECT                ; 2EFA: 4C 1A 26 
 ; ------------------------------------------
 
 ; L_BRS_($2EFD)_($2ED4) OK
 ; L_BRS_($2EFD)_($2EDD) OK
-Colourize_Rocket_White
+Colourize_Ship_White
     lda     #COLOUR_WHITE                   ; 2EFD: A9 01    
     sta     ZP1B                            ; 2EFF: 85 1B    
 
 ; L_BRS_($2F01)_($2EE1) OK
-Colourize_Rocket_NEXT
-    jsr     Colourize_Rocket_Setup_RAM_Ptr  ; 2F01: 20 07 2F 
+Colourize_Ship_NEXT
+    jsr     Colourize_Ship_Setup_RAM_Ptr    ; 2F01: 20 07 2F 
     jmp     GOTO_NEXT_OBJECT                ; 2F04: 4C 1A 26 
 ; ------------------------------------------
 
-; Setup the Colour RAM address where the rocket is and then colourize it
+; Setup the Colour RAM address where the ship is and then colourize it
 ; L_JSR_($2F07)_($2EE9) OK
 ; L_JSR_($2F07)_($2F01) OK
-Colourize_Rocket_Setup_RAM_Ptr
-    ldy     #OBJECT_ROCKET_POSITION_X_PARAM ; 2F07: A0 01    
+Colourize_Ship_Setup_RAM_Ptr
+    ldy     #OBJECT_SHIP_POSITION_X_PARAM   ; 2F07: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F09: B1 00    
     sta     ZP04                            ; 2F0B: 85 04    
 
-    ldy     #OBJECT_ROCKET_POSITION_Y_PARAM ; 2F0D: A0 03    
+    ldy     #OBJECT_SHIP_POSITION_Y_PARAM   ; 2F0D: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F0F: B1 00    
     sta     ZP05                            ; 2F11: 85 05    
 
@@ -4587,7 +4559,7 @@ Colourize_Rocket_Setup_RAM_Ptr
 
 ; L_JSR_($2F16)_($2EF7) OK
 ; L_BRS_($2F16)_($2F2E) OK
-Colourize_Rocket
+Colourize_Ship
     ldy     #COLUMN_INDEX                   ; 2F16: A0 00    
 
 ; ZP02 contains number of rows to paint
@@ -4611,7 +4583,7 @@ Colourize_Rocket
     sta     ZP0D                            ; 2F2A: 85 0D    
 
     dec     ZP02                            ; 2F2C: C6 02    
-    bne     Colourize_Rocket                ; 2F2E: D0 E6    
+    bne     Colourize_Ship                  ; 2F2E: D0 E6    
 
     rts                                     ; 2F30: 60       
 ; ==========================================
@@ -4621,10 +4593,10 @@ Colourize_Rocket
 
 
 ; ############################################################################################
-; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888     88""Yb    db    88""Yb 888888
-; 88__dP dP   Yb dP   `" 88odP  88__     88       88__dP   dPYb   88__dP   88
-; 88"Yb  Yb   dP Yb      88"Yb  88""     88       88"""   dP__Yb  88"Yb    88
-; 88  Yb  YbodP   YboodP 88  Yb 888888   88       88     dP""""Yb 88  Yb   88
+; .dP"Y8 88  88 88 88""Yb      88""Yb    db    88""Yb 888888
+; `Ybo." 88  88 88 88__dP      88__dP   dPYb   88__dP   88
+; o.`Y8b 888888 88 88"""       88"""   dP__Yb  88"Yb    88
+; 8bodP' 88  88 88 88          88     dP""""Yb 88  Yb   88
 
 ;  dP"Yb  88""Yb     888888 88   88 888888 88
 ; dP   Yb 88__dP     88__   88   88 88__   88
@@ -4632,34 +4604,34 @@ Colourize_Rocket
 ;  YbodP  88  Yb     88     `YbodP' 888888 88ood8
 ; ############################################################################################
 
-; Test if rocket part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
+; Test if ship part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
 ; L_BRS_($2F31)_($2F98) OK
-Rocket_Part_Or_Fuel_Dropped
+Ship_Part_Or_Fuel_Dropped
     ldy     #OBJECT_UDG_DATA_OFFSET         ; 2F31: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F33: B1 00    
     cmp     #$18                            ; 2F35: C9 18    
     beq     Fuel_Dropped                    ; 2F37: F0 3E    
 
-; Rocket part dropped, add current Y postion to landed Y position
+; Ship part dropped, add current Y postion to landed Y position
 ; and test to see if object has hit the ground
     asl     a                               ; 2F39: 0A       
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2F3A: A0 03    
     clc                                     ; 2F3C: 18       
     adc     (ZP_Obj_List_Ptr_Lo),y          ; 2F3D: 71 00    
     cmp     #SCREEN_BOTTOM                  ; 2F3F: C9 AF    
-    bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F41: 90 6F    
+    bcc     Ship_Part_Or_Fuel_Move_Down     ; 2F41: 90 6F    
 
-; Rocket part landed, activate next object i.e. set
+; Ship part landed, activate next object i.e. set
 ; status = not dropping and not picked-up by Jetman
 ; Note, using direct addressing, not using Y offset
-    lda     Obj_Rocket_Top_Or_Fuel_Status   ; 2F43: AD BC 03 
+    lda     Obj_Ship_Top_Or_Fuel_Status     ; 2F43: AD BC 03 
     ora     #%00000001                      ; 2F46: 09 01    
-    sta     Obj_Rocket_Top_Or_Fuel_Status   ; 2F48: 8D BC 03 
+    sta     Obj_Ship_Top_Or_Fuel_Status     ; 2F48: 8D BC 03 
     jsr     Disp_Obj_Ship_Or_Fuel_Setup_2   ; 2F4B: 20 54 30 
 
-; Calculate Position Y offset when object lands based on how many rocket pieces have
-; previosuly landed ($10 when rocket middle landed, $20 for top section landed)
-    lda     Obj_Rocket_Base_Parts_Counter   ; 2F4E: AD B4 03 
+; Calculate Position Y offset when object lands based on how many ship pieces have
+; previosuly landed ($10 when ship middle landed, $20 for top section landed)
+    lda     Obj_Ship_Base_Parts_Counter     ; 2F4E: AD B4 03 
     asl     a                               ; 2F51: 0A       
     asl     a                               ; 2F52: 0A       
     asl     a                               ; 2F53: 0A       
@@ -4667,15 +4639,15 @@ Rocket_Part_Or_Fuel_Dropped
     sta     ZP13                            ; 2F55: 85 13    
 
 ; Calculate object landed Position Y and store
-    lda     Obj_Rocket_Base_Y               ; 2F57: AD B3 03 
+    lda     Obj_Ship_Base_Y                 ; 2F57: AD B3 03 
     sec                                     ; 2F5A: 38       
     sbc     ZP13                            ; 2F5B: E5 13    
     sta     ZP19                            ; 2F5D: 85 19    
 
     jsr     Disp_Obj_Ship_Or_Fuel_Setup_1   ; 2F5F: 20 57 30 
-    inc     Obj_Rocket_Base_Parts_Counter   ; 2F62: EE B4 03 
+    inc     Obj_Ship_Base_Parts_Counter     ; 2F62: EE B4 03 
 
-; Turn Rocket Middle Section object off in object list
+; Turn Ship Middle Section object off in object list
 ; L_JMP_($2F65)_($2871) OK
 ; L_JMP_($2F65)_($2F8B) OK
 Disable_Object_In_List
@@ -4683,8 +4655,8 @@ Disable_Object_In_List
     tay                                     ; 2F67: A8       
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2F68: 91 00    
 
-; Trigger sound for valuable pickup and rocket part/fuel cell
-; landing on rocket base
+; Trigger sound for valuable pickup and ship part/fuel cell
+; landing on ship base
     lda     #$02                            ; 2F6A: A9 02    
     sta     Obj_Sound_Collision             ; 2F6C: 8D A9 03 
     lda     #$10                            ; 2F6F: A9 10    
@@ -4698,58 +4670,58 @@ Fuel_Dropped
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2F77: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F79: B1 00    
     cmp     #FUEL_POSITION_Y_WHEN_LANDED    ; 2F7B: C9 A8    
-    bcc     Rocket_Part_Or_Fuel_Move_Down   ; 2F7D: 90 33    
+    bcc     Ship_Part_Or_Fuel_Move_Down     ; 2F7D: 90 33    
 
 ; Fuel cell has landed, increment the counter
-    inc     Obj_Rocket_Base_Fuel_Level      ; 2F7F: EE B2 03 
+    inc     Obj_Ship_Base_Fuel_Level        ; 2F7F: EE B2 03 
     jsr     Load_Object_Type_X_Y_Colour     ; 2F82: 20 E9 35 
     jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 2F85: 20 DA 2F 
     jsr     Display_Object_Ship_Or_Fuel     ; 2F88: 20 5A 30 
     jmp     Disable_Object_In_List          ; 2F8B: 4C 65 2F 
 ; ------------------------------------------
-; On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
+; On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two ship parts
 ; On game startup 03B8+04=00, 03C0+4=01
 ; Pickup  middle section 03B8+04=00, 03C0+4=03
 ; Falling middle section 03B8+04=00, 03C0+4=07
 ; Landed  middle section 03B8+04=01, 03C0+4=07
 ; 03C0 turns into a 0E_Valuable, 03B8 goes round the same cycle as 03C0
 ; 03B8 becomes a fuel cell
-; When middle rocket section deposited, only 03B8 checked, despite dropped valuable
-; When top rocket section lifted, still only 03B8 checked, despite dropped valuable
-; When top rocket section deposited and fuel dropped, still only 03B8 checked
-; When fuel picked-up and dropping onto rocket, still 03B8 checked.
-; When fuel drops into rocket, for a short time, no interrupt until next fuel cell drops 03B8
-ROCKET_PART_OR_FUEL
+; When middle ship section deposited, only 03B8 checked, despite dropped valuable
+; When top ship section lifted, still only 03B8 checked, despite dropped valuable
+; When top ship section deposited and fuel dropped, still only 03B8 checked
+; When fuel picked-up and dropping onto ship, still 03B8 checked.
+; When fuel drops into ship, for a short time, no interrupt until next fuel cell drops 03B8
+SHIP_PART_OR_FUEL
     jsr     Load_Object_Type_X_Y            ; 2F8E: 20 D7 35 
 
-; Test status of the rocket part or fuel cell object
+; Test status of the ship part or fuel cell object
 ; 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
     ldy     #OBJECT_PICKUP_DROPPED_STATE    ; 2F91: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F93: B1 00    
     bit     MASK_00000100                   ; 2F95: 2C 16 20 
-    bne     Rocket_Part_Or_Fuel_Dropped     ; 2F98: D0 97    
+    bne     Ship_Part_Or_Fuel_Dropped       ; 2F98: D0 97    
 
     bit     MASK_00000010                   ; 2F9A: 2C 15 20 
     bne     Copy_Jetman_XY_To_Object        ; 2F9D: D0 7F    
 
     bit     MASK_00000001                   ; 2F9F: 2C 14 20 
-    beq     Setup_Object_Addr_Rocket_Fuel   ; 2FA2: F0 19    
+    beq     Setup_Object_Addr_Ship_Fuel     ; 2FA2: F0 19    
 
-; Test if Jetman has collided with a rocket part or fuel cell, branch if yes
+; Test if Jetman has collided with a ship part or fuel cell, branch if yes
     jsr     Test_Jetman_Object_Collide      ; 2FA4: 20 58 2D 
     lda     ZP02                            ; 2FA7: A5 02    
-    bmi     Jetman_Collide_Rocket_Fuel      ; 2FA9: 30 43    
+    bmi     Jetman_Collide_Ship_Fuel        ; 2FA9: 30 43    
 
-; No Jetman collision, test if rocket part or fuel cell has landed on a platform, branch if yes
-; Rocket top part only falls when middle part deposited
+; No Jetman collision, test if ship part or fuel cell has landed on a platform, branch if yes
+; Ship top part only falls when middle part deposited
     jsr     Test_Platform_Collision         ; 2FAB: 20 B3 30 
     lda     ZP02                            ; 2FAE: A5 02    
-    bmi     Setup_Object_Addr_Rocket_Fuel   ; 2FB0: 30 0B    
+    bmi     Setup_Object_Addr_Ship_Fuel     ; 2FB0: 30 0B    
 
 ; Move object down by 2 pixels, make Position Y an odd number
 ; L_BRS_($2FB2)_($2F41) OK
 ; L_BRS_($2FB2)_($2F7D) OK
-Rocket_Part_Or_Fuel_Move_Down
+Ship_Part_Or_Fuel_Move_Down
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2FB2: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2FB4: B1 00    
     clc                                     ; 2FB6: 18       
@@ -4762,7 +4734,7 @@ Rocket_Part_Or_Fuel_Move_Down
 ; L_BRS_($2FBD)_($2FB0) OK
 ; L_JMP_($2FBD)_($301B) OK
 ; L_JMP_($2FBD)_($3051) OK
-Setup_Object_Addr_Rocket_Fuel
+Setup_Object_Addr_Ship_Fuel
     jsr     Load_Object_Type_X_Y_Colour     ; 2FBD: 20 E9 35 
     jsr     Load_Obj_UDG_Data_Addr_Ship_Wv  ; 2FC0: 20 DA 2F 
 
@@ -4802,7 +4774,7 @@ Setup_Object_Addr
 ; o.`Y8b 888888 88 88"""      88""   Y8   8P 88""   88  .o       YbdP    dP__Yb  88  .o
 ; 8bodP' 88  88 88 88         88     `YbodP' 888888 88ood8        YP    dP""""Yb 88ood8
 
-; Return object's UDG data address offset for Rocket Middle Section/Fuel
+; Return object's UDG data address offset for Ship Middle Section/Fuel
 ; depending on which of the four levels (or multiple of) the player is currently on
 ; L_JSR_($2FDA)_($231F) OK
 ; L_JSR_($2FDA)_($2F85) OK
@@ -4856,21 +4828,21 @@ Load_Obj_UDG_Data_Addr_S_F_V
 ; Yb      Yb   dP 88  .o 88  .o 88  8I  dY 88""
 ;  YboodP  YbodP  88ood8 88ood8 88 8888Y"  888888
 
-; 88""Yb  dP"Yb   dP""b8 88  dP 888888 888888     888888 88   88 888888 88
-; 88__dP dP   Yb dP   `" 88odP  88__     88       88__   88   88 88__   88
-; 88"Yb  Yb   dP Yb      88"Yb  88""     88       88""   Y8   8P 88""   88  .o
-; 88  Yb  YbodP   YboodP 88  Yb 888888   88       88     `YbodP' 888888 88ood8
+; .dP"Y8 88  88 88 88""Yb     888888 88   88 888888 88
+; `Ybo." 88  88 88 88__dP     88__   88   88 88__   88
+; o.`Y8b 888888 88 88"""      88""   Y8   8P 88""   88  .o
+; 8bodP' 88  88 88 88         88     `YbodP' 888888 88ood8
 
-; At point when Jetman picks up Rocket or Fuel module
+; At point when Jetman picks up Ship or Fuel module
 ; L_BRS_($2FEE)_($2FA9) OK
-Jetman_Collide_Rocket_Fuel
+Jetman_Collide_Ship_Fuel
     jsr     Load_Object_Type_X_Y            ; 2FEE: 20 D7 35 
     ldy     #OBJECT_STATUS_PARAM            ; 2FF1: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2FF3: B1 00    
     ora     #OBJECT_STATUS_PICKED_UP        ; 2FF5: 09 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2FF7: 91 00    
 
-; Jetman pickup Rocket Module / Fuel Cell = 100 points
+; Jetman pickup Ship Module / Fuel Cell = 100 points
     jsr     Load_ZP_Parameters              ; 2FF9: 20 9D 25 
     fcb     $02                             ; 2FFC: 02        ZP02/03
     fdb     $0100                           ; 2FFD: 00 01     100 Points
@@ -4893,7 +4865,7 @@ Jetman_Collide_Rocket_Fuel
     lda     Obj_Jetman_Position_Y           ; 3016: AD 83 03 
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 3019: 91 00    
 
-    jmp     Setup_Object_Addr_Rocket_Fuel   ; 301B: 4C BD 2F 
+    jmp     Setup_Object_Addr_Ship_Fuel     ; 301B: 4C BD 2F 
 ; ------------------------------------------
 
 
@@ -4929,7 +4901,7 @@ Copy_Jetman_XY_To_Object
 ; branch if Jetman is to the left of the ship
     dey                                     ; 302F: 88       
     dey                                     ; 3030: 88       
-    lda     Obj_Rocket_Base_X               ; 3031: AD B1 03 
+    lda     Obj_Ship_Base_X                 ; 3031: AD B1 03 
     sec                                     ; 3034: 38       
     sbc     (ZP_Obj_List_Ptr_Lo),y          ; 3035: F1 00    
     bpl     Test_Jetman_Above_Ship          ; 3037: 10 05    
@@ -4943,7 +4915,7 @@ Copy_Jetman_XY_To_Object
 ; L_BRS_($303E)_($3037) OK
 Test_Jetman_Above_Ship
     cmp     #OBJECT_OVER_SHIP_HITBOX_X      ; 303E: C9 06    
-    bcs     JMP_Setup_Obj_Addr_Rocket_Fuel  ; 3040: B0 0F    
+    bcs     JMP_Setup_Obj_Addr_Ship_Fuel    ; 3040: B0 0F    
 
 ; Jetman is above ship, set picked-up object state to Dropped/Landed
     ldy     #OBJECT_PICKUP_DROPPED_STATE    ; 3042: A0 04    
@@ -4951,14 +4923,14 @@ Test_Jetman_Above_Ship
     ora     #%00000100                      ; 3046: 09 04    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 3048: 91 00    
 
-; Set the dropped object's Position X to the same as the rocket base, so they line up on-screen
-    lda     Obj_Rocket_Base_X               ; 304A: AD B1 03 
+; Set the dropped object's Position X to the same as the ship base, so they line up on-screen
+    lda     Obj_Ship_Base_X                 ; 304A: AD B1 03 
     ldy     #OBJECT_POSITION_X_PARAM        ; 304D: A0 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 304F: 91 00    
 
 ; L_BRS_($3051)_($3040) OK
-JMP_Setup_Obj_Addr_Rocket_Fuel
-    jmp     Setup_Object_Addr_Rocket_Fuel   ; 3051: 4C BD 2F 
+JMP_Setup_Obj_Addr_Ship_Fuel
+    jmp     Setup_Object_Addr_Ship_Fuel     ; 3051: 4C BD 2F 
 ; ------------------------------------------
 
 ; L_JSR_($3054)_($2F4B) OK
@@ -5621,7 +5593,7 @@ JETMAN_FLYING_
     jsr     Load_Object_Type_X_Y            ; 3273: 20 D7 35 
     jsr     Read_Keyboard_Joystick          ; 3276: 20 F7 33  Returns A=%RLDU_F111
     sta     ZP_Jetman_Action                ; 3279: 85 1C    
-    jsr     Test_Platform_Collision         ; 327B: 20 B3 30  Remove=Jetman+fuel/rocket part pick-up fly through platforms
+    jsr     Test_Platform_Collision         ; 327B: 20 B3 30  Remove=Jetman+fuel/ship part pick-up fly through platforms
     lda     ZP02                            ; 327E: A5 02    
     bpl     P_Update_Jetman_Position_X      ; 3280: 10 03    
     jmp     H_Jetman_Hits_Surface           ; 3282: 4C F2 31 
@@ -6825,7 +6797,7 @@ Display_Object
 
 ; ZP03 & ZP0B contain heights of the old and new object bitmaps from the UDG graphics data
 ; e.g. Alien Cross object height is $0A pixels/lines
-; Rocket is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
+; Ship is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
     lda     ZP03                            ; 3652: A5 03    
     sta     ZP02                            ; 3654: 85 02    
 
@@ -7180,7 +7152,7 @@ No_X_Wrap_
 Load_Obj_New_UDG_RAM_Addr_Siz_
     jsr     Get_Obj_Old_UDG_Data_Addr       ; 378A: 20 E6 37 
 
-; Example Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
+; Example Ship Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
 ; Store object UDG Data Addr in Registers Y and A into ZP06 & 07, minus $100
 ; L_JSR_($378D)_($27DB) OK
 ; L_JSR_($378D)_($27F1) OK
@@ -7216,7 +7188,7 @@ Load_Obj_New_UDG_RAM_Addr_Size
 ; L_BRS_($37A9)_($37A4) OK
 No_X_Wrap
     sta     ZP04                            ; 37A9: 85 04     ZP04=X=$50 ZP05=Y=$5F
-    jsr     Convert_XY_to_UDG_RAM_Address   ; 37AB: 20 1D 35  ZP05/04=$173F i.e. rocket middle
+    jsr     Convert_XY_to_UDG_RAM_Address   ; 37AB: 20 1D 35  ZP05/04=$173F i.e. ship middle
                                             ; section start position on middle platform
 
 ; ZP04/05 are now an address instead of X and Y coordinates.
@@ -7387,7 +7359,7 @@ Get_Obj_New_UDG_Data_Addr
 ; Yb   dP 88""Yb o.  88 88""   Yb        88
 ;  YbodP  88oodP "bodP' 888888  YboodP   88
 
-; Colorize all object sprites i.e. Jetman, Aliens, Rocket Top/Middle/Base, Fuel, Valuables
+; Colorize all object sprites i.e. Jetman, Aliens, Ship Top/Middle/Base, Fuel, Valuables
 ; L_JSR_($381F)_($2961) OK
 ; L_JSR_($381F)_($2CC6) OK
 ; L_JSR_($381F)_($2FD4) OK
@@ -7399,11 +7371,11 @@ Colourize_Object
     lda     ZP19                            ; 3823: A5 19    
     sta     ZP05                            ; 3825: 85 05    
 
-; Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
+; Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Ship Top X=20, Y=3F
     jsr     Setup_Colour_RAM_Address        ; 3827: 20 F7 34 
 
 ; Divide object height by $10 then add $02, so always update colour on at least two vertical tiles
-; e.g. Jetman=$18->$03, Rocket_Top=$10->$03, Fuzz_Alien=$0A->$02
+; e.g. Jetman=$18->$03, Ship_Top=$10->$03, Fuzz_Alien=$0A->$02
     lda     ZP17                            ; 382A: A5 17    
     lsr     a                               ; 382C: 4A       
     lsr     a                               ; 382D: 4A       

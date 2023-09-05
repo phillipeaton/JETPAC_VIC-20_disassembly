@@ -306,11 +306,11 @@ comment  21D3
 comment  21D3 Register Y becomes $00 i.e. Laser Type/Direction Facing parameter
 comment  21D4
 comment  21D4 Laser Position Y in accumulator, test if laser shot positions near bottom of screen
-comment  21D4 i.e. at or below height of fully-built rocket, branch if it is near the bottom
+comment  21D4 i.e. at or below height of fully-built ship, branch if it is near the bottom
 binary   21D5
 comment  21D8
 comment  21D8 Test if laser address in UDG RAM is empty, jump if not empty
-comment  21D8 This stops you firing through objects when laser is above the top of the fully-built rocket
+comment  21D8 This stops you firing through objects when laser is above the top of the fully-built ship
 label    21DC Save_Laser_Position_X
 comment  21DC
 lcomment 21DC Restore A
@@ -447,17 +447,17 @@ comment  22F2
 label    22F2 Init_Obj_Rockt_Mid_Or_Valu_Typ
 word     22F9
 comment  22FF
-comment  22FF Init rocket top, middle and base object parameters (i.e. 3 x 8 bytes) from static data table
-label    22FF Init_Rocket_Obj_Params
-label    2301 Loop_Init_Rocket_Obj_Params
+comment  22FF Init ship top, middle and base object parameters (i.e. 3 x 8 bytes) from static data table
+label    22FF Init_Ship_Obj_Params
+label    2301 Loop_Init_Ship_Obj_Params
 comment  2301
-label    230B Init_Rocket_Obj_Params_Init
+label    230B Init_Ship_Obj_Params_Init
 comment  230B
 word     2315
 label    231A Loop_Init_Objects
 comment  231A
 comment  2318
-comment  2318 Init rocket top, middle and base
+comment  2318 Init ship top, middle and base
 comment  231C
 comment  2325
 comment  2325 Move 16-bit object address pointer to next object i.e. 8 bytes ahead
@@ -465,18 +465,18 @@ comment  232C
 comment  2332
 comment  2334
 comment  2337
-label    233B Init_Rocket_Objs_Param_Table
-lcomment 233B $09=Rocket Base Section, Posn_X, ?, Posn_Y
+label    233B Init_Ship_Objs_Param_Table
+lcomment 233B $09=Ship Base Section, Posn_X, ?, Posn_Y
 const    233B-235A
 comment  233B
 lcomment 233F $01=Pickup Status, ?, Height on Landing, ?
 break    233F
 comment  2343
-lcomment 2343 $04=Rocket Top Section
+lcomment 2343 $04=Ship Top Section
 break    2343
 break    2347
 comment  234B
-lcomment 234B $04=Rocket Middle Section
+lcomment 234B $04=Ship Middle Section
 break    234F
 comment  2353
 label    2353 Init_Jetman_Obj_Param_Table
@@ -550,7 +550,7 @@ lcomment 23CE \.##..##.
 comment  23CF
 label    23CF LDA_7F_Set_Cntdn_Dec_Num_Lives
 comment  23D4
-comment  23D4 Set Active Player, initial lives for both players and Rocket object parameters
+comment  23D4 Set Active Player, initial lives for both players and ship object parameters
 label    23D4 Setup_Player_Lives
 label    23D6 Loop_Setup_Player_Lives
 comment  23D6
@@ -566,14 +566,14 @@ comment  23EB Test if single player game, if yes, set Player 2 lives to 0 i.e. i
 binary   23EF
 label    23F4 Setup_Player_Lives_RTS
 comment  23F4
-label    23F5 Swap_Player_And_Obj_Rocket
+label    23F5 Swap_Player_And_Obj_Ship
 comment  23F5
-comment  23F5 When active player changes, swap current active/inactive player wave and rocket object data
+comment  23F5 When active player changes, swap current active/inactive player wave and ship object data
 label    23F7 Swap_Player
 comment  23F9
 comment  23FF
 comment  2404
-label    2406 Loop_Swap_Rocket_Object
+label    2406 Loop_Swap_Ship_Object
 comment  2406
 comment  2409
 comment  2410
@@ -765,7 +765,7 @@ label    25F4 Restore_Registers_And_RTI
 comment  25FA
 label    25FA Main_Loop_Init
 comment  25FE
-comment  25FE Reset object list index to $03B0 i.e. Rocket Ascend/Decend
+comment  25FE Reset object list index to $03B0 i.e. Ship Ascend/Decend
 comment  2606
 comment  2606 Enable Interrupts (Clear Interrupt Disable)
 comment  2607
@@ -780,9 +780,9 @@ comment  261C
 comment  261C Test next object type, if non-zero, skip to next object
 comment  2620
 comment  2620 Test if current object address is Jetman, a laser beam, the sound object or zero, branch if yes
-deflabel 2623 OBJECT_ROCKET_ADDRESS
+deflabel 2623 OBJECT_SHIP_ADDRESS
 comment  2626
-comment  2626 Current object is a rocket part or an Alien
+comment  2626 Current object is a ship part or an Alien
 comment  2626 Delay loop, adjusting Register Y from $02 to $0F makes aliens move ~40% slower across screen
 comment  2626 $100 x $02 x (2+3 cycles) = $A00 = 2,560 cycles @ 1.108MHz PAL = 0.02 Seconds
 comment  262A
@@ -795,7 +795,7 @@ comment  2637 If interrupt had occurred, set Jetman object next, it has higher p
 comment  263B
 comment  263B Test if current object is Jetman, a laser beam, the sound object or zero, branch if not
 label    263B Main_Loop_Continue
-deflabel 263E OBJECT_ROCKET_ADDRESS
+deflabel 263E OBJECT_SHIP_ADDRESS
 comment  2641
 comment  2641 Current object is Jetman, a laser beam or the sound object
 comment  2641 Test if current object addres lo-byte is zero, i.e. starting at beginning of list, branch if not
@@ -887,7 +887,7 @@ label    26F2 Decrement_Oscillator_Timer
 comment  26F6
 comment  26F6 Read timer, decrement and write back
 comment  26FE
-label    26FE Rocket_Part_or_Fuel_Cell_Pickup
+label    26FE Ship_Part_or_Fuel_Cell_Pickup
 comment  2703
 comment  2703 Reverses the timer value so $10 countdown becomes $F0, F1, F2 etc. stored
 comment  2703 to the oscillator on subsequent calls, making a pleasent short rising tone
@@ -904,7 +904,7 @@ comment  2710 Register A contains frequency, Y selects channel via X
 label    2710 Output_Sound
 comment  2716
 comment  271C
-label    271C Valuable_Pkup_Rocket_Part_Land
+label    271C Valuable_Pkup_Ship_Part_Land
 comment  2721
 comment  2721 Manipulate timer to make a nice sound
 binary   2723
@@ -914,9 +914,9 @@ comment  272C
 comment  272C Manipulate timer to make a nice sound
 binary   2731
 comment  2735
-label    2735 Rocket_Flight
+label    2735 Ship_Flight
 comment  273A
-comment  273A Utilise rocket object height to manipulate noise sound channel
+comment  273A Utilise ship object height to manipulate noise sound channel
 binary   273F
 comment  2743
 label    2743 Sound_Object_Jump_Table
@@ -985,13 +985,13 @@ comment  27A2
 label    27A2 Loop_Copy_Player_To_Hi_Score
 lcomment 27A7 Return when all bytes copied
 comment  27AA
-label    27AA Display_Rocket_Flame
+label    27AA Display_Ship_Flame
 deflabel 27AB OBJECT_TYPE_PARAM
-deflabel 27AF OBJECT_TYPE_ROCKET_ASCEND
+deflabel 27AF OBJECT_TYPE_SHIP_ASCEND
 comment  27B0
 comment  27B0 Carry set if memory less than value in Register A, meaning branch on Ascend and Decend
 comment  27B3
-label    27B3 Display_Rocket_Flame_Asc_Desc
+label    27B3 Display_Ship_Flame_Asc_Desc
 comment  27B5
 comment  27BD
 comment  27C5
@@ -999,13 +999,13 @@ comment  27C5 On ascend, BCS followed each time until Flame Space Available, whi
 comment  27C5 once, after that, both branches fail. Descend is similar.
 deflabel 27C6 FLAME_SPACE_AVAILABLE
 comment  27CB
-comment  27CB Rocket flame should now be on, if yes, display it
+comment  27CB Ship flame should now be on, if yes, display it
 comment  27CF
 comment  27CF If flame not yet on, i.e. first time round, turn the flame status on
 comment  27D3
 comment  27D3 Load the correct Flame UDG address and display the flame
 comment  27E1
-label    27E1 Display_Rocket_Flame_On_Screen
+label    27E1 Display_Ship_Flame_On_Screen
 comment  27EA
 comment  27EA Load the correct Flame UDG address and display the flame
 comment  27F7
@@ -1018,7 +1018,7 @@ comment  280B
 comment  280B Restore ZP11 and ZP19 and return
 label    280B Restore_And_RTS
 comment  2812
-label    2812 Set_Rocket_Flame_Status_Off
+label    2812 Set_Ship_Flame_Status_Off
 comment  2819
 comment  2819 Display flame if flame state is on, else return
 label    2819 Display_Flame
@@ -1030,11 +1030,11 @@ label    282E Get_Flame_UDG_Addr
 binary   2830
 comment  283A
 comment  283A Flame animation is produced by toggling between two animation frames
-label    283A Rocket_Flame_Frame_0_Addr_Lo
+label    283A Ship_Flame_Frame_0_Addr_Lo
 const    283A-283d
-label    283B Rocket_Flame_Frame_0_Addr_Hi
-label    283C Rocket_Flame_Frame_1_Addr_Lo
-label    283D Rocket_Flame_Frame_1_Addr_Hi
+label    283B Ship_Flame_Frame_0_Addr_Hi
+label    283C Ship_Flame_Frame_1_Addr_Lo
+label    283D Ship_Flame_Frame_1_Addr_Hi
 comment  283E
 comment  283E Replace "Test_Platform_Collision" with nops and gems all fall
 comment  283E through platforms and floor, reentering at top
@@ -1098,12 +1098,12 @@ label    28C0 Valuable_Gemstone_Set_Colour
 deflabel 28C1 COLOUR_GREEN
 deflabel 28C5 COLOUR_WHITE
 comment  28C9
-comment  28C9 Reset rocket parts/fuel/valuables and alien objects, $47 is 9 objects data
+comment  28C9 Reset ship parts/fuel/valuables and alien objects, $47 is 9 objects data
 label    28C9 Reset_Objects_And_Aliens
 comment  28CD
 label    28CD Loop_Reset_Objects_And_Aliens
 comment  28D4
-comment  28D4 Reset Jetman, Lasers, Sounds, Rocket and Aliens, $2F is 6 objects data
+comment  28D4 Reset Jetman, Lasers, Sounds, Ship and Aliens, $2F is 6 objects data
 label    28D4 Reset_Objects_Multiple
 comment  28D8
 label    28D8 Loop_Reset_Objects_Multiple
@@ -1418,12 +1418,12 @@ comment  2B46
 comment  2B46 Object is going down or right, invert direction and store back to object
 comment  2B4B
 comment  2B4B Test if Jetman is onscreen
-label    2B4B Spawn_Rocket_Modules_Fuel_Cell
+label    2B4B Spawn_Ship_Modules_Fuel_Cell
 binary   2B4F
 comment  2B52
 label    2B52 Spawn_RMFC_RTS
 comment  2B53
-comment  2B53 Return if Jetman not only flying or standing or no rocket module/fuel onscreen
+comment  2B53 Return if Jetman not only flying or standing or no ship module/fuel onscreen
 label    2B53 Spawn_RMFC
 deflabel 2B54 NOT_FLYING_AND_NOT_STANDING
 comment  2B5C
@@ -1434,14 +1434,14 @@ comment  2B63 Use counter to randomly spawn another Fuel Cell
 binary   2B66
 binary   2B68
 comment  2B6B
-comment  2B6B Init Rocket Part or Fuel Cell object (8 attributes)
+comment  2B6B Init Ship Part or Fuel Cell object (8 attributes)
 deflabel 2B6C NUM_OBJECT_PARAMS
 comment  2B6D
-label    2B6D Loop_Init_Obj_Rocket_Or_Fuel
+label    2B6D Loop_Init_Obj_Ship_Or_Fuel
 comment  2B76
 comment  2B76 Spawn object at a random X position
 comment  2B7F
-label    2B7F Init_Obj_Rocket_Or_Fuel_Table
+label    2B7F Init_Obj_Ship_Or_Fuel_Table
 const    2B82
 comment  2B87
 label    2B87 Init_Obj_Valuable_Table
@@ -1478,8 +1478,8 @@ comment  2BC2 Make the valuble type $2x, used as an offset into the UDG data
 label    2BC2 Store_Valuable_Type
 binary   2BC3
 comment  2BC7
-comment  2BC7 $03C0 object starts as Rocket Module Middle, then becomes Valuable
-label    2BC7 Load_ZP_Params_Rocket_Or_Val
+comment  2BC7 $03C0 object starts as Ship Module Middle, then becomes Valuable
+label    2BC7 Load_ZP_Params_Ship_Or_Val
 lcomment 2BCD ZP00/01
 const    2BCD
 word     2BCE
@@ -1674,7 +1674,7 @@ deflabel 2D57 COLOUR_PURPLE
 comment  2D58
 comment  2D58 ----------------------------------------------------
 comment  2D58 FUNCTION : Tests if Jetman and the current object have
-comment  2D58 \           overlapped i.e. collided. Object can be rocket
+comment  2D58 \           overlapped i.e. collided. Object can be ship
 comment  2D58 \           part, fuel cell, gem or alien.
 comment  2D58 ENTRY : ZP_Obj_List_Ptr = Current Object
 comment  2D58 \        Obj_Jetman_Looks = Status of Jetman
@@ -1722,11 +1722,11 @@ comment  2D9C Test_Collision_Position_Y, note different collision range for abov
 label    2D9C Test_Collision_Position_Y
 deflabel 2D9D HITBOX_Y_ABOVE
 comment  2DA1
-comment  2DA1 Test if Rocket Top or Fuel object is inactive, if yes, skip initialization
+comment  2DA1 Test if Ship Top or Fuel object is inactive, if yes, skip initialization
 label    2DA1 Restore_Player_Objects
 comment  2DA6
 comment  2DA9
-comment  2DA9 Test if Rocket Middle or Valuable object is inactive, if yes, skip valuable test
+comment  2DA9 Test if Ship Middle or Valuable object is inactive, if yes, skip valuable test
 label    2DA9 Restore_Player_Objects_1
 comment  2DAE
 comment  2DAE Object is active, test if object is a Valuable, if yes, restore it
@@ -1734,13 +1734,13 @@ deflabel 2DAF OBJECT_TYPE_VALUABLE
 comment  2DB2
 comment  2DB2 Object is not a valuable, initialize it
 comment  2DB5
-label    2DB5 Set_Obj_List_Ptr_To_Rocket
+label    2DB5 Set_Obj_List_Ptr_To_Ship
 lcomment 2DBB ZP00/01
 lcomment 2DBC Object Address
 word     2DBC
 comment  2DBF
 comment  2DC5
-label    2DC5 Load_Params_Rocket_Or_Valuable
+label    2DC5 Load_Params_Ship_Or_Valuable
 comment  2DCB
 label    2DCB Set_Load_Obj_Type_X_Y_Colour
 comment  2DD1
@@ -1749,70 +1749,67 @@ comment  2DDD
 label    2DDD Set_Object_UDG_Colour
 comment  2DE3
 comment  2DE8
-comment  2DE8 Current wave modulus 4
-label    2DE8 Restore_Player_Rocket
+comment  2DE8 Active player's current wave modulus 4 to get ship graphics
+label    2DE8 Restore_Player_Ship
 binary   2DED
 comment  2DF1
 comment  2DF9
 comment  2DFF
-comment  2DFF 19 was AF, postion of Jetman or Rocket base module? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-comment  2DFF 11 handled in same way as 19 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-comment  2DFF WOULD APPEAR ZP19 is generally object address position Y, assumedly
-label    2DFF Decrement_Rocket_Position_Y
+label    2DFF Decrement_Ship_Position_Y_Etc
 comment  2E06
 comment  2E0D
 comment  2E14
 comment  2E17
 comment  2E17 Aliens keep moving also
-label    2E17 ROCKET_ASCEND
+label    2E17 SHIP_ASCEND
 comment  2E1A
-comment  2E1A Test if Rocket hit top of screen yet, if yes branch
-deflabel 2E1B ROCKET_BASE_POSITION_Y_PARAM
-deflabel 2E1F ROCKET_BASE_AT_SCREEN_TOP
+comment  2E1A Test if Ship hit top of screen yet, if yes branch
+deflabel 2E1B SHIP_BASE_POSITION_Y_PARAM
+deflabel 2E1F SHIP_BASE_AT_SCREEN_TOP
 comment  2E22
 comment  2E22 Calculate and store new height i.e one pixel up screen
 comment  2E27
-comment  2E27 Trigger rocket flight sound
+comment  2E27 Trigger ship flight sound
 comment  2E31
 comment  2E34
-label    2E34 Rocket_At_Top
+label    2E34 Ship_At_Top
 comment  2E39
-comment  2E39 Transition rocket object type from ascend to descend
+comment  2E39 Transition ship object type from ascend to descend
 deflabel 2E3A OBJECT_TYPE_PARAM
-deflabel 2E3C OBJECT_ROCKET_DESCEND
+deflabel 2E3C OBJECT_SHIP_DESCEND
 comment  2E3F
-comment  2E3F Zero the rocket's fuel level
-deflabel 2E41 OBJECT_ROCKET_FUEL_LEVEL
+comment  2E3F Zero the ship's fuel level
+deflabel 2E41 OBJECT_SHIP_FUEL_LEVEL
 comment  2E44
 comment  2E44 Turn off the flame animation
 deflabel 2E47
 deflabel 2E47
 comment  2E4B
 comment  2E4E
-label    2E4E ROCKET_DESCEND
+label    2E4E SHIP_DESCEND
 comment  2E51
-comment  2E51 Trigger rocket flight sound
+comment  2E51 Trigger ship flight sound
 comment  2E5B
 comment  2E5B Move object Y position down 1 pixel, stopping at bottom i.e. $AF
-deflabel 2E5C ROCKET_BASE_POSITION_Y_PARAM
+deflabel 2E5C SHIP_BASE_POSITION_Y_PARAM
 comment  2E64
-comment  2E64 Test if rocket has landed
-deflabel 2E65 ROCKET_BASE_POSITION_Y
+comment  2E64 Test if ship has landed
+deflabel 2E65 SHIP_BASE_POSITION_Y
 comment  2E68
-comment  2E68 Set current object type to regular rocket base part
+comment  2E68 Set current object type to regular ship base part
 deflabel 2E69 OBJECT_TYPE_PARAM
-deflabel 2E6B OBJECT_ROCKET_LANDED
+deflabel 2E6B OBJECT_SHIP_LANDED
 comment  2E71
 comment  2E74
-comment  2E74 Test if Jetman collided with Rocket
-label    2E74 ROCKET_BASE_MODULE
+comment  2E74 Test if Jetman collided with ship
+label    2E74 SHIP_BASE_MODULE
 comment  2E7E
-comment  2E7E Jetman collided with Rocket, test if fully fulled up
-deflabel 2E7F OBJECT_ROCKET_FUEL_LEVEL
+comment  2E7E Jetman collided with stip, test if fully fulled up
+deflabel 2E7F OBJECT_SHIP_FUEL_LEVEL
 deflabel 2E83 FUELLED_UP
 comment  2E86
-comment  2E86 Rocket fuelled up, set Rocket object type to Ascend
-deflabel 2E87 ROCKET_ASCENDING
+comment  2E86 Ship fuelled up, set Ship object type to Ascend
+deflabel 2E87 SHIP_ASCENDING
 deflabel 2E89 OBJECT_TYPE_PARAM
 comment  2E8F
 comment  2E8F Load current objects list painter to the Jetman object
@@ -1825,31 +1822,31 @@ comment  2EA1
 comment  2EA1 Increment number of lives, gets decremented again on next level start
 comment  2EA9
 comment  2EAC
-label    2EAC Display_Rocket
+label    2EAC Display_Ship
 comment  2EB5
-label    2EB5 Loop_Display_Rocket_Parts
+label    2EB5 Loop_Display_Ship_Parts
 comment  2EC0
 binary   2EC5
 comment  2EC8
-deflabel 2ECD OBJ_ROCKET_PARTS_COUNTER_PARAM
-comment  2EC0 Bit 4 of counter used to flash rocket between white or purple colour
+deflabel 2ECD OBJ_SHIP_PARTS_COUNTER_PARAM
+comment  2EC0 Bit 4 of counter used to flash ship between white or purple colour
 comment  2EC0 The 2xLSR changes Register A to be %0100, which is also the purple colour code
 comment  2EC8 Counter not %0100, so set to white instead of purple
 deflabel 2EC9 COLOUR_WHITE
 comment  2ECA
-label    2ECA Store_Rocket_Colour
+label    2ECA Store_Ship_Colour
 comment  2ECC
-comment  2ECC Load rocket parts count, can be either 1/2/3 depending on base/Base+Mid/Base+Mid+Top built
+comment  2ECC Load ship parts count, can be either 1/2/3 depending on base/Base+Mid/Base+Mid+Top built
 comment  2ED2
-comment  2ED2 If rocket not yet built, colourize what's built with white
+comment  2ED2 If ship not yet built, colourize what's built with white
 comment  2ED6
-comment  2ED6 Rocket is fully built i.e. Base+Mid+Top
+comment  2ED6 Ship is fully built i.e. Base+Mid+Top
 comment  2ED6 Fuel Level ranges from 0 to 6, divide by 2 and store
-deflabel 2ED7 OBJECT_ROCKET_FUEL_LEVEL
+deflabel 2ED7 OBJECT_SHIP_FUEL_LEVEL
 comment  2EDD
 comment  2EDD If no fuel to display yet, colourize it all with white
 comment  2EDF
-comment  2EDF Fuel to display is 6/2=3, i.e. fully fuelled, flash rocket in with current colour purple/white
+comment  2EDF Fuel to display is 6/2=3, i.e. fully fuelled, flash ship in with current colour purple/white
 comment  2EE3
 comment  2EE3 Fuel to display is less than 6/2=3, store fuel level/2
 comment  2EE3 Base or base+mid to be coloured purple
@@ -1857,29 +1854,29 @@ comment  2EE5
 deflabel 2EE6 COLOUR_PURPLE
 comment  2EE9
 comment  2EEC
-comment  2EEC Calculate number of rocket parts remaining to be coloured white i.e. not base or base+mid
-comment  2EEC by subtracting from 3 and store number of rows to colour to Rocket_Parts_Count
+comment  2EEC Calculate number of ship parts remaining to be coloured white i.e. not base or base+mid
+comment  2EEC by subtracting from 3 and store number of rows to colour to Ship_Parts_Count
 comment  2EF3
 deflabel 2EF4 COLOUR_WHITE
 comment  2EF7
 comment  2EFD
 deflabel 2EFE COLOUR_WHITE
-label    2EFD Colourize_Rocket_White
+label    2EFD Colourize_Ship_White
 comment  2F01
-label    2F01 Colourize_Rocket_NEXT
+label    2F01 Colourize_Ship_NEXT
 comment  2F07
-comment  2F07 Setup the Colour RAM address where the rocket is and then colourize it
-label    2F07 Colourize_Rocket_Setup_RAM_Ptr
-deflabel 2F08 OBJECT_ROCKET_POSITION_X_PARAM
+comment  2F07 Setup the Colour RAM address where the ship is and then colourize it
+label    2F07 Colourize_Ship_Setup_RAM_Ptr
+deflabel 2F08 OBJECT_SHIP_POSITION_X_PARAM
 comment  2F0D
-deflabel 2F0E OBJECT_ROCKET_POSITION_Y_PARAM
+deflabel 2F0E OBJECT_SHIP_POSITION_Y_PARAM
 comment  2F13
 comment  2F16
 deflabel 2F17 COLUMN_INDEX
 comment  2F18
 comment  2F18 ZP02 contains number of rows to paint
 comment  2F18 ZP1B contains colour to paint with, $01 = white
-label    2F16 Colourize_Rocket
+label    2F16 Colourize_Ship
 comment  2F1C
 comment  2F1C Move to next horizantal colour tile
 comment  2F1F
@@ -1890,31 +1887,31 @@ comment  2F26 16-bit address hi-byte
 comment  2F2C
 comment  2F30
 comment  2F31
-comment  2F31 Test if rocket part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
-label    2F31 Rocket_Part_Or_Fuel_Dropped
+comment  2F31 Test if ship part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
+label    2F31 Ship_Part_Or_Fuel_Dropped
 deflabel 2F32 OBJECT_UDG_DATA_OFFSET
 comment  2F39
-comment  2F39 Rocket part dropped, add current Y postion to landed Y position
+comment  2F39 Ship part dropped, add current Y postion to landed Y position
 comment  2F39 and test to see if object has hit the ground
 deflabel 2F3B OBJECT_POSITION_Y_PARAM
 deflabel 2F40 SCREEN_BOTTOM
 comment  2F43
-comment  2F43 Rocket part landed, activate next object i.e. set
+comment  2F43 Ship part landed, activate next object i.e. set
 comment  2F43 status = not dropping and not picked-up by Jetman
 comment  2F43 Note, using direct addressing, not using Y offset
 binary   2F47
 comment  2F4E
-comment  2F4E Calculate Position Y offset when object lands based on how many rocket pieces have
-comment  2F4E previosuly landed ($10 when rocket middle landed, $20 for top section landed)
+comment  2F4E Calculate Position Y offset when object lands based on how many ship pieces have
+comment  2F4E previosuly landed ($10 when ship middle landed, $20 for top section landed)
 comment  2F57
 comment  2F57 Calculate object landed Position Y and store
 comment  2F5F
 comment  2F65
-comment  2F65 Turn Rocket Middle Section object off in object list
+comment  2F65 Turn Ship Middle Section object off in object list
 label    2F65 Disable_Object_In_List
 comment  2F6A
-comment  2F6A Trigger sound for valuable pickup and rocket part/fuel cell
-comment  2F6A landing on rocket base
+comment  2F6A Trigger sound for valuable pickup and ship part/fuel cell
+comment  2F6A landing on ship base
 comment  2F74
 comment  2F77
 label    2F77 Fuel_Dropped
@@ -1922,37 +1919,37 @@ deflabel 2F78 OBJECT_POSITION_Y_PARAM
 deflabel 2F7C FUEL_POSITION_Y_WHEN_LANDED
 comment  2F7F
 comment  2F7F Fuel cell has landed, increment the counter
-comment  2F8E On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two rocket parts
+comment  2F8E On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two ship parts
 comment  2F8E On game startup 03B8+04=00, 03C0+4=01
 comment  2F8E Pickup  middle section 03B8+04=00, 03C0+4=03
 comment  2F8E Falling middle section 03B8+04=00, 03C0+4=07
 comment  2F8E Landed  middle section 03B8+04=01, 03C0+4=07
 comment  2F8E 03C0 turns into a 0E_Valuable, 03B8 goes round the same cycle as 03C0
 comment  2F8E 03B8 becomes a fuel cell
-comment  2F8E When middle rocket section deposited, only 03B8 checked, despite dropped valuable
-comment  2F8E When top rocket section lifted, still only 03B8 checked, despite dropped valuable
-comment  2F8E When top rocket section deposited and fuel dropped, still only 03B8 checked
-comment  2F8E When fuel picked-up and dropping onto rocket, still 03B8 checked.
-comment  2F8E When fuel drops into rocket, for a short time, no interrupt until next fuel cell drops 03B8
-label    2F8E ROCKET_PART_OR_FUEL
+comment  2F8E When middle ship section deposited, only 03B8 checked, despite dropped valuable
+comment  2F8E When top ship section lifted, still only 03B8 checked, despite dropped valuable
+comment  2F8E When top ship section deposited and fuel dropped, still only 03B8 checked
+comment  2F8E When fuel picked-up and dropping onto ship, still 03B8 checked.
+comment  2F8E When fuel drops into ship, for a short time, no interrupt until next fuel cell drops 03B8
+label    2F8E SHIP_PART_OR_FUEL
 comment  2F91
-comment  2F91 Test status of the rocket part or fuel cell object
+comment  2F91 Test status of the ship part or fuel cell object
 comment  2F91 001=Ready to Pickup, 011=Picked-up, 111=Dropped/Landed
 deflabel 2F92 OBJECT_PICKUP_DROPPED_STATE
 comment  2F9A
 comment  2F9F
 comment  2FA4
-comment  2FA4 Test if Jetman has collided with a rocket part or fuel cell, branch if yes
+comment  2FA4 Test if Jetman has collided with a ship part or fuel cell, branch if yes
 comment  2FAB
-comment  2FAB No Jetman collision, test if rocket part or fuel cell has landed on a platform, branch if yes
-comment  2FAB Rocket top part only falls when middle part deposited
+comment  2FAB No Jetman collision, test if ship part or fuel cell has landed on a platform, branch if yes
+comment  2FAB Ship top part only falls when middle part deposited
 comment  2FB2
 comment  2FB2 Move object down by 2 pixels, make Position Y an odd number
-label    2FB2 Rocket_Part_Or_Fuel_Move_Down
+label    2FB2 Ship_Part_Or_Fuel_Move_Down
 deflabel 2FB3 OBJECT_POSITION_Y_PARAM
 comment  2FBD
 comment  2FBD Load current object attributes into ZP variables and object index into Register A
-label    2FBD Setup_Object_Addr_Rocket_Fuel
+label    2FBD Setup_Object_Addr_Ship_Fuel
 comment  2FC3
 comment  2FC3 Using index into object data, get addr of object data to A and Y and setup into ZP
 label    2FC3 Setup_Object_Addr
@@ -1960,7 +1957,7 @@ comment  2FCB
 comment  2FCB Do it again to setup the object dimensions
 comment  2FD1
 comment  2FDA
-comment  2FDA Return object's UDG data address offset for Rocket Middle Section/Fuel
+comment  2FDA Return object's UDG data address offset for Ship Middle Section/Fuel
 comment  2FDA depending on which of the four levels (or multiple of) the player is currently on
 label    2FDA Load_Obj_UDG_Data_Addr_Ship_Wv
 comment  2FDC
@@ -1977,11 +1974,11 @@ comment  2FE5
 comment  2FE5 Using A as offset, Load A and Y with address of Ship, Fuel or Valuable UDG data
 label    2FE5 Load_Obj_UDG_Data_Addr_S_F_V
 comment  2FEE
-comment  2FEE At point when Jetman picks up Rocket or Fuel module
-label    2FEE Jetman_Collide_Rocket_Fuel
+comment  2FEE At point when Jetman picks up Ship or Fuel module
+label    2FEE Jetman_Collide_Ship_Fuel
 binary   2FF6
 comment  2FF9
-comment  2FF9 Jetman pickup Rocket Module / Fuel Cell = 100 points
+comment  2FF9 Jetman pickup Ship Module / Fuel Cell = 100 points
 lcomment 2FFC ZP02/03
 deflabel 2FF2 OBJECT_STATUS_PARAM
 deflabel 2FF6 OBJECT_STATUS_PICKED_UP
@@ -2017,10 +2014,10 @@ comment  3042 Jetman is above ship, set picked-up object state to Dropped/Landed
 deflabel 3043 OBJECT_PICKUP_DROPPED_STATE
 binary   3047
 comment  304A
-comment  304A Set the dropped object's Position X to the same as the rocket base, so they line up on-screen
+comment  304A Set the dropped object's Position X to the same as the ship base, so they line up on-screen
 deflabel 304E OBJECT_POSITION_X_PARAM
 comment  3051
-label    3051 JMP_Setup_Obj_Addr_Rocket_Fuel
+label    3051 JMP_Setup_Obj_Addr_Ship_Fuel
 comment  3054
 label    3054 Disp_Obj_Ship_Or_Fuel_Setup_2
 comment  3057
@@ -2333,7 +2330,7 @@ label    326A R__Wrap_Right_To_Left
 label    326F P_TXA_Jump_R
 label    3273 JETMAN_FLYING_
 lcomment 3276 Returns A=%RLDU_F111
-lcomment 327B Remove=Jetman+fuel/rocket part pick-up fly through platforms
+lcomment 327B Remove=Jetman+fuel/ship part pick-up fly through platforms
 label    3285 P_Update_Jetman_Position_X
 deflabel 3286 JETMAN_DIRECTION_X_PARAM
 comment  3291
@@ -2846,7 +2843,7 @@ comment  364E ZP08 and ZP09 used as index into UDG RAM for old object and new ob
 comment  3652
 comment  3652 ZP03 & ZP0B contain heights of the old and new object bitmaps from the UDG graphics data
 comment  3652 e.g. Alien Cross object height is $0A pixels/lines
-comment  3652 Rocket is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
+comment  3652 Ship is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
 comment  3656
 comment  365A
 comment  365A Test if updated object Y position has changed, if yes, horizontal pixels can be erased
@@ -2981,7 +2978,7 @@ comment  378A
 comment  378A Code used for Jetman, Ship Top/Mid/Base, Fuel, Valuables
 label    378A Load_Obj_New_UDG_RAM_Addr_Siz_
 comment  378D
-comment  378D Example Rocket Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
+comment  378D Example Ship Middle Section Object UDG RAM Position A=3C, Y=F7, thus $3CF7
 comment  378D Store object UDG Data Addr in Registers Y and A into ZP06 & 07, minus $100
 label    378D Load_Obj_New_UDG_RAM_Addr_Size
 lcomment 3791 ZP07/06=$3BF7
@@ -2999,7 +2996,7 @@ deflabel 37A8 SCREEN_WIDTH_PIXELS
 comment  37A9
 label    37A9 No_X_Wrap
 lcomment 37A9 ZP04=X=$50 ZP05=Y=$5F
-lcomment 37AB ZP05/04=$173F i.e. rocket middle
+lcomment 37AB ZP05/04=$173F i.e. ship middle
 lcomment 37AB section start position on middle platform
 comment  37AE
 comment  37AE ZP04/05 are now an address instead of X and Y coordinates.
@@ -3074,13 +3071,13 @@ comment  3815 Animations have 2 or 4 frames and are minimum 2 pixels apart so bi
 label    3815 Get_Obj_New_UDG_Data_Addr
 binary   3818
 comment  381F
-comment  381F Colorize all object sprites i.e. Jetman, Aliens, Rocket Top/Middle/Base, Fuel, Valuables
+comment  381F Colorize all object sprites i.e. Jetman, Aliens, Ship Top/Middle/Base, Fuel, Valuables
 label    381F Colourize_Object
 comment  3827
-comment  3827 Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Rocket Top X=20, Y=3F
+comment  3827 Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Ship Top X=20, Y=3F
 comment  382A
 comment  382A Divide object height by $10 then add $02, so always update colour on at least two vertical tiles
-comment  382A e.g. Jetman=$18->$03, Rocket_Top=$10->$03, Fuzz_Alien=$0A->$02
+comment  382A e.g. Jetman=$18->$03, Ship_Top=$10->$03, Fuzz_Alien=$0A->$02
 comment  3833
 comment  3833 Use ZP0B as outer loop for vertical tile rows
 comment  3835

@@ -73,10 +73,10 @@ comment  2F31
 comment  2F31
 comment  2F31
 comment  2F31 ############################################################################################
-comment  2F31 \88""Yb  dP"Yb   dP""b8 88  dP 888888 888888     88""Yb    db    88""Yb 888888
-comment  2F31 \88__dP dP   Yb dP   `" 88odP  88__     88       88__dP   dPYb   88__dP   88
-comment  2F31 \88"Yb  Yb   dP Yb      88"Yb  88""     88       88"""   dP__Yb  88"Yb    88
-comment  2F31 \88  Yb  YbodP   YboodP 88  Yb 888888   88       88     dP""""Yb 88  Yb   88
+comment  2F31 \.dP"Y8 88  88 88 88""Yb      88""Yb    db    88""Yb 888888
+comment  2F31 \`Ybo." 88  88 88 88__dP      88__dP   dPYb   88__dP   88
+comment  2F31 \o.`Y8b 888888 88 88"""       88"""   dP__Yb  88"Yb    88
+comment  2F31 \8bodP' 88  88 88 88          88     dP""""Yb 88  Yb   88
 comment  2F31
 comment  2F31 \ dP"Yb  88""Yb     888888 88   88 888888 88
 comment  2F31 \dP   Yb 88__dP     88__   88   88 88__   88
@@ -158,15 +158,10 @@ comment  2E74
 comment  2E74
 comment  2E74
 comment  2E74 ############################################################################################
-comment  2E74 \88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-comment  2E74 \88__dP dP   Yb dP   `" 88odP  88__     88
-comment  2E74 \88"Yb  Yb   dP Yb      88"Yb  88""     88
-comment  2E74 \88  Yb  YbodP   YboodP 88  Yb 888888   88
-comment  2E74
-comment  2E74 \88""Yb  dP"Yb  888888 888888  dP"Yb  8b    d8
-comment  2E74 \88__dP dP   Yb   88     88   dP   Yb 88b  d88
-comment  2E74 \88""Yb Yb   dP   88     88   Yb   dP 88YbdP88
-comment  2E74 \88oodP  YbodP    88     88    YbodP  88 YY 88
+comment  2E74 \.dP"Y8 88  88 88 88""Yb      88""Yb  dP"Yb  888888 888888  dP"Yb  8b    d8
+comment  2E74 \`Ybo." 88  88 88 88__dP      88__dP dP   Yb   88     88   dP   Yb 88b  d88
+comment  2E74 \o.`Y8b 888888 88 88"""       88""Yb Yb   dP   88     88   Yb   dP 88YbdP88
+comment  2E74 \8bodP' 88  88 88 88          88oodP  YbodP    88     88    YbodP  88 YY 88
 comment  2E74
 comment  2E74 \8b    d8  dP"Yb  8888b.  88   88 88     888888
 comment  2E74 \88b  d88 dP   Yb  8I  Yb 88   88 88     88__
@@ -180,15 +175,10 @@ comment  2E17
 comment  2E17
 comment  2E17
 comment  2E17 ############################################################################################
-comment  2E17 \88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-comment  2E17 \88__dP dP   Yb dP   `" 88odP  88__     88
-comment  2E17 \88"Yb  Yb   dP Yb      88"Yb  88""     88
-comment  2E17 \88  Yb  YbodP   YboodP 88  Yb 888888   88
-comment  2E17
-comment  2E17 \   db    .dP"Y8  dP""b8 888888 88b 88 8888b.
-comment  2E17 \  dPYb   `Ybo." dP   `" 88__   88Yb88  8I  Yb
-comment  2E17 \ dP__Yb  o.`Y8b Yb      88""   88 Y88  8I  dY
-comment  2E17 \dP""""Yb 8bodP'  YboodP 888888 88  Y8 8888Y"
+comment  2E17 \.dP"Y8 88  88 88 88""Yb        db    .dP"Y8  dP""b8 888888 88b 88 8888b.
+comment  2E17 \`Ybo." 88  88 88 88__dP       dPYb   `Ybo." dP   `" 88__   88Yb88  8I  Yb
+comment  2E17 \o.`Y8b 888888 88 88"""       dP__Yb  o.`Y8b Yb      88""   88 Y88  8I  dY
+comment  2E17 \8bodP' 88  88 88 88         dP""""Yb 8bodP'  YboodP 888888 88  Y8 8888Y"
 comment  2E17 ############################################################################################
 ;
 comment  2E4E
@@ -197,15 +187,10 @@ comment  2E4E
 comment  2E4E
 comment  2E4E
 comment  2E4E ############################################################################################
-comment  2E4E \88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-comment  2E4E \88__dP dP   Yb dP   `" 88odP  88__     88
-comment  2E4E \88"Yb  Yb   dP Yb      88"Yb  88""     88
-comment  2E4E \88  Yb  YbodP   YboodP 88  Yb 888888   88
-comment  2E4E
-comment  2E4E \8888b.  888888 .dP"Y8  dP""b8 888888 88b 88 8888b.
-comment  2E4E \ 8I  Yb 88__   `Ybo." dP   `" 88__   88Yb88  8I  Yb
-comment  2E4E \ 8I  dY 88""   o.`Y8b Yb      88""   88 Y88  8I  dY
-comment  2E4E \8888Y"  888888 8bodP'  YboodP 888888 88  Y8 8888Y"
+comment  2E4E \.dP"Y8 88  88 88 88""Yb     8888b.  888888 .dP"Y8  dP""b8 888888 88b 88 8888b.
+comment  2E4E \`Ybo." 88  88 88 88__dP      8I  Yb 88__   `Ybo." dP   `" 88__   88Yb88  8I  Yb
+comment  2E4E \o.`Y8b 888888 88 88"""       8I  dY 88""   o.`Y8b Yb      88""   88 Y88  8I  dY
+comment  2E4E \8bodP' 88  88 88 88         8888Y"  888888 8bodP'  YboodP 888888 88  Y8 8888Y"
 comment  2E4E ############################################################################################
 ;
 comment  26AE
@@ -364,15 +349,10 @@ comment  27AA
 comment  27AA
 comment  27AA
 comment  27AA
-comment  27AA \8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
-comment  27AA \ 8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
-comment  27AA \ 8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
-comment  27AA \8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
-comment  27AA
-comment  27AA \88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-comment  27AA \88__dP dP   Yb dP   `" 88odP  88__     88
-comment  27AA \88"Yb  Yb   dP Yb      88"Yb  88""     88
-comment  27AA \88  Yb  YbodP   YboodP 88  Yb 888888   88
+comment  27AA \8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP     .dP"Y8 88  88 88 88""Yb
+comment  27AA \ 8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP      `Ybo." 88  88 88 88__dP
+comment  27AA \ 8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P       o.`Y8b 888888 88 88"""
+comment  27AA \8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP        8bodP' 88  88 88 88
 comment  27AA
 comment  27AA \888888 88        db    8b    d8 888888
 comment  27AA \88__   88       dPYb   88b  d88 88__
@@ -509,10 +489,10 @@ comment  2FEE \dP   `" dP   Yb 88     88     88  8I  Yb 88__
 comment  2FEE \Yb      Yb   dP 88  .o 88  .o 88  8I  dY 88""
 comment  2FEE \ YboodP  YbodP  88ood8 88ood8 88 8888Y"  888888
 comment  2FEE
-comment  2FEE \88""Yb  dP"Yb   dP""b8 88  dP 888888 888888     888888 88   88 888888 88
-comment  2FEE \88__dP dP   Yb dP   `" 88odP  88__     88       88__   88   88 88__   88
-comment  2FEE \88"Yb  Yb   dP Yb      88"Yb  88""     88       88""   Y8   8P 88""   88  .o
-comment  2FEE \88  Yb  YbodP   YboodP 88  Yb 888888   88       88     `YbodP' 888888 88ood8
+comment  2FEE \.dP"Y8 88  88 88 88""Yb     888888 88   88 888888 88
+comment  2FEE \`Ybo." 88  88 88 88__dP     88__   88   88 88__   88
+comment  2FEE \o.`Y8b 888888 88 88"""      88""   Y8   8P 88""   88  .o
+comment  2FEE \8bodP' 88  88 88 88         88     `YbodP' 888888 88ood8
 ;
 comment  2C78
 comment  2C78
@@ -714,15 +694,10 @@ comment  2EAC
 comment  2EAC
 comment  2EAC
 comment  2EAC
-comment  2EAC \8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP
-comment  2EAC \ 8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP
-comment  2EAC \ 8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P
-comment  2EAC \8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP
-comment  2EAC
-comment  2EAC \88""Yb  dP"Yb   dP""b8 88  dP 888888 888888
-comment  2EAC \88__dP dP   Yb dP   `" 88odP  88__     88
-comment  2EAC \88"Yb  Yb   dP Yb      88"Yb  88""     88
-comment  2EAC \88  Yb  YbodP   YboodP 88  Yb 888888   88
+comment  2EAC \8888b.  88 .dP"Y8 88""Yb 88        db    Yb  dP     .dP"Y8 88  88 88 88""Yb
+comment  2EAC \ 8I  Yb 88 `Ybo." 88__dP 88       dPYb    YbdP      `Ybo." 88  88 88 88__dP
+comment  2EAC \ 8I  dY 88 o.`Y8b 88"""  88  .o  dP__Yb    8P       o.`Y8b 888888 88 88"""
+comment  2EAC \8888Y"  88 8bodP' 88     88ood8 dP""""Yb  dP        8bodP' 88  88 88 88
 ;
 comment  28E7
 comment  28E7
