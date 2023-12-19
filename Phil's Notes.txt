@@ -175,10 +175,31 @@ Many main subroutines enter in the middle and sometimes jupm to code before hand
 What's left?
 - ???
 - @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-- "ZP_Ship_UDG_Addr_Colour?"
-- SKIP_31D7
 - DISPLAY_LASERS
-- Restore_Player_Objects
 - Platform_Collision_Test
-- JETMAN_FLYING
-- JETMAN_STANDING
+- JETMAN_FLYING - GRAPHED, but code not fully single-stepped
+- JETMAN_STANDING - DONE, but load ZP Parameters not done
+- Display_Object - DONE
+
+Ghidra used ImportSymbolsScript.py to import symbols.
+Ghidra locals not used, had to load symbols individually.
+Ghidra not perfect, so bits get left off, go look in the code and graph view!
+Ghidra overlap on ZP variable names in DISPLAY_LASERS, e.g. Laser_Position changes to Laser_UDG_Position.
+Had to manually put in ZP variable names, can't make local due to jump table.
+Purple background due to unidentified function i.e. follows Load_ZP_Parameters.
+
+Overview:
+Clockwise from 00:00 Main Loop
+ANIMATE_EXPLOSIONS
+JETMAN_FLYING
+DISPLAY_LASERS
+JETMAN_STANDING
+WAVE_3_SAUCER
+WAVE_2_SPHERE
+WAVE_1_CROSS
+WAVE_0_FUZZBALL
+SHIP_PART_OR_FUEL
+VALUABLES
+SHIP_BASE_MODULE
+SHIP_DESCEND
+SHIP_ASCEND

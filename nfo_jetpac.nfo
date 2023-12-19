@@ -2049,14 +2049,9 @@ label    3091 Read_ZP_Params_Player_2_Score
 lcomment 3094 ZP06
 lcomment 3095 Player 2 Score in ZP
 word     3095
-
-comment  309B
-comment  309B NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-comment  309B
-
 comment  309B
 comment  309B Perform Absolute on Register A containing Distance X of object from left side of first platform
-label    309B TPC_Test_Platform_Size_X
+label    309B Test_Platform_Size_X
 binary   309C
 comment  309F
 comment  309F Register Y becomes 2, used to point to the number of characters in the middle of a platform
@@ -2127,7 +2122,7 @@ comment  30B9 Register Y becomes OBJECT_POSITION_Y_PARAM
 comment  30BF
 comment  30C2
 comment  30C2 Initialise collision status, which becomes the subroutine return code
-label    30C2 TPC_Test_Platform_Collision_X
+label    30C2 Test_Platform_Collision_X
 comment  30C6
 comment  30C6 Load Position X of platform (leftmost edge, indexed by Register Y) and subtract object Position X
 comment  30CD
@@ -2135,13 +2130,13 @@ comment  30CD Object is to the left of the platform, set status bit 1
 comment  30CD Register A contains the distance between object X and the left side of the left platform
 comment  30D4
 comment  30D4 Register A contains the distance between object X and the left side of the left platform
-label    30D4 TPC_Test_Obj_Pfm_Dist_Over_8
+label    30D4 Test_Obj_Pfm_Dist_Over_8
 comment  30D8
 comment  30D8 Distance X is greater than #08
 comment  30DF
 comment  30DF Register A contains the distance between object X and the left side of the left platform
 comment  30DF Test if obj is $10 pixels left of platform, if yes, no Y check needed, test next platform
-label    30DF TPC_Test_Obj_Past_Right_Of_Pfm
+label    30DF Test_Obj_Past_Right_Of_Pfm
 comment  30E3
 comment  30E3 Test object is $0C or less pixels to left of platform, if yes, Y check needed
 comment  30E3 Triggered When a wave 0 alien position X moves to either side of a platform, but no overlap
@@ -2150,14 +2145,14 @@ comment  30E7 Object is greater than $0C pixels to left of platform, set bit 2, 
 comment  30EC
 comment  30EC Register Y becomes Platform Y position address in Data Table i.e. parameter 01 or 04 or 07.
 comment  30EC Subtract object Position Y from platform Position Y
-label    30EC TPC_Test_Platform_Collision_Y
+label    30EC Test_Platform_Collision_Y
 comment  30F4
 comment  30F4 Object is above platform, test if > 4 pixels above platform, branch if yes
 comment  30F8
 comment  30F8 Set collision flag bit 7
 comment  30FD
 comment  30FD Object is below platform
-label    30FD TPC_Test_Platform_Colli_Y_Skip
+label    30FD Test_Platform_Collision_Y_Skip
 binary   30FE
 comment  3101
 comment  3101 Test if object is Jetman flying
@@ -2168,14 +2163,14 @@ comment  310C
 comment  310C Jetman is flying
 binary   310E
 comment  310F
-label    310F TPC_Move_Toward_RTS
+label    310F Move_Toward_RTS
 comment  3113
 comment  3113 Set collision flag bit 7
 comment  3118 Register Y is address pointer into lookup table, 3 groups of 3
 comment  3118
-label    3118 TPC_Next_Platform_Data_Inc
+label    3118 Next_Platform_Data_Inc
 comment  3119
-label    3119 TPC_Test_All_Platforms_Tested
+label    3119 Test_All_Platforms_Tested
 comment  311F
 comment  311F Test if object is one pixel from the bottom of screen
 deflabel 3120 OBJECT_POSITION_Y_PARAM
@@ -2184,19 +2179,19 @@ comment  3127
 deflabel 3128 SCREEN_BOTTOM
 comment  312B
 comment  312D
-label    312D TPC_STA_Collision_Status_RTS
+label    312D STA_Collision_Status_RTS
 comment  3130
-label    3130 TPC_Test_Object_20_Lines_Bott
+label    3130 Test_Object_20_Lines_Bott
 binary   3131
 comment  3134
 comment  3138
-label    3138 TPC_Set_Collision_Status
+label    3138 Set_Collision_Status
 const    3139
 comment  313C
-label    313C TPC_RTS
+label    313C Test_Platform_Collision_RTS
 comment  313D
 comment  313D Jetman is standing (i.e. not flying)
-label    313D TPC_Test???_Jetman_Standing
+label    313D Test_Jetman_Standing
 binary   313F
 comment  3143
 label    3143 Load_Platform_Data_Table_Addr
@@ -2266,22 +2261,22 @@ lcomment 31BC X Y #Num_middle_chars
 comment  31BF
 comment  31BF NOT COMPLETE YET @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 comment  31BF
-label    31BF A_Left_Right_Impact
+label    31BF Left_Right_Impact
 deflabel 31C0 JETMAN_DIRECTION_X_PARAM
 comment  31C7
 comment  31C7 Load and test Jetman X Direction/Velocity
 comment  31CB
-label    31CB C_Jump_P
+label    31CB JMP_Update_Jetman_Position_X
 comment  31CE
-label    31CE B_Fly_Right_Impact
-label    31D4 B_Jump_Q
+label    31CE Fly_Right_Impact
+label    31D4 JMP_Store_Jetman_Direction_X_
 comment  31D7
 label    31D7 SKIP_31D7
 comment  31DF
 comment  31DF BVS/BVC above means below code can only be jumped/branched to
-label    31DF E_Fly_Left_Impact
+label    31DF Fly_Left_Impact
 comment  31E7
-label    31E7 E_Jump_Q
+label    31E7 JMP_Store_Jetman_Direction_X
 comment  31EA
 label    31EA SKIP_31EA
 comment  31F2
@@ -2294,58 +2289,58 @@ comment  31F2 1xxx1110 = Top Right Corner impact
 comment  31F2 1xxx0110 = Right impact
 comment  31F2 1xxx0111 = Top Left impact
 comment  31F2 1xxx0111 = Left impact
-label    31F2 H_Jetman_Hits_Surface
+label    31F2 Jetman_Hits_Surface
 comment  31F7
 comment  31F7 Test Obj_Jetman_At_Rest???
 deflabel 31F8 JETMAN_DIRECTION_Y_PARAM
 comment  3200
-label    3200 I_Left_Right_Up_Impact
+label    3200 Left_Right_Up_Impact
 comment  3208
 comment  3208 Test Obj_Jetman_At_Rest???
-label    3208 J_Flying_Up_Impact
+label    3208 Flying_Up_Impact
 deflabel 3209 JETMAN_DIRECTION_Y_PARAM
 binary   3211
 comment  3212
-label    3212 K_Jump_U
+label    3212 JMP_Store_Jetman_Direction_Y
 comment  3215
-label    3215 J_Jump_T
+label    3215 JMP_Update_Jetman_Position_Y
 comment  3218
-label    3218 M_Flying_Up_Impact_Bounce
+label    3218 Flying_Up_Impact_Bounce
 label    3224 SKIP_3224
 comment  3228
-label    3228 N_Flying_Left
+label    3228 Flying_Left
 comment  332C
 comment  332C NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 comment  332C
 comment  3230
 comment  323E
-label    323E S_Flying_Right
+label    323E Flying_Right
 comment  3246
 label    3254 SKIP_3254
 comment  3259 HOW DO YOU EVER GET HERE?
-label    325E P_INC_A_Jump_Q
-label    3264 R__Wrap_Left_To_Right
+label    325E CLC_ADC_JMP_Store_JM_Dir_X
+label    3264 Wrap_Left_To_Right
 deflabel 3266 SCREEN_WIDTH_PIXELS
-label    326A R__Wrap_Right_To_Left
-label    326F P_TXA_Jump_R
+label    326A Wrap_Right_To_Left
+label    326F TXA_JMP_Update_JM_Pos_X
 label    3273 JETMAN_FLYING_
 lcomment 3276 Returns A=%RLDU_F111
 lcomment 327B Remove=Jetman+fuel/ship part pick-up fly through platforms
-label    3285 P_Update_Jetman_Position_X
+label    3285 Update_Jetman_Position_X
 deflabel 3286 JETMAN_DIRECTION_X_PARAM
 comment  3291
 binary   3295
-label    32A2 Q_Store_Jetman_Direction_X
+label    32A2 Store_Jetman_Direction_X
 deflabel 32A3 JETMAN_DIRECTION_X_PARAM
-label    32A6 R_Update_Jetman_Position_X
+label    32A6 Update_Jetman_Position_X_
 deflabel 32A7 JETMAN_POSITION_X_PARAM
 comment  32A8
 comment  32AB
 comment  32AE
 deflabel 32B7 SCREEN_WIDTH_PIXELS
-label    32BA R__Store_Jetman_Position_X
+label    32BA Store_Jetman_Position_X
 comment  32BC
-label    32C7 T_Update_Jetman_Position_Y
+label    32C7 Update_Jetman_Position_Y
 deflabel 32C8 JETMAN_DIRECTION_Y_PARAM
 comment  32C9
 lcomment 32CB Test for direction Down
@@ -2354,9 +2349,9 @@ lcomment 32D0 Test for direction Up
 lcomment 32D3 Yes, branch
 comment  32D5
 comment  32DE
-label    32DE U_Store_Jetman_Direction_Y
+label    32DE Store_Jetman_Direction_Y
 comment  32E0
-label    32E0 V_Update_Jetman_Position_Y
+label    32E0 Update_Jetman_Position_Y_
 comment  32E1
 comment  32E4
 deflabel 32E9 SCREEN_BOTTOM
@@ -2367,21 +2362,21 @@ comment  32F5
 comment  32F5 Reverse the direction parameter
 comment  32F7
 comment  32F7 Gets called with either Jetman Type (index 0) or Jetman_Position_Y (index 3)
-label    32F7 W_Store_Jetman_Parameter
+label    32F7 Store_Jetman_Parameter
 comment  32F9
-label    32F9 X_Jetman_Screen_Update
+label    32F9 Jetman_Screen_Update
 comment  32FF
 comment  32FF Test for fire pressed
 label    3309 No_Fire_Pressed
 comment  330C
 comment  330C Load and test Jetman Y Direction
-label    330C Y_Update_Jetman_Direction_Y
+label    330C Update_Jetman_Direction_Y
 comment  3318
-label    3318 T_U_Set_Jetman_Direction_Y_Zro
+label    3318 Set_Jetman_Direction_Y_Zero
 comment  331D
-label    331D V_D_Set_Jetman_Position_Y_Bott
+label    331D Set_Jetman_Position_Y_Bottom
 comment  3321
-label    3321 D_Set_Jetman_Standing
+label    3321 Set_Jetman_Standing
 deflabel 3322 JETMAN_STATE_PARAM
 comment  3325
 comment  3325 ROL saves bit 7 (facing direction), LDA #$04 sets bit 2, ROR restores bit 7 and moves
@@ -2425,7 +2420,7 @@ comment  338D
 comment  338D Jetman walking left, prepare new Direction X value
 label    338D Jetman_Walking_Left
 comment  338F
-label    338F Test_Collision_Status????
+label    338F Test_Collision_Status
 deflabel 3390 JETMAN_DIRECTION_X_PARAM
 comment  3395
 comment  3395 Set Zero flag as AND between between content of addr 2015 (i.e. 0000_0010) and A (i.e. ZP02)

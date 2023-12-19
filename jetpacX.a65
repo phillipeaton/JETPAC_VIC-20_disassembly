@@ -5164,12 +5164,9 @@ Read_ZP_Params_Player_2_Score
 ;   88   88""   o.`Y8b   88
 ;   88   888888 8bodP'   88
 
-; NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
 ; Perform Absolute on Register A containing Distance X of object from left side of first platform
 ; L_BRS_($309B)_($30CB) OK
-TPC_Test_Platform_Size_X
+Test_Platform_Size_X
     eor     #%11111111                      ; 309B: 49 FF    
     adc     #$01                            ; 309D: 69 01    
 
@@ -5197,8 +5194,8 @@ TPC_Test_Platform_Size_X
     sec                                     ; 30AB: 38       
     txa                                     ; 30AC: 8A       
     sbc     ZP0B_Platform_Object_Distance   ; 30AD: E5 0B    
-    bcs     TPC_Test_Obj_Pfm_Dist_Over_8    ; 30AF: B0 23     Object is much further right than the platform
-    bcc     TPC_Test_Platform_Collision_Y   ; 30B1: 90 39    
+    bcs     Test_Obj_Pfm_Dist_Over_8        ; 30AF: B0 23     Object is much further right than the platform
+    bcc     Test_Platform_Collision_Y       ; 30B1: 90 39    
 
 ; Load object Position X and Y into working variables
 ; L_JSR_($30B3)_($2841) OK
@@ -5222,7 +5219,7 @@ Test_Platform_Collision
 
 ; Initialise collision status, which becomes the subroutine return code
 ; L_BRS_($30C2)_($311D) OK
-TPC_Test_Platform_Collision_X
+Test_Platform_Collision_X
     lda     #$00                            ; 30C2: A9 00    
     sta     ZP02_Collision_Status           ; 30C4: 85 02    
 
@@ -5230,66 +5227,66 @@ TPC_Test_Platform_Collision_X
     lda     (ZP08_Platfm_Data_Tbl_Addr_Lo),y; 30C6: B1 08    
     sec                                     ; 30C8: 38       
     sbc     ZP0E_Object_Position_X          ; 30C9: E5 0E    
-    bcc     TPC_Test_Platform_Size_X        ; 30CB: 90 CE    
+    bcc     Test_Platform_Size_X            ; 30CB: 90 CE    
 
 ; Object is to the left of the platform, set status bit 1
 ; Register A contains the distance between object X and the left side of the left platform
     tax                                     ; 30CD: AA       
     lda     #$01                            ; 30CE: A9 01    
-    jsr     TPC_Set_Collision_Status        ; 30D0: 20 38 31 
+    jsr     Set_Collision_Status            ; 30D0: 20 38 31 
     txa                                     ; 30D3: 8A       
 
 ; Register A contains the distance between object X and the left side of the left platform
 ; L_BRS_($30D4)_($30AF) OK
-TPC_Test_Obj_Pfm_Dist_Over_8
+Test_Obj_Pfm_Dist_Over_8
     cmp     #$08                            ; 30D4: C9 08    
-    bcc     TPC_Test_Obj_Past_Right_Of_Pfm  ; 30D6: 90 07    
+    bcc     Test_Obj_Past_Right_Of_Pfm      ; 30D6: 90 07    
 
 ; Distance X is greater than #08
     tax                                     ; 30D8: AA       
     lda     #$02                            ; 30D9: A9 02    
-    jsr     TPC_Set_Collision_Status        ; 30DB: 20 38 31 
+    jsr     Set_Collision_Status            ; 30DB: 20 38 31 
     txa                                     ; 30DE: 8A       
 
 ; Register A contains the distance between object X and the left side of the left platform
 ; Test if obj is $10 pixels left of platform, if yes, no Y check needed, test next platform
 ; L_BRS_($30DF)_($30D6) OK
-TPC_Test_Obj_Past_Right_Of_Pfm
+Test_Obj_Past_Right_Of_Pfm
     cmp     #$10                            ; 30DF: C9 10    
-    bcs     TPC_Next_Platform_Data_Inc      ; 30E1: B0 35    
+    bcs     Next_Platform_Data_Inc          ; 30E1: B0 35    
 
 ; Test object is $0C or less pixels to left of platform, if yes, Y check needed
 ; Triggered When a wave 0 alien position X moves to either side of a platform, but no overlap
     cmp     #$0C                            ; 30E3: C9 0C    
-    bcc     TPC_Test_Platform_Collision_Y   ; 30E5: 90 05    
+    bcc     Test_Platform_Collision_Y       ; 30E5: 90 05    
 
 ; Object is greater than $0C pixels to left of platform, set bit 2, Y check needed
     lda     #$04                            ; 30E7: A9 04    
-    jsr     TPC_Set_Collision_Status        ; 30E9: 20 38 31 
+    jsr     Set_Collision_Status            ; 30E9: 20 38 31 
 
 ; Register Y becomes Platform Y position address in Data Table i.e. parameter 01 or 04 or 07.
 ; Subtract object Position Y from platform Position Y
 ; L_BRS_($30EC)_($30B1) OK
 ; L_BRS_($30EC)_($30E5) OK
-TPC_Test_Platform_Collision_Y
+Test_Platform_Collision_Y
     iny                                     ; 30EC: C8       
     lda     (ZP08_Platfm_Data_Tbl_Addr_Lo),y; 30ED: B1 08    
     sec                                     ; 30EF: 38       
     sbc     ZP0F_Object_Position_Y          ; 30F0: E5 0F    
-    bcc     TPC_Test_Platform_Colli_Y_Skip  ; 30F2: 90 09    
+    bcc     Test_Platform_Collision_Y_Skip  ; 30F2: 90 09    
 
 ; Object is above platform, test if > 4 pixels above platform, branch if yes
     cmp     #$04                            ; 30F4: C9 04    
-    bcs     TPC_Test_All_Platforms_Tested   ; 30F6: B0 21    
+    bcs     Test_All_Platforms_Tested       ; 30F6: B0 21    
 
 ; Set collision flag bit 7
     lda     #$88                            ; 30F8: A9 88    
-    jmp     TPC_Set_Collision_Status        ; 30FA: 4C 38 31 
+    jmp     Set_Collision_Status            ; 30FA: 4C 38 31 
 ; ------------------------------------------
 
 ; Object is below platform
 ; L_BRS_($30FD)_($30F2) OK
-TPC_Test_Platform_Colli_Y_Skip
+Test_Platform_Collision_Y_Skip
     eor     #%11111111                      ; 30FD: 49 FF    
     sty     ZP0B_Platform_Object_Distance   ; 30FF: 84 0B    
 
@@ -5299,40 +5296,40 @@ TPC_Test_Platform_Colli_Y_Skip
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3104: B1 00    
     and     #%00111111                      ; 3106: 29 3F    
     cmp     #%00000001                      ; 3108: C9 01    
-    bne     TPC_Test???_Jetman_Standing     ; 310A: D0 31    
+    bne     Test_Jetman_Standing            ; 310A: D0 31    
 
 ; Jetman is flying
     pla                                     ; 310C: 68       
     cmp     #%00100010                      ; 310D: C9 22    
 
 ; L_JMP_($310F)_($3140) OK
-TPC_Move_Toward_RTS
+Move_Toward_RTS
     ldy     ZP0B_Platform_Object_Distance   ; 310F: A4 0B    
-    bcs     TPC_Test_All_Platforms_Tested   ; 3111: B0 06    
+    bcs     Test_All_Platforms_Tested       ; 3111: B0 06    
 
 ; Set collision flag bit 7
     lda     #$80                            ; 3113: A9 80    
-    jmp     TPC_Set_Collision_Status        ; 3115: 4C 38 31 
+    jmp     Set_Collision_Status            ; 3115: 4C 38 31 
 ; ------------------------------------------
 ; Register Y is address pointer into lookup table, 3 groups of 3
 
 ; L_BRS_($3118)_($30E1) OK
-TPC_Next_Platform_Data_Inc
+Next_Platform_Data_Inc
     iny                                     ; 3118: C8       
 
 ; L_BRS_($3119)_($30F6) OK
 ; L_BRS_($3119)_($3111) OK
-TPC_Test_All_Platforms_Tested
+Test_All_Platforms_Tested
     iny                                     ; 3119: C8       
     iny                                     ; 311A: C8       
     dec     ZP0A_Platform_Quantity          ; 311B: C6 0A    
-    bne     TPC_Test_Platform_Collision_X   ; 311D: D0 A3    
+    bne     Test_Platform_Collision_X       ; 311D: D0 A3    
 
 ; Test if object is one pixel from the bottom of screen
     ldy     #OBJECT_POSITION_Y_PARAM        ; 311F: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3121: B1 00    
     cmp     #SCREEN_BOTTOM_1UP              ; 3123: C9 AE    
-    bcc     TPC_Test_Object_20_Lines_Bott   ; 3125: 90 09    
+    bcc     Test_Object_20_Lines_Bott       ; 3125: 90 09    
 
     lda     #SCREEN_BOTTOM                  ; 3127: A9 AF    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 3129: 91 00    
@@ -5340,39 +5337,39 @@ TPC_Test_All_Platforms_Tested
     lda     #$88                            ; 312B: A9 88    
 
 ; L_BRS_($312D)_($3136) OK
-TPC_STA_Collision_Status_RTS
+STA_Collision_Status_RTS
     sta     ZP02_Collision_Status           ; 312D: 85 02    
     rts                                     ; 312F: 60       
 ; ==========================================
 
 ; L_BRS_($3130)_($3125) OK
-TPC_Test_Object_20_Lines_Bott
+Test_Object_20_Lines_Bott
     cmp     #%00100000                      ; 3130: C9 20    
-    bcs     TPC_RTS                         ; 3132: B0 08    
+    bcs     Test_Platform_Collision_RTS     ; 3132: B0 08    
 
     lda     #$80                            ; 3134: A9 80    
-    bmi     TPC_STA_Collision_Status_RTS    ; 3136: 30 F5    
+    bmi     STA_Collision_Status_RTS        ; 3136: 30 F5    
 
 ; L_JSR_($3138)_($30D0) OK
 ; L_JSR_($3138)_($30DB) OK
 ; L_JSR_($3138)_($30E9) OK
 ; L_JMP_($3138)_($30FA) OK
 ; L_JMP_($3138)_($3115) OK
-TPC_Set_Collision_Status
+Set_Collision_Status
     ora     $0002                           ; 3138: 05 02    
     sta     ZP02_Collision_Status           ; 313A: 85 02    
 
 ; L_BRS_($313C)_($3132) OK
-TPC_RTS
+Test_Platform_Collision_RTS
     rts                                     ; 313C: 60       
 ; ==========================================
 
 ; Jetman is standing (i.e. not flying)
 ; L_BRS_($313D)_($310A) OK
-TPC_Test???_Jetman_Standing
+Test_Jetman_Standing
     pla                                     ; 313D: 68       
     cmp     #%00011010                      ; 313E: C9 1A    
-    jmp     TPC_Move_Toward_RTS             ; 3140: 4C 0F 31 
+    jmp     Move_Toward_RTS                 ; 3140: 4C 0F 31 
 ; ------------------------------------------
 
 
@@ -5533,58 +5530,58 @@ Next_UDG_Char
 ; NOT COMPLETE YET @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 ; L_BRS_($31BF)_($3203) OK
-A_Left_Right_Impact
+Left_Right_Impact
     ldy     #JETMAN_DIRECTION_X_PARAM       ; 31BF: A0 02    
     clc                                     ; 31C1: 18       
     bit     MASK_00000001                   ; 31C2: 2C 14 20 
-    beq     E_Fly_Left_Impact               ; 31C5: F0 18    
+    beq     Fly_Left_Impact                 ; 31C5: F0 18    
 
 ; Load and test Jetman X Direction/Velocity
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31C7: B1 00    
-    bpl     B_Fly_Right_Impact              ; 31C9: 10 03    
+    bpl     Fly_Right_Impact                ; 31C9: 10 03    
 
 ; L_BRS_($31CB)_($31E3) OK
 ; L_BRS_($31CB)_($31FB) OK
-C_Jump_P
-    jmp     P_Update_Jetman_Position_X      ; 31CB: 4C 85 32 
+JMP_Update_Jetman_Position_X
+    jmp     Update_Jetman_Position_X        ; 31CB: 4C 85 32 
 ; ------------------------------------------
 
 ; L_BRS_($31CE)_($31C9) OK
-B_Fly_Right_Impact
+Fly_Right_Impact
     beq     SKIP_31D7                       ; 31CE: F0 07    
     eor     #$FF                            ; 31D0: 49 FF    
     adc     #$03                            ; 31D2: 69 03    
 ; L_BRS_($31D4)_($31DD) OK
-B_Jump_Q
-    jmp     Q_Store_Jetman_Direction_X      ; 31D4: 4C A2 32 
+JMP_Store_Jetman_Direction_X_
+    jmp     Store_Jetman_Direction_X        ; 31D4: 4C A2 32 
 ; ------------------------------------------
 
 ; L_BRS_($31D7)_($31CE) OK
 SKIP_31D7
     ldy     #$00                            ; 31D7: A0 00    
     bit     ZP_Jetman_Action                ; 31D9: 24 1C    
-    bvc     N_Flying_Left                   ; 31DB: 50 4B    
-    bvs     B_Jump_Q                        ; 31DD: 70 F5    
+    bvc     Flying_Left                     ; 31DB: 50 4B    
+    bvs     JMP_Store_Jetman_Direction_X_   ; 31DD: 70 F5    
 
 ; BVS/BVC above means below code can only be jumped/branched to
 ; L_BRS_($31DF)_($31C5) OK
-E_Fly_Left_Impact
+Fly_Left_Impact
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31DF: B1 00    
     beq     SKIP_31EA                       ; 31E1: F0 07    
-    bpl     C_Jump_P                        ; 31E3: 10 E6    
+    bpl     JMP_Update_Jetman_Position_X    ; 31E3: 10 E6    
     eor     #$FF                            ; 31E5: 49 FF    
 
 ; L_BRS_($31E7)_($31F0) OK
-E_Jump_Q
-    jmp     Q_Store_Jetman_Direction_X      ; 31E7: 4C A2 32 
+JMP_Store_Jetman_Direction_X
+    jmp     Store_Jetman_Direction_X        ; 31E7: 4C A2 32 
 ; ------------------------------------------
 
 ; L_BRS_($31EA)_($31E1) OK
 SKIP_31EA
     ldy     #$00                            ; 31EA: A0 00    
     bit     ZP_Jetman_Action                ; 31EC: 24 1C    
-    bpl     S_Flying_Right                  ; 31EE: 10 4E    
-    bmi     E_Jump_Q                        ; 31F0: 30 F5    
+    bpl     Flying_Right                    ; 31EE: 10 4E    
+    bmi     JMP_Store_Jetman_Direction_X    ; 31F0: 30 F5    
 
 
 ; BVS/BVC above means below code can only be jumped/branched to
@@ -5596,60 +5593,60 @@ SKIP_31EA
 ; 1xxx0111 = Top Left impact
 ; 1xxx0111 = Left impact
 ; L_JMP_($31F2)_($3282) OK
-H_Jetman_Hits_Surface
+Jetman_Hits_Surface
     bit     MASK_00001000                   ; 31F2: 2C 17 20 
-    beq     I_Left_Right_Up_Impact          ; 31F5: F0 09    
+    beq     Left_Right_Up_Impact            ; 31F5: F0 09    
 
 ; Test Obj_Jetman_At_Rest???
     ldy     #JETMAN_DIRECTION_Y_PARAM       ; 31F7: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31F9: B1 00    
-    bmi     C_Jump_P                        ; 31FB: 30 CE    
-    jmp     D_Set_Jetman_Standing           ; 31FD: 4C 21 33 
+    bmi     JMP_Update_Jetman_Position_X    ; 31FB: 30 CE    
+    jmp     Set_Jetman_Standing             ; 31FD: 4C 21 33 
 ; ------------------------------------------
 
 ; L_BRS_($3200)_($31F5) OK
-I_Left_Right_Up_Impact
+Left_Right_Up_Impact
     bit     MASK_00000100                   ; 3200: 2C 16 20 
-    bne     A_Left_Right_Impact             ; 3203: D0 BA    
-    jmp     P_Update_Jetman_Position_X      ; 3205: 4C 85 32 
+    bne     Left_Right_Impact               ; 3203: D0 BA    
+    jmp     Update_Jetman_Position_X        ; 3205: 4C 85 32 
 ; ------------------------------------------
 
 ; Test Obj_Jetman_At_Rest???
 ; L_JMP_($3208)_($32C4) OK
-J_Flying_Up_Impact
+Flying_Up_Impact
     ldy     #JETMAN_DIRECTION_Y_PARAM       ; 3208: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 320A: B1 00    
-    beq     M_Flying_Up_Impact_Bounce       ; 320C: F0 0A    
-    bpl     J_Jump_T                        ; 320E: 10 05    
+    beq     Flying_Up_Impact_Bounce         ; 320C: F0 0A    
+    bpl     JMP_Update_Jetman_Position_Y    ; 320E: 10 05    
     eor     #%11111111                      ; 3210: 49 FF    
 
 ; L_BRS_($3212)_($3222) OK
-K_Jump_U
-    jmp     U_Store_Jetman_Direction_Y      ; 3212: 4C DE 32 
+JMP_Store_Jetman_Direction_Y
+    jmp     Store_Jetman_Direction_Y        ; 3212: 4C DE 32 
 ; ------------------------------------------
 
 ; L_BRS_($3215)_($320E) OK
-J_Jump_T
-    jmp     T_Update_Jetman_Position_Y      ; 3215: 4C C7 32 
+JMP_Update_Jetman_Position_Y
+    jmp     Update_Jetman_Position_Y        ; 3215: 4C C7 32 
 ; ------------------------------------------
 
 ; L_BRS_($3218)_($320C) OK
-M_Flying_Up_Impact_Bounce
+Flying_Up_Impact_Bounce
     tax                                     ; 3218: AA       
     lda     ZP_Jetman_Action                ; 3219: A5 1C    
     bit     MASK_00010000                   ; 321B: 2C 18 20 
     bne     SKIP_3224                       ; 321E: D0 04    
     lda     #$00                            ; 3220: A9 00    
-    beq     K_Jump_U                        ; 3222: F0 EE    
+    beq     JMP_Store_Jetman_Direction_Y    ; 3222: F0 EE    
 ; L_BRS_($3224)_($321E) OK
 SKIP_3224
     txa                                     ; 3224: 8A       
-    jmp     T_Update_Jetman_Position_Y      ; 3225: 4C C7 32 
+    jmp     Update_Jetman_Position_Y        ; 3225: 4C C7 32 
 ; ------------------------------------------
 
 ; L_BRS_($3228)_($31DB) OK
 ; L_BRS_($3228)_($328F) OK
-N_Flying_Left
+Flying_Left
     pha                                     ; 3228: 48       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3229: B1 00    
     ora     #$80                            ; 322B: 09 80    
@@ -5657,17 +5654,17 @@ N_Flying_Left
     pla                                     ; 322F: 68       
 
     cmp     #$F8                            ; 3230: C9 F8    
-    beq     R_Update_Jetman_Position_X      ; 3232: F0 72    
+    beq     Update_Jetman_Position_X_       ; 3232: F0 72    
     cmp     #$F7                            ; 3234: C9 F7    
-    beq     Q_Store_Jetman_Direction_X      ; 3236: F0 6A    
+    beq     Store_Jetman_Direction_X        ; 3236: F0 6A    
     sec                                     ; 3238: 38       
     sbc     #$01                            ; 3239: E9 01    
-    jmp     Q_Store_Jetman_Direction_X      ; 323B: 4C A2 32 
+    jmp     Store_Jetman_Direction_X        ; 323B: 4C A2 32 
 ; ------------------------------------------
 
 ; L_BRS_($323E)_($31EE) OK
 ; L_BRS_($323E)_($328D) OK
-S_Flying_Right
+Flying_Right
     pha                                     ; 323E: 48       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 323F: B1 00    
     and     #$7F                            ; 3241: 29 7F    
@@ -5675,43 +5672,43 @@ S_Flying_Right
     pla                                     ; 3245: 68       
 
     cmp     #$08                            ; 3246: C9 08    
-    beq     R_Update_Jetman_Position_X      ; 3248: F0 5C    
+    beq     Update_Jetman_Position_X_       ; 3248: F0 5C    
     cmp     #$09                            ; 324A: C9 09    
     beq     SKIP_3254                       ; 324C: F0 06    
     clc                                     ; 324E: 18       
     adc     #$01                            ; 324F: 69 01    
-    jmp     Q_Store_Jetman_Direction_X      ; 3251: 4C A2 32 
+    jmp     Store_Jetman_Direction_X        ; 3251: 4C A2 32 
 ; ------------------------------------------
 ; L_BRS_($3254)_($324C) OK
 SKIP_3254
     lda     #$08                            ; 3254: A9 08    
-    jmp     Q_Store_Jetman_Direction_X      ; 3256: 4C A2 32 
+    jmp     Store_Jetman_Direction_X        ; 3256: 4C A2 32 
 ; ------------------------------------------
 ; HOW DO YOU EVER GET HERE?
     lda     #$F8                            ; 3259: A9 F8    
-    jmp     Q_Store_Jetman_Direction_X      ; 325B: 4C A2 32 
+    jmp     Store_Jetman_Direction_X        ; 325B: 4C A2 32 
 ; ------------------------------------------
 ; L_BRS_($325E)_($329D) OK
-P_INC_A_Jump_Q
+CLC_ADC_JMP_Store_JM_Dir_X
     clc                                     ; 325E: 18       
     adc     #$01                            ; 325F: 69 01    
-    jmp     Q_Store_Jetman_Direction_X      ; 3261: 4C A2 32 
+    jmp     Store_Jetman_Direction_X        ; 3261: 4C A2 32 
 ; ------------------------------------------
 ; L_BRS_($3264)_($32B4) OK
-R__Wrap_Left_To_Right
+Wrap_Left_To_Right
     clc                                     ; 3264: 18       
     adc     #SCREEN_WIDTH_PIXELS            ; 3265: 69 B8    
-    jmp     R__Store_Jetman_Position_X      ; 3267: 4C BA 32 
+    jmp     Store_Jetman_Position_X         ; 3267: 4C BA 32 
 ; ------------------------------------------
 ; L_BRS_($326A)_($32B8) OK
-R__Wrap_Right_To_Left
+Wrap_Right_To_Left
     adc     #$48                            ; 326A: 69 48    
-    jmp     R__Store_Jetman_Position_X      ; 326C: 4C BA 32 
+    jmp     Store_Jetman_Position_X         ; 326C: 4C BA 32 
 ; ------------------------------------------
 ; L_BRS_($326F)_($3296) OK
-P_TXA_Jump_R
+TXA_JMP_Update_JM_Pos_X
     txa                                     ; 326F: 8A       
-    jmp     R_Update_Jetman_Position_X      ; 3270: 4C A6 32 
+    jmp     Update_Jetman_Position_X_       ; 3270: 4C A6 32 
 ; ------------------------------------------
 JETMAN_FLYING_
     jsr     Load_Object_Type_X_Y            ; 3273: 20 D7 35 
@@ -5719,28 +5716,28 @@ JETMAN_FLYING_
     sta     ZP_Jetman_Action                ; 3279: 85 1C    
     jsr     Test_Platform_Collision         ; 327B: 20 B3 30  Remove=Jetman+fuel/ship part pick-up fly through platforms
     lda     ZP02_Collision_Status           ; 327E: A5 02    
-    bpl     P_Update_Jetman_Position_X      ; 3280: 10 03    
-    jmp     H_Jetman_Hits_Surface           ; 3282: 4C F2 31 
+    bpl     Update_Jetman_Position_X        ; 3280: 10 03    
+    jmp     Jetman_Hits_Surface             ; 3282: 4C F2 31 
 ; ------------------------------------------
 ; L_JMP_($3285)_($31CB) OK
 ; L_JMP_($3285)_($3205) OK
 ; L_BRS_($3285)_($3280) OK
-P_Update_Jetman_Position_X
+Update_Jetman_Position_X
     ldy     #JETMAN_DIRECTION_X_PARAM       ; 3285: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3287: B1 00    
     ldy     #$00                            ; 3289: A0 00    
     bit     ZP_Jetman_Action                ; 328B: 24 1C    
-    bpl     S_Flying_Right                  ; 328D: 10 AF    
-    bvc     N_Flying_Left                   ; 328F: 50 97    
+    bpl     Flying_Right                    ; 328D: 10 AF    
+    bvc     Flying_Left                     ; 328F: 50 97    
 
     tax                                     ; 3291: AA       
     lda     ZP_IRQ_Counter_Lo               ; 3292: A5 4A    
     and     #%00000001                      ; 3294: 29 01    
-    beq     P_TXA_Jump_R                    ; 3296: F0 D7    
+    beq     TXA_JMP_Update_JM_Pos_X         ; 3296: F0 D7    
     txa                                     ; 3298: 8A       
     cmp     #$00                            ; 3299: C9 00    
-    beq     R_Update_Jetman_Position_X      ; 329B: F0 09    
-    bmi     P_INC_A_Jump_Q                  ; 329D: 30 BF    
+    beq     Update_Jetman_Position_X_       ; 329B: F0 09    
+    bmi     CLC_ADC_JMP_Store_JM_Dir_X      ; 329D: 30 BF    
     sec                                     ; 329F: 38       
     sbc     #$01                            ; 32A0: E9 01    
 ; L_JMP_($32A2)_($31D4) OK
@@ -5751,14 +5748,14 @@ P_Update_Jetman_Position_X
 ; L_JMP_($32A2)_($3256) OK
 ; L_JMP_($32A2)_($325B) OK
 ; L_JMP_($32A2)_($3261) OK
-Q_Store_Jetman_Direction_X
+Store_Jetman_Direction_X
     ldy     #JETMAN_DIRECTION_X_PARAM       ; 32A2: A0 02    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 32A4: 91 00    
 ; L_BRS_($32A6)_($3232) OK
 ; L_BRS_($32A6)_($3248) OK
 ; L_JMP_($32A6)_($3270) OK
 ; L_BRS_($32A6)_($329B) OK
-R_Update_Jetman_Position_X
+Update_Jetman_Position_X_
     ldy     #JETMAN_POSITION_X_PARAM        ; 32A6: A0 01    
 
     pha                                     ; 32A8: 48       
@@ -5773,48 +5770,48 @@ R_Update_Jetman_Position_X
     clc                                     ; 32AF: 18       
     adc     (ZP_Obj_List_Ptr_Lo),y          ; 32B0: 71 00    
     cmp     #$F0                            ; 32B2: C9 F0    
-    bcs     R__Wrap_Left_To_Right           ; 32B4: B0 AE    
+    bcs     Wrap_Left_To_Right              ; 32B4: B0 AE    
     cmp     #SCREEN_WIDTH_PIXELS            ; 32B6: C9 B8    
-    bcs     R__Wrap_Right_To_Left           ; 32B8: B0 B0    
+    bcs     Wrap_Right_To_Left              ; 32B8: B0 B0    
 ; L_JMP_($32BA)_($3267) OK
 ; L_JMP_($32BA)_($326C) OK
-R__Store_Jetman_Position_X
+Store_Jetman_Position_X
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 32BA: 91 00    
 
     lda     ZP02                            ; 32BC: A5 02    
-    bpl     T_Update_Jetman_Position_Y      ; 32BE: 10 07    
+    bpl     Update_Jetman_Position_Y        ; 32BE: 10 07    
     and     #$0C                            ; 32C0: 29 0C    
-    bne     T_Update_Jetman_Position_Y      ; 32C2: D0 03    
-    jmp     J_Flying_Up_Impact              ; 32C4: 4C 08 32 
+    bne     Update_Jetman_Position_Y        ; 32C2: D0 03    
+    jmp     Flying_Up_Impact                ; 32C4: 4C 08 32 
 ; ------------------------------------------
 ; L_JMP_($32C7)_($3215) OK
 ; L_JMP_($32C7)_($3225) OK
 ; L_BRS_($32C7)_($32BE) OK
 ; L_BRS_($32C7)_($32C2) OK
-T_Update_Jetman_Position_Y
+Update_Jetman_Position_Y
     ldy     #JETMAN_DIRECTION_Y_PARAM       ; 32C7: A0 04    
 
     lda     ZP_Jetman_Action                ; 32C9: A5 1C    
     bit     MASK_00100000                   ; 32CB: 2C 19 20  Test for direction Down
-    beq     T_U_Set_Jetman_Direction_Y_Zro  ; 32CE: F0 48     Yes, branch
+    beq     Set_Jetman_Direction_Y_Zero     ; 32CE: F0 48     Yes, branch
     bit     MASK_00010000                   ; 32D0: 2C 18 20  Test for direction Up
-    beq     Y_Update_Jetman_Direction_Y     ; 32D3: F0 37     Yes, branch
+    beq     Update_Jetman_Direction_Y       ; 32D3: F0 37     Yes, branch
 
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 32D5: B1 00    
     cmp     #$04                            ; 32D7: C9 04    
-    beq     V_Update_Jetman_Position_Y      ; 32D9: F0 05    
+    beq     Update_Jetman_Position_Y_       ; 32D9: F0 05    
     clc                                     ; 32DB: 18       
     adc     #$01                            ; 32DC: 69 01    
 
 ; L_JMP_($32DE)_($3212) OK
 ; L_JMP_($32DE)_($3315) OK
 ; L_JMP_($32DE)_($331A) OK
-U_Store_Jetman_Direction_Y
+Store_Jetman_Direction_Y
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 32DE: 91 00    
 
 ; L_BRS_($32E0)_($32D9) OK
 ; L_BRS_($32E0)_($3310) OK
-V_Update_Jetman_Position_Y
+Update_Jetman_Position_Y_
     dey                                     ; 32E0: 88       
 
     pha                                     ; 32E1: 48       
@@ -5825,14 +5822,14 @@ V_Update_Jetman_Position_Y
     clc                                     ; 32E5: 18       
     adc     (ZP_Obj_List_Ptr_Lo),y          ; 32E6: 71 00    
     cmp     #SCREEN_BOTTOM                  ; 32E8: C9 AF    
-    bcs     V_D_Set_Jetman_Position_Y_Bott  ; 32EA: B0 31    
+    bcs     Set_Jetman_Position_Y_Bottom    ; 32EA: B0 31    
     cmp     #SCREEN_TOP                     ; 32EC: C9 28    
-    bcs     W_Store_Jetman_Parameter        ; 32EE: B0 07    
+    bcs     Store_Jetman_Parameter          ; 32EE: B0 07    
 
 ; Y becomes index to Direction Y
     iny                                     ; 32F0: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 32F1: B1 00    
-    beq     W_Store_Jetman_Parameter        ; 32F3: F0 02    
+    beq     Store_Jetman_Parameter          ; 32F3: F0 02    
 
 ; Reverse the direction parameter
     eor     #$FF                            ; 32F5: 49 FF    
@@ -5842,11 +5839,11 @@ V_Update_Jetman_Position_Y
 ; L_BRS_($32F7)_($32F3) OK
 ; L_JMP_($32F7)_($3329) OK
 ; L_JMP_($32F7)_($33D1) OK
-W_Store_Jetman_Parameter
+Store_Jetman_Parameter
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 32F7: 91 00    
 
 ; L_JMP_($32F9)_($33B7) OK
-X_Jetman_Screen_Update
+Jetman_Screen_Update
     jsr     Display_Object_Load             ; 32F9: 20 46 36 
     jsr     Colourize_Object                ; 32FC: 20 1F 38 
 
@@ -5862,28 +5859,28 @@ No_Fire_Pressed
 
 ; Load and test Jetman Y Direction
 ; L_BRS_($330C)_($32D3) OK
-Y_Update_Jetman_Direction_Y
+Update_Jetman_Direction_Y
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 330C: B1 00    
     cmp     #$FC                            ; 330E: C9 FC    
-    beq     V_Update_Jetman_Position_Y      ; 3310: F0 CE    
+    beq     Update_Jetman_Position_Y_       ; 3310: F0 CE    
     sec                                     ; 3312: 38       
     sbc     #$01                            ; 3313: E9 01    
-    jmp     U_Store_Jetman_Direction_Y      ; 3315: 4C DE 32 
+    jmp     Store_Jetman_Direction_Y        ; 3315: 4C DE 32 
 ; ------------------------------------------
 
 ; L_BRS_($3318)_($32CE) OK
-T_U_Set_Jetman_Direction_Y_Zro
+Set_Jetman_Direction_Y_Zero
     lda     #$00                            ; 3318: A9 00    
-    jmp     U_Store_Jetman_Direction_Y      ; 331A: 4C DE 32 
+    jmp     Store_Jetman_Direction_Y        ; 331A: 4C DE 32 
 ; ------------------------------------------
 
 ; L_BRS_($331D)_($32EA) OK
-V_D_Set_Jetman_Position_Y_Bott
+Set_Jetman_Position_Y_Bottom
     lda     #$AF                            ; 331D: A9 AF    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 331F: 91 00    
 
 ; L_JMP_($3321)_($31FD) OK
-D_Set_Jetman_Standing
+Set_Jetman_Standing
     ldy     #JETMAN_STATE_PARAM             ; 3321: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 3323: B1 00    
 
@@ -5892,7 +5889,7 @@ D_Set_Jetman_Standing
     rol     a                               ; 3325: 2A       
     lda     #$04                            ; 3326: A9 04    
     ror     a                               ; 3328: 6A       
-    jmp     W_Store_Jetman_Parameter        ; 3329: 4C F7 32 
+    jmp     Store_Jetman_Parameter          ; 3329: 4C F7 32 
 ; ------------------------------------------
 
 
@@ -5995,7 +5992,7 @@ Set_Jetman_Facing_Direction
 
 ; Jetman walking right, prepare new Direction X value
     ldx     #$01                            ; 3389: A2 01    
-    bpl     Test_Collision_Status????       ; 338B: 10 02    
+    bpl     Test_Collision_Status           ; 338B: 10 02    
 
 ; Jetman walking left, prepare new Direction X value
 ; L_BRS_($338D)_($3387) OK
@@ -6003,7 +6000,7 @@ Jetman_Walking_Left
     ldx     #$FF                            ; 338D: A2 FF    
 
 ; L_BRS_($338F)_($338B) OK
-Test_Collision_Status????
+Test_Collision_Status
     ldy     #JETMAN_DIRECTION_X_PARAM       ; 338F: A0 02    
     lda     ZP02_Collision_Status           ; 3391: A5 02    
     bpl     Jetman_Not_Moving_X_Axis        ; 3393: 10 08    
@@ -6048,7 +6045,7 @@ Store_Jetman_New_Position_X
     lda     ZP_Jetman_Action                ; 33B1: A5 1C    
     and     #%00010000                      ; 33B3: 29 10     Test for direction Up
     beq     Update_JM_Direction_Position_Y  ; 33B5: F0 03     Yes, branch
-    jmp     X_Jetman_Screen_Update          ; 33B7: 4C F9 32 
+    jmp     Jetman_Screen_Update            ; 33B7: 4C F9 32 
 ; ------------------------------------------
 
 ; L_BRS_($33BA)_($33B5) OK
@@ -6072,7 +6069,7 @@ Jetman_From_Standing_To_Flying
     rol     a                               ; 33CD: 2A       
     lda     #$02                            ; 33CE: A9 02    
     ror     a                               ; 33D0: 6A       
-    jmp     W_Store_Jetman_Parameter        ; 33D1: 4C F7 32 
+    jmp     Store_Jetman_Parameter          ; 33D1: 4C F7 32 
 ; ------------------------------------------
 
 
