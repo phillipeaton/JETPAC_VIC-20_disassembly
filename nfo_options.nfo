@@ -1,9 +1,9 @@
 *** GENERAL COMMAND LINE OPTIONS ***
 * Options begin,end,offset,interleave,bus always define settings for the following file
-option dasm 6502            * Select disassembler type
-option out jetpac.a65       * Select output filename of dissasembly
-option offset 2000          * Select start address of supplied binary
-file   jetpac_2000-3fff.bin * Instructs dasmfw to load the given file at the given address
+option dasm 6502              * Select disassembler type
+option out jetpac_dasmfw.a65  * Select output filename of dissasembly
+option offset 2000            * Select start address of supplied binary
+file   jetpac_2000-3fff.bin   * Instructs dasmfw to load the given file at the given address
 
 *** OUTPUT FORMATTING OPTIONS ***
 *option addr off      * Show address field output for clean assembler source files

@@ -15,157 +15,33 @@
 ;****************************************************
 
 ZP_Obj_List_Ptr_Lo              equ     $0000
-ZP00_Hi_Score_Addr              equ     $0000
 ZP_Obj_List_Ptr_Hi              equ     $0001
 ZP02                            equ     $0002
-ZP02_Collision_Status           equ     $0002
-ZP02_Colour_Random_0_or_1       equ     $0002
-ZP02_Laser_Param_Countdown      equ     $0002
-ZP02_Num_Aliens_Countdown       equ     $0002
-ZP02_Num_Bytes_To_Display       equ     $0002
-ZP02_Num_Lasers_Countdown       equ     $0002
-ZP02_Num_Of_Bytes_To_Fill_Lo    equ     $0002
-ZP02_Object_Old_Height_Index    equ     $0002
-ZP02_Ship_Parts_Count           equ     $0002
-ZP02_Score_Byte_Hi              equ     $0002
 ZP03                            equ     $0003
-ZP03_Num_Of_Bytes_To_Fill_Hi    equ     $0003
-ZP03_Object_Height_Pixels       equ     $0003
-ZP03_Object_Old_Height          equ     $0003
-ZP03_Platform_Data_Table_Index  equ     $0003
-ZP03_Score_Byte_Lo              equ     $0003
 ZP04                            equ     $0004
-ZP04_Addr_To_Fill_Lo            equ     $0004
-ZP04_Colour_Tile_Position_X     equ     $0004
-ZP04_Laser_Position_X           equ     $0004
-ZP04_Laser_UDG_RAM_Addr_Lo      equ     $0004
-ZP04_Object_Old_UDG_RAM_Lo      equ     $0004
-ZP04_Object_Position_X          equ     $0004
-ZP04_Object_UDG_RAM_Addr_Lo     equ     $0004
-ZP04_Platform_Position_X        equ     $0004
-ZP04_Position_X                 equ     $0004
-ZP04_UDG_RAM_Addr_Lo            equ     $0004
 ZP05                            equ     $0005
-ZP05_Addr_To_Fill_Hi            equ     $0005
-ZP05_Colour_Tile_Position_Y     equ     $0005
-ZP05_Laser_Position_Y           equ     $0005
-ZP05_Laser_UDG_RAM_Addr_Hi      equ     $0005
-ZP05_Object_Old_UDG_RAM_Hi      equ     $0005
-ZP05_Object_Position_Y          equ     $0005
-ZP05_Object_UDG_RAM_Addr_Hi     equ     $0005
-ZP05_Platform_Position_Y        equ     $0005
-ZP05_Position_Y                 equ     $0005
-ZP05_UDG_RAM_Addr_Hi            equ     $0005
 ZP06                            equ     $0006
-ZP06_Char_ROM_Data_Addr_Lo      equ     $0006
-ZP06_Character_To_Copy          equ     $0006
-ZP06_Character_To_Display       equ     $0006
-ZP06_Fill_Data_Byte             equ     $0006
-ZP06_Laser_New_State_Lo         equ     $0006
-ZP06_Laser_Old_State_Lo         equ     $0006
-ZP06_Laser_Position_X           equ     $0006
-ZP06_Object_Old_UDG_Data_Lo     equ     $0006
-ZP06_Object_Position_Y          equ     $0006
-ZP06_Object_UDG_Data_Addr_Lo    equ     $0006
-ZP06_Platform_UDG_Data_Addr_Lo  equ     $0006
-ZP06_Player_Score_Addr          equ     $0006
 ZP07                            equ     $0007
-ZP07_Char_ROM_Data_Addr_Hi      equ     $0007
-ZP07_Laser_Length_Columns       equ     $0007
-ZP07_Laser_Old_State_Hi         equ     $0007
-ZP07_Object_Old_UDG_Data_Hi     equ     $0007
-ZP07_Object_Position_X          equ     $0007
-ZP07_Object_UDG_Data_Addr_Hi    equ     $0007
-ZP07_Platform_UDG_Data_Addr_Hi  equ     $0007
-ZP07_Score_Data_Addr_Hi         equ     $0007
 ZP08                            equ     $0008
-ZP08_Laser_Position_X_Start     equ     $0008
-ZP08_Object_Laser_Addr_Lo       equ     $0008
-ZP08_Object_Old_Y_Index         equ     $0008
-ZP08_Platfm_Data_Tbl_Addr_Lo    equ     $0008
-ZP08_Player_Score_Addr          equ     $0008
-ZP08_Row_Offset_Table_Index     equ     $0008
-ZP08_Subroutine_Addr_Lo         equ     $0008
 ZP09                            equ     $0009
-ZP09_Object_Laser_Addr_Hi       equ     $0009
-ZP09_Object_New_Y_Index         equ     $0009
-ZP09_Platfm_Data_Tbl_Addr_Hi    equ     $0009
-ZP09_Subroutine_Addr_Hi         equ     $0009
 ZP0A                            equ     $000A
-ZP0A_Colour_RAM_Tiles_X         equ     $000A
-ZP0A_Object_New_Height_Index    equ     $000A
-ZP0A_Platform_Quantity          equ     $000A
 ZP0B                            equ     $000B
-ZP0B_Colour_RAM_Tiles_Y         equ     $000B
-ZP0B_Object_Height_Pixels       equ     $000B
-ZP0B_Object_New_Height          equ     $000B
-ZP0B_Platform_Object_Distance   equ     $000B
-ZP0B_Platform_Width_Chars       equ     $000B
 ZP0C                            equ     $000C
-ZP0C_Colour_RAM_Addr_Lo         equ     $000C
-ZP0C_Colour_RAM_Tile_Addr_Lo    equ     $000C
-ZP0C_Object_New_UDG_RAM_Lo      equ     $000C
-ZP0C_Object_UDG_RAM_Addr_Lo     equ     $000C
 ZP0D                            equ     $000D
-ZP0D_Colour_RAM_Addr_Hi         equ     $000D
-ZP0D_Colour_RAM_Tile_Addr_Lo    equ     $000D
-ZP0D_Object_New_UDG_RAM_Hi      equ     $000D
-ZP0D_Object_UDG_RAM_Addr_Hi     equ     $000D
 ZP0E                            equ     $000E
-ZP0E_Object_New_UDG_Data_Lo     equ     $000E
-ZP0E_Object_Position_X          equ     $000E
-ZP0E_Object_UDG_Data_Addr_Lo    equ     $000E
-ZP0E_Score_Data_Addr_Lo         equ     $000E
-ZP0E_String_Addr_Lo             equ     $000E
 ZP0F                            equ     $000F
-ZP0F_Object_New_UDG_Data_Hi     equ     $000F
-ZP0F_Object_Position_Y          equ     $000F
-ZP0F_Object_UDG_Data_Addr_Hi    equ     $000F
-ZP0F_String_Addr_Hi             equ     $000F
 ZP10                            equ     $0010
-ZP10_Object_Position_X          equ     $0010
 ZP11                            equ     $0011
-ZP11_Object_Old_Position_Y      equ     $0011
-ZP11_Object_Position_Y          equ     $0011
-ZP11_Object_Ship_Position_Y     equ     $0011
 ZP12                            equ     $0012
-ZP12_Object_Type                equ     $0012
 ZP13                            equ     $0013
-ZP13_Laser_Position_Y           equ     $0013
-ZP13_Obj_Landed_Posn_Y_Offset   equ     $0013
-ZP13_Object_Lines_To_Erase      equ     $0013
-ZP13_Ship_Fuel_Level_Half       equ     $0013
-ZP13_Temp                       equ     $0013
-ZP13_Keyboard_Data              equ     $0013
 ZP14                            equ     $0014
-ZP14_Laser_Decay_Patten_Data_0  equ     $0014
-ZP14_Object_Old_Width_Bytes     equ     $0014
-ZP14_Object_Width_Bytes         equ     $0014
 ZP15                            equ     $0015
-ZP15_Laser_Decay_Patten_Data_1  equ     $0015
-ZP15_Object_New_Width_Bytes     equ     $0015
-ZP15_Object_Width_Bytes         equ     $0015
 ZP16                            equ     $0016
-ZP16_Laser_Decay_Patten_Data_2  equ     $0016
-ZP16_Object_Size_X_Columns      equ     $0016
-ZP16_Object_Width_Bytes         equ     $0016
 ZP17                            equ     $0017
-ZP17_Laser_Decay_Patten_Data_3  equ     $0017
-ZP17_Object_Height_Pixels       equ     $0017
-ZP17_Object_Size_Y_Pixels       equ     $0017
 ZP18                            equ     $0018
-ZP18_Object_Flame_Position_X    equ     $0018
-ZP18_Object_Position_X          equ     $0018
 ZP19                            equ     $0019
-ZP19_Object_Landed_Position_Y   equ     $0019
-ZP19_Object_Flame_Position_Y    equ     $0019
-ZP19_Object_New_Position_Y      equ     $0019
-ZP19_Object_Position_Y          equ     $0019
 ZP1A                            equ     $001A
-ZP1A_Object_Type                equ     $001A
 ZP1B                            equ     $001B
-ZP1B_Laser_Colour               equ     $001B
-ZP1B_Object_Colour              equ     $001B
 ZP_Jetman_Action                equ     $001C
 ZP_Ship_UDG_Addr_Offset         equ     $001E
 ZP_Ship_Parts_Counter           equ     $001F
@@ -602,11 +478,11 @@ Game_Select
     sta     VIA2_Port_A                     ; 209D: 8D 21 91  (F7/F5/F3/F1/CDown/CRight/Rtn/Del)
     ldx     Game_Settings                   ; 20A0: AE D3 1F  Whilst giving keyboard data time to settle?
     lda     VIA2_Port_B                     ; 20A3: AD 20 91  Read keyboard column
-    sta     ZP13_Keyboard_Data              ; 20A6: 85 13     Store keyboard data
+    sta     ZP13                            ; 20A6: 85 13     Store keyboard data
 
 ; Test F-Keys pressed or Space to start game
     lda     #%00010000                      ; 20A8: A9 10    
-    bit     ZP13_Keyboard_Data              ; 20AA: 24 13     F1 pressed? (1 Player)
+    bit     ZP13                            ; 20AA: 24 13     F1 pressed? (1 Player)
     bne     Test_F3                         ; 20AC: D0 04     No, skip
     txa                                     ; 20AE: 8A       
     and     #%00000010                      ; 20AF: 29 02     Reset Bit 0 = 1 Player
@@ -615,7 +491,7 @@ Game_Select
 ; L_BRS_($20B2)_($20AC) OK
 Test_F3
     lda     #%00100000                      ; 20B2: A9 20    
-    bit     ZP13_Keyboard_Data              ; 20B4: 24 13     F3 pressed? (2 Player)
+    bit     ZP13                            ; 20B4: 24 13     F3 pressed? (2 Player)
     bne     Test_F5                         ; 20B6: D0 04     No, skip
     txa                                     ; 20B8: 8A       
     ora     #%00000001                      ; 20B9: 09 01     Set Bit 0 = 2 Player
@@ -624,7 +500,7 @@ Test_F3
 ; L_BRS_($20BC)_($20B6) OK
 Test_F5
     lda     #%01000000                      ; 20BC: A9 40    
-    bit     ZP13_Keyboard_Data              ; 20BE: 24 13     F5 pressed? (Keyboard)
+    bit     ZP13                            ; 20BE: 24 13     F5 pressed? (Keyboard)
     bne     Test_F7                         ; 20C0: D0 04     No, skip
     txa                                     ; 20C2: 8A       
     and     #%00000001                      ; 20C3: 29 01     Reset Bit 1 = Keyboard controls
@@ -633,7 +509,7 @@ Test_F5
 ; L_BRS_($20C6)_($20C0) OK
 Test_F7
     lda     #%10000000                      ; 20C6: A9 80    
-    bit     ZP13_Keyboard_Data              ; 20C8: 24 13     F7 pressed? (Joystick)
+    bit     ZP13                            ; 20C8: 24 13     F7 pressed? (Joystick)
     bne     Test_Space                      ; 20CA: D0 04     No, skip
     txa                                     ; 20CC: 8A       
     ora     #%00000010                      ; 20CD: 09 02     Set Bit 1 = Joystick controls
@@ -693,18 +569,18 @@ Do_Init_Laser_Objects
 
 ; L_BRS_($20FB)_($210D) OK
 Loop_Update_Laser_Objects
-    lda     (ZP06_Laser_Old_State_Lo),y     ; 20FB: B1 06    
+    lda     (ZP06),y                        ; 20FB: B1 06    
     beq     Init_Laser_Object               ; 20FD: F0 11    
 
 ; Move 16-bit address pointer to next laser shot object i.e. 8 bytes ahead
-    lda     ZP06_Laser_Old_State_Lo         ; 20FF: A5 06    
+    lda     ZP06                            ; 20FF: A5 06    
     clc                                     ; 2101: 18       
     adc     #$08                            ; 2102: 69 08    
-    sta     ZP06_Laser_Old_State_Lo         ; 2104: 85 06    
+    sta     ZP06                            ; 2104: 85 06    
 
-    lda     ZP07_Laser_Old_State_Hi         ; 2106: A5 07    
+    lda     ZP07                            ; 2106: A5 07    
     adc     #$00                            ; 2108: 69 00    
-    sta     ZP07_Laser_Old_State_Hi         ; 210A: 85 07    
+    sta     ZP07                            ; 210A: 85 07    
 
 ; Test if all Laser objects updated, if yes, return, else loop back
     dex                                     ; 210C: CA       
@@ -721,14 +597,14 @@ Init_Laser_Object
 ; Mask for Jetman facing left/right bit 7, set bit 4 and store to variable
     and     #%10000000                      ; 2113: 29 80    
     ora     #%00010000                      ; 2115: 09 10    
-    sta     (ZP06_Laser_New_State_Lo),y     ; 2117: 91 06    
+    sta     (ZP06),y                        ; 2117: 91 06    
 
 ; Get Jetman Position X, manipulate bottom 3 bits and store to variable
     iny                                     ; 2119: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 211A: B1 00    
     and     #%11111000                      ; 211C: 29 F8    
     ora     #%00000101                      ; 211E: 09 05    
-    sta     ZP08_Laser_Position_X_Start     ; 2120: 85 08    
+    sta     ZP08                            ; 2120: 85 08    
 
 ; Test again Jetman facing left/right bit 7
     txa                                     ; 2122: 8A       
@@ -736,7 +612,7 @@ Init_Laser_Object
     beq     Jetman_Facing_Right             ; 2125: F0 4C    
 
 ; Jetman facing left
-    lda     ZP08_Laser_Position_X_Start     ; 2127: A5 08    
+    lda     ZP08                            ; 2127: A5 08    
     sec                                     ; 2129: 38       
     sbc     #$08                            ; 212A: E9 08    
     jsr     Laser_Wrap                      ; 212C: 20 98 22 
@@ -744,7 +620,7 @@ Init_Laser_Object
 ; L_JMP_($212F)_($2184) OK
 ; L_JMP_($212F)_($218A) OK
 Init_Laser_Object_Params
-    sta     ZP08_Laser_Position_X_Start     ; 212F: 85 08    
+    sta     ZP08                            ; 212F: 85 08    
 
 ; Get Jetman Position Y, subtract some pixels to get gun nozzle height and store to laser object
     iny                                     ; 2131: C8       
@@ -754,20 +630,20 @@ Init_Laser_Object_Params
     sbc     #LASER_GUN_HEIGHT_OFFSET        ; 2136: E9 0D    
     dey                                     ; 2138: 88       
     dey                                     ; 2139: 88       
-    sta     (ZP06_Laser_New_State_Lo),y     ; 213A: 91 06    
+    sta     (ZP06),y                        ; 213A: 91 06    
 
 ; Fill Laser object parameters 2-5 with copies of X start position, but with bit 2 ANDed out
     ldx     #LASER_POSITION_X_PARAMS        ; 213C: A2 03    
     iny                                     ; 213E: C8       
-    lda     ZP08_Laser_Position_X_Start     ; 213F: A5 08    
-    sta     (ZP06_Laser_New_State_Lo),y     ; 2141: 91 06    
+    lda     ZP08                            ; 213F: A5 08    
+    sta     (ZP06),y                        ; 2141: 91 06    
 
     and     #%11111011                      ; 2143: 29 FB    
 
 ; L_BRS_($2145)_($2149) OK
 Loop_Init_Laser
     iny                                     ; 2145: C8       
-    sta     (ZP06_Laser_New_State_Lo),y     ; 2146: 91 06    
+    sta     (ZP06),y                        ; 2146: 91 06    
 
     dex                                     ; 2148: CA       
     bne     Loop_Init_Laser                 ; 2149: D0 FA    
@@ -779,7 +655,7 @@ Loop_Init_Laser
     and     #%00111000                      ; 214E: 29 38    
     clc                                     ; 2150: 18       
     adc     #%01000000                      ; 2151: 69 40    
-    sta     (ZP06_Laser_New_State_Lo),y     ; 2153: 91 06    
+    sta     (ZP06),y                        ; 2153: 91 06    
 
 ; Load a random laser colour value 0-7 using IRQ counter
     iny                                     ; 2155: C8       
@@ -787,7 +663,7 @@ Loop_Init_Laser
     and     #%00000111                      ; 2158: 29 07    
     tax                                     ; 215A: AA       
     lda     Laser_Colour_Table,x            ; 215B: BD 6B 21 
-    sta     (ZP06_Laser_New_State_Lo),y     ; 215E: 91 06    
+    sta     (ZP06),y                        ; 215E: 91 06    
 
 ; Trigger laser sound by setting parameters in sound object
     lda     #$03                            ; 2160: A9 03    
@@ -812,7 +688,7 @@ Jetman_Facing_Right
     beq     Add_To_Laser_Start_Position_X   ; 2177: F0 14    
 
 ; Add to the laser start Position X $18 pixels to avoid drawing laser over Jetman on screen
-    lda     ZP08_Laser_Position_X_Start     ; 2179: A5 08    
+    lda     ZP08                            ; 2179: A5 08    
     clc                                     ; 217B: 18       
     adc     #$18                            ; 217C: 69 18    
 
@@ -836,7 +712,7 @@ Wrap_Laser_Shot_Position_X
 ; Add to the laser start Position X $10 pixels to avoid drawing laser over Jetman on screen
 ; L_BRS_($218D)_($2177) OK
 Add_To_Laser_Start_Position_X
-    lda     ZP08_Laser_Position_X_Start     ; 218D: A5 08    
+    lda     ZP08                            ; 218D: A5 08    
     clc                                     ; 218F: 18       
     adc     #$10                            ; 2190: 69 10    
     jmp     Laser_Jetman_Facing_Right_Wrap  ; 2192: 4C 7E 21 
@@ -868,27 +744,27 @@ Add_08_Handle_Wrap_Get_Y_Coord
 DISPLAY_LASERS
     ldy     #LASER_LENGTH_PARAM             ; 219A: A0 06    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 219C: B1 00    
-    sta     ZP07_Laser_Length_Columns       ; 219E: 85 07    
+    sta     ZP07                            ; 219E: 85 07    
 
 ; Y becomes $07 i.e. Laser Colour parameter
     iny                                     ; 21A0: C8        Y=$07, laser colour addr
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 21A1: B1 00     Fetch laser colour
-    sta     ZP1B_Laser_Colour               ; 21A3: 85 1B     Store to ZP variable
+    sta     ZP1B                            ; 21A3: 85 1B     Store to ZP variable
 
 ; Get laser X and Y-coord and store to temp vars
     ldy     #LASER_POSITION_X               ; 21A5: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 21A7: B1 00    
-    sta     ZP06_Laser_Position_X           ; 21A9: 85 06    
-    sta     ZP04_Laser_Position_X           ; 21AB: 85 04    
+    sta     ZP06                            ; 21A9: 85 06    
+    sta     ZP04                            ; 21AB: 85 04    
 
 ; Y becomes $01 i.e. Laser Position Y
     dey                                     ; 21AD: 88       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 21AE: B1 00    
-    sta     ZP05_Laser_Position_Y           ; 21B0: 85 05    
-    sta     ZP13_Laser_Position_Y           ; 21B2: 85 13    
+    sta     ZP05                            ; 21B0: 85 05    
+    sta     ZP13                            ; 21B2: 85 13    
 
 ; Test if full length of laser has now been reached, branch if yes
-    lda     ZP06_Laser_Position_X           ; 21B4: A5 06    
+    lda     ZP06                            ; 21B4: A5 06    
     bit     MASK_00000100                   ; 21B6: 2C 16 20 
     beq     Setup_Laser_Decay_Patterns      ; 21B9: F0 47    
 
@@ -896,7 +772,7 @@ DISPLAY_LASERS
     jsr     Convert_XY_to_UDG_RAM_Address   ; 21BE: 20 1D 35 
 
 ; Test if firing left or right
-    lda     ZP06_Laser_Position_X           ; 21C1: A5 06    
+    lda     ZP06                            ; 21C1: A5 06    
     bit     MASK_00000001                   ; 21C3: 2C 14 20 
     clc                                     ; 21C6: 18       
 
@@ -921,35 +797,35 @@ Handle_Wrap_Get_Y_Cooord
 
 ; Test if laser address in UDG RAM is empty, jump if not empty
 ; This stops you firing through objects when laser is above the top of the fully-built ship
-    lda     (ZP04_Laser_UDG_RAM_Addr_Lo),y  ; 21D8: B1 04    
+    lda     (ZP04),y                        ; 21D8: B1 04    
     bne     UDG_RAM_Zero_Bit_2              ; 21DA: D0 20    
 
 ; L_BRS_($21DC)_($21D6) OK
 Save_Laser_Position_X
     txa                                     ; 21DC: 8A        Restore A
-    sta     ZP06_Laser_Position_X           ; 21DD: 85 06    
+    sta     ZP06                            ; 21DD: 85 06    
 
 ; Reverse the displayed 8-bit byte on-screen
-    lda     (ZP04_Laser_UDG_RAM_Addr_Lo),y  ; 21DF: B1 04    
+    lda     (ZP04),y                        ; 21DF: B1 04    
     eor     #%11111111                      ; 21E1: 49 FF    
-    sta     (ZP04_Laser_UDG_RAM_Addr_Lo),y  ; 21E3: 91 04    
+    sta     (ZP04),y                        ; 21E3: 91 04    
 
 ; Load current tile colour, check it's not green, jump if it is
-    lda     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 21E5: B1 0C    
+    lda     (ZP0C),y                        ; 21E5: B1 0C    
     and     #%00001111                      ; 21E7: 29 0F    
     cmp     #COLOUR_GREEN                   ; 21E9: C9 05    
     beq     Reduce_Laser_Length_Countdown   ; 21EB: F0 04    
 
 ; Update laser tile colour
-    lda     ZP1B_Laser_Colour               ; 21ED: A5 1B    
-    sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 21EF: 91 0C    
+    lda     ZP1B                            ; 21ED: A5 1B    
+    sta     (ZP0C),y                        ; 21EF: 91 0C    
 
 ; L_BRS_($21F1)_($21EB) OK
 Reduce_Laser_Length_Countdown
-    lda     ZP07_Laser_Length_Columns       ; 21F1: A5 07    
+    lda     ZP07                            ; 21F1: A5 07    
     sec                                     ; 21F3: 38       
     sbc     #$08                            ; 21F4: E9 08    
-    sta     ZP07_Laser_Length_Columns       ; 21F6: 85 07    
+    sta     ZP07                            ; 21F6: 85 07    
 
 ; Test if laser length is > 7, if yes branch
     and     #%11111000                      ; 21F8: 29 F8    
@@ -958,9 +834,9 @@ Reduce_Laser_Length_Countdown
 ; Probably turns of further display of laser beam
 ; L_BRS_($21FC)_($21DA) OK
 UDG_RAM_Zero_Bit_2
-    lda     ZP06_Laser_Position_X           ; 21FC: A5 06    
+    lda     ZP06                            ; 21FC: A5 06    
     and     #%11111011                      ; 21FE: 29 FB    
-    sta     ZP06_Laser_Position_X           ; 2200: 85 06    
+    sta     ZP06                            ; 2200: 85 06    
 
 ; Loads ZP 14/15/16/17 with laser decay pattern, initial laser is a line of $FF's then $03
 ; subtracted leaving $FC, then $1C subtracted leaving $E0, the subtracting $E0 leaves $00
@@ -983,13 +859,13 @@ Setup_Laser_Decay_Patterns
 Iterate_Laser_Params_2_3_4_5
     iny                                     ; 2211: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2212: B1 00    
-    eor     ZP06_Laser_Position_X           ; 2214: 45 06    
+    eor     ZP06                            ; 2214: 45 06    
     and     #%11111000                      ; 2216: 29 F8    
     bne     Process_Laser_Shot              ; 2218: D0 0F    
 
 ; Test if all possible laser parameters processed
     jsr     Cascade_Laser_Pattern_Data      ; 221A: 20 8B 22 
-    dec     ZP02_Laser_Param_Countdown      ; 221D: C6 02    
+    dec     ZP02                            ; 221D: C6 02    
     bne     Iterate_Laser_Params_2_3_4_5    ; 221F: D0 F0    
 
 ; All laser shots ended, set laser shots object type to zero i.e. no laser shot
@@ -1008,8 +884,8 @@ Process_Laser_Shot
     bne     Update_Laser_Position_X         ; 222E: D0 27    
 
 ; Decrements length and test for exit condition
-    dec     ZP07_Laser_Length_Columns       ; 2230: C6 07    
-    lda     ZP07_Laser_Length_Columns       ; 2232: A5 07    
+    dec     ZP07                            ; 2230: C6 07    
+    lda     ZP07                            ; 2232: A5 07    
     and     #%00000111                      ; 2234: 29 07    
     bne     Update_Obj_Params_And_Exit      ; 2236: D0 10    
 
@@ -1017,8 +893,8 @@ Process_Laser_Shot
     lda     ZP_IRQ_Random                   ; 2238: A5 4C    
     and     #%00000011                      ; 223A: 29 03    
     ora     #%00000100                      ; 223C: 09 04    
-    ora     ZP07_Laser_Length_Columns       ; 223E: 05 07    
-    sta     ZP07_Laser_Length_Columns       ; 2240: 85 07    
+    ora     ZP07                            ; 223E: 05 07    
+    sta     ZP07                            ; 2240: 85 07    
 
 ; Register Y is 3 or 4 or 5 or 5 at this point, thus setting bit in laser x-coords
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2242: B1 00    
@@ -1029,11 +905,11 @@ Process_Laser_Shot
 ; L_JMP_($2248)_($2282) OK
 Update_Obj_Params_And_Exit
     ldy     #LASER_LENGTH_PARAM             ; 2248: A0 06    
-    lda     ZP07_Laser_Length_Columns       ; 224A: A5 07    
+    lda     ZP07                            ; 224A: A5 07    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 224C: 91 00    
 
     ldy     #LASER_POSITION_X               ; 224E: A0 02    
-    lda     ZP06_Laser_Position_X           ; 2250: A5 06    
+    lda     ZP06                            ; 2250: A5 06    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2252: 91 00    
 
     jmp     GOTO_NEXT_OBJECT                ; 2254: 4C 1A 26 
@@ -1044,7 +920,7 @@ Update_Obj_Params_And_Exit
 ; L_BRS_($2257)_($222E) OK
 Update_Laser_Position_X
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2257: B1 00    
-    sta     ZP04_Laser_Position_X           ; 2259: 85 04    
+    sta     ZP04                            ; 2259: 85 04    
     bit     MASK_00000001                   ; 225B: 2C 14 20 
 
 ; Add 8 if firing left or -8 if firing right ($F8 is -8)
@@ -1058,8 +934,8 @@ Account_For_Wraparound
     jsr     Laser_Wrap                      ; 2263: 20 98 22 
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2266: 91 00    
 
-    lda     ZP13_Laser_Position_Y           ; 2268: A5 13    
-    sta     ZP05_Laser_Position_Y           ; 226A: 85 05    
+    lda     ZP13                            ; 2268: A5 13    
+    sta     ZP05                            ; 226A: 85 05    
 
 ; EXOR-write data in ZP variable to UDG RAM
     tya                                     ; 226C: 98       
@@ -1070,14 +946,14 @@ Account_For_Wraparound
 
 ; Apply laser decay pattern onto screen
     ldy     #$00                            ; 2274: A0 00    
-    lda     ZP14_Laser_Decay_Patten_Data_0  ; 2276: A5 14    
-    eor     (ZP04_Laser_UDG_RAM_Addr_Lo),y  ; 2278: 51 04    
-    sta     (ZP04_Laser_UDG_RAM_Addr_Lo),y  ; 227A: 91 04    
+    lda     ZP14                            ; 2276: A5 14    
+    eor     (ZP04),y                        ; 2278: 51 04    
+    sta     (ZP04),y                        ; 227A: 91 04    
 
     pla                                     ; 227C: 68       
     tay                                     ; 227D: A8       
 
-    dec     ZP02_Laser_Param_Countdown      ; 227E: C6 02    
+    dec     ZP02                            ; 227E: C6 02    
     bne     Iterate_Laser_Params_2_3_4_5    ; 2280: D0 8F    
     jmp     Update_Obj_Params_And_Exit      ; 2282: 4C 48 22 
 ; ------------------------------------------
@@ -1092,12 +968,12 @@ ADC_08_Account_For_Wraparound
 ; L_JSR_($228B)_($221A) OK
 ; L_JSR_($228B)_($2271) OK
 Cascade_Laser_Pattern_Data
-    lda     ZP15_Laser_Decay_Patten_Data_1  ; 228B: A5 15    
-    sta     ZP14_Laser_Decay_Patten_Data_0  ; 228D: 85 14    
-    lda     ZP16_Laser_Decay_Patten_Data_2  ; 228F: A5 16    
-    sta     ZP15_Laser_Decay_Patten_Data_1  ; 2291: 85 15    
-    lda     ZP17_Laser_Decay_Patten_Data_3  ; 2293: A5 17    
-    sta     ZP16_Laser_Decay_Patten_Data_2  ; 2295: 85 16    
+    lda     ZP15                            ; 228B: A5 15    
+    sta     ZP14                            ; 228D: 85 14    
+    lda     ZP16                            ; 228F: A5 16    
+    sta     ZP15                            ; 2291: 85 15    
+    lda     ZP17                            ; 2293: A5 17    
+    sta     ZP16                            ; 2295: 85 16    
     rts                                     ; 2297: 60       
 ; ==========================================
 
@@ -1374,7 +1250,7 @@ Display_Player_2_Lives
 Display_Number_Of_Lives
     clc                                     ; 238E: 18       
     adc     #CHARACTER_ZERO                 ; 238F: 69 70     $70 = "0" character
-    sta     ZP06_Character_To_Copy          ; 2391: 85 06    
+    sta     ZP06                            ; 2391: 85 06    
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 2393: 20 95 35 
 
 ; Display Jetman Icon next to number of lives
@@ -1398,11 +1274,11 @@ Erase_Player_1_Lives
 ; L_JSR_($23A8)_($23A2) OK
 Erase_Player_Lives
     lda     #CHARACTER_SPACE                ; 23A8: A9 60     $60 = Space character
-    sta     ZP06_Character_To_Copy          ; 23AA: 85 06    
+    sta     ZP06                            ; 23AA: 85 06    
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 23AC: 20 95 35 
 
     lda     #CHARACTER_SPACE                ; 23AF: A9 60     $60 = Space character
-    sta     ZP06_Character_To_Copy          ; 23B1: 85 06    
+    sta     ZP06                            ; 23B1: 85 06    
     jmp     Copy_Char_To_UDG_RAM_Setup      ; 23B3: 4C 95 35 
 ; ------------------------------------------
 
@@ -1570,19 +1446,19 @@ Display_1UP_HI_2UP_Text
 ; L_BRS_($2429)_($244D) OK
 Loop_Display_1UP_HI_2UP_Text
     lda     STR_1UP_HI_2UP,x                ; 2429: BD 65 24 
-    sta     ZP04_Position_X                 ; 242C: 85 04    
+    sta     ZP04                            ; 242C: 85 04    
 
     inx                                     ; 242E: E8       
     lda     STR_1UP_HI_2UP,x                ; 242F: BD 65 24 
-    sta     ZP05_Position_Y                 ; 2432: 85 05    
+    sta     ZP05                            ; 2432: 85 05    
 
     inx                                     ; 2434: E8       
     lda     STR_1UP_HI_2UP,x                ; 2435: BD 65 24 
-    sta     ZP0E_String_Addr_Lo             ; 2438: 85 0E    
+    sta     ZP0E                            ; 2438: 85 0E    
 
     inx                                     ; 243A: E8       
     lda     STR_1UP_HI_2UP,x                ; 243B: BD 65 24 
-    sta     ZP0F_String_Addr_Hi             ; 243E: 85 0F    
+    sta     ZP0F                            ; 243E: 85 0F    
 
     inx                                     ; 2440: E8       
     txa                                     ; 2441: 8A       
@@ -1755,24 +1631,24 @@ Display_Game_Select
 
 ; Setup and display attract screen game selection options
     lda     #$00                            ; 24EB: A9 00    
-    sta     ZP08_Row_Offset_Table_Index     ; 24ED: 85 08    
+    sta     ZP08                            ; 24ED: 85 08    
 
 ; X position is hardcoded, Y position comes from a lookup table keyed on ZP08 Index
 ; L_BRS_($24EF)_($251C) OK
 Loop_Display_Game_Select
     lda     #TEXT_POSITION_X                ; 24EF: A9 18    
-    sta     ZP04_Position_X                 ; 24F1: 85 04    
+    sta     ZP04                            ; 24F1: 85 04    
 
-    ldx     ZP08_Row_Offset_Table_Index     ; 24F3: A6 08    
+    ldx     ZP08                            ; 24F3: A6 08    
     lda     Fn_And_SP_Row_Offsets,x         ; 24F5: BD 1F 25 
-    sta     ZP05_Position_Y                 ; 24F8: 85 05    
+    sta     ZP05                            ; 24F8: 85 05    
 
     jsr     Setup_Colour_RAM_Address        ; 24FA: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Address   ; 24FD: 20 1D 35 
 
 ; Setup and call string display routine
     ldy     #$00                            ; 2500: A0 00    
-    ldx     ZP08_Row_Offset_Table_Index     ; 2502: A6 08    
+    ldx     ZP08                            ; 2502: A6 08    
     lda     ZP_Game_Select_F1_Flash,x       ; 2504: B5 45    
     jsr     Display_String                  ; 2506: 20 D6 34 
 
@@ -1781,16 +1657,16 @@ Loop_Display_Game_Select
     iny                                     ; 2509: C8       
     tya                                     ; 250A: 98       
     clc                                     ; 250B: 18       
-    adc     ZP0E_String_Addr_Lo             ; 250C: 65 0E    
-    sta     ZP0E_String_Addr_Lo             ; 250E: 85 0E    
+    adc     ZP0E                            ; 250C: 65 0E    
+    sta     ZP0E                            ; 250E: 85 0E    
 
-    lda     ZP0F_String_Addr_Hi             ; 2510: A5 0F    
+    lda     ZP0F                            ; 2510: A5 0F    
     adc     #$00                            ; 2512: 69 00    
-    sta     ZP0F_String_Addr_Hi             ; 2514: 85 0F    
+    sta     ZP0F                            ; 2514: 85 0F    
 
 ; Increment table index and test if all rows displayed
-    inc     ZP08_Row_Offset_Table_Index     ; 2516: E6 08    
-    lda     ZP08_Row_Offset_Table_Index     ; 2518: A5 08    
+    inc     ZP08                            ; 2516: E6 08    
+    lda     ZP08                            ; 2518: A5 08    
     cmp     #OPTION_TEXT_ROWS               ; 251A: C9 05    
     bne     Loop_Display_Game_Select        ; 251C: D0 D1    
     rts                                     ; 251E: 60       
@@ -2283,10 +2159,10 @@ Loop_Sound_Update
 
 ; Jump to Sound player using Register X as jump table index
     lda     Sound_Object_Jump_Table,x       ; 26D7: BD 43 27 
-    sta     ZP08_Subroutine_Addr_Lo         ; 26DA: 85 08    
+    sta     ZP08                            ; 26DA: 85 08    
     lda     Sound_Object_Jump_Table+1,x     ; 26DC: BD 44 27 
-    sta     ZP09_Subroutine_Addr_Hi         ; 26DF: 85 09    
-    jmp     (ZP08_Subroutine_Addr_Lo)       ; 26E1: 6C 08 00 
+    sta     ZP09                            ; 26DF: 85 09    
+    jmp     (ZP08)                          ; 26E1: 6C 08 00 
 ; ------------------------------------------
 
 ; Update index to next 2-byte oscillator/timer pair, stopping when
@@ -2512,8 +2388,8 @@ Test_New_Hi_Score
 
 ; L_BRS_($2790)_($279D) OK
 Compare_BCD_Byte
-    lda     (ZP00_Hi_Score_Addr),y          ; 2790: B1 00    
-    cmp     (ZP08_Player_Score_Addr),y      ; 2792: D1 08    
+    lda     (ZP_Obj_List_Ptr_Lo),y          ; 2790: B1 00    
+    cmp     (ZP08),y                        ; 2792: D1 08    
     beq     Move_To_Next_BCD_Byte           ; 2794: F0 03    
 
 ; Branch if Player Score > Score_Hi
@@ -2540,8 +2416,8 @@ Copy_Player_Score_To_Hi_Score
 
 ; L_BRS_($27A2)_($27A7) OK
 Loop_Copy_Player_To_Hi_Score
-    lda     (ZP08_Player_Score_Addr),y      ; 27A2: B1 08    
-    sta     (ZP00_Hi_Score_Addr),y          ; 27A4: 91 00    
+    lda     (ZP08),y                        ; 27A2: B1 08    
+    sta     (ZP_Obj_List_Ptr_Lo),y          ; 27A4: 91 00    
     dey                                     ; 27A6: 88       
     bpl     Loop_Copy_Player_To_Hi_Score    ; 27A7: 10 F9     Return when all bytes copied
     rts                                     ; 27A9: 60       
@@ -2576,17 +2452,17 @@ Display_Ship_Flame
 Display_Ship_Flame_Asc_Desc
     inc     ZP_Ship_Flame_UDG_Toggle        ; 27B3: E6 27    
 
-    lda     ZP11_Object_Ship_Position_Y     ; 27B5: A5 11    
+    lda     ZP11                            ; 27B5: A5 11    
     pha                                     ; 27B7: 48       
     clc                                     ; 27B8: 18       
     adc     #$15                            ; 27B9: 69 15    
-    sta     ZP11_Object_Ship_Position_Y     ; 27BB: 85 11    
+    sta     ZP11                            ; 27BB: 85 11    
 
-    lda     ZP19_Object_Flame_Position_Y    ; 27BD: A5 19    
+    lda     ZP19                            ; 27BD: A5 19    
     pha                                     ; 27BF: 48       
     clc                                     ; 27C0: 18       
     adc     #$15                            ; 27C1: 69 15    
-    sta     ZP19_Object_Flame_Position_Y    ; 27C3: 85 19    
+    sta     ZP19                            ; 27C3: 85 19    
 
 ; On ascend, BCS followed each time until Flame Space Available, which triggers Display_Flame
 ; once, after that, both branches fail. Descend is similar.
@@ -2626,19 +2502,19 @@ Display_Ship_Flame_On_Screen
     jsr     Display_Object                  ; 27F4: 20 4C 36 
 
 ; Set the flame colour tile to red, uses two tiles
-    lda     ZP18_Object_Flame_Position_X    ; 27F7: A5 18    
-    sta     ZP04_Object_Position_X          ; 27F9: 85 04    
+    lda     ZP18                            ; 27F7: A5 18    
+    sta     ZP04                            ; 27F9: 85 04    
 
-    lda     ZP19_Object_Flame_Position_Y    ; 27FB: A5 19    
-    sta     ZP05_Object_Position_Y          ; 27FD: 85 05    
+    lda     ZP19                            ; 27FB: A5 19    
+    sta     ZP05                            ; 27FD: 85 05    
 
     jsr     Setup_Colour_RAM_Address        ; 27FF: 20 F7 34 
     lda     #COLOUR_RED                     ; 2802: A9 02    
     ldy     #$00                            ; 2804: A0 00    
-    sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 2806: 91 0C    
+    sta     (ZP0C),y                        ; 2806: 91 0C    
 
     iny                                     ; 2808: C8       
-    sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 2809: 91 0C    
+    sta     (ZP0C),y                        ; 2809: 91 0C    
 
 ; Restore ZP11 and ZP19 and return
 ; L_JMP_($280B)_($2816) OK
@@ -2646,9 +2522,9 @@ Display_Ship_Flame_On_Screen
 ; L_JMP_($280B)_($282B) OK
 Restore_And_RTS
     pla                                     ; 280B: 68       
-    sta     ZP19_Object_Flame_Position_Y    ; 280C: 85 19    
+    sta     ZP19                            ; 280C: 85 19    
     pla                                     ; 280E: 68       
-    sta     ZP11_Object_Ship_Position_Y     ; 280F: 85 11    
+    sta     ZP11                            ; 280F: 85 11    
     rts                                     ; 2811: 60       
 ; ==========================================
 
@@ -2716,7 +2592,7 @@ Ship_Flame_Frame_1_Addr_Hi
 VALUABLES
     jsr     Load_Object_Type_X_Y            ; 283E: 20 D7 35 
     jsr     Test_Platform_Collision         ; 2841: 20 B3 30 
-    lda     ZP02_Collision_Status           ; 2844: A5 02    
+    lda     ZP02                            ; 2844: A5 02    
     bmi     Valuable_Landed                 ; 2846: 30 09    
 
 ; Move valuable Y position down screen by 2 pixels
@@ -2757,11 +2633,11 @@ Animate_Valuable
 ; Use valuable type to index into subroutine list and jump to subroutine
     tax                                     ; 287A: AA       
     lda     Valuable_Handler_Jump_Table,x   ; 287B: BD 88 28 
-    sta     ZP08_Subroutine_Addr_Lo         ; 287E: 85 08    
+    sta     ZP08                            ; 287E: 85 08    
 
     lda     Valuable_Handler_Jump_Table+1,x ; 2880: BD 89 28 
-    sta     ZP09_Subroutine_Addr_Hi         ; 2883: 85 09    
-    jmp     (ZP08_Subroutine_Addr_Lo)       ; 2885: 6C 08 00 
+    sta     ZP09                            ; 2883: 85 09    
+    jmp     (ZP08)                          ; 2885: 6C 08 00 
 
 Valuable_Handler_Jump_Table
     fdb     Valuable_Gold_Bar               ; 2888: 92 28    
@@ -3531,7 +3407,7 @@ Direction_Y_Inc
 ; L_JSR_($2B16)_($2AC4) OK
 Test_Platform_Collision_Bounce
     jsr     Test_Platform_Collision         ; 2B16: 20 B3 30 
-    lda     ZP02_Collision_Status           ; 2B19: A5 02    
+    lda     ZP02                            ; 2B19: A5 02    
     bpl     Do_RTS                          ; 2B1B: 10 19     1xxx_xxx = Collision
 
 ; Collision detected, test if direction X is changing
@@ -3782,52 +3658,52 @@ Object_Position_X_Table
 ; L_JSR_($2BF8)_($2C64) OK
 Test_Laser_Hits_1
     lda     #OBJECT_LASER_0_LO              ; 2BF8: A9 88    
-    sta     ZP08_Object_Laser_Addr_Lo       ; 2BFA: 85 08    
+    sta     ZP08                            ; 2BFA: 85 08    
     lda     #OBJECT_LASER_0_HI              ; 2BFC: A9 03    
-    sta     ZP09_Object_Laser_Addr_Hi       ; 2BFE: 85 09    
+    sta     ZP09                            ; 2BFE: 85 09    
 
 ; Store number of lasers (4) for processing to ZP_02
     lda     #MAX_LASERS                     ; 2C00: A9 04    
-    sta     ZP02_Num_Lasers_Countdown       ; 2C02: 85 02    
+    sta     ZP02                            ; 2C02: 85 02    
 
 ; Store current object X and Y for laser hit test in ZP_06/07
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2C04: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C06: B1 00    
-    sta     ZP06_Object_Position_Y          ; 2C08: 85 06    
+    sta     ZP06                            ; 2C08: 85 06    
 
 ; Register Y becomes Object Position X parameter
     dey                                     ; 2C0A: 88       
     dey                                     ; 2C0B: 88       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2C0C: B1 00    
-    sta     ZP07_Object_Position_X          ; 2C0E: 85 07    
+    sta     ZP07                            ; 2C0E: 85 07    
 
 ; Test if laser Position X value has bit 2 set
 ; L_BRS_($2C10)_($2C5C) OK
 Loop_Test_Laser_Hit
     ldy     #LASER_POSITION_X_PARAM         ; 2C10: A0 02    
-    lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C12: B1 08    
+    lda     (ZP08),y                        ; 2C12: B1 08    
     bit     MASK_00000100                   ; 2C14: 2C 16 20 
     bne     Test_Laser_Object_Active        ; 2C17: D0 08    
 
 ; Register Y becomes Laser next Position X parameter
 ; Test if laser next Position X value has bit 2 set
     iny                                     ; 2C19: C8       
-    lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C1A: B1 08    
+    lda     (ZP08),y                        ; 2C1A: B1 08    
     bit     MASK_00000100                   ; 2C1C: 2C 16 20 
     beq     Goto_Next_Laser                 ; 2C1F: F0 32    
 
 ; L_BRS_($2C21)_($2C17) OK
 Test_Laser_Object_Active
     ldy     #OBJECT_TYPE_PARAM              ; 2C21: A0 00    
-    lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C23: B1 08    
+    lda     (ZP08),y                        ; 2C23: B1 08    
     beq     Goto_Next_Laser                 ; 2C25: F0 2C    
 
 ; Register Y becomes Laser Position Y parameter
 ; Compare laser and object Position Y value, if CMP fails, return
     iny                                     ; 2C27: C8       
-    lda     ZP06_Object_Position_Y          ; 2C28: A5 06    
+    lda     ZP06                            ; 2C28: A5 06    
     sec                                     ; 2C2A: 38       
-    sbc     (ZP08_Object_Laser_Addr_Lo),y   ; 2C2B: F1 08    
+    sbc     (ZP08),y                        ; 2C2B: F1 08    
     cmp     #$10                            ; 2C2D: C9 10    
     bcs     Goto_Next_Laser                 ; 2C2F: B0 22    
 
@@ -3835,11 +3711,11 @@ Test_Laser_Object_Active
 ; Store the bottom 3 bits of Position X, making it a character-sized column reference
 ; Test if object is to the left or right of the Laser object
     iny                                     ; 2C31: C8       
-    lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C32: B1 08    
+    lda     (ZP08),y                        ; 2C32: B1 08    
     and     #%11111000                      ; 2C34: 29 F8    
     sbc     #$03                            ; 2C36: E9 03    
     sec                                     ; 2C38: 38       
-    sbc     ZP07_Object_Position_X          ; 2C39: E5 07    
+    sbc     ZP07                            ; 2C39: E5 07    
     bpl     Test_Laser_And_Obj_Position_X   ; 2C3B: 10 05    
 
 ; Invert the result of the comparison? Not sure...
@@ -3855,13 +3731,13 @@ Test_Laser_And_Obj_Position_X
 
 ; Object hit by laser, return $80 in ZP_02 (i.e. negative number)
     lda     #$80                            ; 2C46: A9 80    
-    sta     ZP02_Num_Lasers_Countdown       ; 2C48: 85 02    
+    sta     ZP02                            ; 2C48: 85 02    
 
 ; Zero bit 2 of laser X parameter, probably to diasble it later
     ldy     #LASER_POSITION_X_PARAM         ; 2C4A: A0 02    
-    lda     (ZP08_Object_Laser_Addr_Lo),y   ; 2C4C: B1 08    
+    lda     (ZP08),y                        ; 2C4C: B1 08    
     and     #%11111011                      ; 2C4E: 29 FB    
-    sta     (ZP08_Object_Laser_Addr_Lo),y   ; 2C50: 91 08    
+    sta     (ZP08),y                        ; 2C50: 91 08    
     rts                                     ; 2C52: 60       
 ; ==========================================
 
@@ -3871,13 +3747,13 @@ Test_Laser_And_Obj_Position_X
 ; L_BRS_($2C53)_($2C2F) OK
 ; L_BRS_($2C53)_($2C44) OK
 Goto_Next_Laser
-    lda     ZP08_Object_Laser_Addr_Lo       ; 2C53: A5 08    
+    lda     ZP08                            ; 2C53: A5 08    
     clc                                     ; 2C55: 18       
     adc     #OBJECT_STRUCTURE_SIZE          ; 2C56: 69 08    
-    sta     ZP08_Object_Laser_Addr_Lo       ; 2C58: 85 08    
+    sta     ZP08                            ; 2C58: 85 08    
 
 ; Decrement object counter, return when all processed
-    dec     ZP02_Num_Lasers_Countdown       ; 2C5A: C6 02    
+    dec     ZP02                            ; 2C5A: C6 02    
     bne     Loop_Test_Laser_Hit             ; 2C5C: D0 B2    
     rts                                     ; 2C5E: 60       
 ; ==========================================
@@ -3890,7 +3766,7 @@ Test_Laser_Hits
     inc     ZP_Alien_Spawn_Counter          ; 2C5F: E6 21    
     jsr     Load_Object_Type_X_Y            ; 2C61: 20 D7 35 
     jsr     Test_Laser_Hits_1               ; 2C64: 20 F8 2B 
-    lda     ZP02_Num_Lasers_Countdown       ; 2C67: A5 02    
+    lda     ZP02                            ; 2C67: A5 02    
     rts                                     ; 2C69: 60       
 ; ==========================================
 
@@ -3917,7 +3793,7 @@ WAVE_0_FUZZBALL
 ; Alien not hit by laser, test if alien hit platform, if yes explode,
 ; else test if alien hit Jetman
     jsr     Test_Platform_Collision         ; 2C6F: 20 B3 30 
-    lda     ZP02_Collision_Status           ; 2C72: A5 02    
+    lda     ZP02                            ; 2C72: A5 02    
     bpl     Display_Object_Position_Update  ; 2C74: 10 1C    
     bmi     Chg_Obj_To_Explosion_Then_Next  ; 2C76: 30 14    
 
@@ -3944,12 +3820,12 @@ Alien_Hit_Score_Update
 
 ; Get score high byte and save
     lda     Alien_Points_Lookup_Table,x     ; 2C7E: BD DB 2C 
-    sta     ZP02_Score_Byte_Hi              ; 2C81: 85 02    
+    sta     ZP02                            ; 2C81: 85 02    
     inx                                     ; 2C83: E8       
 
 ; Get score low byte and save
     lda     Alien_Points_Lookup_Table,x     ; 2C84: BD DB 2C 
-    sta     ZP03_Score_Byte_Lo              ; 2C87: 85 03    
+    sta     ZP03                            ; 2C87: 85 03    
     jsr     Update_Score                    ; 2C89: 20 63 30 
 
 ; L_BRS_($2C8C)_($2C76) OK
@@ -3967,7 +3843,7 @@ Chg_Obj_To_Explosion_Then_Next
 ; L_BRS_($2C92)_($2C74) OK
 Display_Object_Position_Update
     jsr     Test_Jetman_Object_Collide      ; 2C92: 20 58 2D 
-    lda     ZP02_Collision_Status           ; 2C95: A5 02    
+    lda     ZP02                            ; 2C95: A5 02    
     bpl     Update_Object_Position          ; 2C97: 10 06    
 
 ; Alien has hit Jetman
@@ -4083,7 +3959,7 @@ Init_Alien_Object_Next
 ; DEBUG Set $2CFA to 1 to spawn only 1 alien
 ; In MAME Debugger, use "fill 2CFA,1,1"
     lda     #NUM_ALIENS_MAX                 ; 2CF9: A9 06    
-    sta     ZP02_Num_Aliens_Countdown       ; 2CFB: 85 02    
+    sta     ZP02                            ; 2CFB: 85 02    
     ldy     #OBJECT_TYPE_PARAM              ; 2CFD: A0 00    
 
 ; Test if alien object is currently used, if not initiate it
@@ -4099,7 +3975,7 @@ Loop_Next_Object
     sta     ZP_Obj_List_Ptr_Lo              ; 2D08: 85 00    
 
 ; Decrement alien countdown, return when it reaches zero
-    dec     ZP02_Num_Aliens_Countdown       ; 2D0A: C6 02    
+    dec     ZP02                            ; 2D0A: C6 02    
     bne     Loop_Next_Object                ; 2D0C: D0 F1    
     rts                                     ; 2D0E: 60       
 ; ==========================================
@@ -4145,14 +4021,14 @@ Init_Alien_Object
     iny                                     ; 2D35: C8       
     txa                                     ; 2D36: 8A       
     and     #%00000001                      ; 2D37: 29 01    
-    sta     ZP02_Colour_Random_0_or_1       ; 2D39: 85 02    
+    sta     ZP02                            ; 2D39: 85 02    
 
 ; Set object colour randomly, lookup table has 2 colours per wave
     lda     ZP_Wave_Active_Player           ; 2D3B: A5 59    
     asl     a                               ; 2D3D: 0A       
     and     #%00000110                      ; 2D3E: 29 06    
     clc                                     ; 2D40: 18       
-    adc     ZP02_Colour_Random_0_or_1       ; 2D41: 65 02    
+    adc     ZP02                            ; 2D41: 65 02    
     tax                                     ; 2D43: AA       
     lda     Wave_Alien_Colour_Lookup,x      ; 2D44: BD 50 2D 
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 2D47: 91 00    
@@ -4218,7 +4094,7 @@ Test_Jetman_Object_Collide
 ; L_BRS_($2D69)_($2D5A) OK
 Set_No_Collision_And_Return
     lda     #NO_COLLISION                   ; 2D69: A9 00    
-    sta     ZP02_Collision_Status           ; 2D6B: 85 02    
+    sta     ZP02                            ; 2D6B: 85 02    
     rts                                     ; 2D6D: 60       
 ; ==========================================
 
@@ -4227,7 +4103,7 @@ Set_No_Collision_And_Return
 ; L_BRS_($2D6E)_($2D67) OK
 Compare_Obj_Jetman_Position_X
     ldy     #NO_COLLISION                   ; 2D6E: A0 00    
-    sty     ZP02_Collision_Status           ; 2D70: 84 02    
+    sty     ZP02                            ; 2D70: 84 02    
 
 ; Register Y becomes offset to objects Position X, compare to Jetman's Position X and
 ; branch if object is to the left of Jetman
@@ -4270,7 +4146,7 @@ Set_Compare_Result_And_Return
     bcs     No_Collision_Return             ; 2D95: B0 04    
 
     lda     #COLLISION                      ; 2D97: A9 80    
-    sta     ZP02_Collision_Status           ; 2D99: 85 02    
+    sta     ZP02                            ; 2D99: 85 02    
 
 ; L_BRS_($2D9B)_($2D82) OK
 ; L_BRS_($2D9B)_($2D95) OK
@@ -4394,15 +4270,15 @@ Restore_Player_Ship
 ; L_JSR_($2DFF)_($2DD7) OK
 ; L_JSR_($2DFF)_($2EBB) OK
 Decrement_Ship_Position_Y_Etc
-    lda     ZP19_Object_New_Position_Y      ; 2DFF: A5 19    
+    lda     ZP19                            ; 2DFF: A5 19    
     sec                                     ; 2E01: 38       
     sbc     #$10                            ; 2E02: E9 10    
-    sta     ZP19_Object_New_Position_Y      ; 2E04: 85 19    
+    sta     ZP19                            ; 2E04: 85 19    
 
-    lda     ZP11_Object_Old_Position_Y      ; 2E06: A5 11    
+    lda     ZP11                            ; 2E06: A5 11    
     sec                                     ; 2E08: 38       
     sbc     #$10                            ; 2E09: E9 10    
-    sta     ZP11_Object_Old_Position_Y      ; 2E0B: 85 11    
+    sta     ZP11                            ; 2E0B: 85 11    
 
     lda     ZP_Ship_UDG_Addr_Offset         ; 2E0D: A5 1E    
     clc                                     ; 2E0F: 18       
@@ -4531,7 +4407,7 @@ SHIP_DESCEND
 SHIP_BASE_MODULE
     jsr     Load_Object_Type_X_Y            ; 2E74: 20 D7 35 
     jsr     Test_Jetman_Object_Collide      ; 2E77: 20 58 2D 
-    lda     ZP02_Collision_Status           ; 2E7A: A5 02    
+    lda     ZP02                            ; 2E7A: A5 02    
     bpl     Display_Ship                    ; 2E7C: 10 2E    
 
 ; Jetman collided with stip, test if fully fulled up
@@ -4607,12 +4483,12 @@ Loop_Display_Ship_Parts
 
 ; L_BRS_($2ECA)_($2EC6) OK
 Store_Ship_Colour
-    sta     ZP1B_Object_Colour              ; 2ECA: 85 1B    
+    sta     ZP1B                            ; 2ECA: 85 1B    
 
 ; Load ship parts count, can be either 1/2/3 depending on base/Base+Mid/Base+Mid+Top built
     ldy     #OBJ_SHIP_PARTS_COUNTER_PARAM   ; 2ECC: A0 04    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ECE: B1 00    
-    sta     ZP02_Ship_Parts_Count           ; 2ED0: 85 02    
+    sta     ZP02                            ; 2ED0: 85 02    
 
 ; If ship not yet built, colourize what's built with white
     cmp     #$03                            ; 2ED2: C9 03    
@@ -4623,7 +4499,7 @@ Store_Ship_Colour
     ldy     #OBJECT_SHIP_FUEL_LEVEL         ; 2ED6: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2ED8: B1 00    
     lsr     a                               ; 2EDA: 4A       
-    sta     ZP13_Ship_Fuel_Level_Half       ; 2EDB: 85 13    
+    sta     ZP13                            ; 2EDB: 85 13    
 
 ; If no fuel to display yet, colourize it all with white
     beq     Colourize_Ship_White            ; 2EDD: F0 1E    
@@ -4634,10 +4510,10 @@ Store_Ship_Colour
 
 ; Fuel to display is less than 6/2=3, store fuel level/2
 ; Base or base+mid to be coloured purple
-    sta     ZP02_Ship_Parts_Count           ; 2EE3: 85 02    
+    sta     ZP02                            ; 2EE3: 85 02    
 
     lda     #COLOUR_PURPLE                  ; 2EE5: A9 04    
-    sta     ZP1B_Object_Colour              ; 2EE7: 85 1B    
+    sta     ZP1B                            ; 2EE7: 85 1B    
 
     jsr     Colourize_Ship_Setup_RAM_Ptr    ; 2EE9: 20 07 2F 
 
@@ -4645,11 +4521,11 @@ Store_Ship_Colour
 ; by subtracting from 3 and store number of rows to colour to Ship_Parts_Count
     lda     #$03                            ; 2EEC: A9 03    
     sec                                     ; 2EEE: 38       
-    sbc     ZP13_Ship_Fuel_Level_Half       ; 2EEF: E5 13    
-    sta     ZP02_Ship_Parts_Count           ; 2EF1: 85 02    
+    sbc     ZP13                            ; 2EEF: E5 13    
+    sta     ZP02                            ; 2EF1: 85 02    
 
     lda     #COLOUR_WHITE                   ; 2EF3: A9 01    
-    sta     ZP1B_Object_Colour              ; 2EF5: 85 1B    
+    sta     ZP1B                            ; 2EF5: 85 1B    
 
     jsr     Colourize_Ship                  ; 2EF7: 20 16 2F 
     jmp     GOTO_NEXT_OBJECT                ; 2EFA: 4C 1A 26 
@@ -4659,7 +4535,7 @@ Store_Ship_Colour
 ; L_BRS_($2EFD)_($2EDD) OK
 Colourize_Ship_White
     lda     #COLOUR_WHITE                   ; 2EFD: A9 01    
-    sta     ZP1B_Object_Colour              ; 2EFF: 85 1B    
+    sta     ZP1B                            ; 2EFF: 85 1B    
 
 ; L_BRS_($2F01)_($2EE1) OK
 Colourize_Ship_NEXT
@@ -4673,11 +4549,11 @@ Colourize_Ship_NEXT
 Colourize_Ship_Setup_RAM_Ptr
     ldy     #OBJECT_SHIP_POSITION_X_PARAM   ; 2F07: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F09: B1 00    
-    sta     ZP04_Colour_Tile_Position_X     ; 2F0B: 85 04    
+    sta     ZP04                            ; 2F0B: 85 04    
 
     ldy     #OBJECT_SHIP_POSITION_Y_PARAM   ; 2F0D: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2F0F: B1 00    
-    sta     ZP05_Colour_Tile_Position_Y     ; 2F11: 85 05    
+    sta     ZP05                            ; 2F11: 85 05    
 
     jsr     Setup_Colour_RAM_Address        ; 2F13: 20 F7 34 
 
@@ -4688,25 +4564,25 @@ Colourize_Ship
 
 ; ZP02 contains number of rows to paint
 ; ZP1B contains colour to paint with, $01 = white
-    lda     ZP1B_Object_Colour              ; 2F18: A5 1B    
-    sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 2F1A: 91 0C    
+    lda     ZP1B                            ; 2F18: A5 1B    
+    sta     (ZP0C),y                        ; 2F1A: 91 0C    
 
 ; Move to next horizantal colour tile
     iny                                     ; 2F1C: C8       
-    sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 2F1D: 91 0C    
+    sta     (ZP0C),y                        ; 2F1D: 91 0C    
 
 ; Move up one row of colour tiles, 16-bit address lo-byte
-    lda     ZP0C_Colour_RAM_Tile_Addr_Lo    ; 2F1F: A5 0C    
+    lda     ZP0C                            ; 2F1F: A5 0C    
     sec                                     ; 2F21: 38       
     sbc     #SCREEN_WIDTH_COLUMNS           ; 2F22: E9 17    
-    sta     ZP0C_Colour_RAM_Tile_Addr_Lo    ; 2F24: 85 0C    
+    sta     ZP0C                            ; 2F24: 85 0C    
 
 ; 16-bit address hi-byte
-    lda     ZP0D_Colour_RAM_Tile_Addr_Lo    ; 2F26: A5 0D    
+    lda     ZP0D                            ; 2F26: A5 0D    
     sbc     #$00                            ; 2F28: E9 00    
-    sta     ZP0D_Colour_RAM_Tile_Addr_Lo    ; 2F2A: 85 0D    
+    sta     ZP0D                            ; 2F2A: 85 0D    
 
-    dec     ZP02_Ship_Parts_Count           ; 2F2C: C6 02    
+    dec     ZP02                            ; 2F2C: C6 02    
     bne     Colourize_Ship                  ; 2F2E: D0 E6    
 
     rts                                     ; 2F30: 60       
@@ -4760,13 +4636,13 @@ Ship_Part_Or_Fuel_Dropped
     asl     a                               ; 2F52: 0A       
     asl     a                               ; 2F53: 0A       
     asl     a                               ; 2F54: 0A       
-    sta     ZP13_Obj_Landed_Posn_Y_Offset   ; 2F55: 85 13    
+    sta     ZP13                            ; 2F55: 85 13    
 
 ; Calculate object landed Position Y and store
     lda     Obj_Ship_Base_Y                 ; 2F57: AD B3 03 
     sec                                     ; 2F5A: 38       
-    sbc     ZP13_Obj_Landed_Posn_Y_Offset   ; 2F5B: E5 13    
-    sta     ZP19_Object_Landed_Position_Y   ; 2F5D: 85 19    
+    sbc     ZP13                            ; 2F5B: E5 13    
+    sta     ZP19                            ; 2F5D: 85 19    
 
     jsr     Disp_Obj_Ship_Or_Fuel_Setup_1   ; 2F5F: 20 57 30 
     inc     Obj_Ship_Base_Parts_Counter     ; 2F62: EE B4 03 
@@ -4833,13 +4709,13 @@ SHIP_PART_OR_FUEL
 
 ; Test if Jetman has collided with a ship part or fuel cell, branch if yes
     jsr     Test_Jetman_Object_Collide      ; 2FA4: 20 58 2D 
-    lda     ZP02_Collision_Status           ; 2FA7: A5 02    
+    lda     ZP02                            ; 2FA7: A5 02    
     bmi     Jetman_Collide_Ship_Fuel        ; 2FA9: 30 43    
 
 ; No Jetman collision, test if ship part or fuel cell has landed on a platform, branch if yes
 ; Ship top part only falls when middle part deposited
     jsr     Test_Platform_Collision         ; 2FAB: 20 B3 30 
-    lda     ZP02_Collision_Status           ; 2FAE: A5 02    
+    lda     ZP02                            ; 2FAE: A5 02    
     bmi     Setup_Object_Addr_Ship_Fuel     ; 2FB0: 30 0B    
 
 ; Move object down by 2 pixels, make Position Y an odd number
@@ -5107,22 +4983,22 @@ Add_BCD_Digits_To_Score
 
 ; Add units, sed sets CPU Decimal mode
     sed                                     ; 3070: F8       
-    lda     (ZP06_Player_Score_Addr),y      ; 3071: B1 06    
+    lda     (ZP06),y                        ; 3071: B1 06    
     clc                                     ; 3073: 18       
-    adc     ZP02_Score_Byte_Hi              ; 3074: 65 02    
-    sta     (ZP06_Player_Score_Addr),y      ; 3076: 91 06    
+    adc     ZP02                            ; 3074: 65 02    
+    sta     (ZP06),y                        ; 3076: 91 06    
 
 ; Add tens
     dey                                     ; 3078: 88       
-    lda     (ZP06_Player_Score_Addr),y      ; 3079: B1 06    
-    adc     ZP03_Score_Byte_Lo              ; 307B: 65 03    
-    sta     (ZP06_Player_Score_Addr),y      ; 307D: 91 06    
+    lda     (ZP06),y                        ; 3079: B1 06    
+    adc     ZP03                            ; 307B: 65 03    
+    sta     (ZP06),y                        ; 307D: 91 06    
 
 ; Add hundreds, cld clears CPU Decimal mode
     dey                                     ; 307F: 88       
-    lda     (ZP06_Player_Score_Addr),y      ; 3080: B1 06    
+    lda     (ZP06),y                        ; 3080: B1 06    
     adc     #$00                            ; 3082: 69 00    
-    sta     (ZP06_Player_Score_Addr),y      ; 3084: 91 06    
+    sta     (ZP06),y                        ; 3084: 91 06    
     cld                                     ; 3086: D8       
 
 ; Display the updated score for the active player
@@ -5179,11 +5055,11 @@ Test_Platform_Size_X
 
 ; Load number of characters in the middle of a platform and multiply 8, e.g. L & R platforms
 ; have 3 blocks thus Reg A becomes $18 and store to ZP0B
-    lda     (ZP08_Platfm_Data_Tbl_Addr_Lo),y; 30A2: B1 08    
+    lda     (ZP08),y                        ; 30A2: B1 08    
     asl     a                               ; 30A4: 0A       
     asl     a                               ; 30A5: 0A       
     asl     a                               ; 30A6: 0A       
-    sta     ZP0B_Platform_Object_Distance   ; 30A7: 85 0B    
+    sta     ZP0B                            ; 30A7: 85 0B    
 
 ; Register Y becomes 0
     dey                                     ; 30A9: 88       
@@ -5193,7 +5069,7 @@ Test_Platform_Size_X
 ; from Reg A distance from obj to left side of platform
     sec                                     ; 30AB: 38       
     txa                                     ; 30AC: 8A       
-    sbc     ZP0B_Platform_Object_Distance   ; 30AD: E5 0B    
+    sbc     ZP0B                            ; 30AD: E5 0B    
     bcs     Test_Obj_Pfm_Dist_Over_8        ; 30AF: B0 23     Object is much further right than the platform
     bcc     Test_Platform_Collision_Y       ; 30B1: 90 39    
 
@@ -5207,13 +5083,13 @@ Test_Platform_Size_X
 Test_Platform_Collision
     ldy     #OBJECT_POSITION_X_PARAM        ; 30B3: A0 01    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 30B5: B1 00    
-    sta     ZP0E_Object_Position_X          ; 30B7: 85 0E    
+    sta     ZP0E                            ; 30B7: 85 0E    
 
 ; Register Y becomes OBJECT_POSITION_Y_PARAM
     iny                                     ; 30B9: C8       
     iny                                     ; 30BA: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 30BB: B1 00    
-    sta     ZP0F_Object_Position_Y          ; 30BD: 85 0F    
+    sta     ZP0F                            ; 30BD: 85 0F    
 
     jsr     Load_Platform_Data_Table_Addr   ; 30BF: 20 43 31 
 
@@ -5221,12 +5097,12 @@ Test_Platform_Collision
 ; L_BRS_($30C2)_($311D) OK
 Test_Platform_Collision_X
     lda     #$00                            ; 30C2: A9 00    
-    sta     ZP02_Collision_Status           ; 30C4: 85 02    
+    sta     ZP02                            ; 30C4: 85 02    
 
 ; Load Position X of platform (leftmost edge, indexed by Register Y) and subtract object Position X
-    lda     (ZP08_Platfm_Data_Tbl_Addr_Lo),y; 30C6: B1 08    
+    lda     (ZP08),y                        ; 30C6: B1 08    
     sec                                     ; 30C8: 38       
-    sbc     ZP0E_Object_Position_X          ; 30C9: E5 0E    
+    sbc     ZP0E                            ; 30C9: E5 0E    
     bcc     Test_Platform_Size_X            ; 30CB: 90 CE    
 
 ; Object is to the left of the platform, set status bit 1
@@ -5270,9 +5146,9 @@ Test_Obj_Past_Right_Of_Pfm
 ; L_BRS_($30EC)_($30E5) OK
 Test_Platform_Collision_Y
     iny                                     ; 30EC: C8       
-    lda     (ZP08_Platfm_Data_Tbl_Addr_Lo),y; 30ED: B1 08    
+    lda     (ZP08),y                        ; 30ED: B1 08    
     sec                                     ; 30EF: 38       
-    sbc     ZP0F_Object_Position_Y          ; 30F0: E5 0F    
+    sbc     ZP0F                            ; 30F0: E5 0F    
     bcc     Test_Platform_Collision_Y_Skip  ; 30F2: 90 09    
 
 ; Object is above platform, test if > 4 pixels above platform, branch if yes
@@ -5288,7 +5164,7 @@ Test_Platform_Collision_Y
 ; L_BRS_($30FD)_($30F2) OK
 Test_Platform_Collision_Y_Skip
     eor     #%11111111                      ; 30FD: 49 FF    
-    sty     ZP0B_Platform_Object_Distance   ; 30FF: 84 0B    
+    sty     ZP0B                            ; 30FF: 84 0B    
 
 ; Test if object is Jetman flying
     pha                                     ; 3101: 48       
@@ -5304,7 +5180,7 @@ Test_Platform_Collision_Y_Skip
 
 ; L_JMP_($310F)_($3140) OK
 Move_Toward_RTS
-    ldy     ZP0B_Platform_Object_Distance   ; 310F: A4 0B    
+    ldy     ZP0B                            ; 310F: A4 0B    
     bcs     Test_All_Platforms_Tested       ; 3111: B0 06    
 
 ; Set collision flag bit 7
@@ -5322,7 +5198,7 @@ Next_Platform_Data_Inc
 Test_All_Platforms_Tested
     iny                                     ; 3119: C8       
     iny                                     ; 311A: C8       
-    dec     ZP0A_Platform_Quantity          ; 311B: C6 0A    
+    dec     ZP0A                            ; 311B: C6 0A    
     bne     Test_Platform_Collision_X       ; 311D: D0 A3    
 
 ; Test if object is one pixel from the bottom of screen
@@ -5338,7 +5214,7 @@ Test_All_Platforms_Tested
 
 ; L_BRS_($312D)_($3136) OK
 STA_Collision_Status_RTS
-    sta     ZP02_Collision_Status           ; 312D: 85 02    
+    sta     ZP02                            ; 312D: 85 02    
     rts                                     ; 312F: 60       
 ; ==========================================
 
@@ -5357,7 +5233,7 @@ Test_Object_20_Lines_Bott
 ; L_JMP_($3138)_($3115) OK
 Set_Collision_Status
     ora     $0002                           ; 3138: 05 02    
-    sta     ZP02_Collision_Status           ; 313A: 85 02    
+    sta     ZP02                            ; 313A: 85 02    
 
 ; L_BRS_($313C)_($3132) OK
 Test_Platform_Collision_RTS
@@ -5391,13 +5267,13 @@ Test_Jetman_Standing
 ; L_JSR_($3143)_($3152) OK
 Load_Platform_Data_Table_Addr
     lda     #PLATFORM_DATA_TABLE_ADDR_LO    ; 3143: A9 B6    
-    sta     ZP08_Platfm_Data_Tbl_Addr_Lo    ; 3145: 85 08    
+    sta     ZP08                            ; 3145: 85 08    
 
     lda     #PLATFORM_DATA_TABLE_ADDR_HI    ; 3147: A9 31    
-    sta     ZP09_Platfm_Data_Tbl_Addr_Hi    ; 3149: 85 09    
+    sta     ZP09                            ; 3149: 85 09    
 
     lda     #PLATFORM_QUANTITY              ; 314B: A9 03    
-    sta     ZP0A_Platform_Quantity          ; 314D: 85 0A    
+    sta     ZP0A                            ; 314D: 85 0A    
 
 ; Initial index into the Platform Data Table
     ldy     #$00                            ; 314F: A0 00    
@@ -5412,28 +5288,28 @@ Draw_Platforms
 ; Register Y index starts as 0, 3 or 6
 ; L_BRS_($3155)_($319F) OK
 Loop_Draw_Platform
-    lda     (ZP08_Platfm_Data_Tbl_Addr_Lo),y; 3155: B1 08    
-    sta     ZP04_Platform_Position_X        ; 3157: 85 04    
+    lda     (ZP08),y                        ; 3155: B1 08    
+    sta     ZP04                            ; 3157: 85 04    
 
     iny                                     ; 3159: C8       
-    lda     (ZP08_Platfm_Data_Tbl_Addr_Lo),y; 315A: B1 08    
-    sta     ZP05_Platform_Position_Y        ; 315C: 85 05    
+    lda     (ZP08),y                        ; 315A: B1 08    
+    sta     ZP05                            ; 315C: 85 05    
 
     iny                                     ; 315E: C8       
-    lda     (ZP08_Platfm_Data_Tbl_Addr_Lo),y; 315F: B1 08    
-    sta     ZP0B_Platform_Width_Chars       ; 3161: 85 0B    
+    lda     (ZP08),y                        ; 315F: B1 08    
+    sta     ZP0B                            ; 3161: 85 0B    
 
 ; Store platform data table index into variable for next platform
-    sty     ZP03_Platform_Data_Table_Index  ; 3163: 84 03    
+    sty     ZP03                            ; 3163: 84 03    
     jsr     Setup_Colour_RAM_Address        ; 3165: 20 F7 34 
     jsr     Convert_XY_to_UDG_RAM_Address   ; 3168: 20 1D 35 
 
 ; Load zero page variables with addr of leftmost platform UDG object data
     lda     #PLATFORM_UDG_DATA_ADDR_LO      ; 316B: A9 15    
-    sta     ZP06_Platform_UDG_Data_Addr_Lo  ; 316D: 85 06    
+    sta     ZP06                            ; 316D: 85 06    
 
     lda     #PLATFORM_UDG_DATA_ADDR_HI      ; 316F: A9 3E    
-    sta     ZP07_Platform_UDG_Data_Addr_Hi  ; 3171: 85 07    
+    sta     ZP07                            ; 3171: 85 07    
 
 ; Copy platform leftmost UDG object data to RAM, bytes 9 per column i.e. UDG is 9 pixels high
     ldy     #PLATFORM_HEIGHT_PIXELS         ; 3173: A0 09    
@@ -5450,16 +5326,16 @@ Loop_Next_Char
 
 ; Test width of platform counter, when zero, move UDG Data address pointer to the rightmost
 ; platform object, otherwise just display the current middle platform UDG object data again
-    dec     ZP0B_Platform_Width_Chars       ; 3180: C6 0B    
+    dec     ZP0B                            ; 3180: C6 0B    
     beq     Next_UDG_Char_Loop_Next_Char    ; 3182: F0 1E    
     bpl     Loop_Next_Char                  ; 3184: 10 F5    
 
 ; Increment the index into the platform data table and store platform width columns+1 into ZP08
-    ldy     ZP03_Platform_Data_Table_Index  ; 3186: A4 03    
-    lda     (ZP08_Platfm_Data_Tbl_Addr_Lo),y; 3188: B1 08    
+    ldy     ZP03                            ; 3186: A4 03    
+    lda     (ZP08),y                        ; 3188: B1 08    
     clc                                     ; 318A: 18       
     adc     #$01                            ; 318B: 69 01    
-    sta     ZP0B_Platform_Width_Chars       ; 318D: 85 0B    
+    sta     ZP0B                            ; 318D: 85 0B    
 
 ; Initialise colourization data
     ldy     #$00                            ; 318F: A0 00    
@@ -5469,18 +5345,18 @@ Loop_Next_Char
 ; plus a further column for the rightmost platfrom object data column
 ; L_BRS_($3193)_($3198) OK
 Loop_Colorize_Platform_Green
-    sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 3193: 91 0C    
+    sta     (ZP0C),y                        ; 3193: 91 0C    
 
     iny                                     ; 3195: C8       
-    dec     ZP0B_Platform_Width_Chars       ; 3196: C6 0B    
+    dec     ZP0B                            ; 3196: C6 0B    
     bpl     Loop_Colorize_Platform_Green    ; 3198: 10 F9    
 
 ; Get index into the platform data table and increment whlist in Register A
-    ldy     ZP03_Platform_Data_Table_Index  ; 319A: A4 03    
+    ldy     ZP03                            ; 319A: A4 03    
     iny                                     ; 319C: C8       
 
 ; Test if all platform have been drawn yet, loop if not
-    dec     ZP0A_Platform_Quantity          ; 319D: C6 0A    
+    dec     ZP0A                            ; 319D: C6 0A    
     bne     Loop_Draw_Platform              ; 319F: D0 B4    
     rts                                     ; 31A1: 60       
 ; ==========================================
@@ -5495,14 +5371,14 @@ Next_UDG_Char_Loop_Next_Char
 ; L_JSR_($31A8)_($3178) OK
 ; L_JSR_($31A8)_($31A2) OK
 Next_UDG_Char
-    lda     ZP06_Platform_UDG_Data_Addr_Lo  ; 31A8: A5 06    
+    lda     ZP06                            ; 31A8: A5 06    
     clc                                     ; 31AA: 18       
     adc     #PLATFORM_HEIGHT_PIXELS_TOTAL   ; 31AB: 69 0A    
-    sta     ZP06_Platform_UDG_Data_Addr_Lo  ; 31AD: 85 06    
+    sta     ZP06                            ; 31AD: 85 06    
 
-    lda     ZP07_Platform_UDG_Data_Addr_Hi  ; 31AF: A5 07    
+    lda     ZP07                            ; 31AF: A5 07    
     adc     #$00                            ; 31B1: 69 00    
-    sta     ZP07_Platform_UDG_Data_Addr_Hi  ; 31B3: 85 07    
+    sta     ZP07                            ; 31B3: 85 07    
     rts                                     ; 31B5: 60       
 ; ==========================================
 
@@ -5715,7 +5591,7 @@ JETMAN_FLYING_
     jsr     Read_Keyboard_Joystick          ; 3276: 20 F7 33  Returns A=%RLDU_F111
     sta     ZP_Jetman_Action                ; 3279: 85 1C    
     jsr     Test_Platform_Collision         ; 327B: 20 B3 30  Remove=Jetman+fuel/ship part pick-up fly through platforms
-    lda     ZP02_Collision_Status           ; 327E: A5 02    
+    lda     ZP02                            ; 327E: A5 02    
     bpl     Update_Jetman_Position_X        ; 3280: 10 03    
     jmp     Jetman_Hits_Surface             ; 3282: 4C F2 31 
 ; ------------------------------------------
@@ -5970,7 +5846,7 @@ Do_Jetman_Standing
     jsr     Load_Object_Type_X_Y            ; 336A: 20 D7 35 
     jsr     Read_Keyboard_Joystick          ; 336D: 20 F7 33 
     jsr     Test_Platform_Collision         ; 3370: 20 B3 30 
-    lda     ZP02_Collision_Status           ; 3373: A5 02    
+    lda     ZP02                            ; 3373: A5 02    
     bmi     Set_Jetman_Facing_Direction     ; 3375: 30 06    
 
 ; Jetman has walked off edge of platform, test if Position Y is negative, which
@@ -6002,7 +5878,7 @@ Jetman_Walking_Left
 ; L_BRS_($338F)_($338B) OK
 Test_Collision_Status
     ldy     #JETMAN_DIRECTION_X_PARAM       ; 338F: A0 02    
-    lda     ZP02_Collision_Status           ; 3391: A5 02    
+    lda     ZP02                            ; 3391: A5 02    
     bpl     Jetman_Not_Moving_X_Axis        ; 3393: 10 08    
 
 ; Set Zero flag as AND between between content of addr 2015 (i.e. 0000_0010) and A (i.e. ZP02)
@@ -6244,9 +6120,9 @@ Loop_Reverse_UDG_Column
 ; Get current byte of character, reverse it and write it back
 ; L_BRS_($347D)_($3484) OK
 Loop_Reverse_UDG_Pixel_Line
-    lda     (ZP04_UDG_RAM_Addr_Lo),y        ; 347D: B1 04    
+    lda     (ZP04),y                        ; 347D: B1 04    
     eor     #%11111111                      ; 347F: 49 FF    
-    sta     (ZP04_UDG_RAM_Addr_Lo),y        ; 3481: 91 04    
+    sta     (ZP04),y                        ; 3481: 91 04    
 
 ; All lines reversed? If no, loop back
     dey                                     ; 3483: 88       
@@ -6257,14 +6133,14 @@ Loop_Reverse_UDG_Pixel_Line
     beq     RTS_Flash_Score                 ; 3487: F0 10    
 
 ; Move to next column by adding a columns-worth ($B0 #176) of pixel lines to 16-bit UDG RAM Address
-    lda     ZP04_UDG_RAM_Addr_Lo            ; 3489: A5 04    
+    lda     ZP04                            ; 3489: A5 04    
     clc                                     ; 348B: 18       
     adc     #SCREEN_HEIGHT_PIXELS           ; 348C: 69 B0    
-    sta     ZP04_UDG_RAM_Addr_Lo            ; 348E: 85 04    
+    sta     ZP04                            ; 348E: 85 04    
 
-    lda     ZP05_UDG_RAM_Addr_Hi            ; 3490: A5 05    
+    lda     ZP05                            ; 3490: A5 05    
     adc     #$00                            ; 3492: 69 00    
-    sta     ZP05_UDG_RAM_Addr_Hi            ; 3494: 85 05    
+    sta     ZP05                            ; 3494: 85 05    
 
     jmp     Loop_Reverse_UDG_Column         ; 3496: 4C 7B 34 
 ; ------------------------------------------
@@ -6318,7 +6194,7 @@ Display_BCD_Bytes
     ldy     #$00                            ; 34A4: A0 00    
 
 ; Load the first score byte e.g. A = 12 BCD i.e. First score byte of 12 34 56
-    lda     (ZP0E_Score_Data_Addr_Lo),y     ; 34A6: B1 0E    
+    lda     (ZP0E),y                        ; 34A6: B1 0E    
 
 ; Divide by $10 to isolate first digit e.g. 12 becomes 01
     lsr     a                               ; 34A8: 4A       
@@ -6329,32 +6205,32 @@ Display_BCD_Bytes
 ; Add $70, $40 gets subtracted in display routine, thus making 01 into a PETSCII "1"
     clc                                     ; 34AC: 18       
     adc     #PETSCII_OFFSET                 ; 34AD: 69 70    
-    sta     ZP06_Character_To_Display       ; 34AF: 85 06    
+    sta     ZP06                            ; 34AF: 85 06    
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 34B1: 20 95 35 
 
 ; Load first score byte again to display second score character
     ldy     #$00                            ; 34B4: A0 00    
-    lda     (ZP0E_Score_Data_Addr_Lo),y     ; 34B6: B1 0E    
+    lda     (ZP0E),y                        ; 34B6: B1 0E    
 
 ; Zero top 4 bits to isolate second digit e.g. 12 becomes 02
     and     #%00001111                      ; 34B8: 29 0F    
 
 ; Add $70, $40 gets subtracted in display routine, thus making 02 into a PETSCII "2"
     adc     #PETSCII_OFFSET                 ; 34BA: 69 70    
-    sta     ZP06_Character_To_Display       ; 34BC: 85 06    
+    sta     ZP06                            ; 34BC: 85 06    
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 34BE: 20 95 35 
 
 ; Increment addres pointer to next score byte
-    inc     ZP0E_Score_Data_Addr_Lo         ; 34C1: E6 0E    
+    inc     ZP0E                            ; 34C1: E6 0E    
     bne     Test_All_Bytes_Displayed        ; 34C3: D0 02    
 
 ; Looks like a BUG, should inc ZP0F, but in JETPAC it'll never happen
-    inc     ZP07_Score_Data_Addr_Hi         ; 34C5: E6 07    
+    inc     ZP07                            ; 34C5: E6 07    
 
 ; Test all score bytes displayed, if not, loop back
 ; L_BRS_($34C7)_($34C3) OK
 Test_All_Bytes_Displayed
-    dec     ZP02_Num_Bytes_To_Display       ; 34C7: C6 02    
+    dec     ZP02                            ; 34C7: C6 02    
     bne     Display_BCD_Bytes               ; 34C9: D0 D9    
     rts                                     ; 34CB: 60       
 ; ==========================================
@@ -6380,7 +6256,7 @@ Display_String_With_Setup
 
 ; Get string first byte header data, contains colour data and reverse flag
     ldy     #$00                            ; 34D2: A0 00    
-    lda     (ZP0E_String_Addr_Lo),y         ; 34D4: B1 0E    
+    lda     (ZP0E),y                        ; 34D4: B1 0E    
 
 ; Write a string of data to the screen, header byte includes reverse flag and colour attribute
 ; Save colour data and reverse flag to Register X
@@ -6391,7 +6267,7 @@ Display_String
 
 ; Get character to display and test if bit 7 is set, which signifies end of string
     iny                                     ; 34D7: C8       
-    lda     (ZP0E_String_Addr_Lo),y         ; 34D8: B1 0E    
+    lda     (ZP0E),y                        ; 34D8: B1 0E    
     asl     a                               ; 34DA: 0A       
 
 ; If end of string then branch/display/RTS else JSR/display/next_char
@@ -6405,7 +6281,7 @@ Display_String
 ; L_JSR_($34E3)_($34DD) OK
 Display_Character
     lsr     a                               ; 34E3: 4A       
-    sta     ZP06_Character_To_Display       ; 34E4: 85 06    
+    sta     ZP06                            ; 34E4: 85 06    
 
 ; Setup character display colour and reverse bit
     txa                                     ; 34E6: 8A       
@@ -6421,7 +6297,7 @@ Display_Character
 ; Colourize the character just displayed
     lda     ZP_Reverse_And_Colour_Data      ; 34F0: A5 57    
     dey                                     ; 34F2: 88       
-    sta     (ZP0C_Colour_RAM_Addr_Lo),y     ; 34F3: 91 0C    
+    sta     (ZP0C),y                        ; 34F3: 91 0C    
     iny                                     ; 34F5: C8       
     rts                                     ; 34F6: 60       
 ; ==========================================
@@ -6450,17 +6326,17 @@ Display_Character
 ; L_JSR_($34F7)_($34CC) OK
 ; L_JSR_($34F7)_($3827) OK
 Setup_Colour_RAM_Address
-    lda     ZP04_Position_X                 ; 34F7: A5 04     ZP04 = %0001_1000 = $18
+    lda     ZP04                            ; 34F7: A5 04     ZP04 = %0001_1000 = $18
 
 ; Divide X by 8 to get initial address Lo-byte
     lsr     a                               ; 34F9: 4A       
     lsr     a                               ; 34FA: 4A       
     lsr     a                               ; 34FB: 4A       
-    sta     ZP0C_Colour_RAM_Addr_Lo         ; 34FC: 85 0C     ZP0C = %0000_0011 = $03
+    sta     ZP0C                            ; 34FC: 85 0C     ZP0C = %0000_0011 = $03
 
 ; Divide Y by $10 and use as index into Colour RAM Row Offsets i.e. 9600, 9617, 962e etc.
 ; to get address Hi-byte. Divided by $10 because there are 16 Y-pixels per Colour RAM tile.
-    lda     ZP05_Position_Y                 ; 34FE: A5 05     ZP05 = %0110_1000 = $68
+    lda     ZP05                            ; 34FE: A5 05     ZP05 = %0110_1000 = $68
     lsr     a                               ; 3500: 4A       
     lsr     a                               ; 3501: 4A       
     lsr     a                               ; 3502: 4A       
@@ -6470,12 +6346,12 @@ Setup_Colour_RAM_Address
 ; Load from column offset table and add in the inital address Lo-byte
     lda     Colour_RAM_Row_Offset_Table,x   ; 3505: BD 12 35  A = $8A
     clc                                     ; 3508: 18       
-    adc     ZP0C_Colour_RAM_Addr_Lo         ; 3509: 65 0C    
-    sta     ZP0C_Colour_RAM_Addr_Lo         ; 350B: 85 0C     ZP0C = $8D
+    adc     ZP0C                            ; 3509: 65 0C    
+    sta     ZP0C                            ; 350B: 85 0C     ZP0C = $8D
 
 ; Add $9600 to address in ZP0D/0C to become $968D i.e. "F7 JOYSTICK" start position
     lda     #COLOUR_RAM_START_HI_BYTE       ; 350D: A9 96    
-    sta     ZP0D_Colour_RAM_Addr_Hi         ; 350F: 85 0D     ZP0D/0C = $968D
+    sta     ZP0D                            ; 350F: 85 0D     ZP0D/0C = $968D
     rts                                     ; 3511: 60       
 ; ==========================================
 
@@ -6513,11 +6389,11 @@ Colour_RAM_Row_Offset_Table
 ; L_JSR_($351D)_($375D) OK
 ; L_JSR_($351D)_($37AB) OK
 Convert_XY_to_UDG_RAM_Address
-    lda     ZP05_Position_Y                 ; 351D: A5 05     ZP05 = %0110_1000 = $68
+    lda     ZP05                            ; 351D: A5 05     ZP05 = %0110_1000 = $68
     tay                                     ; 351F: A8       
 
 ; Divide X by 8 to get address Lo-byte
-    lda     ZP04_Position_X                 ; 3520: A5 04     ZP04 = %0001_1000 = $18
+    lda     ZP04                            ; 3520: A5 04     ZP04 = %0001_1000 = $18
     lsr     a                               ; 3522: 4A       
     lsr     a                               ; 3523: 4A       
     lsr     a                               ; 3524: 4A        ZP04 = %0000_0011 = $03
@@ -6525,29 +6401,29 @@ Convert_XY_to_UDG_RAM_Address
 
 ; Load from column offset table
     lda     UDG_RAM_Column_Offset_Table,x   ; 3526: BD 45 35  A = $21
-    sta     ZP04_Position_X                 ; 3529: 85 04    
+    sta     ZP04                            ; 3529: 85 04    
     lda     #$00                            ; 352B: A9 00    
-    sta     ZP05_Position_Y                 ; 352D: 85 05     ZP05/04 = $0021
+    sta     ZP05                            ; 352D: 85 05     ZP05/04 = $0021
 
 ; Rotate 16-bit address left by 4 bits
     ldx     #$04                            ; 352F: A2 04    
 ; L_BRS_($3531)_($3536) OK
 Loop_Rotate
-    asl     ZP04_UDG_RAM_Addr_Lo            ; 3531: 06 04    
-    rol     ZP05_UDG_RAM_Addr_Hi            ; 3533: 26 05    
+    asl     ZP04                            ; 3531: 06 04    
+    rol     ZP05                            ; 3533: 26 05    
     dex                                     ; 3535: CA       
     bne     Loop_Rotate                     ; 3536: D0 F9     ZP05/04 $0021 > $0210
 
 ; Add Register Y saved earlier to address in ZP05/04
     tya                                     ; 3538: 98        Register A becomes $68
     clc                                     ; 3539: 18       
-    adc     ZP04_UDG_RAM_Addr_Lo            ; 353A: 65 04    
-    sta     ZP04_UDG_RAM_Addr_Lo            ; 353C: 85 04     ZP05/04 = $0278
+    adc     ZP04                            ; 353A: 65 04    
+    sta     ZP04                            ; 353C: 85 04     ZP05/04 = $0278
 
 ; Add $1000 to address in ZP05/04 to become $1278 i.e. "F7 JOYSTICK" start position
     lda     #$10                            ; 353E: A9 10    
-    adc     ZP05_UDG_RAM_Addr_Hi            ; 3540: 65 05    
-    sta     ZP05_UDG_RAM_Addr_Hi            ; 3542: 85 05     ZP05/04 = $1278
+    adc     ZP05                            ; 3540: 65 05    
+    sta     ZP05                            ; 3542: 85 05     ZP05/04 = $1278
     rts                                     ; 3544: 60       
 ; ==========================================
 
@@ -6600,22 +6476,22 @@ Fill_RAM
 ; L_BRS_($357B)_($358A) OK
 ; L_BRS_($357B)_($3592) OK
 Loop_Fill_RAM
-    lda     ZP06_Fill_Data_Byte             ; 357B: A5 06    
-    sta     (ZP04_Addr_To_Fill_Lo),y        ; 357D: 91 04    
+    lda     ZP06                            ; 357B: A5 06    
+    sta     (ZP04),y                        ; 357D: 91 04    
 
     iny                                     ; 357F: C8       
     bne     No_Inc_Addr_Hi                  ; 3580: D0 02    
-    inc     ZP05_Addr_To_Fill_Hi            ; 3582: E6 05    
+    inc     ZP05                            ; 3582: E6 05    
 
 ; L_BRS_($3584)_($3580) OK
 No_Inc_Addr_Hi
-    dec     ZP02_Num_Of_Bytes_To_Fill_Lo    ; 3584: C6 02    
-    lda     ZP02_Num_Of_Bytes_To_Fill_Lo    ; 3586: A5 02    
+    dec     ZP02                            ; 3584: C6 02    
+    lda     ZP02                            ; 3586: A5 02    
     cmp     #$FF                            ; 3588: C9 FF    
     bne     Loop_Fill_RAM                   ; 358A: D0 EF    
 
-    dec     ZP03_Num_Of_Bytes_To_Fill_Hi    ; 358C: C6 03    
-    lda     ZP03_Num_Of_Bytes_To_Fill_Hi    ; 358E: A5 03    
+    dec     ZP03                            ; 358C: C6 03    
+    lda     ZP03                            ; 358E: A5 03    
     cmp     #$FF                            ; 3590: C9 FF    
     bne     Loop_Fill_RAM                   ; 3592: D0 E7    
     rts                                     ; 3594: 60       
@@ -6657,14 +6533,14 @@ No_Inc_Addr_Hi
 ; L_JSR_($3595)_($34EB) OK
 Copy_Char_To_UDG_RAM_Setup
     lda     #$00                            ; 3595: A9 00     Clear address hi-byte
-    sta     ZP07_Char_ROM_Data_Addr_Hi      ; 3597: 85 07     ZP07/06 = $0071
+    sta     ZP07                            ; 3597: 85 07     ZP07/06 = $0071
 
 ; Exapmle character to display in ZP06, "1" = $71
 ; $31st Character ROM character is "1" so subtract $40
-    lda     ZP06_Char_ROM_Data_Addr_Lo      ; 3599: A5 06    
+    lda     ZP06                            ; 3599: A5 06    
     sec                                     ; 359B: 38       
     sbc     #$40                            ; 359C: E9 40    
-    sta     ZP06_Char_ROM_Data_Addr_Lo      ; 359E: 85 06     ZP07/06 = $0031
+    sta     ZP06                            ; 359E: 85 06     ZP07/06 = $0031
 
 ; 8 bytes per UDG RAM character definition, so multiply by 8 using four 16 bit ROLs
     ldx     #$03                            ; 35A0: A2 03    
@@ -6672,15 +6548,15 @@ Copy_Char_To_UDG_RAM_Setup
 ; L_BRS_($35A2)_($35A8) OK
 Loop_Multiply_by_8
     clc                                     ; 35A2: 18       
-    rol     ZP06_Char_ROM_Data_Addr_Lo      ; 35A3: 26 06    
-    rol     ZP07_Char_ROM_Data_Addr_Hi      ; 35A5: 26 07     ZP07/06 progression:
+    rol     ZP06                            ; 35A3: 26 06    
+    rol     ZP07                            ; 35A5: 26 07     ZP07/06 progression:
     dex                                     ; 35A7: CA        $0031 > $0062 > $00C4 > $0188
     bne     Loop_Multiply_by_8              ; 35A8: D0 F8    
 
 ; Add $8000 Character ROM offset to address, $8188 is Character ROM address for character "1"
-    lda     ZP07_Char_ROM_Data_Addr_Hi      ; 35AA: A5 07    
+    lda     ZP07                            ; 35AA: A5 07    
     adc     #CHARACTER_ROM_START_HI_BYTE    ; 35AC: 69 80    
-    sta     ZP07_Char_ROM_Data_Addr_Hi      ; 35AE: 85 07     ZP07/06 = $8188
+    sta     ZP07                            ; 35AE: 85 07     ZP07/06 = $8188
 
 ; Copy 8 bytes to display a complete character
 ; Displayed character can be normal or reversed, e.g. for score or selected game options
@@ -6693,8 +6569,8 @@ Loop_Multiply_by_8
 ; L_JSR_($35B6)_($317D) OK
 ; L_BRS_($35B6)_($35BB) OK
 Copy_Char_To_UDG_RAM
-    lda     (ZP06_Char_ROM_Data_Addr_Lo),y  ; 35B6: B1 06    
-    sta     (ZP04_UDG_RAM_Addr_Lo),y        ; 35B8: 91 04    
+    lda     (ZP06),y                        ; 35B6: B1 06    
+    sta     (ZP04),y                        ; 35B8: 91 04    
 
     dey                                     ; 35BA: 88       
     bpl     Copy_Char_To_UDG_RAM            ; 35BB: 10 F9    
@@ -6702,14 +6578,14 @@ Copy_Char_To_UDG_RAM
 ; Move 16-bit UDG RAM address to the next-right column, $B0=176=number of vertical pixels
 ; L_JMP_($35BD)_($35D4) OK
 Next_Column
-    lda     ZP04_UDG_RAM_Addr_Lo            ; 35BD: A5 04    
+    lda     ZP04                            ; 35BD: A5 04    
     clc                                     ; 35BF: 18       
     adc     #SCREEN_HEIGHT_PIXELS           ; 35C0: 69 B0    
-    sta     ZP04_UDG_RAM_Addr_Lo            ; 35C2: 85 04    
+    sta     ZP04                            ; 35C2: 85 04    
 
-    lda     ZP05_UDG_RAM_Addr_Hi            ; 35C4: A5 05    
+    lda     ZP05                            ; 35C4: A5 05    
     adc     #$00                            ; 35C6: 69 00    
-    sta     ZP05_UDG_RAM_Addr_Hi            ; 35C8: 85 05    
+    sta     ZP05                            ; 35C8: 85 05    
     rts                                     ; 35CA: 60       
 ; ==========================================
 
@@ -6717,9 +6593,9 @@ Next_Column
 ; L_BRS_($35CB)_($35B4) OK
 ; L_BRS_($35CB)_($35D2) OK
 Copy_Char_To_UDG_RAM_Reversed
-    lda     (ZP06_Char_ROM_Data_Addr_Lo),y  ; 35CB: B1 06    
+    lda     (ZP06),y                        ; 35CB: B1 06    
     eor     #$FF                            ; 35CD: 49 FF    
-    sta     (ZP04_UDG_RAM_Addr_Lo),y        ; 35CF: 91 04    
+    sta     (ZP04),y                        ; 35CF: 91 04    
 
     dey                                     ; 35D1: 88       
     bpl     Copy_Char_To_UDG_RAM_Reversed   ; 35D2: 10 F7    
@@ -6757,15 +6633,15 @@ Copy_Char_To_UDG_RAM_Reversed
 Load_Object_Type_X_Y
     ldy     #OBJECT_TYPE_PARAM              ; 35D7: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35D9: B1 00    
-    sta     ZP12_Object_Type                ; 35DB: 85 12    
+    sta     ZP12                            ; 35DB: 85 12    
 
     iny                                     ; 35DD: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35DE: B1 00    
-    sta     ZP10_Object_Position_X          ; 35E0: 85 10    
+    sta     ZP10                            ; 35E0: 85 10    
 
     ldy     #OBJECT_POSITION_Y_PARAM        ; 35E2: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35E4: B1 00    
-    sta     ZP11_Object_Position_Y          ; 35E6: 85 11    
+    sta     ZP11                            ; 35E6: 85 11    
     rts                                     ; 35E8: 60       
 ; ==========================================
 ; L_JSR_($35E9)_($231C) OK
@@ -6782,19 +6658,19 @@ Load_Object_Type_X_Y
 Load_Object_Type_X_Y_Colour
     ldy     #OBJECT_TYPE_PARAM              ; 35E9: A0 00    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35EB: B1 00    
-    sta     ZP1A_Object_Type                ; 35ED: 85 1A    
+    sta     ZP1A                            ; 35ED: 85 1A    
 
     iny                                     ; 35EF: C8       
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35F0: B1 00    
-    sta     ZP18_Object_Position_X          ; 35F2: 85 18    
+    sta     ZP18                            ; 35F2: 85 18    
 
     ldy     #OBJECT_POSITION_Y_PARAM        ; 35F4: A0 03    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35F6: B1 00    
-    sta     ZP19_Object_Position_Y          ; 35F8: 85 19    
+    sta     ZP19                            ; 35F8: 85 19    
 
     ldy     #OBJECT_COLOUR_PARAM            ; 35FA: A0 05    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 35FC: B1 00    
-    sta     ZP1B_Object_Colour              ; 35FE: 85 1B    
+    sta     ZP1B                            ; 35FE: 85 1B    
     rts                                     ; 3600: 60       
 ; ==========================================
 
@@ -6823,8 +6699,8 @@ Display_Object_Old_Setup_Load
 ; L_JMP_($3604)_($3060) OK
 Display_Object_Old_Setup
     lda     #$00                            ; 3604: A9 00    
-    sta     ZP14_Object_Old_Width_Bytes     ; 3606: 85 14    
-    sta     ZP03_Object_Old_Height          ; 3608: 85 03    
+    sta     ZP14                            ; 3606: 85 14    
+    sta     ZP03                            ; 3608: 85 03    
     jmp     Display_Object                  ; 360A: 4C 4C 36 
 ; ------------------------------------------
 
@@ -6837,8 +6713,8 @@ Display_Object_New_Setup_Load
 ; L_JSR_($3610)_($2864) OK
 Display_Object_New_Setup
     lda     #$00                            ; 3610: A9 00    
-    sta     ZP15_Object_New_Width_Bytes     ; 3612: 85 15    
-    sta     ZP0B_Object_New_Height          ; 3614: 85 0B    
+    sta     ZP15                            ; 3612: 85 15    
+    sta     ZP0B                            ; 3614: 85 0B    
     jmp     Display_Object                  ; 3616: 4C 4C 36 
 ; ------------------------------------------
 
@@ -6852,7 +6728,7 @@ Erase_Object_Moving_Downward
     adc     #$01                            ; 361C: 69 01    
 ; Note code from $361E & $3663 is basically the same until Erase_Draw, but
 ; using old and new object parameters
-    cmp     ZP0B_Object_New_Height          ; 361E: C5 0B    
+    cmp     ZP0B                            ; 361E: C5 0B    
     bcs     Erase_Old_Object                ; 3620: B0 66    
 
 ; Set X to number of Y pixel-lines to erase only i.e. don't draw over the erase for this object
@@ -6861,23 +6737,23 @@ Erase_Object_Moving_Downward
 ; Subtract number of Y erase-only pixels from total object tile height and store to loop
 ; index for later
     pha                                     ; 3623: 48       
-    sta     ZP0A_Object_New_Height_Index    ; 3624: 85 0A    
+    sta     ZP0A                            ; 3624: 85 0A    
 
-    lda     ZP0B_Object_New_Height          ; 3626: A5 0B    
+    lda     ZP0B                            ; 3626: A5 0B    
     sec                                     ; 3628: 38       
-    sbc     ZP0A_Object_New_Height_Index    ; 3629: E5 0A    
-    sta     ZP0A_Object_New_Height_Index    ; 362B: 85 0A    
+    sbc     ZP0A                            ; 3629: E5 0A    
+    sta     ZP0A                            ; 362B: 85 0A    
 
 ; Erase old object data bytes from UDG data to screen RAM by EXORing
 ; ZP09 index decrements from $FF, ZP0E holds address of old UDG object data,
 ; ZP0C holds address of object data on screen to be written to
-    ldy     ZP09_Object_New_Y_Index         ; 362D: A4 09    
+    ldy     ZP09                            ; 362D: A4 09    
 
 ; L_BRS_($362F)_($3637) OK
 Loop_Erase_Down
-    lda     (ZP0E_Object_New_UDG_Data_Lo),y ; 362F: B1 0E    
-    eor     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 3631: 51 0C    
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 3633: 91 0C    
+    lda     (ZP0E),y                        ; 362F: B1 0E    
+    eor     (ZP0C),y                        ; 3631: 51 0C    
+    sta     (ZP0C),y                        ; 3633: 91 0C    
 
 ; Decrement address pointer into UDG data and the loop index
     dey                                     ; 3635: 88       
@@ -6887,12 +6763,12 @@ Loop_Erase_Down
 ; Restore the number of pixel lines to erased and store to ZP13, then subtract it from
 ; ZP09, the updated address offset for erase/draw the first/next part of the new object
     pla                                     ; 3639: 68       
-    sta     ZP13_Object_Lines_To_Erase      ; 363A: 85 13    
+    sta     ZP13                            ; 363A: 85 13    
 
-    lda     ZP09_Object_New_Y_Index         ; 363C: A5 09    
+    lda     ZP09                            ; 363C: A5 09    
     sec                                     ; 363E: 38       
-    sbc     ZP13_Object_Lines_To_Erase      ; 363F: E5 13    
-    sta     ZP09_Object_New_Y_Index         ; 3641: 85 09    
+    sbc     ZP13                            ; 363F: E5 13    
+    sta     ZP09                            ; 3641: 85 09    
 
     jmp     Erase_Old_Object                ; 3643: 4C 88 36 
 ; ------------------------------------------
@@ -6913,30 +6789,30 @@ Display_Object_Load
 Display_Object
     lda     #$FF                            ; 364C: A9 FF    
 ; ZP08 and ZP09 used as index into UDG RAM for old object and new object data
-    sta     ZP08_Object_Old_Y_Index         ; 364E: 85 08    
-    sta     ZP09_Object_New_Y_Index         ; 3650: 85 09    
+    sta     ZP08                            ; 364E: 85 08    
+    sta     ZP09                            ; 3650: 85 09    
 
 ; ZP03 & ZP0B contain heights of the old and new object bitmaps from the UDG graphics data
 ; e.g. Alien Cross object height is $0A pixels/lines
 ; Ship is made of 3x2 tiles, fuel cell 1x2, Jetman 1x2 or 1x3
-    lda     ZP03_Object_Old_Height          ; 3652: A5 03    
-    sta     ZP02_Object_Old_Height_Index    ; 3654: 85 02    
+    lda     ZP03                            ; 3652: A5 03    
+    sta     ZP02                            ; 3654: 85 02    
 
-    lda     ZP0B_Object_New_Height          ; 3656: A5 0B    
-    sta     ZP0A_Object_New_Height_Index    ; 3658: 85 0A    
+    lda     ZP0B                            ; 3656: A5 0B    
+    sta     ZP0A                            ; 3658: 85 0A    
 
 ; Test if updated object Y position has changed, if yes, horizontal pixels can be erased
 ; from top or bottom of old object that are outside new object position, else jump
 ; directly to erase/draw routine
-    lda     ZP11_Object_Old_Position_Y      ; 365A: A5 11    
+    lda     ZP11                            ; 365A: A5 11    
     sec                                     ; 365C: 38       
-    sbc     ZP19_Object_New_Position_Y      ; 365D: E5 19    
+    sbc     ZP19                            ; 365D: E5 19    
     beq     Erase_Old_Object                ; 365F: F0 27    
     bmi     Erase_Object_Moving_Downward    ; 3661: 30 B6    
 
 ; Erase_Object_Moving_Upward, see also comments for Erase_Object_Moving_Downward
 ; as it's basically the same code with a few tweaks
-    cmp     ZP03_Object_Old_Height          ; 3663: C5 03    
+    cmp     ZP03                            ; 3663: C5 03    
     bcs     Erase_Old_Object                ; 3665: B0 21    
 
 ; Set X to number of Y pixel-lines to be erased only i.e. no following draw for this object
@@ -6945,23 +6821,23 @@ Display_Object
 ; Subtract number of Y erase-only pixels from total object tile height and store to loop
 ; index for later
     pha                                     ; 3668: 48       
-    sta     ZP02_Object_Old_Height_Index    ; 3669: 85 02    
+    sta     ZP02                            ; 3669: 85 02    
 
-    lda     ZP03_Object_Old_Height          ; 366B: A5 03    
+    lda     ZP03                            ; 366B: A5 03    
     sec                                     ; 366D: 38       
-    sbc     ZP02_Object_Old_Height_Index    ; 366E: E5 02    
-    sta     ZP02_Object_Old_Height_Index    ; 3670: 85 02    
+    sbc     ZP02                            ; 366E: E5 02    
+    sta     ZP02                            ; 3670: 85 02    
 
 ; Erase old object data bytes from UDG data to screen RAM by EXORing
 ; ZP08 index decrements from $FF, ZP06 holds address of old UDG object data,
 ; ZP04 holds address of object data on screen to be written to
-    ldy     ZP08_Object_Old_Y_Index         ; 3672: A4 08    
+    ldy     ZP08                            ; 3672: A4 08    
 
 ; L_BRS_($3674)_($367C) OK
 Loop_Erase_Up
-    lda     (ZP06_Object_Old_UDG_Data_Lo),y ; 3674: B1 06    
-    eor     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3676: 51 04    
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3678: 91 04    
+    lda     (ZP06),y                        ; 3674: B1 06    
+    eor     (ZP04),y                        ; 3676: 51 04    
+    sta     (ZP04),y                        ; 3678: 91 04    
 
 ; Decrement address pointer into UDG data and the loop index
     dey                                     ; 367A: 88       
@@ -6972,12 +6848,12 @@ Loop_Erase_Up
 ; ZP08, the updated address offset for erase/draw the first/next part of the new object
     pla                                     ; 367E: 68       
 
-    sta     ZP13_Object_Lines_To_Erase      ; 367F: 85 13    
+    sta     ZP13                            ; 367F: 85 13    
 
-    lda     ZP08_Object_Old_Y_Index         ; 3681: A5 08    
+    lda     ZP08                            ; 3681: A5 08    
     sec                                     ; 3683: 38       
-    sbc     ZP13_Object_Lines_To_Erase      ; 3684: E5 13    
-    sta     ZP08_Object_Old_Y_Index         ; 3686: 85 08    
+    sbc     ZP13                            ; 3684: E5 13    
+    sta     ZP08                            ; 3686: 85 08    
 
 ; Erasure of old object and drawing of new object is done in the same code loop,
 ; first you erase the old line from screen memory using EXOR, then you write back
@@ -6990,135 +6866,135 @@ Loop_Erase_Up
 ; L_BRS_($3688)_($369A) OK
 ; L_JMP_($3688)_($36A8) OK
 Erase_Old_Object
-    lda     ZP02_Object_Old_Height_Index    ; 3688: A5 02    
+    lda     ZP02                            ; 3688: A5 02    
     beq     Next_Object_Old_Update_Params   ; 368A: F0 1F    
-    dec     ZP02_Object_Old_Height_Index    ; 368C: C6 02    
+    dec     ZP02                            ; 368C: C6 02    
 
 ; EXOR object data bytes from UDG data to screen RAM to erase
-    ldy     ZP08_Object_Old_Y_Index         ; 368E: A4 08    
-    lda     (ZP06_Object_Old_UDG_Data_Lo),y ; 3690: B1 06    
-    eor     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3692: 51 04    
-    sta     (ZP04_Object_Old_UDG_RAM_Lo),y  ; 3694: 91 04    
+    ldy     ZP08                            ; 368E: A4 08    
+    lda     (ZP06),y                        ; 3690: B1 06    
+    eor     (ZP04),y                        ; 3692: 51 04    
+    sta     (ZP04),y                        ; 3694: 91 04    
 
-    dec     ZP08_Object_Old_Y_Index         ; 3696: C6 08    
+    dec     ZP08                            ; 3696: C6 08    
 
 ; If new object fully drawn, don't try drawing more, erase next old object line
-    lda     ZP0A_Object_New_Height_Index    ; 3698: A5 0A    
+    lda     ZP0A                            ; 3698: A5 0A    
     beq     Erase_Old_Object                ; 369A: F0 EC    
 
 ; L_BRS_($369C)_($36AD) OK
 Draw_New_Object
-    dec     ZP0A_Object_New_Height_Index    ; 369C: C6 0A    
+    dec     ZP0A                            ; 369C: C6 0A    
 
 ; EXOR object data bytes from UDG data to screen RAM to draw
-    ldy     ZP09_Object_New_Y_Index         ; 369E: A4 09    
-    lda     (ZP0E_Object_New_UDG_Data_Lo),y ; 36A0: B1 0E    
-    eor     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 36A2: 51 0C    
-    sta     (ZP0C_Object_New_UDG_RAM_Lo),y  ; 36A4: 91 0C    
+    ldy     ZP09                            ; 369E: A4 09    
+    lda     (ZP0E),y                        ; 36A0: B1 0E    
+    eor     (ZP0C),y                        ; 36A2: 51 0C    
+    sta     (ZP0C),y                        ; 36A4: 91 0C    
 
-    dec     ZP09_Object_New_Y_Index         ; 36A6: C6 09    
+    dec     ZP09                            ; 36A6: C6 09    
     jmp     Erase_Old_Object                ; 36A8: 4C 88 36 
 ; ------------------------------------------
 
 ; Test if more lines to be drawn for new object, if yes, branch
 ; L_BRS_($36AB)_($368A) OK
 Next_Object_Old_Update_Params
-    lda     ZP0A_Object_New_Height_Index    ; 36AB: A5 0A    
+    lda     ZP0A                            ; 36AB: A5 0A    
     bne     Draw_New_Object                 ; 36AD: D0 ED    
 
 ; Test if old object fully erased, if not, move to the next vertical column to erase
-    lda     ZP14_Object_Old_Width_Bytes     ; 36AF: A5 14    
+    lda     ZP14                            ; 36AF: A5 14    
     beq     Object_Width_Complete           ; 36B1: F0 76    
 
-    dec     ZP14_Object_Old_Width_Bytes     ; 36B3: C6 14    
+    dec     ZP14                            ; 36B3: C6 14    
 
 ; Move UDG data 16-bit address pointer to the object data for the next column
-    lda     ZP06_Object_Old_UDG_Data_Lo     ; 36B5: A5 06    
+    lda     ZP06                            ; 36B5: A5 06    
     sec                                     ; 36B7: 38       
-    sbc     ZP03_Object_Old_Height          ; 36B8: E5 03    
-    sta     ZP06_Object_Old_UDG_Data_Lo     ; 36BA: 85 06    
+    sbc     ZP03                            ; 36B8: E5 03    
+    sta     ZP06                            ; 36BA: 85 06    
 
-    lda     ZP07_Object_Old_UDG_Data_Hi     ; 36BC: A5 07    
+    lda     ZP07                            ; 36BC: A5 07    
     sbc     #$00                            ; 36BE: E9 00    
-    sta     ZP07_Object_Old_UDG_Data_Hi     ; 36C0: 85 07    
+    sta     ZP07                            ; 36C0: 85 07    
 
 ; Move UDG RAM address pointer to next vertical column
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36C2: A5 04    
+    lda     ZP04                            ; 36C2: A5 04    
     clc                                     ; 36C4: 18       
     adc     #SCREEN_HEIGHT_PIXELS           ; 36C5: 69 B0    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 36C7: 85 04    
+    sta     ZP04                            ; 36C7: 85 04    
 
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36C9: A5 05    
+    lda     ZP05                            ; 36C9: A5 05    
     adc     #$00                            ; 36CB: 69 00    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 36CD: 85 05    
+    sta     ZP05                            ; 36CD: 85 05    
 
 ; Test for full-screen wrap, $1ED1 is $FF less than the first byte past
 ; UDG RAM (last byte = $1FCF)
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36CF: A5 04    
+    lda     ZP04                            ; 36CF: A5 04    
     sec                                     ; 36D1: 38       
     sbc     #UDG_RAM_END_ADDR_MINUS_FE_LO   ; 36D2: E9 D1    
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36D4: A5 05    
+    lda     ZP05                            ; 36D4: A5 05    
     sbc     #UDG_RAM_END_ADDR_MINUS_FE_HI   ; 36D6: E9 1E    
     bcc     Next_Object_New_Update_Params   ; 36D8: 90 0D    
 
 ; Handle full-screen wrap, $0FD0 is number of bytes used to define the full
 ; UDG RAM. i.e. $16 x $17 x 8=$FD0
-    lda     ZP04_Object_Old_UDG_RAM_Lo      ; 36DA: A5 04    
+    lda     ZP04                            ; 36DA: A5 04    
     sec                                     ; 36DC: 38       
     sbc     #UDG_RAM_NUM_BYTES_LO           ; 36DD: E9 D0    
-    sta     ZP04_Object_Old_UDG_RAM_Lo      ; 36DF: 85 04    
+    sta     ZP04                            ; 36DF: 85 04    
 
-    lda     ZP05_Object_Old_UDG_RAM_Hi      ; 36E1: A5 05    
+    lda     ZP05                            ; 36E1: A5 05    
     sbc     #UDG_RAM_NUM_BYTES_HI           ; 36E3: E9 0F    
-    sta     ZP05_Object_Old_UDG_RAM_Hi      ; 36E5: 85 05    
+    sta     ZP05                            ; 36E5: 85 05    
 
 ; Test if new object fully drawn, if not, move to the next vertical column to draw
 ; L_BRS_($36E7)_($36D8) OK
 ; L_JMP_($36E7)_($3734) OK
 Next_Object_New_Update_Params
-    lda     ZP15_Object_New_Width_Bytes     ; 36E7: A5 15    
+    lda     ZP15                            ; 36E7: A5 15    
     beq     Zero_ZP0B_JMP_Display_Object    ; 36E9: F0 37    
 
-    dec     ZP15_Object_New_Width_Bytes     ; 36EB: C6 15    
+    dec     ZP15                            ; 36EB: C6 15    
 
 ; Move UDG data 16-bit address pointer to the object data for the next column
-    lda     ZP0E_Object_New_UDG_Data_Lo     ; 36ED: A5 0E    
+    lda     ZP0E                            ; 36ED: A5 0E    
     sec                                     ; 36EF: 38       
-    sbc     ZP0B_Object_New_Height          ; 36F0: E5 0B    
-    sta     ZP0E_Object_New_UDG_Data_Lo     ; 36F2: 85 0E    
+    sbc     ZP0B                            ; 36F0: E5 0B    
+    sta     ZP0E                            ; 36F2: 85 0E    
 
-    lda     ZP0F_Object_New_UDG_Data_Hi     ; 36F4: A5 0F    
+    lda     ZP0F                            ; 36F4: A5 0F    
     sbc     #$00                            ; 36F6: E9 00    
-    sta     ZP0F_Object_New_UDG_Data_Hi     ; 36F8: 85 0F    
+    sta     ZP0F                            ; 36F8: 85 0F    
 
 ; Move UDG RAM address pointer to next vertical column
-    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 36FA: A5 0C    
+    lda     ZP0C                            ; 36FA: A5 0C    
     clc                                     ; 36FC: 18       
     adc     #SCREEN_HEIGHT_PIXELS           ; 36FD: 69 B0    
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 36FF: 85 0C    
+    sta     ZP0C                            ; 36FF: 85 0C    
 
-    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 3701: A5 0D    
+    lda     ZP0D                            ; 3701: A5 0D    
     adc     #$00                            ; 3703: 69 00    
-    sta     ZP0D_Object_New_UDG_RAM_Hi      ; 3705: 85 0D    
+    sta     ZP0D                            ; 3705: 85 0D    
 
 ; Test for full-screen wrap, $1ED1 is $FF less than the first byte past UDG RAM (last byte = $1FCF)
-    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 3707: A5 0C    
+    lda     ZP0C                            ; 3707: A5 0C    
     sec                                     ; 3709: 38       
     sbc     #UDG_RAM_END_ADDR_MINUS_FE_LO   ; 370A: E9 D1    
-    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 370C: A5 0D    
+    lda     ZP0D                            ; 370C: A5 0D    
     sbc     #UDG_RAM_END_ADDR_MINUS_FE_HI   ; 370E: E9 1E    
     bcc     JMP_Display_Object              ; 3710: 90 0D    
 
 ; Handle full-screen wrap, $0FD0 is number of bytes used to define the full UDG RAM,
 ; i.e. $16 x $17 x 8=$FD0
-    lda     ZP0C_Object_New_UDG_RAM_Lo      ; 3712: A5 0C    
+    lda     ZP0C                            ; 3712: A5 0C    
     sec                                     ; 3714: 38       
     sbc     #UDG_RAM_NUM_BYTES_LO           ; 3715: E9 D0    
-    sta     ZP0C_Object_New_UDG_RAM_Lo      ; 3717: 85 0C    
+    sta     ZP0C                            ; 3717: 85 0C    
 
-    lda     ZP0D_Object_New_UDG_RAM_Hi      ; 3719: A5 0D    
+    lda     ZP0D                            ; 3719: A5 0D    
     sbc     #UDG_RAM_NUM_BYTES_HI           ; 371B: E9 0F    
-    sta     ZP0D_Object_New_UDG_RAM_Hi      ; 371D: 85 0D    
+    sta     ZP0D                            ; 371D: 85 0D    
 
 ; L_BRS_($371F)_($3710) OK
 JMP_Display_Object
@@ -7128,18 +7004,18 @@ JMP_Display_Object
 ; L_BRS_($3722)_($36E9) OK
 Zero_ZP0B_JMP_Display_Object
     lda     #$00                            ; 3722: A9 00    
-    sta     ZP0B_Object_New_Height          ; 3724: 85 0B    
+    sta     ZP0B                            ; 3724: 85 0B    
     jmp     Display_Object                  ; 3726: 4C 4C 36 
 ; ------------------------------------------
 
 ; L_BRS_($3729)_($36B1) OK
 Object_Width_Complete
     lda     #$00                            ; 3729: A9 00    
-    sta     ZP03_Object_Old_Height          ; 372B: 85 03    
+    sta     ZP03                            ; 372B: 85 03    
 
 ; Test if both old and new object heights are the same, if yes, return
-    lda     ZP14_Object_Old_Width_Bytes     ; 372D: A5 14    
-    ora     ZP15_Object_New_Width_Bytes     ; 372F: 05 15    
+    lda     ZP14                            ; 372D: A5 14    
+    ora     ZP15                            ; 372F: 05 15    
     bne     JMP_Next_Obj_New_Update_Params  ; 3731: D0 01    
     rts                                     ; 3733: 60       
 ; ==========================================
@@ -7182,24 +7058,24 @@ Load_Obj_Old_UDG_RAM_Addr_Siz_
 ; L_JSR_($373D)_($2FC7) OK
 ; L_JSR_($373D)_($305D) OK
 Load_Obj_Old_UDG_RAM_Addr_Size
-    sty     ZP0E_Object_UDG_Data_Addr_Lo    ; 373D: 84 0E    
+    sty     ZP0E                            ; 373D: 84 0E    
     tay                                     ; 373F: A8       
     dey                                     ; 3740: 88       
-    sty     ZP0F_Object_UDG_Data_Addr_Hi    ; 3741: 84 0F    
+    sty     ZP0F                            ; 3741: 84 0F    
 
 ; Store object position in ZP04 & 05
-    lda     ZP18_Object_Position_X          ; 3743: A5 18    
-    sta     ZP04_Object_Position_X          ; 3745: 85 04    
-    lda     ZP19_Object_Position_Y          ; 3747: A5 19    
-    sta     ZP05_Object_Position_Y          ; 3749: 85 05    
+    lda     ZP18                            ; 3743: A5 18    
+    sta     ZP04                            ; 3745: 85 04    
+    lda     ZP19                            ; 3747: A5 19    
+    sta     ZP05                            ; 3749: 85 05    
 
 ; Convert object position XY pixel coordinates to UDG RAM address, managing X axis wrap.
 ; Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
 ; will move object into next UDG RAM column.
     ldy     #$FF                            ; 374B: A0 FF    
-    lda     (ZP0E_Object_UDG_Data_Addr_Lo),y; 374D: B1 0E    
+    lda     (ZP0E),y                        ; 374D: B1 0E    
     clc                                     ; 374F: 18       
-    adc     ZP04_Object_Position_X          ; 3750: 65 04    
+    adc     ZP04                            ; 3750: 65 04    
     cmp     #SCREEN_WIDTH_PIXELS            ; 3752: C9 B8    
     bcc     No_X_Wrap_                      ; 3754: 90 03    
 
@@ -7208,43 +7084,43 @@ Load_Obj_Old_UDG_RAM_Addr_Size
 
 ; L_BRS_($3759)_($3754) OK
 No_X_Wrap_
-    sta     ZP04_Object_Position_X          ; 3759: 85 04    
-    sta     ZP18_Object_Position_X          ; 375B: 85 18    
+    sta     ZP04                            ; 3759: 85 04    
+    sta     ZP18                            ; 375B: 85 18    
     jsr     Convert_XY_to_UDG_RAM_Address   ; 375D: 20 1D 35 
 
 ; ZP04/05 are now an address instead of X and Y coordinates.
 ; Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
-    lda     ZP04_Object_UDG_RAM_Addr_Lo     ; 3760: A5 04    
+    lda     ZP04                            ; 3760: A5 04    
     sec                                     ; 3762: 38       
     sbc     #UDG_DATA_HEIGHT_PIXELS_OFFSET  ; 3763: E9 FF    
-    sta     ZP0C_Object_UDG_RAM_Addr_Lo     ; 3765: 85 0C    
+    sta     ZP0C                            ; 3765: 85 0C    
 
-    lda     ZP05_Object_UDG_RAM_Addr_Hi     ; 3767: A5 05    
+    lda     ZP05                            ; 3767: A5 05    
     sbc     #$00                            ; 3769: E9 00    
-    sta     ZP0D_Object_UDG_RAM_Addr_Hi     ; 376B: 85 0D    
+    sta     ZP0D                            ; 376B: 85 0D    
 
 ; Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
     ldy     #UDG_DATA_WIDTH_BYTES_OFFSET    ; 376D: A0 FE    
-    lda     (ZP0E_Object_UDG_Data_Addr_Lo),y; 376F: B1 0E    
-    sta     ZP15_Object_Width_Bytes         ; 3771: 85 15    
-    sta     ZP16_Object_Width_Bytes         ; 3773: 85 16    
+    lda     (ZP0E),y                        ; 376F: B1 0E    
+    sta     ZP15                            ; 3771: 85 15    
+    sta     ZP16                            ; 3773: 85 16    
 
 ; Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
     dey                                     ; 3775: 88       
-    lda     (ZP0E_Object_UDG_Data_Addr_Lo),y; 3776: B1 0E    
-    sta     ZP0B_Object_Height_Pixels       ; 3778: 85 0B    
-    sta     ZP17_Object_Height_Pixels       ; 377A: 85 17    
+    lda     (ZP0E),y                        ; 3776: B1 0E    
+    sta     ZP0B                            ; 3778: 85 0B    
+    sta     ZP17                            ; 377A: 85 17    
 
 ; Subtract $03 from 16-bit object UDG Data address, i.e. so address
 ; avoids the object dimension bytes
-    lda     ZP0E_Object_UDG_Data_Addr_Lo    ; 377C: A5 0E    
+    lda     ZP0E                            ; 377C: A5 0E    
     sec                                     ; 377E: 38       
     sbc     #UDG_DATA_BITMAP_OFFSET         ; 377F: E9 03    
-    sta     ZP0E_Object_UDG_Data_Addr_Lo    ; 3781: 85 0E    
+    sta     ZP0E                            ; 3781: 85 0E    
 
-    lda     ZP0F_Object_UDG_Data_Addr_Hi    ; 3783: A5 0F    
+    lda     ZP0F                            ; 3783: A5 0F    
     sbc     #$00                            ; 3785: E9 00    
-    sta     ZP0F_Object_UDG_Data_Addr_Hi    ; 3787: 85 0F    
+    sta     ZP0F                            ; 3787: 85 0F    
     rts                                     ; 3789: 60       
 ; ==========================================
 
@@ -7282,24 +7158,24 @@ Load_Obj_New_UDG_RAM_Addr_Siz_
 ; L_JMP_($378D)_($2DFC) OK
 ; L_JSR_($378D)_($2FCE) OK
 Load_Obj_New_UDG_RAM_Addr_Size
-    sty     ZP06_Object_UDG_Data_Addr_Lo    ; 378D: 84 06    
+    sty     ZP06                            ; 378D: 84 06    
     tay                                     ; 378F: A8       
     dey                                     ; 3790: 88       
-    sty     ZP07_Object_UDG_Data_Addr_Hi    ; 3791: 84 07     ZP07/06=$3BF7
+    sty     ZP07                            ; 3791: 84 07     ZP07/06=$3BF7
 
 ; Store object position in ZP04 & 05
-    lda     ZP10_Object_Position_X          ; 3793: A5 10    
-    sta     ZP04_Object_Position_X          ; 3795: 85 04     ZP04=X=$50
-    lda     ZP11_Object_Position_Y          ; 3797: A5 11    
-    sta     ZP05_Object_Position_Y          ; 3799: 85 05     ZP05=Y=$5F
+    lda     ZP10                            ; 3793: A5 10    
+    sta     ZP04                            ; 3795: 85 04     ZP04=X=$50
+    lda     ZP11                            ; 3797: A5 11    
+    sta     ZP05                            ; 3799: 85 05     ZP05=Y=$5F
 
 ; Convert object position XY pixel coordinates to UDG RAM address, managing X axis wrap.
 ; Loads screen-wrap byte from current UDG Data animation frame, it's set to 8 if next frame
 ; will move object into next UDG RAM column.
     ldy     #$FF                            ; 379B: A0 FF    
-    lda     (ZP06_Object_UDG_Data_Addr_Lo),y; 379D: B1 06    
+    lda     (ZP06),y                        ; 379D: B1 06    
     clc                                     ; 379F: 18       
-    adc     ZP04_Object_Position_X          ; 37A0: 65 04    
+    adc     ZP04                            ; 37A0: 65 04    
     cmp     #SCREEN_WIDTH_PIXELS            ; 37A2: C9 B8    
     bcc     No_X_Wrap                       ; 37A4: 90 03    
 
@@ -7308,41 +7184,41 @@ Load_Obj_New_UDG_RAM_Addr_Size
 
 ; L_BRS_($37A9)_($37A4) OK
 No_X_Wrap
-    sta     ZP04_Object_Position_X          ; 37A9: 85 04     ZP04=X=$50 ZP05=Y=$5F
+    sta     ZP04                            ; 37A9: 85 04     ZP04=X=$50 ZP05=Y=$5F
     jsr     Convert_XY_to_UDG_RAM_Address   ; 37AB: 20 1D 35  ZP05/04=$173F i.e. ship middle
                                             ; section start position on middle platform
 
 ; ZP04/05 are now an address instead of X and Y coordinates.
 ; Subtract $FF from 16-bit UDG_RAM Address for indexing with Y after.
-    lda     ZP04_Object_UDG_RAM_Addr_Lo     ; 37AE: A5 04    
+    lda     ZP04                            ; 37AE: A5 04    
     sec                                     ; 37B0: 38       
     sbc     #UDG_DATA_HEIGHT_PIXELS_OFFSET  ; 37B1: E9 FF    
-    sta     ZP04_Object_UDG_RAM_Addr_Lo     ; 37B3: 85 04    
+    sta     ZP04                            ; 37B3: 85 04    
 
-    lda     ZP05_Object_UDG_RAM_Addr_Hi     ; 37B5: A5 05    
+    lda     ZP05                            ; 37B5: A5 05    
     sbc     #$00                            ; 37B7: E9 00    
-    sta     ZP05_Object_UDG_RAM_Addr_Hi     ; 37B9: 85 05    
+    sta     ZP05                            ; 37B9: 85 05    
 
 ; Get/store object width in characters (zero-based i.e. 0 is 1 byte wide)
     ldy     #UDG_DATA_WIDTH_BYTES_OFFSET    ; 37BB: A0 FE    
-    lda     (ZP06_Object_UDG_Data_Addr_Lo),y; 37BD: B1 06    
-    sta     ZP14_Object_Width_Bytes         ; 37BF: 85 14    
+    lda     (ZP06),y                        ; 37BD: B1 06    
+    sta     ZP14                            ; 37BF: 85 14    
 
 ; Get/store object height in pixels (one-based i.e. 9 is 9 pixels high)
     dey                                     ; 37C1: 88       
-    lda     (ZP06_Object_UDG_Data_Addr_Lo),y; 37C2: B1 06    
-    sta     ZP03_Object_Height_Pixels       ; 37C4: 85 03    
+    lda     (ZP06),y                        ; 37C2: B1 06    
+    sta     ZP03                            ; 37C4: 85 03    
 
 ; Subtract $03 from 16-bit object UDG Data address, i.e. so address
 ; avoids the object dimension bytes
-    lda     ZP06_Object_UDG_Data_Addr_Lo    ; 37C6: A5 06    
+    lda     ZP06                            ; 37C6: A5 06    
     sec                                     ; 37C8: 38       
     sbc     #UDG_DATA_BITMAP_OFFSET         ; 37C9: E9 03    
-    sta     ZP06_Object_UDG_Data_Addr_Lo    ; 37CB: 85 06    
+    sta     ZP06                            ; 37CB: 85 06    
 
-    lda     ZP07_Object_UDG_Data_Addr_Hi    ; 37CD: A5 07    
+    lda     ZP07                            ; 37CD: A5 07    
     sbc     #$00                            ; 37CF: E9 00    
-    sta     ZP07_Object_UDG_Data_Addr_Hi    ; 37D1: 85 07    
+    sta     ZP07                            ; 37D1: 85 07    
     rts                                     ; 37D3: 60       
 ; ==========================================
 
@@ -7392,10 +7268,10 @@ Get_Obj_UDG_Data_Addr_Alien
 ; Alternate entry point to routine using different ZP vars for object Position and Type
 ; L_JSR_($37E6)_($378A) OK
 Get_Obj_Old_UDG_Data_Addr
-    lda     ZP10_Object_Position_X          ; 37E6: A5 10    
+    lda     ZP10                            ; 37E6: A5 10    
     and     #%00000110                      ; 37E8: 29 06    
     tax                                     ; 37EA: AA       
-    lda     ZP12_Object_Type                ; 37EB: A5 12    
+    lda     ZP12                            ; 37EB: A5 12    
 
 ; When object is Jetman, Object Type represents State i.e. Flying/Standing, Facing Left/Right, Frame.
 ; There are 16 Jetman animation frames, 4 Fly Right, 4 Fly Left, 4 Stand Left, 4 Stand Right,
@@ -7443,9 +7319,9 @@ Adjust_For_Jetman_Standing
 ; OR A and X together to produce full UDG data table offset
 ; L_JMP_($3807)_($37E3) OK
 Calc_UDG_Data_Table_Index
-    sta     ZP13_Temp                       ; 3807: 85 13    
+    sta     ZP13                            ; 3807: 85 13    
     txa                                     ; 3809: 8A       
-    ora     ZP13_Temp                       ; 380A: 05 13    
+    ora     ZP13                            ; 380A: 05 13    
     tax                                     ; 380C: AA       
 
 ; Using X just set, get index into the Object UDG table, address lo-byte into Y, hi-byte into A
@@ -7460,10 +7336,10 @@ Calc_UDG_Data_Table_Index
 ; Animations have 2 or 4 frames and are minimum 2 pixels apart so bit 0 not used.
 ; L_JSR_($3815)_($373A) OK
 Get_Obj_New_UDG_Data_Addr
-    lda     ZP18_Object_Position_X          ; 3815: A5 18    
+    lda     ZP18                            ; 3815: A5 18    
     and     #%00000110                      ; 3817: 29 06    
     tax                                     ; 3819: AA       
-    lda     ZP1A_Object_Type                ; 381A: A5 1A    
+    lda     ZP1A                            ; 381A: A5 1A    
     jmp     Get_Obj_UDG_Data_Addr           ; 381C: 4C ED 37 
 
 
@@ -7487,9 +7363,9 @@ Get_Obj_New_UDG_Data_Addr
 ; L_JSR_($381F)_($32FC) OK
 ; L_JSR_($381F)_($335B) OK
 Colourize_Object
-    lda     ZP18_Object_Position_X          ; 381F: A5 18    
+    lda     ZP18                            ; 381F: A5 18    
     sta     ZP04                            ; 3821: 85 04    
-    lda     ZP19_Object_Position_Y          ; 3823: A5 19    
+    lda     ZP19                            ; 3823: A5 19    
     sta     ZP05                            ; 3825: 85 05    
 
 ; Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Ship Top X=20, Y=3F
@@ -7497,7 +7373,7 @@ Colourize_Object
 
 ; Divide object height by $10 then add $02, so always update colour on at least two vertical tiles
 ; e.g. Jetman=$18->$03, Ship_Top=$10->$03, Fuzz_Alien=$0A->$02
-    lda     ZP17_Object_Size_Y_Pixels       ; 382A: A5 17    
+    lda     ZP17                            ; 382A: A5 17    
     lsr     a                               ; 382C: 4A       
     lsr     a                               ; 382D: 4A       
     lsr     a                               ; 382E: 4A       
@@ -7506,29 +7382,29 @@ Colourize_Object
     adc     #$02                            ; 3831: 69 02    
 
 ; Use ZP0B as outer loop for vertical tile rows
-    sta     ZP0B_Colour_RAM_Tiles_Y         ; 3833: 85 0B    
+    sta     ZP0B                            ; 3833: 85 0B    
 
 ; Use ZP0A as inner loop for horizontal tile columns
-    lda     ZP16_Object_Size_X_Columns      ; 3835: A5 16    
-    sta     ZP0A_Colour_RAM_Tiles_X         ; 3837: 85 0A    
-    inc     ZP0A_Colour_RAM_Tiles_X         ; 3839: E6 0A    
+    lda     ZP16                            ; 3835: A5 16    
+    sta     ZP0A                            ; 3837: 85 0A    
+    inc     ZP0A                            ; 3839: E6 0A    
 
 ; L_BRS_($383B)_($385C) OK
 Loop_Y
-    ldx     ZP0A_Colour_RAM_Tiles_X         ; 383B: A6 0A    
+    ldx     ZP0A                            ; 383B: A6 0A    
     ldy     #$00                            ; 383D: A0 00    
 
 ; Read colour from RAM and if it's green i.e. colour of the platforms, skip the colour change
 ; else write the updated colour to the colour RAM
 ; L_BRS_($383F)_($384D) OK
 Loop_X
-    lda     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 383F: B1 0C    
+    lda     (ZP0C),y                        ; 383F: B1 0C    
     and     #%00000111                      ; 3841: 29 07    
     cmp     #COLOUR_GREEN                   ; 3843: C9 05    
     beq     Green_Ignored                   ; 3845: F0 04    
 
     lda     ZP1B                            ; 3847: A5 1B    
-    sta     (ZP0C_Colour_RAM_Tile_Addr_Lo),y; 3849: 91 0C    
+    sta     (ZP0C),y                        ; 3849: 91 0C    
 
 ; L_BRS_($384B)_($3845) OK
 Green_Ignored
@@ -7538,15 +7414,15 @@ Green_Ignored
 
 ; Move to next row to colour (i.e. move up) and test for going out of
 ; screen boundry at top of screen, early exit if so
-    lda     ZP0C_Colour_RAM_Tile_Addr_Lo    ; 384F: A5 0C    
+    lda     ZP0C                            ; 384F: A5 0C    
     sec                                     ; 3851: 38       
     sbc     #SCREEN_WIDTH_COLUMNS           ; 3852: E9 17    
     cmp     #SCREEN_WIDTH_COLUMNS           ; 3854: C9 17    
     bcc     Colourize_Object_RTS            ; 3856: 90 06    
 
 ; Update the Colour RAM for the appropriate tile, move up one row
-    sta     ZP0C_Colour_RAM_Tile_Addr_Lo    ; 3858: 85 0C    
-    dec     ZP0B_Colour_RAM_Tiles_Y         ; 385A: C6 0B    
+    sta     ZP0C                            ; 3858: 85 0C    
+    dec     ZP0B                            ; 385A: C6 0B    
     bne     Loop_Y                          ; 385C: D0 DD    
 
 ; L_BRS_($385E)_($3856) OK
