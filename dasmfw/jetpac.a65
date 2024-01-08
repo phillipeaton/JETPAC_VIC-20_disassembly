@@ -1,6 +1,6 @@
 ; dasmfw: Disassembler Framework V0.34
-; Loaded: binary file "jetpac_2000-3fff.bin"
-; Loaded: Info file "nfo_include.nfo"
+; Loaded: binary file "bin_orig/jetpac_2000-3fff.bin"
+; Loaded: Info file "dasmfw\nfo_include.nfo"
 
 ; --------------------------------------------------------------------------------------------
 ; JET PAC for the Commodore VIC-20 + 8K Memory Expansion
