@@ -16,7 +16,7 @@ A reverse-engineering of the 6502 binary image to assembly source code of the cl
 
 JETPAC was one of my favourite games on the VIC-20 in the early '80s, the smooth movement of the sprites and excellent game play mechanics made it a standout title. I wanted to look into the code to see how it all works.
 
-[Back to top](#JETPAC for VIC-20 Disassembly and Reverse Engineering)
+[Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
 
 ## Project Status
 
@@ -29,7 +29,7 @@ After 200+ commits over 18 months, it's probably as completed as I will make it:
 - Code labels and commenting is complete.
 - User-Defined Graphics characters have been identified (see Excel spreadsheet).
 
-[Back to top](#JETPAC for VIC-20 Disassembly and Reverse Engineering)
+[Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
 
 ## Tools Used
 
@@ -59,7 +59,7 @@ After 200+ commits over 18 months, it's probably as completed as I will make it:
 - **Other Stuff**
   Microsoft Excel was used for making lookup tables of memory maps for I/O, screens, colours, User-Defined Graphics and more. Microsoft Word was used for creating the code listing overview picture.
 
-[Back to top](#JETPAC for VIC-20 Disassembly and Reverse Engineering)
+[Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
 
 ## Disassembly and Reassembly Instructions
 
@@ -83,7 +83,7 @@ The makefile in the root of the repository contains all these steps, running `ma
 
 I've never tried this, but dasmfw is simple C++ program designed to be easy to compile for your platform. as65 is available as a Linux version, which may also work on Mac. The other utils are standard Unix tools so are probably available on Linux / Mac by default.
 
-[Back to top](#JETPAC for VIC-20 Disassembly and Reverse Engineering)
+[Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
 
 ## Repository Contents
 
@@ -102,3 +102,5 @@ See also the further readme files in the lower level directories of the reposito
 - [utils](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/tree/main/utils) - [make](https://www.gnu.org/savannah-checkouts/gnu/make/) and programs called by make.
 
 - [docs](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/tree/main/docs) - Note and technical documentation of the VIC-20 and the JETPAC program.
+
+[Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
