@@ -3,11 +3,11 @@
 # Ensure the lines with commands start with a tab, not spaces.
 
 # Executables
-AS65		  = utils/as65.exe
+AS65          = utils/as65.exe
 DASMFW        = utils/dasmfw.exe
 SED           = utils/sed.exe
-MD5SUM		  = utils/md5sum.exe
-RM		      = utils/rm.exe
+MD5SUM        = utils/md5sum.exe
+RM            = utils/rm.exe
 
 # Binary creation
 BIN_ORIG      = bin_orig/jetpac_2000-3fff.bin

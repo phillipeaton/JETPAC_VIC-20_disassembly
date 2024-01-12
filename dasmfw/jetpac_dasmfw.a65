@@ -734,7 +734,6 @@ Add_To_Laser_Start_Position_X
 ; 88ood8 dP""""Yb 8bodP' 888888 88  Yb 8bodP'
 ; ############################################################################################
 
-; NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ; L_BRS_($2195)_($21C7) OK
 Add_08_Handle_Wrap_Get_Y_Coord
     adc     #$08                            ; 2195: 69 08    
@@ -4067,14 +4066,6 @@ Wave_Alien_Colour_Lookup
 ; Yb      Yb   dP 88  .o 88  .o 88  8I  dY 88""
 ;  YboodP  YbodP  88ood8 88ood8 88 8888Y"  888888
 
-; ----------------------------------------------------
-; FUNCTION : Tests if Jetman and the current object have
-;            overlapped i.e. collided. Object can be ship
-;            part, fuel cell, gem or alien.
-; ENTRY : ZP_Obj_List_Ptr = Current Object
-;         Obj_Jetman_Looks = Status of Jetman
-; EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
-; ----------------------------------------------------
 ; L_JSR_($2D58)_($2854) OK
 ; L_JSR_($2D58)_($2C92) OK
 ; L_JSR_($2D58)_($2E77) OK
@@ -5403,8 +5394,6 @@ Next_UDG_Char
 ; 88     88ood8  dP    88 88  Y8  YboodP
 ; ############################################################################################
 
-; NOT COMPLETE YET @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
 ; L_BRS_($31BF)_($3203) OK
 Left_Right_Impact
     ldy     #JETMAN_DIRECTION_X_PARAM       ; 31BF: A0 02    
@@ -5783,9 +5772,6 @@ Set_Jetman_Standing
 ; o.`Y8b   88    dP__Yb  88 Y88  8I  dY 88 88 Y88 Yb  "88
 ; 8bodP'   88   dP""""Yb 88  Y8 8888Y"  88 88  Y8  YboodP
 ; ############################################################################################
-
-; NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
 
 ; L_BRS_($332C)_($3381) OK
 Set_Jetman_Facing_Right
@@ -6510,18 +6496,8 @@ No_Inc_Addr_Hi
 ;   88   Yb   dP     Y8   8P  8I  dY Yb  "88     88"Yb   dP__Yb  88YbdP88
 ;   88    YbodP      `YbodP' 8888Y"   YboodP     88  Yb dP""""Yb 88 YY 88
 
-; ----------------------------------------------------
 ; Copy Character ROM Character to User-Defined Graphics Memory
-; ----------------------------------------------------
-; FUNCTION  : Copy an 8 byte Character ROM character to the
-;             Used-Defined Graphics RAM e.g. to display a
-;             text string or score.
-; CALLED BY :
-; CALLS     : Nothing
-; ARGUMENTS : ??? = Loaded with character to copy e.g. $71 for "1"
-;             ??? BROKEN COMMENTS Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
-;             ??? BROKEN COMMENTS Addr_To gets updated as part of this routine.
-; ----------------------------------------------------
+
 ; Character to copy stored in ZP06, create Character ROM address in ZP07/06 for this
 ; value and copy 8 data bytes from that address to UDG RAM address stored in ZP05/04
 ; Example: Display "1" using $71 in ZP06

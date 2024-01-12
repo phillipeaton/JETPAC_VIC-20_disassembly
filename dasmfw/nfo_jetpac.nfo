@@ -276,7 +276,6 @@ label    218D Add_To_Laser_Start_Position_X
 comment  218D
 comment  218D Add to the laser start Position X $10 pixels to avoid drawing laser over Jetman on screen
 comment  2195
-comment  2195 NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 label    2195 Add_08_Handle_Wrap_Get_Y_Coord
 comment  219A
 label    219A DISPLAY_LASERS
@@ -1672,14 +1671,6 @@ deflabel 2D55 COLOUR_YELLOW
 deflabel 2D56 COLOUR_RED
 deflabel 2D57 COLOUR_PURPLE
 comment  2D58
-comment  2D58 ----------------------------------------------------
-comment  2D58 FUNCTION : Tests if Jetman and the current object have
-comment  2D58 \           overlapped i.e. collided. Object can be ship
-comment  2D58 \           part, fuel cell, gem or alien.
-comment  2D58 ENTRY : ZP_Obj_List_Ptr = Current Object
-comment  2D58 \        Obj_Jetman_Looks = Status of Jetman
-comment  2D58 EXIT  : ZP_01_Lo = $00 No hit / $80 = Collide
-comment  2D58 ----------------------------------------------------
 label    2D58 Test_Jetman_Object_Collide
 comment  2D5C
 comment  2D5C Test to see if Jetman is being displayed yet, set No_Collision and return if not
@@ -2259,8 +2250,6 @@ lcomment 31B9 X Y #Num_middle_chars
 break    31BC
 lcomment 31BC X Y #Num_middle_chars
 comment  31BF
-comment  31BF NOT COMPLETE YET @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-comment  31BF
 label    31BF Left_Right_Impact
 deflabel 31C0 JETMAN_DIRECTION_X_PARAM
 comment  31C7
@@ -2309,9 +2298,6 @@ label    3218 Flying_Up_Impact_Bounce
 label    3224 SKIP_3224
 comment  3228
 label    3228 Flying_Left
-comment  332C
-comment  332C NEEDS MORE WORK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-comment  332C
 comment  3230
 comment  323E
 label    323E Flying_Right
@@ -2736,18 +2722,8 @@ comment  3584
 label    3584 No_Inc_Addr_Hi
 comment  358C
 comment  3595
-comment  3595 ----------------------------------------------------
 comment  3595 Copy Character ROM Character to User-Defined Graphics Memory
-comment  3595 ----------------------------------------------------
-comment  3595 FUNCTION  : Copy an 8 byte Character ROM character to the
-comment  3595 \            Used-Defined Graphics RAM e.g. to display a
-comment  3595 \            text string or score.
-comment  3595 CALLED BY :
-comment  3595 CALLS     : Nothing
-comment  3595 ARGUMENTS : ??? = Loaded with character to copy e.g. $71 for "1"
-comment  3595 \            ??? BROKEN COMMENTS Addr_To is already setup, e.g. $1268 in UDG memory "F5 Keyboard".
-comment  3595 \            ??? BROKEN COMMENTS Addr_To gets updated as part of this routine.
-comment  3595 ----------------------------------------------------
+comment  3595
 comment  3595 Character to copy stored in ZP06, create Character ROM address in ZP07/06 for this
 comment  3595 value and copy 8 data bytes from that address to UDG RAM address stored in ZP05/04
 comment  3595 Example: Display "1" using $71 in ZP06
