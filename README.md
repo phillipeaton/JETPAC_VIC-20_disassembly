@@ -105,6 +105,96 @@ The project originally started off to find out how the smooth sprite graphics wo
 
 The graphics engine was not standalone, it's completely embedded into the rest of the game code, so I, inevitibly, ended up reverse a lot more than just a sprite engine. In the end I just decided to do all of it. The point then became how to reveal the secrets of the VIC-20 version of the game, given it was the only ULTIMATE game produced on the VIC-20 and thus is somewhat unique.
 
-### Initial Hardware Configuration
+KEY STUFF
+
+PROGRAM IS AN OBJECT ENGINE
+
+LISTING: BANNER TEXT SHOWS ROUTINES FROM MAIN-LOOP JUMP TABLE
+LOAD ZP PARAMETERS - probably for speed
+
+Show Object Map code
+
+OVERVIEW from WORD
+
+### Program Start - #### Initial Hardware Configuration
 
 JETPAC requires an 8KiB memory expansion and, once to program has been loaded into memory between \$2000 and \$3FFF, execution starts at \$201D, where it sets up the interrupt handler vectors, erases variable memory, sets-up the VIA I/O ports and sets-up the VIC chip, which configures the screen parameters to 11 rows by 23 columns, with each character being 16x8 pixels wide by 16 pixels high, or 
+
+### Screen RAM, Used-Defined Graphics RAM and Colour RAM mapping
+
+### Game Select
+
+First usage of bitmap graphics, reverses the text on screen, doesn't replace characters.
+
+### Init Laser Objects
+
+Max four laser objects
+
+Init routine works out where jetman is, direction he faces, whether laser will screen-wrap, vertical height of gun, sets up object with these parameters and a random length and colour from a colour table using the IRQ timer.
+
+### Display Lasers
+
+(Graph Function dump)
+
+Decay patterns / countdowns / cascades through ZP variables
+
+### Load ZP Parameters
+
+ZP address followed by ZP value
+
+Called 30+ times
+
+Parameters for this routine are assembled into memory directly after the
+; call to this routine. When the routine is called using JSR, the return address
+; will be the address of the first parameter, so they can be pulled off using PLA.
+; First two stack values are the 16-bit address where next two stack values will be stored.
+
+### IRQ Interrupt handler
+
+Prroritize Jetman object
+
+Uses VIA Time to regulate Jetman speed
+
+TV Raster for random number generater
+
+increments 16 bit counter
+
+### Main Loop / Goto NEXT OBJECT
+
+Resets number of aliens and object list index
+
+Gets next object type and uses to jump to object handler
+
+Goto Next Object called after each object handler terminates, special cases for Jetman, laser beam or sound object
+
+Initiates spawning new aliens when needed
+
+Shown OBJECT HANDLERL in differenet place in the code
+
+### Timer Interrupt Handlers
+
+Used for regulating Jetman movement update speed, inturrepting and updating Jetman as highest prioirty, 
+
+### SOUND OBJECT
+
+Processed by the oject handler, just like the sprites. 
+
+Data entered into the sound object by other object handlens is used to index into a jump table to the sound routines.
+
+Sounds are veri simple
+
+code 26cd-26EF code 271C-2758
+
+### VALUABLES
+
+Valuables objects have movement, can be picked up by Jetman and can change colour, depending on what valuable tehy are.
+
+Like the sound object, a jump table is used to jump to the appropriate handler.
+
+### ANIMATE EXPLOSIONS
+
+Explosions are set to random colours, except green, which is reserved for platforms.
+
+### ALIEN WAVES
+
+### 0 FUZZBALL
