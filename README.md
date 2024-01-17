@@ -213,3 +213,5 @@ Explosions are set to random colours, except green, which is reserved for platfo
 ### 2 SPHERE
 
 ### 3 SAUCER
+
+<https://github.com/mwenge/iridisalpha/blob/8c28bb4a3de73ab5a8277125c3842846e9634e77/src/iridisalpha.asm#L7372-L7423>
