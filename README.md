@@ -75,7 +75,7 @@ The makefile in the root of the repository contains all these steps, running `ma
 
 ### Linux / Mac
 
-I've never tried this, but dasmfw is simple C++ program designed to be easy to compile for your platform. as65 is available as a Linux version, which may also work on Mac. The other utils are standard Unix tools so are probably available on Linux / Mac by default.
+I've never tried this, but dasmfw is C++ program designed to be easy to compile for your platform. as65 is available as a Linux version, which may also work on Mac. The other utils are standard Unix tools so are probably available on Linux / Mac by default.
 
 [Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
 
@@ -99,32 +99,41 @@ See also the further readme files in the lower level directories of the reposito
 
 [Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
 
-## Highlights of the Source Code
+## An Analysis of the Source Code
 
 The project originally started off to find out how the smooth sprite graphics worked, I had an idea in my head, but wanted to see if this was indeed how it was done. However, JETPAC was not built on existing set of libraries, the original Sinclair ZX Spectrum version of the game was completely original and the VIC-20 version was a port of that.
 
 The graphics engine was not standalone, it's completely embedded into the rest of the game code, so I, inevitibly, ended up reverse a lot more than just a sprite engine. In the end I just decided to do all of it. The point then became how to reveal the secrets of the VIC-20 version of the game, given it was the only ULTIMATE game produced on the VIC-20 and thus is somewhat unique.
 
-KEY STUFF
+### Source Code Map
 
-PROGRAM IS AN OBJECT ENGINE
+The complete binary disassembly process generates a single source code file, to which I have added large-font banners to all the important routines so they can be seen from a source code map, shown below, to get an overall 'feel' for the code. The key routines that are called from Main Loop have banners with horizontal lines top and bottom e.g. DISPLAY LASERS near the start of the file.
 
-LISTING: BANNER TEXT SHOWS ROUTINES FROM MAIN-LOOP JUMP TABLE
-LOAD ZP PARAMETERS - probably for speed
+<img title="" src="docs\JETPAC_source_code_map.PNG" alt="" width="1026" height="">
 
-Show Object Map code
+The source code can be, roughly, viewed as four parts:
 
-OVERVIEW from WORD
+1. Program Start / Initialise / Game Select / Main Loop
 
-### Program Start - #### Initial Hardware Configuration
+2. Object handlers called from Main Loop
 
-JETPAC requires an 8KiB memory expansion and, once to program has been loaded into memory between \$2000 and \$3FFF, execution starts at \$201D, where it sets up the interrupt handler vectors, erases variable memory, sets-up the VIA I/O ports and sets-up the VIC chip, which configures the screen parameters to 11 rows by 23 columns, with each character being 16x8 pixels wide by 16 pixels high, or 
+3. Routines for reading control and drawing text and objects to the screen
 
-### Screen RAM, Used-Defined Graphics RAM and Colour RAM mapping
+4. User-Defined Graphics data
+
+### Program Start - Initial Hardware Configuration
+
+JETPAC requires an 8KiB memory expansion and, once the program has been loaded into memory between \$2000 and \$3FFF.
+
+Execution starts at \$201D, where it sets up the interrupt handler vectors, erases variable memory, sets-up the VIA I/O ports and configures the VIC chip. 
+
+The VIC chip configures the Screen RAM, Used-Defined Graphics RAM and Colour RAM mapping parameters to 11 rows by 23 columns, with each character being 16x8 pixels wide by 16 pixels high, and in this mode, colour tiles are also 16x8 pixels. 
+
+<https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/fd7f216bcb76b5fe6a971eb5903b52bf7b668cb4/dasmfw/jetpac.a65#L400C1-L437C133>
 
 ### Game Select
 
-First usage of bitmap graphics, reverses the text on screen, doesn't replace characters.
+The game select screen flashes the chosen options, by inverting the characters already drawn onto the screen on a continual basis until start game is selected.
 
 ### Init Laser Objects
 
@@ -198,3 +207,9 @@ Explosions are set to random colours, except green, which is reserved for platfo
 ### ALIEN WAVES
 
 ### 0 FUZZBALL
+
+### 1 CROSS
+
+### 2 SPHERE
+
+### 3 SAUCER
