@@ -133,80 +133,81 @@ The VIC chip configures the Screen RAM, Used-Defined Graphics RAM and Colour RAM
 
 ### Game Select
 
-The game select screen flashes the chosen options, by inverting the characters already drawn onto the screen on a continual basis until start game is selected.
+The game select screen flashes the chosen options, by inverting the characters already drawn onto the screen on a continual basis until start game is selected. The keyboard is read to select game options and space starts the game. 
 
 ### Init Laser Objects
 
-Max four laser objects
+There are a maximum of four laser objects used at any one time. The initialisation routine works out where Jetman is onscreen and the direction he faces, whether the new laser being created will screen-wrap, the vertical height of Jetman's gun and then creates an object with these parameters, together with a random length and colour from a colour table using the IRQ timer.
 
-Init routine works out where jetman is, direction he faces, whether laser will screen-wrap, vertical height of gun, sets up object with these parameters and a random length and colour from a colour table using the IRQ timer.
-
-### Display Lasers
+### DISPLAY LASERS
 
 (Graph Function dump)
 
-Decay patterns / countdowns / cascades through ZP variables
+This subroutine is called from main loop and is used to update one of the lasers on display.
+
+Once a laser has been fired, over several animation frames, it increases in length to a predetermined size, then decays in four sections by having bits removed from the screen i.e. it starts off as a solid line then becomes dotted and eventually disappears.
+
+The patterns of dots are predetermined from a data table and current decay state is stored in the object record itself.
 
 ### Load ZP Parameters
 
-ZP address followed by ZP value
+This utility routine is used to load multiple 16-bit static data values, e.g. addresses, into one or more Zero Page variables. 
 
-Called 30+ times
+The routine is called from 30+ places in the code than any other routine. 
 
-Parameters for this routine are assembled into memory directly after the
-; call to this routine. When the routine is called using JSR, the return address
-; will be the address of the first parameter, so they can be pulled off using PLA.
-; First two stack values are the 16-bit address where next two stack values will be stored.
+The data to be loaded is assembled directly after the call to the routine, which then utilizes the return address to get the data, incrementing the eventual return address as it goes along. 
+
+When `$FF` is encountered, the routine returns to continue after the call and data.
 
 ### IRQ Interrupt handler
 
-Prroritize Jetman object
+The game utilises a VIA timer to:
 
-Uses VIA Time to regulate Jetman speed
+- Prioritize object list updates to the Jetman object (so he's always responsive)
 
-TV Raster for random number generater
+- Create a random number generator, in conjunction with the TV Raster
 
-increments 16 bit counter
+- Increments 16 bit counter used in various places in the code. 
 
-### Main Loop / Goto NEXT OBJECT
+### Main Loop / GOTO NEXT OBJECT
 
-Resets number of aliens and object list index
+`Main_Loop` gets next active object type from the object table and, using an indexed jump table, uses it to jump to the appropriate object handler and when the processing for each object has completed, `GOTO_NEXT_OBJECT` is called.
 
-Gets next object type and uses to jump to object handler
+GOTO NEXT OBJECT prioritises object cases for Jetman, laser beam and sound objects and initiates spawning of new aliens when needed.
 
-Goto Next Object called after each object handler terminates, special cases for Jetman, laser beam or sound object
-
-Initiates spawning new aliens when needed
-
-Shown OBJECT HANDLERL in differenet place in the code
+In the code, object handlers called directly by Main Loop are written in bold e.g. `DISPLAY_LASERS`.
 
 ### Timer Interrupt Handlers
 
-Used for regulating Jetman movement update speed, inturrepting and updating Jetman as highest prioirty, 
+Once the timer has triggered an IRQ interrupt, this routine will stash the next  object to be handled, update Jetman next, then restoring the next object and serves to regulate Jetman's movement update speed
 
 ### SOUND OBJECT
 
-Processed by the oject handler, just like the sprites. 
+Sounds are processed by the object handler, just like the display sprites. 
 
-Data entered into the sound object by other object handlens is used to index into a jump table to the sound routines.
+Data entered into the sound object by other object handlers is used to index into a jump table to process the various sound routines.
 
-Sounds are veri simple
-
-code 26cd-26EF code 271C-2758
+The sounds are quite simple and don't take up much memory, but are effective.
 
 ### VALUABLES
 
-Valuables objects have movement, can be picked up by Jetman and can change colour, depending on what valuable tehy are.
+Valuables objects have movement, can be picked up by Jetman and can change colour, depending on what valuable they are.
 
 Like the sound object, a jump table is used to jump to the appropriate handler.
 
 ### ANIMATE EXPLOSIONS
 
-Explosions are set to random colours, except green, which is reserved for platforms.
+When an object explodes, e.g. an alien is hit by a laser, it's object type is changed to an Explosion and subsequent calls to this routine will animate the explosion though a list of explosion graphics from a data table and then ending.
 
-### ALIEN WAVES
+Explosions are set to random colours, except green, which is reserved for platforms. 
+
+### Alien Waves
+
+The eight alien waves of the original Spectrum version were truncated to only four for the VIC-20 version of the game and, similarly the four different ships on Spectrum were halved to two for VIC-20, probably due to memory constraints.
 
 ### 0 FUZZBALL
+
+The aliens of the first wave are simply objects that float across the screen with a randomly generated trajectory, either parallel with the planet surface or slowly falling to each, and any contact will cause them to explote.
 
 ### 1 CROSS
 
