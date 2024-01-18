@@ -3609,34 +3609,34 @@ Invert_Direction_Alternate
 Spawn_Ship_Modules_Fuel_Cell
     lda     Obj_Jetman_State                ; 2B4B: AD 80 03 
     and     #%00111111                      ; 2B4E: 29 3F    
-    bne     Spawn_RMFC                      ; 2B50: D0 01    
+    bne     Spawn_SMFC                      ; 2B50: D0 01    
 
 ; L_BRS_($2B52)_($2B55) OK
 ; L_BRS_($2B52)_($2B5A) OK
 ; L_BRS_($2B52)_($2B61) OK
 ; L_BRS_($2B52)_($2B69) OK
-Spawn_RMFC_RTS
+Spawn_SMFC_RTS
     rts                                     ; 2B52: 60       
 ; ==========================================
 
 ; Return if Jetman not only flying or standing or no ship module/fuel onscreen
 ; L_BRS_($2B53)_($2B50) OK
-Spawn_RMFC
+Spawn_SMFC
     cmp     #NOT_FLYING_AND_NOT_STANDING    ; 2B53: C9 03    
-    bcs     Spawn_RMFC_RTS                  ; 2B55: B0 FB    
+    bcs     Spawn_SMFC_RTS                  ; 2B55: B0 FB    
     lda     Obj_Ship_Top_Or_Fuel_Type       ; 2B57: AD B8 03 
-    bne     Spawn_RMFC_RTS                  ; 2B5A: D0 F6    
+    bne     Spawn_SMFC_RTS                  ; 2B5A: D0 F6    
 
 ; Return if ship is built and fuelled up
     lda     Obj_Ship_Base_Fuel_Level        ; 2B5C: AD B2 03 
     cmp     #SHIP_BUILT_AND_FUELLED_UP      ; 2B5F: C9 06    
-    bcs     Spawn_RMFC_RTS                  ; 2B61: B0 EF    
+    bcs     Spawn_SMFC_RTS                  ; 2B61: B0 EF    
 
 ; Use counter to randomly spawn another Fuel Cell
     lda     ZP_IRQ_Counter_Lo               ; 2B63: A5 4A    
     eor     #%11111111                      ; 2B65: 49 FF    
     and     #%00001111                      ; 2B67: 29 0F    
-    bne     Spawn_RMFC_RTS                  ; 2B69: D0 E7    
+    bne     Spawn_SMFC_RTS                  ; 2B69: D0 E7    
 
 ; Init Ship Part or Fuel Cell object (8 attributes)
     ldx     #NUM_OBJECT_PARAMS              ; 2B6B: A2 07    
@@ -3924,10 +3924,10 @@ WAVE_0_FUZZBALL
 
 
 
-; 88     888888 Yb    dP 888888 88          dP""b8  dP"Yb  8b    d8 8b    d8  dP"Yb  88b 88
-; 88     88__    Yb  dP  88__   88         dP   `" dP   Yb 88b  d88 88b  d88 dP   Yb 88Yb88
-; 88  .o 88""     YbdP   88""   88  .o     Yb      Yb   dP 88YbdP88 88YbdP88 Yb   dP 88 Y88
-; 88ood8 888888    YP    888888 88ood8      YboodP  YbodP  88 YY 88 88 YY 88  YbodP  88  Y8
+; Yb        dP    db    Yb    dP 888888      dP""b8  dP"Yb  8b    d8 8b    d8  dP"Yb  88b 88
+;  Yb  db  dP    dPYb    Yb  dP  88__       dP   `" dP   Yb 88b  d88 88b  d88 dP   Yb 88Yb88
+;   YbdPYbdP    dP__Yb    YbdP   88""       Yb      Yb   dP 88YbdP88 88YbdP88 Yb   dP 88 Y88
+;    YP  YP    dP""""Yb    YP    888888      YboodP  YbodP  88 YY 88 88 YY 88  YbodP  88  Y8
 
 ; Alien has been hit by laser, use current player wave to create points table offset
 ; L_JMP_($2C78)_($2A64) OK
@@ -4794,18 +4794,7 @@ Fuel_Dropped
     jsr     Display_Object_Ship_Or_Fuel     ; 2F88: 20 5A 30 
     jmp     Disable_Object_In_List          ; 2F8B: 4C 65 2F 
 ; ------------------------------------------
-; On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two ship parts
-; On game startup 03B8+04=00, 03C0+4=01
-; Pickup  middle section 03B8+04=00, 03C0+4=03
-; Falling middle section 03B8+04=00, 03C0+4=07
-; Landed  middle section 03B8+04=01, 03C0+4=07
-; 03C0 turns into a 0E_Valuable, 03B8 goes round the same cycle as 03C0
-; 03B8 becomes a fuel cell
-; When middle ship section deposited, only 03B8 checked, despite dropped valuable
-; When top ship section lifted, still only 03B8 checked, despite dropped valuable
-; When top ship section deposited and fuel dropped, still only 03B8 checked
-; When fuel picked-up and dropping onto ship, still 03B8 checked.
-; When fuel drops into ship, for a short time, no interrupt until next fuel cell drops 03B8
+
 SHIP_PART_OR_FUEL
     jsr     Load_Object_Type_X_Y            ; 2F8E: 20 D7 35 
 
@@ -5140,6 +5129,11 @@ Read_ZP_Params_Player_2_Score
 
 
 
+; 888888 888888 .dP"Y8 888888
+;   88   88__   `Ybo."   88
+;   88   88""   o.`Y8b   88
+;   88   888888 8bodP'   88
+
 ; 88""Yb 88        db    888888 888888  dP"Yb  88""Yb 8b    d8
 ; 88__dP 88       dPYb     88   88__   dP   Yb 88__dP 88b  d88
 ; 88"""  88  .o  dP__Yb    88   88""   Yb   dP 88"Yb  88YbdP88
@@ -5149,11 +5143,6 @@ Read_ZP_Params_Player_2_Score
 ; dP   `" dP   Yb 88     88     88 `Ybo." 88 dP   Yb 88Yb88
 ; Yb      Yb   dP 88  .o 88  .o 88 o.`Y8b 88 Yb   dP 88 Y88
 ;  YboodP  YbodP  88ood8 88ood8 88 8bodP' 88  YbodP  88  Y8
-
-; 888888 888888 .dP"Y8 888888
-;   88   88__   `Ybo."   88
-;   88   88""   o.`Y8b   88
-;   88   888888 8bodP'   88
 
 ; Perform Absolute on Register A containing Distance X of object from left side of first platform
 ; L_BRS_($309B)_($30CB) OK
@@ -5537,7 +5526,7 @@ JMP_Update_Jetman_Position_X
 
 ; L_BRS_($31CE)_($31C9) OK
 Fly_Right_Impact
-    beq     SKIP_31D7                       ; 31CE: F0 07    
+    beq     Flying_Left_or_Store_Dir_X      ; 31CE: F0 07    
     eor     #$FF                            ; 31D0: 49 FF    
     adc     #$03                            ; 31D2: 69 03    
 ; L_BRS_($31D4)_($31DD) OK
@@ -5546,7 +5535,7 @@ JMP_Store_Jetman_Direction_X_
 ; ------------------------------------------
 
 ; L_BRS_($31D7)_($31CE) OK
-SKIP_31D7
+Flying_Left_or_Store_Dir_X
     ldy     #$00                            ; 31D7: A0 00    
     bit     ZP_Jetman_Action                ; 31D9: 24 1C    
     bvc     Flying_Left                     ; 31DB: 50 4B    
@@ -5556,7 +5545,7 @@ SKIP_31D7
 ; L_BRS_($31DF)_($31C5) OK
 Fly_Left_Impact
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 31DF: B1 00    
-    beq     SKIP_31EA                       ; 31E1: F0 07    
+    beq     Flying_Right_or_Store_Dir_X     ; 31E1: F0 07    
     bpl     JMP_Update_Jetman_Position_X    ; 31E3: 10 E6    
     eor     #$FF                            ; 31E5: 49 FF    
 
@@ -5566,7 +5555,7 @@ JMP_Store_Jetman_Direction_X
 ; ------------------------------------------
 
 ; L_BRS_($31EA)_($31E1) OK
-SKIP_31EA
+Flying_Right_or_Store_Dir_X
     ldy     #$00                            ; 31EA: A0 00    
     bit     ZP_Jetman_Action                ; 31EC: 24 1C    
     bpl     Flying_Right                    ; 31EE: 10 4E    
@@ -5624,11 +5613,11 @@ Flying_Up_Impact_Bounce
     tax                                     ; 3218: AA       
     lda     ZP_Jetman_Action                ; 3219: A5 1C    
     bit     MASK_00010000                   ; 321B: 2C 18 20 
-    bne     SKIP_3224                       ; 321E: D0 04    
+    bne     JMP_Update_Jetman_Position_Y_   ; 321E: D0 04    
     lda     #$00                            ; 3220: A9 00    
     beq     JMP_Store_Jetman_Direction_Y    ; 3222: F0 EE    
 ; L_BRS_($3224)_($321E) OK
-SKIP_3224
+JMP_Update_Jetman_Position_Y_
     txa                                     ; 3224: 8A       
     jmp     Update_Jetman_Position_Y        ; 3225: 4C C7 32 
 ; ------------------------------------------
@@ -5663,13 +5652,13 @@ Flying_Right
     cmp     #$08                            ; 3246: C9 08    
     beq     Update_Jetman_Position_X_       ; 3248: F0 5C    
     cmp     #$09                            ; 324A: C9 09    
-    beq     SKIP_3254                       ; 324C: F0 06    
+    beq     JMP_Store_Jetman_Dir_X          ; 324C: F0 06    
     clc                                     ; 324E: 18       
     adc     #$01                            ; 324F: 69 01    
     jmp     Store_Jetman_Direction_X        ; 3251: 4C A2 32 
 ; ------------------------------------------
 ; L_BRS_($3254)_($324C) OK
-SKIP_3254
+JMP_Store_Jetman_Dir_X
     lda     #$08                            ; 3254: A9 08    
     jmp     Store_Jetman_Direction_X        ; 3256: 4C A2 32 
 ; ------------------------------------------
@@ -6284,17 +6273,6 @@ Load_UDG_RAM_Addr_Player_2
 ; 88""Yb   8P     88   88""   o.`Y8b
 ; 88oodP  dP      88   888888 8bodP'
 
-; ----------------------------------------------------
-; Display_BCD_Bytes
-; ----------------------------------------------------
-; FUNCTION  : Display
-;             Scores
-; CALLED BY :
-; CALLS     :
-; ARGUMENTS : ZP_UDG_RAM_X ZP_UDG_RAM_Y = UDG array absolute position to display score at
-;             ZP_Ptr_To_Str             = Players score in ZP as BCD e.g. 12 34 56
-;             ZP_Temp_1                 = BCD byte counter i.e. number of bytes to display
-; ----------------------------------------------------
 ; Example for score of 12 34 56 at ZP51-53
 ; L_JMP_($34A4)_($247E) OK
 ; L_JMP_($34A4)_($248E) OK
@@ -6345,17 +6323,6 @@ Test_All_Bytes_Displayed
     rts                                     ; 34CB: 60       
 ; ==========================================
 
-; ----------------------------------------------------
-; FUNCTION  :
-; CALLED BY :
-; CALLS     :
-; ARGUMENTS :
-; ZP_PTR_TO_STR  = "COPYRIGHT`qyxs`An" or "JETPAC`GAME`SELEC"
-; ZP_ColourRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
-; ZP_UDG_RAM_X   = 08 A8 or 08 20
-; ZP_UDG_RAM_Y   = 08 A8 or 08 20
-; ZP_Addr_From   = 70 80 or 28 80
-; ----------------------------------------------------
 ; L_JSR_($34CC)_($2445) OK
 ; L_JSR_($34CC)_($24D4) OK
 ; L_JSR_($34CC)_($24E1) OK

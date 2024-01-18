@@ -1420,10 +1420,10 @@ comment  2B4B Test if Jetman is onscreen
 label    2B4B Spawn_Ship_Modules_Fuel_Cell
 binary   2B4F
 comment  2B52
-label    2B52 Spawn_RMFC_RTS
+label    2B52 Spawn_SMFC_RTS
 comment  2B53
 comment  2B53 Return if Jetman not only flying or standing or no ship module/fuel onscreen
-label    2B53 Spawn_RMFC
+label    2B53 Spawn_SMFC
 deflabel 2B54 NOT_FLYING_AND_NOT_STANDING
 comment  2B5C
 comment  2B5C Return if ship is built and fuelled up
@@ -1910,18 +1910,7 @@ deflabel 2F78 OBJECT_POSITION_Y_PARAM
 deflabel 2F7C FUEL_POSITION_Y_WHEN_LANDED
 comment  2F7F
 comment  2F7F Fuel cell has landed, increment the counter
-comment  2F8E On game startup whilst score flash, no Jetman, no Aliens, alternates between 03B8 and 03C0 i.e. two ship parts
-comment  2F8E On game startup 03B8+04=00, 03C0+4=01
-comment  2F8E Pickup  middle section 03B8+04=00, 03C0+4=03
-comment  2F8E Falling middle section 03B8+04=00, 03C0+4=07
-comment  2F8E Landed  middle section 03B8+04=01, 03C0+4=07
-comment  2F8E 03C0 turns into a 0E_Valuable, 03B8 goes round the same cycle as 03C0
-comment  2F8E 03B8 becomes a fuel cell
-comment  2F8E When middle ship section deposited, only 03B8 checked, despite dropped valuable
-comment  2F8E When top ship section lifted, still only 03B8 checked, despite dropped valuable
-comment  2F8E When top ship section deposited and fuel dropped, still only 03B8 checked
-comment  2F8E When fuel picked-up and dropping onto ship, still 03B8 checked.
-comment  2F8E When fuel drops into ship, for a short time, no interrupt until next fuel cell drops 03B8
+comment  2F8E
 label    2F8E SHIP_PART_OR_FUEL
 comment  2F91
 comment  2F91 Test status of the ship part or fuel cell object
@@ -2059,53 +2048,6 @@ comment  30AB from Reg A distance from obj to left side of platform
 lcomment 30AF Object is much further right than the platform
 comment  30B3
 comment  30B3 Load object Position X and Y into working variables
-; comment  30B3 ----------------------------------------------------
-; comment  30B3 Platform Collision Test
-; comment  30B3 ----------------------------------------------------
-; comment  30B3 FUNCTION  : setsoe
-; comment  30B3 \            snethuoistn
-; comment  30B3 \            ethonshu.
-; comment  30B3 CALLED BY :
-; comment  30B3 CALLS     : Nothing
-; comment  30B3 ARGUMENTS : ZP_xxxx
-; comment  30B3 \            satoehsaeuht
-; comment  30B3 \            sathoeusanteho
-; comment  30B3 ----------------------------------------------------
-; comment  30B3 Triggers with Jetman and 3 objects, then again with Jetman and different 3 objects, then...
-; comment  30B3 ZP02 Return Codes:
-;
-; comment  30B3 $8F 0001_1111 Alien dl to dl corner skim
-; comment  30B3 $8F 0001_1111 Alien dl to dr corner hit
-;
-; comment  30B3 $8E 0001_1110 Alien ul to ur
-;
-; comment  30B3 $8B 0001_1011 Alien dl to ul
-;
-; comment  30B3 $8A 0001_1010 Alien dl to ul
-;
-; comment  30B3 $89 0001_1001 Alien dl to ul
-;
-; comment  30B3 $88 0001_1000 Alien dl to ul
-; comment  30B3 $88 0001_1000 Alien dr to ur
-;
-; comment  30B3 $87 0001_0111 Alien dr to dl
-;
-; comment  30B3 $86 0001_0110 Alien ul to ur corner hit
-;
-; comment  30B3 $83 0001_0011 Alien ul to ul
-; comment  30B3 $83 0001_0011 Alien ur to dr
-;
-; comment  30B3 $82 0001_0010 Alien ul to dl
-;
-; comment  30B3 $81 0001_0001 Alien ul to dl
-; comment  30B3 $81 0001_0001 Alien ur to dr
-;
-; comment  30B3 $80 0001_0000 Alien ur to dr
-; comment  30B3 $80 0001_0000 Alien ul to dl
-; comment  30B3 Bit 0:
-; comment  30B3 Bit 1:
-; comment  30B3 Bit 2:
-; comment  30B3 Bit 3:
 label    30B3 Test_Platform_Collision
 deflabel 30B4 OBJECT_POSITION_X_PARAM
 comment  30B9
@@ -2260,14 +2202,14 @@ comment  31CE
 label    31CE Fly_Right_Impact
 label    31D4 JMP_Store_Jetman_Direction_X_
 comment  31D7
-label    31D7 SKIP_31D7
+label    31D7 Flying_Left_or_Store_Dir_X
 comment  31DF
 comment  31DF BVS/BVC above means below code can only be jumped/branched to
 label    31DF Fly_Left_Impact
 comment  31E7
 label    31E7 JMP_Store_Jetman_Direction_X
 comment  31EA
-label    31EA SKIP_31EA
+label    31EA Flying_Right_or_Store_Dir_X
 comment  31F2
 comment  31F2
 comment  31F2 BVS/BVC above means below code can only be jumped/branched to
@@ -2295,14 +2237,14 @@ comment  3215
 label    3215 JMP_Update_Jetman_Position_Y
 comment  3218
 label    3218 Flying_Up_Impact_Bounce
-label    3224 SKIP_3224
+label    3224 JMP_Update_Jetman_Position_Y_
 comment  3228
 label    3228 Flying_Left
 comment  3230
 comment  323E
 label    323E Flying_Right
 comment  3246
-label    3254 SKIP_3254
+label    3254 JMP_Store_Jetman_Dir_X
 comment  3259 HOW DO YOU EVER GET HERE?
 label    325E CLC_ADC_JMP_Store_JM_Dir_X
 label    3264 Wrap_Left_To_Right
@@ -2561,17 +2503,6 @@ lcomment 349E X Y position in pixels
 const    349E
 break    34A0
 comment  34A4
-comment  34A4 ----------------------------------------------------
-comment  34A4 Display_BCD_Bytes
-comment  34A4 ----------------------------------------------------
-comment  34A4 FUNCTION  : Display
-comment  34A4 \            Scores
-comment  34A4 CALLED BY :
-comment  34A4 CALLS     :
-comment  34A4 ARGUMENTS : ZP_UDG_RAM_X ZP_UDG_RAM_Y = UDG array absolute position to display score at
-comment  34A4 \            ZP_Ptr_To_Str             = Players score in ZP as BCD e.g. 12 34 56
-comment  34A4 \            ZP_Temp_1                 = BCD byte counter i.e. number of bytes to display
-comment  34A4 ----------------------------------------------------
 comment  34A4 Example for score of 12 34 56 at ZP51-53
 label    34A4 Display_BCD_Bytes
 comment  34A6
@@ -2597,17 +2528,6 @@ comment  34C7
 comment  34C7 Test all score bytes displayed, if not, loop back
 label    34C7 Test_All_Bytes_Displayed
 comment  34CC
-comment  34CC ----------------------------------------------------
-comment  34CC FUNCTION  :
-comment  34CC CALLED BY :
-comment  34CC CALLS     :
-comment  34CC ARGUMENTS :
-comment  34CC ZP_PTR_TO_STR  = "COPYRIGHT`qyxs`An" or "JETPAC`GAME`SELEC"
-comment  34CC ZP_ColourRAMPtr = "SP START GAME" or "JETPAC`GAME`SELEC"
-comment  34CC ZP_UDG_RAM_X   = 08 A8 or 08 20
-comment  34CC ZP_UDG_RAM_Y   = 08 A8 or 08 20
-comment  34CC ZP_Addr_From   = 70 80 or 28 80
-comment  34CC ----------------------------------------------------
 label    34CC Display_String_With_Setup
 label    34D2
 comment  34D2

@@ -181,7 +181,7 @@ In the code, object handlers called directly by Main Loop are written in bold e.
 
 Once the timer has triggered an IRQ interrupt, this routine will stash the next  object to be handled, update Jetman next, then restoring the next object and serves to regulate Jetman's movement update speed
 
-### SOUND OBJECT
+### SOUND UPDATE
 
 Sounds are processed by the object handler, just like the display sprites. 
 
@@ -191,7 +191,7 @@ The sounds are quite simple and don't take up much memory, but are effective.
 
 ### VALUABLES
 
-Valuables objects have movement, can be picked up by Jetman and can change colour, depending on what valuable they are.
+Valuable objects have movement, can be picked up by Jetman and can change colour, depending on which valuable they are.
 
 Like the sound object, a jump table is used to jump to the appropriate handler.
 
@@ -203,16 +203,110 @@ Explosions are set to random colours, except green, which is reserved for platfo
 
 ### Alien Waves
 
-The eight alien waves of the original Spectrum version were truncated to only four for the VIC-20 version of the game and, similarly the four different ships on Spectrum were halved to two for VIC-20, probably due to memory constraints.
+The eight alien waves and two rocket ships of the original Spectrum version were reduced to only four and two respectively for the VIC-20 version of the game, probably due to memory constraints.
 
-### 0 FUZZBALL
+Each alien on each wave has it's own object in the object table and is handled separately.
 
-The aliens of the first wave are simply objects that float across the screen with a randomly generated trajectory, either parallel with the planet surface or slowly falling to each, and any contact will cause them to explote.
+### WAVE 0 FUZZBALL
 
-### 1 CROSS
+Wave 0 fuzzballs are simply objects that float across the screen with a randomly generated trajectory, either parallel with the planet surface or slowly falling to each, and any contact will cause them to explode.
 
-### 2 SPHERE
+The first test, common to all waves, is whether the alien has been hit by a laser, if it has, the common score routine calculates the increased score based on the wave.
 
-### 3 SAUCER
+Otherwise, the alien is tested to see if it has collided with a platform, which, for Wave 0, this causes it to morph into an explosion object, else it's new position on screen is stored to it's object record and it is redrawn.
 
-<https://github.com/mwenge/iridisalpha/blob/8c28bb4a3de73ab5a8277125c3842846e9634e77/src/iridisalpha.asm#L7372-L7423>
+### WAVE 1 CROSS
+
+Wave 1 is similar to Wave 0, except the alien graphic is different and collisions with platform result in the alien bouncing off in a different direction.
+
+### WAVE 2 SPHERE
+
+Wave 2 is similar to Wave 1, except the alien graphic is different and the alien will also change direction on a random basis, based on the random number produced by the IRQ and Raster interrupt values.
+
+### WAVE 3 SAUCER
+
+Wave 3 is similar to Wave 0, except the alien graphic is different and the alien direction is dictated by the position of Jetman - they home in on him.
+
+### Spawn Objects (\$2B4B)
+
+These routines handle creation of new objects depending on game parameters, e.g. whether Jetman is on-screen, whether all Ship Parts and Fuel Cells have been collected. 
+
+The position of the new object is semi-randomly chosen from look-up table of X-axis start positions.
+
+### SHIP ASCEND/DESCEND (\$2E17/\$2E4E)
+
+When the ascend/decent objects are triggered at end of level, Jetman is removed from the screen and the ship goes up and comes back down again to the next Wave. 
+
+Because it will not fit on the screen until the ship is a several lines off the bottom, the rocket flame has a delay before it is displayed.
+
+### SHIP BOTTOM MODULE (\$2E74)
+
+The rocket ship consists of 3 modules (or parts) and, during normal play, the bottom part is always in the same place, but when the modules that are on the platforms at the start of levels are collected and dropped onto the base, this routine draws the extra modules, coloured depending on the number fo Fuel Cells collected and dropped. 
+
+Additionally, dependent on Fuel Cells collected, this routine collision detects Jetman with the ship for end of level detection.
+
+### SHIP PART OR FUEL (\$2F8E)
+
+The objects on-screen for Ship Modules and Fuel Cells and Valuables share some of the same object list locations, so this routine has some calculations and masks to manage the objects list parameters appropriately.
+
+### Jetman Collide Ship Fuel (\$2FEE)
+
+This collision test can result in a Fuel Cell or Ship Module object being picked up and following Jetman around.
+
+Note the picked-up object isn't updated on-screen as often as Jetman so they move along in jumps after Jetman. 
+
+In my mind, this characteristic is one of the memorable aspects of JETPAC and gives the game an extra liveliness. 
+
+### Test Platform Collision
+
+A complicated routine that is used for testing all on-screen objects whether they have collided with a platform e.g. objects falling from the top of the screen, Jetman or Aliens flying in any direction. 
+
+The collision testing sets bits in a return status byte that is the tested by the calling routine to see whether the collision is of relevance.
+
+See the flowchart and source code for more insight.
+
+### JETMAN FLYING (\$31BF)
+
+Possibly the most complicated routine in the program.
+
+Routine reads the controls then tests if Jetman has collided with a platform, if so, Jetman's position and direction are updated.
+
+Additionally, if the fire button was pressed, laser shots are initiated. 
+
+### JETMAN STANDING (\$332C)
+
+Similar to JETMAN FLYING, but without the Platform Collision tests.
+
+### Read Keyboard Joystick (\$33F7)
+
+Depending on user-selected game options, Joystick or keyboard controls are read, both are read through the VIA I/O interface chips.
+
+The keyboard control is quite novel in the way it allows several different keys to be used to play the game, which are grouped based on the hardware keyboard matrix. 
+
+### Convert XY to UDG RAM Address (\$351D)
+
+Due to the way that the game code configures the VIC chip to be a memory-mapped display, this and a few other routines are needed to convert object X-Y positions to actual memory addresses for object for bitmap and colour display purposes.
+
+This routine utilizes a pre-calculated address look-up table to speed up the process.
+
+### Display Object (\$3601)
+
+Another quite complicated routine and probably where the game spends the majority of it's processing time. 
+
+Generally, the object to be displayed will be moving, so it is given two sets of parameters, one for the objects current position and another for the new position. 
+
+Remember that objects are drawn on the screen using XORing what's there already, which allows on-screen objects to overlap with minimal processing complications. 
+
+The routine will firstly compare the positions of the objects and then erase the lines of the old object that will not be replaced e.g. if the object is moving upwards, you can remove some of the bottom lines from it. 
+
+The objects are then processed in 8 bit columns e.g. 2 or 3 columns to display Jetman, and for each column, the old object bitmap is XOR'd away and then immediately replaced with the new object bitmap, one byte at a time. 
+
+### Colourize Object (\$381F)
+
+Updates the colour map tiles based on the X-Y position of the object it's given, works probably the same way as Sinclair Spectrum games and thus gives you the same colour clash characteristic.
+
+Routine checks to ensure it's not changing the green colour map tiles of the platforms.
+
+### User-Defined Graphics Data Lookup Table - Jetman and Aliens (\$385F)
+
+### User-Defined Graphics Data Lookup Table - Ship Modules, Fuel Cell, Valuables ($3C87)
