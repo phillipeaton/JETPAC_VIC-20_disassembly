@@ -9,14 +9,14 @@ SED           = utils/sed.exe
 MD5SUM        = utils/md5sum.exe
 RM            = utils/rm.exe
 
-# Binary creation
+# Binary creation - NOTE parameters/paths also specified in "nfo_options.nfo"
 BIN_ORIG      = bin_orig/jetpac_2000-3fff.bin
 BIN           = bin/jetpac.bin
 BIN_LIST      = bin/jetpac.lst
 
 # Intemediate and final source code
-SOURCE        = dasmfw/jetpac.a65
-SOURCE_DASMFW = dasmfw/jetpac_dasmfw.a65
+SOURCE        = dasmfw/jetpac.asm
+SOURCE_DASMFW = dasmfw/jetpac_dasmfw.asm
 
 # sed script for post-disassembly local label processing
 SED_SCRIPT    = dasmfw/jetpac.sed
@@ -40,7 +40,6 @@ $(SOURCE): $(SED_SCRIPT) $(SOURCE_DASMFW)
 	$(SED) -f $(SED_SCRIPT) $(SOURCE_DASMFW) > $(SOURCE)
 
 # Disassemble the original binary to source code if any of the info files have been updated
-# NOTE parameters/paths also specified in the info files
 $(SOURCE_DASMFW): $(INFO_FILES)
 	@echo ""; echo "***** Disassemble binary *****"
 	$(DASMFW) -info=$(INFO_INCLUDE)

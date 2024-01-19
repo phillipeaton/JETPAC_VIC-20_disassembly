@@ -18,7 +18,7 @@ JETPAC was one of my favourite games on the VIC-20 in the early '80s, the smooth
 
 [Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
 
-## Project Status
+### Project Status
 
 After 200+ commits over 18 months, it's probably as completed as I will make it:
 
@@ -33,25 +33,25 @@ After 200+ commits over 18 months, it's probably as completed as I will make it:
 
 ## Tools Used
 
-- **Debugger** - MAME debugger was used for single stepping the code and to create the inital code/data separation using the `trackpc` instruction. Functionality appears significantly better than that available in VICE.
+- **Debugger** - [MAME](https://www.mamedev.org/) debugger was used for single stepping the code and to create the initial code/data separation using the `trackpc` instruction. Functionality appears significantly better than that available in VICE.
 
 - **Disassemblers** -
   
-  - **Dasmfw** disassembler was used to disassemble the code, which reads hand-crafted info files and uses them to format the binary code into source code files. Single stepping the code in MAME debugger and subsequest creation of the info files is the vast majority of the work needed.
+  - **[dasmfw](https://github.com/Arakula/dasmfw)** disassembler was used to disassemble the code, which reads hand-crafted info files and uses them to format the binary code into source code files. Single stepping the code in MAME debugger and subsequent creation of the info files is the vast majority of the work needed.
   
-  - **Infiltrator** diasssembler was used to check the code/data separation and provide a list of label references than was then fed into dasmfw for easy reference.
+  - **[Infiltrator](https://csdb.dk/release/?id=100129)** disassembler was used to check the code/data separation and provide a list of label references than was then fed into dasmfw for easy reference.
   
-  - **Ghidra** Function Graph was used later on in the project to visualise the most complex of routines that weren't practical to understand as linear source code or to manually flowchart on paper. Paint.net was used to piece together the graph screenshots.
+  - **[Ghidra](https://ghidra-sre.org/)** Function Graph was used later on in the project to visualise the most complex of routines that weren't practical to understand as linear source code or to manually flowchart on paper. Paint.net was used to piece together the graph screenshots.
 
-- **Automated Source Code Editing** - GNU sed was used for tweaking the disassembled source code (because dasmfw doesn't support local variables yet).
+- **Automated Source Code Editing** - [GNU sed](https://www.gnu.org/software/sed/) was used for tweaking the disassembled source code (because dasmfw doesn't support local variables yet).
 
-- **Assembler** - Dasmfw for 6502 by default produces source code that can be assembled with the as65 assembler, which is what was used. Other assemblers, e.g. 64tass, can also be targetted by dasmfw using parameters, but this has not yet been attempted.
+- **Assembler** - Dasmfw for 6502 by default produces source code that can be assembled with the [Kingswood as65](https://www.kingswood-consulting.co.uk/assemblers/) assembler, which is what was used. Other assemblers, e.g. [64tass](https://sourceforge.net/projects/tass64/), can also be targeted by dasmfw using parameters, but this has not yet been attempted.
 
-- **Build System** - GNU Make was used to sequence the disassembly, post-editing, reassembly and comparison to original binary image. GNU md5sum was used for comparing original and recompiled binary files.
+- **Build System** - [GNU Make](https://www.gnu.org/software/make/) was used to sequence the disassembly, post-editing, reassembly and comparison to original binary image. GNU md5sum was used for comparing original and recompiled binary files.
 
-- **File Comparison** - Beyond Compare was used for comparing binary memory dumps for discovering variables, data structures etc.
+- **File Comparison** - [Beyond Compare](https://www.scootersoftware.com/) was used for comparing binary memory dumps for discovering variables, data structures etc.
 
-- **Other Stuff** - Microsoft Excel was used for making lookup tables of memory maps for I/O, screens, colours, User-Defined Graphics and more. Microsoft Word was used for creating the code listing overview picture.
+- **Other Stuff** - [Excel](https://www.microsoft.com/) was used for making lookup tables of memory maps for I/O, screens, colours, User-Defined Graphics and more. Microsoft Word was used for creating the code listing overview picture.
 
 [Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
 
@@ -65,7 +65,7 @@ The basic approach is:
 
 3. Use [as65](https://www.kingswood-consulting.co.uk/assemblers/) to reassemble the source code back to a binary image.
 
-4. Use [md5sum](https://www.gnu.org/software/coreutils/) to compare the origianal binary image and the newly reassembled binary image to ensure they are identical.
+4. Use [md5sum](https://www.gnu.org/software/coreutils/) to compare the original binary image and the newly reassembled binary image to ensure they are identical.
 
 The info files mentioned above are used to tell dasmfw how the source code should be disassembled. They are developed by observing and/or single-stepping the program code running in the MAME debugger and updating the info files with appropriate disassembly commands.
 
@@ -103,7 +103,7 @@ See also the further readme files in the lower level directories of the reposito
 
 The project originally started off to find out how the smooth sprite graphics worked, I had an idea in my head, but wanted to see if this was indeed how it was done. However, JETPAC was not built on existing set of libraries, the original Sinclair ZX Spectrum version of the game was completely original and the VIC-20 version was a port of that.
 
-The graphics engine was not standalone, it's completely embedded into the rest of the game code, so I, inevitibly, ended up reverse a lot more than just a sprite engine. In the end I just decided to do all of it. The point then became how to reveal the secrets of the VIC-20 version of the game, given it was the only ULTIMATE game produced on the VIC-20 and thus is somewhat unique.
+The graphics engine was not standalone, it's completely embedded into the rest of the game code, so I, inevitably, ended up reverse a lot more than just a sprite engine. In the end I just decided to do all of it. The point then became how to reveal the secrets of the VIC-20 version of the game, given it was the only ULTIMATE game produced on the VIC-20 and thus is somewhat unique.
 
 ### Source Code Map
 
@@ -121,25 +121,23 @@ The source code can be, roughly, viewed as four parts:
 
 4. User-Defined Graphics data
 
-### Program Start - Initial Hardware Configuration
+<mark>DISCUSS OBJECT TABLE</mark>
 
-JETPAC requires an 8KiB memory expansion and, once the program has been loaded into memory between \$2000 and \$3FFF.
+### Program Start (\$201D)
 
-Execution starts at \$201D, where it sets up the interrupt handler vectors, erases variable memory, sets-up the VIA I/O ports and configures the VIC chip. 
+JETPAC requires an 8KiB memory expansion and, once the program has been loaded into memory between \$2000 and \$3FFF, execution starts at \$201D, where it sets up the interrupt handler vectors, erases variable memory, sets-up the VIA I/O ports and configures the VIC chip. 
 
 The VIC chip configures the Screen RAM, Used-Defined Graphics RAM and Colour RAM mapping parameters to 11 rows by 23 columns, with each character being 16x8 pixels wide by 16 pixels high, and in this mode, colour tiles are also 16x8 pixels. 
 
-<https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/fd7f216bcb76b5fe6a971eb5903b52bf7b668cb4/dasmfw/jetpac.a65#L400C1-L437C133>
-
-### Game Select
+### Game Select (\$208F)
 
 The game select screen flashes the chosen options, by inverting the characters already drawn onto the screen on a continual basis until start game is selected. The keyboard is read to select game options and space starts the game. 
 
-### Init Laser Objects
+### Init Laser Objects (\$20E9)
 
 There are a maximum of four laser objects used at any one time. The initialisation routine works out where Jetman is onscreen and the direction he faces, whether the new laser being created will screen-wrap, the vertical height of Jetman's gun and then creates an object with these parameters, together with a random length and colour from a colour table using the IRQ timer.
 
-### DISPLAY LASERS
+### DISPLAY LASERS (\$219A)
 
 (Graph Function dump)
 
@@ -149,7 +147,7 @@ Once a laser has been fired, over several animation frames, it increases in leng
 
 The patterns of dots are predetermined from a data table and current decay state is stored in the object record itself.
 
-### Load ZP Parameters
+### Load ZP Parameters (\$259D)
 
 This utility routine is used to load multiple 16-bit static data values, e.g. addresses, into one or more Zero Page variables. 
 
@@ -159,7 +157,7 @@ The data to be loaded is assembled directly after the call to the routine, which
 
 When `$FF` is encountered, the routine returns to continue after the call and data.
 
-### IRQ Interrupt handler
+### IRQ Interrupt handler (\$25E0)
 
 The game utilises a VIA timer to:
 
@@ -169,19 +167,23 @@ The game utilises a VIA timer to:
 
 - Increments 16 bit counter used in various places in the code. 
 
-### Main Loop / GOTO NEXT OBJECT
+### Main Loop (\$2607)
 
 `Main_Loop` gets next active object type from the object table and, using an indexed jump table, uses it to jump to the appropriate object handler and when the processing for each object has completed, `GOTO_NEXT_OBJECT` is called.
+
+<mark>*(Show Object Handres coed 268C)*</mark>
+
+### GOTO NEXT OBJECT (\$261A)
 
 GOTO NEXT OBJECT prioritises object cases for Jetman, laser beam and sound objects and initiates spawning of new aliens when needed.
 
 In the code, object handlers called directly by Main Loop are written in bold e.g. `DISPLAY_LASERS`.
 
-### Timer Interrupt Handlers
+### Timer Interrupt Handler (\$2669)
 
 Once the timer has triggered an IRQ interrupt, this routine will stash the next  object to be handled, update Jetman next, then restoring the next object and serves to regulate Jetman's movement update speed
 
-### SOUND UPDATE
+### SOUND UPDATE (\$26CD)
 
 Sounds are processed by the object handler, just like the display sprites. 
 
@@ -189,13 +191,13 @@ Data entered into the sound object by other object handlers is used to index int
 
 The sounds are quite simple and don't take up much memory, but are effective.
 
-### VALUABLES
+### VALUABLES (\$283E)
 
 Valuable objects have movement, can be picked up by Jetman and can change colour, depending on which valuable they are.
 
 Like the sound object, a jump table is used to jump to the appropriate handler.
 
-### ANIMATE EXPLOSIONS
+### ANIMATE EXPLOSIONS (\$2934)
 
 When an object explodes, e.g. an alien is hit by a laser, it's object type is changed to an Explosion and subsequent calls to this routine will animate the explosion though a list of explosion graphics from a data table and then ending.
 
@@ -207,7 +209,7 @@ The eight alien waves and two rocket ships of the original Spectrum version were
 
 Each alien on each wave has it's own object in the object table and is handled separately.
 
-### WAVE 0 FUZZBALL
+### WAVE 0 FUZZBALL (\$2C6A)
 
 Wave 0 fuzzballs are simply objects that float across the screen with a randomly generated trajectory, either parallel with the planet surface or slowly falling to each, and any contact will cause them to explode.
 
@@ -215,15 +217,15 @@ The first test, common to all waves, is whether the alien has been hit by a lase
 
 Otherwise, the alien is tested to see if it has collided with a platform, which, for Wave 0, this causes it to morph into an explosion object, else it's new position on screen is stored to it's object record and it is redrawn.
 
-### WAVE 1 CROSS
+### WAVE 1 CROSS (\$2A5F)
 
 Wave 1 is similar to Wave 0, except the alien graphic is different and collisions with platform result in the alien bouncing off in a different direction.
 
-### WAVE 2 SPHERE
+### WAVE 2 SPHERE (\$2A6D)
 
 Wave 2 is similar to Wave 1, except the alien graphic is different and the alien will also change direction on a random basis, based on the random number produced by the IRQ and Raster interrupt values.
 
-### WAVE 3 SAUCER
+### WAVE 3 SAUCER (\$2ABC)
 
 Wave 3 is similar to Wave 0, except the alien graphic is different and the alien direction is dictated by the position of Jetman - they home in on him.
 
@@ -239,7 +241,7 @@ When the ascend/decent objects are triggered at end of level, Jetman is removed 
 
 Because it will not fit on the screen until the ship is a several lines off the bottom, the rocket flame has a delay before it is displayed.
 
-### SHIP BOTTOM MODULE (\$2E74)
+### SHIP BASE MODULE (\$2E74)
 
 The rocket ship consists of 3 modules (or parts) and, during normal play, the bottom part is always in the same place, but when the modules that are on the platforms at the start of levels are collected and dropped onto the base, this routine draws the extra modules, coloured depending on the number fo Fuel Cells collected and dropped. 
 
@@ -257,7 +259,7 @@ Note the picked-up object isn't updated on-screen as often as Jetman so they mov
 
 In my mind, this characteristic is one of the memorable aspects of JETPAC and gives the game an extra liveliness. 
 
-### Test Platform Collision
+### Test Platform Collision (\$30B3)
 
 A complicated routine that is used for testing all on-screen objects whether they have collided with a platform e.g. objects falling from the top of the screen, Jetman or Aliens flying in any direction. 
 
@@ -307,6 +309,20 @@ Updates the colour map tiles based on the X-Y position of the object it's given,
 
 Routine checks to ensure it's not changing the green colour map tiles of the platforms.
 
-### User-Defined Graphics Data Lookup Table - Jetman and Aliens (\$385F)
+### User-Defined Graphics Data Lookup Tables
 
-### User-Defined Graphics Data Lookup Table - Ship Modules, Fuel Cell, Valuables ($3C87)
+The graphics data is mostly referenced by two address lookup tables.
+
+#### Jetman and Aliens (\$385F)
+
+The first lookup table is for Jetman and the alien graphics for each of the four waves and they are characterized by being having animated horizontal movement during the game.
+
+Each UDG frame data ends with some values describing e.g. the number of lines the object data contains and width in columns, but note the data is read from the high-byte downwards for efficient CPU-cycle loops.
+
+Jetman has four frames of animation for standing/walking or flying  in each direction, the alien graphics have two frames each. 
+
+#### Ship Modules, Flames, Fuel Cell, Valuables, Explosions and Platforms ($3C87)
+
+The second block of graphics data has a separate lookup table with addresses for the rocket ship, fuel cell and valuables.
+
+Additionally, graphics data is also present for flames, explosions, fuel cell and platforms, but they are addressed directly, not via any lookup table.
