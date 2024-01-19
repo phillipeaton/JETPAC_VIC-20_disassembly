@@ -123,23 +123,29 @@ The source code can be, roughly, viewed as four parts:
 
 <mark>DISCUSS OBJECT TABLE</mark>
 
-### Program Start (\$201D)
+### [Program Start](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L478)
 
 JETPAC requires an 8KiB memory expansion and, once the program has been loaded into memory between \$2000 and \$3FFF, execution starts at \$201D, where it sets up the interrupt handler vectors, erases variable memory, sets-up the VIA I/O ports and configures the VIC chip. 
 
 The VIC chip configures the Screen RAM, Used-Defined Graphics RAM and Colour RAM mapping parameters to 11 rows by 23 columns, with each character being 16x8 pixels wide by 16 pixels high, and in this mode, colour tiles are also 16x8 pixels. 
 
-### Game Select (\$208F)
+https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L400-L437
+
+https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L513-L520
+
+https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L522-L560
+
+### [Game Select](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L595)
 
 The game select screen flashes the chosen options, by inverting the characters already drawn onto the screen on a continual basis until start game is selected. The keyboard is read to select game options and space starts the game. 
 
-### Init Laser Objects (\$20E9)
+### [Init Laser Objects](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L677)
 
 There are a maximum of four laser objects used at any one time. The initialisation routine works out where Jetman is onscreen and the direction he faces, whether the new laser being created will screen-wrap, the vertical height of Jetman's gun and then creates an object with these parameters, together with a random length and colour from a colour table using the IRQ timer.
 
-### DISPLAY LASERS (\$219A)
+### [DISPLAY LASERS](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L868)
 
-(Graph Function dump)
+(<mark>Graph Function dump)</mark>
 
 This subroutine is called from main loop and is used to update one of the lasers on display.
 
@@ -147,7 +153,7 @@ Once a laser has been fired, over several animation frames, it increases in leng
 
 The patterns of dots are predetermined from a data table and current decay state is stored in the object record itself.
 
-### Load ZP Parameters (\$259D)
+### [Load ZP Parameters](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L1882)
 
 This utility routine is used to load multiple 16-bit static data values, e.g. addresses, into one or more Zero Page variables. 
 
@@ -157,7 +163,7 @@ The data to be loaded is assembled directly after the call to the routine, which
 
 When `$FF` is encountered, the routine returns to continue after the call and data.
 
-### IRQ Interrupt handler (\$25E0)
+### [IRQ Interrupt Handler](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L1960)
 
 The game utilises a VIA timer to:
 
@@ -167,23 +173,23 @@ The game utilises a VIA timer to:
 
 - Increments 16 bit counter used in various places in the code. 
 
-### Main Loop (\$2607)
+### [Main Loop](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2015)
 
 `Main_Loop` gets next active object type from the object table and, using an indexed jump table, uses it to jump to the appropriate object handler and when the processing for each object has completed, `GOTO_NEXT_OBJECT` is called.
 
 <mark>*(Show Object Handres coed 268C)*</mark>
 
-### GOTO NEXT OBJECT (\$261A)
+### [GOTO NEXT OBJECT](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2063)
 
 GOTO NEXT OBJECT prioritises object cases for Jetman, laser beam and sound objects and initiates spawning of new aliens when needed.
 
 In the code, object handlers called directly by Main Loop are written in bold e.g. `DISPLAY_LASERS`.
 
-### Timer Interrupt Handler (\$2669)
+### [Timer Interrupt Handler](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2169)
 
 Once the timer has triggered an IRQ interrupt, this routine will stash the next  object to be handled, update Jetman next, then restoring the next object and serves to regulate Jetman's movement update speed
 
-### SOUND UPDATE (\$26CD)
+### [SOUND UPDATE](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2272)
 
 Sounds are processed by the object handler, just like the display sprites. 
 
@@ -191,13 +197,13 @@ Data entered into the sound object by other object handlers is used to index int
 
 The sounds are quite simple and don't take up much memory, but are effective.
 
-### VALUABLES (\$283E)
+### [VALUABLES](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2716)
 
 Valuable objects have movement, can be picked up by Jetman and can change colour, depending on which valuable they are.
 
 Like the sound object, a jump table is used to jump to the appropriate handler.
 
-### ANIMATE EXPLOSIONS (\$2934)
+### [ANIMATE EXPLOSIONS](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2997)
 
 When an object explodes, e.g. an alien is hit by a laser, it's object type is changed to an Explosion and subsequent calls to this routine will animate the explosion though a list of explosion graphics from a data table and then ending.
 
@@ -209,7 +215,7 @@ The eight alien waves and two rocket ships of the original Spectrum version were
 
 Each alien on each wave has it's own object in the object table and is handled separately.
 
-### WAVE 0 FUZZBALL (\$2C6A)
+### [WAVE 0 FUZZBALL](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L3913)
 
 Wave 0 fuzzballs are simply objects that float across the screen with a randomly generated trajectory, either parallel with the planet surface or slowly falling to each, and any contact will cause them to explode.
 
@@ -217,41 +223,41 @@ The first test, common to all waves, is whether the alien has been hit by a lase
 
 Otherwise, the alien is tested to see if it has collided with a platform, which, for Wave 0, this causes it to morph into an explosion object, else it's new position on screen is stored to it's object record and it is redrawn.
 
-### WAVE 1 CROSS (\$2A5F)
+### [WAVE 1 CROSS](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L3261)
 
 Wave 1 is similar to Wave 0, except the alien graphic is different and collisions with platform result in the alien bouncing off in a different direction.
 
-### WAVE 2 SPHERE (\$2A6D)
+### [WAVE 2 SPHERE](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L3291)
 
 Wave 2 is similar to Wave 1, except the alien graphic is different and the alien will also change direction on a random basis, based on the random number produced by the IRQ and Raster interrupt values.
 
-### WAVE 3 SAUCER (\$2ABC)
+### [WAVE 3 SAUCER](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L3389)
 
 Wave 3 is similar to Wave 0, except the alien graphic is different and the alien direction is dictated by the position of Jetman - they home in on him.
 
-### Spawn Objects (\$2B4B)
+### [Spawn Objects](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L3610)
 
 These routines handle creation of new objects depending on game parameters, e.g. whether Jetman is on-screen, whether all Ship Parts and Fuel Cells have been collected. 
 
 The position of the new object is semi-randomly chosen from look-up table of X-axis start positions.
 
-### SHIP ASCEND/DESCEND (\$2E17/\$2E4E)
+### [SHIP ASCEND](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L4420) / [DESCEND](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L4477)
 
 When the ascend/decent objects are triggered at end of level, Jetman is removed from the screen and the ship goes up and comes back down again to the next Wave. 
 
 Because it will not fit on the screen until the ship is a several lines off the bottom, the rocket flame has a delay before it is displayed.
 
-### SHIP BASE MODULE (\$2E74)
+### [SHIP BASE MODULE](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L4523)
 
 The rocket ship consists of 3 modules (or parts) and, during normal play, the bottom part is always in the same place, but when the modules that are on the platforms at the start of levels are collected and dropped onto the base, this routine draws the extra modules, coloured depending on the number fo Fuel Cells collected and dropped. 
 
 Additionally, dependent on Fuel Cells collected, this routine collision detects Jetman with the ship for end of level detection.
 
-### SHIP PART OR FUEL (\$2F8E)
+### [SHIP PART OR FUEL](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L4799)
 
 The objects on-screen for Ship Modules and Fuel Cells and Valuables share some of the same object list locations, so this routine has some calculations and masks to manage the objects list parameters appropriately.
 
-### Jetman Collide Ship Fuel (\$2FEE)
+### [Jetman Collide Ship Fuel](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L4943)
 
 This collision test can result in a Fuel Cell or Ship Module object being picked up and following Jetman around.
 
@@ -259,7 +265,7 @@ Note the picked-up object isn't updated on-screen as often as Jetman so they mov
 
 In my mind, this characteristic is one of the memorable aspects of JETPAC and gives the game an extra liveliness. 
 
-### Test Platform Collision (\$30B3)
+### [Test Platform Collision](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L5188)
 
 A complicated routine that is used for testing all on-screen objects whether they have collided with a platform e.g. objects falling from the top of the screen, Jetman or Aliens flying in any direction. 
 
@@ -267,7 +273,7 @@ The collision testing sets bits in a return status byte that is the tested by th
 
 See the flowchart and source code for more insight.
 
-### JETMAN FLYING (\$31BF)
+### [JETMAN FLYING](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L5691)
 
 Possibly the most complicated routine in the program.
 
@@ -275,23 +281,23 @@ Routine reads the controls then tests if Jetman has collided with a platform, if
 
 Additionally, if the fire button was pressed, laser shots are initiated. 
 
-### JETMAN STANDING (\$332C)
+### [JETMAN STANDING](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L5923)
 
 Similar to JETMAN FLYING, but without the Platform Collision tests.
 
-### Read Keyboard Joystick (\$33F7)
+### [Read Keyboard Joystick](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L6105)
 
 Depending on user-selected game options, Joystick or keyboard controls are read, both are read through the VIA I/O interface chips.
 
 The keyboard control is quite novel in the way it allows several different keys to be used to play the game, which are grouped based on the hardware keyboard matrix. 
 
-### Convert XY to UDG RAM Address (\$351D)
+### [Convert XY to UDG RAM Address](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L6469)
 
 Due to the way that the game code configures the VIC chip to be a memory-mapped display, this and a few other routines are needed to convert object X-Y positions to actual memory addresses for object for bitmap and colour display purposes.
 
 This routine utilizes a pre-calculated address look-up table to speed up the process.
 
-### Display Object (\$3601)
+### [Display Object](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L6856)
 
 Another quite complicated routine and probably where the game spends the majority of it's processing time. 
 
@@ -303,7 +309,7 @@ The routine will firstly compare the positions of the objects and then erase the
 
 The objects are then processed in 8 bit columns e.g. 2 or 3 columns to display Jetman, and for each column, the old object bitmap is XOR'd away and then immediately replaced with the new object bitmap, one byte at a time. 
 
-### Colourize Object (\$381F)
+### [Colourize Object](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L7433)
 
 Updates the colour map tiles based on the X-Y position of the object it's given, works probably the same way as Sinclair Spectrum games and thus gives you the same colour clash characteristic.
 
@@ -313,7 +319,7 @@ Routine checks to ensure it's not changing the green colour map tiles of the pla
 
 The graphics data is mostly referenced by two address lookup tables.
 
-#### Jetman and Aliens (\$385F)
+#### [Jetman and Aliens](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L7515)
 
 The first lookup table is for Jetman and the alien graphics for each of the four waves and they are characterized by being having animated horizontal movement during the game.
 
@@ -321,7 +327,7 @@ Each UDG frame data ends with some values describing e.g. the number of lines th
 
 Jetman has four frames of animation for standing/walking or flying  in each direction, the alien graphics have two frames each. 
 
-#### Ship Modules, Flames, Fuel Cell, Valuables, Explosions and Platforms ($3C87)
+#### [Ship Modules, Flames, Fuel Cell, Valuables, Explosions and Platforms](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L8570)
 
 The second block of graphics data has a separate lookup table with addresses for the rocket ship, fuel cell and valuables.
 
