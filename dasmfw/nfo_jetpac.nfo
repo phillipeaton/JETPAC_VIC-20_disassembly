@@ -835,7 +835,7 @@ comment  2688
 comment  2688 Enable Interrupts (Clear Disable Interrupts)
 comment  268C
 label    268C Object_Handler_Jump_Table
-lcomment 268C 00
+lcomment 268C Obj 00
 word     268C-26AD
 label    268D Object_Handler_Jump_Table+1
 lcomment 268E Obj 01

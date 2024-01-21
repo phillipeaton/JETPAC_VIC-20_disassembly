@@ -2213,7 +2213,7 @@ Restore_Saved_Obj_Ptr_CLI
 ; 88  88 dP""""Yb 88  Y8 8888Y"  88ood8 888888 88  Yb 8bodP'
 
 Object_Handler_Jump_Table
-    fdb     GOTO_NEXT_OBJECT                ; 268C: 1A 26     00
+    fdb     GOTO_NEXT_OBJECT                ; 268C: 1A 26     Obj 00
     fdb     JETMAN_FLYING_                  ; 268E: 73 32     Obj 01
     fdb     JETMAN_STANDING_                ; 2690: 4D 33     Obj 02
     fdb     ANIMATE_EXPLOSIONS              ; 2692: 34 29     Obj 03
