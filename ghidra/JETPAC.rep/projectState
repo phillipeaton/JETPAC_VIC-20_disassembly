@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROJECT>
+    <PROJECT_TOOL_CONFIG NAME="FRONTEND">
+        <TOOL_CONFIG CONFIG_NAME="NO_LONGER_USED">
+            <ICON LOCATION="view_detailed.png" />
+            <TOOL TOOL_NAME="Ghidra: JETPAC" INSTANCE_NAME="">
+                <OPTIONS />
+                <PACKAGE NAME="Ghidra Core" />
+                <PACKAGE NAME="Utility" />
+                <PACKAGE NAME="Debugger">
+                    <INCLUDE CLASS="ghidra.app.plugin.core.debug.service.model.DebuggerModelServicePlugin" />
+                </PACKAGE>
+                <PLUGIN_STATE CLASS="ghidra.app.plugin.core.debug.service.model.DebuggerModelServicePlugin">
+                    <XML NAME="Factory_agent.dbgeng.DbgEngInJvmDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="DebugConnect options (.server)" TYPE="string" VALUE="none" />
+                            <STATE NAME="Remote process server options (untested)" TYPE="string" VALUE="none" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_agent.dbgeng.gadp.DbgEngGadpDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="Agent TCP port" TYPE="int" VALUE="0" />
+                            <STATE NAME="Agent interface address" TYPE="string" VALUE="localhost" />
+                            <STATE NAME="DebugConnect options (.server)" TYPE="string" VALUE="none" />
+                            <STATE NAME="Open agent's JDWP port (-1 to disable, 0 for ephemeral)" TYPE="int" VALUE="-1" />
+                            <STATE NAME="Remote process server options (untested)" TYPE="string" VALUE="none" />
+                            <STATE NAME="Suspend for JDWP" TYPE="boolean" VALUE="false" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_agent.dbgmodel.DbgModelInJvmDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="DebugConnect options (.server)" TYPE="string" VALUE="none" />
+                            <STATE NAME="Remote process server options (untested)" TYPE="string" VALUE="none" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_agent.dbgmodel.gadp.DbgModelGadpDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="Agent TCP port" TYPE="int" VALUE="0" />
+                            <STATE NAME="Agent interface address" TYPE="string" VALUE="localhost" />
+                            <STATE NAME="DebugConnect options (.server)" TYPE="string" VALUE="none" />
+                            <STATE NAME="Open agent's JDWP port (-1 to disable, 0 for ephemeral)" TYPE="int" VALUE="-1" />
+                            <STATE NAME="Remote process server options (untested)" TYPE="string" VALUE="none" />
+                            <STATE NAME="Suspend for JDWP" TYPE="boolean" VALUE="false" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_agent.frida.FridaInJvmDebuggerModelFactory">
+                        <SAVE_STATE />
+                    </XML>
+                    <XML NAME="Factory_agent.frida.gadp.FridaGadpDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="Agent TCP port" TYPE="int" VALUE="0" />
+                            <STATE NAME="Agent interface address" TYPE="string" VALUE="localhost" />
+                            <STATE NAME="Open agent's JDWP port (-1 to disable, 0 for ephemeral)" TYPE="int" VALUE="-1" />
+                            <STATE NAME="Suspend for JDWP" TYPE="boolean" VALUE="false" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_agent.gdb.GdbInJvmDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="GDB launch command" TYPE="string" VALUE="/usr/bin/gdb" />
+                            <STATE NAME="Use existing session via new-ui" TYPE="boolean" VALUE="false" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_agent.gdb.GdbOverSshDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="GDB launch command" TYPE="string" VALUE="/usr/bin/gdb" />
+                            <STATE NAME="Open SSH config file" TYPE="string" VALUE="~/.ssh/config" />
+                            <STATE NAME="SSH TCP port" TYPE="int" VALUE="22" />
+                            <STATE NAME="SSH hostname" TYPE="string" VALUE="localhost" />
+                            <STATE NAME="SSH username" TYPE="string" VALUE="user" />
+                            <STATE NAME="Use DOS line endings (unchecked for UNIX remote)" TYPE="boolean" VALUE="false" />
+                            <STATE NAME="Use existing session via new-ui" TYPE="boolean" VALUE="false" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_agent.gdb.gadp.GdbGadpDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="Agent TCP port" TYPE="int" VALUE="0" />
+                            <STATE NAME="Agent interface address" TYPE="string" VALUE="localhost" />
+                            <STATE NAME="GDB launch command" TYPE="string" VALUE="/usr/bin/gdb" />
+                            <STATE NAME="Open agent's JDWP port (-1 to disable, 0 for ephemeral)" TYPE="int" VALUE="-1" />
+                            <STATE NAME="Suspend for JDWP" TYPE="boolean" VALUE="false" />
+                            <STATE NAME="Use existing session via new-ui" TYPE="boolean" VALUE="false" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_agent.lldb.LldbInJvmDebuggerModelFactory">
+                        <SAVE_STATE />
+                    </XML>
+                    <XML NAME="Factory_agent.lldb.gadp.LldbGadpDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="Agent TCP port" TYPE="int" VALUE="0" />
+                            <STATE NAME="Agent interface address" TYPE="string" VALUE="localhost" />
+                            <STATE NAME="Open agent's JDWP port (-1 to disable, 0 for ephemeral)" TYPE="int" VALUE="-1" />
+                            <STATE NAME="Suspend for JDWP" TYPE="boolean" VALUE="false" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_ghidra.dbg.gadp.client.GadpTcpDebuggerModelFactory">
+                        <SAVE_STATE>
+                            <STATE NAME="Agent TCP port" TYPE="int" VALUE="15432" />
+                            <STATE NAME="Agent network address" TYPE="string" VALUE="localhost" />
+                        </SAVE_STATE>
+                    </XML>
+                    <XML NAME="Factory_ghidra.dbg.jdi.JdiDebuggerModelFactory">
+                        <SAVE_STATE />
+                    </XML>
+                    <STATE NAME="currentFactoryCls" TYPE="string" VALUE="agent.gdb.GdbInJvmDebuggerModelFactory" />
+                </PLUGIN_STATE>
+                <PLUGIN_STATE CLASS="ghidra.plugin.importer.ImporterPlugin">
+                    <ARRAY NAME="library search paths" TYPE="string">
+                        <A VALUE="." />
+                        <A VALUE="C:\WINDOWS\SysWOW64" />
+                        <A VALUE="C:\Program Files\OpenJDK\openjdk-11.0.14.1_1\bin" />
+                        <A VALUE="C:\WINDOWS\Sun\Java\bin" />
+                        <A VALUE="C:\WINDOWS\system32" />
+                        <A VALUE="C:\WINDOWS" />
+                        <A VALUE="C:\Program Files (x86)\Common Files\Oracle\Java\javapath" />
+                        <A VALUE="C:\Python310\Scripts\" />
+                        <A VALUE="C:\Python310\" />
+                        <A VALUE="C:\Python39\Scripts\" />
+                        <A VALUE="C:\Python39\" />
+                        <A VALUE="C:\WINDOWS\System32\OpenSSH\" />
+                        <A VALUE="C:\WINDOWS\System32\WindowsPowerShell\v1.0\" />
+                        <A VALUE="C:\WINDOWS\System32\Wbem" />
+                        <A VALUE="C:\Android" />
+                        <A VALUE="C:\Program Files (x86)\Microsoft VS Code\bin" />
+                        <A VALUE="C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common" />
+                        <A VALUE="C:\Program Files (x86)\Windows Live\Shared" />
+                        <A VALUE="C:\Program Files (x86)\vim\vim80" />
+                        <A VALUE="C:\Program Files\Git\cmd" />
+                        <A VALUE="C:\Program Files\Git\mingw64\bin" />
+                        <A VALUE="C:\Program Files\Git\usr\bin" />
+                        <A VALUE="C:\Program Files\MPE\VfxForth\Bin" />
+                        <A VALUE="C:\Program Files\TortoiseGit\bin" />
+                        <A VALUE="C:\Program Files\dotnet\" />
+                        <A VALUE="C:\ProgramData\Oracle\Java\javapath" />
+                        <A VALUE="C:\ProgramData\chocolatey\bin" />
+                        <A VALUE="C:\Users\Phil\AppData\Local\GitHubDesktop\bi" />
+                        <A VALUE="C:\Users\Phil\AppData\Local\Microsoft\WindowsApps" />
+                        <A VALUE="X:\Program Files2\unxutils" />
+                        <A VALUE="X:\SkyDrive\_PJE\Home Computers &amp; Consoles\Vectrex\Serial Port Driver\asm6809" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\Forth\F83" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\Forth\Gforth0.7" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\Forth\Power Forth\PF" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\DigitalMarsC\dm\bin" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\C\tcc64\" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\6809\a09\Release" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\6809\as09_111" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\6809\as09_142" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\6809\asm6809-2.12-w64" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\6809\asmx-2.0b5" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\6809\dasmfw\Release" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\6809\dasmx1.40" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\6809\f9dasm\Release" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\6809\lwtools-4.17-win32\lwtools-mingw32" />
+                        <A VALUE="X:\SkyDrive\_PJE\Programming\uP\z80\z80disasm-1.00" />
+                        <A VALUE="X:\SkyDrive\_PJE\Emulation\MAME\mame0229b_64bit" />
+                        <A VALUE="C:\Users\Phil\AppData\Local\GitHubDesktop\bin" />
+                        <A VALUE="%USERPROFILE%\AppData\Local\Microsoft\WindowsApps" />
+                    </ARRAY>
+                </PLUGIN_STATE>
+                <ROOT_NODE X_POS="-7" Y_POS="-7" WIDTH="2062" HEIGHT="1126" EX_STATE="6" FOCUSED_OWNER="FrontEnd Tool" FOCUSED_NAME="FrontEnd" FOCUSED_TITLE="Project Window">
+                    <COMPONENT_NODE TOP_INFO="0">
+                        <COMPONENT_INFO NAME="FrontEnd" OWNER="FrontEnd Tool" TITLE="Project Window" ACTIVE="true" GROUP="Default" INSTANCE_ID="3558184077875542246" />
+                    </COMPONENT_NODE>
+                </ROOT_NODE>
+                <PREFERENCES>
+                    <PREFERENCE_STATE NAME="docking.widgets.filechooser.DirectoryTableModel:Filename:Size:Modified:">
+                        <XML NAME="COLUMN_DATA">
+                            <Table_State>
+                                <COLUMN NAME="Filename" WIDTH="228" VISIBLE="true" />
+                                <COLUMN NAME="Size" WIDTH="228" VISIBLE="true" />
+                                <COLUMN NAME="Modified" WIDTH="227" VISIBLE="true" />
+                                <TABLE_SORT_STATE>
+                                    <COLUMN_SORT_STATE COLUMN_MODEL_INDEX="0" SORT_DIRECTION="ascending" SORT_ORDER="1" />
+                                </TABLE_SORT_STATE>
+                            </Table_State>
+                        </XML>
+                    </PREFERENCE_STATE>
+                    <PREFERENCE_STATE NAME="ghidra.framework.plugintool.dialog.ExtensionTableModel:Installation Status:Name:Description:Version:">
+                        <XML NAME="COLUMN_DATA">
+                            <Table_State>
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.ExtensionTableModel$ExtensionInstalledColumn.Installation Status" WIDTH="25" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.ExtensionTableModel$ExtensionNameColumn.Name" WIDTH="174" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.ExtensionTableModel$ExtensionDescriptionColumn.Description" WIDTH="386" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.ExtensionTableModel$ExtensionVersionColumn.Version" WIDTH="113" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.ExtensionTableModel$ExtensionInstallationDirColumn.Installation Directory" WIDTH="100" VISIBLE="false" />
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.ExtensionTableModel$ExtensionArchiveFileColumn.Archive File" WIDTH="100" VISIBLE="false" />
+                                <TABLE_SORT_STATE>
+                                    <COLUMN_SORT_STATE COLUMN_MODEL_INDEX="1" SORT_DIRECTION="ascending" SORT_ORDER="1" />
+                                </TABLE_SORT_STATE>
+                            </Table_State>
+                        </XML>
+                    </PREFERENCE_STATE>
+                    <PREFERENCE_STATE NAME="docking.theme.gui.ThemeColorTableModel:Id:Current Color:Theme Color:Default Color:">
+                        <XML NAME="COLUMN_DATA">
+                            <Table_State>
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$IdColumn.Id" WIDTH="268" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Current Color" WIDTH="267" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Theme Color" WIDTH="268" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Default Color" WIDTH="267" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Light Defaults" WIDTH="300" VISIBLE="false" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Dark Defaults" WIDTH="300" VISIBLE="false" />
+                                <TABLE_SORT_STATE>
+                                    <COLUMN_SORT_STATE COLUMN_MODEL_INDEX="0" SORT_DIRECTION="ascending" SORT_ORDER="1" />
+                                </TABLE_SORT_STATE>
+                            </Table_State>
+                        </XML>
+                    </PREFERENCE_STATE>
+                    <PREFERENCE_STATE NAME="docking.theme.gui.ThemeColorPaletteTable$1:Id:Current Color:Theme Color:Default Color:">
+                        <XML NAME="COLUMN_DATA">
+                            <Table_State>
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$IdColumn.Id" WIDTH="268" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Current Color" WIDTH="267" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Theme Color" WIDTH="268" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Default Color" WIDTH="267" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Light Defaults" WIDTH="300" VISIBLE="false" />
+                                <COLUMN NAME="docking.theme.gui.ThemeColorTableModel$ValueColumn.Dark Defaults" WIDTH="300" VISIBLE="false" />
+                                <TABLE_SORT_STATE>
+                                    <COLUMN_SORT_STATE COLUMN_MODEL_INDEX="0" SORT_DIRECTION="ascending" SORT_ORDER="1" />
+                                </TABLE_SORT_STATE>
+                            </Table_State>
+                        </XML>
+                    </PREFERENCE_STATE>
+                    <PREFERENCE_STATE NAME="docking.theme.gui.ThemeFontTableModel:Id:Current Font:Theme Font:Default Font:">
+                        <XML NAME="COLUMN_DATA">
+                            <Table_State>
+                                <COLUMN NAME="docking.theme.gui.ThemeFontTableModel$IdColumn.Id" WIDTH="268" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeFontTableModel$FontValueColumn.Current Font" WIDTH="267" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeFontTableModel$FontValueColumn.Theme Font" WIDTH="268" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeFontTableModel$FontValueColumn.Default Font" WIDTH="267" VISIBLE="true" />
+                                <TABLE_SORT_STATE>
+                                    <COLUMN_SORT_STATE COLUMN_MODEL_INDEX="0" SORT_DIRECTION="ascending" SORT_ORDER="1" />
+                                </TABLE_SORT_STATE>
+                            </Table_State>
+                        </XML>
+                    </PREFERENCE_STATE>
+                    <PREFERENCE_STATE NAME="docking.theme.gui.ThemeIconTableModel:Id:Current Icon:Theme Icon:Default Icon:">
+                        <XML NAME="COLUMN_DATA">
+                            <Table_State>
+                                <COLUMN NAME="docking.theme.gui.ThemeIconTableModel$IdColumn.Id" WIDTH="268" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeIconTableModel$IconValueColumn.Current Icon" WIDTH="267" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeIconTableModel$IconValueColumn.Theme Icon" WIDTH="268" VISIBLE="true" />
+                                <COLUMN NAME="docking.theme.gui.ThemeIconTableModel$IconValueColumn.Default Icon" WIDTH="267" VISIBLE="true" />
+                                <TABLE_SORT_STATE>
+                                    <COLUMN_SORT_STATE COLUMN_MODEL_INDEX="0" SORT_DIRECTION="ascending" SORT_ORDER="1" />
+                                </TABLE_SORT_STATE>
+                            </Table_State>
+                        </XML>
+                    </PREFERENCE_STATE>
+                    <PREFERENCE_STATE NAME="ghidra.framework.plugintool.dialog.PluginInstallerTableModel:Installation Status:Status:Name:Description:Category:">
+                        <XML NAME="COLUMN_DATA">
+                            <Table_State>
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.PluginInstallerTableModel$PluginInstalledColumn.Installation Status" WIDTH="25" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.PluginInstallerTableModel$PluginStatusColumn.Status" WIDTH="24" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.PluginInstallerTableModel$PluginNameColumn.Name" WIDTH="216" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.PluginInstallerTableModel$PluginDescriptionColumn.Description" WIDTH="217" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.plugintool.dialog.PluginInstallerTableModel$PluginCategoryColumn.Category" WIDTH="216" VISIBLE="true" />
+                                <TABLE_SORT_STATE>
+                                    <COLUMN_SORT_STATE COLUMN_MODEL_INDEX="2" SORT_DIRECTION="ascending" SORT_ORDER="1" />
+                                </TABLE_SORT_STATE>
+                            </Table_State>
+                        </XML>
+                    </PREFERENCE_STATE>
+                    <PREFERENCE_STATE NAME="docking.ErrLogDialog$ErrEntryTableModel:#:Message:Details:">
+                        <XML NAME="COLUMN_DATA">
+                            <Table_State>
+                                <COLUMN NAME="docking.ErrLogDialog$ErrEntryTableModel$IdColumn.#" WIDTH="15" VISIBLE="true" />
+                                <COLUMN NAME="docking.ErrLogDialog$ErrEntryTableModel$MessageColumn.Message" WIDTH="15" VISIBLE="true" />
+                                <COLUMN NAME="docking.ErrLogDialog$ErrEntryTableModel$DetailsColumn.Details" WIDTH="500" VISIBLE="false" />
+                                <COLUMN NAME="docking.ErrLogDialog$ErrEntryTableModel$TimestampColumn.Time" WIDTH="15" VISIBLE="true" />
+                                <TABLE_SORT_STATE>
+                                    <COLUMN_SORT_STATE COLUMN_MODEL_INDEX="0" SORT_DIRECTION="ascending" SORT_ORDER="1" />
+                                </TABLE_SORT_STATE>
+                            </Table_State>
+                        </XML>
+                    </PREFERENCE_STATE>
+                    <PREFERENCE_STATE NAME="ghidra.framework.main.datatable.ProjectDataTableModel:Type:Name:Path:Modified:Processor:Endian:Address Size:Compiler:Size:Format:">
+                        <XML NAME="COLUMN_DATA">
+                            <Table_State>
+                                <COLUMN NAME="ghidra.framework.main.datatable.ProjectDataTableModel$DomainFileTypeColumn.Type" WIDTH="147" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.main.datatable.ProjectDataTableModel$DomainFileNameColumn.Name" WIDTH="248" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.main.datatable.ProjectDataTableModel$DomainFilePathColumn.Path" WIDTH="248" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.framework.main.datatable.ProjectDataTableModel$ModificationDateColumn.Modified" WIDTH="247" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.ProcessorProjectDataColumn.Processor" WIDTH="190" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.EndianProjectDataColumn.Endian" WIDTH="190" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.AddressSizeProjectDataColumn.Address Size" WIDTH="168" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.CompilerProjectDataColumn.Compiler" WIDTH="190" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.DomainFileSizeProjectDataColumn.Size" WIDTH="202" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.FormatProjectDataColumn.Format" WIDTH="202" VISIBLE="true" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.CreationDateProjectDataColumn.Created" WIDTH="200" VISIBLE="false" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.ExecutablePathProjectDataColumn.Executable Path" WIDTH="60" VISIBLE="false" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.LanguageProjectDataColumn.Language ID" WIDTH="60" VISIBLE="false" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.CreatedWithProjectDataColumn.Created With" WIDTH="100" VISIBLE="false" />
+                                <COLUMN NAME="ghidra.util.table.projectdata.column.Md5ProjectDataColumn.MD5" WIDTH="120" VISIBLE="false" />
+                                <TABLE_SORT_STATE>
+                                    <COLUMN_SORT_STATE COLUMN_MODEL_INDEX="0" SORT_DIRECTION="ascending" SORT_ORDER="1" />
+                                </TABLE_SORT_STATE>
+                            </Table_State>
+                        </XML>
+                    </PREFERENCE_STATE>
+                </PREFERENCES>
+            </TOOL>
+        </TOOL_CONFIG>
+    </PROJECT_TOOL_CONFIG>
+    <PROJECT_DATA_XML_NAME NAME="DISPLAY_DATA">
+        <SAVE_STATE>
+            <ARRAY NAME="EXPANDED_PATHS" TYPE="string">
+                <A VALUE="JETPAC:" />
+            </ARRAY>
+            <STATE NAME="SHOW_TABLE" TYPE="boolean" VALUE="false" />
+        </SAVE_STATE>
+    </PROJECT_DATA_XML_NAME>
+    <TOOL_MANAGER ACTIVE_WORKSPACE="Workspace">
+        <WORKSPACE NAME="Workspace" ACTIVE="true" />
+    </TOOL_MANAGER>
+</PROJECT>
+
