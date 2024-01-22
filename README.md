@@ -100,7 +100,13 @@ The graphics engine was not standalone, it's completely embedded into the rest o
 
 This section presents an overview of the complete program and highlights some noteworthy sections of code as described by the text. Most of the routines are relatively easy to understand by looking directly at the code. However, some of the code routines are sufficiently complex that, to be understood, they need to be flowcharted.
 
-## Ghidra SRE
+### Source Code Map
+
+The complete binary disassembly process generates a single source code file, to which I have added large-font banners to all the important routines so they can be seen from a source code map, shown below, to get an overall 'feel' for the code. Because the banners are all in capital letters, the object handler routine banners that are called from Main Loop have horizontal lines top and bottom e.g. for JETMAN_FLYING.
+
+<img title="" src="docs\JETPAC_source_one_pager.PNG" alt="JETPAC Source One-pager" width="1500" height="">
+
+### Ghidra SRE
 
 To provide flowcharts, after initially drowing everything out on paper, I used the Ghidra software reverse engineering (SRE) tools. Whilst Ghidra is really geared towards compiled high-level programs on modern hardware e.g. Intel x86, good results for 8-bit assembly programs are also possible, but you have to work at it.
 
@@ -109,12 +115,6 @@ The diagrams presented here were created at the end of the reverse engineering p
 Additonally, Ghidra is somewhat automated regarding separation of code subroutines, you can't control it (without changing the code) and having assembly subroutines called from a jump table doesn't help, so the flowcharts may be incomplete, have missing comments/value names and should be viewed together with the reverse engineered source code listing, where commentary etc. is much richer.
 
 Ghidra is an interactive tool and lets you analyse the code is a much more visual and interactive way than raw assembly source code, if you have some time to get a handle on it, it can provide a level of insight that just isn't possible with linear code analysis. 
-
-### Source Code Map
-
-The complete binary disassembly process generates a single source code file, to which I have added large-font banners to all the important routines so they can be seen from a source code map, shown below, to get an overall 'feel' for the code. Because the banners are all in capital letters, the object handler routine banners that are called from Main Loop have horizontal lines top and bottom e.g. for JETMAN_FLYING.
-
-<img title="" src="docs\JETPAC_source_one_pager.PNG" alt="JETPAC Source One-pager" width="1500" height="">
 
 The source code can be, roughly, viewed as three parts, plus graphics data:
 
