@@ -14,8 +14,8 @@ label 1000-1fff UDG_RAM * User-Defined Graphics characters
 label 8000-8fff Character_ROM
 label 9000-90ff VIC
 label 9100-93ff VIA1_2
-label 9400-95ff Unused     * Swapped from default
-label 9600-97ff Colour_RAM * Swapped from default
+label 9400-95ff Unused     * These two swapped from default
+label 9600-97ff Colour_RAM * These two swapped from default
 label 9800-9bff I_O_Expansion1
 label 9c00-9fff I_O_Expansion2
 label a000-bfff Block5_CartROM

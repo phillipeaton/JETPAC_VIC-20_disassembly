@@ -2,6 +2,10 @@
 ; Loaded: binary file "bin_orig/jetpac_2000-3fff.bin"
 ; Loaded: Info file "dasmfw\nfo_include.nfo"
 
+; 03B8 666
+; 03C0 777
+; 03C8 888
+; 1008 999
 ; --------------------------------------------------------------------------------------------
 ; JET PAC for the Commodore VIC-20 + 8K Memory Expansion
 ; Copyright 1982 ULTIMATE PLAY THE GAME / Ashby Computers & Graphics Ltd.
@@ -42,45 +46,140 @@ ZP18                            equ     $0018
 ZP19                            equ     $0019
 ZP1A                            equ     $001A
 ZP1B                            equ     $001B
+
+; FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
+; 1111 1111 = No action
+; 1xxx xxxx = Not moving right
+; x1xx xxxx = Not moving left
+; xx1x xxxx = Not down (i.e. hover)
+; xxx1 xxxx = Not up
+; xxxx 1xxx = Not Firing
+; -
+; Examples:
+; 1110 xxxx = Flying Hover
+; 1010 xxxx = Flying Left
+; 0110 xxxx = Flying Right
+; 1011 xxxx = Walk Left
+; 0111 xxxx = Walk right
 ZP_Jetman_Action                equ     $001C
+
 ZP_Ship_UDG_Addr_Offset         equ     $001E
 ZP_Ship_Parts_Counter           equ     $001F
 ZP_IRQ_Occurred                 equ     $0020
+
+; When reaches $04, Alien spawns, incremented by Explosions and Lasers
 ZP_Alien_Spawn_Counter          equ     $0021
+
 ZP_Obj_List_Ptr_Save_IRQ_Lo     equ     $0022
 ZP_Obj_List_Ptr_Save_IRQ_Hi     equ     $0023
 ZP_Obj_List_Ptr_Save_Lo         equ     $0024
 ZP_Obj_List_Ptr_Save_Hi         equ     $0025
+
+; Turns off at take-off and landing
 ZP_Ship_Flame_State             equ     $0026
+
+; Counts up throughout the flight, used for flame animation
 ZP_Ship_Flame_UDG_Toggle        equ     $0027
+
 ZP_Obj_Ship_Saved               equ     $0028
 ZP_Param_Addr_Lo                equ     $0040
 ZP_Param_Addr_Hi                equ     $0041
+
+; Bit 7 Inverse Video, Bit 0 Display On/Off
 ZP_Game_Select_F1_Flash         equ     $0045
+
 ZP_IRQ_Counter_Lo               equ     $004A
 ZP_IRQ_Counter_Hi               equ     $004B
 ZP_IRQ_Random                   equ     $004C
+
+; 3 bytes per score
 ZP_Score_Player_1               equ     $0051
 ZP_Score_Player_2               equ     $0054
+
+; Used to flash game options & 1UP+score at player start
 ZP_Reverse_And_Colour_Data      equ     $0057
+
 ZP_Flash_Countup                equ     $0058
 ZP_Wave_Active_Player           equ     $0059
 ZP_Num_Lives_Active_Player      equ     $005A
 ZP_Wave_Inactive_Player         equ     $005B
 ZP_Num_Lives_Inactive_Player    equ     $005C
+
+; 7f for 1 player, ff for 2 player i.e. longer when 2 player game
 ZP_Flash_Score_Countdown        equ     $005D
+
 ZP_Active_Player                equ     $005E
 ZP_Subroutine_Addr_Lo           equ     $005F
 ZP_Subroutine_Addr_Hi           equ     $0060
+
 Screen_RAM                      equ     $0200
 IRQ_Interrupt_Vector_Lo         equ     $0314
 IRQ_Interrupt_Vector_Hi         equ     $0315
 NMI_Interrupt_Vector_Lo         equ     $0318
 NMI_Interrupt_Vector_Hi         equ     $0319
+
+; ======================= Objects =======================
+; Each object occupies 8 bytes, some bytes don't appear to be used.
+; First byte of each object is it's type, Jetman can be object type 01/02/81/82,
+; Lasers can be 10 or 90, top bit signifying left/right direction.
+; Other objects:
+; 03 = Explosion, other objects change to this object before disappearing
+; 04 = Ship_Part/Fuel
+; 05 = Wave 0 Fuzzball
+; 06 = Wave 3 Saucer
+; 07 = Wave 2 Sphere
+; 08 = Wave 1 Cross
+; 09 = Ship Bottom Part
+; 0A = Ship Ascend
+; 0B = Ship Descend
+; 0C = Sound
+; 0D = ???
+; 0E = Valuable
+
+; -------------------- Jetman Object --------------------
+; 1xxx xxxx = Facing Left, not facing right
+; xxxx xx1x = Standing
+; xxxx xxx1 = Flying (Not on screen if !Flying & !Standing e.g. hit by alien)
 Obj_Jetman_State                equ     $0380
+
+; Pixel Left=00 Right=B6 or B7
 Obj_Jetman_Position_X           equ     $0381
+
+; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
+Obj_Jetman_Direction_X          equ     $0382
+
+; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
 Obj_Jetman_Position_Y           equ     $0383
+
+; Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
+Obj_Jetman_Direction_Y          equ     $0384
+
+Obj_Jetman_0385                 equ     $0385
+Obj_Jetman_0386                 equ     $0386
+Obj_Jetman_0387                 equ     $0387
+
+; -------------------- Laser Objects --------------------
+; Byte 00/08= object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
+; Byte 01/09= Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
+; Byte 02/0A= X-coord of start of laser beam, calculated from position of Jetman.
+; Byte 03/0B= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+; Byte 04/0C= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+; Byte 05/0D= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+; Byte 06/0E= Laser shot beam length, randomly set using the IRQ counter.
+; Byte 07/0F= Laser Colour
+;
+; Laser_Colour_Table
+; fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colours if it's used
+; fcb     BLUE,YELLOW,CYAN,YELLOW ; 216F: 06 07 03 07
+;
+; Laser decay sequence as written to UDG RAM:
+; $FF       $FC       $E0       $00
+; %11111111 %11111100 %11100000 %00000000
 Obj_Laser_0                     equ     $0388
+Obj_Laser_1                     equ     $0390
+Obj_Laser_2                     equ     $0398
+Obj_Laser_3                     equ     $03A0
+
 Obj_Sound                       equ     $03A8
 Obj_Sound_Collision             equ     $03A9
 Obj_Sound_Collision_Timer       equ     $03AA
@@ -88,6 +187,7 @@ Obj_Sound_Noise                 equ     $03AB
 Obj_Sound_Noise_Timer           equ     $03AC
 Obj_Sound_Laser                 equ     $03AD
 Obj_Sound_Laser_Timer           equ     $03AE
+
 Obj_Ship_Base                   equ     $03B0
 Obj_Ship_Base_X                 equ     $03B1
 Obj_Ship_Base_Fuel_Level        equ     $03B2

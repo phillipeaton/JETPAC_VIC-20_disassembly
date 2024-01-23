@@ -7,7 +7,7 @@ file   bin_orig/jetpac_2000-3fff.bin	* Instructs dasmfw to load the given file a
 
 *** OUTPUT FORMATTING OPTIONS ***
 *option addr off      * Show address field output for clean assembler source files
-*option hex on        * Show hex dump output
+*option hex off       * Show hex dump output
 option asc off        * Show output of the ASCII equivalent to code/data
 *option cref on       * Show cross-referece table
 *option unused on     * Show unused labels
