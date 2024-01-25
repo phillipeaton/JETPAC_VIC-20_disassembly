@@ -1,110 +1,117 @@
 ; Top Level Memory Map for VIC-20 with 8K+ Expansion as used by JETPAC
-;label 0000-00ff ZP
-label 0100-01ff Stack
-;label 0200-03ff OS_Data
-label 0200-02FF Screen_RAM
-label 0300-03FF Other_RAM
-;label 0400-0fff Block0_3K_RAM * Removed, else branch labels don't show-up
-;label 1000-11ff Screen_RAM
-;label 1200-1fff Std_3.5k_RAM
-label 1000-1fff UDG_RAM * User-Defined Graphics characters
-;label 2000-3fff Block1_8K_RAM * Removed, else branch labels don't show-up
-;label 4000-5fff Block2_8K_RAM * Removed, else branch labels don't show-up
-;label 6000-7fff Block3_8K_RAM * Removed, else branch labels don't show-up
-label 8000-8fff Character_ROM
-label 9000-90ff VIC
-label 9100-93ff VIA1_2
-label 9400-95ff Unused     * These two swapped from default
-label 9600-97ff Colour_RAM * These two swapped from default
-label 9800-9bff I_O_Expansion1
-label 9c00-9fff I_O_Expansion2
-label a000-bfff Block5_CartROM
-label c000-dfff BASIC_ROM
-label e000-ffff Kernal_ROM
+;label   0000-00FF ZP
+label    0100-01FF Stack
+;label   0200-03FF OS_Data
 
-; OS_Data register storage
-label 030C      A_register
-label 030D      X_register
-label 030E      Y_register
-label 030F      P_register
+comment  0200
+label    0200-02FF Screen_RAM
+label    0300-03FF Other_RAM
+;label   0400-0FFF Block0_3K_RAM      ; Removed, else branch labels don't show-up
+;label   1000-11FF Screen_RAM
+;label   1200-1FFF Std_3.5k_RAM
 
-; OS_Data vectors - For standard BASIC system?
-label 0314 IRQ_Interrupt_Vector_Lo
-label 0315 IRQ_Interrupt_Vector_Hi
-;label 0316-0317 Break_Int_Vector
-label 0318 NMI_Interrupt_Vector_Lo
-label 0319 NMI_Interrupt_Vector_Hi
-;label 031A-031B Open_Vector
-;label 031C-031D Close_Vector
-;label 031E-031F Set-Input_Vector
-;label 0320-0321 Set-Output_Vector
-;label 0322-0323 Restore_l_O_Vector
-;label 0324-0325 Input_Vector
-;label 0326-0327 Output_Vector
-;label 0328-0329 Test-Stop_Vector
-;label 032A-032B Get_Vector
-;label 032C-032D Abort_l_O_Vector
-;label 032E-032F User_Vector
-;label 0330-0331 Link_to_Load_RAM
-;label 0332-0333 Link_to_Save_RAM
+comment  1000
+label    1000-1FFF UDG_RAM            ; User-Defined Graphics characters
+;label   2000-3FFF Block1_8K_RAM      ; Removed, else branch labels don't show-up
+;label   4000-5FFF Block2_8K_RAM      ; Removed, else branch labels don't show-up
+;label   6000-7FFF Block3_8K_RAM      ; Removed, else branch labels don't show-up
+label    8000-8FFF Character_ROM
+
+comment  9000
+label    9000-90FF VIC
+label    9100-93FF VIA1_2
+label    9400-95FF Unused             ; 9400/9600 swapped from default config
+
+comment  9600
+label    9600-97FF Colour_RAM         ; 9400/9600 swapped from default config
+label    9800-9BFF I_O_Expansion1
+label    9C00-9FFF I_O_Expansion2
+label    A000-BFFF Block5_CartROM
+label    C000-DFFF BASIC_ROM
+label    E000-FFFF Kernal_ROM
+label    030C      A_register         ; OS_Data register storage
+label    030D      X_register
+label    030E      Y_register
+label    030F      P_register
+
+comment  0314
+label    0314 IRQ_Interrupt_Vector_Lo ; OS_Data vectors - For standard BASIC system?
+label    0315 IRQ_Interrupt_Vector_Hi
+;label   0316-0317 Break_Int_Vector
+label    0318 NMI_Interrupt_Vector_Lo
+label    0319 NMI_Interrupt_Vector_Hi
+;label   031A-031B Open_Vector
+;label   031C-031D Close_Vector
+;label   031E-031F Set-Input_Vector
+;label   0320-0321 Set-Output_Vector
+;label   0322-0323 Restore_l_O_Vector
+;label   0324-0325 Input_Vector
+;label   0326-0327 Output_Vector
+;label   0328-0329 Test-Stop_Vector
+;label   032A-032B Get_Vector
+;label   032C-032D Abort_l_O_Vector
+;label   032E-032F User_Vector
+;label   0330-0331 Link_to_Load_RAM
+;label   0332-0333 Link_to_Save_RAM
 ;
 ; Character_ROM sets
-;label 8000-83ff CHAR_ROM_UC_GX  * Upper case & graphics
-;label 8400-87ff CHAR_ROM_UC_GX_R * Upper case & graphics reversed
-;label 8000-83ff CHAR_ROM_UC_LC  * Upper case & lower case
-;label 8000-83ff CHAR_ROM_UC_LC_R * Upper case & lower case reversed
+;label   8000-83FF CHAR_ROM_UC_GX  * Upper case & graphics
+;label   8400-87FF CHAR_ROM_UC_GX_R * Upper case & graphics reversed
+;label   8000-83FF CHAR_ROM_UC_LC  * Upper case & lower case
+;label   8000-83FF CHAR_ROM_UC_LC_R * Upper case & lower case reversed
 
 ; VIC Registers
-label 9000      VIC_R0_H_Ctr
-label 9001      VIC_R1_V_Ctr
-label 9002      VIC_R2_Num_Cols
-label 9003      VIC_R3_Num_Rows
-label 9004      VIC_R4_TV_Raster
-label 9005      VIC_R5_CM_Start
-label 9006      VIC_R6_H_LightP
-label 9007      VIC_R7_V_LightP
-label 9008      VIC_R8_Paddle_X
-label 9009      VIC_R9_Paddle_Y
-label 900A      VIC_RA_Frq_Osc1
-label 900B      VIC_RB_Frq_Osc2
-label 900C      VIC_RC_Frq_Osc3
-label 900D      VIC_RD_Frq_Noise
-label 900E      VIC_RE_Vol_Colour
-label 900F      VIC_RF_BckBdrCol
+label    9000      VIC_R0_H_Ctr
+label    9001      VIC_R1_V_Ctr
+label    9002      VIC_R2_Num_Cols
+label    9003      VIC_R3_Num_Rows
+label    9004      VIC_R4_TV_Raster
+label    9005      VIC_R5_CM_Start
+label    9006      VIC_R6_H_LightP
+label    9007      VIC_R7_V_LightP
+label    9008      VIC_R8_Paddle_X
+label    9009      VIC_R9_Paddle_Y
+label    900A      VIC_RA_Frq_Osc1
+label    900B      VIC_RB_Frq_Osc2
+label    900C      VIC_RC_Frq_Osc3
+label    900D      VIC_RD_Frq_Noise
+label    900E      VIC_RE_Vol_Colour
+label    900F      VIC_RF_BckBdrCol
 
 ; VIA1&2 Registers
-label 9110      VIA1_Port_B      * VIA1 Port B data I/O register (User port & RS-232)
-label 9111      VIA1_Port_A      * VIA1 Port A data I/O register (Serial Clk, Joy, etc.)
-label 9112      VIA1_DDR_B       * VIA1 Port B data direction register (0=in, 1=out)
-label 9113      VIA1_DDR_A       * VIA1 Port A data direction register (0=in, 1=out)
-label 9114      VIA1_T1_Cnt_Lo   * VIA1 Timer 1 count register lo
-label 9115      VIA1_T1_Cnt_Hi   * VIA1 Timer 1 count register hi
-label 9116      VIA1_T1_Latch_Lo * VIA1 Timer 1 latch register lo
-label 9117      VIA1_T1_Latch_Hi * VIA1 Timer 1 latch register hi
-label 9118      VIA1_T2_Lo       * VIA1 Timer 2 count/latch register lo
-label 9119      VIA1_T2_Hi       * VIA1 Timer 2 count/latch register hi
-label 911A      VIA1_Shift_Reg   * VIA1 Shift register
-label 911B      VIA1_Aux_Cntl    * VIA1 Auxiliary control register
-label 911C      VIA1_Periph_Cntl * VIA1 Peripheral control register
-label 911D      VIA1_Int_Flags   * VIA1 Interrupt flags register
-label 911E      VIA1_Int_Enable  * VIA1 Interrupt enable register
-label 911F      VIA1_Port_A_Cass * VIA1 Port A data I/O register (Sense cassette switch)
-
-label 9120      VIA2_Port_B      * VIA2 Port B data I/O register (Keybd col scan, Cassette, Joy)
-label 9121      VIA2_Port_A      * VIA2 Port A data I/O register (Keybd row scan)
-label 9122      VIA2_DDR_B       * VIA2 Port B data direction register (0=in, 1=out)
-label 9123      VIA2_DDR_A       * VIA2 Port A data direction register (0=in, 1=out)
-label 9124      VIA2_T1_Cnt_Lo   * VIA2 Timer 1 count register lo
-label 9125      VIA2_T1_Cnt_Hi   * VIA2 Timer 1 count register hi
-label 9126      VIA2_T1_Latch_Lo * VIA2 Timer 1 latch register lo
-label 9127      VIA2_T1_Latch_Hi * VIA2 Timer 1 latch register hi
-label 9128      VIA2_T2_Lo       * VIA2 Timer 2 count/latch register lo
-label 9129      VIA2_T2_Hi       * VIA2 Timer 2 count/latch register hi
-label 912A      VIA2_Shift_Reg   * VIA2 Shift register
-label 912B      VIA2_Aux_Cntl    * VIA2 Auxiliary control register
-label 912C      VIA2_Periph_Cntl * VIA2 Peripheral control register
-label 912D      VIA2_Int_Flags   * VIA2 Interrupt flags register
-label 912E      VIA2_Int_Enable  * VIA2 Interrupt enable register
-label 912F      VIA2_Port_A_OutR * VIA2 Port A data I/O register (Output Register)
+comment  9110
+label    9110      VIA1_Port_B      * VIA1 Port B data I/O register (User port & RS-232)
+label    9111      VIA1_Port_A      * VIA1 Port A data I/O register (Serial Clk, Joy, etc.)
+label    9112      VIA1_DDR_B       * VIA1 Port B data direction register (0=in, 1=out)
+label    9113      VIA1_DDR_A       * VIA1 Port A data direction register (0=in, 1=out)
+label    9114      VIA1_T1_Cnt_Lo   * VIA1 Timer 1 count register lo
+label    9115      VIA1_T1_Cnt_Hi   * VIA1 Timer 1 count register hi
+label    9116      VIA1_T1_Latch_Lo * VIA1 Timer 1 latch register lo
+label    9117      VIA1_T1_Latch_Hi * VIA1 Timer 1 latch register hi
+label    9118      VIA1_T2_Lo       * VIA1 Timer 2 count/latch register lo
+label    9119      VIA1_T2_Hi       * VIA1 Timer 2 count/latch register hi
+label    911A      VIA1_Shift_Reg   * VIA1 Shift register
+label    911B      VIA1_Aux_Cntl    * VIA1 Auxiliary control register
+label    911C      VIA1_Periph_Cntl * VIA1 Peripheral control register
+label    911D      VIA1_Int_Flags   * VIA1 Interrupt flags register
+label    911E      VIA1_Int_Enable  * VIA1 Interrupt enable register
+label    911F      VIA1_Port_A_Cass * VIA1 Port A data I/O register (Sense cassette switch)
+comment  9120
+label    9120      VIA2_Port_B      * VIA2 Port B data I/O register (Keybd col scan, Cassette, Joy)
+label    9121      VIA2_Port_A      * VIA2 Port A data I/O register (Keybd row scan)
+label    9122      VIA2_DDR_B       * VIA2 Port B data direction register (0=in, 1=out)
+label    9123      VIA2_DDR_A       * VIA2 Port A data direction register (0=in, 1=out)
+label    9124      VIA2_T1_Cnt_Lo   * VIA2 Timer 1 count register lo
+label    9125      VIA2_T1_Cnt_Hi   * VIA2 Timer 1 count register hi
+label    9126      VIA2_T1_Latch_Lo * VIA2 Timer 1 latch register lo
+label    9127      VIA2_T1_Latch_Hi * VIA2 Timer 1 latch register hi
+label    9128      VIA2_T2_Lo       * VIA2 Timer 2 count/latch register lo
+label    9129      VIA2_T2_Hi       * VIA2 Timer 2 count/latch register hi
+label    912A      VIA2_Shift_Reg   * VIA2 Shift register
+label    912B      VIA2_Aux_Cntl    * VIA2 Auxiliary control register
+label    912C      VIA2_Periph_Cntl * VIA2 Peripheral control register
+label    912D      VIA2_Int_Flags   * VIA2 Interrupt flags register
+label    912E      VIA2_Int_Enable  * VIA2 Interrupt enable register
+label    912F      VIA2_Port_A_OutR * VIA2 Port A data I/O register (Output Register)
 
 ; *** END ***

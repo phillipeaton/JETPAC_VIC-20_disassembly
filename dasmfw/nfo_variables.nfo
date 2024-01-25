@@ -1,32 +1,32 @@
-; Zero-Page variables                      ; Usage count
-label    00 ZP_Obj_List_Ptr_Lo             ; 182
-label    01 ZP_Obj_List_Ptr_Hi             ; 111
-label    02 ZP02                           ; 46
-label    03 ZP03                           ; 17
-label    04 ZP04                           ; 56
-label    05 ZP05                           ; 35
-label    06 ZP06                           ; 51
-label    07 ZP07                           ; 26
-label    08 ZP08                           ; 42
-label    09 ZP09                           ; 11
-label    0A ZP0A                           ; 15
-label    0B ZP0B                           ; 18
-label    0C ZP0C                           ; 28
-label    0D ZP0D                           ; 10
-label    0E ZP0E                           ; 21
-label    0F ZP0F                           ; 12
-label    10 ZP10                           ; 04
-label    11 ZP11                           ; 09
-label    12 ZP12                           ; 03
-label    13 ZP13                           ; 18
-label    14 ZP14                           ; 08 _
-label    15 ZP15                           ; 08
-label    16 ZP16                           ; 05
-label    17 ZP17                           ; 04
-label    18 ZP18                           ; 07
-label    19 ZP19                           ; 12
-label    1A ZP1A                           ; 03
-label    1B ZP1B                           ; 10
+; Zero-Page variables            ; Usage count
+label    00 ZP_Obj_List_Ptr_Lo   ; 182
+label    01 ZP_Obj_List_Ptr_Hi   ; 111
+label    02 ZP02                 ; 46
+label    03 ZP03                 ; 17
+label    04 ZP04                 ; 56
+label    05 ZP05                 ; 35
+label    06 ZP06                 ; 51
+label    07 ZP07                 ; 26
+label    08 ZP08                 ; 42
+label    09 ZP09                 ; 11
+label    0A ZP0A                 ; 15
+label    0B ZP0B                 ; 18
+label    0C ZP0C                 ; 28
+label    0D ZP0D                 ; 10
+label    0E ZP0E                 ; 21
+label    0F ZP0F                 ; 12
+label    10 ZP10                 ; 04
+label    11 ZP11                 ; 09
+label    12 ZP12                 ; 03
+label    13 ZP13                 ; 18
+label    14 ZP14                 ; 08
+label    15 ZP15                 ; 08
+label    16 ZP16                 ; 05
+label    17 ZP17                 ; 04
+label    18 ZP18                 ; 07
+label    19 ZP19                 ; 12
+label    1A ZP1A                 ; 03
+label    1B ZP1B                 ; 10
 comment  1C
 comment  1C FF=none, x7=shooting, Bx=left, 7x=right, Ex=fly, Ax=fly left, 6x=fly right
 comment  1C 1111 1111 = No action
@@ -35,7 +35,8 @@ comment  1C x1xx xxxx = Not moving left
 comment  1C xx1x xxxx = Not down (i.e. hover)
 comment  1C xxx1 xxxx = Not up
 comment  1C xxxx 1xxx = Not Firing
-comment  1C -
+insert   1C ;
+comment  1C \
 comment  1C Examples:
 comment  1C 1110 xxxx = Flying Hover
 comment  1C 1010 xxxx = Flying Left
@@ -44,9 +45,9 @@ comment  1C 1011 xxxx = Walk Left
 comment  1C 0111 xxxx = Walk right
 label    1C ZP_Jetman_Action
 comment  1E
-label    1E ZP_Ship_UDG_Addr_Offset        ;
-label    1F ZP_Ship_Parts_Counter          ;
-label    20 ZP_IRQ_Occurred                ;
+label    1E ZP_Ship_UDG_Addr_Offset
+label    1F ZP_Ship_Parts_Counter
+label    20 ZP_IRQ_Occurred
 comment  21
 comment  21 When reaches $04, Alien spawns, incremented by Explosions and Lasers
 label    21 ZP_Alien_Spawn_Counter
@@ -98,11 +99,6 @@ comment  5E
 label    5E ZP_Active_Player
 label    5F ZP_Subroutine_Addr_Lo
 label    60 ZP_Subroutine_Addr_Hi
-
-; Screen RAM starts at 200, set in memory_map info file
-comment  0200
-
-; Non-Zero-Page Object Variables
 comment  0380
 comment  0380 ======================= Objects =======================
 comment  0380 Each object occupies 8 bytes, some bytes don't appear to be used.
@@ -131,33 +127,35 @@ comment  0380 \     01 = Position X  - Pixels Left=00 Right=B6 or B7
 comment  0380 \     02 = Direction X - Fx=Moving Left, 0x=moving right, xN where N is velocity for fly/walk
 comment  0380 \     03 = Position Y  - Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
 comment  0380 \     04 = Direction Y - Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
-comment  0380 \     05 = Direction Y - Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
+comment  0380 \     05 = Colour
+insert   0380 ;
 label    0380 Obj_Jetman_State
 label    0381 Obj_Jetman_Position_X
 used     0382 Obj_Jetman_Direction_X
 label    0383 Obj_Jetman_Position_Y
 used     0384 Obj_Jetman_Direction_Y
 used     0385 Obj_Jetman_Colour
-used     0386 Obj_Jetman_UNUSED_0386
-used     0387 Obj_Jetman_UNUSED_0387
+label    0386 Obj_Jetman_UNUSED_0386
+label    0387 Obj_Jetman_UNUSED_0387
 comment  0388
 comment  0388 -------------------- Laser Objects --------------------
 comment  0388 Byte 00/08 = Object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
-comment  0388      01/09 = Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
-comment  0388      02/0A = X-coord of start of laser beam, calculated from position of Jetman.
-comment  0388      03/0B = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-comment  0388      04/0C = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-comment  0388      05/0D = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-comment  0388      06/0E = Laser shot beam length, randomly set using the IRQ counter.
-comment  0388      07/0F = Laser Colour
+comment  0388 \     01/09 = Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
+comment  0388 \     02/0A = X-coord of start of laser beam, calculated from position of Jetman.
+comment  0388 \     03/0B = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+comment  0388 \     04/0C = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+comment  0388 \     05/0D = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+comment  0388 \     06/0E = Laser shot beam length, randomly set using the IRQ counter.
+comment  0388 \     07/0F = Laser Colour
 insert   0388 ;
-comment  0388 Laser_Colour_Table
-comment  0388 fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colours if it's used
+comment  0388 Laser_Colour_Table at 216B:
+comment  0388 fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04
 comment  0388 fcb     BLUE,YELLOW,CYAN,YELLOW ; 216F: 06 07 03 07
 insert   0388 ;
 comment  0388 Laser decay sequence as written to UDG RAM:
 comment  0388 $FF       $FC       $E0       $00
 comment  0388 %11111111 %11111100 %11100000 %00000000
+insert   0388 ;
 label    0388 Obj_Laser_0
 used     0390 Obj_Laser_1
 used     0398 Obj_Laser_2
@@ -177,7 +175,7 @@ label    03AD Obj_Sound_Laser
 label    03AE Obj_Sound_Laser_Timer
 label    03AF Obj_Sound_UNUSED_03A7
 comment  03B0
-comment  03B0 ----------------- Ship Base Module --------------------
+comment  03B0 -------------- Ship Base Module Object ----------------
 comment  03B0 Byte 00 = 09 during game play, 0A when ascending, 0B when decending
 comment  03B0 \     01 = Position X
 comment  03B0 \     02 = Number of fuel cells, 0=empty, 6=full
@@ -194,20 +192,21 @@ label    03B5 Obj_Ship_UNUSED_03B5
 label    03B6 Obj_Ship_UNUSED_03B6
 label    03B7 Obj_Ship_UNUSED_03B7
 comment  03B8
-comment  03B8 ------------------ Ship Top Module --------------------
+comment  03B8 ----------- Ship Top Module or Fuel Object ------------
 comment  03B8 Byte 00 = 04 when active, else 00
-comment	 03B8 \          Initially it's the ship top module, then switches to Fuel
-comment	 03B8 \          Cell when top module delivered
-comment  03B8 Byte 01 = Position X
-comment  03B8 Byte 02 = DONT KNOW
-comment  03B8 Byte 03 = Position Y
-comment  03B8 Byte 04 = Ship part ready for Pick-up/Picked-up/Falling
+comment  03B8 \          Initially it's the ship top module, then switches to Fuel
+comment  03B8 \          Cell when top module delivered
+comment  03B8 \     01 = Position X
+comment  03B8 \     02 = DONT KNOW
+comment  03B8 \     03 = Position Y
+comment  03B8 \     04 = Ship part ready for Pick-up/Picked-up/Falling
 comment  03B8 \          xxxx_xxx1 = Landed/Stationary
 comment  03B8 \          xxxx_xx1x = Picked-up by Jetman
 comment  03B8 \          xxxx_x1xx = Falling
 comment  03B8 \     05 = Object Colour
 comment  03B8 \     06 = Object User-Defined Graphics data address index
-comment  03B8 ;
+comment  03B8 \     07 = ???
+insert   03B8 ;
 used     03B8 Obj_Ship_Top_Or_Fuel_Type ; Type = 04 when active, else 00
 label    03B9 Obj_Ship_Top_Or_Fuel_X
 used     03BA Obj_Ship_Top_Or_Fuel_DONT_KNOW
@@ -215,68 +214,66 @@ used     03BB Obj_Ship_Top_Or_Fuel_Y
 label    03BC Obj_Ship_Top_Or_Fuel_Status
 used     03BD Obj_Ship_Top_Or_Fuel_Colour
 used     03BE Obj_Ship_Top_Or_Fuel_UDG_Index
-used     03BF Obj_Ship_Top_Or_Fuel_HEIGHT?
-
-comment	03C0
-; Ship Part Middle, then a valuable e.g. 03C0  0E 58 00 5E 00 03 28 18
+used     03BF Obj_Ship_Top_Or_Fuel_???
+comment  03C0
+comment  03C0 -------- Ship Middle Module or Valuable Object --------
+comment  03C0 Byte 00 = 0E when active, else 00
+comment  03C0 \          Initially it's the ship middle module, then switches to
+comment  03C0 \          a Valuable when middle module delivered
+comment  03C0 \     01 = Position X
+comment  03C0 \     02 = DONT KNOW
+comment  03C0 \     03 = Position Y
+comment  03C0 \     04 = Ship part ready for Pick-up/Picked-up/Falling
+comment  03C0 \          xxxx_xxx1 = Landed/Stationary
+comment  03C0 \          xxxx_xx1x = Picked-up by Jetman
+comment  03C0 \          xxxx_x1xx = Falling
+comment  03C0 \     05 = Object Colour
+comment  03C0 \     06 = For Ship Module Object, User-Defined Graphics data address index
+comment  03C0 \          For Valuable, affects colours and flashing of Byte 05
+comment  03C0 \            $20=gold bar (yellow)
+comment  03C0 \            $22=plutonium (cyan)
+comment  03C0 \            $24=isotope (cyan/black flash)
+comment  03C0 \            $26=mineral (blue)
+comment  03C0 \            $28=gemstone (multicolour cycle)
+comment  03C0 \     07 = ???
+insert   03C0 ;
 label    03C0 Obj_Ship_Mid_Or_Valuable_Typ ;
 label    03C1 Obj_Ship_Mid_Or_Valuable_X
-;label   03C2 Obj_Ship_Mid_Or_Valuable_2
-;label   03C3 Obj_Ship_Mid_Or_Valuable_Y
+used     03C2 Obj_Ship_Mid_Or_Valuable_?????
+used     03C3 Obj_Ship_Mid_Or_Valuable_Y
 label    03C4 Obj_Ship_Mid_Or_Valu_Status
-;label   03C5 Obj_Ship_Mid_Or_Valu_Colour
-label    03C6 Obj_Ship_Mid_Or_Valu_UDG_Idx   ; OBJECT_UDG_DATA_INDEX_PARAM
-label    03C7 Obj_Ship_Mid_Or_Valuable_7
-
-
-; Byte 00/08= object type
-; Byte 01/09= X postion
-; Byte 02/0A= X direction Fx=Left, 0x=right, xF=slow, x0=fast, looks like a frames per move setting
-; Byte 03/0B= Y position
-; Byte 04/0C= Y Direction, Wave 0:   x0=horizontal, x1-7=descending 7= fast 0=slow
-;                          Wave 1/2: 08=down, f8=up, always x8
-;                          Wave 3:   Same as 1/2 but xF seen at Jetman explode
-; Byte 05/0D= colour - bottom 3 bits of byte
-; Byte 06/0E= For Valuable, affects colours and flashing of Byte 05
-;             $20=gold bar (yellow)
-;             $22=plutonium (cyan)
-;             $24=isotope (cyan/black flash)
-;             $26=mineral (blue)
-;             $28=gemstone (multicolour cycle)
-; Byte 06/0E= For Alien Sphere Wave, it's a countdown from $18 to 0 for Y reversal
-
-comment	03C8
-; Aliens 1-6
-label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00
-;label   03C9 Obj_Alien_0_1 ;
-;label   03CA Obj_Alien_0_2 ;
-;label   03CB Obj_Alien_0_3 ;
-;label   03CC Obj_Alien_0_4 ;
-;label   03CD Obj_Alien_0_5 ;
-;label   03CE Obj_Alien_0_6 ;
-;label   03CF Obj_Alien_0_7 ;
-
-;label   03D0 Obj_Alien_1_0 ;     03D0  05 91 08 7C 00 06 03 00
-
-;label   03D8 Obj_Alien_2_0 ;     03D8  05 47 08 85 00 02 00 00
-
-;label   03E0 Obj_Alien_3_0 ;     03E0  05 8B 08 81 00 02 03 00
-
-;label   03E8 Obj_Alien_4_0 ;     03E8  05 A6 08 7D 00 02 03 00
-
-;label   03F0 Obj_Alien_5_0 ;     03F0  05 19 F8 8D 00 06 00 00
-
-comment	1008 999
-; UDG RAM positions of score data
+used     03C5 Obj_Ship_Mid_Or_Valu_Colour
+used     03C6 Obj_Ship_Mid_Or_Valu_UDG_Idx
+used     03C7 Obj_Ship_Mid_Or_Valuable_???
+comment  03C8
+comment  03C8 -------------------- Alien Objects --------------------
+comment  03C8 Byte 00/08 = Alien type:
+comment  03C8 \             05 = Wave 0 Fuzzball
+comment  03C8 \             06 = Wave 3 Saucer
+comment  03C8 \             07 = Wave 2 Sphere
+comment  03C8 \             08 = Wave 1 Cross
+comment  03C8 \     01/09 = Position X
+comment  03C8 \     02/0A = Direction X
+comment  03C8 \     03/0B = Position Y
+comment  03C8 \     04/0C = Direction Y
+comment  03C8 \     05/0D = Colour
+comment  03C8 \     06/0E = For Wave 2 Sphere, countdown from $18 to 0 for Direction Y reversal
+comment  03C8 \     07/0F = ???
+insert   03C8 ;
+label    03C8 Obj_Alien_0
+used     03D0 Obj_Alien_1
+used     03D8 Obj_Alien_2
+used     03E0 Obj_Alien_3
+used     03E8 Obj_Alien_4
+used     03F0 Obj_Alien_5
+comment  1008
+comment  1008 Variables that are not persistent i.e. reset at game restart
 label    1008 Player_1_Score_UDG_RAM_Addr
 label    1420 Player_1_Lives_UDG_RAM_Addr
 label    1588 Hi_Score_UDG_RAM_Addr
 label    19A0 Player_2_Lives_UDG_RAM_Addr
 label    1B08 Player_2_Score_UDG_RAM_Addr
-
-; Other variables that are somewhat persistent i.e. not reset at game restart
+comment  1FD0
+comment  1FD0 Variables that are somewhat persistent i.e. not reset at game restart
 label    1FD0 Score_Hi
 label    1FD3 Game_Settings ;
-;                         xxxx_xxx1 = 2 Player Selected (else 1 Player)
-;                         xxxx_xx1x = Joystick Selected (else Keyboard)
-

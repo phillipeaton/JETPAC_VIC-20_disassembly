@@ -2,11 +2,6 @@
 ; Loaded: binary file "bin_orig/jetpac_2000-3fff.bin"
 ; Loaded: Info file "dasmfw\nfo_include.nfo"
 
-; 03B8           Initially it's the ship top module, then switches to Fuel
-; 03B8           Cell when top module delivered
-; 03C0
-; 03C8
-; 1008 999
 ; --------------------------------------------------------------------------------------------
 ; JET PAC for the Commodore VIC-20 + 8K Memory Expansion
 ; Copyright 1982 ULTIMATE PLAY THE GAME / Ashby Computers & Graphics Ltd.
@@ -55,7 +50,8 @@ ZP1B                            equ     $001B
 ; xx1x xxxx = Not down (i.e. hover)
 ; xxx1 xxxx = Not up
 ; xxxx 1xxx = Not Firing
-; -
+;
+; \
 ; Examples:
 ; 1110 xxxx = Flying Hover
 ; 1010 xxxx = Flying Left
@@ -114,6 +110,7 @@ ZP_Subroutine_Addr_Lo           equ     $005F
 ZP_Subroutine_Addr_Hi           equ     $0060
 
 Screen_RAM                      equ     $0200
+
 IRQ_Interrupt_Vector_Lo         equ     $0314
 IRQ_Interrupt_Vector_Hi         equ     $0315
 NMI_Interrupt_Vector_Lo         equ     $0318
@@ -146,33 +143,33 @@ NMI_Interrupt_Vector_Hi         equ     $0319
 ;      02 = Direction X - Fx=Moving Left, 0x=moving right, xN where N is velocity for fly/walk
 ;      03 = Position Y  - Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
 ;      04 = Direction Y - Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
-;      05 = Direction Y - Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
+;      05 = Colour
+;
 Obj_Jetman_State                equ     $0380
 Obj_Jetman_Position_X           equ     $0381
 Obj_Jetman_Direction_X          equ     $0382
 Obj_Jetman_Position_Y           equ     $0383
 Obj_Jetman_Direction_Y          equ     $0384
 Obj_Jetman_Colour               equ     $0385
-Obj_Jetman_UNUSED_0386          equ     $0386
-Obj_Jetman_UNUSED_0387          equ     $0387
 
 ; -------------------- Laser Objects --------------------
 ; Byte 00/08 = Object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
-; 01/09 = Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
-; 02/0A = X-coord of start of laser beam, calculated from position of Jetman.
-; 03/0B = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-; 04/0C = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-; 05/0D = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-; 06/0E = Laser shot beam length, randomly set using the IRQ counter.
-; 07/0F = Laser Colour
+;      01/09 = Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
+;      02/0A = X-coord of start of laser beam, calculated from position of Jetman.
+;      03/0B = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+;      04/0C = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+;      05/0D = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+;      06/0E = Laser shot beam length, randomly set using the IRQ counter.
+;      07/0F = Laser Colour
 ;
-; Laser_Colour_Table
-; fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colours if it's used
+; Laser_Colour_Table at 216B:
+; fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04
 ; fcb     BLUE,YELLOW,CYAN,YELLOW ; 216F: 06 07 03 07
 ;
 ; Laser decay sequence as written to UDG RAM:
 ; $FF       $FC       $E0       $00
 ; %11111111 %11111100 %11100000 %00000000
+;
 Obj_Laser_0                     equ     $0388
 Obj_Laser_1                     equ     $0390
 Obj_Laser_2                     equ     $0398
@@ -191,7 +188,7 @@ Obj_Sound_Noise_Timer           equ     $03AC
 Obj_Sound_Laser                 equ     $03AD
 Obj_Sound_Laser_Timer           equ     $03AE
 
-; ----------------- Ship Base Module --------------------
+; -------------- Ship Base Module Object ----------------
 ; Byte 00 = 09 during game play, 0A when ascending, 0B when decending
 ;      01 = Position X
 ;      02 = Number of fuel cells, 0=empty, 6=full
@@ -205,18 +202,21 @@ Obj_Ship_Base_Fuel_Level        equ     $03B2
 Obj_Ship_Base_Position_Y        equ     $03B3
 Obj_Ship_Base_Parts_Counter     equ     $03B4
 
-; ------------------ Ship Top Module --------------------
+; ----------- Ship Top Module or Fuel Object ------------
 ; Byte 00 = 04 when active, else 00
-; Byte 01 = Position X
-; Byte 02 = DONT KNOW
-; Byte 03 = Position Y
-; Byte 04 = Ship part ready for Pick-up/Picked-up/Falling
+;           Initially it's the ship top module, then switches to Fuel
+;           Cell when top module delivered
+;      01 = Position X
+;      02 = DONT KNOW
+;      03 = Position Y
+;      04 = Ship part ready for Pick-up/Picked-up/Falling
 ;           xxxx_xxx1 = Landed/Stationary
 ;           xxxx_xx1x = Picked-up by Jetman
 ;           xxxx_x1xx = Falling
 ;      05 = Object Colour
 ;      06 = Object User-Defined Graphics data address index
-; ;
+;      07 = ???
+;
 Obj_Ship_Top_Or_Fuel_Type       equ     $03B8
 Obj_Ship_Top_Or_Fuel_X          equ     $03B9
 Obj_Ship_Top_Or_Fuel_DONT_KNOW  equ     $03BA
@@ -224,30 +224,84 @@ Obj_Ship_Top_Or_Fuel_Y          equ     $03BB
 Obj_Ship_Top_Or_Fuel_Status     equ     $03BC
 Obj_Ship_Top_Or_Fuel_Colour     equ     $03BD
 Obj_Ship_Top_Or_Fuel_UDG_Index  equ     $03BE
-Obj_Ship_Top_Or_Fuel_HEIGHT?    equ     $03BF
+Obj_Ship_Top_Or_Fuel_???        equ     $03BF
+
+; -------- Ship Middle Module or Valuable Object --------
+; Byte 00 = 0E when active, else 00
+;           Initially it's the ship middle module, then switches to
+;           a Valuable when middle module delivered
+;      01 = Position X
+;      02 = DONT KNOW
+;      03 = Position Y
+;      04 = Ship part ready for Pick-up/Picked-up/Falling
+;           xxxx_xxx1 = Landed/Stationary
+;           xxxx_xx1x = Picked-up by Jetman
+;           xxxx_x1xx = Falling
+;      05 = Object Colour
+;      06 = For Ship Module Object, User-Defined Graphics data address index
+;           For Valuable, affects colours and flashing of Byte 05
+;             $20=gold bar (yellow)
+;             $22=plutonium (cyan)
+;             $24=isotope (cyan/black flash)
+;             $26=mineral (blue)
+;             $28=gemstone (multicolour cycle)
+;      07 = ???
+;
 Obj_Ship_Mid_Or_Valuable_Typ    equ     $03C0
 Obj_Ship_Mid_Or_Valuable_X      equ     $03C1
+Obj_Ship_Mid_Or_Valuable_?????  equ     $03C2
+Obj_Ship_Mid_Or_Valuable_Y      equ     $03C3
 Obj_Ship_Mid_Or_Valu_Status     equ     $03C4
+Obj_Ship_Mid_Or_Valu_Colour     equ     $03C5
 Obj_Ship_Mid_Or_Valu_UDG_Idx    equ     $03C6
-Obj_Alien_0_0                   equ     $03C8
+Obj_Ship_Mid_Or_Valuable_???    equ     $03C7
+
+; -------------------- Alien Objects --------------------
+; Byte 00/08 = Alien type:
+;              05 = Wave 0 Fuzzball
+;              06 = Wave 3 Saucer
+;              07 = Wave 2 Sphere
+;              08 = Wave 1 Cross
+;      01/09 = Position X
+;      02/0A = Direction X
+;      03/0B = Position Y
+;      04/0C = Direction Y
+;      05/0D = Colour
+;      06/0E = For Wave 2 Sphere, countdown from $18 to 0 for Direction Y reversal
+;      07/0F = ???
+;
+Obj_Alien_0                     equ     $03C8
+Obj_Alien_1                     equ     $03D0
+Obj_Alien_2                     equ     $03D8
+Obj_Alien_3                     equ     $03E0
+Obj_Alien_4                     equ     $03E8
+Obj_Alien_5                     equ     $03F0
+
 UDG_RAM                         equ     $1000
+
+; Variables that are not persistent i.e. reset at game restart
 Player_1_Score_UDG_RAM_Addr     equ     $1008
 Player_1_Lives_UDG_RAM_Addr     equ     $1420
 Hi_Score_UDG_RAM_Addr           equ     $1588
 Player_2_Lives_UDG_RAM_Addr     equ     $19A0
 Player_2_Score_UDG_RAM_Addr     equ     $1B08
+
+; Variables that are somewhat persistent i.e. not reset at game restart
 Score_Hi                        equ     $1FD0
 Game_Settings                   equ     $1FD3
+
 VIC_R0_H_Ctr                    equ     $9000
 VIC_R4_TV_Raster                equ     $9004
 VIC_RA_Frq_Osc1                 equ     $900A
 VIC_RB_Frq_Osc2                 equ     $900B
 VIC_RC_Frq_Osc3                 equ     $900C
 VIC_RE_Vol_Colour               equ     $900E
+
 VIA1_Port_B                     equ     $9110
 VIA1_Port_A                     equ     $9111
 VIA1_DDR_A                      equ     $9113
 VIA1_Int_Enable                 equ     $911E
+
 VIA2_Port_B                     equ     $9120
 VIA2_Port_A                     equ     $9121
 VIA2_DDR_B                      equ     $9122
@@ -255,6 +309,7 @@ VIA2_DDR_A                      equ     $9123
 VIA2_T1_Cnt_Lo                  equ     $9124
 VIA2_T1_Cnt_Hi                  equ     $9125
 VIA2_Int_Enable                 equ     $912E
+
 Colour_RAM                      equ     $9600
 
 ;****************************************************
@@ -2873,7 +2928,7 @@ Loop_Reset_Objects_Multiple
 
 ; L_BRS_($28E0)_($28E4) OK
 Loop_Reset_Objects_Aliens
-    sta     Obj_Alien_0_0,x                 ; 28E0: 9D C8 03 
+    sta     Obj_Alien_0,x                   ; 28E0: 9D C8 03 
     dex                                     ; 28E3: CA       
     bpl     Loop_Reset_Objects_Aliens       ; 28E4: 10 FA    
     rts                                     ; 28E6: 60       
