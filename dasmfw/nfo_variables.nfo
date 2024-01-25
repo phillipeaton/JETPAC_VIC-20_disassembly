@@ -109,51 +109,47 @@ comment  0380 Each object occupies 8 bytes, some bytes don't appear to be used.
 comment  0380 First byte of each object is it's type, Jetman can be object type 01/02/81/82,
 comment  0380 Lasers can be 10 or 90, top bit signifying left/right direction.
 comment  0380 Other objects:
-comment  0380   03 = Explosion, other objects change to this object before disappearing
-comment  0380   04 = Ship_Part/Fuel
-comment  0380   05 = Wave 0 Fuzzball
-comment  0380   06 = Wave 3 Saucer
-comment  0380   07 = Wave 2 Sphere
-comment  0380   08 = Wave 1 Cross
-comment  0380   09 = Ship Bottom Part
-comment  0380   0A = Ship Ascend
-comment  0380   0B = Ship Descend
-comment  0380   0C = Sound
-comment  0380   0D = ???
-comment  0380   0E = Valuable
-insert   0380
+comment  0380 \  01/02 = Jetman Flying/Standing
+comment  0380 \     03 = Explosion, other objects change to this object before disappearing
+comment  0380 \     04 = Ship_Part/Fuel
+comment  0380 \     05 = Wave 0 Fuzzball
+comment  0380 \     06 = Wave 3 Saucer
+comment  0380 \     07 = Wave 2 Sphere
+comment  0380 \     08 = Wave 1 Cross
+comment  0380 \     09 = Ship Bottom Part
+comment  0380 \     0A = Ship Ascend
+comment  0380 \     0B = Ship Descend
+comment  0380 \     0C = Sound
+comment  0380 \     0D = ???
+comment  0380 \     0E = Valuable
+comment  0380
 comment  0380 -------------------- Jetman Object --------------------
-comment  0380 1xxx xxxx = Facing Left, not facing right
-comment  0380 xxxx xx1x = Standing
-comment  0380 xxxx xxx1 = Flying (Not on screen if !Flying & !Standing e.g. hit by alien)
+comment  0380 Byte 00 = 1xxx xxxx = Facing Left, not facing right
+comment  0380 \          xxxx xx1x = Standing
+comment  0380 \          xxxx xxx1 = Flying (Not on screen if !Flying & !Standing e.g. hit by alien)
+comment  0380 \     01 = Position X  - Pixels Left=00 Right=B6 or B7
+comment  0380 \     02 = Direction X - Fx=Moving Left, 0x=moving right, xN where N is velocity for fly/walk
+comment  0380 \     03 = Position Y  - Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
+comment  0380 \     04 = Direction Y - Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
+comment  0380 \     05 = Direction Y - Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
 label    0380 Obj_Jetman_State
-comment  0381
-comment  0381 Pixel Left=00 Right=B6 or B7
 label    0381 Obj_Jetman_Position_X
-comment  0382
-comment  0382 Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
 used     0382 Obj_Jetman_Direction_X
-comment  0383
-comment  0383 Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
 label    0383 Obj_Jetman_Position_Y
-comment  0384
-comment  0384 Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
 used     0384 Obj_Jetman_Direction_Y
-comment  0385
-used     0385 Obj_Jetman_0385
-used     0386 Obj_Jetman_0386
-used     0387 Obj_Jetman_0387
-
+used     0385 Obj_Jetman_Colour
+used     0386 Obj_Jetman_UNUSED_0386
+used     0387 Obj_Jetman_UNUSED_0387
 comment  0388
 comment  0388 -------------------- Laser Objects --------------------
-comment  0388 Byte 00/08= object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
-comment  0388 Byte 01/09= Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
-comment  0388 Byte 02/0A= X-coord of start of laser beam, calculated from position of Jetman.
-comment  0388 Byte 03/0B= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-comment  0388 Byte 04/0C= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-comment  0388 Byte 05/0D= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-comment  0388 Byte 06/0E= Laser shot beam length, randomly set using the IRQ counter.
-comment  0388 Byte 07/0F= Laser Colour
+comment  0388 Byte 00/08 = Object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
+comment  0388      01/09 = Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
+comment  0388      02/0A = X-coord of start of laser beam, calculated from position of Jetman.
+comment  0388      03/0B = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+comment  0388      04/0C = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+comment  0388      05/0D = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+comment  0388      06/0E = Laser shot beam length, randomly set using the IRQ counter.
+comment  0388      07/0F = Laser Colour
 insert   0388 ;
 comment  0388 Laser_Colour_Table
 comment  0388 fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colours if it's used
@@ -166,25 +162,12 @@ label    0388 Obj_Laser_0
 used     0390 Obj_Laser_1
 used     0398 Obj_Laser_2
 used     03A0 Obj_Laser_3
-
-;
-;
-;
-;
-;
-;
-;
-;
-;
-;
-;
-;
-;
-
-                             ;            0  1  2  3  4  5  6  7
-                             ;     03B0  09 70 00 AF 01 00 00 1C
-; Sound object 1st/3rd/5th parameter indicates which sound to play, 2nd/4th/6th is the period
 comment  03A8
+comment  03A8 -------------------- Sound Object ---------------------
+comment  03A8 Byte 01/03/05 = Which sound to play
+comment  03A8 \     02/04/06 = Period of the sound
+comment  03A8 \     07       = Unused
+insert   03A8 ;
 label    03A8 Obj_Sound
 label    03A9 Obj_Sound_Collision
 label    03AA Obj_Sound_Collision_Timer
@@ -192,35 +175,49 @@ label    03AB Obj_Sound_Noise
 label    03AC Obj_Sound_Noise_Timer
 label    03AD Obj_Sound_Laser
 label    03AE Obj_Sound_Laser_Timer
-;label   03AF Obj_Sound_7 ; Not used
-
+label    03AF Obj_Sound_UNUSED_03A7
 comment  03B0
-                             ;        0  1  2  3  4  5  6  7
-                             ; 03B0  09 70 00 AF 01 00 00 1C
-label    03B0 Obj_Ship_Base     ; Type = 09, 0A when ascending, 0B when decending
-label    03B1 Obj_Ship_Base_X
-label    03B2 Obj_Ship_Base_Fuel_Level ; Number of fuel cells, 0=empty, 6=full
-label    03B3 Obj_Ship_Base_Y
-label    03B4 Obj_Ship_Base_Parts_Counter ; 1=Base only, 2=Base+Mid, 3=Base+Mid+Top
-;label    03B5 Obj_Ship_5
-;label    03B6 Obj_Ship_6
-;label    03B7 Obj_Ship_7
+comment  03B0 ----------------- Ship Base Module --------------------
+comment  03B0 Byte 00 = 09 during game play, 0A when ascending, 0B when decending
+comment  03B0 \     01 = Position X
+comment  03B0 \     02 = Number of fuel cells, 0=empty, 6=full
+comment  03B0 \     03 = Position Y
+comment  03B0 \     04 = 1=Base only, 2=Base+Mid, 3=Base+Mid+Top
+comment  03B0 \     07 = Unused, but initiated to $1C
+insert   03B0 ;
+label    03B0 Obj_Ship_Base
+label    03B1 Obj_Ship_Base_Position_X
+label    03B2 Obj_Ship_Base_Fuel_Level
+label    03B3 Obj_Ship_Base_Position_Y
+label    03B4 Obj_Ship_Base_Parts_Counter ;
+label    03B5 Obj_Ship_UNUSED_03B5
+label    03B6 Obj_Ship_UNUSED_03B6
+label    03B7 Obj_Ship_UNUSED_03B7
+comment  03B8
+comment  03B8 ------------------ Ship Top Module --------------------
+comment  03B8 Byte 00 = 04 when active, else 00
+comment	 03B8 \          Initially it's the ship top module, then switches to Fuel
+comment	 03B8 \          Cell when top module delivered
+comment  03B8 Byte 01 = Position X
+comment  03B8 Byte 02 = DONT KNOW
+comment  03B8 Byte 03 = Position Y
+comment  03B8 Byte 04 = Ship part ready for Pick-up/Picked-up/Falling
+comment  03B8 \          xxxx_xxx1 = Landed/Stationary
+comment  03B8 \          xxxx_xx1x = Picked-up by Jetman
+comment  03B8 \          xxxx_x1xx = Falling
+comment  03B8 \     05 = Object Colour
+comment  03B8 \     06 = Object User-Defined Graphics data address index
+comment  03B8 ;
+used     03B8 Obj_Ship_Top_Or_Fuel_Type ; Type = 04 when active, else 00
+label    03B9 Obj_Ship_Top_Or_Fuel_X
+used     03BA Obj_Ship_Top_Or_Fuel_DONT_KNOW
+used     03BB Obj_Ship_Top_Or_Fuel_Y
+label    03BC Obj_Ship_Top_Or_Fuel_Status
+used     03BD Obj_Ship_Top_Or_Fuel_Colour
+used     03BE Obj_Ship_Top_Or_Fuel_UDG_Index
+used     03BF Obj_Ship_Top_Or_Fuel_HEIGHT?
 
-; Ship Part Top (RPT), then Fuel e.g. 03B8  04 20 00 3F 00 01 10 18
-comment	03B8 666
-label   03B8 Obj_Ship_Top_Or_Fuel_Type ; Type = 04 when active, else 00
-label   03B9 Obj_Ship_Top_Or_Fuel_X
-;label   03BA Obj_Ship_Top_Or_Fuel_2
-;label   03BB Obj_Ship_Top_Or_Fuel_Y
-label   03BC Obj_Ship_Top_Or_Fuel_Status ; Ship part Ready for pick-up/picked-up/Dropping
-                                            ; xxxx_xxx1 = Landed/Stationary
-                                            ; xxxx_xx1x = Picked-up by Jetman
-                                            ; xxxx_x1xx = Dropping
-;label   03BD Obj_Ship_Top_Or_Fuel_5
-;label   03BE Obj_Ship_Top_Or_Fuel_6 ; OBJECT_UDG_DATA_INDEX_PARAM
-;label   03BF Obj_Ship_Top_Or_Fuel_7
-
-comment	03C0 777
+comment	03C0
 ; Ship Part Middle, then a valuable e.g. 03C0  0E 58 00 5E 00 03 28 18
 label    03C0 Obj_Ship_Mid_Or_Valuable_Typ ;
 label    03C1 Obj_Ship_Mid_Or_Valuable_X
@@ -248,7 +245,7 @@ label    03C7 Obj_Ship_Mid_Or_Valuable_7
 ;             $28=gemstone (multicolour cycle)
 ; Byte 06/0E= For Alien Sphere Wave, it's a countdown from $18 to 0 for Y reversal
 
-comment	03C8 888
+comment	03C8
 ; Aliens 1-6
 label    03C8 Obj_Alien_0_0 ;     03C8  05 57 08 9D 00 02 03 00
 ;label   03C9 Obj_Alien_0_1 ;

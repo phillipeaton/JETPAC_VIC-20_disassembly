@@ -2,9 +2,10 @@
 ; Loaded: binary file "bin_orig/jetpac_2000-3fff.bin"
 ; Loaded: Info file "dasmfw\nfo_include.nfo"
 
-; 03B8 666
-; 03C0 777
-; 03C8 888
+; 03B8           Initially it's the ship top module, then switches to Fuel
+; 03B8           Cell when top module delivered
+; 03C0
+; 03C8
 ; 1008 999
 ; --------------------------------------------------------------------------------------------
 ; JET PAC for the Commodore VIC-20 + 8K Memory Expansion
@@ -247,50 +248,47 @@ NMI_Interrupt_Vector_Hi         equ     $0319
 ; First byte of each object is it's type, Jetman can be object type 01/02/81/82,
 ; Lasers can be 10 or 90, top bit signifying left/right direction.
 ; Other objects:
-; 03 = Explosion, other objects change to this object before disappearing
-; 04 = Ship_Part/Fuel
-; 05 = Wave 0 Fuzzball
-; 06 = Wave 3 Saucer
-; 07 = Wave 2 Sphere
-; 08 = Wave 1 Cross
-; 09 = Ship Bottom Part
-; 0A = Ship Ascend
-; 0B = Ship Descend
-; 0C = Sound
-; 0D = ???
-; 0E = Valuable
+;   01/02 = Jetman Flying/Standing
+;      03 = Explosion, other objects change to this object before disappearing
+;      04 = Ship_Part/Fuel
+;      05 = Wave 0 Fuzzball
+;      06 = Wave 3 Saucer
+;      07 = Wave 2 Sphere
+;      08 = Wave 1 Cross
+;      09 = Ship Bottom Part
+;      0A = Ship Ascend
+;      0B = Ship Descend
+;      0C = Sound
+;      0D = ???
+;      0E = Valuable
 
 ; -------------------- Jetman Object --------------------
-; 1xxx xxxx = Facing Left, not facing right
-; xxxx xx1x = Standing
-; xxxx xxx1 = Flying (Not on screen if !Flying & !Standing e.g. hit by alien)
+; Byte 00 = 1xxx xxxx = Facing Left, not facing right
+;           xxxx xx1x = Standing
+;           xxxx xxx1 = Flying (Not on screen if !Flying & !Standing e.g. hit by alien)
+;      01 = Position X  - Pixels Left=00 Right=B6 or B7
+;      02 = Direction X - Fx=Moving Left, 0x=moving right, xN where N is velocity for fly/walk
+;      03 = Position Y  - Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
+;      04 = Direction Y - Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
+;      05 = Direction Y - Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
 Obj_Jetman_State                equ     $0380
-
-; Pixel Left=00 Right=B6 or B7
 Obj_Jetman_Position_X           equ     $0381
-
-; Fx=Moving Left, 0x=moving right, xN where N appears to be a velocity for fly/walk
 Obj_Jetman_Direction_X          equ     $0382
-
-; Pixels Top=28 Bottom=AF, 5E= Middle Platform, 3E=Left, 2E=Right
 Obj_Jetman_Position_Y           equ     $0383
-
-; Range between FC=Up to 04=Down at rest i.e. FC,FD,FE,FF,0,1,2,3,4
 Obj_Jetman_Direction_Y          equ     $0384
-
-Obj_Jetman_0385                 equ     $0385
-Obj_Jetman_0386                 equ     $0386
-Obj_Jetman_0387                 equ     $0387
+Obj_Jetman_Colour               equ     $0385
+Obj_Jetman_UNUSED_0386          equ     $0386
+Obj_Jetman_UNUSED_0387          equ     $0387
 
 ; -------------------- Laser Objects --------------------
-; Byte 00/08= object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
-; Byte 01/09= Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
-; Byte 02/0A= X-coord of start of laser beam, calculated from position of Jetman.
-; Byte 03/0B= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-; Byte 04/0C= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-; Byte 05/0D= Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
-; Byte 06/0E= Laser shot beam length, randomly set using the IRQ counter.
-; Byte 07/0F= Laser Colour
+; Byte 00/08 = Object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
+; 01/09 = Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
+; 02/0A = X-coord of start of laser beam, calculated from position of Jetman.
+; 03/0B = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+; 04/0C = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+; 05/0D = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
+; 06/0E = Laser shot beam length, randomly set using the IRQ counter.
+; 07/0F = Laser Colour
 ;
 ; Laser_Colour_Table
 ; fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04  Green not used, messes up colours if it's used
@@ -304,6 +302,11 @@ Obj_Laser_1                     equ     $0390
 Obj_Laser_2                     equ     $0398
 Obj_Laser_3                     equ     $03A0
 
+; -------------------- Sound Object ---------------------
+; Byte 01/03/05 = Which sound to play
+;      02/04/06 = Period of the sound
+;      07       = Unused
+;
 Obj_Sound                       equ     $03A8
 Obj_Sound_Collision             equ     $03A9
 Obj_Sound_Collision_Timer       equ     $03AA
@@ -312,14 +315,40 @@ Obj_Sound_Noise_Timer           equ     $03AC
 Obj_Sound_Laser                 equ     $03AD
 Obj_Sound_Laser_Timer           equ     $03AE
 
+; ----------------- Ship Base Module --------------------
+; Byte 00 = 09 during game play, 0A when ascending, 0B when decending
+;      01 = Position X
+;      02 = Number of fuel cells, 0=empty, 6=full
+;      03 = Position Y
+;      04 = 1=Base only, 2=Base+Mid, 3=Base+Mid+Top
+;      07 = Unused, but initiated to $1C
+;
 Obj_Ship_Base                   equ     $03B0
-Obj_Ship_Base_X                 equ     $03B1
+Obj_Ship_Base_Position_X        equ     $03B1
 Obj_Ship_Base_Fuel_Level        equ     $03B2
-Obj_Ship_Base_Y                 equ     $03B3
+Obj_Ship_Base_Position_Y        equ     $03B3
 Obj_Ship_Base_Parts_Counter     equ     $03B4
+
+; ------------------ Ship Top Module --------------------
+; Byte 00 = 04 when active, else 00
+; Byte 01 = Position X
+; Byte 02 = DONT KNOW
+; Byte 03 = Position Y
+; Byte 04 = Ship part ready for Pick-up/Picked-up/Falling
+;           xxxx_xxx1 = Landed/Stationary
+;           xxxx_xx1x = Picked-up by Jetman
+;           xxxx_x1xx = Falling
+;      05 = Object Colour
+;      06 = Object User-Defined Graphics data address index
+; ;
 Obj_Ship_Top_Or_Fuel_Type       equ     $03B8
 Obj_Ship_Top_Or_Fuel_X          equ     $03B9
+Obj_Ship_Top_Or_Fuel_DONT_KNOW  equ     $03BA
+Obj_Ship_Top_Or_Fuel_Y          equ     $03BB
 Obj_Ship_Top_Or_Fuel_Status     equ     $03BC
+Obj_Ship_Top_Or_Fuel_Colour     equ     $03BD
+Obj_Ship_Top_Or_Fuel_UDG_Index  equ     $03BE
+Obj_Ship_Top_Or_Fuel_HEIGHT?    equ     $03BF
 Obj_Ship_Mid_Or_Valuable_Typ    equ     $03C0
 Obj_Ship_Mid_Or_Valuable_X      equ     $03C1
 Obj_Ship_Mid_Or_Valu_Status     equ     $03C4
@@ -1393,8 +1422,8 @@ Loop_Init_Objects
 ; ==========================================
 
 Init_Ship_Objs_Param_Table
-    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Ship Base Section, Posn_X, ?, Posn_Y
-    fcb     $01,$00,$00,$1C                 ; 233F: 01 00 00 1C  $01=Pickup Status, ?, Height on Landing, ?
+    fcb     $09,$70,$00,$AF                 ; 233B: 09 70 00 AF  $09=Ship Base Section
+    fcb     $01,$00,$00,$1C                 ; 233F: 01 00 00 1C 
 
     fcb     $04,$20,$00,$3F                 ; 2343: 04 20 00 3F  $04=Ship Top Section
     fcb     $00,$01,$10,$18                 ; 2347: 00 01 10 18 
@@ -2495,7 +2524,7 @@ Ship_Flight
     beq     Sound_Done_Reset_Object_Param   ; 2738: F0 D0    
 
 ; Utilise ship object height to manipulate noise sound channel
-    lda     Obj_Ship_Base_Y                 ; 273A: AD B3 03 
+    lda     Obj_Ship_Base_Position_Y        ; 273A: AD B3 03 
     lsr     a                               ; 273D: 4A       
     eor     #%11111110                      ; 273E: 49 FE    
     jmp     Enable_Oscillator_Channel       ; 2740: 4C 05 27 
@@ -4854,7 +4883,7 @@ Ship_Part_Or_Fuel_Dropped
     sta     ZP13_Obj_Landed_Posn_Y_Offset   ; 2F55: 85 13    
 
 ; Calculate object landed Position Y and store
-    lda     Obj_Ship_Base_Y                 ; 2F57: AD B3 03 
+    lda     Obj_Ship_Base_Position_Y        ; 2F57: AD B3 03 
     sec                                     ; 2F5A: 38       
     sbc     ZP13_Obj_Landed_Posn_Y_Offset   ; 2F5B: E5 13    
     sta     ZP19_Object_Landed_Position_Y   ; 2F5D: 85 19    
@@ -5105,7 +5134,7 @@ Copy_Jetman_XY_To_Object
 ; branch if Jetman is to the left of the ship
     dey                                     ; 302F: 88       
     dey                                     ; 3030: 88       
-    lda     Obj_Ship_Base_X                 ; 3031: AD B1 03 
+    lda     Obj_Ship_Base_Position_X        ; 3031: AD B1 03 
     sec                                     ; 3034: 38       
     sbc     (ZP_Obj_List_Ptr_Lo),y          ; 3035: F1 00    
     bpl     Test_Jetman_Above_Ship          ; 3037: 10 05    
@@ -5128,7 +5157,7 @@ Test_Jetman_Above_Ship
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 3048: 91 00    
 
 ; Set the dropped object's Position X to the same as the ship base, so they line up on-screen
-    lda     Obj_Ship_Base_X                 ; 304A: AD B1 03 
+    lda     Obj_Ship_Base_Position_X        ; 304A: AD B1 03 
     ldy     #OBJECT_POSITION_X_PARAM        ; 304D: A0 01    
     sta     (ZP_Obj_List_Ptr_Lo),y          ; 304F: 91 00    
 

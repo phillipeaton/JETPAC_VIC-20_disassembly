@@ -464,11 +464,10 @@ comment  232C
 comment  2332
 comment  2334
 comment  2337
-label    233B Init_Ship_Objs_Param_Table
-lcomment 233B $09=Ship Base Section, Posn_X, ?, Posn_Y
-const    233B-235A
 comment  233B
-lcomment 233F $01=Pickup Status, ?, Height on Landing, ?
+label    233B Init_Ship_Objs_Param_Table
+lcomment 233B $09=Ship Base Section
+const    233B-235A
 break    233F
 comment  2343
 lcomment 2343 $04=Ship Top Section
