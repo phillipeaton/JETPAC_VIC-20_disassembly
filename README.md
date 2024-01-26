@@ -165,7 +165,7 @@ Simply put, the essence of JETPAC is up to 15 objects, each with a set of proper
 
 Thus, the object table and object handlers are the core of the game. The following pictures show a screenshot of JETPAC during play and a memory dump of the object table and some commentary.
 
-<img title="" src="docs\JETPAC_gameplay_objects.png" alt="JETPAC Source One-pager" width="400" height=""> <img title="" src="docs\JETPAC_object_table.png" alt="JETPAC Source One-pager" width="400" height="">
+<img title="" src="docs\JETPAC_gameplay_objects.png" alt="JETPAC Gameplay Objects" width="400" height=""> <img title="" src="docs\JETPAC_object_table.png" alt="JETPAC Object Table" width="400" height="">
 
 The byte 00 denotes object type, 01-04 typically X position & direction, Y position & direction, 05-07 various other parameters e.g. colour.
 
