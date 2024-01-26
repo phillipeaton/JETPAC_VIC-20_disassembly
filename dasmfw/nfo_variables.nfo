@@ -36,7 +36,6 @@ comment  1C xx1x xxxx = Not down (i.e. hover)
 comment  1C xxx1 xxxx = Not up
 comment  1C xxxx 1xxx = Not Firing
 insert   1C ;
-comment  1C \
 comment  1C Examples:
 comment  1C 1110 xxxx = Flying Hover
 comment  1C 1010 xxxx = Flying Left
@@ -104,20 +103,23 @@ comment  0380 ======================= Objects =======================
 comment  0380 Each object occupies 8 bytes, some bytes don't appear to be used.
 comment  0380 First byte of each object is it's type, Jetman can be object type 01/02/81/82,
 comment  0380 Lasers can be 10 or 90, top bit signifying left/right direction.
-comment  0380 Other objects:
-comment  0380 \  01/02 = Jetman Flying/Standing
-comment  0380 \     03 = Explosion, other objects change to this object before disappearing
-comment  0380 \     04 = Ship_Part/Fuel
-comment  0380 \     05 = Wave 0 Fuzzball
-comment  0380 \     06 = Wave 3 Saucer
-comment  0380 \     07 = Wave 2 Sphere
-comment  0380 \     08 = Wave 1 Cross
-comment  0380 \     09 = Ship Bottom Part
-comment  0380 \     0A = Ship Ascend
-comment  0380 \     0B = Ship Descend
-comment  0380 \     0C = Sound
-comment  0380 \     0D = ???
-comment  0380 \     0E = Valuable
+comment  0380 Object Types:
+comment  0380 \     01/81 = Jetman Flying
+comment  0380 \     02/82 = Jetman Standing
+comment  0380 \     03    = Explosion
+comment  0380 \     04    = Ship Top Module or Fuel
+comment  0380 \     05    = Wave 0 Fuzzball
+comment  0380 \     06    = Wave 3 Saucer
+comment  0380 \     07    = Wave 2 Sphere
+comment  0380 \     08    = Wave 1 Cross
+comment  0380 \     09    = Ship Base Module
+comment  0380 \     0A    = Ship Ascend
+comment  0380 \     0B    = Ship Descend
+comment  0380 \     0C    = Sound
+comment  0380 \     0D    = (Goto Next Object)
+comment  0380 \     0E    = Ship Middle Module or Valuable
+comment  0380 \     0F    = (Goto Next Object)
+comment  0380 \     10/90 = Laser beam
 comment  0380
 comment  0380 -------------------- Jetman Object --------------------
 comment  0380 Byte 00 = 1xxx xxxx = Facing Left, not facing right
@@ -139,7 +141,7 @@ label    0386 Obj_Jetman_UNUSED_0386
 label    0387 Obj_Jetman_UNUSED_0387
 comment  0388
 comment  0388 -------------------- Laser Objects --------------------
-comment  0388 Byte 00/08 = Object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
+comment  0388 Byte 00/08 = Object type: 0001_0000=Laser Shot Left / 1001_0000=Laser Shot Right, else Zero
 comment  0388 \     01/09 = Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
 comment  0388 \     02/0A = X-coord of start of laser beam, calculated from position of Jetman.
 comment  0388 \     03/0B = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
@@ -173,7 +175,7 @@ label    03AB Obj_Sound_Noise
 label    03AC Obj_Sound_Noise_Timer
 label    03AD Obj_Sound_Laser
 label    03AE Obj_Sound_Laser_Timer
-label    03AF Obj_Sound_UNUSED_03A7
+label    03AF Obj_Sound_UNUSED_03AF
 comment  03B0
 comment  03B0 -------------- Ship Base Module Object ----------------
 comment  03B0 Byte 00 = 09 during game play, 0A when ascending, 0B when decending

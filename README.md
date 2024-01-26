@@ -34,7 +34,7 @@ This repository contains:
   
   - **[Infiltrator](https://csdb.dk/release/?id=100129)** disassembler was used to check the code/data separation and provide a list of label references than was then fed into dasmfw for easy reference.
   
-  - **[Ghidra](https://ghidra-sre.org/)** Function Graph was used later on in the project to visualise the most complex of routines that weren't practical to understand as linear source code or to manually flowchart on paper. Paint.net was used to piece together the graph screenshots.
+  - **[Ghidra](https://ghidra-sre.org/)** Function Graph was used later on in the project to visualize the most complex of routines that weren't practical to understand as linear source code or to manually flowchart on paper. Paint.net was used to piece together the graph screenshots.
 
 - **Automated Source Code Editing** - [GNU sed](https://www.gnu.org/software/sed/) was used for tweaking the disassembled source code (because dasmfw doesn't support local variables yet).
 
@@ -108,17 +108,19 @@ The complete binary disassembly process generates a single source code file, to 
 
 ### Ghidra SRE
 
-To provide flowcharts, after initially drowing everything out on paper, I used the Ghidra software reverse engineering (SRE) tools. Whilst Ghidra is really geared towards compiled high-level programs on modern hardware e.g. Intel x86, good results for 8-bit assembly programs are also possible, but you have to work at it.
+To provide flowcharts, after initially drawing everything out on paper, I used the Ghidra software reverse engineering (SRE) tools. Whilst Ghidra is really geared towards compiled high-level programs on modern hardware e.g. Intel x86, good results for 8-bit assembly programs are also possible, but you have to work at it.
 
 The diagrams presented here were created at the end of the reverse engineering process and so address labels had to be loaded into Ghidra using a script to get any from of usable flowchart (or Function Graph in Ghidra terms).
 
-Additonally, Ghidra is somewhat automated regarding separation of code subroutines, you can't control it (without changing the code) and having assembly subroutines called from a jump table doesn't help, so the flowcharts may be incomplete, have missing comments/value names and should be viewed together with the reverse engineered source code listing, where commentary etc. is much richer.
+Additionally, Ghidra is somewhat automated regarding separation of code subroutines, you can't control it (without changing the code) and having assembly subroutines called from a jump table doesn't help, so the flowcharts may be incomplete, have missing comments/value names and should be viewed together with the reverse engineered source code listing, where commentary etc. is much richer.
 
-Ghidra is an interactive tool and lets you analyse the code is a much more visual and interactive way than raw assembly source code, if you have some time to get a handle on it, it can provide a level of insight that just isn't possible with linear code analysis. 
+Ghidra is an interactive tool and lets you analyze the code is a much more visual and interactive way than raw assembly source code, if you have some time to get a handle on it, it can provide a level of insight that just isn't possible with linear code analysis.
+
+### Source Code Listing
 
 The source code can be, roughly, viewed as three parts, plus graphics data:
 
-1. Program Initialization / Game Select / Main Loop
+1. Program Initialize / Game Select / Main Loop
 
 1. Object handlers called from Main Loop
 
@@ -126,7 +128,7 @@ The source code can be, roughly, viewed as three parts, plus graphics data:
 
 1. User-Defined Graphics data
 
-### Program Initialise / Game Select / Main Loop
+### Program Initialize / Game Select / Main Loop
 
 #### [Program Initialize](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L478)
 
@@ -135,15 +137,11 @@ variable memory, sets-up the VIA I/O ports and configures the VIC chip.
 
 The VIC chip configures the Screen RAM, Used-Defined Graphics RAM and Colour RAM mapping parameters to 11 rows by 23 columns, with each character being 16x8 pixels wide by 16 pixels high, and in this mode, colour tiles are also 16x8 pixels.
 
-<details><summary>Expand to view code extract</summary>
-
 <https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L400-L437>
 
 <https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L513-L520>
 
 <https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L522-L560>
-
-</details>
 
 #### [Game Select](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L595)
 
@@ -151,7 +149,7 @@ The game select screen flashes the chosen options, by inverting the characters a
 
 #### [Init Laser Objects](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L677)
 
-There are a maximum of four laser objects used at any one time. The initialisation routine works out where Jetman is onscreen and the direction he faces, whether the new laser being created will screen-wrap, the vertical height of Jetman's gun and then creates an object with these parameters, together with a random length and colour from a colour table using the IRQ timer.
+There are a maximum of four laser objects used at any one time. The initialization routine works out where Jetman is onscreen and the direction he faces, whether the new laser being created will screen-wrap, the vertical height of Jetman's gun and then creates an object with these parameters, together with a random length and colour from a colour table using the IRQ timer.
 
 <https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L664-L712>
 
@@ -161,15 +159,41 @@ There are a maximum of four laser objects used at any one time. The initialisati
 
 <https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L1992-L2027>
 
-### Object Handlers
+### Objects and Handlers
 
-<mark>DISCUSS OBJECT TABLE</mark>
+Simply put, the essence of JETPAC is up to 15 objects, each with a set of properties and methods, displayed moving on screen, with the bare minimum of background static objects i.e. the platforms and scores.
+
+Thus, the object table and object handlers are the core of the game. The following pictures show a screenshot of JETPAC during play and a memory dump of the object table and some commentary.
+
+<img title="" src="docs\JETPAC_gameplay_objects.png" alt="JETPAC Source One-pager" width="400" height=""> <img title="" src="docs\JETPAC_object_table.png" alt="JETPAC Source One-pager" width="400" height="">
+
+The byte 00 denotes object type, 01-04 typically X position & direction, Y position & direction, 05-07 various other parameters e.g. colour.
+
+```text
+Addr  00 01 02 03 04 05 06 07 ASCII     Object Description
+---------------------------------------------------------------------------------------------------
+0380  81 25 F8 6C FC 01 00 00   .%ølü...  Jetman facing left, flying, white 
+0388  00 9B A1 A5 A5 A5 07 01   ..¡¥¥¥..  Laser shot not active
+0390  90 93 A1 A5 A5 15 07 02   ..¡¥¥...  Laser shot right active, red 
+0398  90 8B A1 A5 0D 45 04 03   ..¡¥.E..  Laser shot right active, cyan (recoloured by next laser)
+03A0  90 83 A1 AD 1D 41 01 07   ..¡-.A..  Laser shot right active, yellow
+03A8  0C 00 00 00 00 00 00 00   ........  Sound currently not being played
+03B0  09 70 02 AF 03 00 00 00    p.¯....  Ship base module, 2 of 6 fuel cells, Base+Mid+Top modules
+03B8  04 98 00 2B 01 04 18 18   ...+....  Fuel Cell, purple
+03C0  0E 18 00 3E 00 01 28 18   ...>..(.  Valuable, gemstone (multicolour cycle)
+03C8  06 60 FB A8 FD 04 03 00   .`û¨ý...  Wave 3 Saucer, purple
+03D0  06 79 FB 6F 04 04 03 00   .yûo....  Wave 3 Saucer, purple
+03D8  06 6E FB 28 04 04 03 00   .nû(....  Wave 3 Saucer, purple
+03E0  03 7D 00 A6 02 07 03 00   .}.¦....  Explosion, yellow
+03E8  06 69 FB A1 FB 04 03 00   .iû¡û...  Wave 3 Saucer, purple
+03F0  06 63 FB A1 FB 04 03 00   .cû¡û...  Wave 3 Saucer, purple
+```
 
 <https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2205-L2232>
 
 #### [GOTO NEXT OBJECT](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2063)
 
-GOTO NEXT OBJECT prioritises object cases for Jetman, laser beam and sound objects and initiates spawning of new aliens when needed.
+GOTO NEXT OBJECT prioritizes object cases for Jetman, laser beam and sound objects and initiates spawning of new aliens when needed.
 
 In the code, object handlers called directly by Main Loop are written in bold e.g. `DISPLAY_LASERS`.
 
@@ -275,7 +299,7 @@ When `$FF` is encountered, the routine returns to continue after the call and da
 
 #### [IRQ Interrupt Handler](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L1960)
 
-The game utilises a VIA timer to:
+The game utilizes a VIA timer to:
 
 - Prioritize object list updates to the Jetman object (so he's always responsive)
 
