@@ -51,7 +51,6 @@ ZP1B                            equ     $001B
 ; xxx1 xxxx = Not up
 ; xxxx 1xxx = Not Firing
 ;
-; \
 ; Examples:
 ; 1110 xxxx = Flying Hover
 ; 1010 xxxx = Flying Left
@@ -120,20 +119,23 @@ NMI_Interrupt_Vector_Hi         equ     $0319
 ; Each object occupies 8 bytes, some bytes don't appear to be used.
 ; First byte of each object is it's type, Jetman can be object type 01/02/81/82,
 ; Lasers can be 10 or 90, top bit signifying left/right direction.
-; Other objects:
-;   01/02 = Jetman Flying/Standing
-;      03 = Explosion, other objects change to this object before disappearing
-;      04 = Ship_Part/Fuel
-;      05 = Wave 0 Fuzzball
-;      06 = Wave 3 Saucer
-;      07 = Wave 2 Sphere
-;      08 = Wave 1 Cross
-;      09 = Ship Bottom Part
-;      0A = Ship Ascend
-;      0B = Ship Descend
-;      0C = Sound
-;      0D = ???
-;      0E = Valuable
+; Object Types:
+;      01/81 = Jetman Flying
+;      02/82 = Jetman Standing
+;      03    = Explosion
+;      04    = Ship Top Module or Fuel
+;      05    = Wave 0 Fuzzball
+;      06    = Wave 3 Saucer
+;      07    = Wave 2 Sphere
+;      08    = Wave 1 Cross
+;      09    = Ship Base Module
+;      0A    = Ship Ascend
+;      0B    = Ship Descend
+;      0C    = Sound
+;      0D    = (Goto Next Object)
+;      0E    = Ship Middle Module or Valuable
+;      0F    = (Goto Next Object)
+;      10/90 = Laser beam
 
 ; -------------------- Jetman Object --------------------
 ; Byte 00 = 1xxx xxxx = Facing Left, not facing right
@@ -153,7 +155,7 @@ Obj_Jetman_Direction_Y          equ     $0384
 Obj_Jetman_Colour               equ     $0385
 
 ; -------------------- Laser Objects --------------------
-; Byte 00/08 = Object type: 0001_0000=Laser Shot Left / 0101_0000=Laser Shot Right, else Zero
+; Byte 00/08 = Object type: 0001_0000=Laser Shot Left / 1001_0000=Laser Shot Right, else Zero
 ;      01/09 = Laser Y-coord, offset from the bottom of the Jetman UDG (i.e. at the laser gun height).
 ;      02/0A = X-coord of start of laser beam, calculated from position of Jetman.
 ;      03/0B = Delayed X-coords of 02/0A, as laser decays, these decay by 8 each time.
@@ -207,7 +209,7 @@ Obj_Ship_Base_Parts_Counter     equ     $03B4
 ;           Initially it's the ship top module, then switches to Fuel
 ;           Cell when top module delivered
 ;      01 = Position X
-;      02 = DONT KNOW
+;      02 = ???
 ;      03 = Position Y
 ;      04 = Ship part ready for Pick-up/Picked-up/Falling
 ;           xxxx_xxx1 = Landed/Stationary

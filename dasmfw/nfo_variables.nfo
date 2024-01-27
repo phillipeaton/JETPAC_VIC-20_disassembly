@@ -199,7 +199,7 @@ comment  03B8 Byte 00 = 04 when active, else 00
 comment  03B8 \          Initially it's the ship top module, then switches to Fuel
 comment  03B8 \          Cell when top module delivered
 comment  03B8 \     01 = Position X
-comment  03B8 \     02 = DONT KNOW
+comment  03B8 \     02 = ???
 comment  03B8 \     03 = Position Y
 comment  03B8 \     04 = Ship part ready for Pick-up/Picked-up/Falling
 comment  03B8 \          xxxx_xxx1 = Landed/Stationary

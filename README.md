@@ -170,7 +170,7 @@ Thus, the object table and object handlers are the core of the game. The followi
 The byte 00 denotes object type, 01-04 typically X position & direction, Y position & direction, 05-07 various other parameters e.g. colour.
 
 ```text
-Addr  00 01 02 03 04 05 06 07 ASCII     Object Description
+Addr  00 01 02 03 04 05 06 07 ASCII       Object Description
 ---------------------------------------------------------------------------------------------------
 0380  81 25 F8 6C FC 01 00 00   .%ølü...  Jetman facing left, flying, white 
 0388  00 9B A1 A5 A5 A5 07 01   ..¡¥¥¥..  Laser shot not active
@@ -191,6 +191,12 @@ Addr  00 01 02 03 04 05 06 07 ASCII     Object Description
 
 <https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2205-L2232>
 
+Using Ghidra Function Graph view, we can map of all the object handlers called from Main Loop in one picture.
+
+<img title="" src="ghidra\graph_screenshots\Overview.png" alt="JETPAC Object Handler Overview" width="1500" height="">
+
+Note, this picture is just to give a feel for the code, you can zoom in, but not so you can read it comfortably. To look at all the flowcharts, you need to open the project in Ghidra for yourself.
+
 #### [GOTO NEXT OBJECT](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2063)
 
 GOTO NEXT OBJECT prioritizes object cases for Jetman, laser beam and sound objects and initiates spawning of new aliens when needed.
@@ -199,7 +205,9 @@ In the code, object handlers called directly by Main Loop are written in bold e.
 
 #### [JETMAN FLYING](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L5691)
 
-Possibly the most complicated routine in the program.
+The most complicated routine in the program.
+
+<img title="" src="ghidra\graph_screenshots\JETMAN_FLYING.png" alt="JETPAC Object Handler JETMAN FLYING" width="1500" height="">
 
 Routine reads the controls then tests if Jetman has collided with a platform, if so, Jetman's position and direction are updated.
 
@@ -208,6 +216,8 @@ Additionally, if the fire button was pressed, laser shots are initiated.
 #### [JETMAN STANDING](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L5923)
 
 Similar to JETMAN FLYING, but without the Platform Collision tests.
+
+<img title="" src="ghidra\graph_screenshots\JETMAN_STANDING.png" alt="JETPAC Object Handler JETMAN STANDING" width="1500" height="">
 
 #### [ANIMATE EXPLOSIONS](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L2997)
 
@@ -275,9 +285,9 @@ Like the sound object, a jump table is used to jump to the appropriate handler.
 
 #### [DISPLAY LASERS](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L868)
 
-(<mark>Graph Function dump)</mark>
-
 This subroutine is called from main loop and is used to update one of the lasers on display.
+
+<img title="" src="ghidra\graph_screenshots\DISPLAY_LASERS.png" alt="JETPAC Object Handler DISPLAY LASERS" width="1500" height="">
 
 Once a laser has been fired, over several animation frames, it increases in length to a predetermined size, then decays in four sections by having bits removed from the screen i.e. it starts off as a solid line then becomes dotted and eventually disappears.
 
@@ -335,6 +345,8 @@ In my mind, this characteristic is one of the memorable aspects of JETPAC and gi
 
 A complicated routine that is used for testing all on-screen objects whether they have collided with a platform e.g. objects falling from the top of the screen, Jetman or Aliens flying in any direction.
 
+<img title="" src="ghidra\graph_screenshots\Test_Platform_Collision.png" alt="JETPAC Object Handler Test Platform Collision" width="1500" height="">
+
 The collision testing sets bits in a return status byte that is the tested by the calling routine to see whether the collision is of relevance.
 
 See the flowchart and source code for more insight.
@@ -358,6 +370,10 @@ This routine utilizes a pre-calculated address look-up table to speed up the pro
 #### [Display Object](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L6856)
 
 Another quite complicated routine and probably where the game spends the majority of it's processing time.
+
+<img title="" src="ghidra\graph_screenshots\Display_Object.png" alt="JETPAC Object Handler Display Object" width="1500" height="">
+
+Display_Object
 
 Generally, the object to be displayed will be moving, so it is given two sets of parameters, one for the objects current position and another for the new position.
 

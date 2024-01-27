@@ -106,9 +106,6 @@ $9120   #37152     Port B output register
 
 --------------------------------------------------------------------------
 
-$5F = Height of item on middle platform e.g. rocket middle section, fuel, gem
-$3F = Height of item on left   platform e.g. rocket top    section, fuel, gem
-
 Rocket middle section is 16 pixels high
 
 ------------
@@ -172,14 +169,6 @@ General idea is that the code documents itself
 Variables and labels often reversed for clarity
 Many main subroutines enter in the middle and sometimes jupm to code before hand, maybe to use short jumps
 -----------
-What's left?
-- ???
-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-- DISPLAY_LASERS
-- Platform_Collision_Test
-- JETMAN_FLYING - GRAPHED, but code not fully single-stepped
-- JETMAN_STANDING - DONE, but load ZP Parameters not done
-- Display_Object - DONE
 
 Ghidra used ImportSymbolsScript.py to import symbols.
 Ghidra locals not used, had to load symbols individually.
