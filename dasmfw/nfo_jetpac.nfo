@@ -27,12 +27,14 @@ comment  2004
 comment  2004 Character Map RAM Location
 comment  2004 --------------------------
 comment  2004 VIC_R5_CM_Start Bits 4321 (CCCC = 1100 = $C) signifies Character Map RAM starts at $1000
-comment  2004
-comment  2004 Screen Size Rows x Columns
+comment  2004 
+comment  2004 Screen Size Columns x Rows
 comment  2004 --------------------------
 comment  2004 VIC_R2_Num_Cols Bits 6543210 set number of columns = _001_0111 = $17 = 23 decimal
 comment  2004 VIC_R3_Num_Rows Bits 654321  set number of rows    = _001_011_ = $0B = 11 decimal
-comment  2004 NOTE: VIC_R3_Num_Rows Bit 0=1 sets character matrices to 8x16 pixels
+comment  2004 VIC_R3_Num_Rows Bit 0=1 sets character matrices to 8x16 pixels, thus 23x11 tile map = 253 tiles.
+comment  2004 Each tile maps to a user-defined character in the $1000-$1FCF range, which effectively gives 
+comment  2004 bitmapped graphics with X:Y 23*8 x 11*16 = 184x176 pixels.
 comment  2004
 label    2004 VIC_Init_Table
 const    2004-201B
@@ -67,7 +69,7 @@ label    201B MASK_10000000
 comment  201C
 comment  201C +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 comment  201C Empty NMI Interrupt Handler, simply returns from interrupt
-used     201C NMI_Interrupt_Hardler
+used     201C NMI_Interrupt_Handler
 comment  201D
 comment  201D Disable Interrupts, reset stack address pointer, clear Decimal flag
 comment  2022
@@ -95,7 +97,7 @@ comment  2056 Reset the VIC registers
 lcomment 2056 16 registers
 label    2058 Reset_VIC
 comment  2061
-comment  2061 Initialize Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
+comment  2061 Initialise Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
 comment  2061 Each character is a 16x8 tile i.e. double height, thus play area
 comment  2061 is decimal 11 Rows x 23 Columns
 comment  2061 0200  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
@@ -298,7 +300,7 @@ comment  21C1 Test if firing left or right
 comment  21C7
 comment  21C7 Add 8 if firing left or -8 if firing right ($F8 is -8)
 comment  21CB
-label    21CB Handle_Wrap_Get_Y_Cooord
+label    21CB Handle_Wrap_Get_Y_Coord
 lcomment 21CE Save A
 deflabel 21D0 LASER_POSITION_Y
 comment  21D3
@@ -332,8 +334,10 @@ comment  21FC
 comment  21FC Probably turns of further display of laser beam
 binary   21FF
 comment  2202
-comment  2202 Loads ZP 14/15/16/17 with laser decay pattern, initial laser is a line of $FF's then $03
+comment  2202 Loads ZP 14/15/16/17 with laser decay pattern, initial laser graphic is a line of $FF's then $03
 comment  2202 subtracted leaving $FC, then $1C subtracted leaving $E0, the subtracting $E0 leaves $00
+comment  2202 i.e. $FF       $FC       $E0       $00
+comment  2202 \     %11111111 %11111100 %11100000 %00000000
 label    2202 Setup_Laser_Decay_Patterns
 lcomment 2205 ZP14/15
 lcomment 2206 Laser decay pattern
@@ -362,7 +366,7 @@ comment  2221 All laser shots ended, set laser shots object type to zero i.e. no
 deflabel 2222 LASER_TYPE_PARAM
 comment  2229
 comment  2229 Process laser shot, update parameters in object table
-comment  2229 Get one of the four laser object paramenters, test if bit 2 is set, ef
+comment  2229 Get one of the four laser object parameters, test if bit 2 is set, ef
 label    2229 Process_Laser_Shot
 comment  2230
 comment  2230 Decrements length and test for exit condition
@@ -436,14 +440,14 @@ label    22D1 Restore_Player_Objs_Init_Sound
 comment  22D7
 label    22D7 Reset_Level
 comment  22E3
-label    22E3 Init_Obj_Rockt_Top_Or_Fuel_Typ
+label    22E3 Init_Obj_Ship_Top_Or_Fuel_Typ
 lcomment 22E9 ZP00/01
 word     22EA
 label    22ED Init_Objects
 break    22ED
 comment  22ED
 comment  22F2
-label    22F2 Init_Obj_Rockt_Mid_Or_Valu_Typ
+label    22F2 Init_Obj_Ship_Mid_Or_Valu_Typ
 word     22F9
 comment  22FF
 comment  22FF Init ship top, middle and base object parameters (i.e. 3 x 8 bytes) from static data table
@@ -587,19 +591,19 @@ comment  2434
 comment  243A
 comment  2440
 comment  244C
-label    2450 STR_1UP
+label    2450 STRING_1UP
 comment  2450
 deflabel 2450 COLOUR_WHITE
-lcomment  2451 `=Space, q=1, r=2
+lcomment 2451 `=Space, q=1, r=2
 lcomment 2456 Top bit=1 indicates end of string
-label    2457 STR_HI
+label    2457 STRING_HI
 break    2457
 deflabel 2457 COLOUR_YELLOW
-label    245E STR_2UP
+label    245E STRING_2UP
 break    245E
 deflabel 245E COLOUR_WHITE
 comment  2465
-label    2465 STR_1UP_HI_2UP
+label    2465 STRING_1UP_HI_2UP
 lcomment 2465 X Y
 word     2467
 lcomment 2469 X Y
@@ -648,7 +652,7 @@ comment  24A1 Code runs twice, first with JSR/RTS, then with normal run though, 
 label    24A4 Do_Game_Select_Flash
 comment  24A4
 comment  24A5
-comment  24A5 Test setting flag, if set, this is the unselcted option, skip the countup/invert part
+comment  24A5 Test setting flag, if set, this is the unselected option, skip the count-up/invert part
 binary   24A6
 comment  24A9
 comment  24A9 This is the selected option, divide the counter by 8 and use it to set the display
@@ -710,15 +714,22 @@ label    251F Fn_And_SP_Row_Offsets
 const    251F-2523
 comment  2524
 label    2524 STRING_COPYRIGHT_1983_ACG
+deflabel 2524 COLOUR_WHITE
 lcomment 2539 Bit 7 = 1 indicates string end, $EE = $6E + bit 7
 lcomment 2539 `= Space, qyxs = 1983, n=.
 label    253A STRING_JETPAC_GAME_SELECT
+deflabel 253A COLOUR_WHITE
 lcomment 254F $CE = $4E + top bit, $4E = "N"
 label    2550 STRING_F1_1_PLAYER_GAME
+deflabel 2550 COLOUR_BLACK
 label    2562 STRING_F3_2_PLAYER_GAME
+deflabel 2562 COLOUR_BLACK
 label    2574 STRING_F5_KEYBOARD
+deflabel 2574 COLOUR_BLACK
 label    2581 STRING_F7_JOYSTICK
+deflabel 2581 COLOUR_BLACK
 label    258E STRING_SP_START_GAME
+deflabel 258E COLOUR_BLACK
 comment  259D
 label    259D Load_ZP_Parameters
 comment  259D Parameters for this routine are assembled into memory directly after the
@@ -751,7 +762,7 @@ comment  25E0
 comment  25E0 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 used     25E0 IRQ_Interrupt_Handler
 comment  25E2
-comment  25E2 Set IRQ Occured flag, used to prioritise Jetman object handling in main loop
+comment  25E2 Set IRQ Occurred flag, used to prioritise Jetman object handling in main loop
 comment  25E4
 comment  25E4 Reset VIA2 timer, which directly regulates Jetman's update speed
 comment  25E7
@@ -763,7 +774,7 @@ label    25F4 Restore_Registers_And_RTI
 comment  25FA
 label    25FA Main_Loop_Init
 comment  25FE
-comment  25FE Reset object list index to $03B0 i.e. Ship Ascend/Decend
+comment  25FE Reset object list index to $03B0 i.e. Ship Ascend/Descend
 comment  2606
 comment  2606 Enable Interrupts (Clear Interrupt Disable)
 comment  2607
@@ -796,11 +807,11 @@ label    263B Main_Loop_Continue
 deflabel 263E OBJECT_SHIP_ADDRESS
 comment  2641
 comment  2641 Current object is Jetman, a laser beam or the sound object
-comment  2641 Test if current object addres lo-byte is zero, i.e. starting at beginning of list, branch if not
+comment  2641 Test if current object address lo-byte is zero, i.e. starting at beginning of list, branch if not
 comment  2645
 comment  2645 Test to see if Spawn counter has reached four yet, branch if not
 comment  264B
-comment  264B Test TV Raster counter, spawn object ever eight attepts i.e. when data = xxxx_x111
+comment  264B Test TV Raster counter, spawn object ever eight attempts i.e. when data = xxxx_x111
 binary   264F
 comment  2652
 comment  2652 Test if score flash time is zero, if yes, reset next obj address pointer and spawn setup objects
@@ -816,7 +827,7 @@ comment  265E should get across the screen in about 3.5 seconds.
 comment  265E ----------------------------------------------------
 label    265E Reset_VIA2_Timer
 comment  2669
-comment  2669 Disable Interrupts (Set Interupt Disable)
+comment  2669 Disable Interrupts (Set Interrupt Disable)
 comment  2669 Save current object address pointer and set Jetman to be the next object
 label    2669 SEI_Obj_Ptr_To_Jetman
 comment  266A
@@ -833,6 +844,7 @@ label    2680 Restore_Saved_Obj_Ptr_CLI
 comment  2688
 comment  2688 Enable Interrupts (Clear Disable Interrupts)
 comment  268C
+comment  268C Object handler names in CAPITALS for easier routine identification in code
 label    268C Object_Handler_Jump_Table
 lcomment 268C Obj 00
 word     268C-26AD
@@ -855,11 +867,11 @@ lcomment 26AA Obj 0F
 lcomment 26AC Obj 10
 comment  26AE
 comment  26AE Init sound object parameters (i.e. 8 bytes) from static data table
-label    26AE Initialize_Sound_Object
+label    26AE Initialise_Sound_Object
 comment  26B0
-label    26B0 Loop_Initialize_Sound_Object
+label    26B0 Loop_Initialise_Sound_Object
 comment  26B9
-comment  26B9 Initialize sound channels
+comment  26B9 Initialise sound channels
 comment  26C5
 label    26C5 Init_Sound_Object_Table
 break    26C9
@@ -888,7 +900,7 @@ comment  26FE
 label    26FE Ship_Part_or_Fuel_Cell_Pickup
 comment  2703
 comment  2703 Reverses the timer value so $10 countdown becomes $F0, F1, F2 etc. stored
-comment  2703 to the oscillator on subsequent calls, making a pleasent short rising tone
+comment  2703 to the oscillator on subsequent calls, making a pleasant short rising tone
 binary   2704
 comment  2705
 comment  2705 Set top bit of oscillator channel to enable
@@ -987,7 +999,7 @@ label    27AA Display_Ship_Flame
 deflabel 27AB OBJECT_TYPE_PARAM
 deflabel 27AF OBJECT_TYPE_SHIP_ASCEND
 comment  27B0
-comment  27B0 Carry set if memory less than value in Register A, meaning branch on Ascend and Decend
+comment  27B0 Carry set if memory less than value in Register A, meaning branch on Ascend and Descend
 comment  27B3
 label    27B3 Display_Ship_Flame_Asc_Desc
 comment  27B5
@@ -1034,7 +1046,7 @@ label    283B Ship_Flame_Frame_0_Addr_Hi
 label    283C Ship_Flame_Frame_1_Addr_Lo
 label    283D Ship_Flame_Frame_1_Addr_Hi
 comment  283E
-comment  283E Replace "Test_Platform_Collision" with nops and gems all fall
+comment  283E Replace "Test_Platform_Collision" with NOPs and gems all fall
 comment  283E through platforms and floor, reentering at top
 label    283E VALUABLES
 comment  2848
@@ -1252,9 +1264,11 @@ lcomment 2A19 X Y
 const    2A1A
 break    2A1B
 comment  2A1F
-label    2A1F STR_GAME_OVER_PLAYER_1
+label    2A1F STRING_GAME_OVER_PLAYER_1
+deflabel 2A1F COLOUR_WHITE
 comment  2A32
-label    2A32 STR_GAME_OVER_PLAYER_2
+label    2A32 STRING_GAME_OVER_PLAYER_2
+deflabel 2A32 COLOUR_WHITE
 break    2A32
 comment  2A45
 comment  2A45 Jetman has collided with an alien, setup object ready to become an explosion
@@ -1390,7 +1404,7 @@ deflabel 2B1E OBJECT_DIRECTION_X
 lcomment 2B1F xxxx_x1xx = Direction X change
 comment  2B24
 comment  2B24 Test if direction Y is changing, down to up i.e. hitting top surface of platform
-comment  2B24 Note collsion going up has neither X or Y flag triggered
+comment  2B24 Note collision going up has neither X or Y flag triggered
 deflabel 2B25 OBJECT_DIRECTION_Y
 lcomment 2B26 xxxx_1xxx - Direction Y change
 comment  2B2B
@@ -1472,7 +1486,7 @@ comment  2BC0 Bit 3 wasn't set, so zero all bits apart from bit 3
 comment  2BC0 Bit 3 will make the object the gemstone which cycles through all colours
 binary   2BC1
 comment  2BC2
-comment  2BC2 Make the valuble type $2x, used as an offset into the UDG data
+comment  2BC2 Make the valuable type $2x, used as an offset into the UDG data
 label    2BC2 Store_Valuable_Type
 binary   2BC3
 comment  2BC7
@@ -1534,7 +1548,7 @@ comment  2C42 Compare Position X of object and later, see if they overlap and th
 comment  2C46
 comment  2C46 Object hit by laser, return $80 in ZP_02 (i.e. negative number)
 comment  2C4A
-comment  2C4A Zero bit 2 of laser X parameter, probably to diasble it later
+comment  2C4A Zero bit 2 of laser X parameter, probably to disable it later
 deflabel 2C4B LASER_POSITION_X_PARAM
 binary   2C4F
 comment  2C53
@@ -1562,7 +1576,7 @@ comment  2C8C
 label    2C8C Chg_Obj_To_Explosion_Then_Next
 comment  2C92
 comment  2C92 Test if object has collided with Jetman, if not, update position and display object
-comment  2C92 DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
+comment  2C92 DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerability (LDA Immediate instead of ZP)
 comment  2C92 In MAME Debugger, use "fill 2C95,1,A9"
 label    2C92 Display_Object_Position_Update
 comment  2C99
@@ -1722,7 +1736,7 @@ comment  2DAE
 comment  2DAE Object is active, test if object is a Valuable, if yes, restore it
 deflabel 2DAF OBJECT_TYPE_VALUABLE
 comment  2DB2
-comment  2DB2 Object is not a valuable, initialize it
+comment  2DB2 Object is not a valuable, initialise it
 comment  2DB5
 label    2DB5 Set_Obj_List_Ptr_To_Ship
 lcomment 2DBB ZP00/01
@@ -1794,7 +1808,7 @@ comment  2E74
 comment  2E74 Test if Jetman collided with ship
 label    2E74 SHIP_BASE_MODULE
 comment  2E7E
-comment  2E7E Jetman collided with stip, test if fully fulled up
+comment  2E7E Jetman collided with ship, test if fully fulled up
 deflabel 2E7F OBJECT_SHIP_FUEL_LEVEL
 deflabel 2E83 FUELLED_UP
 comment  2E86
@@ -1805,7 +1819,7 @@ comment  2E8F
 comment  2E8F Load current objects list painter to the Jetman object
 word     2E93
 comment  2E96
-comment  2E96 Load Jetman object paraments and display on screen
+comment  2E96 Load Jetman object parameters and display on screen
 comment  2E9C
 comment  2E9C Set Jetman not standing and not flying i.e. not visible
 comment  2EA1
@@ -1868,7 +1882,7 @@ comment  2F18 ZP02 contains number of rows to paint
 comment  2F18 ZP1B contains colour to paint with, $01 = white
 label    2F16 Colourize_Ship
 comment  2F1C
-comment  2F1C Move to next horizantal colour tile
+comment  2F1C Move to next horizontal colour tile
 comment  2F1F
 comment  2F1F Move up one row of colour tiles, 16-bit address lo-byte
 deflabel 2F23 SCREEN_WIDTH_COLUMNS
@@ -1881,7 +1895,7 @@ comment  2F31 Test if ship part has landed, OFFSET $08=Middle, $10=Top, $18=Fuel
 label    2F31 Ship_Part_Or_Fuel_Dropped
 deflabel 2F32 OBJECT_UDG_DATA_OFFSET
 comment  2F39
-comment  2F39 Ship part dropped, add current Y postion to landed Y position
+comment  2F39 Ship part dropped, add current Y position to landed Y position
 comment  2F39 and test to see if object has hit the ground
 deflabel 2F3B OBJECT_POSITION_Y_PARAM
 deflabel 2F40 SCREEN_BOTTOM
@@ -1892,7 +1906,7 @@ comment  2F43 Note, using direct addressing, not using Y offset
 binary   2F47
 comment  2F4E
 comment  2F4E Calculate Position Y offset when object lands based on how many ship pieces have
-comment  2F4E previosuly landed ($10 when ship middle landed, $20 for top section landed)
+comment  2F4E previously landed ($10 when ship middle landed, $20 for top section landed)
 comment  2F57
 comment  2F57 Calculate object landed Position Y and store
 comment  2F5F
@@ -2168,11 +2182,11 @@ comment  318F Initialise colourization data
 deflabel 3192 COLOUR_GREEN
 comment  3193
 comment  3193 Colourize the first platform object data column, then loop round the other data object columns
-comment  3193 plus a further column for the rightmost platfrom object data column
+comment  3193 plus a further column for the rightmost platform object data column
 label    3193 Loop_Colorize_Platform_Green
 comment  3195
 comment  319A
-comment  319A Get index into the platform data table and increment whlist in Register A
+comment  319A Get index into the platform data table and increment whilst in Register A
 comment  319D
 comment  319D Test if all platform have been drawn yet, loop if not
 comment  31A2
@@ -2520,7 +2534,7 @@ comment  34BA
 comment  34BA Add $70, $40 gets subtracted in display routine, thus making 02 into a PETSCII "2"
 deflabel 34BB PETSCII_OFFSET
 comment  34C1
-comment  34C1 Increment addres pointer to next score byte
+comment  34C1 Increment address pointer to next score byte
 comment  34C5
 comment  34C5 Looks like a BUG, should inc ZP0F, but in JETPAC it'll never happen
 comment  34C7
@@ -2562,7 +2576,7 @@ comment  34FE to get address Hi-byte. Divided by $10 because there are 16 Y-pixe
 lcomment 34FE ZP05 = %0110_1000 = $68
 lcomment 3503 ZP05 = %0000_0110 = $06
 comment  3505
-comment  3505 Load from column offset table and add in the inital address Lo-byte
+comment  3505 Load from column offset table and add in the initial address Lo-byte
 lcomment 3505 A = $8A
 lcomment 350B ZP0C = $8D
 comment  350D
@@ -2575,6 +2589,7 @@ const    3512-351C
 comment  351D
 comment  351D Example for "F7 JOYSTICK" start position
 comment  351D Convert X=$18 pixels from left, Y=$68 pixels from top, to UDG RAM Address $1278
+comment  351D Position X Y at 0,0 = bottom left corner of object to display
 label    351D Convert_XY_to_UDG_RAM_Address
 lcomment 351D ZP05 = %0110_1000 = $68
 lcomment 351F
@@ -2650,7 +2665,7 @@ label    3595 Copy_Char_To_UDG_RAM_Setup
 lcomment 3595 Clear address hi-byte
 lcomment 3597 ZP07/06 = $0071
 comment  3599
-comment  3599 Exapmle character to display in ZP06, "1" = $71
+comment  3599 Example character to display in ZP06, "1" = $71
 comment  3599 $31st Character ROM character is "1" so subtract $40
 lcomment 359E ZP07/06 = $0031
 comment  35A0
@@ -2961,7 +2976,7 @@ comment  3815 Animations have 2 or 4 frames and are minimum 2 pixels apart so bi
 label    3815 Get_Obj_New_UDG_Data_Addr
 binary   3818
 comment  381F
-comment  381F Colorize all object sprites i.e. Jetman, Aliens, Ship Top/Middle/Base, Fuel, Valuables
+comment  381F Colourize all object sprites i.e. Jetman, Aliens, Ship Top/Middle/Base, Fuel, Valuables
 label    381F Colourize_Object
 comment  3827
 comment  3827 Setup Colour RAM params based on object position X & Y via ZP04/ZP05 e.g. Ship Top X=20, Y=3F
@@ -2985,7 +3000,7 @@ comment  384B
 label    384B Green_Ignored
 comment  384F
 comment  384F Move to next row to colour (i.e. move up) and test for going out of
-comment  384F screen boundry at top of screen, early exit if so
+comment  384F screen boundary at top of screen, early exit if so
 deflabel 3853 SCREEN_WIDTH_COLUMNS
 deflabel 3855 SCREEN_WIDTH_COLUMNS
 comment  3858

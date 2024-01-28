@@ -154,10 +154,6 @@ comment  0388 Laser_Colour_Table at 216B:
 comment  0388 fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04
 comment  0388 fcb     BLUE,YELLOW,CYAN,YELLOW ; 216F: 06 07 03 07
 insert   0388 ;
-comment  0388 Laser decay sequence as written to UDG RAM:
-comment  0388 $FF       $FC       $E0       $00
-comment  0388 %11111111 %11111100 %11100000 %00000000
-insert   0388 ;
 label    0388 Obj_Laser_0
 used     0390 Obj_Laser_1
 used     0398 Obj_Laser_2
@@ -178,7 +174,7 @@ label    03AE Obj_Sound_Laser_Timer
 label    03AF Obj_Sound_UNUSED_03AF
 comment  03B0
 comment  03B0 -------------- Ship Base Module Object ----------------
-comment  03B0 Byte 00 = 09 during game play, 0A when ascending, 0B when decending
+comment  03B0 Byte 00 = 09 during game play, 0A when ascending, 0B when descending
 comment  03B0 \     01 = Position X
 comment  03B0 \     02 = Number of fuel cells, 0=empty, 6=full
 comment  03B0 \     03 = Position Y

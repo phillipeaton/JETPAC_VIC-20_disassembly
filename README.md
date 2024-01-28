@@ -373,13 +373,13 @@ Another quite complicated routine and probably where the game spends the majorit
 
 <img title="" src="ghidra\graph_screenshots\Display_Object.png" alt="JETPAC Object Handler Display Object" width="1500" height="">
 
-Display_Object
-
 Generally, the object to be displayed will be moving, so it is given two sets of parameters, one for the objects current position and another for the new position.
 
 Remember that objects are drawn on the screen using XORing what's there already, which allows on-screen objects to overlap with minimal processing complications.
 
 The routine will firstly compare the positions of the objects and then erase the lines of the old object that will not be replaced e.g. if the object is moving upwards, you can remove some of the bottom lines from it.
+
+Note the objects are drawn bottom to top, due to the use of a decremented index Y register loop.
 
 The objects are then processed in 8 bit columns e.g. 2 or 3 columns to display Jetman, and for each column, the old object bitmap is XOR'd away and then immediately replaced with the new object bitmap, one byte at a time.
 
@@ -390,6 +390,26 @@ Updates the colour map tiles based on the X-Y position of the object it's given,
 Routine checks to ensure it's not changing the green colour map tiles of the platforms.
 
 <https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L7416-L7497>
+
+The below table shows the Colour RAM, after a few seconds of Wave 0 Fuzzball (re-)start. The Colour RAM is initialised with $01 (Colour White) and I have replaced all $01s with ".." in the table for clarity.
+
+As the alien objects float onto the screen, they leave an invisible trace in the Colour RAM ($06=Blue and $02=Red). Platforms are where you'd expect them to be ($05=Green) and the High Score is coloured at the top ($07=yellow).
+
+```text
+      00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16
+--------------------------------------------------------------------------
+9600  .. .. .. .. .. .. .. .. 07 07 07 07 07 07 .. .. .. .. .. .. .. .. ..    07=yellow
+9617  .. .. .. .. .. .. .. .. .. .. .. .. 06 06 06 06 06 06 06 06 06 06 06    06=blue
+962E  06 06 02 02 .. .. 02 02 02 02 02 .. 06 06 06 06 06 06 06 06 06 06 06    05=green
+9645  06 06 02 02 .. .. 02 02 02 02 .. .. .. .. .. .. .. 05 05 05 05 05 06    04=purple
+965C  06 03 05 05 05 05 05 .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..    03=cyan
+9673  .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..    02=red
+968A  02 02 02 02 .. .. .. .. .. .. 05 05 05 .. .. .. .. .. .. .. .. .. ..    01=white
+96A1  02 02 02 02 02 02 02 02 .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..    00=black
+96B8  .. .. 02 02 02 02 02 02 .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
+96CF  .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
+96E6  .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
+```
 
 ### User-Defined Graphics Data Lookup Tables
 

@@ -168,10 +168,6 @@ Obj_Jetman_Colour               equ     $0385
 ; fcb     WHITE,RED,CYAN,PURPLE   ; 216B: 01 02 03 04
 ; fcb     BLUE,YELLOW,CYAN,YELLOW ; 216F: 06 07 03 07
 ;
-; Laser decay sequence as written to UDG RAM:
-; $FF       $FC       $E0       $00
-; %11111111 %11111100 %11100000 %00000000
-;
 Obj_Laser_0                     equ     $0388
 Obj_Laser_1                     equ     $0390
 Obj_Laser_2                     equ     $0398
@@ -474,11 +470,13 @@ NMI_INTERRUPT_HANDLER_ADDR_LO   equ     $1C
 ; --------------------------
 ; VIC_R5_CM_Start Bits 4321 (CCCC = 1100 = $C) signifies Character Map RAM starts at $1000
 
-; Screen Size Rows x Columns
+; Screen Size Columns x Rows
 ; --------------------------
 ; VIC_R2_Num_Cols Bits 6543210 set number of columns = _001_0111 = $17 = 23 decimal
 ; VIC_R3_Num_Rows Bits 654321  set number of rows    = _001_011_ = $0B = 11 decimal
-; NOTE: VIC_R3_Num_Rows Bit 0=1 sets character matrices to 8x16 pixels
+; VIC_R3_Num_Rows Bit 0=1 sets character matrices to 8x16 pixels, thus 23x11 tile map = 253 tiles.
+; Each tile maps to a user-defined character in the $1000-$1FCF range, which effectively gives
+; bitmapped graphics with X:Y 23
 
 VIC_Init_Table
     fcb     $0B                             ; 2004: 0B        VIC_R0_H_Ctr     Left edge of TV picture and interlace switch.Left edge of TV picture and interlace switch.
@@ -518,7 +516,7 @@ MASK_10000000
 
 ; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 ; Empty NMI Interrupt Handler, simply returns from interrupt
-NMI_Interrupt_Hardler
+NMI_Interrupt_Handler
     rti                                     ; 201C: 40       
 ; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
@@ -581,7 +579,7 @@ Reset_VIC
     dex                                     ; 205E: CA       
     bpl     Reset_VIC                       ; 205F: 10 F7    
 
-; Initialize Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
+; Initialise Screen RAM i.e. map screen tiles to User-Defined Graphics RAM
 ; Each character is a 16x8 tile i.e. double height, thus play area
 ; is decimal 11 Rows x 23 Columns
 ; 0200  00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5 B0 BB C6 D1 DC E7 F2
@@ -923,7 +921,7 @@ Add_To_Laser_Start_Position_X
 ; L_BRS_($2195)_($21C7) OK
 Add_08_Handle_Wrap_Get_Y_Coord
     adc     #$08                            ; 2195: 69 08    
-    jmp     Handle_Wrap_Get_Y_Cooord        ; 2197: 4C CB 21 
+    jmp     Handle_Wrap_Get_Y_Coord         ; 2197: 4C CB 21 
 ; ------------------------------------------
 
 DISPLAY_LASERS
@@ -966,7 +964,7 @@ DISPLAY_LASERS
     adc     #$F8                            ; 21C9: 69 F8    
 
 ; L_JMP_($21CB)_($2197) OK
-Handle_Wrap_Get_Y_Cooord
+Handle_Wrap_Get_Y_Coord
     jsr     Laser_Wrap                      ; 21CB: 20 98 22 
     tax                                     ; 21CE: AA        Save A
     ldy     #LASER_POSITION_Y               ; 21CF: A0 01    
@@ -1023,8 +1021,10 @@ UDG_RAM_Zero_Bit_2
     and     #%11111011                      ; 21FE: 29 FB    
     sta     ZP06                            ; 2200: 85 06    
 
-; Loads ZP 14/15/16/17 with laser decay pattern, initial laser is a line of $FF's then $03
+; Loads ZP 14/15/16/17 with laser decay pattern, initial laser graphic is a line of $FF's then $03
 ; subtracted leaving $FC, then $1C subtracted leaving $E0, the subtracting $E0 leaves $00
+; i.e. $FF       $FC       $E0       $00
+;      %11111111 %11111100 %11100000 %00000000
 ; L_BRS_($2202)_($21B9) OK
 ; L_BRS_($2202)_($21FA) OK
 Setup_Laser_Decay_Patterns
@@ -1061,7 +1061,7 @@ Iterate_Laser_Params_2_3_4_5
 ; ------------------------------------------
 
 ; Process laser shot, update parameters in object table
-; Get one of the four laser object paramenters, test if bit 2 is set, ef
+; Get one of the four laser object parameters, test if bit 2 is set, ef
 ; L_BRS_($2229)_($2218) OK
 Process_Laser_Shot
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2229: B1 00    
@@ -1246,7 +1246,7 @@ Reset_Level_Add_Extra_Life
 ; L_JMP_($22CB)_($22E0) OK
 Draw_Platforms_Init_Sound
     jsr     Draw_Platforms                  ; 22CB: 20 52 31 
-    jmp     Initialize_Sound_Object         ; 22CE: 4C AE 26 
+    jmp     Initialise_Sound_Object         ; 22CE: 4C AE 26 
 ; ------------------------------------------
 
 ; L_BRS_($22D1)_($22C1) OK
@@ -1274,7 +1274,7 @@ Reset_Level
 
 ; L_JMP_($22E3)_($2B7C) OK
 ; L_JSR_($22E3)_($2DA6) OK
-Init_Obj_Rockt_Top_Or_Fuel_Typ
+Init_Obj_Ship_Top_Or_Fuel_Typ
     jsr     Save_Obj_List_Ptr               ; 22E3: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22E6: 20 9D 25 
     fcb     $00                             ; 22E9: 00        ZP00/01
@@ -1288,7 +1288,7 @@ Init_Objects
 ; ------------------------------------------
 
 ; L_JSR_($22F2)_($2DB2) OK
-Init_Obj_Rockt_Mid_Or_Valu_Typ
+Init_Obj_Ship_Mid_Or_Valu_Typ
     jsr     Save_Obj_List_Ptr               ; 22F2: 20 E7 28 
     jsr     Load_ZP_Parameters              ; 22F5: 20 9D 25 
     fcb     $00                             ; 22F8: 00       
@@ -1630,19 +1630,19 @@ Display_1UP_HI_2UP_Text
 
 ; L_BRS_($2429)_($244D) OK
 Loop_Display_1UP_HI_2UP_Text
-    lda     STR_1UP_HI_2UP,x                ; 2429: BD 65 24 
+    lda     STRING_1UP_HI_2UP,x             ; 2429: BD 65 24 
     sta     ZP04                            ; 242C: 85 04    
 
     inx                                     ; 242E: E8       
-    lda     STR_1UP_HI_2UP,x                ; 242F: BD 65 24 
+    lda     STRING_1UP_HI_2UP,x             ; 242F: BD 65 24 
     sta     ZP05                            ; 2432: 85 05    
 
     inx                                     ; 2434: E8       
-    lda     STR_1UP_HI_2UP,x                ; 2435: BD 65 24 
+    lda     STRING_1UP_HI_2UP,x             ; 2435: BD 65 24 
     sta     ZP0E                            ; 2438: 85 0E    
 
     inx                                     ; 243A: E8       
-    lda     STR_1UP_HI_2UP,x                ; 243B: BD 65 24 
+    lda     STRING_1UP_HI_2UP,x             ; 243B: BD 65 24 
     sta     ZP0F                            ; 243E: 85 0F    
 
     inx                                     ; 2440: E8       
@@ -1661,26 +1661,26 @@ Loop_Display_1UP_HI_2UP_Text
     rts                                     ; 244F: 60       
 ; ==========================================
 
-STR_1UP
+STRING_1UP
     fcb     COLOUR_WHITE                    ; 2450: 01       
     fcc     "`qUP`"                         ; 2451: 60 71 55 50 60  `=Space, q=1, r=2
     fcb     $E0                             ; 2456: E0        Top bit=1 indicates end of string
-STR_HI
+STRING_HI
     fcb     COLOUR_YELLOW                   ; 2457: 07       
     fcc     "``HI`"                         ; 2458: 60 60 48 49 60 
     fcb     $E0                             ; 245D: E0       
-STR_2UP
+STRING_2UP
     fcb     COLOUR_WHITE                    ; 245E: 01       
     fcc     "``rUP"                         ; 245F: 60 60 72 55 50 
     fcb     $E0                             ; 2464: E0       
 
-STR_1UP_HI_2UP
+STRING_1UP_HI_2UP
     fcb     $00,$00                         ; 2465: 00 00     X Y
-    fdb     STR_1UP                         ; 2467: 50 24    
+    fdb     STRING_1UP                      ; 2467: 50 24    
     fcb     $40,$00                         ; 2469: 40 00     X Y
-    fdb     STR_HI                          ; 246B: 57 24    
+    fdb     STRING_HI                       ; 246B: 57 24    
     fcb     $80,$00                         ; 246D: 80 00     X Y
-    fdb     STR_2UP                         ; 246F: 5E 24    
+    fdb     STRING_2UP                      ; 246F: 5E 24    
 
 ; L_JSR_($2471)_($241C) OK
 ; L_JMP_($2471)_($308B) OK
@@ -1752,7 +1752,7 @@ Game_Select_Flash
 Do_Game_Select_Flash
     pha                                     ; 24A4: 48       
 
-; Test setting flag, if set, this is the unselcted option, skip the countup/invert part
+; Test setting flag, if set, this is the unselected option, skip the count-up/invert part
     and     #%00000001                      ; 24A5: 29 01    
     bne     Store_Option_Selection_State    ; 24A7: D0 09    
 
@@ -1861,32 +1861,32 @@ Fn_And_SP_Row_Offsets
     fcb     $38,$48,$58,$68,$90             ; 251F: 38 48 58 68 90 
 
 STRING_COPYRIGHT_1983_ACG
-    fcb     $01                             ; 2524: 01       
+    fcb     COLOUR_WHITE                    ; 2524: 01       
     fcc     "COPYRIGHT`qyxs`AnCnG"          ; 2525: 43 4F 50 59 52 49 47 48 54 60 71 79 78 73 60 41 6E 43 6E 47 
     fcb     $EE                             ; 2539: EE        Bit 7 = 1 indicates string end, $EE = $6E + bit 7
                                             ; `= Space, qyxs = 1983, n=.
 STRING_JETPAC_GAME_SELECT
-    fcb     $01                             ; 253A: 01       
+    fcb     COLOUR_WHITE                    ; 253A: 01       
     fcc     "JETPAC`GAME`SELECTIO"          ; 253B: 4A 45 54 50 41 43 60 47 41 4D 45 60 53 45 4C 45 43 54 49 4F 
     fcb     $CE                             ; 254F: CE        $CE = $4E + top bit, $4E = "N"
 STRING_F1_1_PLAYER_GAME
-    fcb     $00                             ; 2550: 00       
+    fcb     COLOUR_BLACK                    ; 2550: 00       
     fcc     "Fq``q`PLAYER`GAM"              ; 2551: 46 71 60 60 71 60 50 4C 41 59 45 52 60 47 41 4D 
     fcb     $C5                             ; 2561: C5       
 STRING_F3_2_PLAYER_GAME
-    fcb     $00                             ; 2562: 00       
+    fcb     COLOUR_BLACK                    ; 2562: 00       
     fcc     "Fs``r`PLAYER`GAM"              ; 2563: 46 73 60 60 72 60 50 4C 41 59 45 52 60 47 41 4D 
     fcb     $C5                             ; 2573: C5       
 STRING_F5_KEYBOARD
-    fcb     $00                             ; 2574: 00       
+    fcb     COLOUR_BLACK                    ; 2574: 00       
     fcc     "Fu``KEYBOAR"                   ; 2575: 46 75 60 60 4B 45 59 42 4F 41 52 
     fcb     $C4                             ; 2580: C4       
 STRING_F7_JOYSTICK
-    fcb     $00                             ; 2581: 00       
+    fcb     COLOUR_BLACK                    ; 2581: 00       
     fcc     "Fw``JOYSTIC"                   ; 2582: 46 77 60 60 4A 4F 59 53 54 49 43 
     fcb     $CB                             ; 258D: CB       
 STRING_SP_START_GAME
-    fcb     $00                             ; 258E: 00       
+    fcb     COLOUR_BLACK                    ; 258E: 00       
     fcc     "SP``START`GAM"                 ; 258F: 53 50 60 60 53 54 41 52 54 60 47 41 4D 
     fcb     $C5                             ; 259C: C5       
 
@@ -2021,7 +2021,7 @@ Game_Start
 IRQ_Interrupt_Handler
     lda     #$01                            ; 25E0: A9 01    
 
-; Set IRQ Occured flag, used to prioritise Jetman object handling in main loop
+; Set IRQ Occurred flag, used to prioritise Jetman object handling in main loop
     sta     ZP_IRQ_Occurred                 ; 25E2: 85 20    
 
 ; Reset VIA2 timer, which directly regulates Jetman's update speed
@@ -2062,7 +2062,7 @@ Main_Loop_Init
     lda     #$00                            ; 25FA: A9 00    
     sta     ZP_Alien_Spawn_Counter          ; 25FC: 85 21    
 
-; Reset object list index to $03B0 i.e. Ship Ascend/Decend
+; Reset object list index to $03B0 i.e. Ship Ascend/Descend
     lda     #$B0                            ; 25FE: A9 B0    
     sta     ZP_Obj_List_Ptr_Lo              ; 2600: 85 00    
     lda     #$03                            ; 2602: A9 03    
@@ -2168,7 +2168,7 @@ Main_Loop_Continue
     beq     Restore_Saved_Obj_Ptr_CLI       ; 263F: F0 3F    
 
 ; Current object is Jetman, a laser beam or the sound object
-; Test if current object addres lo-byte is zero, i.e. starting at beginning of list, branch if not
+; Test if current object address lo-byte is zero, i.e. starting at beginning of list, branch if not
     and     ZP_Obj_List_Ptr_Lo              ; 2641: 25 00    
     bne     Main_Loop                       ; 2643: D0 C2    
 
@@ -2177,7 +2177,7 @@ Main_Loop_Continue
     cmp     #$04                            ; 2647: C9 04    
     bcc     Test_Score_Flash_Time_At_Zero   ; 2649: 90 07    
 
-; Test TV Raster counter, spawn object ever eight attepts i.e. when data = xxxx_x111
+; Test TV Raster counter, spawn object ever eight attempts i.e. when data = xxxx_x111
     lda     VIC_R4_TV_Raster                ; 264B: AD 04 90 
     and     #%00000111                      ; 264E: 29 07    
     bne     Spawn_Objects                   ; 2650: D0 03    
@@ -2224,7 +2224,7 @@ Reset_VIA2_Timer
     rts                                     ; 2668: 60       
 ; ==========================================
 
-; Disable Interrupts (Set Interupt Disable)
+; Disable Interrupts (Set Interrupt Disable)
 ; Save current object address pointer and set Jetman to be the next object
 ; L_BRS_($2669)_($2639) OK
 SEI_Obj_Ptr_To_Jetman
@@ -2274,6 +2274,7 @@ Restore_Saved_Obj_Ptr_CLI
 ; 888888  dP__Yb  88 Y88  8I  dY 88  .o 88""   88"Yb  o.`Y8b
 ; 88  88 dP""""Yb 88  Y8 8888Y"  88ood8 888888 88  Yb 8bodP'
 
+; Object handler names in CAPITALS for easier routine identification in code
 Object_Handler_Jump_Table
     fdb     GOTO_NEXT_OBJECT                ; 268C: 1A 26     Obj 00
     fdb     JETMAN_FLYING_                  ; 268E: 73 32     Obj 01
@@ -2306,17 +2307,17 @@ Object_Handler_Jump_Table
 
 ; Init sound object parameters (i.e. 8 bytes) from static data table
 ; L_JMP_($26AE)_($22CE) OK
-Initialize_Sound_Object
+Initialise_Sound_Object
     ldx     #$07                            ; 26AE: A2 07    
 
 ; L_BRS_($26B0)_($26B7) OK
-Loop_Initialize_Sound_Object
+Loop_Initialise_Sound_Object
     lda     Init_Sound_Object_Table,x       ; 26B0: BD C5 26 
     sta     Obj_Sound,x                     ; 26B3: 9D A8 03 
     dex                                     ; 26B6: CA       
-    bpl     Loop_Initialize_Sound_Object    ; 26B7: 10 F7    
+    bpl     Loop_Initialise_Sound_Object    ; 26B7: 10 F7    
 
-; Initialize sound channels
+; Initialise sound channels
     lda     #$00                            ; 26B9: A9 00    
     sta     VIC_RA_Frq_Osc1                 ; 26BB: 8D 0A 90 
     sta     VIC_RB_Frq_Osc2                 ; 26BE: 8D 0B 90 
@@ -2390,7 +2391,7 @@ Ship_Part_or_Fuel_Cell_Pickup
     beq     Sound_Done_Reset_Object_Param   ; 2701: F0 07    
 
 ; Reverses the timer value so $10 countdown becomes $F0, F1, F2 etc. stored
-; to the oscillator on subsequent calls, making a pleasent short rising tone
+; to the oscillator on subsequent calls, making a pleasant short rising tone
     eor     #%11111111                      ; 2703: 49 FF    
 
 ; Set top bit of oscillator channel to enable
@@ -2628,7 +2629,7 @@ Display_Ship_Flame
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 27AC: B1 00    
     cmp     #OBJECT_TYPE_SHIP_ASCEND        ; 27AE: C9 0A    
 
-; Carry set if memory less than value in Register A, meaning branch on Ascend and Decend
+; Carry set if memory less than value in Register A, meaning branch on Ascend and Descend
     bcs     Display_Ship_Flame_Asc_Desc     ; 27B0: B0 01    
     rts                                     ; 27B2: 60       
 ; ==========================================
@@ -2772,7 +2773,7 @@ Ship_Flame_Frame_1_Addr_Hi
 ;    YP    dP""""Yb 88ood8 `YbodP' dP""""Yb 88oodP 88ood8 888888 8bodP'
 ; ############################################################################################
 
-; Replace "Test_Platform_Collision" with nops and gems all fall
+; Replace "Test_Platform_Collision" with NOPs and gems all fall
 ; through platforms and floor, reentering at top
 VALUABLES
     jsr     Load_Object_Type_X_Y            ; 283E: 20 D7 35 
@@ -3212,7 +3213,7 @@ Display_Game_Over
 Display_Game_Over_Player_1
     jsr     Load_ZP_Parameters              ; 29EE: 20 9D 25 
     fcb     $0E                             ; 29F1: 0E        ZP0E/0F
-    fdb     STR_GAME_OVER_PLAYER_1          ; 29F2: 1F 2A    
+    fdb     STRING_GAME_OVER_PLAYER_1       ; 29F2: 1F 2A    
     fcb     $04                             ; 29F4: 04        ZP04/05
     fcb     $10,$60                         ; 29F5: 10 60     X Y
     fcb     $FF                             ; 29F7: FF       
@@ -3251,20 +3252,20 @@ Delay_Loop_Game_Over
 Display_Game_Over_Player_2
     jsr     Load_ZP_Parameters              ; 2A12: 20 9D 25 
     fcb     $0E                             ; 2A15: 0E        ZP0E/0F
-    fdb     STR_GAME_OVER_PLAYER_2          ; 2A16: 32 2A    
+    fdb     STRING_GAME_OVER_PLAYER_2       ; 2A16: 32 2A    
     fcb     $04                             ; 2A18: 04        ZP04/05
     fcb     $10,$60                         ; 2A19: 10 60     X Y
     fcb     $FF                             ; 2A1B: FF       
     jmp     Display_Game_Over_Player_1_2    ; 2A1C: 4C F8 29 
 ; ------------------------------------------
 
-STR_GAME_OVER_PLAYER_1
-    fcb     $01                             ; 2A1F: 01       
+STRING_GAME_OVER_PLAYER_1
+    fcb     COLOUR_WHITE                    ; 2A1F: 01       
     fcc     "GAME`OVER`PLAYER`"             ; 2A20: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
     fcb     $F1                             ; 2A31: F1       
 
-STR_GAME_OVER_PLAYER_2
-    fcb     $01                             ; 2A32: 01       
+STRING_GAME_OVER_PLAYER_2
+    fcb     COLOUR_WHITE                    ; 2A32: 01       
     fcc     "GAME`OVER`PLAYER`"             ; 2A33: 47 41 4D 45 60 4F 56 45 52 60 50 4C 41 59 45 52 60 
     fcb     $F2                             ; 2A44: F2       
 
@@ -3601,7 +3602,7 @@ Test_Platform_Collision_Bounce
     bne     Invert_Direction_X              ; 2B22: D0 13    
 
 ; Test if direction Y is changing, down to up i.e. hitting top surface of platform
-; Note collsion going up has neither X or Y flag triggered
+; Note collision going up has neither X or Y flag triggered
     ldy     #OBJECT_DIRECTION_Y             ; 2B24: A0 04    
     bit     MASK_00001000                   ; 2B26: 2C 17 20  xxxx_1xxx - Direction Y change
     bne     Invert_Direction_Alternate      ; 2B29: D0 17    
@@ -3713,7 +3714,7 @@ Loop_Init_Obj_Ship_Or_Fuel
 ; Spawn object at a random X position
     jsr     Get_Random_Position_X           ; 2B76: 20 DE 2B 
     sta     Obj_Ship_Top_Or_Fuel_X          ; 2B79: 8D B9 03 
-    jmp     Init_Obj_Rockt_Top_Or_Fuel_Typ  ; 2B7C: 4C E3 22 
+    jmp     Init_Obj_Ship_Top_Or_Fuel_Typ   ; 2B7C: 4C E3 22 
 ; ------------------------------------------
 
 Init_Obj_Ship_Or_Fuel_Table
@@ -3772,7 +3773,7 @@ Loop_Init_Obj_Valuable
 ; Bit 3 will make the object the gemstone which cycles through all colours
     and     #%00001000                      ; 2BC0: 29 08    
 
-; Make the valuble type $2x, used as an offset into the UDG data
+; Make the valuable type $2x, used as an offset into the UDG data
 ; L_BRS_($2BC2)_($2BBE) OK
 Store_Valuable_Type
     ora     #%00100000                      ; 2BC2: 09 20    
@@ -3918,7 +3919,7 @@ Test_Laser_And_Obj_Position_X
     lda     #$80                            ; 2C46: A9 80    
     sta     ZP02                            ; 2C48: 85 02    
 
-; Zero bit 2 of laser X parameter, probably to diasble it later
+; Zero bit 2 of laser X parameter, probably to disable it later
     ldy     #LASER_POSITION_X_PARAM         ; 2C4A: A0 02    
     lda     (ZP08),y                        ; 2C4C: B1 08    
     and     #%11111011                      ; 2C4E: 29 FB    
@@ -4020,7 +4021,7 @@ Chg_Obj_To_Explosion_Then_Next
 ; ------------------------------------------
 
 ; Test if object has collided with Jetman, if not, update position and display object
-; DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerabilty (LDA Immediate instead of ZP)
+; DEBUG Change $2C95 A5 02 to A9 02 for Jetman Invulnerability (LDA Immediate instead of ZP)
 ; In MAME Debugger, use "fill 2C95,1,A9"
 ; L_JMP_($2C92)_($2A97) OK
 ; L_JMP_($2C92)_($2AB9) OK
@@ -4363,7 +4364,7 @@ Restore_Player_Objects
     lda     Obj_Ship_Top_Or_Fuel_Type       ; 2DA1: AD B8 03 
     beq     Restore_Player_Objects_1        ; 2DA4: F0 03    
 
-    jsr     Init_Obj_Rockt_Top_Or_Fuel_Typ  ; 2DA6: 20 E3 22 
+    jsr     Init_Obj_Ship_Top_Or_Fuel_Typ   ; 2DA6: 20 E3 22 
 
 ; Test if Ship Middle or Valuable object is inactive, if yes, skip valuable test
 ; L_BRS_($2DA9)_($2DA4) OK
@@ -4375,8 +4376,8 @@ Restore_Player_Objects_1
     cmp     #OBJECT_TYPE_VALUABLE           ; 2DAE: C9 0E    
     beq     Load_Params_Ship_Or_Valuable    ; 2DB0: F0 13    
 
-; Object is not a valuable, initialize it
-    jsr     Init_Obj_Rockt_Mid_Or_Valu_Typ  ; 2DB2: 20 F2 22 
+; Object is not a valuable, initialise it
+    jsr     Init_Obj_Ship_Mid_Or_Valu_Typ   ; 2DB2: 20 F2 22 
 
 ; L_BRS_($2DB5)_($2DAC) OK
 ; L_JMP_($2DB5)_($2DC8) OK
@@ -4587,7 +4588,7 @@ SHIP_BASE_MODULE
     lda     ZP02                            ; 2E7A: A5 02    
     bpl     Display_Ship                    ; 2E7C: 10 2E    
 
-; Jetman collided with stip, test if fully fulled up
+; Jetman collided with ship, test if fully fulled up
     ldy     #OBJECT_SHIP_FUEL_LEVEL         ; 2E7E: A0 02    
     lda     (ZP_Obj_List_Ptr_Lo),y          ; 2E80: B1 00    
     cmp     #FUELLED_UP                     ; 2E82: C9 06    
@@ -4605,7 +4606,7 @@ SHIP_BASE_MODULE
     fdb     Obj_Jetman_State                ; 2E93: 80 03    
     fcb     $FF                             ; 2E95: FF       
 
-; Load Jetman object paraments and display on screen
+; Load Jetman object parameters and display on screen
     jsr     Load_Object_Type_X_Y_Colour     ; 2E96: 20 E9 35 
     jsr     Display_Object_Old_Setup_Load   ; 2E99: 20 01 36 
 
@@ -4744,7 +4745,7 @@ Colourize_Ship
     lda     ZP1B                            ; 2F18: A5 1B    
     sta     (ZP0C),y                        ; 2F1A: 91 0C    
 
-; Move to next horizantal colour tile
+; Move to next horizontal colour tile
     iny                                     ; 2F1C: C8       
     sta     (ZP0C),y                        ; 2F1D: 91 0C    
 
@@ -4789,7 +4790,7 @@ Ship_Part_Or_Fuel_Dropped
     cmp     #$18                            ; 2F35: C9 18    
     beq     Fuel_Dropped                    ; 2F37: F0 3E    
 
-; Ship part dropped, add current Y postion to landed Y position
+; Ship part dropped, add current Y position to landed Y position
 ; and test to see if object has hit the ground
     asl     a                               ; 2F39: 0A       
     ldy     #OBJECT_POSITION_Y_PARAM        ; 2F3A: A0 03    
@@ -4807,7 +4808,7 @@ Ship_Part_Or_Fuel_Dropped
     jsr     Disp_Obj_Ship_Or_Fuel_Setup_2   ; 2F4B: 20 54 30 
 
 ; Calculate Position Y offset when object lands based on how many ship pieces have
-; previosuly landed ($10 when ship middle landed, $20 for top section landed)
+; previously landed ($10 when ship middle landed, $20 for top section landed)
     lda     Obj_Ship_Base_Parts_Counter     ; 2F4E: AD B4 03 
     asl     a                               ; 2F51: 0A       
     asl     a                               ; 2F52: 0A       
@@ -5508,7 +5509,7 @@ Loop_Next_Char
     lda     #COLOUR_GREEN                   ; 3191: A9 05    
 
 ; Colourize the first platform object data column, then loop round the other data object columns
-; plus a further column for the rightmost platfrom object data column
+; plus a further column for the rightmost platform object data column
 ; L_BRS_($3193)_($3198) OK
 Loop_Colorize_Platform_Green
     sta     (ZP0C),y                        ; 3193: 91 0C    
@@ -5517,7 +5518,7 @@ Loop_Colorize_Platform_Green
     dec     ZP0B                            ; 3196: C6 0B    
     bpl     Loop_Colorize_Platform_Green    ; 3198: 10 F9    
 
-; Get index into the platform data table and increment whlist in Register A
+; Get index into the platform data table and increment whilst in Register A
     ldy     ZP03                            ; 319A: A4 03    
     iny                                     ; 319C: C8       
 
@@ -6370,7 +6371,7 @@ Display_BCD_Bytes
     sta     ZP06                            ; 34BC: 85 06    
     jsr     Copy_Char_To_UDG_RAM_Setup      ; 34BE: 20 95 35 
 
-; Increment addres pointer to next score byte
+; Increment address pointer to next score byte
     inc     ZP0E                            ; 34C1: E6 0E    
     bne     Test_All_Bytes_Displayed        ; 34C3: D0 02    
 
@@ -6482,7 +6483,7 @@ Setup_Colour_RAM_Address
     lsr     a                               ; 3503: 4A        ZP05 = %0000_0110 = $06
     tax                                     ; 3504: AA       
 
-; Load from column offset table and add in the inital address Lo-byte
+; Load from column offset table and add in the initial address Lo-byte
     lda     Colour_RAM_Row_Offset_Table,x   ; 3505: BD 12 35  A = $8A
     clc                                     ; 3508: 18       
     adc     ZP0C                            ; 3509: 65 0C    
@@ -6519,6 +6520,7 @@ Colour_RAM_Row_Offset_Table
 
 ; Example for "F7 JOYSTICK" start position
 ; Convert X=$18 pixels from left, Y=$68 pixels from top, to UDG RAM Address $1278
+; Position X Y at 0,0 = bottom left corner of object to display
 ; L_JSR_($351D)_($21BE) OK
 ; L_JSR_($351D)_($226E) OK
 ; L_JSR_($351D)_($24FD) OK
@@ -6664,7 +6666,7 @@ Copy_Char_To_UDG_RAM_Setup
     lda     #$00                            ; 3595: A9 00     Clear address hi-byte
     sta     ZP07                            ; 3597: 85 07     ZP07/06 = $0071
 
-; Exapmle character to display in ZP06, "1" = $71
+; Example character to display in ZP06, "1" = $71
 ; $31st Character ROM character is "1" so subtract $40
     lda     ZP06                            ; 3599: A5 06    
     sec                                     ; 359B: 38       
@@ -7485,7 +7487,7 @@ Get_Obj_New_UDG_Data_Addr
 ; Yb   dP 88""Yb o.  88 88""   Yb        88
 ;  YbodP  88oodP "bodP' 888888  YboodP   88
 
-; Colorize all object sprites i.e. Jetman, Aliens, Ship Top/Middle/Base, Fuel, Valuables
+; Colourize all object sprites i.e. Jetman, Aliens, Ship Top/Middle/Base, Fuel, Valuables
 ; L_JSR_($381F)_($2961) OK
 ; L_JSR_($381F)_($2CC6) OK
 ; L_JSR_($381F)_($2FD4) OK
@@ -7542,7 +7544,7 @@ Green_Ignored
     bne     Loop_X                          ; 384D: D0 F0    
 
 ; Move to next row to colour (i.e. move up) and test for going out of
-; screen boundry at top of screen, early exit if so
+; screen boundary at top of screen, early exit if so
     lda     ZP0C                            ; 384F: A5 0C    
     sec                                     ; 3851: 38       
     sbc     #SCREEN_WIDTH_COLUMNS           ; 3852: E9 17    

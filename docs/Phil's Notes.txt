@@ -1,57 +1,6 @@
-******************************************************************************
-*If you think about it, there are various kinds of mutually exclusive options
-*for a memory cell. These are:
-*type (unused / code / data / rmb)
-*size (default char / word; dasmfw also has dword for processors that support 4-byte entities)
-*formatting (bin / char / dec / hex)
-*semantics (const)
-******************************************************************************
-
-******************************************************************************
-* If an address is used in an instruction that clearly indicates it's referencing
-* data (LDA, as a simple example) and there's no label in place for that address,
-* it uses a "M" prefix for generated labels; if the referenced address is clearly
-* code (JMP, for example), it uses a "Z" prefix.
-******************************************************************************
-
-
-To debug JETPAC after a warm reset, set breakpoint at $201d then SYS4624 then SYS8221.
-
-Colour mapping is at $9600, #23 columns, #11 rows from 1UP to COPYRIGHT text
-Potentially more rows are used.
-23rd column might be not used, it's not used on game selection screen.
-
-9600  07 05 01 01 01 01 01 01 07 07 05 04 07 07 01 01 01 01 01 01 01 06 04
-9617  06 01 01 01 01 01 01 01 07 01 01 01 01 01 01 01 01 01 01 01 01 01 01
-962E  05 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
-9645  04 01 01 00 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
-965C  03 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
-9673  02 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 04 01 01 01 01 01 01
-968A  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 04 01 01 01 01 01 01
-96A1  01 01 01 01 01 01 07 06 07 01 01 01 01 01 01 01 04 01 01 01 01 01 01
-96B8  01 01 01 01 01 01 01 01 07 01 01 01 01 01 01 01 04 01 01 01 01 01 01
-96CF  01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
-96E6  07 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
-
-07=yellow
-06=blue
-05=green
-04=purple
-03=cyan
-02=red
-01=white
-00=black
-
-1UP
-000000 are both on a single line, which is 15 pixels.
-Line spacing between lines appears large.
-
-23x11 tile map = 253 tiles. Each tile maps to a user-defined character in the $1000-$1fcf range, which effectively gives bitmapped graphics with X:Y 23*8 x 11*16 = X:Y 184x176 pixels.
-
-
 --------------------------------------------------------------------------
 
-VIC20 Keyboard Matrix
+VIC-20 Keyboard Matrix
 
 Write to Port B($9120)column
 Read from Port A($9121)row
@@ -60,7 +9,7 @@ Read from Port A($9121)row
     --------------------------------
   7| F7  F5  F3  F1  CDN CRT RET DEL    CRT=Cursor-Right, CDN=Cursor-Down
    |
-  6| HOM UA  =   RSH /   ;   *   BP     BP=British Pound, RSH=Should be Right-SHIFT,
+  6| HOM UA  =   RSH /   ;   *   BP     BP=British Pound, RSH=Right-SHIFT,
    |                                    UA=Up Arrow
   5| -   @   :   .   ,   L   P   +
    |
@@ -70,7 +19,7 @@ Read from Port A($9121)row
    |
   2| 6   T   F   C   X   D   R   5
    |
-  1| 4   E   S   Z   LSH A   W   3      LSH=Should be Left-SHIFT
+  1| 4   E   S   Z   LSH A   W   3      LSH=Left-SHIFT
    |
   0| 2   Q   CBM SPC STP CTL LA  1      LA=Left Arrow, CTL=Should be CTRL, STP=RUN/STOP
    |                                    CBM=Commodore key
@@ -104,91 +53,3 @@ $9120   #37152     Port B output register
                    (PB3) Bit 3=Cassette write line
                    (PB7) Bit 7=Joy 3
 
---------------------------------------------------------------------------
-
-Rocket middle section is 16 pixels high
-
-------------
-
-Assembling with Kick Assembler:
-ZP_Obj_List_Ptr_Lo        equ $0000
-becomes
-.const ZP_Obj_List_Ptr_Lo =   $0000
-
-Take out '?' character in names
-
-; becomes //
-
-fcb becomes .byte
-
-fdb becomes .word
-
-labels get a ':' at the end (but not when referenced)
-
-   org     $2000
-becomes
-   * =     $2000 "xxx"
-
-
--------------
-
-Laser decay sequence:
-$FF       $FC       $E0       $00
-%11111111 %11111100 %11100000 %00000000
-
-     0388  10 30 3C 38 38 38 40 01   .0<888@.
-
-
-All sprites are drawn downwards in RAM, upwards on screen
-Sprites are drawn in blocks
-
--------------
-Setting MAME conditional breakpoints
-
-bp 3815,w@0000=$03C8    Breakpoint at $3815 that only triggers when memory
-                        location $0000 contains $03C8 i.e. is an Alien
-
--------------
-First byte of a String definition contains reverse (bit 7) and colour information (bits 0-2)
-If colour > 7 used, you just get wrong characters displayed
-When colour is 0, it's invisible against the black background
-
-End of string has top bit set to denote end. But is it the top 4 bits? See STR_GAME_OVER_PLAYER_1.
-
--------------
-Describe what an Object is i.e. a sprite, sound etc.
-Point out that AND zero's bits, OR sets them. (Remove Zeros/Resets/Sets comments).
-Object position is bottom left of sprite.
-Loading of Infiltrator comments and comment at start of code come from different nfo files, so layout can be a bit funny.
-Comments at the start of a work sit above branch labels...can this be fixed?
-Change Rocket to ship
-Banners with ============== above and below signify calls from Main Loop,
-Labels in CAPS are called from Main Loop
-Rocket ship shortened to Ship where space limited
-General idea is that the code documents itself
-Variables and labels often reversed for clarity
-Many main subroutines enter in the middle and sometimes jupm to code before hand, maybe to use short jumps
------------
-
-Ghidra used ImportSymbolsScript.py to import symbols.
-Ghidra locals not used, had to load symbols individually.
-Ghidra not perfect, so bits get left off, go look in the code and graph view!
-Ghidra overlap on ZP variable names in DISPLAY_LASERS, e.g. Laser_Position changes to Laser_UDG_Position.
-Had to manually put in ZP variable names, can't make local due to jump table.
-Purple background due to unidentified function i.e. follows Load_ZP_Parameters.
-
-Overview:
-Clockwise from 00:00 Main Loop
-ANIMATE_EXPLOSIONS
-JETMAN_FLYING
-DISPLAY_LASERS
-JETMAN_STANDING
-WAVE_3_SAUCER
-WAVE_2_SPHERE
-WAVE_1_CROSS
-WAVE_0_FUZZBALL
-SHIP_PART_OR_FUEL
-VALUABLES
-SHIP_BASE_MODULE
-SHIP_DESCEND
-SHIP_ASCEND
