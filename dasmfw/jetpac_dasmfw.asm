@@ -187,7 +187,7 @@ Obj_Sound_Laser                 equ     $03AD
 Obj_Sound_Laser_Timer           equ     $03AE
 
 ; -------------- Ship Base Module Object ----------------
-; Byte 00 = 09 during game play, 0A when ascending, 0B when decending
+; Byte 00 = 09 during game play, 0A when ascending, 0B when descending
 ;      01 = Position X
 ;      02 = Number of fuel cells, 0=empty, 6=full
 ;      03 = Position Y
