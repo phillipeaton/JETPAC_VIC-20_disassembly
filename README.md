@@ -29,11 +29,11 @@ This repository contains:
 - **Debugger** - [MAME](https://www.mamedev.org/) debugger was used for single stepping the code and to create the initial code/data separation using the `trackpc` instruction. Functionality appears significantly better than that available in VICE.
 
 - **Disassemblers** -
-  
+
   - **[dasmfw](https://github.com/Arakula/dasmfw)** was used to disassemble the code, which reads hand-crafted "info" files and uses them to format the binary code into source code files. Single stepping the code in MAME debugger and subsequent creation of the info files was the vast majority of the reverse-engineering effort.
-  
+
   - **[Infiltrator](https://csdb.dk/release/?id=100129)** was used to check the code/data separation and provide a list of label references than was then fed into dasmfw for easy reference.
-  
+
   - **[Ghidra](https://ghidra-sre.org/)** Function Graph functionality was used later on in the project to visualize the most complex of routines that weren't practical to understand as linear source code or to manually flowchart on paper. [Paint.net](https://www.getpaint.net/) was used to manually piece together the graph screenshots.
 
 - **Automated Source Code Editing** - [GNU sed](https://www.gnu.org/software/sed/) was used for automated editing of the disassembled source code as a workaround for dasmfw not (yet)  supporting local variables.
@@ -105,6 +105,8 @@ This section presents an overview of the complete program and highlights some no
 **NOTE:** Throughout the code and description, I use the word "object" and not "sprite". This is deliberate; whilst the majority of objects in the code are managing graphical elements, the objects also store other attributes, such as position, state, direction etc.
 
 **NOTE2:** Most of the sub-headings in the README link directly to the relevant point in the source code.
+
+**NOTE3:** Throughout the code, most objects are described as having have X and Y Position and Direction. In some cases Direction should mean Velocity, as the parameter describes not just the direction that the object is moving, but also the rate it is moving i.e. the velocity.
 
 ### Source Code Map
 
@@ -182,9 +184,9 @@ Byte 00 in each object's 8-byte record denotes object type, bytes 01-04 typicall
 ```text
 Addr  00 01 02 03 04 05 06 07 ASCII       Object Description
 ---------------------------------------------------------------------------------------------------
-0380  81 25 F8 6C FC 01 00 00   .%ølü...  Jetman facing left, flying, white 
+0380  81 25 F8 6C FC 01 00 00   .%ølü...  Jetman facing left, flying, white
 0388  00 9B A1 A5 A5 A5 07 01   ..¡¥¥¥..  Laser shot not active
-0390  90 93 A1 A5 A5 15 07 02   ..¡¥¥...  Laser shot right active, red 
+0390  90 93 A1 A5 A5 15 07 02   ..¡¥¥...  Laser shot right active, red
 0398  90 8B A1 A5 0D 45 04 03   ..¡¥.E..  Laser shot right active, cyan (recoloured by next laser)
 03A0  90 83 A1 AD 1D 41 01 07   ..¡-.A..  Laser shot right active, yellow
 03A8  0C 00 00 00 00 00 00 00   ........  Sound currently not being played
@@ -219,13 +221,13 @@ The most complex routine in the whole program is what gives JETPAC it's super-sm
 
 <img title="" src="ghidra\graph_screenshots\JETMAN_FLYING.png" alt="JETPAC Object Handler JETMAN FLYING" width="1500" height="">
 
-An summary of the flowcharted routine:
+A summary of the flowcharted routine:
 
 1. Note that where it shows `ZP_Laser_Param_Countdown`, it's a bad local variable name replace, it should say `ZP02_Collision_Status`🤦‍♂️.
 
-1. On entry, Jetman is tested for a platform collision, if yes, the code top-right on the graph works out what collision has happened depending on Jetman's current position and direction, ranging from transitioning from flying to standing to reversing direction and several events in between.
+1. On entry, Jetman is tested for a platform collision, if yes, the code top-right from `$3282` on the graph works out what collision has happened depending on Jetman's current position and direction, ranging from transitioning from flying to standing to reversing direction and several events in between.
 
-1. At the end of the collision testing and, together with the Direction X state, the new X-axis Position and Direction have been calculated and the code will store the Direction then the Position or just the Position only, bypassing the Direction. 
+1. At the end of the collision testing and, together with the Direction X state, the new X-axis Position and Direction have been calculated and the code will store the Direction then the Position or just the Position only, bypassing the Direction.
 
 1. Storing X Position is the box in the centre of the flowchart that everything must pass through, except the path to the left when Jetman transitions from Flying to Standing. Additionally, when storing the new Position X, left or right screen wraparound is accounted-for.
 
@@ -241,13 +243,13 @@ Similar to `JETMAN FLYING`, but without the Platform Collision tests.
 
 <img title="" src="ghidra\graph_screenshots\JETMAN_STANDING.png" alt="JETPAC Object Handler JETMAN STANDING" width="1500" height="">
 
-An summary of the flowcharted routine:
+A summary of the flowcharted routine:
 
 1. The first thing the routine does is to check if the flashing score countdown his finished, when you start a wave, the score flashes for a few seconds and Jetman is not drawn until the countdown reaches zero.
 
-1. One flashing score is complete, Jetman is tested to see if his height has increased, if yes, he transitions from Standing to Flying and most of the code is bypassed using the path on the right hand side of the flowchart. 
+1. One flashing score is complete, Jetman is tested to see if his height has increased, if yes, he transitions from Standing to Flying and most of the code is bypassed using the path on the right hand side of the flowchart.
 
-1. If Jetman is not Standing, his X Direction is tested to see if has changed and, if not, flow passes through the upper middle/left code that prepares for setting Direction X to 1 or -1 (i.e $FF). If Jetman has changed direction, Jetman's Status and Direction parameters are set instead. 
+1. If Jetman is not Standing, his X Direction is tested to see if has changed and, if not, flow passes through the upper middle/left code that prepares for setting Direction X to 1 or -1 (i.e $FF). If Jetman has changed direction, Jetman's Status and Direction parameters are set instead.
 
 1. Like for `JETMAN_FLYING`, storing X Position (and Direction) is the box in the centre of the flowchart that everything must pass through, except the path to the left when Jetman transitions from Standing to Flying. Additionally, when storing the new Position X, left or right screen wraparound is accounted-for.
 
@@ -325,7 +327,7 @@ The patterns of dots are predetermined from a data table and current decay state
 
 <img title="" src="ghidra\graph_screenshots\DISPLAY_LASERS.png" alt="JETPAC Object Handler DISPLAY LASERS" width="1500" height="">
 
-An summary of the flowcharted routine:
+A summary of the flowcharted routine:
 
 1. The `DISPLAY_LASERS` code is in several parts, linked using JSR/RTS, which Ghidra renders as separate graphs. The `Laser_Wrap` routine, bottom right, is called from \$21CB on the left. The purple box around some of the code can be ignored, it is a warning produced by Ghidra that, when seeing the `Load_ZP_Parameters` routine that is JSR'd to, it can't match the return address, because it is manipulated in the `Load_ZP...` routine.
 
@@ -391,6 +393,24 @@ This routine is used for testing all on-screen objects whether they have collide
 
 The collision testing sets bits in a return status byte that is then tested by the calling routine to see whether the collision is of relevance.
 
+A summary of the flowcharted routine:
+
+1. The routine is run for a single object in the object list at a time e.g. for one alien object, and the routine includes a loop iteration for each of the three platforms.
+
+1. The entry point to the routine is the top-leftmost code at `$30b3`, which loads the object X and Y values into zero page variables, then tests to see if the object is to the left of the current platform being tested. Platform co-ordinates and width are loaded from small lookup table.
+
+1. If the object is to the left of the platform, then further tests are made to see by how much, given the object bitmap has a width and the X and Y position of the object pertain to the bottom-left of the object.
+
+1. If the object is to right of the leftmost edge of the platform, then the large block of code at `$309B` is run, which looks up the width of the platform and calculates the distance of the object from the rightmost edge of the current platform, then uses the same test as the left side.
+
+1. If the object is not vertically overlapping a platform, the code `$3119` is run, which iterates to the next platform for the current object, otherwise the object is overlapping and thus position Y must be tested.
+
+1. The code in the bottom right hand corner tests to see if the object position Y causes it to overlap a platform. Note there are multiple exits using `JMP Set_Collision_Status`, which is JSR'd to in other places, but when called with a JMP, uses the JSR to exit the routine for the object.
+
+1. Once the object has been tested for collision with the platforms, it is then tested to see if the object has hit the ground and a collision status bit set accordingly and the routine exited.
+
+The reverse-engineered source code is reasonably well commented, but the exact meaning of each bit of the collision status byte is not documented, this could be improved upon.
+
 #### [Read Keyboard Joystick](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L6105)
 
 Depending on user-selected game options, joystick or keyboard controls are read, with both being read through the VIA I/O interface chips.
@@ -413,17 +433,19 @@ This routine utilizes a pre-calculated address look-up table to speed up the pro
 
 This routine is probably where the game spends the majority of processing time.
 
-<img title="" src="ghidra\graph_screenshots\Display_Object.png" alt="JETPAC Object Handler Display Object" width="1500" height="">
-
 Usually, the object to be displayed will be moving, so it is given two sets of parameters, one for the objects current position and another for the new position.
 
 Remember that objects are drawn on the screen by simple XOR textures i.e.XOR'ing what's there already, which allows on-screen objects to overlap with minimal processing complications.
 
-The routine will firstly compare the positions of the objects and then erase the lines of the old object that will not be replaced e.g. if the object is moving upwards, you can remove some of the bottom lines from it.
+<img title="" src="ghidra\graph_screenshots\Display_Object.png" alt="JETPAC Object Handler Display Object" width="1500" height="">
 
-Note the objects are drawn bottom to top, due to the use of a decremented index Y register loop used to read/write the graphics data to the screen.
+A summary of the flowcharted routine:
 
-The objects are then processed in 8 bit columns e.g. 2 or 3 columns to display Jetman, and for each column, the old object bitmap is XOR'd away and then immediately replaced with the new object bitmap, one byte at a time.
+1. The routine will firstly compare the positions of the objects and then erase the lines of the old object that will not be replaced e.g. if the object is moving upwards, you can remove some of the bottom lines from it. This is the circle of routines in the top-right of the flowchart starting `$3661`.
+
+1. The `Erase_Old_Object` at `$3688` through which all flows must pass, together with three code chunks directly connected to it on the right and downwards, erase the old object animation frame and copy in the new frame directly on top a byte-by-byte. Note the objects are drawn bottom to top, due to the use of a decremented index Y register loop used to read/write the graphics data to the screen.
+
+1. The code below `$36AF` is concerned with moving to the next column of screen data to be erased and written to again with new object frame data.
 
 #### [Colourize Object](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/blob/906f2c404933ebfa5af458bcecabfc5d900ac8df/dasmfw/jetpac.asm#L7433)
 
@@ -435,7 +457,7 @@ The routine checks to ensure it's not changing the green colour map tiles of the
 
 The below table shows the Colour RAM, after a few seconds of Wave 0 Fuzzball (re-)start. The Colour RAM is initialised with $01 (=white) and I have replaced all $01s with ".." in the table below for clarity.
 
-As the alien objects float onto the screen from the sides, they leave an invisible trace in the Colour RAM ($06=Blue and $02=Red). Platforms are where you'd expect them to be ($05=Green) and the High Score is coloured at top-centre ($07=yellow). 
+As the alien objects float onto the screen from the sides, they leave an invisible trace in the Colour RAM ($06=Blue and $02=Red). Platforms are where you'd expect them to be ($05=Green) and the High Score is coloured at top-centre ($07=yellow).
 
 ```text
       00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16
