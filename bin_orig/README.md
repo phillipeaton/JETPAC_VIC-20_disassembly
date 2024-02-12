@@ -1,0 +1,6 @@
+<!-- markdownlint-disable MD033 -->
+# Original Binary Image Files
+
+- **jetpac.prg** The original reference file this projects is based on, available from many places on the internet. The .prg file contains a small relocation routine written in machine code that is started with `RUN` from the BASIC command prompt (`10 SYS 4624`). The routine relocates the game code to an 8K block of memory at `$2000` to `$3FFF` and then jumps to a start address in the relocated code.
+
+- **jetpac_2000-3fff.bin** - Reverse-engineering the jetpac.prg file isn't practical because, when initially loaded as a .prg file, all of the absolute jumps expect the code to be at `$2000-$3fff`. However, that's not where the absolute jump targets are until _after_ the relocation routine runs. Thus, all work must be performed on the code _after_ the relocation code has run. This is achieved using MAME by loading the .prg file into memory, using the MAME debugger console to add a breakpoint in the code to the location where the relocated code starts (`bp 201D`) and running the program, which will relocate the code and then stop at the breakpoint. A this point, the contents of the memory is saved to file using `save jetpac_2000_3fff.bin,2000,2000`.

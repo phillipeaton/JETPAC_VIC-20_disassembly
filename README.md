@@ -26,7 +26,7 @@ This repository contains:
 
 ## Tools Used
 
-- **Debugger** - [MAME](https://www.mamedev.org/) debugger was used for single stepping the code and to create the initial code/data separation using the `trackpc` instruction. Functionality appears significantly better than that available in VICE.
+- **Debugger** - [MAME](https://www.mamedev.org/) debugger was used for single stepping the code and to create the initial code/data separation using the `trackpc` instruction. Functionality appears significantly better than that available in VICE without external debuggers (which tend to be only available for Commodore 64).
 
 - **Disassemblers** -
 
