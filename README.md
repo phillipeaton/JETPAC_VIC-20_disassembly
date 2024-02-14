@@ -1,5 +1,5 @@
 <!-- markdownlint-disable MD033 -->
-# JETPAC for VIC-20 Disassembly and Reverse-Engineering
+# VIC-20 JETPAC Disassembly and Reverse-Engineering
 
 A reverse-engineering of the 6502 binary image to assembly source code of the classic VIC-20 game JETPAC by ULTIMATE PLAY THE GAME.
 
@@ -46,7 +46,7 @@ This repository contains:
 
 - **Other Stuff** - [Microsoft Excel](https://www.microsoft.com/) was used for making lookup tables of memory maps for I/O, screens, colours, User-Defined Graphics and more. [Microsoft Word](https://www.microsoft.com/) was used for creating the code listing overview picture.
 
-[Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
+[Back to top](#vic-20-jetpac-disassembly-and-reverse-engineering)
 
 ## Repository Contents
 
@@ -68,7 +68,7 @@ See also the further readme files in the lower level directories of the reposito
 
 - [docs](https://github.com/phillipeaton/JETPAC_VIC-20_disassembly/tree/main/docs) - Notes and technical documentation of the VIC-20 and the JETPAC program.
 
-[Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
+[Back to top](#vic-20-jetpac-disassembly-and-reverse-engineering)
 
 ## Disassembly and Reassembly Instructions
 
@@ -92,7 +92,7 @@ The makefile in the root of the repository contains all these steps, running `ma
 
 I've never tried this, but dasmfw is C++ program designed to be easy to compile for your platform. as65 is available as a Linux version, which may also work on Mac. The other utils are standard Unix tools so are probably available on Linux / Mac by default.
 
-[Back to top](#jetpac-for-vic-20-disassembly-and-reverse-engineering)
+[Back to top](#vic-20-jetpac-disassembly-and-reverse-engineering)
 
 ## Source Code Highlights
 
@@ -492,3 +492,5 @@ Jetman has four frames of animation for standing/walking or flying  in each dire
 The second block of graphics data has a separate lookup table with addresses for the rocket ship, fuel cell and valuables.
 
 Additionally, graphics data is also present for flames, explosions, fuel cell and platforms, but they are addressed directly, not via any lookup table.
+
+[Back to top](#vic-20-jetpac-disassembly-and-reverse-engineering)

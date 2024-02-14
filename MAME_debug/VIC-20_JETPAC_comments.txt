@@ -1,11 +1,7 @@
-** Use "source <this_file_name>" to load the comments, YOU HAVE TO HIT
-** ENTER A FEW TIMES TO COMPLETE, MAYBE BECAUSE OF THESE COMMENT LINES?
-** Use "comsave" to save comments to .\comments\vic20p.cmt file
-** Use "help comments" and "help source" for more info
-comadd 201E, Reset stack pointer
-comadd 2021, Clear Decimal flag
-comadd 2022, Setup NMI Interrupt Vector
-comadd 2056, Reset the VIC 16 registers
+* Use "source <this_file_name>" to load the comments, YOU HAVE TO HIT
+* ENTER A FEW TIMES TO COMPLETE, MAYBE BECAUSE OF THESE COMMENT LINES?
+* Use "comsave" to save comments to .\comments\vic20p.cmt file
+* Use "help comments" and "help source" for more info
 
 * Double underline after jmp
 comadd 20E9, ===========================================================
@@ -208,6 +204,10 @@ comadd 2018, MASK_10
 comadd 2019, MASK_20
 comadd 201A, MASK_40
 comadd 201B, MASK_80
+comadd 201E, Reset stack pointer
+comadd 2021, Clear Decimal flag
+comadd 2022, Setup NMI Interrupt Vector
+comadd 2056, Reset the VIC 16 registers
 comadd 2058, Reset_VIC
 comadd 2064, ISR_Cols
 comadd 2067, ISR_Rows
