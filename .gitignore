@@ -11,13 +11,15 @@
 ~$*.xls*
 
 # Specific untracked stuff
-_git_untracked/*
+_git_untracked*
 
 # Ghidra backup files
 ghidra/**/*.bak
 
-# Ignore other prg files used for testing
+# Other prg files used for testing
 matrix.prg
+
+# Various test files and MAME save directories
 MAME_debug/*.bin
 MAME_debug/*.txt
 MAME_debug/screendumps/*
