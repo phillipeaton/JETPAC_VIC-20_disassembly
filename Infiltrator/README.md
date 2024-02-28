@@ -17,7 +17,7 @@ The modified .prg file was loaded into Infiltrator and, using the code/data dasm
 
 After running the Infiltrator disassemble command, I was able to copy the fully disassembled code into an Excel spreadsheet and, with a simple formatting formula, create the contents of the nfo_labels.nfo file, which was loaded back into dasmfw.
 
-A list of file in the directory, discussed in the text above:
+A list of files in the directory, discussed in the text above:
 
 - **jetpac_201c-3844.prg** - The modified .prg file for disassembly by Infiltrator.
 
